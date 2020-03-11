@@ -1,0 +1,6 @@
+{
+  "name": "HealthArea",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./HealthArea.js"
+}

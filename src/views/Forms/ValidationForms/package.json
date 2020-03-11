@@ -1,0 +1,6 @@
+{
+  "name": "ValidationForms",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ValidationForms.js"
+}

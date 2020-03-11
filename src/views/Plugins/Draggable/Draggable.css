@@ -1,0 +1,10 @@
+.react-draggable > .card-header {
+  cursor: move;
+}
+.main {
+  overflow: hidden;
+}
+.react-grid-item.react-grid-placeholder {
+  background: gray;
+  border: thin dashed;
+}
