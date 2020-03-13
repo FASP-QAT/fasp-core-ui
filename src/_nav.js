@@ -16,6 +16,23 @@ export default {
           icon: 'fa fa-code',
         }
       ]
+    },
+    {
+      name: 'Sub Funding Source',
+      url: '/subFundingSource',
+      icon: 'fa fa-money',
+      children: [
+        {
+          name: 'Add Sub Funding Source',
+          url: '/subFundingSource/addSubFundingSource',
+          icon: 'fa fa-plus',
+        },
+        {
+          name: 'Sub Funding Source List',
+          url: '/subFundingSource/subFundingSourceList',
+          icon: 'fa fa-plus',
+        }
+      ]
     }
   ]
 };
