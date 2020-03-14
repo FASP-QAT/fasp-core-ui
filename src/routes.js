@@ -2,8 +2,12 @@ import React from 'react';
 
 const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
 const AddSubFundingSource = React.lazy(() => import('./views/subFundingSource/AddSubFundingSourceComponent'));
-const SubFundingSourceList = React.lazy(() => import('./views/subFundingSource/SubFundingSourceListComponent'));
+const ListSubFundingSource = React.lazy(() => import('./views/subFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/EditSubFundingSourceComponent'));
+const AddFundingSource = React.lazy(() => import('./views/fundingSource/AddFundingSourceComponent'));
+const ListFundingSource = React.lazy(() => import('./views/fundingSource/ListFundingSourceComponent'));
+const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFundingSourceComponent'));
+
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
 const TextEditors = React.lazy(() => import('./views/Editors/TextEditors'));
@@ -67,10 +71,14 @@ const User = React.lazy(() => import('./views/Users/User'));
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
+  { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
+  { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
+  { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },
+  { path: '/fundingSource/listFundingSource/:message',component: ListFundingSource },
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: SubFundingSourceList },
+  { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
+  { path: '/subFundingSource/listSubFundingSource/:message',component: ListSubFundingSource },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
