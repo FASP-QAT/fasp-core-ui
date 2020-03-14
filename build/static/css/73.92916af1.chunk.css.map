@@ -1,0 +1,1 @@
+{"version":3,"sources":["style.css"],"names":[],"mappings":"AAAA,KACI,sBAEF,CAEA,iCAHE,iBAMF","file":"73.92916af1.chunk.css","sourcesContent":[".App {\n    font-family: sans-serif;\n    text-align: center;\n  }\n\n  ::ng-deep .jexcel > tbody > tr > {\n    /* styles here */\n    text-align: center;\n  }"]}
