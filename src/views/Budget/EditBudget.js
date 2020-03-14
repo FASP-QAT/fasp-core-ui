@@ -4,7 +4,8 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import '../Forms/ValidationForms/ValidationForms.css';
 import ProgramServcie from '../../api/ProgramService';
-import BudgetServcie from '../../api/BudgetService'
+import BudgetServcie from '../../api/BudgetService';
+import getLabelText from '../../CommonComponent/getLabelText'
 
 
 let initialValues = {
@@ -60,7 +61,7 @@ export default class EditBudget extends Component {
             lang: 'en'
         }
         initialValues={
-            budget: this.getText(this.props.location.state.budget.label,this.state.lan),
+            budget: getLabelText(this.props.location.state.budget.label,this.state.lan),
             programId: this.props.location.state.budget.program.programId,
             subFundingSourceId:this.props.location.state.budget.subFundingSource.subFundingSourceId,
             budgetAmt:this.props.location.state.budget.budgetAmt,
@@ -69,7 +70,7 @@ export default class EditBudget extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.getText = this.getText.bind(this);
+        
     }
 
     dataChange(event) {
@@ -90,20 +91,7 @@ export default class EditBudget extends Component {
 
         this.setState({ budget }, () => {})
     }
-    getText(label, lang) {
-        if (lang == 'en') {
-            return label.label_en;
-        } else if (lang == 'fr') {
-            return label.label_fr;
-        } else if (lang == 'sp') {
-            return label.label_sp;
-        } else if (lang == 'pr') {
-            return label.label_pr;
-        } else {
-            return label.label_en;
-        }
-
-    }
+    
 
     componentDidMount() {
 
@@ -167,8 +155,8 @@ export default class EditBudget extends Component {
         let programs = programList.length > 0
             && programList.map((item, i) => {
                 return (
-                    // {this.getText(dataSource.label,lan)}
-                    <option key={i} value={item.programId}>{this.getText(item.label, lan)}</option>
+                    
+                    <option key={i} value={item.programId}>{getLabelText(item.label, lan)}</option>
                 )
             }, this);
         return (
@@ -232,7 +220,7 @@ export default class EditBudget extends Component {
                                                             onBlur={handleBlur}
 
                                                             placeholder="Enter your budget name"
-                                                            value={this.getText(this.state.budget.label,this.state.lang)} />
+                                                            value={getLabelText(this.state.budget.label,this.state.lang)} />
                                                         <FormFeedback>{errors.budget}</FormFeedback>
                                                     </Col>
 
@@ -243,7 +231,7 @@ export default class EditBudget extends Component {
                                                     </Col>
                                                     <Col xs="12" md="9">
                                                         <Input type="select"
-
+                                                            disabled
                                                             valid={!errors.programId}
                                                             invalid={touched.programId && !!errors.programId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -262,7 +250,7 @@ export default class EditBudget extends Component {
                                                     </Col>
                                                     <Col xs="12" md="9">
                                                         <Input
-
+                                                            disabled    
                                                             type="select" valid={!errors.subFundingSourceId}
                                                             invalid={touched.subFundingSourceId && !!errors.subFundingSourceId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}

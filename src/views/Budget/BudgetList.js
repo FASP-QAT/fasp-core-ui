@@ -3,7 +3,8 @@ import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-import BudgetServcie from '../../api/BudgetService'
+import BudgetServcie from '../../api/BudgetService';
+import getLabelText from '../../CommonComponent/getLabelText'
 // import budgetData from './BudgetData'
 
 class Budgets extends Component {
@@ -26,7 +27,7 @@ class Budgets extends Component {
         this.editBudget(row);
       }.bind(this)
     }
-    this.getText = this.getText.bind(this);
+  
     this.showBudgetLabel = this.showBudgetLabel.bind(this);
     this.editBudget=this.editBudget.bind(this);
   }
@@ -63,28 +64,13 @@ class Budgets extends Component {
 
   }
 
-  getText(label, lang) {
-    if (lang == 'en') {
-      return label.label_en;
-    } else if (lang == 'fr') {
-      return label.label_fr;
-    } else if (lang == 'sp') {
-      return label.label_sp;
-    } else if (lang == 'pr') {
-      return label.label_pr;
-    } else {
-      return label.label_en;
-    }
-
-  }
+  
   showBudgetLabel(cell, row) {
     console.log("========", this.state.lang);
-    return this.getText(cell, this.state.lang);
+    return getLabelText(cell, this.state.lang);
     // return cell.label_sp;
   }
-  // showLabel(cell, row) {
-  //   return cell.description;
-  // }
+  
 
   editBudget(budget) {
     this.props.history.push({

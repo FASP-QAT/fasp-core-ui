@@ -10,7 +10,8 @@ import * as Yup from 'yup';
 import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
 import ProgramServcie from '../../api/ProgramService';
-import BudgetServcie from '../../api/BudgetService'
+import BudgetServcie from '../../api/BudgetService';
+import getLabelText from '../../CommonComponent/getLabelText'
 
 
 
@@ -65,37 +66,6 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-// const onSubmit = (values, { setSubmitting, setErrors }) => {
-//     console.log("submit called---", values);
-//     // setTimeout(() => {
-//     //     alert(JSON.stringify(values, null, 2))
-//     //     setSubmitting(false)
-//     // }, 2000)
-
-//     BudgetServcie.addBudget(values).then(response => {
-//         console.log("----------->response",response);
-//     }
-//     )
-//         .catch(
-//             error => {
-//                 switch (error.message) {
-//                     case "Network Error":
-//                         this.setState({
-//                             message: error.message
-//                         })
-//                         break
-//                     default:
-//                         this.setState({
-//                             message: error.message
-//                         })
-//                         break
-//                 }
-//             }
-//         )
-// }    
-
-
-
 class Budget extends Component {
     constructor(props) {
         super(props);
@@ -117,7 +87,7 @@ class Budget extends Component {
             programList: [],
             subFundingSourceList: []
         }
-        this.getText = this.getText.bind(this);
+        
         this.dataChange = this.dataChange.bind(this);
     }
 
@@ -139,25 +109,10 @@ class Budget extends Component {
 
         this.setState({ budget }, () => { console.log("updated state--", this.state.budget) })
     }
-    getText(label, lang) {
-        if (lang == 'en') {
-            return label.label_en;
-        } else if (lang == 'fr') {
-            return label.label_fr;
-        } else if (lang == 'sp') {
-            return label.label_sp;
-        } else if (lang == 'pr') {
-            return label.label_pr;
-        } else {
-            return label.label_en;
-        }
-
-    }
-
     componentDidMount() {
 
         ProgramServcie.getProgramList().then(response => {
-            // console.log(response.data)
+            
             this.setState({
                 programList: response.data
             })
@@ -213,7 +168,7 @@ class Budget extends Component {
             && programList.map((item, i) => {
                 return (
                     // {this.getText(dataSource.label,lan)}
-                    <option key={i} value={item.programId}>{this.getText(item.label, lan)}</option>
+                    <option key={i} value={item.programId}>{getLabelText(item.label, lan)}</option>
                 )
             }, this);
         return (
