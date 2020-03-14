@@ -1,19 +1,18 @@
 import React, { Component } from 'react';
-
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import BudgetServcie from '../../api/BudgetService'
-
-import budgetDate from './BudgetData'
-
-
+// import budgetData from './BudgetData'
 
 class Budgets extends Component {
   constructor(props) {
     super(props);
-    this.state = { table: [] }
+    this.state = {
+      table: [],
+      lang: 'en'
+    }
 
     this.options = {
       sortIndicator: true,
@@ -22,22 +21,25 @@ class Budgets extends Component {
       hidePageListOnlyOnePage: true,
       clearSearch: true,
       alwaysShowAllBtns: false,
-      withFirstAndLast: false
+      withFirstAndLast: false,
+      onRowClick: function (row) {
+        this.editBudget(row);
+      }.bind(this)
     }
-
+    this.getText = this.getText.bind(this);
+    this.showBudgetLabel = this.showBudgetLabel.bind(this);
+    this.editBudget=this.editBudget.bind(this);
   }
 
   // just an example
-  nameFormat(cell, row) {
-    const id = `/budgets/${row.id}`
-    return (
-      <NavLink strict to={id}> {cell} </NavLink>
-    );
-  };
+  // nameFormat(cell, row) {
+  //   const id = `/budgets/${row.id}`
+  //   return (
+  //     <NavLink strict to={id}> {cell} </NavLink>
+  //   );
+  // };
   componentDidMount() {
-
     BudgetServcie.getBudgetList().then(response => {
-      console.log("-------------",response.data.data);
       this.setState({
         table: response.data.data
       })
@@ -60,14 +62,45 @@ class Budgets extends Component {
       );
 
   }
-  showBudgetLabel(cell, row) {
-    return cell.label_en;
+
+  getText(label, lang) {
+    if (lang == 'en') {
+      return label.label_en;
+    } else if (lang == 'fr') {
+      return label.label_fr;
+    } else if (lang == 'sp') {
+      return label.label_sp;
+    } else if (lang == 'pr') {
+      return label.label_pr;
+    } else {
+      return label.label_en;
     }
 
+  }
+  showBudgetLabel(cell, row) {
+    console.log("========", this.state.lang);
+    return this.getText(cell, this.state.lang);
+    // return cell.label_sp;
+  }
+  // showLabel(cell, row) {
+  //   return cell.description;
+  // }
+
+  editBudget(budget) {
+    this.props.history.push({
+      pathname:"/budget/editBudget",
+      state: { budget }
+    });
+  }
+
+  showStatus(cell, row) {
+    if (cell) {
+        return "Active";
+    } else {
+        return "Disabled";
+    }
+  }
   render() {
-
-
-
     return (
       <div className="animated">
         <Card>
@@ -82,11 +115,11 @@ class Budgets extends Component {
           </CardHeader>
           <CardBody>
             <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
-              <TableHeaderColumn dataField="label" dataFormat={this.showBudgetLabel} >Budget</TableHeaderColumn>
+              <TableHeaderColumn dataField="label" dataFormat={this.showBudgetLabel}>Budget</TableHeaderColumn>
               <TableHeaderColumn isKey dataField="budgetAmt" dataSort>Budget Amount</TableHeaderColumn>
               <TableHeaderColumn dataField="startDate" dataSort>Start Date</TableHeaderColumn>
               <TableHeaderColumn dataField="stopDate" dataSort>Stop Date</TableHeaderColumn>
-              <TableHeaderColumn dataField="active" dataSort>Active</TableHeaderColumn>
+              <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>Active</TableHeaderColumn>
             </BootstrapTable>
           </CardBody>
         </Card>

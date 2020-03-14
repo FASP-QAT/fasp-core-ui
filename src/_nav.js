@@ -18,6 +18,23 @@ export default {
       ]
     },
     {
+      name: 'Sub Funding Source',
+      url: '/subFundingSource',
+      icon: 'fa fa-money',
+      children: [
+        {
+          name: 'Add Sub Funding Source',
+          url: '/subFundingSource/addSubFundingSource',
+          icon: 'fa fa-plus',
+        },
+        {
+          name: 'Sub Funding Source List',
+          url: '/subFundingSource/subFundingSourceList',
+          icon: 'fa fa-plus',
+        }
+      ]
+    },
+    {
       name: 'Program Level Masters',
       url: '/program',
       icon: 'icon-graph',
@@ -53,9 +70,9 @@ export default {
               name: 'List Budgets',
               url: '/budget/listBudgets',
               icon: 'icon-list',
-            },{
-              name:'Test',
-              url:'/budget/test',
+            }, {
+              name: 'Test',
+              url: '/budget/test',
               icon: 'icon-pencil'
             }
           ]
@@ -90,6 +107,18 @@ export default {
           ]
         }
       ]
-    }
+    },
+    {
+      name: 'Program',
+      url: '/program',
+      icon: 'icon-speedometer',
+      children: [
+        {
+          name: 'Download Program',
+          url: '/program/downloadProgram',
+          icon: 'fa fa-code',
+        }
+      ]
+    },
   ]
 };

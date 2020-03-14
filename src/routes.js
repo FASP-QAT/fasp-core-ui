@@ -1,5 +1,10 @@
 import React from 'react';
 
+const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
+const AddSubFundingSource = React.lazy(() => import('./views/subFundingSource/AddSubFundingSourceComponent'));
+const SubFundingSourceList = React.lazy(() => import('./views/subFundingSource/SubFundingSourceListComponent'));
+const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/EditSubFundingSourceComponent'));
+
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
 const TextEditors = React.lazy(() => import('./views/Editors/TextEditors'));
 
@@ -43,7 +48,6 @@ const ButtonDropdowns = React.lazy(() => import('./views/Buttons/ButtonDropdowns
 const ButtonGroups = React.lazy(() => import('./views/Buttons/ButtonGroups'));
 const Buttons = React.lazy(() => import('./views/Buttons/Buttons'));
 const Charts = React.lazy(() => import('./views/Charts'));
-const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
 
 const Dashboard = React.lazy(() => import('./views/Dashboard'));
 const CoreUIIcons = React.lazy(() => import('./views/Icons/CoreUIIcons'));
@@ -66,6 +70,7 @@ const AddProductCategory = React.lazy(() => import('./views/ProductCategory/AddP
 const AddProgram = React.lazy(() => import('./views/Program/AddProgram'));
 const Programs = React.lazy(() => import('./views/Program/ProgramList'));
 const Test = React.lazy(() => import('./views/Budget/Test'));
+const EditBudget=React.lazy(() => import('./views/Budget/EditBudget'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -76,8 +81,13 @@ const routes = [
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
   { path: '/budget/addBudget', name: 'Add Budget', component: AddBudget },
   { path: '/budget/listBudgets', name: 'Budget List', component: Budgets },
+  { path: '/budget/editBudget', name: 'Edit Budget', component: EditBudget },
   { path: '/', exact: true, name: 'Home' },
   { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
+  { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
+  { path: '/subFundingSource/subFundingSourceList', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: SubFundingSourceList },
+  { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
+  { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
