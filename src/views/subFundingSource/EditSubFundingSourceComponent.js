@@ -8,7 +8,7 @@ import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
 let initialValues = {
-    subFundingSource: ""
+    subFundingSource: "anchal"
 }
 
 const validationSchema = function (values) {
@@ -56,6 +56,9 @@ class EditSubFundingSourceComponent extends Component {
         if (event.target.name == "subFundingSource") {
             subFundingSource.label.label_en = event.target.value;
         }
+        if (event.target.name == "active") {
+            subFundingSource.active = event.target.id === "active2" ? false : true;
+        }
         this.setState({
             subFundingSource
         },
@@ -94,7 +97,8 @@ class EditSubFundingSourceComponent extends Component {
                                 <i className="icon-note"></i><strong>Edit Sub Funding Source</strong>{' '}
                             </CardHeader>
                             <Formik
-                                initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{ subFundingSource: this.state.subFundingSource.label.label_en }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -163,6 +167,41 @@ class EditSubFundingSourceComponent extends Component {
                                                             value={this.state.subFundingSource.label.label_en}
                                                             required />
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label>Status  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="active"
+                                                                value={true}
+                                                                checked={this.state.subFundingSource.active === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                Active
+                                                                </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active2"
+                                                                name="active"
+                                                                value={false}
+                                                                checked={this.state.subFundingSource.active === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                Disabled
+                                                                </Label>
+                                                        </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

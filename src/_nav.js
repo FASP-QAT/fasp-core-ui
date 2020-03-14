@@ -30,7 +30,7 @@ export default {
         {
           name: 'Sub Funding Source List',
           url: '/subFundingSource/subFundingSourceList',
-          icon: 'fa fa-plus',
+          icon: 'fa fa-list-alt',
         }
       ]
     }
