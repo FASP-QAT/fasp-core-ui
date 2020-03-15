@@ -7,6 +7,12 @@ const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/E
 const AddFundingSource = React.lazy(() => import('./views/fundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('./views/fundingSource/ListFundingSourceComponent'));
 const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFundingSourceComponent'));
+const AddManufacturer = React.lazy(() => import('./views/manufacturer/AddManufacturerComponent'));
+const ListManufacturer = React.lazy(() => import('./views/manufacturer/ListManufacturerComponent'));
+const EditManufacturer = React.lazy(() => import('./views/manufacturer/EditManufacturerComponent'));
+const AddRegion = React.lazy(() => import('./views/region/AddRegionComponent'));
+const ListRegion = React.lazy(() => import('./views/region/ListRegionComponent'));
+const EditRegion = React.lazy(() => import('./views/region/EditRegionComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -79,6 +85,14 @@ const routes = [
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource/:message',component: ListSubFundingSource },
+  { path: '/manufacturer/addManufacturer', name: 'Manufacturer / Add Manufacturer', component: AddManufacturer },
+  { path: '/manufacturer/listManufacturer', exact: true, name: 'Manufacturer / Manufacturer List', component: ListManufacturer },
+  { path: '/manufacturer/editManufacturer', name: 'Manufacturer / Edit Manufacturer', component: EditManufacturer },
+  { path: '/manufacturer/listManufacturer/:message',component: ListManufacturer },
+  { path: '/region/addRegion', name: 'Region / Add Region', component: AddRegion },
+  { path: '/region/listRegion', exact: true, name: 'Region / Region List', component: ListRegion },
+  { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
+  { path: '/region/listRegion/:message',component: ListRegion },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },

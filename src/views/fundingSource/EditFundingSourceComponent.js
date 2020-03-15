@@ -94,7 +94,7 @@ class EditFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Edit Funding Source</strong>{' '}
+                                <i className="icon-note"></i><strong>Update Funding Source</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
