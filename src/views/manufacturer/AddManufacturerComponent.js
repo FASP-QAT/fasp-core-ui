@@ -4,21 +4,21 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 
-import FundingSourceService from "../../api/FundingSourceService";
-import SubFundingSourceService from "../../api/SubFundingSourceService";
+import ManufacturerService from "../../api/ManufacturerService";
+import RealmService from "../../api/RealmService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
-  fundingSourceId: [],
-  subFundingSource: ""
+  realmId: [],
+  manufacturer: ""
 }
 
 const validationSchema = function (values) {
   return Yup.object().shape({
-    fundingSourceId: Yup.string()
-      .required('Please select Funding source'),
-    subFundingSource: Yup.string()
-      .required('Please enter Sub Funding source')
+    realmId: Yup.string()
+      .required('Please select Realm'),
+    manufacturer: Yup.string()
+      .required('Please enter Manufacturer')
   })
 }
 
@@ -43,16 +43,15 @@ const getErrorsFromValidationError = (validationError) => {
     }
   }, {})
 }
-class AddSubFundingSourceComponent extends Component {
+class AddManufacturerComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fundingSources: [],
-      subFundingSource: {
-        fundingSource: {
+      realms: [],
+      manufacturer: {
+        realm: {
         },
         label: {
-
         }
       },
       message: ''
@@ -62,29 +61,29 @@ class AddSubFundingSourceComponent extends Component {
   }
 
   dataChange(event) {
-    let { subFundingSource } = this.state;
-    if (event.target.name == "fundingSourceId") {
-      subFundingSource.fundingSource.fundingSourceId = event.target.value;
+    let { manufacturer } = this.state;
+    if (event.target.name == "realmId") {
+      manufacturer.realm.realmId = event.target.value;
     }
-    if (event.target.name == "subFundingSource") {
-      subFundingSource.label.label_en = event.target.value;
+    if (event.target.name == "manufacturer") {
+      manufacturer.label.label_en = event.target.value;
     }
     this.setState({
-      subFundingSource
+      manufacturer
     },
       () => { });
   };
 
   touchAll(setTouched, errors) {
     setTouched({
-      fundingSourceId: true,
-      subFundingSource: true
+      realmId: true,
+      manufacturer: true
     }
-    )
-    this.validateForm(errors)
+    );
+    this.validateForm(errors);
   }
   validateForm(errors) {
-    this.findFirstError('subFundingSourceForm', (fieldName) => {
+    this.findFirstError('manufacturerForm', (fieldName) => {
       return Boolean(errors[fieldName])
     })
   }
@@ -100,10 +99,10 @@ class AddSubFundingSourceComponent extends Component {
 
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
-    FundingSourceService.getFundingSourceListAll()
+    RealmService.getRealmListAll()
       .then(response => {
         this.setState({
-          fundingSources: response.data.data
+          realms: response.data.data
         })
       }).catch(
         error => {
@@ -124,11 +123,11 @@ class AddSubFundingSourceComponent extends Component {
   }
 
   render() {
-    const { fundingSources } = this.state;
-    let fundingSourceList = fundingSources.length > 0
-      && fundingSources.map((item, i) => {
+    const { realms } = this.state;
+    let realmList = realms.length > 0
+      && realms.map((item, i) => {
         return (
-          <option key={i} value={item.fundingSourceId}>
+          <option key={i} value={item.realmId}>
             {item.label.label_en}
           </option>
         )
@@ -139,16 +138,18 @@ class AddSubFundingSourceComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>Add Sub Funding Source</strong>{' '}
+                <i className="icon-note"></i><strong>Add Manufacturer</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                  SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
+                  console.log("Submit clicked");
+                  ManufacturerService.addManufacturer(this.state.manufacturer)
                     .then(response => {
+                      console.log("Response->",response);
                       if (response.data.status == "Success") {
-                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.message}`)
+                        this.props.history.push(`/manufacturer/listManufacturer/${response.data.message}`)
                       } else {
                         this.setState({
                           message: response.data.message
@@ -184,38 +185,38 @@ class AddSubFundingSourceComponent extends Component {
                     isValid,
                     setTouched
                   }) => (
-                      <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
+                      <Form onSubmit={handleSubmit} noValidate name='manufacturerForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="fundingSourceId">Funding Source</Label>
+                            <Label htmlFor="realmId">Realm</Label>
                             <Input
                               type="select"
-                              name="fundingSourceId"
-                              id="fundingSourceId"
+                              name="realmId"
+                              id="realmId"
                               bsSize="lg"
-                              valid={!errors.fundingSourceId}
-                              invalid={touched.fundingSourceId && !!errors.fundingSourceId}
+                              valid={!errors.realmId}
+                              invalid={touched.realmId && !!errors.realmId}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required
-                              value={this.state.fundingSourceId}
+                              value={this.state.realmId}
                             >
                               <option value="0">Please select</option>
-                              {fundingSourceList}
+                              {realmList}
                             </Input>
-                            <FormFeedback>{errors.fundingSourceId}</FormFeedback>
+                            <FormFeedback>{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="subFundingSource">Sub Funding Source</Label>
+                            <Label for="manufacturer">Manufacturer</Label>
                             <Input type="text"
-                              name="subFundingSource"
-                              id="subFundingSource"
-                              valid={!errors.subFundingSource}
-                              invalid={touched.subFundingSource && !!errors.subFundingSource}
+                              name="manufacturer"
+                              id="manufacturer"
+                              valid={!errors.manufacturer}
+                              invalid={touched.manufacturer && !!errors.manufacturer}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required />
-                            <FormFeedback>{errors.subFundingSource}</FormFeedback>
+                            <FormFeedback>{errors.manufacturer}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
@@ -235,8 +236,8 @@ class AddSubFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "Action Canceled")
+    this.props.history.push(`/manufacturer/listManufacturer/` + "Action Canceled")
   }
 }
 
-export default AddSubFundingSourceComponent;
+export default AddManufacturerComponent;

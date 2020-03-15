@@ -21,15 +21,5 @@ class CountryService {
         return axios.put(`${API_URL}/api/editCountry/`, json, {}
         );
     }
-
-    getRealmCountryList() {
-        return axios.get(`${API_URL}/api/getRealmCountryList/`, {
-        });
-    }
-    getRealmCountryListByRealmId(realmId) {
-        return axios.get(`${API_URL}/api/getRealmCountryListByRealmId/${realmId}`, {
-        });
-    }
-
 }
 export default new CountryService();

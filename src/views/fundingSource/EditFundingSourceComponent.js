@@ -4,17 +4,17 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 
-import SubFundingSourceService from "../../api/SubFundingSourceService";
+import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
 let initialValues = {
-    subFundingSource: ""
+    fundingSource: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        subFundingSource: Yup.string()
-            .required('Please enter Sub Funding source')
+        fundingSource: Yup.string()
+            .required('Please enter Funding source')
     })
 }
 
@@ -40,11 +40,11 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-class EditSubFundingSourceComponent extends Component {
+class EditFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subFundingSource: this.props.location.state.subFundingSource,
+            fundingSource: this.props.location.state.fundingSource,
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -52,28 +52,28 @@ class EditSubFundingSourceComponent extends Component {
     }
 
     dataChange(event) {
-        let { subFundingSource } = this.state;
-        if (event.target.name == "subFundingSource") {
-            subFundingSource.label.label_en = event.target.value;
+        let { fundingSource } = this.state;
+        if (event.target.name == "fundingSource") {
+            fundingSource.label.label_en = event.target.value;
         }
         if (event.target.name == "active") {
-            subFundingSource.active = event.target.id === "active2" ? false : true;
+            fundingSource.active = event.target.id === "active2" ? false : true;
         }
         this.setState({
-            subFundingSource
+            fundingSource
         },
             () => { });
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            subFundingSource: true
+            fundingSource: true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('subFundingSourceForm', (fieldName) => {
+        this.findFirstError('fundingSourceForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -94,18 +94,18 @@ class EditSubFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Updaet Sub Funding source</strong>{' '}
+                                <i className="icon-note"></i><strong>Update Funding Source</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ subFundingSource: this.state.subFundingSource.label.label_en }}
+                                initialValues={{ fundingSource: this.state.fundingSource.label.label_en }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
-                                    SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
+                                    FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.data.status == "Success") {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.message}`)
+                                                this.props.history.push(`/fundingSource/listFundingSource/${response.data.message}`)
                                             } else {
                                                 this.setState({
                                                     message: response.data.message
@@ -141,32 +141,32 @@ class EditSubFundingSourceComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="fundingSourceId">Funding Source</Label>
+                                                        <Label htmlFor="realmId">Realm</Label>
                                                         <Input
                                                             type="text"
-                                                            name="fundingSourceId"
-                                                            id="fundingSourceId"
+                                                            name="realmId"
+                                                            id="realmId"
                                                             bsSize="lg"
                                                             readOnly
-                                                            value={this.state.subFundingSource.fundingSource.label.label_en}
+                                                            value={this.state.fundingSource.realm.label.label_en}
                                                         >
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="subFundingSource">Sub Funding Source</Label>
+                                                        <Label for="fundingSource">Funding Source</Label>
                                                         <Input type="text"
-                                                            name="subFundingSource"
-                                                            id="subFundingSource"
-                                                            valid={!errors.subFundingSource}
-                                                            invalid={touched.subFundingSource && !!errors.subFundingSource}
+                                                            name="fundingSource"
+                                                            id="fundingSource"
+                                                            valid={!errors.fundingSource}
+                                                            invalid={touched.fundingSource && !!errors.fundingSource}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.subFundingSource.label.label_en}
+                                                            value={this.state.fundingSource.label.label_en}
                                                             required />
-                                                        <FormFeedback>{errors.subFundingSource}</FormFeedback>
+                                                        <FormFeedback>{errors.fundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>Status  </Label>
@@ -177,7 +177,7 @@ class EditSubFundingSourceComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.subFundingSource.active === true}
+                                                                checked={this.state.fundingSource.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -193,7 +193,7 @@ class EditSubFundingSourceComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.subFundingSource.active === false}
+                                                                checked={this.state.fundingSource.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -221,8 +221,8 @@ class EditSubFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + "Action Canceled")
+        this.props.history.push(`/fundingSource/listFundingSource/` + "Action Canceled")
     }
 }
 
-export default EditSubFundingSourceComponent;
+export default EditFundingSourceComponent;

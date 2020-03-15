@@ -1,22 +1,20 @@
 
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-import data from '../Tables/DataTable/_data';
 
 
 import FundingSourceService from "../../api/FundingSourceService";
+import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
-class SubFundingSourceListComponent extends Component {
+class ListSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
-        this.table = data.rows;
         this.options = {
             sortIndicator: true,
-            hideSizePerPage: true,
+            hideSizePerPage: false,
             paginationSize: 3,
             hidePageListOnlyOnePage: true,
             clearSearch: true,
@@ -65,7 +63,7 @@ class SubFundingSourceListComponent extends Component {
                 }
             );
 
-        FundingSourceService.getSubFundingSourceListAll()
+        SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
                 this.setState({
                     subFundingSourceList: response.data.data
@@ -108,14 +106,14 @@ class SubFundingSourceListComponent extends Component {
             <div className="animated">
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>Sub Funding Source List
+                        <i className="icon-menu"></i><strong>Sub Funding Source List</strong>{' '}
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.subFundingSourceList} version="4" hover pagination search options={this.options}>
+                        <BootstrapTable data={this.state.subFundingSourceList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>
                             <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Sub Funding Source</TableHeaderColumn>
-                            <TableHeaderColumn dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort>Funding Source</TableHeaderColumn>
-                            <TableHeaderColumn dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>Status</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Sub Funding Source</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort>Funding Source</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>Status</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>
@@ -123,4 +121,4 @@ class SubFundingSourceListComponent extends Component {
         );
     }
 }
-export default SubFundingSourceListComponent;
+export default ListSubFundingSourceComponent;
