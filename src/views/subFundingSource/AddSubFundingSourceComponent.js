@@ -229,7 +229,7 @@ class AddSubFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required
-                            
+                              value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                                />
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>

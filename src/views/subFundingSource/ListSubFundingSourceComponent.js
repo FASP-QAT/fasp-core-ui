@@ -147,7 +147,11 @@ class ListSubFundingSourceComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>Sub Funding Source List</strong>{' '}
-                        <a href="javascript:void();" title="Add Sub Funding Source" onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                            <a href="javascript:void();" title="Add Sub Funding Source" onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardBody>
                         <Col md="3">
