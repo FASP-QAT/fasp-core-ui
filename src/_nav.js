@@ -117,8 +117,28 @@ export default {
           name: 'Download Program',
           url: '/program/downloadProgram',
           icon: 'fa fa-code',
+        },
+        {
+          name: 'Export Program',
+          url: '/program/exportProgram',
+          icon: 'fa fa-code',
+        },
+        {
+          name: 'Import Program',
+          url: '/program/importProgram',
+          icon: 'fa fa-code',
         }
       ]
+    },
+    {
+      name: 'Master Data sync',
+      url: '/masterDataSync',
+      icon: 'icon-speedometer',
+    },
+    {
+      name: 'Consumption details',
+      url: '/consumptionDetails',
+      icon: 'icon-speedometer',
     },
   ]
 };

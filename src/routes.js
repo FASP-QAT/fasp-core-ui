@@ -70,6 +70,11 @@ const AddProductCategory = React.lazy(() => import('./views/ProductCategory/AddP
 const AddProgram = React.lazy(() => import('./views/Program/AddProgram'));
 const Programs = React.lazy(() => import('./views/Program/ProgramList'));
 const Test = React.lazy(() => import('./views/Budget/Test'));
+const DownloadProgram = React.lazy(() => import('./views/Program/DownloadProgram'));
+const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
+const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
+const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
+const ConsumptionDetails = React.lazy(() => import('./views/Consumption/ConsumptionDetails'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -148,7 +153,12 @@ const routes = [
   { path: '/apps/invoicing', name: 'Invoice', component: Invoice, exact: true },
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
-  { path: '/users/:id', exact: true, name: 'User Details', component: User }
+  { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/program/downloadProgram', name: 'Download Program', component: DownloadProgram },
+  { path: '/program/exportProgram', name: 'Export Program', component: ExportProgram },
+  { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
+  { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
+  { path: '/consumptionDetails', name: 'Consumption Data', component: ConsumptionDetails  },
 ];
 
 export default routes;
