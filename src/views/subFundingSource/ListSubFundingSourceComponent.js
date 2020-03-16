@@ -31,11 +31,18 @@ class ListSubFundingSourceComponent extends Component {
             message: ''
         }
         this.editSubFundingSource = this.editSubFundingSource.bind(this);
+        this.addSubFundingSource = this.addSubFundingSource.bind(this);
     }
     editSubFundingSource(subFundingSource) {
         this.props.history.push({
             pathname: "/subFundingSource/editSubFundingSource",
             state: { subFundingSource }
+        });
+    }
+
+    addSubFundingSource(subFundingSource) {
+        this.props.history.push({
+            pathname: "/subFundingSource/addSubFundingSource"
         });
     }
 
@@ -107,9 +114,14 @@ class ListSubFundingSourceComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>Sub Funding Source List</strong>{' '}
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Sub Funding source" onClick={this.addSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.subFundingSourceList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>
+                        <BootstrapTable data={this.state.subFundingSourceList} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Sub Funding Source</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort>Funding Source</TableHeaderColumn>

@@ -29,11 +29,18 @@ class FundingSourceListComponent extends Component {
             message: ''
         }
         this.editFundingSource = this.editFundingSource.bind(this);
+        this.addFundingSource = this.addFundingSource.bind(this);
     }
     editFundingSource(fundingSource) {
         this.props.history.push({
             pathname: "/fundingSource/editFundingSource",
             state: { fundingSource }
+        });
+    }
+
+    addFundingSource(fundingSource) {
+        this.props.history.push({
+            pathname: "/fundingSource/addFundingSource"
         });
     }
 
@@ -60,7 +67,7 @@ class FundingSourceListComponent extends Component {
                     }
                 }
             );
-        
+
     }
 
     showFundingSourceLabel(cell, row) {
@@ -84,9 +91,14 @@ class FundingSourceListComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>Funding Source List</strong>{' '}
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Funding source" onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.fundingSourceList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>
+                        <BootstrapTable data={this.state.fundingSourceList} version="4" striped hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='fundingSourceId' hidden>ID</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showFundingSourceLabel} dataAlign="center">Funding Source</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>Realm</TableHeaderColumn>

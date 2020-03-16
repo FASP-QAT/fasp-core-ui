@@ -29,11 +29,17 @@ class ManufacturerListComponent extends Component {
             message: ''
         }
         this.editManufacturer = this.editManufacturer.bind(this);
+        this.addManufacturer = this.addManufacturer.bind(this);
     }
     editManufacturer(manufacturer) {
         this.props.history.push({
             pathname: "/manufacturer/editManufacturer",
             state: { manufacturer }
+        });
+    }
+    addManufacturer(manufacturer) {
+        this.props.history.push({
+            pathname: "/manufacturer/addManufacturer"
         });
     }
 
@@ -84,6 +90,11 @@ class ManufacturerListComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>Manufacturer List</strong>{' '}
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Manufacturer" onClick={this.addManufacturer}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardBody>
                         <BootstrapTable data={this.state.manufacturerList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>

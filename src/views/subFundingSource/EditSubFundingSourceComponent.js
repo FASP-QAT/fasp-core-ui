@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -149,7 +149,7 @@ class EditSubFundingSourceComponent extends Component {
                                                             type="text"
                                                             name="fundingSourceId"
                                                             id="fundingSourceId"
-                                                            bsSize="lg"
+                                                            bsSize="sm"
                                                             readOnly
                                                             value={this.state.subFundingSource.fundingSource.label.label_en}
                                                         >
@@ -160,6 +160,7 @@ class EditSubFundingSourceComponent extends Component {
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"
+                                                            bsSize="sm"
                                                             valid={!errors.subFundingSource}
                                                             invalid={touched.subFundingSource && !!errors.subFundingSource}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -169,7 +170,7 @@ class EditSubFundingSourceComponent extends Component {
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Status  </Label>
+                                                        <Label>Status&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -206,8 +207,10 @@ class EditSubFundingSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

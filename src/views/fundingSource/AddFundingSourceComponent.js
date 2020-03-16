@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -149,7 +149,7 @@ class AddFundingSourceComponent extends Component {
                   console.log("Submit clicked");
                   FundingSourceService.addFundingSource(this.state.fundingSource)
                     .then(response => {
-                      console.log("Response->",response);
+                      console.log("Response->", response);
                       if (response.data.status == "Success") {
                         this.props.history.push(`/fundingSource/listFundingSource/${response.data.message}`)
                       } else {
@@ -195,7 +195,7 @@ class AddFundingSourceComponent extends Component {
                               type="select"
                               name="realmId"
                               id="realmId"
-                              bsSize="lg"
+                              bsSize="sm"
                               valid={!errors.realmId}
                               invalid={touched.realmId && !!errors.realmId}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -213,6 +213,7 @@ class AddFundingSourceComponent extends Component {
                             <Input type="text"
                               name="fundingSource"
                               id="fundingSource"
+                              bsSize="sm"
                               valid={!errors.fundingSource}
                               invalid={touched.fundingSource && !!errors.fundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -223,8 +224,10 @@ class AddFundingSourceComponent extends Component {
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button>
-                            <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>

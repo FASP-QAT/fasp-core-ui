@@ -29,11 +29,17 @@ class RegionListComponent extends Component {
             message: ''
         }
         this.editRegion = this.editRegion.bind(this);
+        this.addRegion = this.addRegion.bind(this);
     }
     editRegion(region) {
         this.props.history.push({
             pathname: "/region/editRegion",
             state: { region }
+        });
+    }
+    addRegion(region) {
+        this.props.history.push({
+            pathname: "/region/addRegion"
         });
     }
 
@@ -86,6 +92,11 @@ class RegionListComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>Region List</strong>{' '}
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Region" onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardBody>
                         <BootstrapTable data={this.state.regionList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>

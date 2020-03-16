@@ -13,75 +13,38 @@ export default {
         {
           name: 'Add Health Area',
           url: '/healthArea/addHealthArea',
-          icon: 'fa fa-code',
+          icon: 'fa fa-code'
         }
       ]
     },
     {
-      name: 'Funding Source',
-      url: '/fundingSource',
-      icon: 'fa fa-money',
+      name: 'Realm Masters',
+      icon: 'fa fa-list',
       children: [
         {
-          name: 'Add Funding Source',
-          url: '/fundingSource/addFundingSource',
-          icon: 'fa fa-plus',
+          name: 'Funding Source',
+          icon: 'fa fa-bank',
+          url: '/fundingSource/listFundingSource'
         },
         {
-          name: 'Funding Source List',
-          url: '/fundingSource/listFundingSource',
-          icon: 'fa fa-list-alt',
-        }
-      ]
-    },
-    {
-      name: 'Sub Funding Source',
-      url: '/subFundingSource',
-      icon: 'fa fa-money',
-      children: [
-        {
-          name: 'Add Sub Funding Source',
-          url: '/subFundingSource/addSubFundingSource',
-          icon: 'fa fa-plus',
-        },
-        {
-          name: 'Sub Funding Source List',
+          name: 'Sub Funding Source',
           url: '/subFundingSource/listSubFundingSource',
-          icon: 'fa fa-list-alt',
-        }
-      ]
-    },
-    {
-      name: 'Manufacturer',
-      url: '/manufacturer',
-      icon: 'fa fa-money',
-      children: [
-        {
-          name: 'Add Manufacturer',
-          url: '/manufacturer/addManufacturer',
-          icon: 'fa fa-plus',
+          icon: 'fa fa-bank'
         },
         {
-          name: 'Manufacturer List',
+          name: 'Budget',
+          url: '/budget/listBudget',
+          icon: 'fa fa-money'
+        },
+        {
+          name: 'Manufacturer',
           url: '/manufacturer/listManufacturer',
-          icon: 'fa fa-list-alt',
-        }
-      ]
-    },
-    {
-      name: 'Region',
-      url: '/region',
-      icon: 'fa fa-money',
-      children: [
-        {
-          name: 'Add Region',
-          url: '/region/addRegion',
-          icon: 'fa fa-plus',
+          icon: 'fa fa-industry'
         },
         {
-          name: 'Region List',
+          name: 'Region',
           url: '/region/listRegion',
-          icon: 'fa fa-list-alt',
+          icon: 'fa fa-globe'
         }
       ]
     },
@@ -104,27 +67,6 @@ export default {
               name: 'List Program',
               url: '/program/listProgram',
               icon: 'icon-list',
-            }
-          ]
-        },
-        {
-          name: 'Budget Master',
-          url: '/budget',
-          icon: 'icon-graph',
-          children: [
-            {
-              name: 'Add Budget',
-              url: '/budget/addBudget',
-              icon: 'icon-pencil',
-            },
-            {
-              name: 'List Budgets',
-              url: '/budget/listBudgets',
-              icon: 'icon-list',
-            }, {
-              name: 'Test',
-              url: '/budget/test',
-              icon: 'icon-pencil'
             }
           ]
         },
