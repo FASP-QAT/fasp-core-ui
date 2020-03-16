@@ -170,7 +170,7 @@ class ListProcurementAgentComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <BootstrapTable data={this.state.selProcurementAgent} version="4" hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
+                        <BootstrapTable data={this.state.selProcurementAgent} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='procurementAgentId' hidden>ID</TableHeaderColumn>
                             <TableHeaderColumn dataField="procurementAgentCode" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Procurement Agent Code</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProcurementAgentLabel} dataAlign="center">Procurement Agent Name</TableHeaderColumn>

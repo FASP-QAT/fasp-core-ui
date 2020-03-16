@@ -175,7 +175,7 @@ class ListSubFundingSourceComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <BootstrapTable data={this.state.selSubFundingSource} version="4" hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
+                        <BootstrapTable data={this.state.selSubFundingSource} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Sub Funding Source</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort>Funding Source</TableHeaderColumn>
