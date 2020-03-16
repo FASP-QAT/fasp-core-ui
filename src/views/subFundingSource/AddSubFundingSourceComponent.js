@@ -205,7 +205,7 @@ class AddSubFundingSourceComponent extends Component {
                               type="select"
                               name="fundingSourceId"
                               id="fundingSourceId"
-                              bsSize="lg"
+                              bsSize="sm"
                               valid={!errors.fundingSourceId}
                               invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -223,26 +223,27 @@ class AddSubFundingSourceComponent extends Component {
                             <Input type="text"
                               name="subFundingSource"
                               id="subFundingSource"
+                              bsSize="sm"
                               valid={!errors.subFundingSource}
                               invalid={touched.subFundingSource && !!errors.subFundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required
-                              value={this.Capitalize(this.state.subFundingSource.label.label_en)}
+                            
                                />
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button>
-                            <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                            {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>
-
                     )} />
-
             </Card>
           </Col>
         </Row>

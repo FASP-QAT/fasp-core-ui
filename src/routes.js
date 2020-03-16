@@ -10,6 +10,12 @@ const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFun
 const AddProcurementAgent = React.lazy(() => import('./views/procurementAgent/AddProcurementAgentComponent'));
 const ListProcurementAgent = React.lazy(() => import('./views/procurementAgent/ListProcurementAgentComponent'));
 const EditProcurementAgent = React.lazy(() => import('./views/procurementAgent/EditProcurementAgentComponent'));
+const AddManufacturer = React.lazy(() => import('./views/manufacturer/AddManufacturerComponent'));
+const ListManufacturer = React.lazy(() => import('./views/manufacturer/ListManufacturerComponent'));
+const EditManufacturer = React.lazy(() => import('./views/manufacturer/EditManufacturerComponent'));
+const AddRegion = React.lazy(() => import('./views/region/AddRegionComponent'));
+const ListRegion = React.lazy(() => import('./views/region/ListRegionComponent'));
+const EditRegion = React.lazy(() => import('./views/region/EditRegionComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -70,8 +76,24 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
+const AddBudgetComponent = React.lazy(() => import('./views/budget/AddBudgetComponent'));
+const ListBudgetComponent = React.lazy(() => import('./views/budget/ListBudgetComponent'));
+const EditBudgetComponent=React.lazy(() => import('./views/budget/EditBudgetComponent'));
+const AddProgramProduct = React.lazy(() => import('./views/ProgramProduct/AddProgramProduct'));
+const AddProductCategory = React.lazy(() => import('./views/ProductCategory/AddProductCategory'));
+const AddProgram = React.lazy(() => import('./views/Program/AddProgram'));
+const Programs = React.lazy(() => import('./views/Program/ProgramList'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
+  { path: '/program/listProgram', name: 'Program List', component: Programs },
+  { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
+  { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
+  { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
+  { path: '/budget/listBudget', name: 'Budget List', component: ListBudgetComponent },
+  { path: '/budget/listBudget/:message',component: ListBudgetComponent },
+  { path: '/budget/editBudget', name: 'Update Budget', component: EditBudgetComponent },
   { path: '/', exact: true, name: 'Home' },
   { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
   { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
@@ -87,6 +109,14 @@ const routes = [
   { path: '/procurementAgent/listProcurementAgent/:message',component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
 
+  { path: '/manufacturer/addManufacturer', name: 'Manufacturer / Add Manufacturer', component: AddManufacturer },
+  { path: '/manufacturer/listManufacturer', exact: true, name: 'Manufacturer / Manufacturer List', component: ListManufacturer },
+  { path: '/manufacturer/editManufacturer', name: 'Manufacturer / Edit Manufacturer', component: EditManufacturer },
+  { path: '/manufacturer/listManufacturer/:message',component: ListManufacturer },
+  { path: '/region/addRegion', name: 'Region / Add Region', component: AddRegion },
+  { path: '/region/listRegion', exact: true, name: 'Region / Region List', component: ListRegion },
+  { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
+  { path: '/region/listRegion/:message',component: ListRegion },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },

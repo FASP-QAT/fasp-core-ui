@@ -48,7 +48,7 @@ class ListSubFundingSourceComponent extends Component {
             this.setState({
                 selSubFundingSource: selSubFundingSource
             });
-        }else{
+        } else {
             this.setState({
                 selSubFundingSource: this.state.subFundingSourceList
             });
@@ -58,6 +58,12 @@ class ListSubFundingSourceComponent extends Component {
         this.props.history.push({
             pathname: "/subFundingSource/editSubFundingSource",
             state: { subFundingSource }
+        });
+    }
+
+    addSubFundingSource(subFundingSource) {
+        this.props.history.push({
+            pathname: "/subFundingSource/addSubFundingSource"
         });
     }
 
@@ -141,7 +147,7 @@ class ListSubFundingSourceComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>Sub Funding Source List</strong>{' '}
-                        <i className="icon-plus pull-right" onClick={this.addNewSubFundingSource}></i>
+                        <a href="javascript:void();" title="Add Sub Funding Source" onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
                     </CardHeader>
                     <CardBody>
                         <Col md="3">

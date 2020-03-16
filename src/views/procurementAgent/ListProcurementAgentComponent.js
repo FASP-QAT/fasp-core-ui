@@ -142,7 +142,7 @@ class ListProcurementAgentComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>Procurement Agent List</strong>{' '}
-                        <i className="icon-plus pull-right" onClick={this.addNewProcurementAgent}></i>
+                        <a href="javascript:void();" title="Add Procurement Agent" onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
                     </CardHeader>
                     <CardBody>
                         <Col md="3">

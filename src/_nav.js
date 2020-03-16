@@ -13,36 +13,45 @@ export default {
         {
           name: 'Add Health Area',
           url: '/healthArea/addHealthArea',
-          icon: 'fa fa-code',
+          icon: 'fa fa-code'
         }
       ]
     },
     {
-      name: 'Funding Source',
-      url: '/fundingSource',
-      icon: 'fa fa-money',
+      name: 'Realm Masters',
+      icon: 'fa fa-list',
       children: [
         {
-          name: 'Add Funding Source',
-          url: '/fundingSource/addFundingSource',
-          icon: 'fa fa-plus',
+          name: 'Funding Source',
+          icon: 'fa fa-bank',
+          url: '/fundingSource/listFundingSource'
         },
         {
-          name: 'Funding Source List',
-          url: '/fundingSource/listFundingSource',
-          icon: 'fa fa-list-alt',
+          name: 'Sub Funding Source',
+          url: '/subFundingSource/listSubFundingSource',
+          icon: 'fa fa-bank'
+        },
+        {
+          name: 'Procurement Agent',
+          url: '/procurementAgent/listProcurementAgent',
+          icon: 'fa fa-user'
+        },
+        {
+          name: 'Budget',
+          url: '/budget/listBudget',
+          icon: 'fa fa-money'
+        },
+        {
+          name: 'Manufacturer',
+          url: '/manufacturer/listManufacturer',
+          icon: 'fa fa-industry'
+        },
+        {
+          name: 'Region',
+          url: '/region/listRegion',
+          icon: 'fa fa-globe'
         }
       ]
-    },
-    {
-      name: 'Sub Funding Source',
-      url: '/subFundingSource/listSubFundingSource',
-      icon: 'fa fa-money'
-    },
-    {
-      name: 'Procurement Agent',
-      url: '/procurementAgent/listProcurementAgent',
-      icon: 'fa fa-user'
     }
   ]
 };
