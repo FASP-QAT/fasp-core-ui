@@ -1,0 +1,1 @@
+{"version":3,"sources":["Spinners.scss"],"names":[],"mappings":"AAEA,6BACE,aAAc,CACf,iBAEC,WAAY","file":"45.462c671c.chunk.css","sourcesContent":["// minor fixes for spinkit in Spinners view\n//\n.sk-fading-circle .sk-circle {\n  margin: 0 auto;\n}\n.sk-three-bounce {\n  height: 40px;\n}\n"]}

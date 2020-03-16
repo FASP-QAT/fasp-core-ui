@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -59,7 +59,19 @@ class AddSubFundingSourceComponent extends Component {
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
+    this.Capitalize = this.Capitalize.bind(this);
   }
+
+  Capitalize(str) {
+    console.log("capitalize");
+    if (str != null && str != "") {
+      console.log("str---" + str)
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    } else {
+      return "";
+    }
+  }
+
 
   dataChange(event) {
     let { subFundingSource } = this.state;
@@ -135,6 +147,7 @@ class AddSubFundingSourceComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
+        <h5>{this.state.message}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -214,7 +227,9 @@ class AddSubFundingSourceComponent extends Component {
                               invalid={touched.subFundingSource && !!errors.subFundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
-                              required />
+                              required
+                              value={this.Capitalize(this.state.subFundingSource.label.label_en)}
+                               />
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>

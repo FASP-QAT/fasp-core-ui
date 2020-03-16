@@ -18,6 +18,8 @@ import {
 import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
+import LogoutService from "../../api/LogoutService";
+import AuthenticationService from '../../views/common/AuthenticationService.js';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -27,8 +29,23 @@ class DefaultLayout extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
 
   signOut(e) {
-    e.preventDefault()
-    this.props.history.push('/login')
+    e.preventDefault();
+    console.log("sign out called---");
+    AuthenticationService.setupAxiosInterceptors();
+    console.log("interceptors set up---");
+    LogoutService.logout()
+      .then(response => {
+        console.log("logout response---", response);
+        if (response.data.status == "Success") {
+          localStorage.removeItem("token-" + AuthenticationService.getLoggedInUserId());
+          this.props.history.push(`/login/${response.data.message}`);
+        }
+      }).catch(
+        error => {
+          console.log("logout error---", error);
+        }
+      );
+    // this.props.history.push('/login')
   }
 
   render() {
@@ -36,7 +53,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e=>this.signOut(e)}/>
+            <DefaultHeader onLogout={e => this.signOut(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -44,13 +61,13 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-            <AppSidebarNav navConfig={navigation} {...this.props} />
+              <AppSidebarNav navConfig={navigation} {...this.props} />
             </Suspense>
             <AppSidebarFooter />
             <AppSidebarMinimizer />
           </AppSidebar>
           <main className="main">
-            <AppBreadcrumb appRoutes={routes}/>
+            <AppBreadcrumb appRoutes={routes} />
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>

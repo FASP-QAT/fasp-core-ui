@@ -7,6 +7,9 @@ const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/E
 const AddFundingSource = React.lazy(() => import('./views/fundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('./views/fundingSource/ListFundingSourceComponent'));
 const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFundingSourceComponent'));
+const AddProcurementAgent = React.lazy(() => import('./views/procurementAgent/AddProcurementAgentComponent'));
+const ListProcurementAgent = React.lazy(() => import('./views/procurementAgent/ListProcurementAgentComponent'));
+const EditProcurementAgent = React.lazy(() => import('./views/procurementAgent/EditProcurementAgentComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -79,6 +82,11 @@ const routes = [
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource/:message',component: ListSubFundingSource },
+  { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'Procurement Agent / Procurement Agent List', component: ListProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent/:message',component: ListProcurementAgent },
+  { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
+
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },

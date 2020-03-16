@@ -36,20 +36,13 @@ export default {
     },
     {
       name: 'Sub Funding Source',
-      url: '/subFundingSource',
-      icon: 'fa fa-money',
-      children: [
-        {
-          name: 'Add Sub Funding Source',
-          url: '/subFundingSource/addSubFundingSource',
-          icon: 'fa fa-plus',
-        },
-        {
-          name: 'Sub Funding Source List',
-          url: '/subFundingSource/listSubFundingSource',
-          icon: 'fa fa-list-alt',
-        }
-      ]
+      url: '/subFundingSource/listSubFundingSource',
+      icon: 'fa fa-money'
+    },
+    {
+      name: 'Procurement Agent',
+      url: '/procurementAgent/listProcurementAgent',
+      icon: 'fa fa-user'
     }
   ]
 };
