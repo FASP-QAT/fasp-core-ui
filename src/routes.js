@@ -16,6 +16,7 @@ const EditManufacturer = React.lazy(() => import('./views/manufacturer/EditManuf
 const AddRegion = React.lazy(() => import('./views/region/AddRegionComponent'));
 const ListRegion = React.lazy(() => import('./views/region/ListRegionComponent'));
 const EditRegion = React.lazy(() => import('./views/region/EditRegionComponent'));
+const ListRealmCountry = React.lazy(() => import('./views/realmCountry/ListRealmCountryComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -117,6 +118,9 @@ const routes = [
   { path: '/region/listRegion', exact: true, name: 'Region / Region List', component: ListRegion },
   { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
   { path: '/region/listRegion/:message',component: ListRegion },
+  { path: '/realmCountry/listRealmCountry/:message',component: ListRealmCountry },
+  { path: '/realmCountry/listRealmCountry', exact: true, name: 'Realm Country / Realm Country List', component: ListRealmCountry },
+
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
