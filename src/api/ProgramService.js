@@ -9,8 +9,18 @@ class ProgramService {
     }
 
     getProgramList() {
-        return axios.get(`${API_URL}/api/getProgramList`, {
+        return axios.get(`${API_URL}/api/program/`, {
         });
+    }
+
+    addProgram(json) {
+        return axios.post(`${API_URL}/api/program/`, json, {}
+        );
+    }
+
+    editProgram(json) {
+        return axios.put(`${API_URL}/api/program/`, json, {}
+        );
     }
 }
 export default new ProgramService()

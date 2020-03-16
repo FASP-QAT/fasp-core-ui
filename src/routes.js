@@ -70,13 +70,15 @@ const AddProductCategory = React.lazy(() => import('./views/ProductCategory/AddP
 const AddProgram = React.lazy(() => import('./views/Program/AddProgram'));
 const Programs = React.lazy(() => import('./views/Program/ProgramList'));
 const Test = React.lazy(() => import('./views/Budget/Test'));
-const EditBudget=React.lazy(() => import('./views/Budget/EditBudget'));
+const EditBudget = React.lazy(() => import('./views/Budget/EditBudget'));
+const EditProgram = React.lazy(() => import('./views/Program/EditProgram'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/budget/test', name: 'Test', component: Test},
+  { path: '/budget/test', name: 'Test', component: Test },
   { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
   { path: '/program/listProgram', name: 'Program List', component: Programs },
+  { path: '/program/editProgram', name: 'Edit Program', component: EditProgram },
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
   { path: '/budget/addBudget', name: 'Add Budget', component: AddBudget },
@@ -87,7 +89,7 @@ const routes = [
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: SubFundingSourceList },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
+  { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },

@@ -9,7 +9,13 @@ import getLabelText from '../../CommonComponent/getLabelText'
 
 
 let initialValues = {
-     budget:''
+     budget:'',
+     budget: '',
+     programId: '',
+     subFundingSourceId: '',
+     budgetAmt: '',
+     startDate: '',
+     stopDate: ''
 }
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -218,7 +224,6 @@ export default class EditBudget extends Component {
                                                             invalid={touched.budget && !!errors.budget}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-
                                                             placeholder="Enter your budget name"
                                                             value={getLabelText(this.state.budget.label,this.state.lang)} />
                                                         <FormFeedback>{errors.budget}</FormFeedback>
