@@ -12,6 +12,7 @@ import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import LoginService from '../../../api/LoginService'
+import i18n from '../../../i18n'
 
 
 class Login extends Component {
@@ -115,15 +116,15 @@ class Login extends Component {
                 <Card className="p-4">
                   <CardBody>
                     <Form>
-                      <h1>Login</h1>
-                      <p className="text-muted">Sign In to your account</p>
+                      <h1>{i18n.t('static.login.login')}</h1>
+                      <p className="text-muted">{i18n.t('static.login.signintext')}</p>
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
                             <i className="icon-user"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input type="text" placeholder="Username" autoComplete="username" name="username" id="username" required />
+                        <Input type="text" placeholder={i18n.t('static.login.username')} autoComplete="username" name="username" id="username" required />
                       </InputGroup>
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
@@ -131,14 +132,14 @@ class Login extends Component {
                             <i className="icon-lock"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input type="password" placeholder="Password" autoComplete="current-password" name="password" id="password" required />
+                        <Input type="password" placeholder={i18n.t('static.login.password')} autoComplete="current-password" name="password" id="password" required />
                       </InputGroup>
                       <Row>
                         <Col xs="6">
-                          <Button color="primary" className="px-4" onClick={this.loginClicked}>Login</Button>
+                          <Button color="primary" className="px-4" onClick={this.loginClicked}>{i18n.t('static.login.login')}</Button>
                         </Col>
                         <Col xs="6" className="text-right">
-                          <Button color="link" className="px-0">Forgot password?</Button>
+                          <Button color="link" className="px-0">{i18n.t('static.login.forgotpassword')}?</Button>
                         </Col>
                       </Row>
                     </Form>
