@@ -7,6 +7,9 @@ const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/E
 const AddFundingSource = React.lazy(() => import('./views/fundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('./views/fundingSource/ListFundingSourceComponent'));
 const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFundingSourceComponent'));
+const AddProcurementAgent = React.lazy(() => import('./views/procurementAgent/AddProcurementAgentComponent'));
+const ListProcurementAgent = React.lazy(() => import('./views/procurementAgent/ListProcurementAgentComponent'));
+const EditProcurementAgent = React.lazy(() => import('./views/procurementAgent/EditProcurementAgentComponent'));
 const AddManufacturer = React.lazy(() => import('./views/manufacturer/AddManufacturerComponent'));
 const ListManufacturer = React.lazy(() => import('./views/manufacturer/ListManufacturerComponent'));
 const EditManufacturer = React.lazy(() => import('./views/manufacturer/EditManufacturerComponent'));
@@ -85,6 +88,12 @@ const SubFundingSourceList=React.lazy(() => import('./views/subFundingSource/Lis
 const AddProduct = React.lazy(() => import('./views/Product/AddProduct'));
 const ListProdct =React.lazy(() => import('./views/Product/ProductList'));
 const EditProdct =React.lazy(() => import('./views/Product/EditProduct'));
+const DownloadProgram = React.lazy(() => import('./views/Program/DownloadProgram'));
+const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
+const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
+const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
+const ConsumptionDetails = React.lazy(() => import('./views/Consumption/ConsumptionDetails'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/product/editProduct', name: 'Edit Product', component: EditProdct },
@@ -110,6 +119,11 @@ const routes = [
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/subFundingSource/listSubFundingSource/:message',component: ListSubFundingSource },
+  { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'Procurement Agent / Procurement Agent List', component: ListProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent/:message',component: ListProcurementAgent },
+  { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
+
   { path: '/manufacturer/addManufacturer', name: 'Manufacturer / Add Manufacturer', component: AddManufacturer },
   { path: '/manufacturer/listManufacturer', exact: true, name: 'Manufacturer / Manufacturer List', component: ListManufacturer },
   { path: '/manufacturer/editManufacturer', name: 'Manufacturer / Edit Manufacturer', component: EditManufacturer },
@@ -119,6 +133,7 @@ const routes = [
   { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
   { path: '/region/listRegion/:message',component: ListRegion },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
@@ -180,7 +195,13 @@ const routes = [
   { path: '/apps/invoicing', name: 'Invoice', component: Invoice, exact: true },
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
-  { path: '/users/:id', exact: true, name: 'User Details', component: User }
+  { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/program/downloadProgram', name: 'Download Program', component: DownloadProgram },
+  { path: '/program/downloadProgram/:message', name: 'Download Program', component: DownloadProgram },
+  { path: '/program/exportProgram', name: 'Export Program', component: ExportProgram },
+  { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
+  { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
+  { path: '/consumptionDetails', name: 'Consumption Data', component: ConsumptionDetails  },
 ];
 
 export default routes;

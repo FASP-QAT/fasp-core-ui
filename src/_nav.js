@@ -32,6 +32,11 @@ export default {
           icon: 'fa fa-bank'
         },
         {
+          name: 'Procurement Agent',
+          url: '/procurementAgent/listProcurementAgent',
+          icon: 'fa fa-user'
+        },
+        {
           name: 'Budget',
           url: '/budget/listBudget',
           icon: 'fa fa-money'
@@ -115,20 +120,35 @@ export default {
               icon: 'icon-pencil',
             }
           ]
-        }
-      ]
-    },
-    {
       name: 'Program',
-      url: '/program',
-      icon: 'icon-speedometer',
+      icon: 'fa fa-list',
       children: [
         {
           name: 'Download Program',
           url: '/program/downloadProgram',
           icon: 'fa fa-code',
+        },
+        {
+          name: 'Export Program',
+          url: '/program/exportProgram',
+          icon: 'fa fa-code',
+        },
+        {
+          name: 'Import Program',
+          url: '/program/importProgram',
+          icon: 'fa fa-code',
         }
       ]
-    }
+    },
+    {
+      name: 'Master Data sync',
+      url: '/masterDataSync',
+      icon: 'icon-speedometer',
+    },
+    {
+      name: 'Consumption details',
+      url: '/consumptionDetails',
+      icon: 'icon-speedometer',
+    },
   ]
 };
