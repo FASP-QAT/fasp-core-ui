@@ -5,7 +5,8 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 
 import RealmService from "../../api/RealmService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
+import CountryService from "../../api/CountryService";
+import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
@@ -54,6 +55,7 @@ class AddRealmCountryComponent extends Component {
         super(props);
         this.state = {
             realms: [],
+            countries: [],
             procurementAgent: {
                 realm: {
                 },
@@ -148,10 +150,33 @@ class AddRealmCountryComponent extends Component {
                     }
                 }
             );
+        CountryService.getCountryListAll()
+            .then(response => {
+                console.log("countries---",response.data.data);
+                this.setState({
+                    countries: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
     }
 
     render() {
         const { realms } = this.state;
+        const { countries } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
@@ -160,6 +185,15 @@ class AddRealmCountryComponent extends Component {
                     </option>
                 )
             }, this);
+        
+        // let countryList = countries.length > 0
+        //     && countries.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.countryuId}>
+        //                 {item.label.label_en}
+        //             </option>
+        //         )
+        //     }, this);
         return (
             <div className="animated fadeIn">
                 <h5>{this.state.message}</h5>
@@ -174,8 +208,8 @@ class AddRealmCountryComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("this.state.procurementAgent---",this.state.procurementAgent);
-                                    ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
+                                    console.log("this.state.procurementAgent---", this.state.procurementAgent);
+                                    RealmCountryService.addRealmCountry(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.data.status == "Success") {
                                                 this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.message}`)
@@ -233,6 +267,24 @@ class AddRealmCountryComponent extends Component {
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="countryId">Country</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="countryId"
+                                                            id="countryId"
+                                                            bsSize="lg"
+                                                            valid={!errors.countryId}
+                                                            invalid={touched.countryId && !!errors.countryId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                        >
+                                                            <option value="">Please select</option>
+                                                            {realmList}
+                                                        </Input>
+                                                        <FormFeedback>{errors.countryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentCode">Procurement Agent Code</Label>

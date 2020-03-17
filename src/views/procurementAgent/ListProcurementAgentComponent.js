@@ -44,7 +44,7 @@ class ListProcurementAgentComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selProcurementAgent = this.state.subFundingSourceList.filter(c => c.realm.realmId == realmId)
+            const selProcurementAgent = this.state.procurementAgentList.filter(c => c.realm.realmId == realmId)
             console.log("selProcurementAgent---", selProcurementAgent);
             this.setState({
                 selProcurementAgent
