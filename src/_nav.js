@@ -32,6 +32,11 @@ export default {
           icon: 'fa fa-bank'
         },
         {
+          name: 'Procurement Agent',
+          url: '/procurementAgent/listProcurementAgent',
+          icon: 'fa fa-user'
+        },
+        {
           name: 'Budget',
           url: '/budget/listBudget',
           icon: 'fa fa-money'
@@ -49,12 +54,12 @@ export default {
       ]
     },
     {
-      name: 'Program Level Masters',
+      name: 'Program Masters',
       url: '/program',
       icon: 'icon-graph',
       children: [
         {
-          name: 'Program Master',
+          name: 'Program',
           url: '/program',
           icon: 'icon-graph',
           children: [
@@ -71,7 +76,24 @@ export default {
           ]
         },
         {
-          name: 'Program Product Master',
+          name: 'Product',
+          url: '/product',
+          icon: 'icon-graph',
+          children: [
+            {
+              name: 'Add Product',
+              url: '/product/addProduct',
+              icon: 'icon-pencil',
+            },
+            {
+              name: 'List Product',
+              url: '/product/listProduct',
+              icon: 'icon-list',
+            }
+          ]
+        },
+        {
+          name: 'Program Product',
           url: '/programProduct',
           icon: 'icon-graph',
           children: [
@@ -88,7 +110,7 @@ export default {
           ]
         },
         {
-          name: 'Product Category Master',
+          name: 'Product Category',
           url: '/productCategory',
           icon: 'icon-graph',
           children: [
@@ -103,15 +125,34 @@ export default {
     },
     {
       name: 'Program',
-      url: '/program',
-      icon: 'icon-speedometer',
+      icon: 'fa fa-list',
       children: [
         {
           name: 'Download Program',
           url: '/program/downloadProgram',
           icon: 'fa fa-code',
+        },
+        {
+          name: 'Export Program',
+          url: '/program/exportProgram',
+          icon: 'fa fa-code',
+        },
+        {
+          name: 'Import Program',
+          url: '/program/importProgram',
+          icon: 'fa fa-code',
         }
       ]
-    }
+    },
+    {
+      name: 'Master Data sync',
+      url: '/masterDataSync',
+      icon: 'icon-speedometer',
+    },
+    {
+      name: 'Consumption details',
+      url: '/consumptionDetails',
+      icon: 'icon-speedometer',
+    },
   ]
 };

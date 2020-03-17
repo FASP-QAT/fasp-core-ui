@@ -49,8 +49,18 @@ class EditSubFundingSourceComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
-
+    Capitalize(str) {
+        console.log("capitalize");
+        if (str != null && str != "") {
+          console.log("str---" + str)
+          return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+          return "";
+        }
+      }
+    
     dataChange(event) {
         let { subFundingSource } = this.state;
         if (event.target.name == "subFundingSource") {
@@ -90,6 +100,7 @@ class EditSubFundingSourceComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <h5>{this.state.message}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -165,7 +176,7 @@ class EditSubFundingSourceComponent extends Component {
                                                             invalid={touched.subFundingSource && !!errors.subFundingSource}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.subFundingSource.label.label_en}
+                                                            value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                                                             required />
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
@@ -207,7 +218,7 @@ class EditSubFundingSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
                                                         <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
                                                         &nbsp;

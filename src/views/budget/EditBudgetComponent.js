@@ -3,12 +3,17 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import getLabelText from '../../CommonComponent/getLabelText'
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
 let initialValues = {
-    budget: ''
+    budget: '',
+    programId: '',
+    subFundingSourceId: '',
+    budgetAmt: '',
+    startDate: '',
+    stopDate: ''
 }
 
 const validationSchema = function (values) {
@@ -51,7 +56,16 @@ class EditBudgetComponent extends Component {
         super(props);
         this.state = {
             budget: this.props.location.state.budget,
-            message: ''
+            message: '',
+            lan:'en'
+        }
+        initialValues = {
+            budget:getLabelText(this.props.location.state.budget.label,this.state.lan),
+            programId:this.props.location.state.budget.program.programId,
+            subFundingSourceId:this.props.location.state.budget.subFundingSource.subFundingSourceId,
+            budgetAmt:this.props.location.state.budget.budgetAmt,
+            startDate:this.props.location.state.budget.startDate,
+            stopDate:this.props.location.state.budget.stopDate,
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -64,14 +78,11 @@ class EditBudgetComponent extends Component {
         }
         if (event.target.name === "budgetAmt") {
             budget.budgetAmt = event.target.value;
-        }
-        if (event.target.name === "startDate") {
+        }if (event.target.name === "startDate") {
             budget.startDate = event.target.value;
-        }
-        if (event.target.name === "stopDate") {
+        }if (event.target.name === "stopDate") {
             budget.stopDate = event.target.value;
-        }
-        if (event.target.name === "active") {
+        }else if (event.target.name === "active") {
             budget.active = event.target.id === "active2" ? false : true;
         }
         this.setState({
@@ -116,7 +127,7 @@ class EditBudgetComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ budget: this.state.budget.label.label_en }}
+                                initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -171,7 +182,7 @@ class EditBudgetComponent extends Component {
                                                             invalid={touched.budget && !!errors.budget}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
+                                                            value={getLabelText(this.state.budget.label,this.state.lan)}
                                                             required />
                                                         <FormFeedback>{errors.budget}</FormFeedback>
                                                     </FormGroup>
@@ -260,7 +271,7 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback>{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                    <Label>Status&nbsp;&nbsp;</Label>
+                                                        <Label>Status&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -297,9 +308,9 @@ class EditBudgetComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button>
+                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
                                                         <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}>Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
