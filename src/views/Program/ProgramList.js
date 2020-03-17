@@ -36,6 +36,7 @@ export default class ProgramList extends Component {
     this.editProgram = this.editProgram.bind(this);
     this.addNewProgram = this.addNewProgram.bind(this);
     this.buttonFormatter=this.buttonFormatter.bind(this);
+    this.addProductMapping=this.addProductMapping.bind(this);
 
   }
 
@@ -99,13 +100,21 @@ export default class ProgramList extends Component {
     return getLabelText(cell.label, this.state.lang);
 
   }
-  // buttonFormatter(cell, row){
-  //   return <Button type="button" size="sm" color="success" className="float-right mr-1" ><i className="fa fa-check"></i> Add</Button>;
-  // }
   addNewProgram() {
     this.props.history.push({
       pathname: "/program/addProgram"
     });
+  }
+  buttonFormatter(cell, row){
+    return <Button type="button" size="sm" color="success" onClick={(event) => {this.addProductMapping(event)}} className="float-right mr-1" ><i className="fa fa-check"></i> Add</Button>;
+  }
+  addProductMapping(event){
+    event.stopPropagation();
+    // console.log("---------------------",cell.program.programId);
+    this.props.history.push({
+      pathname: "/programProduct/addProgramProduct"
+    });
+    
   }
   render() {
     return (
