@@ -27,7 +27,12 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
-
+  changePassword(e) {
+    console.log("----------------123-----------------")
+    e.preventDefault();
+    console.log("----------------4567-----------------")
+    this.props.history.push(`/changePassword`);
+  }
   signOut(e) {
     e.preventDefault();
     console.log("sign out called---");
@@ -53,7 +58,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">

@@ -18,6 +18,9 @@ const ListRegion = React.lazy(() => import('./views/region/ListRegionComponent')
 const EditRegion = React.lazy(() => import('./views/region/EditRegionComponent'));
 const ListRealmCountry = React.lazy(() => import('./views/realmCountry/ListRealmCountryComponent'));
 const AddRealmCountry = React.lazy(() => import('./views/realmCountry/AddRealmCountryComponent'));
+const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswordComponent'));
+const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
+const ChangePassword = React.lazy(() => import('./views/Pages/Login/ChangePasswordComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -80,16 +83,16 @@ const User = React.lazy(() => import('./views/Users/User'));
 
 const AddBudgetComponent = React.lazy(() => import('./views/budget/AddBudgetComponent'));
 const ListBudgetComponent = React.lazy(() => import('./views/budget/ListBudgetComponent'));
-const EditBudgetComponent=React.lazy(() => import('./views/budget/EditBudgetComponent'));
+const EditBudgetComponent = React.lazy(() => import('./views/budget/EditBudgetComponent'));
 const AddProgramProduct = React.lazy(() => import('./views/ProgramProduct/AddProgramProduct'));
 const AddProductCategory = React.lazy(() => import('./views/ProductCategory/AddProductCategory'));
 const AddProgram = React.lazy(() => import('./views/Program/AddProgram'));
 const Programs = React.lazy(() => import('./views/Program/ProgramList'));
-const EditProgram=React.lazy(() => import('./views/Program/EditProgram'));
-const SubFundingSourceList=React.lazy(() => import('./views/subFundingSource/ListSubFundingSourceComponent'));
+const EditProgram = React.lazy(() => import('./views/Program/EditProgram'));
+const SubFundingSourceList = React.lazy(() => import('./views/subFundingSource/ListSubFundingSourceComponent'));
 const AddProduct = React.lazy(() => import('./views/Product/AddProduct'));
-const ListProdct =React.lazy(() => import('./views/Product/ProductList'));
-const EditProdct =React.lazy(() => import('./views/Product/EditProduct'));
+const ListProdct = React.lazy(() => import('./views/Product/ProductList'));
+const EditProdct = React.lazy(() => import('./views/Product/EditProduct'));
 const DownloadProgram = React.lazy(() => import('./views/Program/DownloadProgram'));
 const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
@@ -108,35 +111,38 @@ const routes = [
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
   { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
   { path: '/budget/listBudget', name: 'Budget List', component: ListBudgetComponent },
-  { path: '/budget/listBudget/:message',component: ListBudgetComponent },
+  { path: '/budget/listBudget/:message', component: ListBudgetComponent },
   { path: '/budget/editBudget', name: 'Update Budget', component: EditBudgetComponent },
   { path: '/', exact: true, name: 'Home' },
   { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
   { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },
-  { path: '/fundingSource/listFundingSource/:message',component: ListFundingSource },
+  { path: '/fundingSource/listFundingSource/:message', component: ListFundingSource },
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
-  { path: '/subFundingSource/listSubFundingSource/:message',component: ListSubFundingSource },
+  { path: '/subFundingSource/listSubFundingSource/:message', component: ListSubFundingSource },
   { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'Procurement Agent / Procurement Agent List', component: ListProcurementAgent },
-  { path: '/procurementAgent/listProcurementAgent/:message',component: ListProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
 
   { path: '/manufacturer/addManufacturer', name: 'Manufacturer / Add Manufacturer', component: AddManufacturer },
   { path: '/manufacturer/listManufacturer', exact: true, name: 'Manufacturer / Manufacturer List', component: ListManufacturer },
   { path: '/manufacturer/editManufacturer', name: 'Manufacturer / Edit Manufacturer', component: EditManufacturer },
-  { path: '/manufacturer/listManufacturer/:message',component: ListManufacturer },
+  { path: '/manufacturer/listManufacturer/:message', component: ListManufacturer },
   { path: '/region/addRegion', name: 'Region / Add Region', component: AddRegion },
   { path: '/region/listRegion', exact: true, name: 'Region / Region List', component: ListRegion },
   { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
-  { path: '/region/listRegion/:message',component: ListRegion },
-  { path: '/realmCountry/listRealmCountry/:message',component: ListRealmCountry },
+  { path: '/region/listRegion/:message', component: ListRegion },
+  { path: '/realmCountry/listRealmCountry/:message', component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: 'Realm Country / Realm Country List', component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'Realm Country / Add Realm Country', component: AddRealmCountry },
+  { path: '/forgotPassword', exact: true, name: 'Forgot Password', component: ForgotPassword },
+  { path: '/updateExpiredPassword', exact: true, name: 'Update expired password', component: UpdateExpiredPassword },
+  { path: '/changePassword', exact: true, name: 'Update expired password', component: ChangePassword },
 
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },
@@ -207,7 +213,7 @@ const routes = [
   { path: '/program/exportProgram', name: 'Export Program', component: ExportProgram },
   { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
   { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
-  { path: '/consumptionDetails', name: 'Consumption Data', component: ConsumptionDetails  },
+  { path: '/consumptionDetails', name: 'Consumption Data', component: ConsumptionDetails },
 ];
 
 export default routes;

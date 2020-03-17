@@ -59,7 +59,7 @@ class Login extends Component {
     this.state = {
       message: ''
     }
-    this.loginClicked = this.loginClicked.bind(this);
+    this.forgotPassword = this.forgotPassword.bind(this);
   }
 
   touchAll(setTouched, errors) {
@@ -85,88 +85,8 @@ class Login extends Component {
     }
   }
 
-  loginClicked() {
-    var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
-    if (navigator.onLine) {
-      LoginService.authenticate(username, password)
-        .then(response => {
-          var decoded = jwt_decode(response.data.token);
-          console.log("user id---" + decoded.userId);
-          localStorage.removeItem("token-" + decoded.userId);
-          localStorage.removeItem('username-' + decoded.userId);
-          localStorage.removeItem('password-' + decoded.userId);
-          localStorage.removeItem('curUser');
-
-          localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-          localStorage.setItem('username-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.username).toString(), `${SECRET_KEY}`));
-          localStorage.setItem('password-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.password).toString(), `${SECRET_KEY}`));
-          localStorage.setItem('typeOfSession', "Online");
-          localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
-          console.log("local storage length---" + localStorage.length);
-          console.log("user cur ---" + localStorage.getItem("curUser"));
-          AuthenticationService.setupAxiosInterceptors();
-          this.props.history.push(`/dashboard`)
-        })
-        .catch(
-          error => {
-            if (error.response != null && error.response.status === 401) {
-              switch (error.response.data) {
-                case "Password expired":
-                  this.setState({
-                    message: error.response.data
-                  })
-                  this.props.history.push({
-                    pathname: "/updateExpiredPassword",
-                    state: {
-                      username: username
-                    }
-                  });
-                  break
-                default:
-                  this.setState({
-                    message: error.response.data
-                  })
-                  break
-              }
-            } else {
-              switch (error.message) {
-                case "Network Error":
-                  this.setState({
-                    message: error.message
-                  })
-                  break
-                default:
-                  this.setState({
-                    message: error.message
-                  })
-                  break
-              }
-            }
-          }
-        );
-    }
-    else {
-      var decryptedPassword = AuthenticationService.isUserLoggedIn(username, password);
-      if (decryptedPassword != "") {
-        bcrypt.compare(password, decryptedPassword, function (err, res) {
-          if (err) {
-            this.setState({ message: 'Error occured' });
-          }
-          if (res) {
-            localStorage.setItem('typeOfSession', "Offline");
-            localStorage.setItem('curUser', CryptoJS.AES.encrypt(localStorage.getItem("tempUser").toString(), `${SECRET_KEY}`));
-            localStorage.removeItem("tempUser");
-            this.props.history.push(`/welcome`)
-          } else {
-            this.setState({ message: 'Bad credentials.' });
-          }
-        }.bind(this));
-      }
-      else {
-        this.setState({ message: 'User not found.' });
-      }
-    }
+  forgotPassword() {
+    this.props.history.push(`/forgotPassword`)
   }
   render() {
     return (
@@ -174,6 +94,7 @@ class Login extends Component {
         <Container>
           <Row className="justify-content-center">
             <Col md="6">
+
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
@@ -188,54 +109,47 @@ class Login extends Component {
                             .then(response => {
                               var decoded = jwt_decode(response.data.token);
                               localStorage.removeItem("token-" + decoded.userId);
+                              localStorage.removeItem("user-" + decoded.userId);
                               localStorage.removeItem('username-' + decoded.userId);
                               localStorage.removeItem('password-' + decoded.userId);
                               localStorage.removeItem('curUser');
-                              localStorage.removeItem('curUser');
+                              localStorage.removeItem('lang');
 
                               localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
+                              localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user).toString(), `${SECRET_KEY}`));
                               localStorage.setItem('username-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.username).toString(), `${SECRET_KEY}`));
                               localStorage.setItem('password-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.password).toString(), `${SECRET_KEY}`));
                               localStorage.setItem('typeOfSession', "Online");
                               localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
-                              console.log("local storage length---" + localStorage.length);
-                              console.log("user cur ---" + localStorage.getItem("curUser"));
+                              localStorage.setItem('lang', CryptoJS.AES.encrypt((decoded.user.language.languageId).toString(), `${SECRET_KEY}`));
                               AuthenticationService.setupAxiosInterceptors();
                               this.props.history.push(`/dashboard`)
                             })
                             .catch(
                               error => {
-                                if (error.response != null && error.response.status === 401) {
-                                  switch (error.response.data) {
-                                    case "Password expired":
-                                      this.setState({
-                                        message: error.response.data
-                                      })
+                                console.log(error);
+                                if (error.message === "Network Error") {
+                                  this.setState({ message: error.message });
+                                } else {
+                                  switch (error.response.status) {
+                                    case 500:
+                                    case 401:
+                                    case 404:
+                                    case 412:
+                                      this.setState({ message: error.response.data.messageCode });
+                                      break;
+                                    case 406:
                                       this.props.history.push({
                                         pathname: "/updateExpiredPassword",
                                         state: {
-                                          username: username
+                                          username
                                         }
                                       });
-                                      break
+                                      break;
                                     default:
-                                      this.setState({
-                                        message: error.response.data
-                                      })
-                                      break
-                                  }
-                                } else {
-                                  switch (error.message) {
-                                    case "Network Error":
-                                      this.setState({
-                                        message: error.message
-                                      })
-                                      break
-                                    default:
-                                      this.setState({
-                                        message: error.message
-                                      })
-                                      break
+                                      this.setState({ message: 'static.unkownError' });
+                                      console.log("Error code unkown");
+                                      break;
                                   }
                                 }
                               }
@@ -276,6 +190,8 @@ class Login extends Component {
                           setTouched
                         }) => (
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">
+                              <h5>{this.props.match.params.message}</h5>
+                              <h5>{this.state.message}</h5>
                               <h1>Login</h1>
                               <p className="text-muted">Sign In to your account</p>
                               <InputGroup className="mb-3">
@@ -318,11 +234,10 @@ class Login extends Component {
                               </InputGroup>
                               <Row>
                                 <Col xs="6">
-                                  {/* <Button color="primary" className="px-4" onClick={this.loginClicked}>Login</Button> */}
                                   <Button type="submit" color="primary" className="px-4" onClick={() => this.touchAll(setTouched, errors)} >Login</Button>
                                 </Col>
                                 <Col xs="6" className="text-right">
-                                  <Button color="link" className="px-0">Forgot password?</Button>
+                                  <Online><Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>Forgot password?</Button></Online>
                                 </Col>
                               </Row>
                             </Form>

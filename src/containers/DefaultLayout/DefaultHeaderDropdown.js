@@ -81,7 +81,7 @@ class DefaultHeaderDropdown extends Component {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
-          <DropdownItem><i className="fa fa-user"></i> Profile</DropdownItem>
+          <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> Change Password</DropdownItem>
           <DropdownItem><i className="fa fa-shield"></i> Language</DropdownItem>
           <DropdownItem onClick={this.props.onLogout}><i className="fa fa-lock"></i> Logout</DropdownItem>
           {/*<DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>*/}
