@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
@@ -94,7 +94,7 @@ class EditFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Update Funding Source</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.fundingsource.fundingsourceedittext')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -144,7 +144,7 @@ class EditFundingSourceComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">Realm</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label>
                                                         <Input
                                                             type="text"
                                                             name="realmId"
@@ -156,7 +156,7 @@ class EditFundingSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="fundingSource">Funding Source</Label>
+                                                        <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
                                                         <Input type="text"
                                                             name="fundingSource"
                                                             id="fundingSource"
@@ -184,7 +184,7 @@ class EditFundingSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active1">
-                                                                Active
+                                                               {i18n.t('static.common.active')}
                                                                 </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -200,16 +200,16 @@ class EditFundingSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active2">
-                                                                Disabled
+                                                                {i18n.t('static.common.disabled')}
                                                                 </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
