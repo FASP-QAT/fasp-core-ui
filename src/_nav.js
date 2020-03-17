@@ -91,7 +91,7 @@ export default {
               icon: 'icon-list',
             }
           ]
-        }, 
+        },
         {
           name: 'Program Product',
           url: '/programProduct',
@@ -120,6 +120,10 @@ export default {
               icon: 'icon-pencil',
             }
           ]
+        }
+      ]
+    },
+    {
       name: 'Program',
       icon: 'fa fa-list',
       children: [
