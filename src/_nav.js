@@ -159,5 +159,90 @@ export default {
       url: '/consumptionDetails',
       icon: 'icon-speedometer',
     },
+    {
+      name: 'Language',
+      url: '/language',
+      icon: 'icon-speedometer',
+      children: [
+        {
+          name: 'Add Language',
+          url: '/language/addLanguage',
+          icon: 'fa fa-plus',
+        },
+        {
+          name: 'Language List',
+          url: '/language/listLanguage',
+          icon: 'fa fa-list-alt',
+        }
+      ]
+    },
+    {
+      name: 'Country',
+      url: '/country',
+      icon: 'icon-speedometer',
+      children: [
+        {
+          name: 'Add Country',
+          url: '/country/addCountry',
+          icon: 'fa fa-plus',
+        },
+        {
+          name: 'Country List',
+          url: '/country/listCountry',
+          icon: 'fa fa-list-alt',
+        }
+      ]
+    },
+    {
+      name: 'DataSource Type',
+      url: '/dataSourceType',
+      icon: 'icon-speedometer',
+      children: [
+        {
+          name: 'Add DataSource Type',
+          url: '/datasourceType/addDatasourceType',
+          icon: 'fa fa-plus',
+        },
+        {
+          name: 'DataSource Type List',
+          url: '/datasourceType/listDataSourceType',
+          icon: 'fa fa-list-alt',
+        }
+      ]
+    },
+    {
+      name: 'DataSource',
+      url: '/dataSource',
+      icon: 'icon-speedometer',
+      children: [
+        {
+          name: 'Add DataSource',
+          url: '/datasource/addDatasource',
+          icon: 'fa fa-plus',
+        },
+        {
+          name: 'DataSource List',
+          url: '/datasource/listDataSource',
+          icon: 'fa fa-list-alt',
+        }
+      ]
+    },
+    {
+      name: 'Currency',
+      url: '/currency',
+      icon: 'icon-speedometer',
+      children: [
+        {
+          name: 'Add Currency',
+          url: '/currency/addCurrency',
+          icon: 'fa fa-plus',
+        },
+        {
+          name: 'Currency List',
+          url: '/currency/listCurrency',
+          icon: 'fa fa-list-alt',
+        }
+      ]
+    },
   ]
 };
