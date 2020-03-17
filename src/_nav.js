@@ -57,6 +57,107 @@ export default {
           icon: 'fa fa-globe'
         }
       ]
-    }
+    },
+    {
+      name: 'Program Masters',
+      url: '/program',
+      icon: 'icon-graph',
+      children: [
+        {
+          name: 'Program',
+          url: '/program',
+          icon: 'icon-graph',
+          children: [
+            {
+              name: 'Add Program',
+              url: '/program/addProgram',
+              icon: 'icon-pencil',
+            },
+            {
+              name: 'List Program',
+              url: '/program/listProgram',
+              icon: 'icon-list',
+            }
+          ]
+        },
+        {
+          name: 'Product',
+          url: '/product',
+          icon: 'icon-graph',
+          children: [
+            {
+              name: 'Add Product',
+              url: '/product/addProduct',
+              icon: 'icon-pencil',
+            },
+            {
+              name: 'List Product',
+              url: '/product/listProduct',
+              icon: 'icon-list',
+            }
+          ]
+        },
+        {
+          name: 'Program Product',
+          url: '/programProduct',
+          icon: 'icon-graph',
+          children: [
+            {
+              name: 'Add Program Prodcut',
+              url: '/programProduct/addProgramProduct',
+              icon: 'icon-pencil',
+            },
+            {
+              name: 'List Program Product',
+              url: '/programProduct/listProgramProduct',
+              icon: 'icon-list',
+            }
+          ]
+        },
+        {
+          name: 'Product Category',
+          url: '/productCategory',
+          icon: 'icon-graph',
+          children: [
+            {
+              name: 'Add Prodcut Category',
+              url: '/productCategory/addProductCategory',
+              icon: 'icon-pencil',
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'Program',
+      icon: 'fa fa-list',
+      children: [
+        {
+          name: 'Download Program',
+          url: '/program/downloadProgram',
+          icon: 'fa fa-code',
+        },
+        {
+          name: 'Export Program',
+          url: '/program/exportProgram',
+          icon: 'fa fa-code',
+        },
+        {
+          name: 'Import Program',
+          url: '/program/importProgram',
+          icon: 'fa fa-code',
+        }
+      ]
+    },
+    {
+      name: 'Master Data sync',
+      url: '/masterDataSync',
+      icon: 'icon-speedometer',
+    },
+    {
+      name: 'Consumption details',
+      url: '/consumptionDetails',
+      icon: 'icon-speedometer',
+    },
   ]
 };
