@@ -7,6 +7,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import programDate from './ProgramData';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../common/AuthenticationService.js';
+import i18n from '../../i18n';
 export default class ProgramList extends Component {
 
   constructor(props) {
@@ -35,7 +36,7 @@ export default class ProgramList extends Component {
     this.showOrganisationLabel = this.showOrganisationLabel.bind(this);
     this.editProgram = this.editProgram.bind(this);
     this.addNewProgram = this.addNewProgram.bind(this);
-    this.buttonFormatter=this.buttonFormatter.bind(this);
+   // this.buttonFormatter=this.buttonFormatter.bind(this);
 
   }
 
@@ -112,7 +113,7 @@ export default class ProgramList extends Component {
       <div className="animated">
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>Program List{' '}
+            <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
                 <a href="javascript:void();" title="Add Budget" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
@@ -121,15 +122,15 @@ export default class ProgramList extends Component {
           </CardHeader>
           <CardBody>
             <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
-              <TableHeaderColumn dataField="label" dataSort dataFormat={this.showProgramLabel} >Program</TableHeaderColumn>
-              <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >Realm</TableHeaderColumn>
-              <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >Country</TableHeaderColumn>
-              <TableHeaderColumn dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >Organisation</TableHeaderColumn>
-              <TableHeaderColumn isKey dataField="airFreightPerc" dataSort >Air Freight Percentage</TableHeaderColumn>
-              <TableHeaderColumn dataField="seaFreightPerc" dataSort>Sea Freight Percentage</TableHeaderColumn>
-              <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>Planed To Draft Lead Time</TableHeaderColumn>
-              <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>Draft To Submit Lead Time</TableHeaderColumn>
-              <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>Submited To Approved Lead Time</TableHeaderColumn>
+              <TableHeaderColumn dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >{i18n.t('static.program.realmcountry')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >{i18n.t('static.program.organisation')}</TableHeaderColumn>
+              <TableHeaderColumn isKey dataField="airFreightPerc" dataSort >{i18n.t('static.program.airfreightperc')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="seaFreightPerc" dataSort>{i18n.t('static.program.seafreightperc')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>{i18n.t('static.program.draftleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>{i18n.t('static.program.drafttosubmitleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>{i18n.t('static.program.submittoapproveleadtime')}</TableHeaderColumn>
               {/* <TableHeaderColumn dataField="button" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn> */}
             </BootstrapTable>
           </CardBody>

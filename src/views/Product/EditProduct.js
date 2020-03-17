@@ -12,7 +12,7 @@ import UnitService from '../../api/UnitService';
 import AuthenticationService from '../common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import ProductService from '../../api/ProductService';
-
+import i18n from '../../i18n'
 let initialValues = {
     productName: '',
     genericName: '',
@@ -205,7 +205,7 @@ export default class EditProduct extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Edit Product</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.product.productedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -256,7 +256,7 @@ export default class EditProduct extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='productForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="product">Product</Label>
+                                                        <Label for="product">{i18n.t('static.product.product')}</Label>
                                                         <Input 
                                                             value={getLabelText(this.state.product.label,this.state.lan)}
                                                             type="text"
@@ -271,7 +271,7 @@ export default class EditProduct extends Component {
                                                         <FormFeedback>{errors.productName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="product">Product Generic name</Label>
+                                                        <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
                                                         <Input type="text"
                                                             value={getLabelText(this.state.product.genericLabel,this.state.lan)}
                                                             name="genericName"
@@ -285,7 +285,7 @@ export default class EditProduct extends Component {
                                                         <FormFeedback>{errors.genericName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">Realm</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.product.realm')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -299,13 +299,13 @@ export default class EditProduct extends Component {
                                                             disabled
                                                             value={this.state.product.realm.realmId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {realms}
                                                         </Input>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="">ProductCategory</Label>
+                                                        <Label htmlFor="">{i18n.t('static.product.productcategory')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="productCategoryId"
@@ -345,7 +345,7 @@ export default class EditProduct extends Component {
                                                         <FormFeedback>{errors.unitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                    <Label>Status&nbsp;&nbsp;</Label>
+                                                    <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -359,7 +359,7 @@ export default class EditProduct extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active1">
-                                                                Active
+                                                                {i18n.t('static.common.active')}
                                                                 </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -375,7 +375,7 @@ export default class EditProduct extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active2">
-                                                                Disabled
+                                                                {i18n.t('static.common.disabled')}
                                                                 </Label>
                                                         </FormGroup>
                                                     </FormGroup>
@@ -384,8 +384,8 @@ export default class EditProduct extends Component {
                                                     <FormGroup>
 
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                 </FormGroup>
                                                 </CardFooter>
