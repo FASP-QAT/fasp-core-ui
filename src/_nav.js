@@ -22,6 +22,11 @@ export default {
       icon: 'fa fa-list',
       children: [
         {
+          name: 'Realm Country',
+          icon: 'fa fa-bank',
+          url: '/realmCountry/listRealmCountry'
+        },
+        {
           name: 'Funding Source',
           icon: 'fa fa-bank',
           url: '/fundingSource/listFundingSource'

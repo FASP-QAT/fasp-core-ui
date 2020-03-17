@@ -13,6 +13,7 @@ class CountryService {
         });
     }
     getCountryListActive() {
+        console.log("call api---")
         return axios.get(`${API_URL}/api/getCountryListActive/`, {
         });
     }

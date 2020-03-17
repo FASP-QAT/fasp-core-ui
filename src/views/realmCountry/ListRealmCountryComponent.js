@@ -8,10 +8,10 @@ import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 
 
 import RealmService from "../../api/RealmService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
+import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
-class ListProcurementAgentComponent extends Component {
+class ListRealmCountryComponent extends Component {
     constructor(props) {
         super(props);
         this.options = {
@@ -29,29 +29,29 @@ class ListProcurementAgentComponent extends Component {
         }
         this.state = {
             realms: [],
-            procurementAgentList: [],
+            realmCountryList: [],
             message: '',
-            selProcurementAgent: []
+            selRealmCountry: []
         }
         this.editProcurementAgent = this.editProcurementAgent.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.addNewProcurementAgent = this.addNewProcurementAgent.bind(this);
+        this.addNewRealmCountry = this.addNewRealmCountry.bind(this);
 
     }
-    addNewProcurementAgent() {
-        this.props.history.push("/procurementAgent/addProcurementAgent");
+    addNewRealmCountry() {
+        this.props.history.push("/realmCountry/addRealmCountry");
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selProcurementAgent = this.state.procurementAgentList.filter(c => c.realm.realmId == realmId)
-            console.log("selProcurementAgent---", selProcurementAgent);
+            const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId)
+            console.log("selRealmCountry---", selRealmCountry);
             this.setState({
-                selProcurementAgent
+                selRealmCountry
             });
         } else {
             this.setState({
-                selProcurementAgent: this.state.procurementAgentList
+                selRealmCountry: this.state.realmCountryList
             });
         }
     }
@@ -86,11 +86,11 @@ class ListProcurementAgentComponent extends Component {
                 }
             );
 
-        ProcurementAgentService.getProcurementAgentListAll()
+            RealmCountryService.getRealmCountryListAll()
             .then(response => {
                 this.setState({
-                    procurementAgentList: response.data.data,
-                    selProcurementAgent: response.data.data
+                    realmCountryList: response.data.data,
+                    selRealmCountry: response.data.data
                 })
             }).catch(
                 error => {
@@ -110,8 +110,15 @@ class ListProcurementAgentComponent extends Component {
             );
     }
 
-    showProcurementAgentLabel(cell, row) {
-        return cell.label_en;
+    showCountryLabel(cell, row) {
+        return cell.label.label_en;
+    }
+    showCurrencyLabel(cell, row) {
+        return cell.label.label_en;
+    }
+
+    showPalletUnitLabel(cell, row) {
+        return cell.label.label_en;
     }
 
     showRealmLabel(cell, row) {
@@ -141,10 +148,10 @@ class ListProcurementAgentComponent extends Component {
                 <h5>{this.state.message}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Procurement Agent List</strong>{' '}
+                        <i className="icon-menu"></i><strong>Realm Country List</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Procurement Agent" onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title="Add Realm Country" onClick={this.addNewRealmCountry}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
@@ -170,12 +177,17 @@ class ListProcurementAgentComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <BootstrapTable data={this.state.selProcurementAgent} version="4" hover pagination search options={this.options}>
-                            <TableHeaderColumn isKey dataField='procurementAgentId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn dataField="procurementAgentCode" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Procurement Agent Code</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProcurementAgentLabel} dataAlign="center">Procurement Agent Name</TableHeaderColumn>
+                        <BootstrapTable data={this.state.selRealmCountry} version="4" hover pagination search options={this.options}>
+                            <TableHeaderColumn isKey dataField='realmCountryId' hidden>ID</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="country" dataSort dataFormat={this.showCountryLabel} dataAlign="center">Country</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>Realm</TableHeaderColumn>
-                            <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort dataAlign="center">Submitted To Approved Lead Time</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="defaultCurrency" dataFormat={this.showCurrencyLabel} dataAlign="center" dataSort>Default Currency</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="palletUnit" dataFormat={this.showPalletUnitLabel} dataAlign="center" dataSort>Pallet Unit</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="airFreightPercentage" dataAlign="center" dataSort>Air Freight Percentage</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="seaFreightPercentage" dataAlign="center" dataSort>Sea Freight Percentage</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="shippedToArrivedAirLeadTime" dataAlign="center" dataSort>Shipped To Arrived Air Lead Time</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="shippedToArrivedSeaLeadTime" dataAlign="center" dataSort>Shipped To Arrived Sea Lead Time</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="arrivedToDeliveredLeadTime" dataAlign="center" dataSort>Arrived To Delivered Lead Time</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>Status</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
@@ -184,4 +196,4 @@ class ListProcurementAgentComponent extends Component {
         );
     }
 }
-export default ListProcurementAgentComponent;
+export default ListRealmCountryComponent;

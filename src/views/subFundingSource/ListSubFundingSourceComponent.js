@@ -76,6 +76,7 @@ class ListSubFundingSourceComponent extends Component {
                 })
             }).catch(
                 error => {
+                    console.log("error---", error);
                     switch (error.message) {
                         case "Network Error":
                             this.setState({
@@ -149,7 +150,7 @@ class ListSubFundingSourceComponent extends Component {
                         <i className="icon-menu"></i><strong>Sub Funding Source List</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                            <a href="javascript:void();" title="Add Sub Funding Source" onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title="Add Sub Funding Source" onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
