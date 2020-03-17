@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-
+import i18n from '../../i18n'
 
 import ManufacturerService from "../../api/ManufacturerService";
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -89,7 +89,7 @@ class ManufacturerListComponent extends Component {
             <div className="animated">
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Manufacturer List</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.manufacturer.manufacturerlist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title="Add Manufacturer" onClick={this.addManufacturer}><i className="fa fa-plus-square"></i></a>
@@ -99,9 +99,9 @@ class ManufacturerListComponent extends Component {
                     <CardBody>
                         <BootstrapTable data={this.state.manufacturerList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>
                             <TableHeaderColumn isKey dataField='manufacturerId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showManufacturerLabel} dataAlign="center">Manufacturer</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>Realm</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>Status</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showManufacturerLabel} dataAlign="center">{i18n.t('static.manufacturer.manufacturer')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>{i18n.t('static.manufacturer.realm')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

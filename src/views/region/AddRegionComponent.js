@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n'
 import RegionService from "../../api/RegionService";
 import RealmCountryService from "../../api/RealmCountryService.js";
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -138,7 +138,7 @@ class AddRegionComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>Add Region</strong>{' '}
+    <i className="icon-note"></i><strong>{i18n.t('static.region.regionadd')}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -188,7 +188,7 @@ class AddRegionComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='regionForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmCountryId">Country</Label>
+                            <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
                             <Input
                               type="select"
                               name="realmCountryId"
@@ -201,13 +201,13 @@ class AddRegionComponent extends Component {
                               required
                               value={this.state.realmCountryId}
                             >
-                              <option value="0">Please select</option>
+                              <option value="0">{i18n.t('static.common.select')}</option>
                               {realmCountryList}
                             </Input>
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="region">Region</Label>
+                            <Label for="region">{i18n.t('static.region.region')}</Label>
                             <Input type="text"
                               name="region"
                               id="region"
@@ -222,9 +222,9 @@ class AddRegionComponent extends Component {
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.region.submit')}</Button>
                                                         &nbsp;
                           </FormGroup>
                         </CardFooter>

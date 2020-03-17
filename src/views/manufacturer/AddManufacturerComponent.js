@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n'
 import ManufacturerService from "../../api/ManufacturerService";
 import RealmService from "../../api/RealmService";
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -138,7 +138,7 @@ class AddManufacturerComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>Add Manufacturer</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.manufacturer.manufactureradd')}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -188,7 +188,7 @@ class AddManufacturerComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='manufacturerForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">Realm</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
                             <Input
                               type="select"
                               name="realmId"
@@ -201,13 +201,13 @@ class AddManufacturerComponent extends Component {
                               required
                               value={this.state.realmId}
                             >
-                              <option value="0">Please select</option>
+                              <option value="0">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
                             <FormFeedback>{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="manufacturer">Manufacturer</Label>
+                            <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
                             <Input type="text"
                               name="manufacturer"
                               id="manufacturer"
@@ -222,9 +222,9 @@ class AddManufacturerComponent extends Component {
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                           </FormGroup>
                         </CardFooter>
