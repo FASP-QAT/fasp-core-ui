@@ -34,35 +34,62 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     componentDidMount = function () {
-        console.log("In component did mount",new Date())
+        console.log("In component did mount", new Date())
         const lan = 'en';
-        JsStoreFunctions.getProgramDataList().then(response => {
-            console.log("in then function",new Date());
-            var proList = [];
-            for (var i = 0; i < response.length; i++) {
-                var bytes = CryptoJS.AES.decrypt(response[i].programName, SECRET_KEY);
-                var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                var programJson = {
-                    name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + response[i].version,
-                    id: response[i].id
+        var db1;
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = {
+                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            id: myResult[i].id
+                        }
+                        proList[i] = programJson
+                    }
                 }
-                proList[i] = programJson
-            }
-            this.setState({
-                programList: proList
-            })
-            console.log("proList", proList)
-            JsStoreFunctions.getProductCategoryList().then(response => {
-                console.log("Response", response)
                 this.setState({
-                    categoryList: response
+                    programList: proList
                 })
-            }).catch(error => {
-                console.log("Error occurred")
-            })
-        }).catch(error => {
-            console.log("Error occurred")
-        })
+            }.bind(this);
+
+            var categoryTransaction = db1.transaction(['productCategory'], 'readwrite');
+            var categoryOs = categoryTransaction.objectStore('productCategory');
+            var catRequest = categoryOs.getAll();
+            var catList = []
+            catRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            catRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = catRequest.result;
+                for (var i = 0; i < myResult.length; i++) {
+                    var categoryJson = {
+                        name: getLabelText(myResult[i].label, lan),
+                        id: myResult[i].productCategoryId
+                    }
+                    catList[i + 1] = categoryJson
+                }
+                this.setState({
+                    categoryList: catList
+                })
+            }.bind(this);
+        }.bind(this)
     };
 
     addRow = function () {
@@ -410,7 +437,7 @@ export default class ConsumptionDetails extends React.Component {
         let categories = categoryList.length > 0
             && categoryList.map((item, i) => {
                 return (
-                    <option key={i} value={item.productCategoryId}>{getLabelText(item.label, lan)}</option>
+                    <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
         const { productList } = this.state;
@@ -435,44 +462,51 @@ export default class ConsumptionDetails extends React.Component {
                                             <CardBody>
                                                 <Card className="card-accent-success">
                                                     {/* <Col xs="8" sm="8"> */}
-                                                        <Row>
-                                                            <Col md="1"></Col>
-                                                            <Col md="3">
-                                                                <br />
-                                                                <Label htmlFor="select">Program</Label><br />
-                                                                <Input type="select"
-                                                                    value={this.state.programId}
-                                                                    name="programId" id="programId">
-                                                                    <option value="0">Please select</option>
-                                                                    {programs}
-                                                                </Input><br />
-                                                            </Col>
-                                                            <Col md="3">
-                                                                <br />
-                                                                <Label htmlFor="select">Product category</Label><br />
-                                                                <Input type="select"
-                                                                    value={this.state.productCategoryId}
-                                                                    name="categoryId" id="categoryId"
-                                                                    onChange={(e) => { this.getProductList(e) }}>
-                                                                    <option value="0">Please select</option>
-                                                                    {categories}
-                                                                </Input><br />
-                                                            </Col>
-                                                            <Col md="3">
-                                                                <br />
-                                                                <Label htmlFor="select">Product</Label><br />
-                                                                <Input type="select"
-                                                                    value={this.state.productId}
-                                                                    name="productId" id="productId">
-                                                                    <option value="0">Please select</option>
-                                                                    {products}
-                                                                </Input><br />
-                                                            </Col>
-                                                            <Col md="2">
-                                                                <br /><br />
-                                                                <Button type="button" onClick={() => this.formSubmit()} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Go</Button>
-                                                            </Col>
-                                                        </Row>
+                                                    <Row>
+                                                        <Col md="1"></Col>
+                                                        <Col md="3">
+                                                            <br />
+                                                            <Label htmlFor="select">Program</Label><br />
+                                                            <Input type="select"
+                                                                bsSize="sm"
+                                                                value={this.state.programId}
+                                                                name="programId" id="programId">
+                                                                <option value="0">Please select</option>
+                                                                {programs}
+                                                            </Input><br />
+                                                        </Col>
+                                                        <Col md="3">
+                                                            <br />
+                                                            <Label htmlFor="select">Product category</Label><br />
+                                                            <Input type="select"
+                                                                bsSize="sm"
+                                                                value={this.state.productCategoryId}
+                                                                name="categoryId" id="categoryId"
+                                                                onChange={(e) => { this.getProductList(e) }}>
+                                                                <option value="0">Please select</option>
+                                                                {categories}
+                                                            </Input><br />
+                                                        </Col>
+                                                        <Col md="3">
+                                                            <br />
+                                                            <Label htmlFor="select">Product</Label><br />
+                                                            <Input type="select"
+                                                                bsSize="sm"
+                                                                value={this.state.productId}
+                                                                name="productId" id="productId">
+                                                                <option value="0">Please select</option>
+                                                                {products}
+                                                            </Input><br />
+                                                        </Col>
+                                                        <Col md="1">
+                                                            <br /><br />
+                                                            <FormGroup>
+                                                                <Button type="button" size="sm" color="primary" className="float-right mr-1" onClick={() => this.formSubmit()}> Go</Button>
+                                                                &nbsp;
+                                                            </FormGroup>
+                                                            {/* <Button type="button" onClick={() => this.formSubmit()} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Go</Button> */}
+                                                        </Col>
+                                                    </Row>
                                                     {/* </Col> */}
                                                 </Card>
                                             </CardBody>
@@ -554,20 +588,39 @@ export default class ConsumptionDetails extends React.Component {
     getProductList(event) {
         console.log("in product list")
         const lan = 'en';
-        JsStoreFunctions.getProductListByProductCategory(event.target.value).then(response => {
-            console.log("Response", response)
-            var proList = [];
-            for (var i = 0; i < response.length; i++) {
-                var productJson = {
-                    name: getLabelText(response[i].label, lan),
-                    id: response[i].productId
+        var db1;
+        var storeOS;
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var productTransaction = db1.transaction(['product'], 'readwrite');
+            var productOs = productTransaction.objectStore('product');
+            var productRequest = productOs.getAll();
+            var proList = []
+            productRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            productRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = productRequest.result;
+                console.log("myResult", myResult);
+                // console.log(event.target.value);
+                var categoryId = document.getElementById("categoryId").value;
+                console.log(categoryId)
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].productCategory.productCategoryId == categoryId) {
+                        var productJson = {
+                            name: getLabelText(myResult[i].label, lan),
+                            id: myResult[i].productId
+                        }
+                        proList[i] = productJson
+                    }
                 }
-                proList[i] = productJson
-            }
-            this.setState({
-                productList: proList
-            })
-        });
+                this.setState({
+                    productList: proList
+                })
+            }.bind(this);
+        }.bind(this)
     }
 
     getConsumptionData() {

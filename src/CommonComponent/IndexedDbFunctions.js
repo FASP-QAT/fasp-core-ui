@@ -74,46 +74,4 @@ export function getDatabase() {
             storeOS = db1.createObjectStore('planningUnit', { keyPath: 'planningUnitId', autoIncrement: true });
         }
     };
-    openRequest.onsuccess = function (e) {
-        console.log("in success")
-        db1 = e.target.result;
-        return db1;
-    }
-}
-
-export function saveProgram(json) {
-    console.log("in save program")
-    var db1;
-    var openRequest = indexedDB.open('fasp', 1);
-    openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        console.log("in program",program)
-        for (var i = 0; i < json.length; i++) {
-            console.log("in for")
-            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[i]), SECRET_KEY);
-            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-            var userId = userBytes.toString(CryptoJS.enc.Utf8);
-            var item = {
-                id: json[i].programId + "_v" + json[i].programVersion + "_uId_" + userId,
-                programId: json[i].programId,
-                version: json[i].programVersion,
-                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[i].label)), SECRET_KEY)).toString(),
-                programData: encryptedText.toString(),
-                userId: userId
-            };
-            var putRequest = program.put(item);
-            console.log("afyer put")
-        }
-
-        transaction.oncomplete = function (event) {
-            console.log("in trans complete");
-            let promise = new Promise(function (resolve, reject) {
-                setTimeout(() => resolve("done!"), 0);
-            });
-            console.log("promise",promise)
-            return promise;
-        }
-    }
 }

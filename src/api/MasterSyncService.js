@@ -87,7 +87,7 @@ class MasterSyncService {
         });
     }
 
-    getFundingSourceListForSync(lastSyncDate, realmId) {
+    getFundingSourceListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null

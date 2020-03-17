@@ -16,6 +16,9 @@ import 'react-select/dist/react-select.min.css';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import AuthenticationService from '../common/AuthenticationService.js';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 
 const initialValues = {
     programId: ''
@@ -54,16 +57,18 @@ const getErrorsFromValidationError = (validationError) => {
 
 export default class DownloadProgram extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             programList: []
         }
-        this.formSubmit = this.formSubmit.bind(this)
+        this.formSubmit = this.formSubmit.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
 
     componentDidMount() {
         const lan = 'en'
+        AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList().then(response => {
             var json = response.data;
             var prgList = [];
@@ -103,37 +108,119 @@ export default class DownloadProgram extends Component {
             ProgramService.getProgramData((programIdStr.substring(0, programIdStr.length - 1)).toString())
                 .then(response => {
                     var json = response.data;
+                    console.log("Json", json);
+                    console.log("Json length", json.length)
                     var db1;
                     var openRequest = indexedDB.open('fasp', 1);
                     openRequest.onsuccess = function (e) {
+                        console.log("in success");
                         db1 = e.target.result;
                         var transaction = db1.transaction(['programData'], 'readwrite');
                         var program = transaction.objectStore('programData');
-                        for (var i = 0; i < json.length; i++) {
-                            var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[i]), SECRET_KEY);
-                            var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                            var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                            var item = {
-                                id: json[i].programId + "_v" + json[i].programVersion + "_uId_" + userId,
-                                programId: json[i].programId,
-                                version: json[i].programVersion,
-                                programName: (CryptoJS.AES.encrypt(JSON.stringify((json[i].label)), SECRET_KEY)).toString(),
-                                programData: encryptedText.toString(),
-                                userId: userId
-                            };
-                            program.put(item);
-                        }
-                        console.log("transaction", transaction)
-                        transaction.oncomplete = function (event) {
-                            console.log("in complete")
-                        }
-                        transaction.onerror=function(event){
-                            console.log("in error");
-                        }
-                        program.onerror=function(event){
-                            console.log("In program error")
-                        }
-                    }
+                        var count = 0;
+                        var getRequest = program.getAll();
+                        getRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        getRequest.onsuccess = function (event) {
+                            var myResult = [];
+                            myResult = getRequest.result;
+                            for (var i = 0; i < myResult.length; i++) {
+                                for (var j = 0; j < json.length; j++) {
+                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                    if (myResult[i].id == json[j].programId + "_v" + json[j].programVersion + "_uId_" + userId) {
+                                        count++;
+                                    }
+                                }
+                                console.log("count", count)
+                            }
+                            if (count == 0) {
+                                db1 = e.target.result;
+                                var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
+                                var programSaveData = transactionForSavingData.objectStore('programData');
+                                for (var i = 0; i < json.length; i++) {
+                                    var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[i]), SECRET_KEY);
+                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                    var item = {
+                                        id: json[i].programId + "_v" + json[i].programVersion + "_uId_" + userId,
+                                        programId: json[i].programId,
+                                        version: json[i].programVersion,
+                                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[i].label)), SECRET_KEY)).toString(),
+                                        programData: encryptedText.toString(),
+                                        userId: userId
+                                    };
+                                    var putRequest = programSaveData.put(item);
+                                    putRequest.onerror = function (error) {
+                                        this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                    }.bind(this);
+                                }
+                                transactionForSavingData.oncomplete = function (event) {
+                                    console.log("in transaction complete")
+                                    this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
+                                }.bind(this);
+                                transactionForSavingData.onerror = function (event) {
+                                    this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                }.bind(this);
+                                programSaveData.onerror = function (event) {
+                                    this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                }.bind(this)
+                            } else {
+                                confirmAlert({
+                                    title: 'Confirm to submit',
+                                    message: `Program with same version already exists in the local machine you want to overwirte that program with the new data?`,
+                                    buttons: [
+                                        {
+                                            label: 'Yes',
+                                            onClick: () => {
+                                                db1 = e.target.result;
+                                                var transactionForOverwrite = db1.transaction(['programData'], 'readwrite');
+                                                var programOverWrite = transactionForOverwrite.objectStore('programData');
+                                                for (var i = 0; i < json.length; i++) {
+                                                    var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[i]), SECRET_KEY);
+                                                    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                                                    var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                                                    var item = {
+                                                        id: json[i].programId + "_v" + json[i].programVersion + "_uId_" + userId,
+                                                        programId: json[i].programId,
+                                                        version: json[i].programVersion,
+                                                        programName: (CryptoJS.AES.encrypt(JSON.stringify((json[i].label)), SECRET_KEY)).toString(),
+                                                        programData: encryptedText.toString(),
+                                                        userId: userId
+                                                    };
+                                                    var putRequest = programOverWrite.put(item);
+                                                    putRequest.onerror = function (error) {
+                                                        this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                                    }.bind(this);
+
+                                                }
+                                                transactionForOverwrite.oncomplete = function (event) {
+                                                    console.log("in transaction complete")
+                                                    this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
+                                                }.bind(this);
+                                                transactionForOverwrite.onerror = function (event) {
+                                                    this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                                }.bind(this);
+                                                transactionForOverwrite.onerror = function (event) {
+                                                    this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                                }.bind(this)
+                                            }
+                                        },
+                                        {
+                                            label: 'No',
+                                            onClick: () => {
+                                                this.setState({
+                                                    message: "Action Canceled."
+                                                })
+                                                this.props.history.push(`/program/downloadProgram/` + "Action Canceled.")
+                                            }
+                                        }
+                                    ]
+                                });
+                            }
+                        }.bind(this)
+                    }.bind(this)
                 })
                 .catch(
                     error => {
@@ -142,15 +229,17 @@ export default class DownloadProgram extends Component {
                                 this.setState({
                                     message: error.message
                                 })
+                                this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                 break
                             default:
                                 this.setState({
                                     message: error.response
                                 })
+                                this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                 break
                         }
                     }
-                );
+                )
 
         } else {
             alert("You must be online.")
@@ -186,14 +275,6 @@ export default class DownloadProgram extends Component {
     }
 
     render() {
-        // const lan = 'en';
-        // const { programList } = this.state;
-        // let programs = programList.length > 0
-        //     && programList.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.programId}>{getLabelText(item.label, lan)}</option>
-        //         )
-        //     }, this);
         return (
             <>
                 <Col xs="12" sm="8">
@@ -212,28 +293,28 @@ export default class DownloadProgram extends Component {
                                                 <strong>Download Program Data</strong>
                                             </CardHeader>
                                             <CardBody>
-                                                <FormGroup >
-                                                    <Col md="3">
-                                                        <Label htmlFor="select">Select Program</Label>
-                                                    </Col>
-                                                    <Col xs="12" md="9">
-                                                        <Select
-                                                            valid={!errors.programId}
-                                                            invalid={touched.programId && !!errors.programId}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="programId" id="programId"
-                                                            multi
-                                                            options={this.state.programList}
-                                                            value={this.state.programId}
-                                                        />
-                                                        <FormFeedback>{errors.programId}</FormFeedback>
-                                                    </Col>
-
+                                                <FormGroup>
+                                                    <Label htmlFor="select">Program</Label>
+                                                    <Select
+                                                        valid={!errors.programId}
+                                                        bsSize="sm"
+                                                        invalid={touched.programId && !!errors.programId}
+                                                        onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                        onBlur={handleBlur} name="programId" id="programId"
+                                                        multi
+                                                        options={this.state.programList}
+                                                        value={this.state.programId}
+                                                    />
+                                                    <FormFeedback>{errors.programId}</FormFeedback>
                                                 </FormGroup>
                                             </CardBody>
                                             <CardFooter>
-                                                <Button type="button" onClick={() => this.formSubmit()} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i> Download</Button>
-                                                <Button type="reset" size="sm" color="danger"><i className="fa fa-ban"></i> Reset</Button>
+                                                <FormGroup>
+                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                    <Button type="button" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>Submit</Button>
+                                                    &nbsp;
+                                                </FormGroup>
                                             </CardFooter>
                                         </Form>
                                     )} />
@@ -242,6 +323,9 @@ export default class DownloadProgram extends Component {
             </>
         )
 
+    }
+    cancelClicked() {
+        this.props.history.push(`/dashboard/` + "Action Canceled")
     }
 
 }

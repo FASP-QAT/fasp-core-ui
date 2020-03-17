@@ -4,17 +4,17 @@ import { API_URL } from '../Constants.js';
 class RegionService {
 
     addRegion(json) {
-        console.log(json);
-        return axios.put(`${API_URL}/api/addRegion/`, json, {}
+        return axios.post(`${API_URL}/api/region/`, json, {}
         );
     }
 
     getRegionList() {
-        return axios.get(`${API_URL}/api/getRegionList/`, {
+        return axios.get(`${API_URL}/api/region/`, {
         });
     }
-    editRegion(json) {
-        return axios.put(`${API_URL}/api/editRegion/`, json, {}
+    
+    updateRegion(json) {
+        return axios.put(`${API_URL}/api/region/`, json, {}
         );
     }
 

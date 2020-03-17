@@ -43,6 +43,15 @@ class AuthenticationService {
         return decoded.user.language.languageId;
     }
 
+    getRealmId(){
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("decryptedCurUser---" + decryptedCurUser);
+        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
+        var decoded = jwt_decode(decryptedToken);
+        console.log("Decoded",decoded);
+        return decoded.user.realm.realmId;
+    }
+
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
         console.log("typeofsession---" + typeOfSession);

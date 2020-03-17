@@ -10,7 +10,6 @@ import * as Yup from 'yup';
 import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
 import getLabelText from '../../CommonComponent/getLabelText.js';
-import * as JsStoreFunction from "../../CommonComponent/JsStoreFunctions.js"
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import CryptoJS from 'crypto-js'
@@ -55,87 +54,88 @@ const getErrorsFromValidationError = (validationError) => {
 
 export default class ExportProgram extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             programList: []
         }
         this.formSubmit = this.formSubmit.bind(this)
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
 
     componentDidMount() {
         const lan = 'en'
-        JsStoreFunction.getProgramDataList().then(response => {
-            var json = response;
+        var db1;
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            console.log("in success");
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
             var prgList = [];
-            for (var i = 0; i < json.length; i++) {
-                var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
-                var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                console.log("ProgramNameLabel", programNameLabel);
-                prgList[i] = { value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version }
-            }
-            console.log("ProgramList", prgList)
-            this.setState({
-                programList: prgList
-            })
-        })
-            .catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                console.log("in success")
+                var json = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < json.length; i++) {
+                    var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
+                    var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                    console.log("ProgramNameLabel", programNameLabel);
+                    if (json[i].userId == userId) {
+                        prgList[i] = { value: json[i].id, label: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + json[i].version }
                     }
                 }
-            );
+            }.bind(this)
+            transaction.oncomplete = function (event) {
+                console.log("ProgramList", prgList)
+                this.setState({
+                    programList: prgList
+                })
+                console.log("ProgramList", this.state.programList);
+            }.bind(this)
+        }.bind(this)
     }
 
     formSubmit() {
         var zip = new JSZip();
         var programId = this.state.programId;
-        var programIdStr = "";
-        for (var i = 0; i < programId.length; i++) {
-            programIdStr = programIdStr.concat("'" + programId[i].value).concat("',");
-        }
-        console.log("programIdStr", programIdStr);
-        JsStoreFunction.getProgramDataByprogramIds((programIdStr.substring(0, programIdStr.length - 1)).toString()).then(response => {
-            var json = response;
-            for (var i = 0; i < json.length; i++) {
-                var txt = JSON.stringify(json[i]);
-                zip.file(programId[i].label + "_" + parseInt(i + 1) + ".txt", txt);
-            }
-            zip.generateAsync({
-                type: "blob"
-            }).then(function (content) {
-                FileSaver.saveAs(content, "download.zip");
-            });
-            this.setState({
-                message: "Data exported successfully."
-            })
-        })
-            .catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+        var db1;
+        var storeOS;
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                for (var i = 0; i < myResult.length; i++) {
+                    for (var j = 0; j < programId.length; j++) {
+                        if (myResult[i].id == programId[j].value) {
+                            var txt = JSON.stringify(myResult[i]);
+                            zip.file(programId[i].label + "_" + parseInt(i + 1) + ".txt", txt);
+                        }
+                    }
+                    if (i == myResult.length - 1) {
+                        zip.generateAsync({
+                            type: "blob"
+                        }).then(function (content) {
+                            FileSaver.saveAs(content, "download.zip");
+                            this.props.history.push(`/dashboard/` + "Data exported successfully.")
+                        }.bind(this));
                     }
                 }
-            );
+            }.bind(this);
+        }.bind(this)
     }
 
     touchAll(setTouched, errors) {
@@ -188,27 +188,27 @@ export default class ExportProgram extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 <FormGroup >
-                                                    <Col md="3">
-                                                        <Label htmlFor="select">Select Program</Label>
-                                                    </Col>
-                                                    <Col xs="12" md="9">
-                                                        <Select
-                                                            valid={!errors.programId}
-                                                            invalid={touched.programId && !!errors.programId}
-                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                            onBlur={handleBlur} name="programId" id="programId"
-                                                            multi
-                                                            options={this.state.programList}
-                                                            value={this.state.programId}
-                                                        />
-                                                        <FormFeedback>{errors.programId}</FormFeedback>
-                                                    </Col>
-
+                                                    <Label htmlFor="select">Program</Label>
+                                                    <Select
+                                                        bsSize="sm"
+                                                        valid={!errors.programId}
+                                                        invalid={touched.programId && !!errors.programId}
+                                                        onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                        onBlur={handleBlur} name="programId" id="programId"
+                                                        multi
+                                                        options={this.state.programList}
+                                                        value={this.state.programId}
+                                                    />
+                                                    <FormFeedback>{errors.programId}</FormFeedback>
                                                 </FormGroup>
                                             </CardBody>
                                             <CardFooter>
-                                                <Button type="button" onClick={() => this.formSubmit()} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Export</Button>
-                                                <Button type="reset" size="sm" color="danger"><i className="fa fa-ban"></i> Reset</Button>
+                                                <FormGroup>
+                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                    <Button type="button" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>Submit</Button>
+                                                    &nbsp;
+                                                </FormGroup>
                                             </CardFooter>
                                         </Form>
                                     )} />
@@ -216,6 +216,10 @@ export default class ExportProgram extends Component {
                 </Col>
             </>
         )
+    }
+
+    cancelClicked() {
+        this.props.history.push(`/dashboard/` + "Action Canceled")
     }
 
 }

@@ -2,8 +2,21 @@ import React from 'react';
 
 const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
 const AddSubFundingSource = React.lazy(() => import('./views/subFundingSource/AddSubFundingSourceComponent'));
-const SubFundingSourceList = React.lazy(() => import('./views/subFundingSource/SubFundingSourceListComponent'));
+const ListSubFundingSource = React.lazy(() => import('./views/subFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/EditSubFundingSourceComponent'));
+const AddFundingSource = React.lazy(() => import('./views/fundingSource/AddFundingSourceComponent'));
+const ListFundingSource = React.lazy(() => import('./views/fundingSource/ListFundingSourceComponent'));
+const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFundingSourceComponent'));
+const AddProcurementAgent = React.lazy(() => import('./views/procurementAgent/AddProcurementAgentComponent'));
+const ListProcurementAgent = React.lazy(() => import('./views/procurementAgent/ListProcurementAgentComponent'));
+const EditProcurementAgent = React.lazy(() => import('./views/procurementAgent/EditProcurementAgentComponent'));
+const AddManufacturer = React.lazy(() => import('./views/manufacturer/AddManufacturerComponent'));
+const ListManufacturer = React.lazy(() => import('./views/manufacturer/ListManufacturerComponent'));
+const EditManufacturer = React.lazy(() => import('./views/manufacturer/EditManufacturerComponent'));
+const AddRegion = React.lazy(() => import('./views/region/AddRegionComponent'));
+const ListRegion = React.lazy(() => import('./views/region/ListRegionComponent'));
+const EditRegion = React.lazy(() => import('./views/region/EditRegionComponent'));
+
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
 const TextEditors = React.lazy(() => import('./views/Editors/TextEditors'));
@@ -63,13 +76,13 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
-const AddBudget = React.lazy(() => import('./views/Budget/AddBudget'));
-const Budgets = React.lazy(() => import('./views/Budget/BudgetList'));
+const AddBudgetComponent = React.lazy(() => import('./views/budget/AddBudgetComponent'));
+const ListBudgetComponent = React.lazy(() => import('./views/budget/ListBudgetComponent'));
+const EditBudgetComponent=React.lazy(() => import('./views/budget/EditBudgetComponent'));
 const AddProgramProduct = React.lazy(() => import('./views/ProgramProduct/AddProgramProduct'));
 const AddProductCategory = React.lazy(() => import('./views/ProductCategory/AddProductCategory'));
 const AddProgram = React.lazy(() => import('./views/Program/AddProgram'));
 const Programs = React.lazy(() => import('./views/Program/ProgramList'));
-const Test = React.lazy(() => import('./views/Budget/Test'));
 const DownloadProgram = React.lazy(() => import('./views/Program/DownloadProgram'));
 const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
@@ -78,20 +91,39 @@ const ConsumptionDetails = React.lazy(() => import('./views/Consumption/Consumpt
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/budget/test', name: 'Test', component: Test},
   { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
   { path: '/program/listProgram', name: 'Program List', component: Programs },
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
-  { path: '/budget/addBudget', name: 'Add Budget', component: AddBudget },
-  { path: '/budget/listBudgets', name: 'Budget List', component: Budgets },
+  { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
+  { path: '/budget/listBudget', name: 'Budget List', component: ListBudgetComponent },
+  { path: '/budget/listBudget/:message',component: ListBudgetComponent },
+  { path: '/budget/editBudget', name: 'Update Budget', component: EditBudgetComponent },
   { path: '/', exact: true, name: 'Home' },
   { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
+  { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
+  { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
+  { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },
+  { path: '/fundingSource/listFundingSource/:message',component: ListFundingSource },
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: SubFundingSourceList },
+  { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
+  { path: '/subFundingSource/listSubFundingSource/:message',component: ListSubFundingSource },
+  { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'Procurement Agent / Procurement Agent List', component: ListProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent/:message',component: ListProcurementAgent },
+  { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
+
+  { path: '/manufacturer/addManufacturer', name: 'Manufacturer / Add Manufacturer', component: AddManufacturer },
+  { path: '/manufacturer/listManufacturer', exact: true, name: 'Manufacturer / Manufacturer List', component: ListManufacturer },
+  { path: '/manufacturer/editManufacturer', name: 'Manufacturer / Edit Manufacturer', component: EditManufacturer },
+  { path: '/manufacturer/listManufacturer/:message',component: ListManufacturer },
+  { path: '/region/addRegion', name: 'Region / Add Region', component: AddRegion },
+  { path: '/region/listRegion', exact: true, name: 'Region / Region List', component: ListRegion },
+  { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
+  { path: '/region/listRegion/:message',component: ListRegion },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
@@ -155,6 +187,7 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/program/downloadProgram', name: 'Download Program', component: DownloadProgram },
+  { path: '/program/downloadProgram/:message', name: 'Download Program', component: DownloadProgram },
   { path: '/program/exportProgram', name: 'Export Program', component: ExportProgram },
   { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
   { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
