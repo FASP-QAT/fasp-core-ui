@@ -13,34 +13,48 @@ export default {
         {
           name: 'Add Health Area',
           url: '/healthArea/addHealthArea',
-          icon: 'fa fa-code',
+          icon: 'fa fa-code'
         }
       ]
     },
     {
-      name: 'Sub Funding Source',
-      url: '/subFundingSource',
-      icon: 'fa fa-money',
+      name: 'Realm Masters',
+      icon: 'fa fa-list',
       children: [
         {
-          name: 'Add Sub Funding Source',
-          url: '/subFundingSource/addSubFundingSource',
-          icon: 'fa fa-plus',
+          name: 'Funding Source',
+          icon: 'fa fa-bank',
+          url: '/fundingSource/listFundingSource'
         },
         {
-          name: 'Sub Funding Source List',
-          url: '/subFundingSource/subFundingSourceList',
-          icon: 'fa fa-plus',
+          name: 'Sub Funding Source',
+          url: '/subFundingSource/listSubFundingSource',
+          icon: 'fa fa-bank'
+        },
+        {
+          name: 'Budget',
+          url: '/budget/listBudget',
+          icon: 'fa fa-money'
+        },
+        {
+          name: 'Manufacturer',
+          url: '/manufacturer/listManufacturer',
+          icon: 'fa fa-industry'
+        },
+        {
+          name: 'Region',
+          url: '/region/listRegion',
+          icon: 'fa fa-globe'
         }
       ]
     },
     {
-      name: 'Program Level Masters',
+      name: 'Program Masters',
       url: '/program',
       icon: 'icon-graph',
       children: [
         {
-          name: 'Program Master',
+          name: 'Program',
           url: '/program',
           icon: 'icon-graph',
           children: [
@@ -57,28 +71,24 @@ export default {
           ]
         },
         {
-          name: 'Budget Master',
-          url: '/budget',
+          name: 'Product',
+          url: '/product',
           icon: 'icon-graph',
           children: [
             {
-              name: 'Add Budget',
-              url: '/budget/addBudget',
+              name: 'Add Product',
+              url: '/product/addProduct',
               icon: 'icon-pencil',
             },
             {
-              name: 'List Budgets',
-              url: '/budget/listBudgets',
+              name: 'List Product',
+              url: '/product/listProduct',
               icon: 'icon-list',
-            }, {
-              name: 'Test',
-              url: '/budget/test',
-              icon: 'icon-pencil'
             }
           ]
-        },
+        }, 
         {
-          name: 'Program Product Master',
+          name: 'Program Product',
           url: '/programProduct',
           icon: 'icon-graph',
           children: [
@@ -95,7 +105,7 @@ export default {
           ]
         },
         {
-          name: 'Product Category Master',
+          name: 'Product Category',
           url: '/productCategory',
           icon: 'icon-graph',
           children: [
@@ -119,6 +129,6 @@ export default {
           icon: 'fa fa-code',
         }
       ]
-    },
+    }
   ]
 };

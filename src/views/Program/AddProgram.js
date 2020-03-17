@@ -10,6 +10,9 @@ import * as Yup from 'yup';
 import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
+import HealthAreaService from "../../api/HealthAreaService";
+import getLabelText from '../../CommonComponent/getLabelText'
+import AuthenticationService from '../common/AuthenticationService.js';
 
 
 const initialValues = {
@@ -44,23 +47,23 @@ const validationSchema = function (values) {
         userId: Yup.string()
             .required('Please select program manager'),
         airFreightPerc: Yup.number()
-            .required('Please enter air freight percentage').min(0,'Please enter value greater then 0'),
+            .required('Please enter air freight percentage').min(0, 'Please enter value greater then 0'),
         seaFreightPerc: Yup.number()
-            .required('Please enter sea freight percentage').min(0,'Please enter value greater then 0'),
+            .required('Please enter sea freight percentage').min(0, 'Please enter value greater then 0'),
         deliveredToReceivedLeadTime: Yup.number()
-            .required('Please enter deliverd to recived lead time').min(0,'Please enter value greater then 0'),
+            .required('Please enter deliverd to recived lead time').min(0, 'Please enter value greater then 0'),
         draftToSubmittedLeadTime: Yup.number()
-            .required('Please enter draft to submitted lead time').min(0,'Please enter value greater then 0'),
+            .required('Please enter draft to submitted lead time').min(0, 'Please enter value greater then 0'),
         plannedToDraftLeadTime: Yup.number()
-            .required('Please enter plan to draft lead time').min(0,'Please enter value greater then 0'),
+            .required('Please enter plan to draft lead time').min(0, 'Please enter value greater then 0'),
         submittedToApprovedLeadTime: Yup.number()
-            .required('Please enter submit to approved lead time').min(0,'Please enter value greater then 0'),
+            .required('Please enter submit to approved lead time').min(0, 'Please enter value greater then 0'),
         approvedToShippedLeadTime: Yup.number()
-            .required('Please enter approved to shippedLeadTime').min(0,'Please enter value greater then 0'),
+            .required('Please enter approved to shippedLeadTime').min(0, 'Please enter value greater then 0'),
         monthsInFutureForAmc: Yup.number()
-            .required('Please enter month in funture for AMC').min(0,'Please enter value greater then 0'),
+            .required('Please enter month in funture for AMC').min(0, 'Please enter value greater then 0'),
         monthsInPastForAmc: Yup.number()
-            .required('Please enter month in past for AMC').min(0,'Please enter value greater then 0'),
+            .required('Please enter month in past for AMC').min(0, 'Please enter value greater then 0'),
         healthAreaId: Yup.string()
             .required('Please select health area'),
         programNotes: Yup.string()
@@ -124,19 +127,160 @@ export default class AddProgram extends Component {
                     healthAreaId: ''
                 },
                 programNotes: '',
-                regionArray: []
+                regionArray: [],
+                lan: 'en'
 
             },
-            regionList: [{ value: '1', label: 'R1' },
-            { value: '2', label: 'R2' },
-            { value: '3', label: 'R3' }],
-            regionId: ''
+            // regionList: [{ value: '1', label: 'R1' },
+            // { value: '2', label: 'R2' },
+            // { value: '3', label: 'R3' }],
+            regionId: '',
+            realmList: [],
+            realmCountryList: [],
+            organisationList: [],
+            healthAreaList: [],
+            programManagerList: [],
+            regionList: []
+
         }
         this.dataChange = this.dataChange.bind(this);
+        this.getDependentLists = this.getDependentLists.bind(this);
+        this.getRegionList = this.getRegionList.bind(this);
+        this.cancelClicked=this.cancelClicked.bind(this);
 
     }
     componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        HealthAreaService.getRealmList()
+            .then(response => {
+                // console.log("realm list---", response.data.data);
+                this.setState({
+                    realmList: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
 
+    }
+    getDependentLists(e) {
+        console.log(e.target.value)
+
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getRealmCountryList(e.target.value)
+            .then(response => {
+                console.log("realm list---", response.data.data);
+                this.setState({
+                    realmCountryList: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
+
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getOrganisationList(e.target.value)
+            .then(response => {
+                console.log("organisation list---", response.data.data);
+                this.setState({
+                    organisationList: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
+
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getHealthAreaList(e.target.value)
+            .then(response => {
+                console.log("health area list---", response.data.data);
+                this.setState({
+                    healthAreaList: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
+
+    }
+
+    getRegionList(e) {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getRegionList(e.target.value)
+            .then(response => {
+                console.log("health area list---", response.data.data);
+                var json = response.data.data;
+                var regList = [];
+                for (var i = 0; i < json.length; i++) {
+                    regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                }
+                this.setState({
+                    regionList: regList
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
 
     }
     updateFieldData(value) {
@@ -145,10 +289,10 @@ export default class AddProgram extends Component {
         var regionId = value;
         var regionIdArray = [];
         for (var i = 0; i < regionId.length; i++) {
-            regionIdArray[i] = regionId[i].value;   
+            regionIdArray[i] = regionId[i].value;
         }
-        program.regionArray=regionIdArray;
-        this.setState({program: program});
+        program.regionArray = regionIdArray;
+        this.setState({ program: program });
     }
     dataChange(event) {
         let { program } = this.state;
@@ -187,7 +331,7 @@ export default class AddProgram extends Component {
             program.programNotes = event.target.value;
         }
 
-        this.setState({ program }, () => { console.log(this.state) })
+        this.setState({ program }, () => { })
 
     }
     touchAll(setTouched, errors) {
@@ -228,6 +372,48 @@ export default class AddProgram extends Component {
     }
 
     render() {
+        const { realmList } = this.state;
+        const { realmCountryList } = this.state;
+        const { organisationList } = this.state;
+        const { healthAreaList } = this.state;
+
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lan)}
+                    </option>
+                )
+            }, this);
+
+        let realmCountries = realmCountryList.length > 0
+            && realmCountryList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmCountryId}>
+                        {getLabelText(item.country.label, this.state.lan)}
+                    </option>
+                )
+            }, this);
+
+        let realmOrganisation = organisationList.length > 0
+            && organisationList.map((item, i) => {
+                return (
+                    <option key={i} value={item.organisationId}>
+                        {getLabelText(item.label, this.state.lan)}
+                    </option>
+                )
+            }, this);
+
+        let realmHealthArea = healthAreaList.length > 0
+            && healthAreaList.map((item, i) => {
+                return (
+                    <option key={i} value={item.healthAreaId}>
+                        {getLabelText(item.label, this.state.lan)}
+                    </option>
+                )
+            }, this);
+
+
         return (
             <Col xs="12" sm="8">
                 <Card>
@@ -235,9 +421,10 @@ export default class AddProgram extends Component {
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
+                            AuthenticationService.setupAxiosInterceptors();
                             ProgramService.addProgram(this.state.program).then(response => {
-                                console.log(this.state.program);
-                                console.log(response);
+                                // console.log(this.state.program);
+                                // console.log(response);
                                 this.props.history.push(`/program/listProgram/${response.data.message}`)
                             }
                             )
@@ -299,13 +486,11 @@ export default class AddProgram extends Component {
                                                         value={this.state.program.realm.realmId}
                                                         valid={!errors.realmId}
                                                         invalid={touched.realmId && !!errors.realmId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                         onBlur={handleBlur}
                                                         type="select" name="realmId" id="realmId">
                                                         <option value="0">Please select</option>
-                                                        <option value="1">Realm #1</option>
-                                                        <option value="2">Realm #2</option>
-                                                        <option value="3">Realm #3</option>
+                                                        {realms}
                                                     </Input>
                                                     <FormFeedback>{errors.realmId}</FormFeedback>
                                                 </Col>
@@ -319,13 +504,14 @@ export default class AddProgram extends Component {
                                                         value={this.state.program.realmCountry.realmCountryId}
                                                         valid={!errors.realmCountryId}
                                                         invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
                                                         onBlur={handleBlur}
                                                         type="select" name="realmCountryId" id="realmCountryId">
                                                         <option value="0">Please select</option>
-                                                        <option value="1">Country #1</option>
+                                                        {/* <option value="1">Country #1</option>
                                                         <option value="2">Country #2</option>
-                                                        <option value="3">Country #3</option>
+                                                        <option value="3">Country #3</option> */}
+                                                        {realmCountries}
                                                     </Input>
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                 </Col>
@@ -339,7 +525,7 @@ export default class AddProgram extends Component {
                                                     <Select
                                                         valid={!errors.regionId}
                                                         invalid={touched.reagonId && !!errors.regionId}
-                                                        onChange={(e) => { handleChange(e); this.updateFieldData(e)}}
+                                                        onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
                                                         onBlur={handleBlur} name="regionId" id="regionId"
                                                         multi
                                                         options={this.state.regionList}
@@ -361,9 +547,10 @@ export default class AddProgram extends Component {
                                                         onBlur={handleBlur}
                                                         type="select" name="organisationId" id="organisationId">
                                                         <option value="0">Please select</option>
-                                                        <option value="1">product #1</option>
+                                                        {realmOrganisation}
+                                                        {/* <option value="1">product #1</option>
                                                         <option value="2">product #2</option>
-                                                        <option value="3">product #3</option>
+                                                        <option value="3">product #3</option> */}
                                                     </Input>
                                                     <FormFeedback>{errors.organisationId}</FormFeedback>
                                                 </Col>
@@ -380,9 +567,10 @@ export default class AddProgram extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="healthAreaId" id="healthAreaId">
                                                         <option value="0">Please select</option>
-                                                        <option value="1">Health Area #1</option>
+                                                        {realmHealthArea}
+                                                        {/* <option value="1">Health Area #1</option>
                                                         <option value="2">Health Area #2</option>
-                                                        <option value="3">Health Area #3</option>
+                                                        <option value="3">Health Area #3</option> */}
                                                     </Input>
                                                     <FormFeedback>{errors.healthAreaId}</FormFeedback>
                                                 </Col>
@@ -399,9 +587,9 @@ export default class AddProgram extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
                                                         <option value="0">Please select</option>
-                                                        <option value="1">product #1</option>
-                                                        <option value="2">product #2</option>
-                                                        <option value="3">product #3</option>
+                                                        <option value="1">user #1</option>
+                                                        <option value="2">user #2</option>
+                                                        <option value="3">user #3</option>
                                                     </Input>
                                                     <FormFeedback>{errors.userId}</FormFeedback>
                                                 </Col>
@@ -553,14 +741,20 @@ export default class AddProgram extends Component {
                                                         invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder="Enter month in future for AMC" />
+                                                        type="number" name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder="EcancelClickednter month in future for AMC" />
                                                     <FormFeedback>{errors.monthsInFutureForAmc}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
 
                                         </CardBody>
                                         <CardFooter>
-                                            <Button type="submit" size="sm" color="primary" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-dot-circle-o"></i>Submit </Button>
+                                            <FormGroup>
+                                            {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
+                                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                            <Button type="submit" size="sm" color="primary" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>Submit </Button>
+                                            {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
+                                            &nbsp;
+                                        </FormGroup>
                                         </CardFooter>
                                     </Form>
                                 )} />
@@ -568,5 +762,8 @@ export default class AddProgram extends Component {
             </Col>
 
         );
+    }
+    cancelClicked() {
+        this.props.history.push(`/program/listProgram/` + "Action Canceled")
     }
 }

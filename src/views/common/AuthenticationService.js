@@ -37,7 +37,7 @@ class AuthenticationService {
 
     getLanguageId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---" + decryptedCurUser);
+        // console.log("decryptedCurUser---" + decryptedCurUser);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
         var decoded = jwt_decode(decryptedToken);
         return decoded.user.language.languageId;
@@ -45,8 +45,8 @@ class AuthenticationService {
 
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
-        console.log("typeofsession---" + typeOfSession);
-        console.log("network----" + navigator.onLine);
+        // console.log("typeofsession---" + typeOfSession);
+        // console.log("network----" + navigator.onLine);
         if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && !navigator.onLine)) {
             console.log("true");
             return true;
@@ -60,13 +60,13 @@ class AuthenticationService {
     }
 
     checkIfDifferentUserIsLoggedIn(newUsername) {
-        console.log("token username---" + newUsername);
+        // console.log("token username---" + newUsername);
         let usernameStored = localStorage.getItem('username');
-        console.log("usernameStored---" + usernameStored);
+        // console.log("usernameStored---" + usernameStored);
         if (usernameStored !== null && usernameStored !== "") {
             var usernameDecrypted = CryptoJS.AES.decrypt(usernameStored, `${SECRET_KEY}`)
             var originalText = usernameDecrypted.toString(CryptoJS.enc.Utf8);
-            console.log("usernameDecrypted---" + originalText);
+            // console.log("usernameDecrypted---" + originalText);
             if (originalText !== newUsername) {
                 if (window.confirm("Are you sure you want to overrride already logged in user's details?")) {
                     return true;
@@ -84,11 +84,11 @@ class AuthenticationService {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
         var decoded = jwt_decode(decryptedToken);
-        console.log(decoded);
+        // console.log(decoded);
         let tokenExpiryTime = new Date(decoded.exp * 1000);
         var curDate = new Date();
-        console.log(new Date(decoded.exp * 1000));
-        console.log("cur date---" + curDate);
+        // console.log(new Date(decoded.exp * 1000));
+        // console.log("cur date---" + curDate);
 
         if (new Date(decoded.exp * 1000) > new Date()) {
             console.log("Token not expired");
@@ -103,8 +103,8 @@ class AuthenticationService {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
         var decoded = jwt_decode(decryptedToken);
-        console.log("decoded---", decoded);
-        console.log("Session expires on---" + decoded.user.sessionExpiresOn);
+        // console.log("decoded---", decoded);
+        // console.log("Session expires on---" + decoded.user.sessionExpiresOn);
         return decoded.user.sessionExpiresOn;
     }
 
@@ -121,11 +121,11 @@ class AuthenticationService {
     // }
 
     setupAxiosInterceptors() {
-        console.log(localStorage.getItem('curUser'));
+        // console.log(localStorage.getItem('curUser'));
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
         let basicAuthHeader = 'Bearer ' + decryptedToken
-        console.log("headers=" + basicAuthHeader);
+        // console.log("headers=" + basicAuthHeader);
         axios.interceptors.request.use(
             // if (this.isUserLoggedIn) {
             (config) => {

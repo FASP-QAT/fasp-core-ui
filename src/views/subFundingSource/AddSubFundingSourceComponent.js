@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 
 import FundingSourceService from "../../api/FundingSourceService";
+import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
@@ -15,9 +16,9 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     fundingSourceId: Yup.string()
-      .required('Please select realm.'),
+      .required('Please select Funding source'),
     subFundingSource: Yup.string()
-      .required('Please enter health area')
+      .required('Please enter Sub Funding source')
   })
 }
 
@@ -144,10 +145,10 @@ class AddSubFundingSourceComponent extends Component {
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                  FundingSourceService.addSubFundingSource(this.state.subFundingSource)
+                  SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
                     .then(response => {
                       if (response.data.status == "Success") {
-                        this.props.history.push(`/subFundingSource/subFundingSourceList/${response.data.message}`)
+                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.message}`)
                       } else {
                         this.setState({
                           message: response.data.message
@@ -191,7 +192,7 @@ class AddSubFundingSourceComponent extends Component {
                               type="select"
                               name="fundingSourceId"
                               id="fundingSourceId"
-                              bsSize="lg"
+                              bsSize="sm"
                               valid={!errors.fundingSourceId}
                               invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -205,10 +206,11 @@ class AddSubFundingSourceComponent extends Component {
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="healthArea">Sub Funding Source</Label>
+                            <Label for="subFundingSource">Sub Funding Source</Label>
                             <Input type="text"
                               name="subFundingSource"
                               id="subFundingSource"
+                              bsSize="sm"
                               valid={!errors.subFundingSource}
                               invalid={touched.subFundingSource && !!errors.subFundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -219,14 +221,14 @@ class AddSubFundingSourceComponent extends Component {
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button>
-                            <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>
-
                     )} />
-
             </Card>
           </Col>
         </Row>
@@ -234,7 +236,7 @@ class AddSubFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/subFundingSource/subFundingSourceList/` + "Action Canceled")
+    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "Action Canceled")
   }
 }
 
