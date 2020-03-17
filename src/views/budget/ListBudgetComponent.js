@@ -45,7 +45,7 @@ class ListBudgetComponent extends Component {
   }
 
   addBudget(budget) {
-    console.log("going to Add Budget");
+    // console.log("going to Add Budget");
     this.props.history.push({
       pathname: "/budget/addBudget"
     });
@@ -55,9 +55,9 @@ class ListBudgetComponent extends Component {
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
-        console.log(response);
+        console.log(response.data);
         this.setState({
-          table: response.data.data
+          table: response.data
         })
       })
       .catch(

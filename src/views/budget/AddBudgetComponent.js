@@ -135,8 +135,9 @@ class AddBudgetComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList()
             .then(response => {
+                // console.log(response.data);
                 this.setState({
-                    programs: response.data
+                    programs: response.data.data
                 })
             }).catch(
                 error => {
