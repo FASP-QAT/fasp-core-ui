@@ -12,6 +12,7 @@
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
+node_modules/.cache
 node_modules
 build
 # End of https://www.gitignore.io/api/visualstudiocode
