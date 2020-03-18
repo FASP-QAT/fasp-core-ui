@@ -13,13 +13,17 @@ import LanguageService from '../../api/LanguageService.js'
 // import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
-    languageName: ""
+    languageName: "",
+    languageCode: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
+
         languageName: Yup.string()
-        .required(i18n.t('static.language.languagetext')) 
+        .required(i18n.t('static.language.languagetext')) ,
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
+
     })
 }
 
@@ -49,11 +53,11 @@ class AddLanguageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            languageName: '',
+            language: {},
             message: ''
         }
-        
-        this.Capitalize = this.Capitalize.bind(this);
+
+        // this.Capitalize = this.Capitalize.bind(this);
 
         this.submitClicked = this.submitClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -61,23 +65,27 @@ class AddLanguageComponent extends Component {
     }
 
     dataChange(event) {
-        let { languageName } = this.state;
-
+        let { language } = this.state;
+        if (event.target.name == "langauageName") {
+            language.languageName = event.target.value;
+        }
+        if (event.target.name == "languageCode") {
+            language.languageCode = event.target.value;
+        }
         this.setState({
-            languageName
+            language
         },
-            () => {
-                //  console.log("state after update---", this.state.languageName) 
-        });
+            () => { });
     };
 
-    Capitalize(str) {
-        this.setState({languageName: str.charAt(0).toUpperCase() + str.slice(1)});
-    }
+    // Capitalize(str) {
+    //     this.setState({language: str.charAt(0).toUpperCase() + str.slice(1)});
+    // }
 
     touchAll(setTouched, errors) {
         setTouched({
-            languageName: true
+            languageName: true,
+            languageCode: true
         }
         )
         this.validateForm(errors)
@@ -105,7 +113,9 @@ class AddLanguageComponent extends Component {
     submitHandler = event => {
         event.preventDefault();
         event.target.className += " was-validated";
-    };
+    }
+
+
 
     render() {
 
@@ -119,19 +129,16 @@ class AddLanguageComponent extends Component {
                             </CardHeader>
                             <CardBody>
                                 <Formik
-                                    // initialValues={initialValues}
                                     validate={validate(validationSchema)}
-
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
-
                                         LanguageService.addLanguage(values).then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/language/listLanguage/${response.data.message}`)
-                                              } else {
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)
+                                            } else {
                                                 this.setState({
-                                                  message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
-                                              }
+                                            }
                                         }
                                         )
                                             .catch(
@@ -144,9 +151,9 @@ class AddLanguageComponent extends Component {
                                                             break
                                                         default:
                                                             this.setState({
-                                                                message: error.response.data.message
+                                                                message: error.response.data.messageCode
                                                             })
-                                                            break
+                                                            break;
                                                     }
                                                 }
                                             )
@@ -169,30 +176,44 @@ class AddLanguageComponent extends Component {
                                             setTouched
                                         }) => (
                                                 <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
-
-
                                                     <FormGroup>
                                                         <Label for="languageName">{i18n.t('static.language.language')}</Label>
                                                         <Input type="text"
                                                             name="languageName"
                                                             id="languageName"
+                                                            bsSize="sm"
                                                             valid={!errors.languageName}
                                                             invalid={touched.languageName && !!errors.languageName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.languageName}
                                                             required />
                                                         <FormFeedback>{errors.languageName}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="languageCode">Language code</Label>
+                                                        <Input type="text"
+                                                            name="languageCode"
+                                                            id="languageCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.languageCpde}
+                                                            invalid={touched.languageCode && !!errors.languageCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.languageCode}
+                                                            required />
+                                                        <FormFeedback>{errors.languageCode}</FormFeedback>
+                                                    </FormGroup>
 
                                                     <FormGroup>
+
                                                         <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} >{i18n.t('static.common.submit')}</Button>
                                                         {/* <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button> */}
                                                         <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+
                                                     </FormGroup>
                                                 </Form>
                                             )}
-
                                 />
                             </CardBody>
                         </Card>
@@ -202,11 +223,8 @@ class AddLanguageComponent extends Component {
         );
     }
 
-    submitClicked() {
-
-    }
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` + "Action Canceled")
+        this.props.history.push(`/language/listLanguage/` + "static.actionCancelled")
     }
 
 

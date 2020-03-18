@@ -104,27 +104,29 @@ class EditFundingSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/fundingSource/listFundingSource/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/fundingSource/listFundingSource/${response.data.messageCode}`)
                                             } else {
-                                                this.setState({
-                                                    message: response.data.message
-                                                })
+                                                this.setState({ message: response.data.messageCode })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -220,11 +222,15 @@ class EditFundingSourceComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{this.state.message}</h6>
+                    <h6>{this.props.match.params.messageCode}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/fundingSource/listFundingSource/` + "Action Canceled")
+        this.props.history.push(`/fundingSource/listFundingSource/` + "static.actionCancelled")
     }
 }
 
