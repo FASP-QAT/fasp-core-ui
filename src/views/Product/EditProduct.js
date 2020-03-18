@@ -23,15 +23,15 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         productName: Yup.string()
-            .required('Please enter product name'),
-        genericName: Yup.string()
-            .required('Please select generic name'),
-        realmId: Yup.string()
-            .required('Please select realm'),
-        productCategoryId: Yup.string()
-            .required('Please select product category'),
-        unitId: Yup.string()
-            .required('Please select unit')
+        .required(i18n.t('static.product.productnametext')),
+    genericName: Yup.string()
+    .required(i18n.t('static.product.generictext')),
+    realmId: Yup.string()
+    .required(i18n.t('static.product.realmtext')),
+    productCategoryId: Yup.string()
+    .required(i18n.t('static.product.productcategorytext')),
+    unitId: Yup.string()
+    .required(i18n.t('static.product.productunittext'))
     })
 }
 

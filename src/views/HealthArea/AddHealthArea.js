@@ -21,11 +21,11 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-      .required('Please select realm.'),
-    countryId: Yup.string()
-      .required('Please select country'),
+    .required(i18n.t('static.healtharea.realmtext')),
+     countryId: Yup.string()
+      .required(i18n.t('static.healtharea.countrytext')),
     healthAreaName: Yup.string()
-      .required('Please enter health area')
+      .required(i18n.t('static.healtharea.healthareatext'))
   })
 }
 

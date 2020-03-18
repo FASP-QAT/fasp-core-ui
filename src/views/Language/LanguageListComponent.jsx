@@ -47,7 +47,7 @@ export default class LanguageListComponent extends Component {
         if (navigator.onLine) {
             this.props.history.push(`/language/addLanguage`)
         } else {
-            alert("You must be Online.")
+            alert(i18n.t('static.common.onlinealerttext'))
         }
     }
 

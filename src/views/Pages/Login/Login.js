@@ -26,9 +26,9 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     username: Yup.string()
-      .required('Please enter username'),
+      .required(i18n.t('static.login.usernametext')),
     password: Yup.string()
-      .required('Please enter password')
+      .required(i18n.t('static.login.passwordtext'))
   })
 }
 
