@@ -102,9 +102,9 @@ export default class EditBudget extends Component {
     componentDidMount() {
 
         ProgramServcie.getProgramList().then(response => {
-            // console.log(response.data)
+            console.log(response.data.data)
             this.setState({
-                programList: response.data
+                programList: response.data.data
             })
         })
             .catch(

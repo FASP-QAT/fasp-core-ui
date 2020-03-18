@@ -18,7 +18,7 @@ import JSZip from 'jszip';
 import CryptoJS from 'crypto-js';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-
+import i18n from '../../i18n';
 const initialValues = {
     programId: ''
 }
@@ -309,19 +309,19 @@ export default class ImportProgram extends Component {
                                 }) => (
                                         <Form noValidate name='simpleForm'>
                                             <CardHeader>
-                                                <strong>Download Program Data</strong>
+                                                <strong>{i18n.t('static.program.import')}</strong>
                                             </CardHeader>
                                             <CardBody>
                                                 <FormGroup id="fileImportDiv">
                                                     <Col md="3">
-                                                        <Label htmlFor="file-input">File input</Label>
+                                                        <Label htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
                                                     </Col>
                                                     <Col xs="12" md="9">
                                                         <Input type="file" id="file-input" name="file-input" />
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup id="programIdDiv">
-                                                    <Label htmlFor="select">Program</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                     <Select
                                                         bsSize="sm"
                                                         valid={!errors.programId}
@@ -337,10 +337,10 @@ export default class ImportProgram extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                    <Button type="button" id="fileImportButton" size="sm" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>Submit</Button>
-                                                    <Button type="button" id="formSubmitButton" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>Submit</Button>
+                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" id="fileImportButton" size="sm" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="button" id="formSubmitButton" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>

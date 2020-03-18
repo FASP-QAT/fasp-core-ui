@@ -100,7 +100,7 @@ class ResetPasswordComponent extends Component {
             .then(response => {
                 console.log("response---", response);
                 this.setState({
-                    message: response.data.message
+                    message: response.data.messageCode
                 })
             }).catch(
                 error => {
@@ -139,13 +139,15 @@ class ResetPasswordComponent extends Component {
                             <Formik
                                 initialValues={{
                                     newPassword: "",
-                                    confirmNewPassword: ""
+                                    confirmNewPassword: "",
+                                    username: this.state.username
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     if (navigator.onLine) {
                                         UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
                                             .then(response => {
+                                                console.log("response---", response);
                                                 this.props.history.push(`/login`)
                                             })
                                             .catch(

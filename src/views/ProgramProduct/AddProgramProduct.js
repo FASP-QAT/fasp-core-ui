@@ -22,6 +22,7 @@ class AddProgramProduct extends Component {
             maxMonth: '',
             // },
             rows: []
+
         }
 
         this.addRow = this.addRow.bind(this);

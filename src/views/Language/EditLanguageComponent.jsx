@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import ManufacturerService from "../../api/ManufacturerService";
-import AuthenticationService from '../common/AuthenticationService.js';
+import i18n from '../../i18n';
+// import AuthenticationService from '../common/AuthenticationService.js';
+// import * as myConst from '../../Labels.js';
+import LanguageService from '../../api/LanguageService.js'
 
 let initialValues = {
-    manufacturer: ""
+    language: ""
 }
-
 const validationSchema = function (values) {
     return Yup.object().shape({
-        manufacturer: Yup.string()
-            .required('Please enter Manufacturer')
+        languageName: Yup.string().required('Please enter Language'),
+        languageCode: Yup.string().required('Please enter Language code')
     })
 }
 
@@ -40,40 +40,48 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-class EditManufacturerComponent extends Component {
+export default class EditLanguageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            manufacturer: this.props.location.state.manufacturer,
+            language: this.props.location.state.language,
             message: ''
         }
-        this.cancelClicked = this.cancelClicked.bind(this);
+
+        // this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
+
     }
 
     dataChange(event) {
-        let { manufacturer } = this.state;
-        if (event.target.name == "manufacturer") {
-            manufacturer.label.label_en = event.target.value;
+        let { language } = this.state
+        if (event.target.name === "languageName") {
+            language.languageName = event.target.value
+        } else if (event.target.name === "languageCode") {
+            language.languageCode = event.target.value
+        } else if (event.target.name === "active") {
+            language.active = event.target.id === "active2" ? false : true
         }
-        if (event.target.name == "active") {
-            manufacturer.active = event.target.id === "active2" ? false : true;
-        }
-        this.setState({
-            manufacturer
-        },
-            () => { });
+
+        this.setState(
+            {
+                language
+            },
+            () => { }
+        );
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            manufacturer: true
+            languageName: true,
+            languageCode: true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('manufacturerForm', (fieldName) => {
+        this.findFirstError('languageForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -86,6 +94,14 @@ class EditManufacturerComponent extends Component {
             }
         }
     }
+    componentDidMount() {
+
+    }
+
+    // Capitalize(str) {
+    //     let { language } = this.state
+    //     language.languageName = str.charAt(0).toUpperCase() + str.slice(1)
+    // }
 
     render() {
         return (
@@ -94,40 +110,42 @@ class EditManufacturerComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.manufacturer.manufactureredit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.language.languageedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ manufacturer: this.state.manufacturer.label.label_en }}
+                                initialValues={{ language: this.state.language }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    AuthenticationService.setupAxiosInterceptors();
-                                    ManufacturerService.updateManufacturer(this.state.manufacturer)
-                                        .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/manufacturer/listManufacturer/${response.data.message}`)
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.message
-                                                })
-                                            }
-                                        })
+                                    // AuthenticationService.setupAxiosInterceptors();
+                                    LanguageService.editLanguage(this.state.language).then(response => {
+                                        if (response.status == 200) {
+                                            this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            })
+                                        }
+
+                                    }
+                                    )
                                         .catch(
                                             error => {
                                                 switch (error.message) {
                                                     case "Network Error":
                                                         this.setState({
-                                                            message: error.message
+                                                            message: error.response.data
                                                         })
-                                                        break
+                                                        break;
                                                     default:
                                                         this.setState({
-                                                            message: error.response.data.message
+                                                            message: error.response.data.messageCode
                                                         })
-                                                        break
+                                                        break;
                                                 }
                                             }
-                                        );
+                                        )
+
                                 }}
                                 render={
                                     ({
@@ -141,36 +159,40 @@ class EditManufacturerComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='manufacturerForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.manufacturer.realm.label.label_en}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
+
+                                                        <Label for="language">{i18n.t('static.language.language')}</Label>
+
                                                         <Input type="text"
-                                                            name="manufacturer"
-                                                            id="manufacturer"
+                                                            name="languageName"
+                                                            id="languageName"
                                                             bsSize="sm"
-                                                            valid={!errors.manufacturer}
-                                                            invalid={touched.manufacturer && !!errors.manufacturer}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            valid={!errors.languageName}
+                                                            invalid={touched.languageName && !!errors.languageName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.manufacturer.label.label_en}
+                                                            value={this.state.language.languageName}
                                                             required />
-                                                        <FormFeedback>{errors.manufacturer}</FormFeedback>
+                                                        <FormFeedback>{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label for="languageCode">Language</Label>
+                                                        <Input type="text"
+                                                            name="languageCode"
+                                                            id="languageCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.languageCode}
+                                                            invalid={touched.languageCode && !!errors.languageCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.language.languageCode}
+                                                            required />
+                                                        <FormFeedback>{errors.languageCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -178,7 +200,7 @@ class EditManufacturerComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.manufacturer.active === true}
+                                                                checked={this.state.language.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -194,7 +216,7 @@ class EditManufacturerComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.manufacturer.active === false}
+                                                                checked={this.state.language.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -207,10 +229,8 @@ class EditManufacturerComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
@@ -224,8 +244,7 @@ class EditManufacturerComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/manufacturer/listManufacturer/` + "Action Canceled")
+        this.props.history.push(`/language/listLanguage/` + "static.actionCancelled")
     }
-}
 
-export default EditManufacturerComponent;
+}

@@ -16,6 +16,7 @@ import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
+import i18n from '../../i18n';
 
 const initialValues = {
     programId: ''
@@ -184,11 +185,11 @@ export default class ExportProgram extends Component {
                                 }) => (
                                         <Form noValidate name='simpleForm'>
                                             <CardHeader>
-                                                <strong>Export Program Data</strong>
+                                                <strong>{i18n.t('static.program.export')}</strong>
                                             </CardHeader>
                                             <CardBody>
                                                 <FormGroup >
-                                                    <Label htmlFor="select">Program</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                     <Select
                                                         bsSize="sm"
                                                         valid={!errors.programId}
@@ -204,9 +205,9 @@ export default class ExportProgram extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                    <Button type="button" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>Submit</Button>
+                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>

@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -115,21 +115,22 @@ class AddSubFundingSourceComponent extends Component {
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
         this.setState({
-          fundingSources: response.data.data
+          fundingSources: response.data
         })
       }).catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
+          switch (error.response.status) {
+            case 500:
+            case 401:
+            case 404:
+            case 406:
+            case 412:
+              this.setState({ message: error.response.data.messageCode });
+              break;
             default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
+              this.setState({ message: 'static.unkownError' });
+              console.log("Error code unkown");
+              break;
           }
         }
       );
@@ -147,12 +148,12 @@ class AddSubFundingSourceComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
-        <h5>{this.state.message}</h5>
+        <h5>{i18n.t(this.state.message)}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>Add Sub Funding Source</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceadd')}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -200,7 +201,7 @@ class AddSubFundingSourceComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="fundingSourceId">Funding Source</Label>
+                            <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
                             <Input
                               type="select"
                               name="fundingSourceId"
@@ -213,13 +214,13 @@ class AddSubFundingSourceComponent extends Component {
                               required
                               value={this.state.fundingSourceId}
                             >
-                              <option value="0">Please select</option>
+                              <option value="0">{i18n.t('static.common.select')}</option>
                               {fundingSourceList}
                             </Input>
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="subFundingSource">Sub Funding Source</Label>
+                            <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
                             <Input type="text"
                               name="subFundingSource"
                               id="subFundingSource"
@@ -230,16 +231,16 @@ class AddSubFundingSourceComponent extends Component {
                               onBlur={handleBlur}
                               required
                               value={this.Capitalize(this.state.subFundingSource.label.label_en)}
-                               />
+                            />
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
-                                                        &nbsp;
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+
+                            &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>

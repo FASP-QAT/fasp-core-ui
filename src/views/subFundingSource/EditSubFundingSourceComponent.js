@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n'
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
@@ -54,13 +54,13 @@ class EditSubFundingSourceComponent extends Component {
     Capitalize(str) {
         console.log("capitalize");
         if (str != null && str != "") {
-          console.log("str---" + str)
-          return str.charAt(0).toUpperCase() + str.slice(1);
+            console.log("str---" + str)
+            return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
-          return "";
+            return "";
         }
-      }
-    
+    }
+
     dataChange(event) {
         let { subFundingSource } = this.state;
         if (event.target.name == "subFundingSource") {
@@ -105,7 +105,7 @@ class EditSubFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Updaet Sub Funding source</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -115,27 +115,28 @@ class EditSubFundingSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
+                                                switch (error.response.status) {
+                                                    case 500:
+                                                    case 401:
+                                                    case 404:
+                                                    case 406:
+                                                    case 412:
+                                                        this.setState({ message: error.response.data.messageCode });
+                                                        break;
                                                     default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                        this.setState({ message: 'static.unkownError' });
+                                                        console.log("Error code unkown");
+                                                        break;
                                                 }
                                             }
                                         );
@@ -155,7 +156,7 @@ class EditSubFundingSourceComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="fundingSourceId">Funding Source</Label>
+                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
                                                         <Input
                                                             type="text"
                                                             name="fundingSourceId"
@@ -167,7 +168,7 @@ class EditSubFundingSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="subFundingSource">Sub Funding Source</Label>
+                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"
@@ -181,7 +182,7 @@ class EditSubFundingSourceComponent extends Component {
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Status&nbsp;&nbsp;</Label>
+                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -195,8 +196,8 @@ class EditSubFundingSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                Active
-                                                                </Label>
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -211,16 +212,15 @@ class EditSubFundingSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                Disabled
-                                                                </Label>
+                                                                {i18n.t('static.common.disabled')}
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

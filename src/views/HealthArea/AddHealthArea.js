@@ -3,6 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
+import i18n from '../../i18n'
 // React select
 import states from '../Forms/AdvancedForms/data/states';
 import Select from 'react-select';
@@ -239,7 +240,8 @@ class AddHealthArea extends Component {
                     }) => (
                         <Form onSubmit={handleSubmit} noValidate name='simpleForm'>
                           <FormGroup>
-                            <Label htmlFor="realmId">Realm</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.healtharea.realm')}</Label>
+
                             <Input
                               type="select"
                               name="realmId"

@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
@@ -94,7 +94,7 @@ class EditFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Update Funding Source</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.fundingsource.fundingsourceedittext')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -104,27 +104,29 @@ class EditFundingSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/fundingSource/listFundingSource/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/fundingSource/listFundingSource/${response.data.messageCode}`)
                                             } else {
-                                                this.setState({
-                                                    message: response.data.message
-                                                })
+                                                this.setState({ message: response.data.messageCode })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -144,7 +146,7 @@ class EditFundingSourceComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">Realm</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label>
                                                         <Input
                                                             type="text"
                                                             name="realmId"
@@ -156,7 +158,7 @@ class EditFundingSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="fundingSource">Funding Source</Label>
+                                                        <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
                                                         <Input type="text"
                                                             name="fundingSource"
                                                             id="fundingSource"
@@ -170,7 +172,7 @@ class EditFundingSourceComponent extends Component {
                                                         <FormFeedback>{errors.fundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Status&nbsp;&nbsp;</Label>
+                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -184,7 +186,7 @@ class EditFundingSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active1">
-                                                                Active
+                                                               {i18n.t('static.common.active')}
                                                                 </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -200,16 +202,16 @@ class EditFundingSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active2">
-                                                                Disabled
+                                                                {i18n.t('static.common.disabled')}
                                                                 </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -220,11 +222,15 @@ class EditFundingSourceComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{this.state.message}</h6>
+                    <h6>{this.props.match.params.messageCode}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/fundingSource/listFundingSource/` + "Action Canceled")
+        this.props.history.push(`/fundingSource/listFundingSource/` + "static.actionCancelled")
     }
 }
 

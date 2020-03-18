@@ -7,7 +7,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import FundingSourceService from "../../api/FundingSourceService";
 import RealmService from "../../api/RealmService";
 import AuthenticationService from '../common/AuthenticationService.js';
-
+import i18n from '../../i18n'
 const initialValues = {
   fundingSourceId: [],
   subFundingSource: ""
@@ -75,14 +75,12 @@ class AddFundingSourceComponent extends Component {
   };
 
   touchAll(setTouched, errors) {
-    console.log("Inside touchAll");
     setTouched({
       realmId: true,
       fundingSource: true
     }
     );
     this.validateForm(errors);
-    console.log("Completed Touch All");
   }
   validateForm(errors) {
     this.findFirstError('fundingSourceForm', (fieldName) => {
@@ -103,22 +101,28 @@ class AddFundingSourceComponent extends Component {
     AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
-        this.setState({
-          realms: response.data.data
-        })
+        if (response.status == 200) {
+          this.setState({ realms: response.data })
+        } else {
+          this.setState({ message: response.data.messageCode })
+        }
       }).catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
           }
         }
       );
@@ -140,7 +144,7 @@ class AddFundingSourceComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>Add Funding Source</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.fundingsource.fundingsourceaddttext')}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -150,27 +154,29 @@ class AddFundingSourceComponent extends Component {
                   FundingSourceService.addFundingSource(this.state.fundingSource)
                     .then(response => {
                       console.log("Response->", response);
-                      if (response.data.status == "Success") {
-                        this.props.history.push(`/fundingSource/listFundingSource/${response.data.message}`)
+                      if (response.status == 200) {
+                        this.props.history.push(`/fundingSource/listFundingSource/${response.data.messageCode}`)
                       } else {
-                        this.setState({
-                          message: response.data.message
-                        })
+                        this.setState({ message: response.data.messageCode })
                       }
                     })
                     .catch(
                       error => {
-                        switch (error.message) {
-                          case "Network Error":
-                            this.setState({
-                              message: error.message
-                            })
-                            break
-                          default:
-                            this.setState({
-                              message: error.response.data.message
-                            })
-                            break
+                        if (error.message === "Network Error") {
+                          this.setState({ message: error.message });
+                        } else {
+                          switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                              this.setState({ message: error.response.data.messageCode });
+                              break;
+                            default:
+                              this.setState({ message: 'static.unkownError' });
+                              break;
+                          }
                         }
                       }
                     );
@@ -190,7 +196,7 @@ class AddFundingSourceComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">Realm</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label>
                             <Input
                               type="select"
                               name="realmId"
@@ -203,13 +209,13 @@ class AddFundingSourceComponent extends Component {
                               required
                               value={this.state.realmId}
                             >
-                              <option value="0">Please select</option>
+                              <option value="0">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
                             <FormFeedback>{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="fundingSource">Funding Source</Label>
+                            <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
                             <Input type="text"
                               name="fundingSource"
                               id="fundingSource"
@@ -224,9 +230,10 @@ class AddFundingSourceComponent extends Component {
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            
                                                         &nbsp;
                           </FormGroup>
                         </CardFooter>
@@ -237,11 +244,15 @@ class AddFundingSourceComponent extends Component {
             </Card>
           </Col>
         </Row>
+        <div>
+          <h6>{this.state.message}</h6>
+          <h6>{this.props.match.params.messageCode}</h6>
+        </div>
       </div>
     );
   }
   cancelClicked() {
-    this.props.history.push(`/fundingSource/listFundingSource/` + "Action Canceled")
+    this.props.history.push(`/fundingSource/listFundingSource/` + "static.actionCancelled")
   }
 }
 

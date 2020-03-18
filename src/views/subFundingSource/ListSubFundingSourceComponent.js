@@ -5,7 +5,7 @@ import {
 } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-
+import i18n from '../../i18n'
 
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
@@ -72,22 +72,27 @@ class ListSubFundingSourceComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    fundingSources: response.data.data
+                    fundingSources: response.data
                 })
             }).catch(
                 error => {
-                    console.log("error---", error);
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    console.log("error---", error)
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -100,17 +105,18 @@ class ListSubFundingSourceComponent extends Component {
                 })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+                    switch (error.response.status) {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
                         default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
                     }
                 }
             );
@@ -143,11 +149,11 @@ class ListSubFundingSourceComponent extends Component {
             }, this);
         return (
             <div className="animated">
-                <h5>{this.props.match.params.message}</h5>
-                <h5>{this.state.message}</h5>
+                <h5>{i18n.t(this.props.match.params.message)}</h5>
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Sub Funding Source List</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.subfundingsource.subfundingsourcelisttext')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title="Add Sub Funding Source" onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
@@ -178,9 +184,9 @@ class ListSubFundingSourceComponent extends Component {
                         </Col>
                         <BootstrapTable data={this.state.selSubFundingSource} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Sub Funding Source</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort>Funding Source</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>Status</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center"><strong>{i18n.t('static.subfundingsource.subfundingsource')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort><strong>{i18n.t('static.subfundingsource.fundingsource')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort><strong>{i18n.t('static.common.status')}</strong></TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

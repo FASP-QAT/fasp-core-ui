@@ -100,6 +100,25 @@ const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
 const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
 const ConsumptionDetails = React.lazy(() => import('./views/Consumption/ConsumptionDetails'));
 
+const AddLanguage = React.lazy(() => import('./views/Language/AddLanguageComponent'));
+const ListLanguage = React.lazy(() => import('./views/Language/LanguageListComponent'));
+const EditLanguage = React.lazy(() => import('./views/Language/EditLanguageComponent'));
+
+const AddCountry = React.lazy(() => import('./views/Country/AddCountryComponent'));
+const ListCountry = React.lazy(() => import('./views/Country/CountryListComponent'));
+const EditCountry = React.lazy(() => import('./views/Country/UpdateCountryComponent'));
+
+const AddDataSource = React.lazy(() => import('./views/DataSource/AddDataSource'));
+const ListDataSource = React.lazy(() => import('./views/DataSource/DataSourceListComponent'));
+const EditDataSource = React.lazy(() => import('./views/DataSource/UpdateDataSourceComponent'));
+
+const AddDataSourceType = React.lazy(() => import('./views/DataSourceType/AddDataSourceTypeComponent'));
+const ListDataSourceType = React.lazy(() => import('./views/DataSourceType/DataSourceTypeListComponent'));
+const EditDataSourceType = React.lazy(() => import('./views/DataSourceType/UpdateDataSourceTypeComponent'));
+
+const AddCurrency = React.lazy(() => import('./views/Currency/AddCurrencyComponent'));
+const ListCurrency = React.lazy(() => import('./views/Currency/CurrencyListComponent'));
+const EditCurrency = React.lazy(() => import('./views/Currency/UpdateCurrencyComponent'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/product/editProduct', name: 'Edit Product', component: EditProdct },
@@ -216,6 +235,30 @@ const routes = [
   { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
   { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
   { path: '/consumptionDetails', name: 'Consumption Data', component: ConsumptionDetails },
+  { path: '/language/addLanguage', name: 'Language / Add Language', component: AddLanguage },
+  { path: '/language/listLanguage', exact: true, name: 'Language / Language List', component: ListLanguage },
+  { path: '/language/listLanguage/:message', component: ListLanguage },
+  { path: '/language/editLanguage', name: 'Language / Edit Language', component: EditLanguage },
+
+  { path: '/country/addCountry', name: 'Country / Add Country', component: AddCountry },
+  { path: '/country/listCountry', exact: true, name: 'Country / Country List', component: ListCountry },
+  { path: '/country/listCountry/:message', component: ListCountry },
+  { path: '/country/editCountry', name: 'Country / Edit Country', component: EditCountry },
+
+  { path: '/dataSourceType/addDataSourceType', name: 'DataSource Type / Add DataSource Type', component: AddDataSourceType },
+  { path: '/dataSourceType/listDataSourceType', exact: true, name: 'DataSource Type / DataSource Type List', component: ListDataSourceType },
+  { path: '/dataSourceType/listDataSourceType/:message', component: ListDataSourceType },
+  { path: '/dataSourceType/editDataSourceType', name: 'DataSource Type / Edit DataSource Type', component: EditDataSourceType },
+
+  { path: '/dataSource/addDataSource', name: 'DataSource / Add DataSource', component: AddDataSource },
+  { path: '/dataSource/listDataSource', exact: true, name: 'DataSource / DataSource List', component: ListDataSource },
+  { path: '/dataSource/listDataSource/:message', component: ListDataSource },
+  { path: '/dataSource/editDataSource', name: 'DataSource / Edit DataSource', component: EditDataSource },
+
+  { path: '/currency/addCurrency', name: 'Currency / Add Currency', component: AddCurrency },
+  { path: '/currency/listCurrency', exact: true, name: 'Currency / Currency List', component: ListCurrency },
+  { path: '/currency/listCurrency/:message', component: ListCurrency },
+  { path: '/currency/editCurrency', name: 'Currency / Edit Currency', component: EditCurrency },
 ];
 
 export default routes;
