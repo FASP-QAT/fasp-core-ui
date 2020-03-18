@@ -97,35 +97,35 @@ export default {
             }
           ]
         },
-        {
-          name: 'Program Product',
-          url: '/programProduct',
-          icon: 'icon-graph',
-          children: [
-            {
-              name: 'Add Program Prodcut',
-              url: '/programProduct/addProgramProduct',
-              icon: 'icon-pencil',
-            },
-            {
-              name: 'List Program Product',
-              url: '/programProduct/listProgramProduct',
-              icon: 'icon-list',
-            }
-          ]
-        },
-        {
-          name: 'Product Category',
-          url: '/productCategory',
-          icon: 'icon-graph',
-          children: [
-            {
-              name: 'Add Prodcut Category',
-              url: '/productCategory/addProductCategory',
-              icon: 'icon-pencil',
-            }
-          ]
-        }
+        // {
+        //   name: 'Program Product',
+        //   url: '/programProduct',
+        //   icon: 'icon-graph',
+        //   children: [
+        //     {
+        //       name: 'Add Program Prodcut',
+        //       url: '/programProduct/addProgramProduct',
+        //       icon: 'icon-pencil',
+        //     },
+        //     {
+        //       name: 'List Program Product',
+        //       url: '/programProduct/listProgramProduct',
+        //       icon: 'icon-list',
+        //     }
+        //   ]
+        // },
+        // {
+        //   name: 'Product Category',
+        //   url: '/productCategory',
+        //   icon: 'icon-graph',
+        //   children: [
+        //     {
+        //       name: 'Add Prodcut Category',
+        //       url: '/productCategory/addProductCategory',
+        //       icon: 'icon-pencil',
+        //     }
+        //   ]
+        // }
       ]
     },
     {

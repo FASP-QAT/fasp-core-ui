@@ -134,7 +134,7 @@ export default class EditProgram extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
-        this.cancelClicked=this.cancelClicked.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -502,7 +502,7 @@ export default class EditProgram extends Component {
             }, this);
 
         return (
-            <Col xs="12" sm="8">
+            <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                 <Card>
                     <Formik
                         initialValues={initialValues}
@@ -512,7 +512,15 @@ export default class EditProgram extends Component {
                             ProgramService.editProgram(this.state.program).then(response => {
                                 // console.log(this.state.program);
                                 //console.log(response);
-                                this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                if (response.status == "200") {
+                                    console.log(response);
+                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                } else {
+                                    this.setState({
+                                        message: response.data.message
+                                    })
+                                }
+
                             }
                             )
                                 .catch(
@@ -547,7 +555,7 @@ export default class EditProgram extends Component {
 
                                     <Form onSubmit={handleSubmit} noValidate name='programForm'>
                                         <CardHeader>
-                                            <strong>Edit Program</strong>
+                                            <i className="icon-note"></i><strong>Edit Program</strong>{' '}
                                         </CardHeader>
                                         <CardBody>
                                             <FormGroup>
@@ -838,8 +846,8 @@ export default class EditProgram extends Component {
                                         <CardFooter>
                                             <FormGroup>
                                                 {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}>Cancel</Button>
-                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
+                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>Cancel</Button>
+                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                 &nbsp;
                                                 {/* <Button type="submit" onClick={() => this.touchAll(setTouched, errors)} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Update</Button> */}
                                                 {/* <Button type="submit" size="sm" color="primary" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-dot-circle-o"></i>Submit </Button> */}

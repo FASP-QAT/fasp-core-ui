@@ -263,6 +263,7 @@ export default class AddProgram extends Component {
                     regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                 }
                 this.setState({
+                    regionId:'',
                     regionList: regList
                 })
             }).catch(
@@ -415,7 +416,7 @@ export default class AddProgram extends Component {
 
 
         return (
-            <Col xs="12" sm="8">
+            <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                 <Card>
                     <Formik
                         initialValues={initialValues}
@@ -425,7 +426,15 @@ export default class AddProgram extends Component {
                             ProgramService.addProgram(this.state.program).then(response => {
                                 // console.log(this.state.program);
                                 // console.log(response);
-                                this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                if (response.status == "200") {
+                                    console.log(response);
+                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                } else {
+                                    this.setState({
+                                        message: response.data.message
+                                    })
+                                }
+                                
                             }
                             )
                                 .catch(
@@ -459,8 +468,8 @@ export default class AddProgram extends Component {
                             }) => (
 
                                     <Form onSubmit={handleSubmit} noValidate name='programForm'>
-                                        <CardHeader>
-                                            <strong>Add Program</strong>
+                                        <CardHeader> 
+                                        <i className="icon-note"></i><strong>Add Program</strong>{' '}
                                         </CardHeader>
                                         <CardBody>
                                             <FormGroup>

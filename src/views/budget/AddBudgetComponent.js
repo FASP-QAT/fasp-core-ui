@@ -133,11 +133,11 @@ class AddBudgetComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramList()
+        ProgramService.getProgramListForDropDown()
             .then(response => {
                 // console.log(response.data);
                 this.setState({
-                    programs: response.data.data
+                    programs: response.data
                 })
             }).catch(
                 error => {
@@ -210,7 +210,9 @@ class AddBudgetComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     BudgetService.addBudget(this.state.budget)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
+                                            console.log("===========",response)
+                                            if (response.status == "200") {
+                                                // this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                                 this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                             } else {
                                                 this.setState({

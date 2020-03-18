@@ -63,23 +63,24 @@ export default class EditProduct extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            product:this.props.location.state.product,
+            product: this.props.location.state.product,
             lan: 'en',
             realmList: [],
             productCategoryList: [],
             unitList: []
         }
-        initialValues={
-            productName: getLabelText(this.props.location.state.product.label,this.state.lan),
-            genericName: getLabelText(this.props.location.state.product.genericLabel,this.state.lan),
-            realmId:this.props.location.state.product.realm.realmId,
-            productCategoryId:this.props.location.state.product.productCategory.productCategoryId,
-            unitId:this.props.location.state.product.forecastingUnit.unitId,
-            
+        initialValues = {
+            productName: getLabelText(this.props.location.state.product.label, this.state.lan),
+            genericName: getLabelText(this.props.location.state.product.genericLabel, this.state.lan),
+            realmId: this.props.location.state.product.realm.realmId,
+            productCategoryId: this.props.location.state.product.productCategory.productCategoryId,
+            unitId: this.props.location.state.product.forecastingUnit.unitId,
+
         }
-       
+
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.getDependentLists = this.getDependentLists.bind(this);
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -109,6 +110,55 @@ export default class EditProduct extends Component {
             .then(response => {
                 this.setState({
                     unitList: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
+        ProductService.getProdcutCategoryListByRealmId(this.props.location.state.product.realm.realmId)
+            .then(response => {
+                console.log(response);
+                this.setState({
+                    productCategoryList: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
+
+
+    }
+    getDependentLists(event) {
+        AuthenticationService.setupAxiosInterceptors();
+        ProductService.getProdcutCategoryListByRealmId(event.target.value)
+            .then(response => {
+                console.log(response);
+                this.setState({
+                    productCategoryList: response.data.data
                 })
             }).catch(
                 error => {
@@ -185,6 +235,7 @@ export default class EditProduct extends Component {
     render() {
         const { realmList } = this.state;
         const { unitList } = this.state;
+        const { productCategoryList } = this.state;
         let realms = realmList.length > 0 && realmList.map((item, i) => {
             return (
                 <option key={i} value={item.realmId}>
@@ -195,6 +246,13 @@ export default class EditProduct extends Component {
         let units = unitList.length > 0 && unitList.map((item, i) => {
             return (
                 <option key={i} value={item.unitId}>
+                    {getLabelText(item.label, this.state.lan)}
+                </option>
+            )
+        }, this);
+        let productCategories = productCategoryList.length > 0 && productCategoryList.map((item, i) => {
+            return (
+                <option key={i} value={item.productCategoryId}>
                     {getLabelText(item.label, this.state.lan)}
                 </option>
             )
@@ -212,10 +270,10 @@ export default class EditProduct extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     // AuthenticationService.setupAxiosInterceptors();
-                                    console.log("==============",this.state.product);
+                                    console.log("==============", this.state.product);
                                     ProductService.editProduct(this.state.product)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
+                                            if (response.status == "200") {
                                                 console.log(response);
                                                 this.props.history.push(`/product/listProduct/${response.data.message}`)
                                             } else {
@@ -257,8 +315,8 @@ export default class EditProduct extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="product">Product</Label>
-                                                        <Input 
-                                                            value={getLabelText(this.state.product.label,this.state.lan)}
+                                                        <Input
+                                                            value={getLabelText(this.state.product.label, this.state.lan)}
                                                             type="text"
                                                             name="productName"
                                                             id="productName"
@@ -273,7 +331,7 @@ export default class EditProduct extends Component {
                                                     <FormGroup>
                                                         <Label for="product">Product Generic name</Label>
                                                         <Input type="text"
-                                                            value={getLabelText(this.state.product.genericLabel,this.state.lan)}
+                                                            value={getLabelText(this.state.product.genericLabel, this.state.lan)}
                                                             name="genericName"
                                                             id="genericName"
                                                             bsSize="sm"
@@ -293,7 +351,7 @@ export default class EditProduct extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                             onBlur={handleBlur}
                                                             required
                                                             disabled
@@ -319,14 +377,15 @@ export default class EditProduct extends Component {
                                                             value={this.state.product.productCategory.productCategoryId}
                                                         >
                                                             {/* <option value="0">Please select</option> */}
-                                                            <option value="1">Product Category One</option>
+                                                            {/* <option value="1">Product Category One</option>
                                                             <option value="2">Product Category Two</option>
-                                                            <option value="3">Product Category Three</option>
+                                                            <option value="3">Product Category Three</option> */}
+                                                            {productCategories}
                                                         </Input>
                                                         <FormFeedback>{errors.productCategoryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">Unit</Label>
+                                                        <Label htmlFor="unitId">Forcasting Unit</Label>
                                                         <Input
                                                             type="select"
                                                             name="unitId"
@@ -345,7 +404,7 @@ export default class EditProduct extends Component {
                                                         <FormFeedback>{errors.unitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                    <Label>Status&nbsp;&nbsp;</Label>
+                                                        <Label>Status&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

@@ -50,8 +50,8 @@ class ListBudgetComponent extends Component {
       pathname: "/budget/addBudget"
     });
   }
-  
-  componentDidMount() {    
+
+  componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
@@ -112,10 +112,11 @@ class ListBudgetComponent extends Component {
           </CardHeader>
           <CardBody>
             <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
-              <TableHeaderColumn dataField="label" dataFormat={this.showBudgetLabel} dataSort>Budget</TableHeaderColumn>
-              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showSubFundingSourceLabel} dataSort>Sub Funding source</TableHeaderColumn>
-              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showFundingSourceLabel} dataSort>Funding source</TableHeaderColumn>
-              <TableHeaderColumn isKey dataField="budgetAmt" dataSort>Budget Amt</TableHeaderColumn>
+              <TableHeaderColumn isKey dataField="budgetId" hidden>Budget Id</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showBudgetLabel} dataSort>Budget</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="subFundingSource" dataFormat={this.showSubFundingSourceLabel} dataSort>Sub Funding source</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="subFundingSource" dataFormat={this.showFundingSourceLabel} dataSort>Funding source</TableHeaderColumn>
+              <TableHeaderColumn dataField="budgetAmt" dataSort>Budget Amt</TableHeaderColumn>
               <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
               <TableHeaderColumn dataField="stopDate" dataSort>Stop date</TableHeaderColumn>
               <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>Active</TableHeaderColumn>

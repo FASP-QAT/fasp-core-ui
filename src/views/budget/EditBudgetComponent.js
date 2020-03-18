@@ -133,7 +133,7 @@ class EditBudgetComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
+                                            if (response.status == "200") {
                                                 this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                             } else {
                                                 this.setState({
@@ -309,8 +309,8 @@ class EditBudgetComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}>Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>Cancel</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

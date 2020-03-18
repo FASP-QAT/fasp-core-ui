@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { NavLink } from 'react-router-dom';
-import { Card, CardHeader, CardBody,Button } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
@@ -35,8 +35,8 @@ export default class ProgramList extends Component {
     this.showOrganisationLabel = this.showOrganisationLabel.bind(this);
     this.editProgram = this.editProgram.bind(this);
     this.addNewProgram = this.addNewProgram.bind(this);
-    this.buttonFormatter=this.buttonFormatter.bind(this);
-    this.addProductMapping=this.addProductMapping.bind(this);
+    this.buttonFormatter = this.buttonFormatter.bind(this);
+    this.addProductMapping = this.addProductMapping.bind(this);
 
   }
 
@@ -105,45 +105,143 @@ export default class ProgramList extends Component {
       pathname: "/program/addProgram"
     });
   }
-  buttonFormatter(cell, row){
-    return <Button type="button" size="sm" color="success" onClick={(event) => {this.addProductMapping(event)}} className="float-right mr-1" ><i className="fa fa-check"></i> Add</Button>;
+  buttonFormatter(cell, row) {
+    // console.log("-----------", cell);
+    return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} className="float-right mr-1" ><i className="fa fa-check"></i> Add</Button>;
   }
-  addProductMapping(event){
+  addProductMapping(event, cell) {
+    // console.log(cell);
     event.stopPropagation();
-    // console.log("---------------------",cell.program.programId);
-    this.props.history.push({
-      pathname: "/programProduct/addProgramProduct"
-    });
+    AuthenticationService.setupAxiosInterceptors();
+    ProgramService.getProgramProductListByProgramId(cell)
+      .then(response => {
+        
+        let myReasponse=response.data.data;
+        console.log("myResponce=========",response.data.data);
+        this.props.history.push({
+          pathname: "/programProduct/addProgramProduct",
+          state: {
+            programProduct:myReasponse     
+          }
+          
+        })
+      }).catch(
+        error => {
+          switch (error.message) {
+            case "Network Error":
+              this.setState({
+                message: error.response
+              })
+              break
+            default:
+              this.setState({
+                message: error.response
+              })
+              break
+          }
+        }
+      );
+
+
+
+    // this.props.history.push({
+    //   pathname: "/programProduct/addProgramProduct",
+    //   state: {
     
-  }
-  render() {
-    return (
-      <div className="animated">
-        <Card>
-          <CardHeader>
-            <i className="icon-menu"></i>Program List{' '}
-            <div className="card-header-actions">
-              <div className="card-header-action">
-                <a href="javascript:void();" title="Add Budget" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
-              </div>
+    
+    
+    
+    
+    
+    
+    
+    //     'programProduct':
+
+    //     {
+    //       'programId': 1,
+    //       'label': {
+    //         'label_en': "Kenya Malaria"
+    //       },
+    //       'prodcuts':
+    //         [
+    //           {
+    //             'productId': 2,
+    //             'label': {
+    //               'label_en': "Abacavir"
+    //             },
+    //             'minMonth': 1,
+    //             'maxMonth': 3
+    //           },
+    //           {
+    //             'productId': 4,
+    //             'label': {
+    //               'label_en': "Condoms"
+    //             },
+    //             'minMonth': 1,
+    //             'maxMonth': 3
+    //           }
+    //         ]
+    //     }
+
+
+
+
+
+    // programId: 1,
+    // label: 'program 1',
+    // rows: [
+    //   {
+    //     programId: '1',
+    //     programName: 'Program 1',
+    //     productId: '1',
+    //     productName: 'product 1',
+    //     minMonth: '2',
+    //     maxMonth: '2'
+    //   },
+    //   {
+    //     programId: '1',
+    //     programName: 'Program 1',
+    //     productId: '2',
+    //     productName: 'product 2',
+    //     minMonth: '3',
+    //     maxMonth: '4'
+    //   }
+    // ]
+    // }
+
+  
+
+
+}
+render() {
+  return (
+    <div className="animated">
+      <Card>
+        <CardHeader>
+          <i className="icon-menu"></i>Program List{' '}
+          <div className="card-header-actions">
+            <div className="card-header-action">
+              <a href="javascript:void();" title="Add Budget" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
             </div>
-          </CardHeader>
-          <CardBody>
-            <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
-              <TableHeaderColumn dataField="label" dataSort dataFormat={this.showProgramLabel} >Program</TableHeaderColumn>
-              <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >Realm</TableHeaderColumn>
-              <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >Country</TableHeaderColumn>
-              <TableHeaderColumn dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >Organisation</TableHeaderColumn>
-              <TableHeaderColumn isKey dataField="airFreightPerc" dataSort >Air Freight Percentage</TableHeaderColumn>
-              <TableHeaderColumn dataField="seaFreightPerc" dataSort>Sea Freight Percentage</TableHeaderColumn>
-              <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>Planed To Draft Lead Time</TableHeaderColumn>
-              <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>Draft To Submit Lead Time</TableHeaderColumn>
-              <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>Submited To Approved Lead Time</TableHeaderColumn>
-              {/* <TableHeaderColumn dataField="button" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn> */}
-            </BootstrapTable>
-          </CardBody>
-        </Card>
-      </div>
-    )
-  }
+          </div>
+        </CardHeader>
+        <CardBody>
+          <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
+            <TableHeaderColumn isKey dataField="programId" hidden >Program Id</TableHeaderColumn>
+            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProgramLabel} >Program</TableHeaderColumn>
+            <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >Realm</TableHeaderColumn>
+            <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >Country</TableHeaderColumn>
+            <TableHeaderColumn filterFormatted dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >Organisation</TableHeaderColumn>
+            <TableHeaderColumn dataField="airFreightPerc" dataSort >Air Freight Percentage</TableHeaderColumn>
+            <TableHeaderColumn dataField="seaFreightPerc" dataSort>Sea Freight Percentage</TableHeaderColumn>
+            <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>Planed To Draft Lead Time</TableHeaderColumn>
+            <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>Draft To Submit Lead Time</TableHeaderColumn>
+            <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>Submited To Approved Lead Time</TableHeaderColumn>
+            <TableHeaderColumn dataField="programId" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn>
+          </BootstrapTable>
+        </CardBody>
+      </Card>
+    </div>
+  )
+}
 }

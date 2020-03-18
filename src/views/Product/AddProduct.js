@@ -88,8 +88,9 @@ export default class AddProduct extends Component {
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.getDependentLists=this.getDependentLists.bind(this);
     }
-    componentDidMount() { 
+    componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmServcie.getRealmListAll()
             .then(response => {
@@ -117,6 +118,32 @@ export default class AddProduct extends Component {
             .then(response => {
                 this.setState({
                     unitList: response.data.data
+                })
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
+    }
+
+    getDependentLists(event) {
+        AuthenticationService.setupAxiosInterceptors();
+        ProductService.getProdcutCategoryListByRealmId(event.target.value)
+            .then(response => {
+                console.log(response);
+                this.setState({
+                    productCategoryList: response.data.data
                 })
             }).catch(
                 error => {
@@ -190,6 +217,7 @@ export default class AddProduct extends Component {
     render() {
         const { realmList } = this.state;
         const { unitList } = this.state;
+        const { productCategoryList } = this.state;
         let realms = realmList.length > 0 && realmList.map((item, i) => {
             return (
                 <option key={i} value={item.realmId}>
@@ -200,6 +228,13 @@ export default class AddProduct extends Component {
         let units = unitList.length > 0 && unitList.map((item, i) => {
             return (
                 <option key={i} value={item.unitId}>
+                    {getLabelText(item.label, this.state.lan)}
+                </option>
+            )
+        }, this);
+        let productCategories = productCategoryList.length > 0 && productCategoryList.map((item, i) => {
+            return (
+                <option key={i} value={item.productCategoryId}>
                     {getLabelText(item.label, this.state.lan)}
                 </option>
             )
@@ -220,7 +255,7 @@ export default class AddProduct extends Component {
                                     // console.log("==============",this.state.product);
                                     ProductService.addProduct(this.state.product)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
+                                            if (response.status == "200") {
                                                 console.log(response);
                                                 this.props.history.push(`/product/listProduct/${response.data.message}`)
                                             } else {
@@ -295,12 +330,12 @@ export default class AddProduct extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.getDependentLists(e) }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.realmId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="">Please select</option>
                                                             {realms}
                                                         </Input>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
@@ -319,10 +354,11 @@ export default class AddProduct extends Component {
                                                             required
                                                             value={this.state.productCategoryId}
                                                         >
-                                                            <option value="0">Please select</option>
-                                                            <option value="1">Product Category One</option>
+                                                            <option value="">Please select</option>
+                                                            {/* <option value="1">Product Category One</option>
                                                             <option value="2">Product Category Two</option>
-                                                            <option value="3">Product Category Three</option>
+                                                            <option value="3">Product Category Three</option> */}
+                                                            {productCategories}
                                                         </Input>
                                                         <FormFeedback>{errors.productCategoryId}</FormFeedback>
                                                     </FormGroup>
@@ -340,7 +376,7 @@ export default class AddProduct extends Component {
                                                             required
                                                             value={this.state.unitId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="">Please select</option>
                                                             {units}
                                                         </Input>
                                                         <FormFeedback>{errors.unitId}</FormFeedback>

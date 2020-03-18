@@ -5,41 +5,50 @@ import {
     CardFooter, Button, Table, Badge, Col, Row
 
 } from 'reactstrap';
-// import deleteSpecificRowFormTable from './TableFeatures'
-import DeleteSpecificRow from './TableFeatureTwo'
+import DeleteSpecificRow from './TableFeatureTwo';
+import ProgramService from "../../api/ProgramService";
+import ProductService from "../../api/ProductService"
+import AuthenticationService from '../common/AuthenticationService.js';
 
 class AddProgramProduct extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            // programProduct:{
-            programId: '',
-            programName: '',
+            programProduct: this.props.location.state.programProduct,
             productId: '',
             productName: '',
             minMonth: '',
             maxMonth: '',
-            // },
-            rows: []
-
+            rows: this.props.location.state.programProduct.productList,
+            programList: [],
+            productList: []
         }
-
+        // console.log("kam kam", this.state.rows);
+        // console.log("------------in", this.state.programProduct);
         this.addRow = this.addRow.bind(this);
         this.deleteLastRow = this.deleteLastRow.bind(this);
-        //this.handleChange=this.handleChange.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
-        this.updateFieldData = this.updateFieldData.bind(this);
         this.submitForm = this.submitForm.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
 
     }
     addRow() {
-        console.log(this.state);
-        var rows = this.state.rows
-        rows.push({ programId: this.state.programId, programName: this.state.programName, productId: this.state.productId, productName: this.state.productName, minMonth: this.state.minMonth, maxMonth: this.state.maxMonth })
-        this.setState({ rows: rows });
-        this.setState({ productId: '', minMonth: '', maxMonth: '' });
+        this.state.rows.push(
+            {
+                productId: this.state.productId,
+                label:
+                {
+                    label_en: this.state.productName
+                },
+
+                minMonth: this.state.minMonth,
+                maxMonth: this.state.maxMonth
+            })
+
+        this.setState({ rows: this.state.rows })
+        this.setState({ productId: '', minMonth: '', maxMonth: '', productName: '' });
 
     }
     deleteLastRow() {
@@ -47,16 +56,6 @@ class AddProgramProduct extends Component {
             rows: this.state.rows.slice(0, -1)
         });
     }
-    // handleChange = idx => e => {
-    //     const { name, value } = e.target;
-    //     const rows = [...this.state.rows];
-    //     rows[idx] = {
-    //       [name]: value
-    //     };
-    //     this.setState({
-    //       rows
-    //     });
-    //   };
 
     handleRemoveSpecificRow(idx) {
         const rows = [...this.state.rows]
@@ -64,44 +63,139 @@ class AddProgramProduct extends Component {
         this.setState({ rows })
     }
 
-    // handleRemoveSpecificRow = (idx) => () => {
-    //     const rows = [...this.state.rows]
-    //     rows.splice(idx, 1)
-    //     this.setState({ rows })
-    // }
-
-    updateFieldData(event) {
-        this.setState(
-            {
-                [event.target.name]: event.target.value
-
-            }
-
-        )
-
-    }
-
     setTextAndValue = (event) => {
-        if (event.target.name === 'programId') {
-            this.setState({
-                programName: event.target[event.target.selectedIndex].text,
-                programId: event.target.value
-            });
+
+        if (event.target.name === 'minMonth') {
+            this.setState({ minMonth: event.target.value });
+        } if (event.target.name === 'maxMonth') {
+            this.setState({ maxMonth: event.target.value });
         } else if (event.target.name === 'productId') {
-            this.setState({
-                productName: event.target[event.target.selectedIndex].text,
-                productId: event.target.value
-            });
+            this.setState({ productName: event.target[event.target.selectedIndex].text });
+            this.setState({ productId: event.target.value })
         }
     };
     submitForm() {
-        console.log(this.state.rows);
+        var programProduct = {
+            programId: this.state.programProduct.programId,
+            prodcuts: this.state.rows
+        }
+
+        AuthenticationService.setupAxiosInterceptors();
+        console.log(programProduct);
+        ProgramService.addProgramProductMapping(programProduct)
+            .then(response => {
+                console.log(response.data);
+                if (response.status == "200") {
+                    console.log(response);
+                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                } else {
+                    this.setState({
+                        message: response.data.message
+                    })
+                }
+
+            }).catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.response.data.message
+                            })
+                            break
+                    }
+                }
+            );
+
+
+
+    }
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getProgramListForDropDown().then(response => {
+            console.log(response.data);
+            if (response.status == "200") {
+                this.setState({
+                    programList: response.data
+                });
+            } else {
+                this.setState({
+                    message: response.data.message
+                })
+            }
+
+        }).catch(
+            error => {
+                switch (error.message) {
+                    case "Network Error":
+                        this.setState({
+                            message: error.message
+                        })
+                        break
+                    default:
+                        this.setState({
+                            message: error.message
+                        })
+                        break
+                }
+            }
+        );
+        ProductService.getProductList().then(response => {
+            console.log(response.data.data);
+            if (response.status == "200") {
+                this.setState({
+                    productList: response.data.data
+                });
+            } else {
+                this.setState({
+                    message: response.data.message
+                })
+            }
+
+        }).catch(
+            error => {
+                switch (error.message) {
+                    case "Network Error":
+                        this.setState({
+                            message: error.message
+                        })
+                        break
+                    default:
+                        this.setState({
+                            message: error.message
+                        })
+                        break
+                }
+            }
+        );
+
+
     }
     render() {
+        const { programList } = this.state;
+        const { productList } = this.state;
+        let programs = programList.length > 0 && programList.map((item, i) => {
+            return (
+                <option key={i} value={item.programId}>
+                    {item.label.label_en}
+                </option>
+            )
+        }, this);
+        let products = productList.length > 0 && productList.map((item, i) => {
+            return (
+                <option key={i} value={item.productId}>
+                    {item.label.label_en}
+                </option>
+            )
+        }, this);
         return (
             <div className="animated fadeIn">
                 <Row>
-                    <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <strong>Add Program Product</strong>
@@ -109,30 +203,33 @@ class AddProgramProduct extends Component {
                             <CardBody>
                                 <FormGroup>
                                     <Label htmlFor="select">Select Program</Label>
-                                    <Input type="select" name="programId" id="programId" value={this.state.programId} onChange={event => this.setTextAndValue(event)}>
-                                        <option value="0">Please select</option>
+                                    <Input type="select" value={this.state.programProduct.programId} name="programId" id="programId" disabled>
+                                        {/* <option value="0">Please select</option>
                                         <option value="1">Program #1</option>
                                         <option value="2">Program #2</option>
-                                        <option value="3">Program #3</option>
+                                        <option value="3">Program #3</option> */}
+                                        {programs}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="select">Select Product</Label>
                                     <Input type="select" name="productId" id="select" value={this.state.productId} onChange={event => this.setTextAndValue(event)}>
-                                        <option value="0">Please select</option>
-                                        <option value="1">product #1</option>
+
+                                        <option value="">Please select</option>
+                                        {/*<option value="1">product #1</option>
                                         <option value="2">product #2</option>
-                                        <option value="3">product #3</option>
+                                        <option value="3">product #3</option> */}
+                                        {products}
                                     </Input>
 
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="company">Min Month Stock</Label>
-                                    <Input type="number" name="minMonth" id="minMonth" value={this.state.minMonth} placeholder="Enter your budget amount" onChange={this.updateFieldData} />
+                                    <Input type="number" name="minMonth" id="minMonth" value={this.state.minMonth} placeholder="Enter your budget amount" onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="company">Max Month Stock</Label>
-                                    <Input type="number" name="maxMonth" id="maxMonth" value={this.state.maxMonth} placeholder="Enter your budget amount" onChange={this.updateFieldData} />
+                                    <Input type="number" name="maxMonth" id="maxMonth" value={this.state.maxMonth} placeholder="Enter your budget amount" onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
                                     <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Delete Last Row</Button>
@@ -144,7 +241,7 @@ class AddProgramProduct extends Component {
 
                                     <thead>
                                         <tr>
-                                            {/* <th className="text-left"> Id </th> */}
+
                                             <th className="text-left"> Program </th>
                                             <th className="text-left"> Product</th>
                                             <th className="text-left"> Min Month Stock </th>
@@ -153,46 +250,28 @@ class AddProgramProduct extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.rows.map((item, idx) => (
-                                            <tr id="addr0" key={idx}>
-                                                {/* <td>{idx}</td> */}
-                                                <td>
-                                                    {/* <input
-                          type="text"
-                          name="name"
-                          value={this.state.rows[idx].name}
-                          onChange={this.handleChange(idx)}
-                          className="form-control"
-                        /> */}
-                                                    {/* {item.program} */}
-                                                    {this.state.rows[idx].programName}
-                                                </td>
-                                                <td>
-                                                    {/* <input
-                          type="text"
-                          name="mobile"
-                          value={this.state.rows[idx].mobile}
-                          onChange={this.handleChange(idx)}
-                          className="form-control"
-                        /> */}
-                                                    {/* {item.budgetAmount} */}
-                                                    {this.state.rows[idx].productName}
-                                                </td>
-                                                <td>
-                                                    {/* {item.startDate} */}
-                                                    {this.state.rows[idx].minMonth}
-                                                </td>
-                                                <td>
-                                                    {/* {item.startDate} */}
-                                                    {this.state.rows[idx].maxMonth}
-                                                </td>
-                                                <td>
-                                                    {/* <Button type="button" size="sm" color="danger" onClick={this.handleRemoveSpecificRow(idx)}><i className="fa fa-dot-circle-o"></i> Delete  Row </Button> */}
-                                                    {/* <Button type="button" size="sm" color="danger" onClick={deleteSpecificRowFormTable.bind(this)}><i className="fa fa-dot-circle-o"></i> Delete  Row </Button> */}
-                                                    <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} />
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {
+                                            this.state.rows.map((item, idx) => (
+                                                <tr id="addr0" key={idx}>
+                                                    <td>
+                                                        {this.state.programProduct.label.label_en}
+                                                    </td>
+                                                    <td>
+                                                        {this.state.rows[idx].label.label_en}
+                                                    </td>
+                                                    <td>
+
+                                                        {this.state.rows[idx].minMonth}
+                                                    </td>
+                                                    <td>
+                                                        {this.state.rows[idx].maxMonth}
+                                                    </td>
+                                                    <td>
+                                                        <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} />
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        }
                                     </tbody>
 
                                 </Table>
@@ -203,13 +282,17 @@ class AddProgramProduct extends Component {
                                     <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>Submit</Button>
                                     &nbsp;
                                 </FormGroup>
-                                {/* <Button type="button" size="sm" color="primary" onClick={this.submitForm}><i className="fa fa-dot-circle-o"></i>Submit </Button> */}
+
                             </CardFooter>
                         </Card>
                     </Col>
-                </Row></div>
+                </Row>
+            </div>
 
         );
+    }
+    cancelClicked() {
+        this.props.history.push(`/program/listProgram/` + "Action Canceled")
     }
 
 }
