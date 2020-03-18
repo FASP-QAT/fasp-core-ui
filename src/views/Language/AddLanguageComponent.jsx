@@ -56,7 +56,6 @@ class AddLanguageComponent extends Component {
 
         // this.Capitalize = this.Capitalize.bind(this);
 
-        this.submitClicked = this.submitClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
