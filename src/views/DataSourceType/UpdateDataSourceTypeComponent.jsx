@@ -5,6 +5,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import DataSourceTypeService from '../../api/DataSourceTypeService.js';
+import i18n from '../../i18n'
 
 let initialValues = {
     label: ''
@@ -131,7 +132,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Update DataSource Type</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.datasourcetype.datasourcetypeedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -184,7 +185,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">Country name (English):</Label>
+                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -198,7 +199,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label>Status  </Label>
+                                                        <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -212,7 +213,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                Active
+                                                                {i18n.t('static.common.active')}
                                                                 </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -228,15 +229,15 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                Disabled
+                                                                {i18n.t('static.common.disabled')}
                                                                 </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Submit</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

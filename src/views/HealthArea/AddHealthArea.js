@@ -236,7 +236,7 @@ class AddHealthArea extends Component {
                     }) => (
                         <Form onSubmit={handleSubmit} noValidate name='simpleForm'>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('healtharea.realm')}</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.healtharea.realm')}</Label>
                             <Input
                               type="select"
                               name="realmId"

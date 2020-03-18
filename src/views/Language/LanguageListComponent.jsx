@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
+import i18n from '../../i18n';
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 
 export default class LanguageListComponent extends Component {
@@ -84,12 +85,12 @@ export default class LanguageListComponent extends Component {
         <div className="animated">
             <Card>
                 <CardHeader>
-                    <i className="icon-menu"></i>Language List
+                    <i className="icon-menu"></i>{i18n.t('static.language.languagelist')}
                 </CardHeader>
                 <CardBody>
                     <BootstrapTable data={this.state.langaugeList} version="4" striped hover pagination search  options={this.options}>
-                        <TableHeaderColumn isKey dataField="languageName" >Language Name</TableHeaderColumn>
-                        <TableHeaderColumn dataField="active" dataSort>Status</TableHeaderColumn>
+                        <TableHeaderColumn isKey dataField="languageName" >{i18n.t('static.language.language')}</TableHeaderColumn>
+                        <TableHeaderColumn dataField="active" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                     </BootstrapTable>
                 </CardBody>
             </Card>
