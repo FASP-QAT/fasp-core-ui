@@ -22,6 +22,11 @@ const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswo
 const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ChangePassword = React.lazy(() => import('./views/Pages/Login/ChangePasswordComponent'));
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
+const AddRole = React.lazy(() => import('./views/role/AddRoleComponent'));
+const ListRole = React.lazy(() => import('./views/role/ListRoleComponent'));
+const EditRole = React.lazy(() => import('./views/role/EditRoleComponent'));
+const AddUser = React.lazy(() => import('./views/user/AddUserComponent'));
+const ListUser = React.lazy(() => import('./views/user/ListUserComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -164,6 +169,13 @@ const routes = [
   { path: '/updateExpiredPassword', exact: true, name: 'Update expired password', component: UpdateExpiredPassword },
   { path: '/changePassword', exact: true, name: 'Change password', component: ChangePassword },
   { path: '/resetPassword/:username/:token', exact: true, name: 'Reset password', component: ResetPassword },
+  { path: '/role/listRole/:message', component: ListRole },
+  { path: '/role/listRole', exact: true, name: 'Role / Role List', component: ListRole },
+  { path: '/role/addRole', exact: true, name: 'Role / Add Role', component: AddRole },
+  { path: '/role/editRole', exact: true, name: 'Role / Edit Role', component: EditRole },
+  { path: '/user/listUser/:message', component: ListUser },
+  { path: '/user/listUser', exact: true, name: 'User / User List', component: ListUser },
+  { path: '/user/addUser', exact: true, name: 'User / Add User', component: AddUser },
 
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },

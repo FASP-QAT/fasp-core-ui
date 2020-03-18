@@ -52,7 +52,7 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> Spanish</DropdownItem>
              </DropdownMenu>
           </UncontrolledDropdown>
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt />
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword}/>
         </Nav>
       </React.Fragment>
     );

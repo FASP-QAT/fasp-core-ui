@@ -22,6 +22,16 @@ export default {
       icon: 'fa fa-list',
       children: [
         {
+          name: 'Role',
+          url: '/role/listRole',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'User',
+          url: '/user/listUser',
+          icon: 'fa fa-list-alt'
+        },
+        {
           name: 'Language',
           url: '/language/listLanguage',
           icon: 'fa fa-list-alt'
