@@ -4,6 +4,9 @@ const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'
 const AddSubFundingSource = React.lazy(() => import('./views/subFundingSource/AddSubFundingSourceComponent'));
 const ListSubFundingSource = React.lazy(() => import('./views/subFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/EditSubFundingSourceComponent'));
+const ApplicationDashboard = React.lazy(() => import('./views/ApplicationDashboard'));
+const RealmDashboard = React.lazy(() => import('./views/RealmDashboard'));
+const ProgramDashboard = React.lazy(() => import('./views/ProgramDashboard'));
 const AddFundingSource = React.lazy(() => import('./views/fundingSource/AddFundingSourceComponent'));
 const ListFundingSource = React.lazy(() => import('./views/fundingSource/ListFundingSourceComponent'));
 const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFundingSourceComponent'));
@@ -64,7 +67,7 @@ const ButtonGroups = React.lazy(() => import('./views/Buttons/ButtonGroups'));
 const Buttons = React.lazy(() => import('./views/Buttons/Buttons'));
 const Charts = React.lazy(() => import('./views/Charts'));
 
-const Dashboard = React.lazy(() => import('./views/Dashboard'));
+// const Dashboard = React.lazy(() => import('./views/Dashboard'));
 const CoreUIIcons = React.lazy(() => import('./views/Icons/CoreUIIcons'));
 const Flags = React.lazy(() => import('./views/Icons/Flags'));
 const FontAwesome = React.lazy(() => import('./views/Icons/FontAwesome'));
@@ -138,6 +141,11 @@ const routes = [
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
+  { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
+   { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
+    { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
+  { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
+  // { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/subFundingSource/listSubFundingSource/:message',component: ListSubFundingSource },
   { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
@@ -157,8 +165,8 @@ const routes = [
   { path: '/realmCountry/listRealmCountry', exact: true, name: 'Realm Country / Realm Country List', component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'Realm Country / Add Realm Country', component: AddRealmCountry },
 
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
-  { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },
+  // { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  // { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

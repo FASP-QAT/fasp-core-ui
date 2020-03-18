@@ -1,1 +1,136 @@
 // Here you can add other styles
+
+// Login Css//
+.Login-component {
+    background: url(../assets/img/bg-image/bg-login.jpg) no-repeat center center fixed;
+    background-size: cover!important;
+    min-height: 786px;
+    
+}
+
+.main-content
+{
+    width:100%;
+}
+.upper-logo{
+    margin-left:2%;
+}
+.Login-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff!important;
+    background-clip: border-box;
+    border: none!important;
+    border-radius: 0.25rem;
+}
+.frdpsd{
+    margin-top: 6%;
+}
+
+.Login-logo{
+    margin-bottom: 25px;
+}
+.Loginicon {
+    color:#bb3430;
+    }
+
+.Login-btn{
+
+box-shadow: 0px 0px 8px 0px #ccc !important;
+color: #fff !important;
+background-color: #002f6c;
+border: none;
+width: 150px;
+padding: 10px 0px 10px !important;
+border: 1px solid #ccc;
+font-size: 17px;
+font-weight: 500;
+}
+
+.Login-btn:hover
+{
+  
+    background-color: #002f6c;
+    box-shadow: 0px 0px 8px 0px #ccc !important;
+    color: #fff !important;
+    border: none;
+    width: 150px;
+    padding: 10px 0px 10px !important;
+    border: 1px solid #ccc;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+
+.Login-fpwd{
+   color: #002f6c;
+}
+
+.Login-fpwd:hover{
+    color: #002f6c;
+    text-decoration: none;
+ }
+.Login-p
+{
+    font-family: sans-serif;
+    font-style: italic;
+    text-align: justify;
+}
+.Login-bttom-logo {
+   margin-top: -3%; 
+}
+.Input-form{
+    background-color:#e9e9e9;
+    box-shadow: 1px 3px 5px #aaaaaa;
+    border-color:#e9e9e9;
+    text-align:center;
+    font-size: 12px;
+}
+
+///forgot password
+.fwd-btn{
+    margin-left: 10px;
+}
+/////Dashboard 
+  .text-clr{
+      color: #73818f;
+      text-align: right;
+      font-size: 17px;
+  }
+  .count-text{
+      font-size: 24px;
+      color: #73818f;
+      text-align: right;
+      font-weight: normal;
+  }
+
+  .card-box
+  {
+    border-radius: 10px!important;
+    box-shadow: 0 6px 10px -4px rgba(0,0,0,.15)!important;
+    background-color: #fff!important;
+    // border: 1px solid #fff;
+    border-bottom: 1px solid #333 ;
+  }
+
+  .Changepwd-click{
+      text-decoration: none!important;
+  }
+ 
+.link-ds{
+    text-decoration: none!important;
+}
+.count-clr{
+    color:#20a8d8;
+    
+}
+.count-text{
+    font-size: 18px;
+    color:#333;
+}
+.chart-graph{
+    height:280px;
+}
