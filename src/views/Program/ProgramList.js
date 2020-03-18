@@ -36,15 +36,8 @@ export default class ProgramList extends Component {
     this.showOrganisationLabel = this.showOrganisationLabel.bind(this);
     this.editProgram = this.editProgram.bind(this);
     this.addNewProgram = this.addNewProgram.bind(this);
-<<<<<<< HEAD
     this.buttonFormatter = this.buttonFormatter.bind(this);
     this.addProductMapping = this.addProductMapping.bind(this);
-=======
-
-
-    this.buttonFormatter=this.buttonFormatter.bind(this);
-    this.addProductMapping=this.addProductMapping.bind(this);
->>>>>>> dev
 
 
 

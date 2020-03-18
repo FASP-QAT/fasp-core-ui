@@ -81,7 +81,7 @@ class AddProgramProduct extends Component {
         }
 
         AuthenticationService.setupAxiosInterceptors();
-        console.log(programProduct);
+        console.log("------------------programProdcut",programProduct);
         ProgramService.addProgramProductMapping(programProduct)
             .then(response => {
                 console.log(response.data);
