@@ -8,11 +8,11 @@ addLanguage(json){
 }
 
 getLanguageList() {
-    return axios.get(`${API_URL}/api/language/`, {
+    return axios.get(`${API_URL}/api/language/all`, {
     });
 }
 getLanguageListActive() {
-    return axios.get(`${API_URL}/api/langauge/all`, {
+    return axios.get(`${API_URL}/api/langauge/`, {
     });
 }
 editLanguage(json) {

@@ -243,7 +243,7 @@ class AddFundingSourceComponent extends Component {
           </Col>
         </Row>
         <div>
-          <h6>{this.state.message}</h6>
+          <h6>{this.state.messageCode}</h6>
           <h6>{this.props.match.params.messageCode}</h6>
         </div>
       </div>

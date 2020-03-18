@@ -55,7 +55,6 @@ class AddLanguageComponent extends Component {
 
         // this.Capitalize = this.Capitalize.bind(this);
 
-        this.submitClicked = this.submitClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
@@ -123,55 +122,53 @@ class AddLanguageComponent extends Component {
                             <CardHeader>
                                 <i className="icon-note"></i><strong>Add Language</strong>{' '}
                             </CardHeader>
-                            <CardBody>
-                                <Formik
-                                    validate={validate(validationSchema)}
-                                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        LanguageService.addLanguage(values).then(response => {
-                                            if (response.status == 200) {
-                                                this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.messageCode
-                                                })
-                                            }
+                            <Formik
+                                validate={validate(validationSchema)}
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    LanguageService.addLanguage(values).then(response => {
+                                        if (response.status == 200) {
+                                            this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            })
                                         }
-                                        )
-                                            .catch(
-                                                error => {
-                                                    switch (error.message) {
-                                                        case "Network Error":
-                                                            this.setState({
-                                                                message: error.message
-                                                            })
-                                                            break
+                                    })
+                                        .catch(
+                                            error => {
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
                                                         default:
-                                                            this.setState({
-                                                                message: error.response.data.messageCode
-                                                            })
+                                                            this.setState({ message: 'static.unkownError' });
                                                             break;
                                                     }
                                                 }
-                                            )
-                                        setTimeout(() => {
-                                            setSubmitting(false)
-                                        }, 2000)
-                                    }
-                                    }
-
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched
-                                        }) => (
-                                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
+                                            }
+                                        );
+                                }}
+                                render={
+                                    ({
+                                        values,
+                                        errors,
+                                        touched,
+                                        handleChange,
+                                        handleBlur,
+                                        handleSubmit,
+                                        isSubmitting,
+                                        isValid,
+                                        setTouched
+                                    }) => (
+                                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
+                                                <CardBody>
                                                     <FormGroup>
                                                         <Label for="languageName">Language</Label>
                                                         <Input type="text"
@@ -200,19 +197,23 @@ class AddLanguageComponent extends Component {
                                                             required />
                                                         <FormFeedback>{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
-
+                                                </CardBody>
+                                                <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
                                                         &nbsp;
                                                     </FormGroup>
-                                                </Form>
-                                            )}
-                                />
-                            </CardBody>
+                                                </CardFooter>
+                                            </Form>
+                                        )} />
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{this.state.message}</h6>
+                    <h6>{this.props.match.params.message}</h6>
+                </div>
             </div>
         );
     }

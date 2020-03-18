@@ -131,17 +131,21 @@ export default class EditLanguageComponent extends Component {
                                     )
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.response.data
-                                                        })
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode
-                                                        })
-                                                        break;
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         )
@@ -169,21 +173,21 @@ export default class EditLanguageComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
                                                             invalid={touched.languageName && !!errors.languageName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
                                                             required />
                                                         <FormFeedback>{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="languageCode">Language</Label>
+                                                        <Label for="languageCode">Language code</Label>
                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
                                                             bsSize="sm"
                                                             valid={!errors.languageCode}
                                                             invalid={touched.languageCode && !!errors.languageCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
@@ -227,17 +231,21 @@ export default class EditLanguageComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
 
                                         )} />
-
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{this.state.message}</h6>
+                    <h6>{this.props.match.params.message}</h6>
+                </div>
             </div>
         );
     }
