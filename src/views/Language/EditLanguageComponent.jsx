@@ -13,8 +13,8 @@ let initialValues = {
 }
 const validationSchema = function (values) {
     return Yup.object().shape({
-        language: Yup.string()
-            .required('Please enter Language Name')
+        languageName: Yup.string().required('Please enter Language'),
+        languageCode: Yup.string().required('Please enter Language code')
     })
 }
 
@@ -41,17 +41,14 @@ const getErrorsFromValidationError = (validationError) => {
 }
 
 export default class EditLanguageComponent extends Component {
-
     constructor(props) {
-
         super(props);
-
         this.state = {
             language: this.props.location.state.language,
             message: ''
         }
 
-        this.Capitalize = this.Capitalize.bind(this);
+        // this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
 
@@ -59,9 +56,10 @@ export default class EditLanguageComponent extends Component {
 
     dataChange(event) {
         let { language } = this.state
-
-        if (event.target.name === "language") {
+        if (event.target.name === "languageName") {
             language.languageName = event.target.value
+        } else if (event.target.name === "languageCode") {
+            language.languageCode = event.target.value
         } else if (event.target.name === "active") {
             language.active = event.target.id === "active2" ? false : true
         }
@@ -76,7 +74,8 @@ export default class EditLanguageComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            language: true
+            languageName: true,
+            languageCode: true
         }
         )
         this.validateForm(errors)
@@ -99,10 +98,10 @@ export default class EditLanguageComponent extends Component {
 
     }
 
-    Capitalize(str) {
-        let { language } = this.state
-        language.languageName = str.charAt(0).toUpperCase() + str.slice(1)
-    }
+    // Capitalize(str) {
+    //     let { language } = this.state
+    //     language.languageName = str.charAt(0).toUpperCase() + str.slice(1)
+    // }
 
     render() {
         return (
@@ -120,11 +119,11 @@ export default class EditLanguageComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     // AuthenticationService.setupAxiosInterceptors();
                                     LanguageService.editLanguage(this.state.language).then(response => {
-                                        if (response.data.status == "Success") {
-                                            this.props.history.push(`/language/listLanguage/${response.data.message}`)
+                                        if (response.status == 200) {
+                                            this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)
                                         } else {
                                             this.setState({
-                                                message: response.data.message
+                                                message: response.data.messageCode
                                             })
                                         }
 
@@ -137,12 +136,12 @@ export default class EditLanguageComponent extends Component {
                                                         this.setState({
                                                             message: error.response.data
                                                         })
-                                                        break
+                                                        break;
                                                     default:
                                                         this.setState({
-                                                            message: error.response.data.message
+                                                            message: error.response.data.messageCode
                                                         })
-                                                        break
+                                                        break;
                                                 }
                                             }
                                         )
@@ -163,17 +162,34 @@ export default class EditLanguageComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody>
                                                     <FormGroup>
+
                                                         <Label for="language">{i18n.t('static.language.language')}</Label>
+
                                                         <Input type="text"
-                                                            name="language"
-                                                            id="language"
-                                                            valid={!errors.language}
-                                                            invalid={touched.language && !!errors.language}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            name="languageName"
+                                                            id="languageName"
+                                                            bsSize="sm"
+                                                            valid={!errors.languageName}
+                                                            invalid={touched.languageName && !!errors.languageName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
                                                             required />
-                                                        <FormFeedback>{errors.language}</FormFeedback>
+                                                        <FormFeedback>{errors.languageName}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="languageCode">Language</Label>
+                                                        <Input type="text"
+                                                            name="languageCode"
+                                                            id="languageCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.languageCode}
+                                                            invalid={touched.languageCode && !!errors.languageCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.language.languageCode}
+                                                            required />
+                                                        <FormFeedback>{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -228,7 +244,7 @@ export default class EditLanguageComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` + "Action Canceled")
+        this.props.history.push(`/language/listLanguage/` + "static.actionCancelled")
     }
 
 }
