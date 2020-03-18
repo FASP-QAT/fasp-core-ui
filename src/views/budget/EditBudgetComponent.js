@@ -22,13 +22,13 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         budget: Yup.string()
-            .required('Please enter Budget'),
+        .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
-            .required('Please enter Budget amount'),
+        .required(i18n.t('static.budget.budgetamounttext')),
         startDate: Yup.string()
-            .required('Please enter Start date'),
+        .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
-            .required('Please enter Stop date')
+        .required(i18n.t('static.budget.stopdatetext'))
     })
 }
 

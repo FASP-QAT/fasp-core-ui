@@ -21,14 +21,14 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .required('Please enter country name'),
+        .required(i18n.t('static.country.countrytext')),
         countryCode: Yup.string()
-            .max(3, 'Please enter 3 characters')
-            .required('Please enter country code'),
+            .max(3, i18n.t('static.country.countrycodemax3digittext'))
+            .required(i18n.t('static.country.countrycodetext')),
         languageId: Yup.string()
-            .required('Please select Language'),
+            .required(i18n.t('static.country.languagetext')),
         currencyId: Yup.string()
-            .required('Please select Currency'),
+            .required(i18n.t('static.country.currencytext')),
     })
 }
 
