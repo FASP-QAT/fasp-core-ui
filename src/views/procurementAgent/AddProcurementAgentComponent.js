@@ -7,7 +7,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../common/AuthenticationService.js';
-
+import i18n from '../../i18n';
 const initialValues = {
     realmId: [],
     procurementAgentCode: "",
@@ -18,13 +18,13 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required('Please select realm'),
-        procurementAgentCode: Yup.string()
-            .required('Please enter code'),
+            .required(i18n.t('static.procurementagent.realmtext')),
+         procurementAgentCode: Yup.string()
+            .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
-            .required('Please enter name'),
+        .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
-            .required('Please enter submitted to approved lead time')
+        .required(i18n.t('static.procurementagent.submittoapprovetext'))
     })
 }
 
@@ -168,7 +168,7 @@ class AddProcurementAgentComponent extends Component {
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Procurement Agent</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.procurementagent.procurementagentadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -217,7 +217,7 @@ class AddProcurementAgentComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">Realm</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.procurementagent.realm')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -229,13 +229,13 @@ class AddProcurementAgentComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                         >
-                                                            <option value="">Please select</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">Procurement Agent Code</Label>
+                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
                                                         <Input type="text"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
@@ -250,7 +250,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentName">Procurement Agent Name</Label>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
                                                         <Input type="text"
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
@@ -264,7 +264,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">Submitted To Approved Lead Time</Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetosubmittime')}</Label>
                                                         <Input type="number"
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
@@ -280,8 +280,8 @@ class AddProcurementAgentComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

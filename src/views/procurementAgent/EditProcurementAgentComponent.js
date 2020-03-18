@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n';
 import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -17,11 +17,11 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentCode: Yup.string()
-            .required('Please enter code'),
-        procurementAgentName: Yup.string()
-            .required('Please enter name'),
-        submittedToApprovedLeadTime: Yup.string()
-            .required('Please enter submitted to approved lead time')
+        .required(i18n.t('static.procurementagent.codetext')),
+    procurementAgentName: Yup.string()
+    .required(i18n.t('static.procurementAgent.procurementagentnametext')),
+    submittedToApprovedLeadTime: Yup.string()
+    .required(i18n.t('static.procurementagent.submittoapprovetext'))
     })
 }
 
@@ -127,7 +127,7 @@ class EditProcurementAgentComponent extends Component {
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Edit Procurement Agent</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.procurementAgent.procurementagentedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={
@@ -182,7 +182,7 @@ class EditProcurementAgentComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">Realm</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.procurementAgent.realm')}</Label>
                                                         <Input
                                                             type="text"
                                                             name="realmId"
@@ -194,7 +194,7 @@ class EditProcurementAgentComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">Procurement Agent Code</Label>
+                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementAgent.procurementagentcode')}</Label>
                                                         <Input type="text"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
@@ -209,7 +209,7 @@ class EditProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentName">Procurement Agent Name</Label>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementAgent.procurementagentname')}</Label>
                                                         <Input type="text"
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
@@ -223,7 +223,7 @@ class EditProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">Submitted To Approved Lead Time</Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementAgent.procurementagentsubmittoapprovetime')}</Label>
                                                         <Input type="number"
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
@@ -238,7 +238,7 @@ class EditProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Status  </Label>
+                                                        <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -252,7 +252,7 @@ class EditProcurementAgentComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                Active
+                                                                {i18n.t('static.common.active')}
                                                                 </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -268,15 +268,15 @@ class EditProcurementAgentComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                Disabled
+                                                                {i18n.t('static.common.disabled')}
                                                                 </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

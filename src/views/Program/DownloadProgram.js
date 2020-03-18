@@ -27,7 +27,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
-            .required('Please select program.')
+            .required(i18n.t('static.program.validselectprogramtext'))
     })
 }
 
@@ -153,26 +153,26 @@ export default class DownloadProgram extends Component {
                                     };
                                     var putRequest = programSaveData.put(item);
                                     putRequest.onerror = function (error) {
-                                        this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                        this.props.history.push(`/program/downloadProgram/` +i18n.t('static.program.errortext') )
                                     }.bind(this);
                                 }
                                 transactionForSavingData.oncomplete = function (event) {
                                     console.log("in transaction complete")
-                                    this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
+                                    this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
                                 }.bind(this);
                                 transactionForSavingData.onerror = function (event) {
-                                    this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                 }.bind(this);
                                 programSaveData.onerror = function (event) {
-                                    this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                 }.bind(this)
                             } else {
                                 confirmAlert({
-                                    title: 'Confirm to submit',
-                                    message: `Program with same version already exists in the local machine you want to overwirte that program with the new data?`,
+                                    title: i18n.t('static.program.confirmsubmit'),
+                                    message: i18n.t('static.program.programwithsameversion'),
                                     buttons: [
                                         {
-                                            label: 'Yes',
+                                            label: i18n.t('static.program.yes'),
                                             onClick: () => {
                                                 db1 = e.target.result;
                                                 var transactionForOverwrite = db1.transaction(['programData'], 'readwrite');
@@ -208,12 +208,12 @@ export default class DownloadProgram extends Component {
                                             }
                                         },
                                         {
-                                            label: 'No',
+                                            label: i18n.t('static.program.no'),
                                             onClick: () => {
                                                 this.setState({
-                                                    message: "Action Canceled."
+                                                    message: i18n.t('static.program.actioncancelled')
                                                 })
-                                                this.props.history.push(`/program/downloadProgram/` + "Action Canceled.")
+                                                this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                             }
                                         }
                                     ]
@@ -229,20 +229,20 @@ export default class DownloadProgram extends Component {
                                 this.setState({
                                     message: error.message
                                 })
-                                this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                this.props.history.push(`/program/downloadProgram/` +  i18n.t('static.program.errortext'))
                                 break
                             default:
                                 this.setState({
                                     message: error.response
                                 })
-                                this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                this.props.history.push(`/program/downloadProgram/` +  i18n.t('static.program.errortext'))
                                 break
                         }
                     }
                 )
 
         } else {
-            alert("You must be online.")
+            alert( i18n.t('static.common.onlinealerttext'))
         }
     }
 
@@ -325,7 +325,7 @@ export default class DownloadProgram extends Component {
 
     }
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + "Action Canceled")
+        this.props.history.push(`/dashboard/` +    i18n.t('static.program.actioncancelled') )
     }
 
 }

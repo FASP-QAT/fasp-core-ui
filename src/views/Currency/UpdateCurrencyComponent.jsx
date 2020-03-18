@@ -17,13 +17,14 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
-            .required('Please enter currency code'),
+        .required(i18n.t('static.currency.currencycodetext')),
+         
         currencySymbol: Yup.string()
-            .required('Please enter currency symbol'),
+            .required(i18n.t('static.currency.currencysymboltext')),
         label: Yup.string()
-            .required('Please enter currency name'),
+            .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.string()
-            .required('Please enter conversion rate to usd'),
+            .required(i18n.t('static.currency.currencyconversiontext')),
     })
 }
 

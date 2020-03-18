@@ -14,7 +14,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         manufacturer: Yup.string()
-            .required('Please enter Manufacturer')
+    .required(i18n.t('static.manufaturer.manufaturertext'))
     })
 }
 

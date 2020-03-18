@@ -16,9 +16,9 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-      .required('Please select Country'),
+    .required( i18n.t('static.region.validcountry')),
     region: Yup.string()
-      .required('Please enter Region')
+    .required( i18n.t('static.region.validregion'))
   })
 }
 

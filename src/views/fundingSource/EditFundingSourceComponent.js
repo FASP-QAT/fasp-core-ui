@@ -14,7 +14,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
-            .required('Please enter Funding source')
+      .required(i18n.t('static.fundingsource.fundingsourcetext'))
     })
 }
 

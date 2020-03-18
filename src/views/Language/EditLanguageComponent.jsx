@@ -14,7 +14,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         language: Yup.string()
-            .required('Please enter Language Name')
+        .required(i18n.t('static.language.languagetext')) 
     })
 }
 
