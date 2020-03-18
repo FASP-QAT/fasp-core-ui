@@ -6,6 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import AuthenticationService from '../common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
+import i18n from '../../i18n';
 
 const initialValues = {
     label: '',
@@ -390,7 +391,7 @@ export default class AddDataSource extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Country</strong>{' '}
+        <i className="icon-note"></i><strong>{i18n.t('static.datasource.datasourceadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -443,7 +444,7 @@ export default class AddDataSource extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">Data source name (English):</Label>
+                                                        <Label for="label">{i18n.t('static.datasource.datasource')}</Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -456,7 +457,7 @@ export default class AddDataSource extends Component {
                                                         <FormFeedback>{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="dataSourceTypeId">Select Data Source Type :</Label>
+                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="dataSourceTypeId"
@@ -469,7 +470,7 @@ export default class AddDataSource extends Component {
                                                             required
                                                             // value={this.state.dataSourceType.dataSourceTypeId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {dataSourceTypes}
                                                         </Input>
                                                         <FormFeedback>{errors.dataSourceTypeId}</FormFeedback>
@@ -478,8 +479,8 @@ export default class AddDataSource extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Submit</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

@@ -5,6 +5,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import CurrencyService from '../../api/CurrencyService.js';
+import i18n from '../../i18n';
 
 let initialValues = {
     currencyCode: '',
@@ -151,7 +152,7 @@ export default class UpdateCurrencyComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Currency</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.currency.currencyedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -204,7 +205,7 @@ export default class UpdateCurrencyComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="currencyCode">Currency Code:</Label>
+                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
                                                         <Input type="text"
                                                             name="currencyCode"
                                                             id="currencyCode"
@@ -217,7 +218,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <FormFeedback>{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="currencySymbol">Currency Symbol</Label>
+                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
                                                         <Input type="text"
                                                             name="currencySymbol"
                                                             id="currencySymbol"
@@ -230,7 +231,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <FormFeedback>{errors.currencySymbol}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">Currency Name (English):</Label>
+                                                        <Label for="label">{i18n.t('static.currency.currency')}</Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -243,7 +244,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <FormFeedback>{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="conversionRate">Conversion Rate To Usd:</Label>
+                                                        <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}</Label>
                                                         <Input type="text"
                                                             name="conversionRate"
                                                             id="conversionRate"
@@ -260,8 +261,8 @@ export default class UpdateCurrencyComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

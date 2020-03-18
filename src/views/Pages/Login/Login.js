@@ -16,12 +16,13 @@ import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import LoginService from '../../../api/LoginService'
+import i18n from '../../../i18n'
+
 
 const initialValues = {
   username: "",
   password: ""
 }
-
 const validationSchema = function (values) {
   return Yup.object().shape({
     username: Yup.string()
@@ -177,6 +178,8 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
+
+
                     <Formik
                       initialValues={initialValues}
                       validate={validate(validationSchema)}
@@ -276,8 +279,8 @@ class Login extends Component {
                           setTouched
                         }) => (
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                              <h1>Login</h1>
-                              <p className="text-muted">Sign In to your account</p>
+                              <h1>{i18n.t('static.login.login')}</h1>
+                              <p className="text-muted">{i18n.t('static.login.signintext')}</p>
                               <InputGroup className="mb-3">
                                 <InputGroupAddon addonType="prepend">
                                   <InputGroupText>
@@ -286,7 +289,7 @@ class Login extends Component {
                                 </InputGroupAddon>
                                 <Input
                                   type="text"
-                                  placeholder="Username"
+                                  placeholder={i18n.t('static.login.username')}
                                   autoComplete="username"
                                   name="username"
                                   id="username"
@@ -305,7 +308,7 @@ class Login extends Component {
                                 </InputGroupAddon>
                                 <Input
                                   type="password"
-                                  placeholder="Password"
+                                  placeholder={i18n.t('static.login.password')}
                                   autoComplete="current-password"
                                   name="password"
                                   id="password"
@@ -319,10 +322,10 @@ class Login extends Component {
                               <Row>
                                 <Col xs="6">
                                   {/* <Button color="primary" className="px-4" onClick={this.loginClicked}>Login</Button> */}
-                                  <Button type="submit" color="primary" className="px-4" onClick={() => this.touchAll(setTouched, errors)} >Login</Button>
+                                  <Button type="submit" color="primary" className="px-4" onClick={() => this.touchAll(setTouched, errors)} >{i18n.t('static.login.login')}</Button>
                                 </Col>
                                 <Col xs="6" className="text-right">
-                                  <Button color="link" className="px-0">Forgot password?</Button>
+                                  <Button color="link" className="px-0">{i18n.t('static.login.forgotpassword')}?</Button>
                                 </Col>
                               </Row>
                             </Form>

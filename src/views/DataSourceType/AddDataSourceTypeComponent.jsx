@@ -3,6 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
+import i18n from '../../i18n';
 // import AuthenticationService from '../common/AuthenticationService.js';
 import DataSourceTypeService from '../../api/DataSourceTypeService.js'
 
@@ -277,7 +278,7 @@ export default class AddDataSourceTypeComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add DataSource Type</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.datasourcetype.datasourcetypeadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -330,7 +331,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceType'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">Country name (English):</Label>
+                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -346,8 +347,8 @@ export default class AddDataSourceTypeComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Submit</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

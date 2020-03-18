@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
+import '../Forms/ValidationForms/ValidationForms.css';
+import i18n from '../../i18n'
 
 // React select
 import Select from 'react-select';
@@ -121,7 +122,7 @@ class AddLanguageComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Language</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.language.languageadd')}</strong>{' '}
                             </CardHeader>
                             <CardBody>
                                 <Formik
@@ -173,7 +174,7 @@ class AddLanguageComponent extends Component {
                                         }) => (
                                                 <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
                                                     <FormGroup>
-                                                        <Label for="languageName">Language</Label>
+                                                        <Label for="languageName">{i18n.t('static.language.language')}</Label>
                                                         <Input type="text"
                                                             name="languageName"
                                                             id="languageName"
@@ -202,9 +203,11 @@ class AddLanguageComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Update</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
-                                                        &nbsp;
+
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} >{i18n.t('static.common.submit')}</Button>
+                                                        {/* <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button> */}
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+
                                                     </FormGroup>
                                                 </Form>
                                             )}
