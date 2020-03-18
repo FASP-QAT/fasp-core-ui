@@ -49,21 +49,26 @@ class FundingSourceListComponent extends Component {
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    fundingSourceList: response.data.data
+                    fundingSourceList: response.data
                 })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -106,6 +111,10 @@ class FundingSourceListComponent extends Component {
                         </BootstrapTable>
                     </CardBody>
                 </Card>
+                <div>
+                    <h6>{this.state.message}</h6>
+                    <h6>{this.props.match.params.messageCode}</h6>
+                </div>
             </div>
         );
     }

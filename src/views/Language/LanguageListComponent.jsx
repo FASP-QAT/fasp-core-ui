@@ -31,7 +31,8 @@ export default class LanguageListComponent extends Component {
             langaugeList: []
         }
         this.editLanguage = this.editLanguage.bind(this);
-        this.addNewLanguage = this.addNewLanguage.bind(this);
+        this.addLanguage = this.addLanguage.bind(this);
+        this.showStatus = this.showStatus.bind(this);
     }
 
     editLanguage(language) {
@@ -41,13 +42,20 @@ export default class LanguageListComponent extends Component {
         });
     }
 
-    addNewLanguage(){
+    addLanguage(){
         if (navigator.onLine) {
-            this.props.history.push(`/addLanguage`)
+            this.props.history.push(`/language/addLanguage`)
         } else {
             alert("You must be Online.")
         }
-
+    }
+    
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
     }
 
     componentDidMount() {
@@ -84,15 +92,24 @@ export default class LanguageListComponent extends Component {
         <div className="animated">
             <Card>
                 <CardHeader>
-                    <i className="icon-menu"></i>Language List
+                    <i className="icon-menu"></i><strong>Language List</strong>{' '}
+                    <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Language" onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                 </CardHeader>
                 <CardBody>
                     <BootstrapTable data={this.state.langaugeList} version="4" striped hover pagination search  options={this.options}>
                         <TableHeaderColumn isKey dataField="languageName" >Language Name</TableHeaderColumn>
-                        <TableHeaderColumn dataField="active" dataSort>Status</TableHeaderColumn>
+                        <TableHeaderColumn dataField="active" dataFormat={this.showStatus} dataSort>Status</TableHeaderColumn>
                     </BootstrapTable>
                 </CardBody>
             </Card>
+            <div>
+                    <h6>{this.state.message}</h6>
+                    <h6>{this.props.match.params.messageCode}</h6>
+                </div>
         </div>
     );
     }

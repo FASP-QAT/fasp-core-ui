@@ -18,11 +18,42 @@ export default {
       ]
     },
     {
+      name: 'Application Masters',
+      icon: 'fa fa-list',
+      children: [
+        {
+          name: 'Language',
+          url: '/language/listLanguage',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'Country',
+          url: '/country/listCountry',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'DataSource Type',
+          url: '/dataSourceType/listDataSourceType',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'DataSource',
+          url: '/dataSource/listDataSource',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'Currency',
+          url: '/currency/listCurrency',
+          icon: 'fa fa-list-alt'
+        }
+      ]
+    },
+    {
       name: 'Realm Masters',
       icon: 'fa fa-list',
       children: [
         {
-          name: 'Realm Country',
+          name: 'Realm-Country',
           icon: 'fa fa-bank',
           url: '/realmCountry/listRealmCountry'
         },
@@ -158,91 +189,6 @@ export default {
       name: 'Consumption details',
       url: '/consumptionDetails',
       icon: 'icon-speedometer',
-    },
-    {
-      name: 'Language',
-      url: '/language',
-      icon: 'icon-speedometer',
-      children: [
-        {
-          name: 'Add Language',
-          url: '/language/addLanguage',
-          icon: 'fa fa-plus',
-        },
-        {
-          name: 'Language List',
-          url: '/language/listLanguage',
-          icon: 'fa fa-list-alt',
-        }
-      ]
-    },
-    {
-      name: 'Country',
-      url: '/country',
-      icon: 'icon-speedometer',
-      children: [
-        {
-          name: 'Add Country',
-          url: '/country/addCountry',
-          icon: 'fa fa-plus',
-        },
-        {
-          name: 'Country List',
-          url: '/country/listCountry',
-          icon: 'fa fa-list-alt',
-        }
-      ]
-    },
-    {
-      name: 'DataSource Type',
-      url: '/dataSourceType',
-      icon: 'icon-speedometer',
-      children: [
-        {
-          name: 'Add DataSource Type',
-          url: '/datasourceType/addDatasourceType',
-          icon: 'fa fa-plus',
-        },
-        {
-          name: 'DataSource Type List',
-          url: '/datasourceType/listDataSourceType',
-          icon: 'fa fa-list-alt',
-        }
-      ]
-    },
-    {
-      name: 'DataSource',
-      url: '/dataSource',
-      icon: 'icon-speedometer',
-      children: [
-        {
-          name: 'Add DataSource',
-          url: '/datasource/addDatasource',
-          icon: 'fa fa-plus',
-        },
-        {
-          name: 'DataSource List',
-          url: '/datasource/listDataSource',
-          icon: 'fa fa-list-alt',
-        }
-      ]
-    },
-    {
-      name: 'Currency',
-      url: '/currency',
-      icon: 'icon-speedometer',
-      children: [
-        {
-          name: 'Add Currency',
-          url: '/currency/addCurrency',
-          icon: 'fa fa-plus',
-        },
-        {
-          name: 'Currency List',
-          url: '/currency/listCurrency',
-          icon: 'fa fa-list-alt',
-        }
-      ]
     },
   ]
 };

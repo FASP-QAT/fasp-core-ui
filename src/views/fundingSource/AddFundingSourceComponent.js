@@ -75,14 +75,12 @@ class AddFundingSourceComponent extends Component {
   };
 
   touchAll(setTouched, errors) {
-    console.log("Inside touchAll");
     setTouched({
       realmId: true,
       fundingSource: true
     }
     );
     this.validateForm(errors);
-    console.log("Completed Touch All");
   }
   validateForm(errors) {
     this.findFirstError('fundingSourceForm', (fieldName) => {
@@ -103,22 +101,28 @@ class AddFundingSourceComponent extends Component {
     AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
-        this.setState({
-          realms: response.data.data
-        })
+        if (response.status == 200) {
+          this.setState({ realms: response.data })
+        } else {
+          this.setState({ message: response.data.messageCode })
+        }
       }).catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
           }
         }
       );
@@ -150,27 +154,29 @@ class AddFundingSourceComponent extends Component {
                   FundingSourceService.addFundingSource(this.state.fundingSource)
                     .then(response => {
                       console.log("Response->", response);
-                      if (response.data.status == "Success") {
-                        this.props.history.push(`/fundingSource/listFundingSource/${response.data.message}`)
+                      if (response.status == 200) {
+                        this.props.history.push(`/fundingSource/listFundingSource/${response.data.messageCode}`)
                       } else {
-                        this.setState({
-                          message: response.data.message
-                        })
+                        this.setState({ message: response.data.messageCode })
                       }
                     })
                     .catch(
                       error => {
-                        switch (error.message) {
-                          case "Network Error":
-                            this.setState({
-                              message: error.message
-                            })
-                            break
-                          default:
-                            this.setState({
-                              message: error.response.data.message
-                            })
-                            break
+                        if (error.message === "Network Error") {
+                          this.setState({ message: error.message });
+                        } else {
+                          switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                              this.setState({ message: error.response.data.messageCode });
+                              break;
+                            default:
+                              this.setState({ message: 'static.unkownError' });
+                              break;
+                          }
                         }
                       }
                     );
@@ -224,9 +230,8 @@ class AddFundingSourceComponent extends Component {
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
                             <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
                                                         &nbsp;
                           </FormGroup>
                         </CardFooter>
@@ -237,11 +242,15 @@ class AddFundingSourceComponent extends Component {
             </Card>
           </Col>
         </Row>
+        <div>
+          <h6>{this.state.message}</h6>
+          <h6>{this.props.match.params.messageCode}</h6>
+        </div>
       </div>
     );
   }
   cancelClicked() {
-    this.props.history.push(`/fundingSource/listFundingSource/` + "Action Canceled")
+    this.props.history.push(`/fundingSource/listFundingSource/` + "static.actionCancelled")
   }
 }
 
