@@ -4,6 +4,9 @@ const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'
 const AddSubFundingSource = React.lazy(() => import('./views/subFundingSource/AddSubFundingSourceComponent'));
 const SubFundingSourceList = React.lazy(() => import('./views/subFundingSource/SubFundingSourceListComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/EditSubFundingSourceComponent'));
+const ApplicationDashboard = React.lazy(() => import('./views/ApplicationDashboard'));
+const RealmDashboard = React.lazy(() => import('./views/RealmDashboard'));
+const ProgramDashboard = React.lazy(() => import('./views/ProgramDashboard'));
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
 const TextEditors = React.lazy(() => import('./views/Editors/TextEditors'));
@@ -49,7 +52,7 @@ const ButtonGroups = React.lazy(() => import('./views/Buttons/ButtonGroups'));
 const Buttons = React.lazy(() => import('./views/Buttons/Buttons'));
 const Charts = React.lazy(() => import('./views/Charts'));
 
-const Dashboard = React.lazy(() => import('./views/Dashboard'));
+// const Dashboard = React.lazy(() => import('./views/Dashboard'));
 const CoreUIIcons = React.lazy(() => import('./views/Icons/CoreUIIcons'));
 const Flags = React.lazy(() => import('./views/Icons/Flags'));
 const FontAwesome = React.lazy(() => import('./views/Icons/FontAwesome'));
@@ -71,7 +74,10 @@ const routes = [
   { path: '/subFundingSource/subFundingSourceList', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: SubFundingSourceList },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+   { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
+    { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
+  { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
+  // { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

@@ -1,154 +1,103 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardGroup, Col, Container, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row } from 'reactstrap';
-import navigation from '../../../_nav';
-// routes config
-import routes from '../../../routes';
-
-import CryptoJS from 'crypto-js'
-import AuthenticationService from '../../common/AuthenticationService.js';
-import { Online } from "react-detect-offline";
-import bcrypt from 'bcryptjs';
-import jwt_decode from 'jwt-decode'
-import { SECRET_KEY } from '../../../Constants.js'
-import LoginService from '../../../api/LoginService'
-
+import { Button, Card, CardBody, CardGroup, Col, Container,ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, Label, FormGroup } from 'reactstrap';
 
 class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      message: ''
-    }
-    this.loginClicked = this.loginClicked.bind(this);
-  }
-  loginClicked() {
-    var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
-    if (navigator.onLine) {
-      LoginService.authenticate(username, password)
-        .then(response => {
-          var decoded = jwt_decode(response.data.token);
-          console.log("user id---" + decoded.userId);
-          localStorage.removeItem("token-" + decoded.userId);
-          localStorage.removeItem('username-' + decoded.userId);
-          localStorage.removeItem('password-' + decoded.userId);
-          localStorage.removeItem('curUser');
-
-          localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-          localStorage.setItem('username-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.username).toString(), `${SECRET_KEY}`));
-          localStorage.setItem('password-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.password).toString(), `${SECRET_KEY}`));
-          localStorage.setItem('typeOfSession', "Online");
-          localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
-          console.log("local storage length---" + localStorage.length);
-          console.log("user cur ---" + localStorage.getItem("curUser"));
-          AuthenticationService.setupAxiosInterceptors();
-          this.props.history.push(`/dashboard`)
-        })
-        .catch(
-          error => {
-            if (error.response != null && error.response.status === 401) {
-              switch (error.response.data) {
-                case "Password expired":
-                  this.setState({
-                    message: error.response.data
-                  })
-                  this.props.history.push({
-                    pathname: "/updateExpiredPassword",
-                    state: {
-                      username: username
-                    }
-                  });
-                  break
-                default:
-                  this.setState({
-                    message: error.response.data
-                  })
-                  break
-              }
-            } else {
-              switch (error.message) {
-                case "Network Error":
-                  this.setState({
-                    message: error.message
-                  })
-                  break
-                default:
-                  this.setState({
-                    message: error.message
-                  })
-                  break
-              }
-            }
-          }
-        );
-    }
-    else {
-      var decryptedPassword = AuthenticationService.isUserLoggedIn(username, password);
-      if (decryptedPassword != "") {
-        bcrypt.compare(password, decryptedPassword, function (err, res) {
-          if (err) {
-            this.setState({ message: 'Error occured' });
-          }
-          if (res) {
-            localStorage.setItem('typeOfSession', "Offline");
-            localStorage.setItem('curUser', CryptoJS.AES.encrypt(localStorage.getItem("tempUser").toString(), `${SECRET_KEY}`));
-            localStorage.removeItem("tempUser");
-            this.props.history.push(`/welcome`)
-          } else {
-            this.setState({ message: 'Bad credentials.' });
-          }
-        }.bind(this));
-      }
-      else {
-        this.setState({ message: 'User not found.' });
-      }
-    }
-  }
   render() {
     return (
-      <div className="app flex-row align-items-center">
-        <Container>
-          <Row className="justify-content-center">
-            <Col md="6">
+      <div className="main-content flex-row align-items-center">
+     
+      <div className="Login-component">
+        <br></br>
+         <div>
+            <img src={'assets/img/QAT-logo.png'} className="img-fluid upper-logo" />
+         </div>
+         <br></br>
+         <Col>
+         <Row className="justify-content-center">
+            <Col md="4">
               <CardGroup>
-                <Card className="p-4">
+                <Card className="p-4 Login-card">
                   <CardBody>
                     <Form>
-                      <h1>Login</h1>
-                      <p className="text-muted">Sign In to your account</p>
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="icon-user"></i>
+                            <i className="icon-user Loginicon"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input type="text" placeholder="Username" autoComplete="username" name="username" id="username" required />
+                        <Input type="text" placeholder="Username" autoComplete="username" />
                       </InputGroup>
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="icon-lock"></i>
+                            <i className="icon-lock Loginicon"></i>
                           </InputGroupText>
                         </InputGroupAddon>
-                        <Input type="password" placeholder="Password" autoComplete="current-password" name="password" id="password" required />
+                        <Input type="password" placeholder="Password" autoComplete="current-password" />
                       </InputGroup>
                       <Row>
                         <Col xs="6">
-                          <Button color="primary" className="px-4" onClick={this.loginClicked}>Login</Button>
+                          <Button className="px-4 Login-btn">Login</Button>
                         </Col>
                         <Col xs="6" className="text-right">
-                          <Button color="link" className="px-0">Forgot password?</Button>
+                          <Link to="/ForgotPassword">
+                          <Button color="link" className="px-0 Login-fpwd">Forgot password?</Button>
+                          </Link>
+                         
                         </Col>
                       </Row>
                     </Form>
                   </CardBody>
                 </Card>
+         
               </CardGroup>
             </Col>
           </Row>
-        </Container>
+    
+      < Col className="Login-bttom ">
+      <Col xs="12">
+          <CardBody>
+            <br></br>
+              <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management 
+              (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.  
+              GHSC-PSM connects technical solutions and proven commercial processes to 
+              promote efficient and cost-effective health supply chains worldwide. 
+              Our goal is to ensure uninterrupted supplies of health commodities to save 
+              lives and create a healthier future for all. The project purchases and delivers 
+              health commodities, offers comprehensive technical assistance to strengthen 
+              national supply chain systems, and provides global supply chain leadership.For more 
+              information,visit ghsupplychain.org.The information provided in this tool is not official
+              U.S. government information and does not represent the views or positions of the Agency for International 
+              Development or the U.S. government.
+              </p>
+          </CardBody>
+        </Col>
+        <Row className="text-center Login-bttom-logo">
+        <Col md="4">
+            <CardBody>
+            <img src={'assets/img/wordmark.png'} className="img-fluid"  width="420"/>
+            </CardBody>
+       </Col>
+        <Col md="4">
+           <CardBody>
+            <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid" width="420"/>
+            </CardBody>
+       </Col>
+        <Col md="4">
+          <CardBody>
+            <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid" width="420"/>
+            </CardBody>
+       </Col>
+       </Row>
+       </ Col>
+    
+      </Col>
       </div>
+      </div>
+  
+      
+      
     );
   }
 }

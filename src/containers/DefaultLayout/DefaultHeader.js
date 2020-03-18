@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
-import sygnet from '../../assets/img/brand/sygnet.svg'
+// import QAT from '../../assets/img/brand/QAT.svg'
 
 const propTypes = {
   children: PropTypes.node,
@@ -24,14 +24,14 @@ class DefaultHeader extends Component {
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
-          full={{ src: logo, width: 89, height: 25, alt: 'CoreUI Logo' }}
-          minimized={{ src: sygnet, width: 30, height: 30, alt: 'CoreUI Logo' }}
+          full={{ src: logo, width: 160, height: 200, alt: 'QAT Logo' }}
+          // minimized={{ src: QAT, width: 30, height: 30, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
-          <NavItem className="px-3">
+          {/* <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >Dashboard</NavLink>
-          </NavItem>
+          </NavItem> */}
         </Nav>
         <Nav className="ml-auto" navbar>
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt />
