@@ -18,11 +18,42 @@ export default {
       ]
     },
     {
+      name: 'Application Masters',
+      icon: 'fa fa-list',
+      children: [
+        {
+          name: 'Language',
+          url: '/language/listLanguage',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'Country',
+          url: '/country/listCountry',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'DataSource Type',
+          url: '/dataSourceType/listDataSourceType',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'DataSource',
+          url: '/dataSource/listDataSource',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'Currency',
+          url: '/currency/listCurrency',
+          icon: 'fa fa-list-alt'
+        }
+      ]
+    },
+    {
       name: 'Realm Masters',
       icon: 'fa fa-list',
       children: [
         {
-          name: 'Realm Country',
+          name: 'Realm-Country',
           icon: 'fa fa-bank',
           url: '/realmCountry/listRealmCountry'
         },

@@ -3,7 +3,10 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
+
+import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText'
+
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
@@ -57,15 +60,15 @@ class EditBudgetComponent extends Component {
         this.state = {
             budget: this.props.location.state.budget,
             message: '',
-            lan:'en'
+            lan: 'en'
         }
         initialValues = {
-            budget:getLabelText(this.props.location.state.budget.label,this.state.lan),
-            programId:this.props.location.state.budget.program.programId,
-            subFundingSourceId:this.props.location.state.budget.subFundingSource.subFundingSourceId,
-            budgetAmt:this.props.location.state.budget.budgetAmt,
-            startDate:this.props.location.state.budget.startDate,
-            stopDate:this.props.location.state.budget.stopDate,
+            budget: getLabelText(this.props.location.state.budget.label, this.state.lan),
+            programId: this.props.location.state.budget.program.programId,
+            subFundingSourceId: this.props.location.state.budget.subFundingSource.subFundingSourceId,
+            budgetAmt: this.props.location.state.budget.budgetAmt,
+            startDate: this.props.location.state.budget.startDate,
+            stopDate: this.props.location.state.budget.stopDate,
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -78,11 +81,11 @@ class EditBudgetComponent extends Component {
         }
         if (event.target.name === "budgetAmt") {
             budget.budgetAmt = event.target.value;
-        }if (event.target.name === "startDate") {
+        } if (event.target.name === "startDate") {
             budget.startDate = event.target.value;
-        }if (event.target.name === "stopDate") {
+        } if (event.target.name === "stopDate") {
             budget.stopDate = event.target.value;
-        }else if (event.target.name === "active") {
+        } else if (event.target.name === "active") {
             budget.active = event.target.id === "active2" ? false : true;
         }
         this.setState({
@@ -123,7 +126,7 @@ class EditBudgetComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Update Budget</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.budget.budgetedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -173,7 +176,7 @@ class EditBudgetComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="budget">Budget</Label>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}</Label>
                                                         <Input type="text"
                                                             name="budget"
                                                             id="budget"
@@ -182,12 +185,12 @@ class EditBudgetComponent extends Component {
                                                             invalid={touched.budget && !!errors.budget}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.budget.label,this.state.lan)}
+                                                            value={getLabelText(this.state.budget.label, this.state.lan)}
                                                             required />
                                                         <FormFeedback>{errors.budget}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="programId">Program</Label>
+                                                        <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
                                                         <Input
                                                             type="text"
                                                             name="programId"
@@ -205,7 +208,7 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback>{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="subFundingSourceId">Sub Funding source</Label>
+                                                        <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
                                                         <Input
                                                             type="text"
                                                             name="subFundingSourceId"
@@ -223,7 +226,7 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback>{errors.subFundingSourceId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="budgetAmt">Budget Amount</Label>
+                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
                                                         <Input type="text"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
@@ -233,13 +236,13 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="number"
-                                                            placeholder="Enter your Budget amount in USD"
+                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
                                                             required />
                                                         <FormFeedback>{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">Start date</Label>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
                                                         <Input type="text"
                                                             name="startDate"
                                                             id="startDate"
@@ -250,12 +253,12 @@ class EditBudgetComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="date"
                                                             value={this.state.budget.startDate}
-                                                            placeholder="Start date of Budget"
+                                                            placeholder="{i18n.t('static.budget.budgetstartdate')}"
                                                             required />
                                                         <FormFeedback>{errors.startDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">Stop date</Label>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                         <Input type="text"
                                                             name="stopDate"
                                                             id="stopDate"
@@ -266,12 +269,14 @@ class EditBudgetComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="date"
                                                             value={this.state.budget.stopDate}
-                                                            placeholder="Stop date of Budget"
+                                                            placeholder="{i18n.t('static.budget.budgetstopdate')}"
                                                             required />
                                                         <FormFeedback>{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Status&nbsp;&nbsp;</Label>
+
+                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -285,8 +290,8 @@ class EditBudgetComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active1">
-                                                                Active
-                                                                </Label>
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -301,15 +306,15 @@ class EditBudgetComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active2">
-                                                                Disabled
-                                                                </Label>
+                                                                {i18n.t('static.common.disabled')}
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>Cancel</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.budget.cancel')}</Button>
                                                         <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>

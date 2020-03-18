@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n'
 import BudgetService from "../../api/BudgetService";
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -20,10 +20,10 @@ const initialValues = {
     subFundingSourceList: []
 }
 
-const validationSchema = function (values) {
+const validationSchema = function (values,t) {
     return Yup.object().shape({
         budget: Yup.string()
-            .required('Please enter Budget'),
+            .required(t('static.budget.budgetamountdesc')),
         programId: Yup.string()
             .required('Please select Program'),
         subFundingSourceId: Yup.string()
@@ -39,7 +39,7 @@ const validationSchema = function (values) {
 
 const validate = (getValidationSchema) => {
     return (values) => {
-        const validationSchema = getValidationSchema(values)
+        const validationSchema = getValidationSchema(values,i18n.t)
         try {
             validationSchema.validateSync(values, { abortEarly: false })
             return {}
@@ -141,17 +141,22 @@ class AddBudgetComponent extends Component {
                 })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -163,17 +168,22 @@ class AddBudgetComponent extends Component {
                 })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -202,7 +212,7 @@ class AddBudgetComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Budget</strong>{' '}
+        <i className="icon-note"></i><strong>{i18n.t('static.budget.budgetadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -222,17 +232,22 @@ class AddBudgetComponent extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -252,7 +267,7 @@ class AddBudgetComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="budget">Budget</Label>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}</Label>
                                                         <Input type="text"
                                                             name="budget"
                                                             id="budget"
@@ -265,7 +280,7 @@ class AddBudgetComponent extends Component {
                                                         <FormFeedback>{errors.budget}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="programId">Program</Label>
+                                                        <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="programId"
@@ -278,13 +293,13 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.programId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
                                                         </Input>
                                                         <FormFeedback>{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="subFundingSourceId">Sub Funding source</Label>
+                                                        <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="subFundingSourceId"
@@ -297,13 +312,13 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.subFundingSourceId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {subFundingSourceList}
                                                         </Input>
                                                         <FormFeedback>{errors.subFundingSourceId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="budgetAmt">Budget Amount</Label>
+                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
                                                         <Input type="text"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
@@ -313,12 +328,12 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="number"
-                                                            placeholder="Enter your Budget amount in USD"
+                                                            placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             required />
                                                         <FormFeedback>{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">Start date</Label>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
                                                         <Input type="text"
                                                             name="startDate"
                                                             id="startDate"
@@ -328,12 +343,12 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="date"
-                                                            placeholder="Start date of Budget"
+                                                            placeholder="{i18n.t('static.budget.budgetstartdate')}"
                                                             required />
                                                         <FormFeedback>{errors.startDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">Stop date</Label>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                         <Input type="text"
                                                             name="stopDate"
                                                             id="stopDate"
@@ -343,16 +358,18 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="date"
-                                                            placeholder="Stop date of Budget"
+                                                            placeholder={i18n.t('static.budget.budgetstopdate')}
                                                             required />
                                                         <FormFeedback>{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+
+                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -361,6 +378,10 @@ class AddBudgetComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{this.state.message}</h6>
+                    <h6>{this.props.match.params.message}</h6>
+                </div>
             </div>
         );
     }

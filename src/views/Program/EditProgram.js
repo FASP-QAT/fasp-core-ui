@@ -11,7 +11,7 @@ import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
 import { lang } from "moment";
-
+import i18n from "../../i18n"
 import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -555,12 +555,12 @@ export default class EditProgram extends Component {
 
                                     <Form onSubmit={handleSubmit} noValidate name='programForm'>
                                         <CardHeader>
-                                            <i className="icon-note"></i><strong>Edit Program</strong>{' '}
+                                            <strong>{i18n.t('static.program.programlist')}</strong>
                                         </CardHeader>
                                         <CardBody>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Program Name</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -569,13 +569,13 @@ export default class EditProgram extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         value={getLabelText(this.state.program.label, lang)}
-                                                        id="programName" placeholder="Enter program name" />
+                                                        id="programName" placeholder={i18n.t('static.program.programtext')} />
                                                     <FormFeedback>{errors.programName}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="4">
-                                                    <Label htmlFor="select">Select Realm</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -594,7 +594,7 @@ export default class EditProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="4">
-                                                    <Label htmlFor="select">Select Realm Country</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -613,7 +613,7 @@ export default class EditProgram extends Component {
                                             </FormGroup>
                                             <FormGroup >
                                                 <Col md="3">
-                                                    <Label htmlFor="select">Select Region</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
                                                 </Col>
 
                                                 <Col xs="12" md="9">
@@ -631,7 +631,7 @@ export default class EditProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="4">
-                                                    <Label htmlFor="select">Select Organisation</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -653,7 +653,7 @@ export default class EditProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="4">
-                                                    <Label htmlFor="select">Select Health Area</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -673,7 +673,7 @@ export default class EditProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="4">
-                                                    <Label htmlFor="select">Select Program Manager</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -692,7 +692,7 @@ export default class EditProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="4">
-                                                    <Label htmlFor="select">Program Notes</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -707,7 +707,7 @@ export default class EditProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Air Freight Percentage</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -716,13 +716,13 @@ export default class EditProgram extends Component {
                                                         invalid={touched.airFreightPerc && !!errors.airFreightPerc}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="airFreightPerc" id="airFreightPerc" placeholder="Enter air freight percentage" />
+                                                        type="number" name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
                                                     <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Sea Freight Percentage</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -731,13 +731,13 @@ export default class EditProgram extends Component {
                                                         invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="seaFreightPerc" id="seaFreightPerc" placeholder="Enter sea freight percentage" />
+                                                        type="number" name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperctext')} />
                                                     <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Plan Draft Lead Time</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -746,13 +746,13 @@ export default class EditProgram extends Component {
                                                         invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder="Enter plan to draft lead time" />
+                                                        type="number" name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')}/>
                                                     <FormFeedback>{errors.plannedToDraftLeadTime}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Draft To Submitted Lead Time</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -761,14 +761,14 @@ export default class EditProgram extends Component {
                                                         invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder="Enter draft to submitted lead time" />
+                                                        type="number" name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
                                                     <FormFeedback>{errors.draftToSubmittedLeadTime}</FormFeedback>
 
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Submitted To Approved Lead Time</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -777,13 +777,13 @@ export default class EditProgram extends Component {
                                                         invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder="Enter submited to approved lead time" />
+                                                        type="number" name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
                                                     <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Approve To Shipped Lead Time</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -792,13 +792,13 @@ export default class EditProgram extends Component {
                                                         invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder="Enter draft to submitted lead time" />
+                                                        type="number" name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
                                                     <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Delivered To Recived Lead Time</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.delivedtoreceivedleadtime')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -807,13 +807,13 @@ export default class EditProgram extends Component {
                                                         invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder="Enter delivered to reacived lead time" />
+                                                        type="number" name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                                     <FormFeedback>{errors.deliveredToReceivedLeadTime}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Month In Past For AMC</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -822,13 +822,13 @@ export default class EditProgram extends Component {
                                                         invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder="Enter month in past for AMC" />
+                                                        type="number" name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
                                                     <FormFeedback>{errors.monthsInPastForAmc}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
                                             <FormGroup>
                                                 <Col md="5">
-                                                    <Label htmlFor="company">Month In Future For AMC</Label>
+                                                    <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}</Label>
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
@@ -837,7 +837,7 @@ export default class EditProgram extends Component {
                                                         invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder="Enter month in future for AMC" />
+                                                        type="number" name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
                                                     <FormFeedback>{errors.monthsInFutureForAmc}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
@@ -846,7 +846,7 @@ export default class EditProgram extends Component {
                                         <CardFooter>
                                             <FormGroup>
                                                 {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>Cancel</Button>
+                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                 <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                 &nbsp;
                                                 {/* <Button type="submit" onClick={() => this.touchAll(setTouched, errors)} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Update</Button> */}

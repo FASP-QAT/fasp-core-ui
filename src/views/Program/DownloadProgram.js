@@ -18,7 +18,7 @@ import { SECRET_KEY } from '../../Constants.js'
 import AuthenticationService from '../common/AuthenticationService.js';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-
+import i18n from '../../i18n';
 
 const initialValues = {
     programId: ''
@@ -290,11 +290,11 @@ export default class DownloadProgram extends Component {
                                 }) => (
                                         <Form noValidate name='simpleForm'>
                                             <CardHeader>
-                                                <strong>Download Program Data</strong>
+                                                <strong>{i18n.t('static.program.download')}</strong>
                                             </CardHeader>
                                             <CardBody>
                                                 <FormGroup>
-                                                    <Label htmlFor="select">Program</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                     <Select
                                                         valid={!errors.programId}
                                                         bsSize="sm"
@@ -310,9 +310,9 @@ export default class DownloadProgram extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
-                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                    <Button type="button" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>Submit</Button>
+                                                    <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="sm" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
                                                 </FormGroup>
                                             </CardFooter>

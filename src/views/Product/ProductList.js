@@ -6,6 +6,7 @@ import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import ProductService from '../../api/ProductService'
 import AuthenticationService from '../common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
+import i18n from '../../i18n'
 
 class ProductList extends Component {
   constructor(props) {
@@ -114,7 +115,7 @@ class ProductList extends Component {
       <div className="animated">
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>Product List{' '}
+            <i className="icon-menu"></i>{i18n.t('static.product.productlist')}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
                 <a href="javascript:void();" title="Add product" onClick={this.addProduct}><i className="fa fa-plus-square"></i></a>
@@ -124,11 +125,11 @@ class ProductList extends Component {
           <CardBody>
             <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
               <TableHeaderColumn isKey dataField="productId" hidden>Product Id</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showProductLabel} dataSort>Product Name</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="genericLabel" dataFormat={this.showGenericLabel} dataSort>Generic Name</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataSort>Realm</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="productCategory" dataFormat={this.showProductCategoryLabel} dataSort>Product Category</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="forecastingUnit" dataFormat={this.showForcastingUnitLabel} dataSort>Forcasting Unit</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showProductLabel} dataSort>{i18n.t('static.product.product')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="genericLabel" dataFormat={this.showGenericLabel} dataSort>{i18n.t('static.product.productgenericname')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataSort>{i18n.t('static.product.realm')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="productCategory" dataFormat={this.showProductCategoryLabel} dataSort>{i18n.t('static.product.productcategory')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="forecastingUnit" dataFormat={this.showForcastingUnitLabel} dataSort>{i18n.t('static.product.unit')}</TableHeaderColumn>
               {/* <TableHeaderColumn dataField="stopDate" dataSort>Stop date</TableHeaderColumn> */}
               <TableHeaderColumn dataFormat={this.showStatus} dataField="active">Active</TableHeaderColumn>
             </BootstrapTable>

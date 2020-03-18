@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import AuthenticationService from '../common/AuthenticationService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
+import DataSourceTypeService from '../../api/DataSourceTypeService.js';
 import i18n from '../../i18n'
-import ManufacturerService from "../../api/ManufacturerService";
-import AuthenticationService from '../common/AuthenticationService.js';
 
 let initialValues = {
-    manufacturer: ""
+    label: ''
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        manufacturer: Yup.string()
-            .required('Please enter Manufacturer')
+        label: Yup.string()
+            .required('Please enter country name')
     })
 }
 
@@ -40,40 +40,64 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-class EditManufacturerComponent extends Component {
+
+export default class UpdateDataSourceTypeComponent extends Component {
+
+
     constructor(props) {
         super(props);
         this.state = {
-            manufacturer: this.props.location.state.manufacturer,
-            message: ''
+            dataSourceType:
+            {
+                active: '',
+
+                label: {
+                    label_en: '',
+                    // spaLabel: '',
+                    // freLabel: '',
+                    // porLabel: '',
+                    labelId: '',
+                }
+            }
         }
-        this.cancelClicked = this.cancelClicked.bind(this);
+
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
+        initialValues = {
+            label: this.props.location.state.dataSourceType.label.label_en
+        }
     }
 
     dataChange(event) {
-        let { manufacturer } = this.state;
-        if (event.target.name == "manufacturer") {
-            manufacturer.label.label_en = event.target.value;
+        let { dataSourceType } = this.state
+
+        if (event.target.name === "label") {
+            dataSourceType.label.label_en = event.target.value
         }
-        if (event.target.name == "active") {
-            manufacturer.active = event.target.id === "active2" ? false : true;
+
+        else if (event.target.name === "active") {
+            dataSourceType.active = event.target.id === "active2" ? false : true
         }
-        this.setState({
-            manufacturer
-        },
-            () => { });
+
+
+        this.setState(
+            {
+                dataSourceType
+            }
+        )
+
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            manufacturer: true
+            'label': true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('manufacturerForm', (fieldName) => {
+        this.findFirstError('dataSourceTypeForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -87,25 +111,40 @@ class EditManufacturerComponent extends Component {
         }
     }
 
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+
+        this.setState({
+            dataSourceType: this.props.location.state.dataSourceType
+        });
+    }
+
+    Capitalize(str) {
+        let { dataSourceType } = this.state
+        dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    }
+
     render() {
+
         return (
             <div className="animated fadeIn">
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.manufacturer.manufactureredit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.datasourcetype.datasourcetypeedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                enableReinitialize={true}
-                                initialValues={{ manufacturer: this.state.manufacturer.label.label_en }}
+                                initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    AuthenticationService.setupAxiosInterceptors();
-                                    ManufacturerService.updateManufacturer(this.state.manufacturer)
+
+                                    // alert("----"+this.state);
+                                    // console.log("------IN SUBMIT------" + this.state.country)
+                                    DataSourceTypeService.editDataSourceType(this.state.dataSourceType)
                                         .then(response => {
                                             if (response.data.status == "Success") {
-                                                this.props.history.push(`/manufacturer/listManufacturer/${response.data.message}`)
+                                                this.props.history.push(`/dataSourceType/listDataSourceType/${response.data.message}`)
                                             } else {
                                                 this.setState({
                                                     message: response.data.message
@@ -129,6 +168,8 @@ class EditManufacturerComponent extends Component {
                                             }
                                         );
                                 }}
+
+
                                 render={
                                     ({
                                         values,
@@ -141,36 +182,24 @@ class EditManufacturerComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='manufacturerForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.manufacturer.realm.label.label_en}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
+                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
                                                         <Input type="text"
-                                                            name="manufacturer"
-                                                            id="manufacturer"
-                                                            bsSize="sm"
-                                                            valid={!errors.manufacturer}
-                                                            invalid={touched.manufacturer && !!errors.manufacturer}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            name="label"
+                                                            id="label"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.manufacturer.label.label_en}
+                                                            value={this.state.dataSourceType.label.label_en}
                                                             required />
-                                                        <FormFeedback>{errors.manufacturer}</FormFeedback>
+                                                        <FormFeedback>{errors.label}</FormFeedback>
                                                     </FormGroup>
+
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -178,7 +207,7 @@ class EditManufacturerComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.manufacturer.active === true}
+                                                                checked={this.state.dataSourceType.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -194,7 +223,7 @@ class EditManufacturerComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.manufacturer.active === false}
+                                                                checked={this.state.dataSourceType.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -207,10 +236,8 @@ class EditManufacturerComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        &nbsp;
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
@@ -224,8 +251,8 @@ class EditManufacturerComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/manufacturer/listManufacturer/` + "Action Canceled")
+        this.props.history.push(`/dataSourceType/listDataSourceType/` + "Action Canceled")
     }
+
 }
 
-export default EditManufacturerComponent;

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-
+import i18n from '../../i18n'
 
 import RegionService from "../../api/RegionService";
 import AuthenticationService from '../common/AuthenticationService.js';
@@ -91,7 +91,7 @@ class RegionListComponent extends Component {
             <div className="animated">
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Region List</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.region.regionlist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title="Add Region" onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
@@ -101,9 +101,9 @@ class RegionListComponent extends Component {
                     <CardBody>
                         <BootstrapTable data={this.state.regionList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>
                             <TableHeaderColumn isKey dataField='regionId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showRegionLabel} dataAlign="center">Region</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="realmCountry" dataFormat={this.showRealmCountryLabel} dataAlign="center" dataSort>Country</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>Status</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showRegionLabel} dataAlign="center">{i18n.t('static.region.region')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="realmCountry" dataFormat={this.showRealmCountryLabel} dataAlign="center" dataSort>{i18n.t('static.region.country')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>
