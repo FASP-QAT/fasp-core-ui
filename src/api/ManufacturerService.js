@@ -4,7 +4,6 @@ import { API_URL } from '../Constants.js';
 class ManufacturerService {
 
     addManufacturer(json) {
-        //console.log(json);
         return axios.post(`${API_URL}/api/manufacturer/`, json, {}
         );
     }
@@ -18,7 +17,6 @@ class ManufacturerService {
         return axios.put(`${API_URL}/api/manufacturer/`, json, {
         });
     }
-
 
 }
 export default new ManufacturerService();
