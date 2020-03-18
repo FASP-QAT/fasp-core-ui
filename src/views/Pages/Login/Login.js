@@ -18,11 +18,11 @@ import { SECRET_KEY } from '../../../Constants.js'
 import LoginService from '../../../api/LoginService'
 import i18n from '../../../i18n'
 
+
 const initialValues = {
   username: "",
   password: ""
 }
-
 const validationSchema = function (values) {
   return Yup.object().shape({
     username: Yup.string()
@@ -178,6 +178,7 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
+
 
                     <Formik
                       initialValues={initialValues}
