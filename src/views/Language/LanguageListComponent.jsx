@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
+import i18n from '../../i18n';
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 
 export default class LanguageListComponent extends Component {
@@ -63,9 +64,9 @@ export default class LanguageListComponent extends Component {
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {
-                    this.setState({langaugeList: response.data})
+                    this.setState({ langaugeList: response.data })
                 } else {
-                    this.setState({message: response.data.messageCode})
+                    this.setState({ message: response.data.messageCode })
                 }
             })
             .catch(
@@ -92,12 +93,11 @@ export default class LanguageListComponent extends Component {
     }
 
     render() {
-
         return (
             <div className="animated">
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Language List</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.language.languagelist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title="Add Language" onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>
@@ -106,14 +106,15 @@ export default class LanguageListComponent extends Component {
                     </CardHeader>
                     <CardBody>
                         <BootstrapTable data={this.state.langaugeList} version="4" striped hover pagination search options={this.options}>
-                            <TableHeaderColumn isKey dataField="languageName" >Language Name</TableHeaderColumn>
-                            <TableHeaderColumn dataField="active" dataFormat={this.showStatus} dataSort>Status</TableHeaderColumn>
+                            <TableHeaderColumn isKey dataField="languageName" >{i18n.t('static.language.language')}</TableHeaderColumn>
+                            <TableHeaderColumn isKey dataField="languageCode" >{i18n.t('static.language.languageCode')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>
                 <div>
-                    <h6>{this.state.message}</h6>
-                    <h6>{this.props.match.params.message}</h6>
+                    <h6>{i18n.t('this.state.message')}{}</h6>
+                    <h6>{i18n.t('this.props.match.params.message')}{}</h6>
                 </div>
             </div>
         );

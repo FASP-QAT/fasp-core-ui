@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Nav, NavItem } from 'reactstrap';
+import { Nav, NavItem ,UncontrolledDropdown,DropdownToggle,DropdownMenu,DropdownItem} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
@@ -15,6 +15,15 @@ const propTypes = {
 const defaultProps = {};
 
 class DefaultHeader extends Component {
+  constructor(props){
+    super(props);
+    this.changeLanguage=this.changeLanguage.bind(this)
+  }
+  changeLanguage(lang ) {
+   
+  localStorage.setItem('lang',lang);
+  window.location.reload();
+  }
   render() {
 
     // eslint-disable-next-line
@@ -34,6 +43,15 @@ class DefaultHeader extends Component {
           </NavItem>
         </Nav>
         <Nav className="ml-auto" navbar>
+        <UncontrolledDropdown nav direction="down">
+            <DropdownToggle nav>
+           { localStorage.getItem('lang').toString()}
+            </DropdownToggle>
+            <DropdownMenu right>
+              <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> English</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> Spanish</DropdownItem>
+             </DropdownMenu>
+          </UncontrolledDropdown>
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt />
         </Nav>
       </React.Fragment>

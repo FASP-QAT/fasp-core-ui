@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n';
 // import AuthenticationService from '../common/AuthenticationService.js';
 // import * as myConst from '../../Labels.js';
 import LanguageService from '../../api/LanguageService.js'
@@ -110,7 +110,7 @@ export default class EditLanguageComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Edit Language</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.language.languageedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -166,7 +166,7 @@ export default class EditLanguageComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="languageName">Language</Label>
+                                                        <Label for="language">{i18n.t('static.language.language')}</Label>
                                                         <Input type="text"
                                                             name="languageName"
                                                             id="languageName"
@@ -180,7 +180,7 @@ export default class EditLanguageComponent extends Component {
                                                         <FormFeedback>{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="languageCode">Language code</Label>
+                                                        <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
@@ -194,7 +194,7 @@ export default class EditLanguageComponent extends Component {
                                                         <FormFeedback>{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Status  </Label>
+                                                        <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -208,8 +208,8 @@ export default class EditLanguageComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                Active
-                                                                </Label>
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -224,15 +224,15 @@ export default class EditLanguageComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                Disabled
-                                                                </Label>
+                                                                {i18n.t('static.common.disabled')}
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -243,8 +243,8 @@ export default class EditLanguageComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{this.state.message}</h6>
-                    <h6>{this.props.match.params.message}</h6>
+                    <h6>{i18n.t('this.state.message')}{}</h6>
+                    <h6>{i18n.t('this.props.match.params.message')}{}</h6>
                 </div>
             </div>
         );

@@ -6,6 +6,7 @@ import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
+import i18n from '../../i18n';
 
 
 export default class CurrencyListComponent extends Component {
@@ -173,14 +174,14 @@ export default class CurrencyListComponent extends Component {
             <div className="animated">
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>Country List
+                        <i className="icon-menu"></i>{i18n.t('static.currency.currencylist')}
                     </CardHeader>
                     <CardBody>
                         <BootstrapTable data={this.state.currencyList} version="4" striped hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
-                        <TableHeaderColumn isKey filterFormatted dataField="currencyCode" dataSort dataAlign="center">Currency Code</TableHeaderColumn>
-                        <TableHeaderColumn  filterFormatted dataField="currencySymbol" dataSort dataAlign="center">Currency Symbol</TableHeaderColumn>
-                        <TableHeaderColumn  filterFormatted dataField="label" dataSort dataFormat={this.showCurrencyLabel} dataAlign="center">Currency Name (English)</TableHeaderColumn>
-                        <TableHeaderColumn dataField="conversionRateToUsd" dataSort dataAlign="center">Conversion Rate To Usd</TableHeaderColumn>
+                        <TableHeaderColumn isKey filterFormatted dataField="currencyCode" dataSort dataAlign="center">{i18n.t('static.currency.currencycode')}</TableHeaderColumn>
+                        <TableHeaderColumn  filterFormatted dataField="currencySymbol" dataSort dataAlign="center">{i18n.t('static.currency.currencysymbol')}</TableHeaderColumn>
+                        <TableHeaderColumn  filterFormatted dataField="label" dataSort dataFormat={this.showCurrencyLabel} dataAlign="center">{i18n.t('static.currency.currency')}</TableHeaderColumn>
+                        <TableHeaderColumn dataField="conversionRateToUsd" dataSort dataAlign="center">{i18n.t('static.currency.conversionrateusd')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

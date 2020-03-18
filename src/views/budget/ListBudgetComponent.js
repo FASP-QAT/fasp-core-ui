@@ -6,7 +6,7 @@ import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import BudgetServcie from '../../api/BudgetService';
 import AuthenticationService from '../common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
-
+import i18n from '../../i18n'
 class ListBudgetComponent extends Component {
   constructor(props) {
     super(props);
@@ -103,7 +103,7 @@ class ListBudgetComponent extends Component {
       <div className="animated">
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>Budget List{' '}
+            <i className="icon-menu"></i>{i18n.t('static.budget.budgetlist')}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
                 <a href="javascript:void();" title="Add Budget" onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
@@ -112,13 +112,13 @@ class ListBudgetComponent extends Component {
           </CardHeader>
           <CardBody>
             <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
-              <TableHeaderColumn dataField="label" dataFormat={this.showBudgetLabel} dataSort>Budget</TableHeaderColumn>
-              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showSubFundingSourceLabel} dataSort>Sub Funding source</TableHeaderColumn>
-              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showFundingSourceLabel} dataSort>Funding source</TableHeaderColumn>
-              <TableHeaderColumn isKey dataField="budgetAmt" dataSort>Budget Amt</TableHeaderColumn>
-              <TableHeaderColumn dataField="startDate" dataSort>Start date</TableHeaderColumn>
-              <TableHeaderColumn dataField="stopDate" dataSort>Stop date</TableHeaderColumn>
-              <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>Active</TableHeaderColumn>
+              <TableHeaderColumn dataField="label" dataFormat={this.showBudgetLabel} dataSort>{i18n.t('static.budget.budget')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showSubFundingSourceLabel} dataSort>{i18n.t('static.budget.subfundingsource')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showFundingSourceLabel} dataSort>{i18n.t('static.budget.fundingsource')}</TableHeaderColumn>
+              <TableHeaderColumn isKey dataField="budgetAmt" dataSort>{i18n.t('static.budget.budgetamount')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="startDate" dataSort>{i18n.t('static.common.startdate')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="stopDate" dataSort>{i18n.t('static.common.stopdate')}</TableHeaderColumn>
+              <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>{i18n.t('static.common.active')}</TableHeaderColumn>
             </BootstrapTable>
           </CardBody>
         </Card>

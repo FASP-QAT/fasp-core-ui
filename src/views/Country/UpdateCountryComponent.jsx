@@ -7,7 +7,7 @@ import CurrencyService from '../../api/CurrencyService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import i18n from '../../i18n';
 let initialValues = {
     label: '',
     countryCode: '',
@@ -225,7 +225,7 @@ export default class UpdateCountryComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Update Country</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.country.countryedit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -278,7 +278,7 @@ export default class UpdateCountryComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='countryForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">Country name (English):</Label>
+                                                        <Label for="label">{i18n.t('static.country.country')}</Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -291,7 +291,7 @@ export default class UpdateCountryComponent extends Component {
                                                         <FormFeedback>{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="countryCode">Country Code</Label>
+                                                        <Label for="countryCode">{i18n.t('static.country.countrycode')}</Label>
                                                         <Input type="text"
                                                             name="countryCode"
                                                             id="countryCode"
@@ -304,7 +304,7 @@ export default class UpdateCountryComponent extends Component {
                                                         <FormFeedback>{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="languageId">Language</Label>
+                                                        <Label htmlFor="languageId">{i18n.t('static.country.language')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="languageId"
@@ -317,13 +317,13 @@ export default class UpdateCountryComponent extends Component {
                                                             required
                                                             value={this.state.country.language.languageId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
                                                         </Input>
                                                         <FormFeedback>{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="currencyId">Currency</Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.country.currency')}</Label>
                                                         <Input
                                                             type="select"
                                                             name="currencyId"
@@ -336,13 +336,13 @@ export default class UpdateCountryComponent extends Component {
                                                             required
                                                             value={this.state.country.currency.currencyId}
                                                         >
-                                                            <option value="0">Please select</option>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
                                                             {currencyItems}
                                                         </Input>
                                                         <FormFeedback>{errors.currencyId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Status  </Label>
+                                                        <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -356,7 +356,7 @@ export default class UpdateCountryComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                Active
+                                                                {i18n.t('static.common.active')}
                                                                 </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -372,15 +372,15 @@ export default class UpdateCountryComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                Disabled
+                                                                {i18n.t('static.common.disabled')}
                                                                 </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>Submit</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

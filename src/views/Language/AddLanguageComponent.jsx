@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
+import '../Forms/ValidationForms/ValidationForms.css';
+import i18n from '../../i18n'
 
 // React select
 import Select from 'react-select';
@@ -120,7 +121,7 @@ class AddLanguageComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Language</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.language.languageadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 validate={validate(validationSchema)}
@@ -170,7 +171,7 @@ class AddLanguageComponent extends Component {
                                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="languageName">Language</Label>
+                                                        <Label for="languageName">{i18n.t('static.language.language')}</Label>
                                                         <Input type="text"
                                                             name="languageName"
                                                             id="languageName"
@@ -184,7 +185,7 @@ class AddLanguageComponent extends Component {
                                                         <FormFeedback>{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="languageCode">Language code</Label>
+                                                        <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
@@ -200,8 +201,8 @@ class AddLanguageComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -211,8 +212,8 @@ class AddLanguageComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{this.state.message}</h6>
-                    <h6>{this.props.match.params.message}</h6>
+                    <h6>{i18n.t('this.state.message')}{}</h6>
+                    <h6>{i18n.t('this.props.match.params.message')}{}</h6>
                 </div>
             </div>
         );

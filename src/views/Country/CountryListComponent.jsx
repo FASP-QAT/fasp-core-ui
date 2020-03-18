@@ -6,7 +6,7 @@ import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
-
+import i18n from '../../i18n';
 export default class CountryListComponent extends Component {
 
     constructor(props) {
@@ -173,15 +173,15 @@ export default class CountryListComponent extends Component {
             <div className="animated">
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>Country List
+                        <i className="icon-menu"></i>{i18n.t('static.country.countrylist')}
                     </CardHeader>
                     <CardBody>
                         <BootstrapTable data={this.state.countryList} version="4" striped hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
-                            <TableHeaderColumn isKey filterFormatted dataField="label" dataSort dataFormat={this.showCountryLabel} dataAlign="center">Country Name (English)</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="countryCode" dataSort dataAlign="center">Country Code</TableHeaderColumn>
+                            <TableHeaderColumn isKey filterFormatted dataField="label" dataSort dataFormat={this.showCountryLabel} dataAlign="center">{i18n.t('static.country.country')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="countryCode" dataSort dataAlign="center">{i18n.t('static.country.countrycode')}</TableHeaderColumn>
                             {/* <TableHeaderColumn filterFormatted dataField="language" dataSort dataFormat={this.showLanguage} dataAlign="center">Language</TableHeaderColumn> */}
                             {/* <TableHeaderColumn filterFormatted dataField="currencyId" dataSort dataAlign="center">Currency</TableHeaderColumn> */}
-                            <TableHeaderColumn dataField="active" dataSort dataAlign="center">Status</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataSort dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>
