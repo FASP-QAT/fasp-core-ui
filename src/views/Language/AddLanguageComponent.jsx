@@ -10,7 +10,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 
 import LanguageService from '../../api/LanguageService.js'
-// import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
     languageName: "",
@@ -56,7 +56,6 @@ class AddLanguageComponent extends Component {
 
         // this.Capitalize = this.Capitalize.bind(this);
 
-        this.submitClicked = this.submitClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
@@ -103,7 +102,7 @@ class AddLanguageComponent extends Component {
     }
 
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
+        AuthenticationService.setupAxiosInterceptors();
 
     }
 

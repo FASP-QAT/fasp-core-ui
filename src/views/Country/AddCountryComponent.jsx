@@ -134,7 +134,7 @@ export default class AddCountryComponent extends Component {
 
 
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
+        AuthenticationService.setupAxiosInterceptors();
         LanguageService.getLanguageListActive().then(response => {
             this.setState({
                 languageList: response.data
