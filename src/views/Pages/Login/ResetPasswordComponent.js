@@ -16,8 +16,6 @@ import UserService from '../../../api/UserService'
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        oldPassword: Yup.string()
-            .required('Please enter old password'),
         newPassword: Yup.string()
             .min(6, `Password has to be at least 6 characters`)
             .matches(/^(?!.*password).*$/, 'Password should not contain password string')
@@ -29,13 +27,6 @@ const validationSchema = function (values) {
                 function (value) {
                     console.log("values---", values.username);
                     if ((values.username != value)) {
-                        return true;
-                    }
-                })
-            .test('oldPassword', "New password should not be same as old password ",
-                function (value) {
-                    console.log("values---", values.username);
-                    if (values.oldPassword != value) {
                         return true;
                     }
                 })
@@ -67,12 +58,13 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-class ChangePasswordComponent extends Component {
+class ResetPasswordComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             message: '',
-            username: ""
+            username: this.props.match.params.username,
+            token: this.props.match.params.token
         }
         this.cancelClicked = this.cancelClicked.bind(this);
     }
@@ -83,10 +75,8 @@ class ChangePasswordComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            oldPassword: true,
             newPassword: true,
-            confirmNewPassword: true,
-            username: true
+            confirmNewPassword: true
         }
         )
         this.validateForm(errors)
@@ -106,9 +96,35 @@ class ChangePasswordComponent extends Component {
         }
     }
     componentDidMount() {
-        let username = AuthenticationService.getLoggedInUsername();
-        this.setState({ username },
-            () => { console.log("state---", this.state.username) });
+        UserService.confirmForgotPasswordToken(this.state.username, this.state.token)
+            .then(response => {
+                console.log("response---", response);
+                this.setState({
+                    message: response.data.message
+                })
+            }).catch(
+                error => {
+                    console.log("error---", error)
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+
     }
     render() {
         return (
@@ -118,24 +134,19 @@ class ChangePasswordComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Change Password</strong>{' '}
+                                <i className="icon-note"></i><strong>Reset Password</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={{
-                                    oldPassword: "",
                                     newPassword: "",
-                                    confirmNewPassword: "",
-                                    username: ""
+                                    confirmNewPassword: ""
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     if (navigator.onLine) {
-                                        AuthenticationService.setupAxiosInterceptors();
-                                        UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
+                                        UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
                                             .then(response => {
-                                                console.log("response.data---",response.data);
-                                                localStorage.setItem('password', CryptoJS.AES.encrypt((response.data.hashPass).toString(), `${SECRET_KEY}`));
-                                                this.props.history.push(`/dashboard`)
+                                                this.props.history.push(`/login`)
                                             })
                                             .catch(
                                                 error => {
@@ -188,20 +199,6 @@ class ChangePasswordComponent extends Component {
                                                         hidden
                                                     />
                                                     <FormGroup>
-                                                        <Label for="oldPassword">Old Password</Label>
-                                                        <Input type="text"
-                                                            name="oldPassword"
-                                                            id="oldPassword"
-                                                            bsSize="sm"
-                                                            valid={!errors.oldPassword}
-                                                            invalid={touched.oldPassword && !!errors.oldPassword}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                        />
-                                                        <FormFeedback>{errors.oldPassword}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
                                                         <Label for="newPassword">New Password</Label>
                                                         <Input type="text"
                                                             name="newPassword"
@@ -247,4 +244,4 @@ class ChangePasswordComponent extends Component {
     }
 }
 
-export default ChangePasswordComponent;
+export default ResetPasswordComponent;

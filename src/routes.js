@@ -21,6 +21,7 @@ const AddRealmCountry = React.lazy(() => import('./views/realmCountry/AddRealmCo
 const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswordComponent'));
 const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ChangePassword = React.lazy(() => import('./views/Pages/Login/ChangePasswordComponent'));
+const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -142,7 +143,8 @@ const routes = [
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'Realm Country / Add Realm Country', component: AddRealmCountry },
   { path: '/forgotPassword', exact: true, name: 'Forgot Password', component: ForgotPassword },
   { path: '/updateExpiredPassword', exact: true, name: 'Update expired password', component: UpdateExpiredPassword },
-  { path: '/changePassword', exact: true, name: 'Update expired password', component: ChangePassword },
+  { path: '/changePassword', exact: true, name: 'Change password', component: ChangePassword },
+  { path: '/resetPassword/:username/:token', exact: true, name: 'Reset password', component: ResetPassword },
 
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },

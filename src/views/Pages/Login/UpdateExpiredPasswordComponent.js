@@ -25,9 +25,17 @@ const validationSchema = function (values) {
             .matches(/^(?=.*\d).*$/, 'Password must contain atleast 1 number')
             .matches(/^(?=.*[A-Z]).*$/, 'Password must contain atleast 1 uppercase alphabet')
             .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
-            .test('test-name', "New password should not be same as username/old password ",
+            .test('username', "New password should not be same as username ",
                 function (value) {
-                    if ((values.username != value) || (values.oldPassword != value)) {
+                    console.log("values---", values.username);
+                    if ((values.username != value)) {
+                        return true;
+                    }
+                })
+            .test('oldPassword', "New password should not be same as old password ",
+                function (value) {
+                    console.log("values---", values.username);
+                    if (values.oldPassword != value) {
                         return true;
                     }
                 })
