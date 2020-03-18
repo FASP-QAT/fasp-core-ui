@@ -10,7 +10,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 
 import LanguageService from '../../api/LanguageService.js'
-// import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
     languageName: "",
@@ -103,7 +103,7 @@ class AddLanguageComponent extends Component {
     }
 
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
+        AuthenticationService.setupAxiosInterceptors();
 
     }
 

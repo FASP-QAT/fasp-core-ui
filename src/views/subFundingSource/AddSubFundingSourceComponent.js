@@ -57,6 +57,7 @@ class AddSubFundingSourceComponent extends Component {
       },
       message: ''
     }
+    this.submiClicked = this.submiClicked.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
     this.Capitalize = this.Capitalize.bind(this);
