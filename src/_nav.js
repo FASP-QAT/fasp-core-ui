@@ -3,6 +3,7 @@ export default {
   items: [
     {
 
+
       name: i18n.t('static.dashboard.applicationdashboard'),
       url: '/ApplicationDashboard',
       icon: 'cui-dashboard icons',
@@ -35,6 +36,7 @@ export default {
       children: [
         {
 
+
           name: i18n.t('static.dashboard.role'),
           url: '/role/listRole',
           icon: 'fa fa-list-alt'
@@ -46,6 +48,7 @@ export default {
         },
         {
           
+
           name:  i18n.t('static.dashboard.language'),
           url: '/language/listLanguage',
           icon: 'fa fa-list-alt'
@@ -153,6 +156,7 @@ export default {
           ]
         },
 
+
     //     {
     //       name: i18n.t('static.dashboard.programproduct'),
     //       url: '/programProduct',
@@ -184,6 +188,7 @@ export default {
     //     }
        ]
      },
+
     {
       name: i18n.t('static.dashboard.program') ,
       icon: 'fa fa-list',

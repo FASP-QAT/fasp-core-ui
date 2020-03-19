@@ -7,7 +7,9 @@ import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/reac
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
 
+
 // import QAT from '../../assets/img/brand/QAT.svg'
+
 import i18n from '../../i18n'
 
 const propTypes = {
@@ -41,7 +43,9 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
 
+
 {/*          <NavItem className="px-3">
+
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
           </NavItem>
 */}
