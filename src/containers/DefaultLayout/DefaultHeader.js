@@ -7,6 +7,7 @@ import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/reac
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
 import sygnet from '../../assets/img/brand/sygnet.svg'
+import i18n from '../../i18n'
 
 const propTypes = {
   children: PropTypes.node,
@@ -39,7 +40,7 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
           <NavItem className="px-3">
-            <NavLink to="/dashboard" className="nav-link" >Dashboard</NavLink>
+            <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto" navbar>
@@ -48,8 +49,10 @@ class DefaultHeader extends Component {
            { localStorage.getItem('lang').toString()}
             </DropdownToggle>
             <DropdownMenu right>
-              <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> English</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> Spanish</DropdownItem>
+              <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> {i18n.t('static.language.english')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> {i18n.t('static.language.spanish')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this,'fr')}> {i18n.t('static.language.french')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this,'pr')}> {i18n.t('static.language.pourtegese')}</DropdownItem>
              </DropdownMenu>
           </UncontrolledDropdown>
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt />

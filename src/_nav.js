@@ -1,157 +1,158 @@
+import i18n from './i18n'
 export default {
   items: [
     {
-      name: 'Dashboard',
+      name: i18n.t('static.common.dashboard'),
       url: '/dashboard',
       icon: 'icon-speedometer',
     },
     {
-      name: 'Health Area',
+      name: i18n.t('static.dashboard.healtharea') ,
       url: '/healthArea',
       icon: 'icon-speedometer',
       children: [
         {
-          name: 'Add Health Area',
+          name: i18n.t('static.dashboard.addhealtharea'),
           url: '/healthArea/addHealthArea',
           icon: 'fa fa-code'
         }
       ]
     },
     {
-      name: 'Application Masters',
+      name: i18n.t('static.dashboard.applicationmaster') ,
       icon: 'fa fa-list',
       children: [
         {
-          name: 'Language',
+          name:  i18n.t('static.dashboard.language'),
           url: '/language/listLanguage',
           icon: 'fa fa-list-alt'
         },
         {
-          name: 'Country',
+          name: i18n.t('static.dashboard.country'),
           url: '/country/listCountry',
           icon: 'fa fa-list-alt'
         },
         {
-          name: 'DataSource Type',
+          name: i18n.t('static.dashboard.datasourcetype'),
           url: '/dataSourceType/listDataSourceType',
           icon: 'fa fa-list-alt'
         },
         {
-          name: 'DataSource',
+          name: i18n.t('static.dashboard.datasource') ,
           url: '/dataSource/listDataSource',
           icon: 'fa fa-list-alt'
         },
         {
-          name: 'Currency',
+          name:  i18n.t('static.dashboard.currency'),
           url: '/currency/listCurrency',
           icon: 'fa fa-list-alt'
         }
       ]
     },
     {
-      name: 'Realm Masters',
+      name: i18n.t('static.dashboard.realmmaster') ,
       icon: 'fa fa-list',
       children: [
         {
-          name: 'Realm-Country',
+          name: i18n.t('static.dashboard.realmcountry') ,
           icon: 'fa fa-bank',
           url: '/realmCountry/listRealmCountry'
         },
         {
-          name: 'Funding Source',
+          name: i18n.t('static.dashboard.fundingsource'),
           icon: 'fa fa-bank',
           url: '/fundingSource/listFundingSource'
         },
         {
-          name: 'Sub Funding Source',
+          name: i18n.t('static.dashboard.subfundingsource') ,
           url: '/subFundingSource/listSubFundingSource',
           icon: 'fa fa-bank'
         },
         {
-          name: 'Procurement Agent',
+          name: i18n.t('static.dashboard.procurementagent') ,
           url: '/procurementAgent/listProcurementAgent',
           icon: 'fa fa-user'
         },
         {
-          name: 'Budget',
+          name:  i18n.t('static.dashboard.budget'),
           url: '/budget/listBudget',
           icon: 'fa fa-money'
         },
         {
-          name: 'Manufacturer',
+          name: i18n.t('static.dashboard.manufacturer') ,
           url: '/manufacturer/listManufacturer',
           icon: 'fa fa-industry'
         },
         {
-          name: 'Region',
+          name: i18n.t('static.dashboard.region'),
           url: '/region/listRegion',
           icon: 'fa fa-globe'
         }
       ]
     },
     {
-      name: 'Program Masters',
+      name: i18n.t('static.dashboard.programmaster') ,
       url: '/program',
       icon: 'icon-graph',
       children: [
         {
-          name: 'Program',
+          name:  i18n.t('static.dashboard.program'),
           url: '/program',
           icon: 'icon-graph',
           children: [
             {
-              name: 'Add Program',
+              name: i18n.t('static.dashboard.addprogram') ,
               url: '/program/addProgram',
               icon: 'icon-pencil',
             },
             {
-              name: 'List Program',
+              name: i18n.t('static.dashboard.listprogram') ,
               url: '/program/listProgram',
               icon: 'icon-list',
             }
           ]
         },
         {
-          name: 'Product',
+          name:  i18n.t('static.dashboard.product'),
           url: '/product',
           icon: 'icon-graph',
           children: [
             {
-              name: 'Add Product',
+              name: i18n.t('static.dashboard.addproduct') ,
               url: '/product/addProduct',
               icon: 'icon-pencil',
             },
             {
-              name: 'List Product',
+              name: i18n.t('static.dashboard.listproduct') ,
               url: '/product/listProduct',
               icon: 'icon-list',
             }
           ]
         },
         {
-          name: 'Program Product',
+          name: i18n.t('static.dashboard.programproduct'),
           url: '/programProduct',
           icon: 'icon-graph',
           children: [
             {
-              name: 'Add Program Prodcut',
+              name:  i18n.t('static.dashboard.addprogramproduct'),
               url: '/programProduct/addProgramProduct',
               icon: 'icon-pencil',
             },
             {
-              name: 'List Program Product',
+              name: i18n.t('static.dashboard.listprogramproduct'),
               url: '/programProduct/listProgramProduct',
               icon: 'icon-list',
             }
           ]
         },
         {
-          name: 'Product Category',
+          name: i18n.t('static.dashboard.productcategory') ,
           url: '/productCategory',
           icon: 'icon-graph',
           children: [
             {
-              name: 'Add Prodcut Category',
+              name: i18n.t('static.dashboard.addproductcategory') ,
               url: '/productCategory/addProductCategory',
               icon: 'icon-pencil',
             }
@@ -160,33 +161,33 @@ export default {
       ]
     },
     {
-      name: 'Program',
+      name: i18n.t('static.dashboard.program') ,
       icon: 'fa fa-list',
       children: [
         {
-          name: 'Download Program',
+          name: i18n.t('static.dashboard.downloadprogram') ,
           url: '/program/downloadProgram',
           icon: 'fa fa-code',
         },
         {
-          name: 'Export Program',
+          name: i18n.t('static.dashboard.exportprogram') ,
           url: '/program/exportProgram',
           icon: 'fa fa-code',
         },
         {
-          name: 'Import Program',
+          name: i18n.t('static.dashboard.importprogram'),
           url: '/program/importProgram',
           icon: 'fa fa-code',
         }
       ]
     },
     {
-      name: 'Master Data sync',
+      name:  i18n.t('static.dashboard.datasync'),
       url: '/masterDataSync',
       icon: 'icon-speedometer',
     },
     {
-      name: 'Consumption details',
+      name: i18n.t('static.dashboard.consumptiondetails') ,
       url: '/consumptionDetails',
       icon: 'icon-speedometer',
     },
