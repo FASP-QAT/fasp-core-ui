@@ -189,7 +189,7 @@ class ChangePasswordComponent extends Component {
                                                     />
                                                     <FormGroup>
                                                         <Label for="oldPassword">Old Password</Label>
-                                                        <Input type="text"
+                                                        <Input type="password"
                                                             name="oldPassword"
                                                             id="oldPassword"
                                                             bsSize="sm"
@@ -203,7 +203,7 @@ class ChangePasswordComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="newPassword">New Password</Label>
-                                                        <Input type="text"
+                                                        <Input type="password"
                                                             name="newPassword"
                                                             id="newPassword"
                                                             bsSize="sm"
@@ -217,7 +217,7 @@ class ChangePasswordComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="confirmNewPassword">Confirm New Password</Label>
-                                                        <Input type="text"
+                                                        <Input type="password"
                                                             name="confirmNewPassword"
                                                             id="confirmNewPassword"
                                                             bsSize="sm"
