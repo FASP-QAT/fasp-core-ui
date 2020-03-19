@@ -49,7 +49,7 @@ class DefaultHeader extends Component {
         <Nav className="ml-auto" navbar>
         <UncontrolledDropdown nav direction="down">
             <DropdownToggle nav>
-           { localStorage.getItem('lang').toString()}
+           { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> {i18n.t('static.language.english')}</DropdownItem>
