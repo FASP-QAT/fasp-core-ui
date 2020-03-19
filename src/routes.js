@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from './i18n'
 
 const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
 const AddSubFundingSource = React.lazy(() => import('./views/subFundingSource/AddSubFundingSourceComponent'));
