@@ -161,7 +161,7 @@ class ListProcurementAgentComponent extends Component {
                     <CardBody>
                         <Col md="3">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.realm')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmname')}</Label>
                                 <div className="controls">
                                     <InputGroup>
                                         <Input
@@ -184,7 +184,7 @@ class ListProcurementAgentComponent extends Component {
                             <TableHeaderColumn isKey dataField='procurementAgentId' hidden>ID</TableHeaderColumn>
                             <TableHeaderColumn dataField="procurementAgentCode" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">{i18n.t('static.procurementagent.procurementagentcode')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProcurementAgentLabel} dataAlign="center">{i18n.t('static.procurementagent.procurementagentname')}</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>{i18n.t('static.procurementagent.realm')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>{i18n.t('static.realm.realmname')}</TableHeaderColumn>
                             <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort dataAlign="center">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>

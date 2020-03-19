@@ -155,7 +155,7 @@ const routes = [
    { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
     { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
   { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard',exact:true, name: 'Dashboard', component: Dashboard },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/subFundingSource/listSubFundingSource/:message', component: ListSubFundingSource },
   { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
@@ -187,7 +187,6 @@ const routes = [
   { path: '/user/addUser', exact: true, name: 'User / Add User', component: AddUser },
   { path: '/user/editUser', exact: true, name: 'User / Edit User', component: EditUser },
 
-  { path: '/dashboard',exact:true, name: 'Dashboard', component: Dashboard },
   { path: '/dashboard/:message',component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
