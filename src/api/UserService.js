@@ -8,11 +8,11 @@ class UserService {
         });
     }
     getRoleList() {
-        return axios.get(`${API_URL}/api/getRoleList`, {
+        return axios.get(`${API_URL}/api/role`, {
         });
     }
     getBusinessFunctionList() {
-        return axios.get(`${API_URL}/api/getBusinessFunctionList`, {
+        return axios.get(`${API_URL}/api/businessFunction`, {
         });
     }
     getRealmList() {
@@ -23,19 +23,19 @@ class UserService {
         console.log(json);
         // var jsonString=JSON.stringify(json);
 
-        return axios.put(`${API_URL}/api/addNewUser/`, json, {
+        return axios.post(`${API_URL}/api/user/`, json, {
         });
     }
     addNewRole(json) {
         console.log(json);
         // var jsonString=JSON.stringify(json);
 
-        return axios.put(`${API_URL}/api/addNewRole/`, json, {
+        return axios.post(`${API_URL}/api/role/`, json, {
         });
     }
 
     getUserList() {
-        return axios.get(`${API_URL}/api/getUserList`, {
+        return axios.get(`${API_URL}/api/user`, {
         });
     }
     getUserByUserId(userId) {
@@ -43,7 +43,7 @@ class UserService {
         });
     }
     editUser(json) {
-        return axios.put(`${API_URL}/api/editUser/`, json, {
+        return axios.put(`${API_URL}/api/user/`, json, {
         });
     }
 
@@ -51,7 +51,7 @@ class UserService {
         console.log(json);
         // var jsonString=JSON.stringify(json);
 
-        return axios.put(`${API_URL}/api/editRole/`, json, {
+        return axios.put(`${API_URL}/api/role/`, json, {
         });
     }
     unlockAccount(userId, emailId) {

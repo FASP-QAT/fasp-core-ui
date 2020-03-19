@@ -7,11 +7,11 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import i18n from '../../i18n'
 
-import FundingSourceService from "../../api/FundingSourceService";
-import SubFundingSourceService from "../../api/SubFundingSourceService";
+import RealmService from "../../api/RealmService";
+import UserService from "../../api/UserService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
-class ListSubFundingSourceComponent extends Component {
+class ListUserComponent extends Component {
     constructor(props) {
         super(props);
         this.options = {
@@ -23,62 +23,56 @@ class ListSubFundingSourceComponent extends Component {
             alwaysShowAllBtns: false,
             withFirstAndLast: false,
             onRowClick: function (row) {
-                this.editSubFundingSource(row);
+                this.editUser(row);
             }.bind(this)
 
         }
         this.state = {
-            fundingSources: [],
-            subFundingSourceList: [],
+            realms: [],
+            userList: [],
             message: '',
-            selSubFundingSource: []
+            selUserList: []
         }
-        this.editSubFundingSource = this.editSubFundingSource.bind(this);
+        this.editUser = this.editUser.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.addNewSubFundingSource = this.addNewSubFundingSource.bind(this);
+        this.addNewUser = this.addNewUser.bind(this);
     }
-    addNewSubFundingSource() {
-        this.props.history.push("/subFundingSource/addSubFundingSource");
+    addNewUser() {
+        this.props.history.push("/user/addUser");
     }
     filterData() {
-        let fundingSourceId = document.getElementById("fundingSourceId").value;
-        if (fundingSourceId != 0) {
-            const selSubFundingSource = this.state.subFundingSourceList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+        let realmId = document.getElementById("realmId").value;
+        if (realmId != 0) {
+            const selUserList = this.state.userList.filter(c => c.realm.realmId == realmId)
             this.setState({
-                selSubFundingSource: selSubFundingSource
+                selUserList
             });
         } else {
             this.setState({
-                selSubFundingSource: this.state.subFundingSourceList
+                selUserList: this.state.userList
             });
         }
     }
-    editSubFundingSource(subFundingSource) {
+    editUser(user) {
         this.props.history.push({
-            pathname: "/subFundingSource/editSubFundingSource",
-            state: { subFundingSource }
-        });
-    }
-
-    addSubFundingSource(subFundingSource) {
-        this.props.history.push({
-            pathname: "/subFundingSource/addSubFundingSource"
+            pathname: "/user/editUser",
+            state: { user }
         });
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        FundingSourceService.getFundingSourceListAll()
+        RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    fundingSources: response.data
+                    realms: response.data.data
                 })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -94,11 +88,11 @@ class ListSubFundingSourceComponent extends Component {
                 }
             );
 
-        SubFundingSourceService.getSubFundingSourceListAll()
+        UserService.getUserList()
             .then(response => {
                 this.setState({
-                    subFundingSourceList: response.data.data,
-                    selSubFundingSource: response.data.data
+                    userList: response.data,
+                    selUserList: response.data
                 })
             }).catch(
                 error => {
@@ -123,14 +117,16 @@ class ListSubFundingSourceComponent extends Component {
             );
     }
 
-    showSubFundingSourceLabel(cell, row) {
-        return cell.label_en;
-    }
-
-    showFundingSourceLabel(cell, row) {
+    showRealmLabel(cell, row) {
         return cell.label.label_en;
     }
 
+    showRoleLabel(cell, row) {
+        return cell.label.label_en;
+    }
+    showLanguageLabel(cell, row) {
+        return cell.languageName;
+    }
     showStatus(cell, row) {
         if (cell) {
             return "Active";
@@ -139,11 +135,11 @@ class ListSubFundingSourceComponent extends Component {
         }
     }
     render() {
-        const { fundingSources } = this.state;
-        let fundingSourceList = fundingSources.length > 0
-            && fundingSources.map((item, i) => {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
                 return (
-                    <option key={i} value={item.fundingSourceId}>
+                    <option key={i} value={item.realmId}>
                         {item.label.label_en}
                     </option>
                 )
@@ -154,27 +150,27 @@ class ListSubFundingSourceComponent extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.subfundingsource.subfundingsourcelisttext')}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.user.userlisttext')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.subfundingsource.subfundingsourceaddtext')} onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.user.useraddtext')} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
                         <Col md="3">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.subfundingsource.fundingsource')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmname')}</Label>
                                 <div className="controls">
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="fundingSourceId"
-                                            id="fundingSourceId"
+                                            name="realmId"
+                                            id="realmId"
                                             bsSize="lg"
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
-                                            {fundingSourceList}
+                                            {realmList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -183,10 +179,15 @@ class ListSubFundingSourceComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <BootstrapTable data={this.state.selSubFundingSource} version="4" hover pagination search options={this.options}>
-                            <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center"><strong>{i18n.t('static.subfundingsource.subfundingsource')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort><strong>{i18n.t('static.subfundingsource.fundingsource')}</strong></TableHeaderColumn>
+                        <BootstrapTable data={this.state.selUserList} version="4" hover pagination search options={this.options}>
+                            <TableHeaderColumn isKey dataField='userId' hidden>ID</TableHeaderColumn>
+                            <TableHeaderColumn dataField="username" dataSort dataAlign="center"><strong>{i18n.t('static.user.username')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="realm" dataSort dataFormat={this.showRealmLabel} dataAlign="center" ><strong>{i18n.t('static.realm.realmname')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn dataField="emailId" dataSort dataAlign="center"><strong>{i18n.t('static.common.emailid')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn dataField="phoneNumber" dataSort dataAlign="center"><strong>{i18n.t('static.common.phoneNumber')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="language" dataSort dataFormat={this.showLanguageLabel} dataAlign="center"><strong>{i18n.t('static.language.language')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="lastLoginDate" dataAlign="center" dataSort><strong>{i18n.t('static.common.lastlogindate')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="faildAttempts" dataAlign="center" dataSort><strong>{i18n.t('static.common.faildAttempts')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort><strong>{i18n.t('static.common.status')}</strong></TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
@@ -195,4 +196,4 @@ class ListSubFundingSourceComponent extends Component {
         );
     }
 }
-export default ListSubFundingSourceComponent;
+export default ListUserComponent;

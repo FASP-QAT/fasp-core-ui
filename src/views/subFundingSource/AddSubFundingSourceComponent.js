@@ -63,9 +63,7 @@ class AddSubFundingSourceComponent extends Component {
   }
 
   Capitalize(str) {
-    console.log("capitalize");
     if (str != null && str != "") {
-      console.log("str---" + str)
       return str.charAt(0).toUpperCase() + str.slice(1);
     } else {
       return "";
@@ -115,21 +113,25 @@ class AddSubFundingSourceComponent extends Component {
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
         this.setState({
-          fundingSources: response.data.data
+          fundingSources: response.data
         })
       }).catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
           }
         }
       );
@@ -147,12 +149,12 @@ class AddSubFundingSourceComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
-        <h5>{this.state.message}</h5>
+        <h5>{i18n.t(this.state.message)}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceadd')}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceaddttext')}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -160,8 +162,8 @@ class AddSubFundingSourceComponent extends Component {
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
                     .then(response => {
-                      if (response.data.status == "Success") {
-                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.message}`)
+                      if (response.status == 200) {
+                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
                       } else {
                         this.setState({
                           message: response.data.message
@@ -170,17 +172,21 @@ class AddSubFundingSourceComponent extends Component {
                     })
                     .catch(
                       error => {
-                        switch (error.message) {
-                          case "Network Error":
-                            this.setState({
-                              message: error.message
-                            })
-                            break
-                          default:
-                            this.setState({
-                              message: error.response.data.message
-                            })
-                            break
+                        if (error.message === "Network Error") {
+                          this.setState({ message: error.message });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                              this.setState({ message: error.response.data.messageCode });
+                              break;
+                            default:
+                              this.setState({ message: 'static.unkownError' });
+                              break;
+                          }
                         }
                       }
                     );
@@ -230,18 +236,16 @@ class AddSubFundingSourceComponent extends Component {
                               onBlur={handleBlur}
                               required
                               value={this.Capitalize(this.state.subFundingSource.label.label_en)}
-                               />
+                            />
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-
-                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                             <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                           &nbsp;
+                            &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>
@@ -253,7 +257,7 @@ class AddSubFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "Action Canceled")
+    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
   }
 }
 
