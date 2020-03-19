@@ -314,7 +314,7 @@ class EditBudgetComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.budget.cancel')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>
