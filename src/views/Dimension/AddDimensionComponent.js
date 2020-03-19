@@ -3,6 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
+import i18n from '../../i18n';
 
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -185,8 +186,9 @@ export default class AddUnitTypeComponent extends Component {
 
                                                     <FormGroup>
                                                         
-                                                        <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i> Submit</Button>
+                                                    <Button type="reset" color="danger"className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </Form>
                                             )}

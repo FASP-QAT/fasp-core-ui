@@ -166,6 +166,13 @@ export default class CountryListComponent extends Component {
 
     //     );
     // }
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
+    }
 
     render() {
 
@@ -189,7 +196,7 @@ export default class CountryListComponent extends Component {
                             <TableHeaderColumn filterFormatted dataField="countryCode" dataSort dataAlign="center">{i18n.t('static.country.countrycode')}</TableHeaderColumn>
                             {/* <TableHeaderColumn filterFormatted dataField="language" dataSort dataFormat={this.showLanguage} dataAlign="center">Language</TableHeaderColumn> */}
                             {/* <TableHeaderColumn filterFormatted dataField="currencyId" dataSort dataAlign="center">Currency</TableHeaderColumn> */}
-                            <TableHeaderColumn dataField="active" dataSort dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataSort dataFormat={this.showStatus}  dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

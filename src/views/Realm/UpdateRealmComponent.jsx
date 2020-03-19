@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService';
+import i18n from '../../i18n';
 import AuthenticationService from '../common/AuthenticationService.js';
 
 let initialValues = {
@@ -57,16 +58,7 @@ export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // realm: {
-            //     realmCode: '',
-            //     label: {
-            //         label_en: ''
-            //     },
-            //     monthInPastForAmc: '',
-            //     monthInFutureForAmc: '',
-            //     orderFrequency: '',
-            //     defaultRealm: ''
-            // }
+        
             realm: this.props.location.state.realm
         }
         this.Capitalize = this.Capitalize.bind(this);
@@ -138,107 +130,16 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
-        // this.setState({
-        //     realm: this.props.location.state.realm
-        // });
-        // console.log(this.props.location.state.realm);
-        // console.log(this.state.realm);
+     
     }
 
     Capitalize(str) {
-        // if (str != undefined) {
-        //     return str.charAt(0).toUpperCase() + str.slice(1);
-        // }
+        
     }
     cancelClicked() {
         this.props.history.push(`/realm/listRealm/` + "Action Canceled")
     }
-    // updateForm() {
-
-    //     if (navigator.onLine) {
-
-    //         RealmService.updateRealm(this.state.realm).then(response => {
-    //             this.props.history.push(`/realm/listRealm/${response.data.message}`)
-    //         }
-    //         )
-    //             .catch(
-    //                 error => {
-    //                     switch (error.message) {
-    //                         case "Network Error":
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                         default:
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                     }
-    //                 }
-    //             )
-
-
-    //     }
-    //     else {
-    //         alert("To perform this action you must be online.");
-    //     }
-    // }
-
-    // render() {
-    //     return (
-
-    //         <>
-    //             <div><h5>{this.state.message}</h5></div>
-    //             <h3>Update DataSource</h3>
-    //             <div><h5>{this.state.message}</h5></div>
-    //             <h3>Add Realm </h3>
-    //             <form name="realmForm" id="realmForm">
-    //                 <div>
-    //                     <label>Realm Code:-</label>
-    //                     <input type="text" name="realm.realmCode" value={this.Capitalize(this.state.realm.realmCode)} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br /><br />
-    //                 <div>
-    //                     <label>Realm Name (English) :-</label>
-    //                     <input type="text" name="realm.label.label_en" value={this.Capitalize(this.state.realm.label.label_en)} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br /><br />
-    //                 <div>
-    //                     <label>Month In Past For AMC :-</label>
-    //                     <input type="text" name="realm.monthInPastForAmc" value={this.state.realm.monthInPastForAmc} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br></br>
-    //                 <div>
-    //                     <label>Month In Future For AMC :-</label>
-    //                     <input type="text" name="realm.monthInFutureForAmc" value={this.state.realm.monthInFutureForAmc} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br></br>
-    //                 <div>
-    //                     <label>Order Frequency :-</label>
-    //                     <input type="text" name="realm.orderFrequency" value={this.state.realm.orderFrequency} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br></br>
-    //                 <div>
-    //                     Default:
-    //                 <input type="radio" id="realm.active1" name="realm.defaultRealm" value={true} checked={this.state.realm.defaultRealm === true} onChange={this.updateFieldData} /> Active
-    //                 <input type="radio" id="realm.active2" name="realm.defaultRealm" value={false} checked={this.state.realm.defaultRealm === false} onChange={this.updateFieldData} /> Disabled
-    //                  </div>
-    //                 <br /><br />
-    //                 <div>
-    //                     <button type="button" onClick={this.updateForm}>Update</button>
-    //                     <button type="button" onClick={this.cancelClicked}>Cancel</button><br></br><br></br>
-    //                 </div>
-    //             </form>
-
-    //         </>
-
-    //     );
-
-
-    // }
-
+    
     render() {
 
         return (
@@ -254,9 +155,6 @@ export default class UpdateDataSourceComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-
-                                    // alert("----"+this.state.label.label_en);
-                                    // console.log("------IN SUBMIT------", this.state.realm)
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -409,9 +307,9 @@ export default class UpdateDataSourceComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right btn-sm" onClick={this.cancelClicked} ><i className="fa fa-times"></i>Cancel</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right btn-sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
-                                                       &nbsp;
+                                                    <Button type="reset" color="danger"className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

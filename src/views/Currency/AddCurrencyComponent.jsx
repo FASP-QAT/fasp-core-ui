@@ -58,9 +58,7 @@ export default class AddCurrencyComponent extends Component {
             currencySymbol: '',
             label: {
                 label_en: ''
-                // freLabel: '',
-                // spaLabel: '',
-                // porLabel: ''
+              
             },
             conversionRateToUsd: ''
         }
@@ -138,8 +136,6 @@ export default class AddCurrencyComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                    // alert("----"+this.state.label.label_en);
-                                    // console.log("------IN SUBMIT------", this.state)
                                     CurrencyService.addCurrency(this.state)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -193,7 +189,7 @@ export default class AddCurrencyComponent extends Component {
                                                             invalid={touched.currencyCode && !!errors.currencyCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            // value={this.state.label.label_en}
+                                                          
                                                             required />
                                                         <FormFeedback>{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
@@ -234,7 +230,7 @@ export default class AddCurrencyComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             bsSize="sm"
-                                                            // value={this.state.country.label.label_en}
+                                                           
                                                             required />
                                                         <FormFeedback>{errors.conversionRate}</FormFeedback>
                                                     </FormGroup>

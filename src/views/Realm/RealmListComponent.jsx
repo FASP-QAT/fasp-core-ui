@@ -23,7 +23,7 @@ export default class ReactListComponent extends Component {
             alwaysShowAllBtns: false,
             withFirstAndLast: false,
             onRowClick: function (row) {
-                // console.log("row--------------", row);
+               
                 this.editRealm(row);
             }.bind(this)
 
@@ -40,7 +40,7 @@ export default class ReactListComponent extends Component {
             this.setState({
                 realmList: response.data.data
             })
-            // console.log("REALM LIST",this.state.realmList)
+        
         })
             .catch(
                 error => {
@@ -79,55 +79,14 @@ export default class ReactListComponent extends Component {
         return cell.label_en;
     }
 
-    // render() {
-    //     return (
-    //         <>
-    //             <p>{this.props.match.params.message}</p>
-    //             <div>
-    //                 <button type="button" style={{ marginLeft: '-999px' }} onClick={this.addNewRealm}>Add Realm</button><br /><br />
-    //             </div>
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
+    }
 
-    //             <div className="realmList">
-
-    //                 <h1>Realm List</h1>
-    //                 <table border="1" align="center">
-    //                     <thead>
-    //                         <tr>
-    //                             <th>Realm Code</th>
-    //                             <th>Realm Name (English)</th>
-    //                             <th>Month In Past For AMC</th>
-    //                             <th>Month In Future For AMC</th>
-    //                             <th>Order Frequency</th>
-    //                             <th>Default</th>
-
-
-    //                         </tr>
-    //                     </thead>
-    //                     <tbody>
-    //                         {
-    //                             this.state.realmList.map(realm =>
-
-    //                                 <tr key={realm.realmId} onClick={() => this.editRealm(realm)}>
-    //                                     <td>{realm.realmCode}</td>
-    //                                     <td>{realm.label.label_en}</td>
-    //                                     <td>{realm.label.label_fr}</td>
-    //                                     <td>{realm.label.label_sp}</td>
-    //                                     <td>{realm.label.label_pr}</td>
-    //                                     <td>{realm.monthInPastForAmc}</td>
-    //                                     <td>{realm.monthInFutureForAmc}</td>
-    //                                     <td>{realm.orderFrequency}</td>
-    //                                     <td>{realm.defaultRealm.toString() == "true" ? "Active" : "Disabled"}</td>
-    //                                 </tr>
-    //                             )
-
-    //                         }
-    //                     </tbody>
-    //                 </table>
-    //             </div>
-    //         </>
-    //     );
-
-    // }
 
     render() {
 
@@ -150,7 +109,7 @@ export default class ReactListComponent extends Component {
                             <TableHeaderColumn filterFormatted dataField="monthInPastForAmc" dataSort dataAlign="center">Month In Past For AMC</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="monthInFutureForAmc" dataSort dataAlign="center">Month In Future For AMC</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="orderFrequency" dataSort dataAlign="center">Order Frequency</TableHeaderColumn>
-                            <TableHeaderColumn dataField="defaultRealm" dataSort dataAlign="center">Default</TableHeaderColumn>
+                            <TableHeaderColumn dataField="defaultRealm" dataSort dataFormat={this.showStatus} dataAlign="center">Default</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

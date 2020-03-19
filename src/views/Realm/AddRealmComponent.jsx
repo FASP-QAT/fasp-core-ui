@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService'
 import AuthenticationService from '../common/AuthenticationService.js';
-
+import i18n from '../../i18n';
 const initialValues = {
     realmCode: '',
     label: '',
@@ -24,7 +24,7 @@ const validationSchema = function (values) {
             .required('Please enter month in past for amc'),
         monthInFutureForAmc: Yup.string()
             .required('Please enter month in future for amc'),
-            orderFrequency: Yup.string()
+        orderFrequency: Yup.string()
             .required('Please enter order frequency')
     })
 }
@@ -132,129 +132,11 @@ export default class AddRealmComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        // $("#realmForm").validate({
-        //     ignore: [],
-        //     rules: {
-        //         'realm.label.label_en': {
-        //             required: true,
-        //             lettersonlywhitespace: true,
-        //             maxlength: 255
-        //         },
-
-        //         'realm.realmCode': {
-        //             required: true,
-        //             lettersonly: true,
-        //             maxlength: 4
-        //         },
-        //         'realm.monthInPastForAmc': {
-        //             required: true,
-        //             positiveinteger: true
-
-        //         },
-        //         'realm.monthInFutureForAmc': {
-        //             required: true,
-        //             positiveinteger: true
-
-        //         },
-        //         'realm.orderFrequency': {
-        //             required: true,
-        //             positiveinteger: true
-
-        //         }
-
-        //     },
-        //     errorPlacement: function (error, element) {
-        //         error.insertAfter(element);
-        //     }
-        // });
-
-
-
     }
     Capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    // submitForm() {
-    //     if (navigator.onLine) {
-
-    //         RealmService.addRealm(this.state.realm).then(response => {
-    //             this.props.history.push(`/realmList/${response.data.message}`)
-    //             console.log(response);
-    //         }
-    //         )
-    //             .catch(
-    //                 error => {
-    //                     switch (error.message) {
-    //                         case "Network Error":
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                         default:
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                     }
-    //                 }
-    //             )
-
-
-    //     } else {
-    //         alert("To perform this action you must be online.");
-
-    //     }
-
-    // }
-    // render() {
-    //     return (
-    //         <>
-
-    //             <div><h5>{this.state.message}</h5></div>
-    //             <h3>Add Realm </h3>
-    //             <form name="realmForm" id="realmForm">
-    //                 <div>
-    //                     <label>Realm Code:-</label>
-    //                     <input type="text" name="realm.realmCode" value={this.Capitalize(this.state.realm.realmCode)} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br /><br />
-    //                 <div>
-    //                     <label>Realm Name (English) :-</label>
-    //                     <input type="text" name="realm.label.label_en" value={this.Capitalize(this.state.realm.label.label_en)} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br /><br />
-    //                 <div>
-    //                     <label>Month In Past For AMC :-</label>
-    //                     <input type="text" name="realm.monthInPastForAmc" value={this.Capitalize(this.state.realm.monthInPastForAmc)} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br></br>
-    //                 <div>
-    //                     <label>Month In Future For AMC :-</label>
-    //                     <input type="text" name="realm.monthInFutureForAmc" value={this.Capitalize(this.state.realm.monthInFutureForAmc)} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br></br>
-    //                 <div>
-    //                     <label>Order Frequency :-</label>
-    //                     <input type="text" name="realm.orderFrequency" value={this.Capitalize(this.state.realm.orderFrequency)} onChange={this.updateFieldData} />
-    //                 </div>
-    //                 <br></br>
-    //                 <div>
-    //                     Default:
-    //                 <input type="radio" id="realm.active1" name="realm.defaultRealm" value={true} checked={this.state.realm.defaultRealm === true} onChange={this.updateFieldData} /> Active
-    //                 <input type="radio" id="realm.active2" name="realm.defaultRealm" value={false} checked={this.state.realm.defaultRealm === false} onChange={this.updateFieldData} /> Disabled
-    //                  </div>
-    //                 <br /><br />
-    //                 <div>
-    //                     <button type="button" onClick={this.submitForm}>Submit</button>
-    //                 </div>
-    //             </form>
-
-
-    //         </>
-    //     );
-
-    // }
 
     render() {
 
@@ -271,7 +153,7 @@ export default class AddRealmComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                    // alert("----"+this.state.label.label_en);
+
                                     console.log("------IN SUBMIT------", this.state.country)
                                     RealmService.addRealm(this.state.realm)
                                         .then(response => {
@@ -326,7 +208,6 @@ export default class AddRealmComponent extends Component {
                                                             invalid={touched.realmCode && !!errors.realmCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            // value={this.state.country.label.label_en}
                                                             required />
                                                         <FormFeedback>{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
@@ -421,9 +302,8 @@ export default class AddRealmComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right btn-sm" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" color="success"className="mr-1 float-right btn-sm"onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Submit</Button>
-                                                     
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="sm" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

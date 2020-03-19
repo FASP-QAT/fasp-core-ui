@@ -25,39 +25,39 @@ export default {
         {
           name: 'Country',
           url: '/country/listCountry',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-globe'
         },
         {
           name: 'DataSource Type',
           url: '/dataSourceType/listDataSourceType',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-table'
         },
         {
           name: 'DataSource',
           url: '/dataSource/listDataSource',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-database'
         },
         {
           name: 'Currency',
           url: '/currency/listCurrency',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-usd'
         },
         {
-          name: 'Dimension Type',
+          name: 'Dimension',
           url: 'diamension/diamensionlist',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-map'
         }
         ,
         {
           name: 'Realm',
           url: 'realm/realmlist',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-user'
         },
         
         {
           name: 'Language',
           url: 'language/languagelist',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-language'
         }
       ]
     },
@@ -67,38 +67,38 @@ export default {
       children: [
         {
           name: 'Realm-Country',
-          icon: 'fa fa-circle',
+          icon: 'fa fa-globe',
           url: '/realmCountry/listRealmCountry'
         },
         {
           name: 'Funding Source',
-          icon: 'fa fa-circle',
+          icon: 'fa fa-university',
           url: '/fundingSource/listFundingSource'
         },
         {
           name: 'Sub Funding Source',
           url: '/subFundingSource/listSubFundingSource',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-university'
         },
         {
           name: 'Procurement Agent',
           url: '/procurementAgent/listProcurementAgent',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-user'
         },
         {
           name: 'Budget',
           url: '/budget/listBudget',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-line-chart'
         },
         {
           name: 'Manufacturer',
           url: '/manufacturer/listManufacturer',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-industry'
         },
         {
           name: 'Region',
           url: '/region/listRegion',
-          icon: 'fa fa-circle'
+          icon: 'fa fa-pie-chart'
         }
       ]
     },
@@ -108,43 +108,30 @@ export default {
       icon: 'fa fa-list',
       children: [
         {
-          name: 'Program',
-          url: '/program',
-          icon: 'icon-graph',
-          children: [
+       
            
-            {
+         
               name: ' Program',
               url: '/program/listProgram',
-              icon: 'fa fa-circle',
-            }
-          ]
+              icon: 'fa fa-object-group',
+          
+          
         },
         {
-          name: 'Product',
-          url: '/product',
-          icon: 'fa fa-list',
-          children: [
-         
-            {
-              name: 'List Product',
-              url: '/product/listProduct',
-              icon: 'fa fa-circle',
-            }
-          ]
-        },
-        {
-          name: 'Program Product',
-          url: '/programProduct',
-          icon: 'fa fa-list',
-          children: [
         
-            {
-              name: 'List Program Product',
+         
+          
+              name: ' Product',
+              url: '/product/listProduct',
+              icon: 'fa fa-th-large',
+           
+          
+        },
+        {  name: ' Program Product',
               url: '/programProduct/listProgramProduct',
-              icon: 'fa fa-circle',
-            }
-          ]
+              icon: 'fa fa-sitemap',
+           
+         
         },
         {
           name: 'Product Category',
@@ -167,17 +154,17 @@ export default {
         {
           name: 'Download Program',
           url: '/program/downloadProgram',
-          icon: 'fa fa-code',
+          icon: 'fa fa-download',
         },
         {
           name: 'Export Program',
           url: '/program/exportProgram',
-          icon: 'fa fa-code',
+          icon: 'fa fa-upload',
         },
         {
           name: 'Import Program',
           url: '/program/importProgram',
-          icon: 'fa fa-code',
+          icon: 'fa fa-long-arrow-up',
         }
       ]
     },

@@ -60,9 +60,7 @@ export default class UpdateCurrencyComponent extends Component {
                 currencySymbol: '',
                 label: {
                     label_en: ''
-                    // freLabel: '',
-                    // spaLabel: '',
-                    // porLabel: ''
+               
                 },
                 conversionRateToUsd: ''
             }
@@ -159,8 +157,6 @@ export default class UpdateCurrencyComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                    // alert("----"+this.state.label.label_en);
-                                    // console.log("------IN SUBMIT------", this.state)
                                     CurrencyService.editCurrency(this.state.currency)
                                         .then(response => {
                                             if (response.data.status == "Success") {

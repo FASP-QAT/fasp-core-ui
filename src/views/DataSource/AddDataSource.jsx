@@ -55,9 +55,6 @@ export default class AddDataSource extends Component {
             message: '',
             label: {
                 label_en: ''
-                // freLabel: '',
-                // spaLabel: '',
-                // porLabel: ''
             },
             dataSourceType: {
                 dataSourceTypeId: ''
@@ -72,19 +69,8 @@ export default class AddDataSource extends Component {
 
     dataChange(event) {
         if (event.target.name === "label") {
-            //console.log("inside if")
             this.state.label.label_en = event.target.value
         }
-        // if (event.target.name === "label.freLabel") {
-        //     //console.log("inside if")
-        //     this.state.label.freLabel = event.target.value
-        // } if (event.target.name === "label.spaLabel") {
-        //     //console.log("inside if")
-        //     this.state.label.spaLabel = event.target.value
-        // } if (event.target.name === "label.porLabel") {
-        //     //console.log("inside if")
-        //     this.state.label.porLabel = event.target.value
-        // }
         else if (event.target.name === "dataSourceTypeId") {
             this.state.dataSourceType.dataSourceTypeId = event.target.value
         }
@@ -124,7 +110,6 @@ export default class AddDataSource extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeListActive().then(response => {
-            //console.log(response.data)
             this.setState({
                 dataSourceTypeList: response.data
             })
@@ -145,236 +130,14 @@ export default class AddDataSource extends Component {
                     }
                 }
             );
-        // $("#dataSourceForm").validate({
-        //     ignore: [],
-        //     rules: {
-        //         'label.label_en': {
-        //             required: true,
-        //             lettersonlywhitespace: true,
-        //             maxlength: 255
-        //         },
-        // 'label.freLabel': {
-
-        //     lettersonly: true,
-        //     maxlength: 255
-        // },
-        // 'label.spaLabel': {
-
-        //     lettersonly: true,
-        //     maxlength: 255
-        // },
-        // 'label.porLabel': {
-
-        //     lettersonly: true,
-        //     maxlength: 255
-        // },
-        //         'dataSourceType.dataSourceTypeId': {
-        //             required: true
-        //         }
-        //     },
-        //     errorPlacement: function (error, element) {
-        //         error.insertAfter(element);
-        //     }
-        // });
+        
 
     }
 
-    // updateFieldData(event) {
-    //     if (event.target.name === "label.label_en") {
-    //         //console.log("inside if")
-    //         this.state.label.label_en = event.target.value
-    //     }
-    //     // if (event.target.name === "label.freLabel") {
-    //     //     //console.log("inside if")
-    //     //     this.state.label.freLabel = event.target.value
-    //     // } if (event.target.name === "label.spaLabel") {
-    //     //     //console.log("inside if")
-    //     //     this.state.label.spaLabel = event.target.value
-    //     // } if (event.target.name === "label.porLabel") {
-    //     //     //console.log("inside if")
-    //     //     this.state.label.porLabel = event.target.value
-    //     // }
-    //     else if (event.target.name === "dataSourceType.dataSourceTypeId") {
-    //         this.state.dataSourceType.dataSourceTypeId = event.target.value
-    //     }
-
-    //     let { dataSource } = this.state
-    //     this.setState(
-    //         {
-    //             dataSource
-    //         }
-    //     )
-
-
-    // }
+    
     Capitalize(str) {
         this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-
-    // submitForm() {
-
-    //     if (navigator.onLine) {
-    //         // if ($("#dataSourceForm").valid()) {
-    //         console.log(this.state);
-    //         //delete this.state["dataSourceTypeList"];
-    //         DataSourceService.addDataSource(this.state).then(response => {
-    //             this.props.history.push(`/dataSourceList/${response.data.message}`)
-    //             //console.log("success");
-    //         }
-    //         )
-    //             .catch(
-    //                 error => {
-    //                     switch (error.message) {
-    //                         case "Network Error":
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                         default:
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                     }
-    //                 }
-    //             )
-
-
-
-    //     } else {
-    //         alert("To perform this action you must be online.");
-
-    //     }
-
-    // }
-
-
-    // render() {
-    //     const { dataSourceTypeList } = this.state;
-    //     let dataSourceTypes = dataSourceTypeList.length > 0
-    //         && dataSourceTypeList.map((item, i) => {
-    //             return (
-    //                 <option key={i} value={item.dataSourceTypeId}>{item.label.label_en}</option>
-    //             )
-    //         }, this);
-    //     return (
-    //         // <>
-    //         //     <div><h5>{this.state.message}</h5></div>
-    //         //     <h3>{myConst.ADD_DATASOURCE}</h3>
-    //         //     <form name="dataSourceForm" id="dataSourceForm">
-    //         //         <div>
-    //         //             <label>{myConst.DATASOURCE_NAME_EN}:-</label>
-    //         //             <input type="text" name="label.label_en" value={this.Capitalize(this.state.label.label_en)} onChange={this.updateFieldData} />
-    //         //         </div>
-    //         //         <br /><br />
-
-
-    //         //         <div>
-    //         //             {myConst.SELECT_DATA_SOURCE_TYPE} : <select id="dataSourceTypeId" name="dataSourceType.dataSourceTypeId" onChange={this.updateFieldData}>
-    //         //                 <option value="">-Nothing Selected-</option>
-    //         //                 {dataSourceTypes}
-    //         //             </select>
-    //         //         </div>
-    //         //         <br></br>
-    //         //         <div>
-    //         //             <button type="button" onClick={this.submitForm}>{myConst.SUBMIT_BUTTON}</button>
-    //         //         </div>
-    //         //     </form>
-    //         // </>
-
-    //         <div className="page-content-wrap">
-
-
-    //             <div className="row">
-
-    //                 <div className="">
-    //                     <ul class="breadcrumb text-left">
-    //                         <li><a href="#">Home</a></li>
-    //                         <li><a href="#">Admin</a></li>
-    //                         <li><a href="#">Data Source</a></li>
-    //                         <li><a href="#">Add Data Source</a></li>
-    //                     </ul>
-    //                 </div>
-    //                 <div className="help-block"></div>
-
-    //                 <div className="col-md-8 col-md-offset-2">
-
-    //                     <div className="login mt-2 block">
-
-
-    //                         <div className="panel panel-default">
-
-
-    //                             <div className="panel-heading">
-    //                                 <h3 className="panel-title">Add Data Source</h3>
-    //                             </div>
-    //                             <div className="panel-body">
-    //                                 <div className="col-md-8 col-md-offset-2">
-    //                                     <div className="block">
-
-    //                                         <form className="form-horizontal" name="dataSourceForm" id="dataSourceForm">
-
-
-    //                                             <div className="form-group">
-    //                                                 <label className="col-md-5 control-label">Data source name (English):</label>
-    //                                                 <div className="col-md-7">
-    //                                                     <input className="form-control" type="text" name="label.engLabel" onChange={this.updateFieldData} ></input>
-    //                                                     <span className="help-block"></span>
-    //                                                 </div>
-    //                                             </div>
-
-
-
-    //                                             <div className="form-group">
-    //                                                 <label className="col-md-5 control-label"> Select Data Source Type : </label>
-    //                                                 <div className="col-md-7">
-    //                                                     <select className="form-control select" id="dataSourceTypeId" name="dataSourceType.dataSourceTypeId" onChange={this.updateFieldData}>
-    //                                                         <option value="" disabled>-Nothing Selected-</option>
-    //                                                         {dataSourceTypes}
-    //                                                     </select>
-    //                                                     <span className="help-block"></span>
-    //                                                 </div>
-    //                                             </div>
-
-
-
-
-
-    //                                         </form>
-
-    //                                     </div>
-    //                                 </div>
-
-    //                             </div>
-    //                             <div className="panel-footer">
-
-
-
-
-    //                                 <button type="button" className="btn btn-success pull-right" onClick={this.submitForm}>Submit</button>
-
-
-    //                             </div>
-
-
-    //                         </div>
-
-
-    //                     </div>
-
-
-    //                 </div>
-
-
-    //             </div>
-
-
-    //         </div>
-    //     );
-
-    // }
-
-
     render() {
 
         const { dataSourceTypeList } = this.state;
@@ -396,10 +159,7 @@ export default class AddDataSource extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
-
-                                    // alert("----"+this.state.label.label_en);
-                                    // console.log("------IN SUBMIT------", this.state.country)
+                                onSubmit={(values, { setSubmitting, setErrors }) => {  
                                     DataSourceService.addDataSource(this.state)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -468,9 +228,7 @@ export default class AddDataSource extends Component {
                                                             invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            required
-                                                            // value={this.state.dataSourceType.dataSourceTypeId}
-                                                        >
+                                                            required>
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {dataSourceTypes}
                                                         </Input>

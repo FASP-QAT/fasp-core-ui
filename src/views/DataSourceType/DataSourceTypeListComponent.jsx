@@ -168,6 +168,13 @@ export default class DataSourceListComponent extends Component {
     //         </div>
     //     );
     // }
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
+    }
 
     render() {
 
@@ -186,7 +193,7 @@ export default class DataSourceListComponent extends Component {
                     <CardBody>
                         <BootstrapTable data={this.state.dataSourceList} version="4"  hover pagination search options={this.options}>
                             <TableHeaderColumn isKey filterFormatted dataField="label" dataSort dataFormat={this.showCountryLabel} dataAlign="center">{i18n.t('static.datasourcetype.datasourcetype')}</TableHeaderColumn>
-                            <TableHeaderColumn dataField="active" dataSort dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataSort dataFormat={this.showStatus} dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>
