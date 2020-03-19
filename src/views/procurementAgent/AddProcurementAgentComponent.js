@@ -24,7 +24,8 @@ const validationSchema = function (values) {
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
-            .required(i18n.t('static.procurementagent.submittoapprovetext'))
+            .matches(/^[0-9]*$/, 'Only numbers allowed')
+            .required("Please enter submitted to approved lead time")
     })
 }
 

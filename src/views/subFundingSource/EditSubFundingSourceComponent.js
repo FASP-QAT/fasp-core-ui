@@ -103,7 +103,7 @@ class EditSubFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceedittext')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}

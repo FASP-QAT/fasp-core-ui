@@ -182,9 +182,9 @@ class ListProcurementAgentComponent extends Component {
                         </Col>
                         <BootstrapTable data={this.state.selProcurementAgent} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='procurementAgentId' hidden>ID</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>{i18n.t('static.realm.realmname')}</TableHeaderColumn>
                             <TableHeaderColumn dataField="procurementAgentCode" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">{i18n.t('static.procurementagent.procurementagentcode')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProcurementAgentLabel} dataAlign="center">{i18n.t('static.procurementagent.procurementagentname')}</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>{i18n.t('static.realm.realmname')}</TableHeaderColumn>
                             <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort dataAlign="center">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>

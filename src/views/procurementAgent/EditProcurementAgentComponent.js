@@ -16,9 +16,10 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         procurementAgentName: Yup.string()
-            .required(i18n.t('static.procurementAgent.procurementagentnametext')),
+            .required("Please enter procurement agent name"),
         submittedToApprovedLeadTime: Yup.string()
-            .required(i18n.t('static.procurementagent.submittoapprovetext'))
+            .matches(/^[0-9]*$/, 'Only numbers allowed')
+            .required("Please enter submitted to approved lead time.")
     })
 }
 
@@ -188,7 +189,7 @@ class EditProcurementAgentComponent extends Component {
                                                             type="text"
                                                             name="realmId"
                                                             id="realmId"
-                                                            bsSize="lg"
+                                                            bsSize="sm"
                                                             readOnly={true}
                                                             value={this.state.procurementAgent.realm.label.label_en}
                                                         >
@@ -197,6 +198,7 @@ class EditProcurementAgentComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
                                                         <Input type="text"
+                                                            bsSize="sm"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
                                                             readOnly={true}
@@ -207,6 +209,7 @@ class EditProcurementAgentComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
                                                         <Input type="text"
+                                                            bsSize="sm"
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
                                                             valid={!errors.procurementAgentName}
@@ -221,6 +224,7 @@ class EditProcurementAgentComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
                                                         <Input type="number"
+                                                            bsSize="sm"
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
                                                             valid={!errors.submittedToApprovedLeadTime}

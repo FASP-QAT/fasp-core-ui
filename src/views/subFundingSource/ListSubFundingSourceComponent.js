@@ -185,8 +185,8 @@ class ListSubFundingSourceComponent extends Component {
                         </Col>
                         <BootstrapTable data={this.state.selSubFundingSource} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center"><strong>{i18n.t('static.subfundingsource.subfundingsource')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort><strong>{i18n.t('static.subfundingsource.fundingsource')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center"><strong>{i18n.t('static.subfundingsource.subfundingsource')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort><strong>{i18n.t('static.common.status')}</strong></TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
