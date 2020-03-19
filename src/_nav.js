@@ -69,11 +69,6 @@ export default {
       ]
     },
     {
-      name: 'Login',
-      url: '/login',
-      icon: 'fa fa-sign-in',
-    },
-    {
       name: 'Realm Masters',
       icon: 'fa fa-list',
       children: [
