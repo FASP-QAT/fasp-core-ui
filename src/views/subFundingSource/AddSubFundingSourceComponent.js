@@ -63,9 +63,7 @@ class AddSubFundingSourceComponent extends Component {
   }
 
   Capitalize(str) {
-    console.log("capitalize");
     if (str != null && str != "") {
-      console.log("str---" + str)
       return str.charAt(0).toUpperCase() + str.slice(1);
     } else {
       return "";
@@ -119,18 +117,21 @@ class AddSubFundingSourceComponent extends Component {
         })
       }).catch(
         error => {
-          switch (error.response.status) {
-            case 500:
-            case 401:
-            case 404:
-            case 406:
-            case 412:
-              this.setState({ message: error.response.data.messageCode });
-              break;
-            default:
-              this.setState({ message: 'static.unkownError' });
-              console.log("Error code unkown");
-              break;
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
           }
         }
       );
@@ -153,7 +154,7 @@ class AddSubFundingSourceComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceadd')}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceaddttext')}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -161,8 +162,8 @@ class AddSubFundingSourceComponent extends Component {
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
                     .then(response => {
-                      if (response.data.status == "Success") {
-                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.message}`)
+                      if (response.status == 200) {
+                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
                       } else {
                         this.setState({
                           message: response.data.message
@@ -171,17 +172,21 @@ class AddSubFundingSourceComponent extends Component {
                     })
                     .catch(
                       error => {
-                        switch (error.message) {
-                          case "Network Error":
-                            this.setState({
-                              message: error.message
-                            })
-                            break
-                          default:
-                            this.setState({
-                              message: error.response.data.message
-                            })
-                            break
+                        if (error.message === "Network Error") {
+                          this.setState({ message: error.message });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                              this.setState({ message: error.response.data.messageCode });
+                              break;
+                            default:
+                              this.setState({ message: 'static.unkownError' });
+                              break;
+                          }
                         }
                       }
                     );
@@ -252,7 +257,7 @@ class AddSubFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "Action Canceled")
+    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
   }
 }
 

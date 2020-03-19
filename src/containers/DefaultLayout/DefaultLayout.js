@@ -41,9 +41,9 @@ class DefaultLayout extends Component {
     LogoutService.logout()
       .then(response => {
         console.log("logout response---", response);
-        if (response.data.status == "Success") {
+        if (response.status == 200) {
           localStorage.removeItem("token-" + AuthenticationService.getLoggedInUserId());
-          this.props.history.push(`/login/${response.data.message}`);
+          this.props.history.push(`/login/static.logoutSuccess`)
         }
       }).catch(
         error => {

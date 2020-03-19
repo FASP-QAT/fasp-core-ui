@@ -5,7 +5,7 @@ import {
 } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-import i18n from '../../i18n';
+import i18n from '../../i18n'
 
 
 import RealmService from "../../api/RealmService";
@@ -46,7 +46,6 @@ class ListProcurementAgentComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
             const selProcurementAgent = this.state.procurementAgentList.filter(c => c.realm.realmId == realmId)
-            console.log("selProcurementAgent---", selProcurementAgent);
             this.setState({
                 selProcurementAgent
             });
@@ -72,17 +71,22 @@ class ListProcurementAgentComponent extends Component {
                 })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -95,17 +99,22 @@ class ListProcurementAgentComponent extends Component {
                 })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -138,8 +147,8 @@ class ListProcurementAgentComponent extends Component {
             }, this);
         return (
             <div className="animated">
-                <h5>{this.props.match.params.message}</h5>
-                <h5>{this.state.message}</h5>
+                <h5>{i18n.t(this.props.match.params.message)}</h5>
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.procurementagent.procurementagentlist')}</strong>{' '}

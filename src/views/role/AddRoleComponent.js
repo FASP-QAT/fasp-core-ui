@@ -3,28 +3,24 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
-import RealmService from "../../api/RealmService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
+import i18n from '../../i18n'
+import UserService from "../../api/UserService";
 import AuthenticationService from '../common/AuthenticationService.js';
-import i18n from '../../i18n';
+
 const initialValues = {
-    realmId: [],
-    procurementAgentCode: "",
-    procurementAgentName: "",
-    submittedToApprovedLeadTime: ""
+    roleName: "",
+    businessFunctions: [],
+    canCreateRole: []
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        realmId: Yup.string()
-            .required(i18n.t('static.procurementagent.realmtext')),
-         procurementAgentCode: Yup.string()
-            .required(i18n.t('static.procurementagent.codetext')),
-        procurementAgentName: Yup.string()
-        .required(i18n.t('static.procurementAgent.procurementagentnametext')),
-        submittedToApprovedLeadTime: Yup.string()
-        .required(i18n.t('static.procurementagent.submittoapprovetext'))
+        roleName: Yup.string()
+            .required('Please enter role name'),
+        businessFunctions: Yup.string()
+            .required('Please select business functions'),
+        canCreateRole: Yup.string()
+            .required('Please select can create role')
     })
 }
 
@@ -49,14 +45,15 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-class AddProcurementAgentComponent extends Component {
+class AddRoleComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            realms: [],
-            procurementAgent: {
-                realm: {
-                },
+            businessFunctions: [],
+            roles: [],
+            role: {
+                businessFunctions: [],
+                canCreateRole: [],
                 label: {
 
                 }
@@ -78,39 +75,33 @@ class AddProcurementAgentComponent extends Component {
 
 
     dataChange(event) {
-        let { procurementAgent } = this.state;
-        if (event.target.name == "realmId") {
-            procurementAgent.realm.realmId = event.target.value;
+        let { role } = this.state;
+        if (event.target.name == "roleName") {
+            role.label.label_en = event.target.value;
         }
-        if (event.target.name == "procurementAgentCode") {
-            procurementAgent.procurementAgentCode = event.target.value;
+        if (event.target.name == "businessFunctions") {
+            role.businessFunctions = Array.from(event.target.selectedOptions, (item) => item.value);
         }
-        if (event.target.name == "procurementAgentName") {
-            procurementAgent.label.label_en = event.target.value;
+        if (event.target.name == "canCreateRole") {
+            role.canCreateRole = Array.from(event.target.selectedOptions, (item) => item.value);
         }
-        if (event.target.name == "submittedToApprovedLeadTime") {
-            procurementAgent.submittedToApprovedLeadTime = event.target.value;
-        }
-
-
         this.setState({
-            procurementAgent
+            role
         },
             () => { });
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            realmId: true,
-            procurementAgentCode: true,
-            procurementAgentName: true,
-            submittedToApprovedLeadTime: true
+            roleName: true,
+            businessFunctions: true,
+            canCreateRole: true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('procurementAgentForm', (fieldName) => {
+        this.findFirstError('roleForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -126,10 +117,36 @@ class AddProcurementAgentComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
+        UserService.getBusinessFunctionList()
             .then(response => {
                 this.setState({
-                    realms: response.data.data
+                    businessFunctions: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+        UserService.getRoleList()
+            .then(response => {
+                this.setState({
+                    roles: response.data
                 })
             }).catch(
                 error => {
@@ -155,39 +172,51 @@ class AddProcurementAgentComponent extends Component {
     }
 
     render() {
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
+        const { businessFunctions } = this.state;
+        const { roles } = this.state;
+
+        let businessFunctionsList = businessFunctions.length > 0
+            && businessFunctions.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmId}>
+                    <>
+                        <option key={i} value={item.businessFunctionId}>
+                            {item.label.label_en}
+                        </option>
+                    </>
+                )
+            }, this);
+        let roleList = roles.length > 0
+            && roles.map((item, i) => {
+                return (
+                    <option key={i} value={item.roleId}>
                         {item.label.label_en}
                     </option>
                 )
             }, this);
+
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
-
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.procurementagent.procurementagentadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.role.roleaddtext')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("this.state.procurementAgent---", this.state.procurementAgent);
-                                    ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
+                                    UserService.addNewRole(this.state.role)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/role/listRole/${response.data.messageCode}`)
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
+
                                         })
                                         .catch(
                                             error => {
@@ -210,6 +239,8 @@ class AddProcurementAgentComponent extends Component {
                                                 }
                                             }
                                         );
+
+
                                 }}
                                 render={
                                     ({
@@ -223,80 +254,74 @@ class AddProcurementAgentComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.procurementagent.realm')}</Label>
+                                                        <Label for="roleName">{i18n.t('static.role.rolename')}</Label>
+                                                        <Input type="text"
+                                                            name="roleName"
+                                                            id="roleName"
+                                                            bsSize="sm"
+                                                            valid={!errors.roleName}
+                                                            invalid={touched.roleName && !!errors.roleName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.Capitalize(this.state.role.label.label_en)}
+                                                        />
+                                                        <FormFeedback>{errors.roleName}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label>
                                                         <Input
                                                             type="select"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="lg"
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            name="businessFunctions"
+                                                            id="businessFunctions"
+                                                            bsSize="sm"
+                                                            valid={!errors.businessFunctions}
+                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
+                                                            value={this.state.role.businessFunctions}
+                                                            multiple={true}
                                                         >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {realmList}
+                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
+                                                            {businessFunctionsList}
                                                         </Input>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
+                                                        <FormFeedback>{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
-                                                        <Input type="text"
-                                                            name="procurementAgentCode"
-                                                            id="procurementAgentCode"
-                                                            valid={!errors.procurementAgentCode}
-                                                            invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
+                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="canCreateRole"
+                                                            id="canCreateRole"
+                                                            bsSize="sm"
+                                                            valid={!errors.canCreateRole}
+                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            maxLength={6}
-                                                            value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
-                                                        />
-                                                        <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
-                                                        <Input type="text"
-                                                            name="procurementAgentName"
-                                                            id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.Capitalize(this.state.procurementAgent.label.label_en)}
-                                                        />
-                                                        <FormFeedback>{errors.procurementAgentName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetosubmittime')}</Label>
-                                                        <Input type="number"
-                                                            name="submittedToApprovedLeadTime"
-                                                            id="submittedToApprovedLeadTime"
-                                                            valid={!errors.submittedToApprovedLeadTime}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            min={1}
-                                                        />
-                                                        <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                            value={this.state.role.canCreateRole}
+                                                            multiple={true}
+                                                        >
+                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
+                                                            {roleList}
+                                                        </Input>
+                                                        <FormFeedback>{errors.canCreateRole}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                    </FormGroup>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+
+                                                        &nbsp;
+                          </FormGroup>
                                                 </CardFooter>
                                             </Form>
-
                                         )} />
-
                         </Card>
                     </Col>
                 </Row>
@@ -304,8 +329,8 @@ class AddProcurementAgentComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + "Action Canceled")
+        this.props.history.push(`/role/listRole/` + "static.actionCancelled")
     }
 }
 
-export default AddProcurementAgentComponent;
+export default AddRoleComponent;
