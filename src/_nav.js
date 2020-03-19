@@ -1,8 +1,8 @@
+
 import i18n from './i18n'
 export default {
   items: [
     {
-
       name: i18n.t('static.dashboard.applicationdashboard'),
       url: '/ApplicationDashboard',
       icon: 'cui-dashboard icons',
@@ -34,12 +34,7 @@ export default {
       icon: 'fa fa-list',
       children: [
         {
-<<<<<<< HEAD
-         name: 'Role',
-=======
-
           name: i18n.t('static.dashboard.role'),
->>>>>>> language json
           url: '/role/listRole',
           icon: 'fa fa-list-alt'
         },
@@ -49,7 +44,7 @@ export default {
           icon: 'fa fa-list-alt'
         },
         {
-       name:  i18n.t('static.dashboard.language'),
+          name:  i18n.t('static.dashboard.language'),
           url: '/language/listLanguage',
           icon: 'fa fa-list-alt'
         },
@@ -155,41 +150,8 @@ export default {
             }
           ]
         },
-<<<<<<< HEAD
-        {
-          name: i18n.t('static.dashboard.programproduct'),
-          url: '/programProduct',
-          icon: 'icon-graph',
-          children: [
-            {
-              name:  i18n.t('static.dashboard.addprogramproduct'),
-              url: '/programProduct/addProgramProduct',
-              icon: 'icon-pencil',
-            },
-            {
-              name: i18n.t('static.dashboard.listprogramproduct'),
-              url: '/programProduct/listProgramProduct',
-              icon: 'icon-list',
-            }
-          ]
-        },
-        {
-          name: i18n.t('static.dashboard.productcategory') ,
-          url: '/productCategory',
-          icon: 'icon-graph',
-          children: [
-            {
-              name: i18n.t('static.dashboard.addproductcategory') ,
-              url: '/productCategory/addProductCategory',
-              icon: 'icon-pencil',
-            }
-          ]
-        }
-     ]
-    },
-=======
 
-    //     {
+            //     {
     //       name: i18n.t('static.dashboard.programproduct'),
     //       url: '/programProduct',
     //       icon: 'icon-graph',
@@ -220,7 +182,6 @@ export default {
     //     }
        ]
      },
->>>>>>> language json
     {
       name: i18n.t('static.dashboard.program') ,
       icon: 'fa fa-list',
