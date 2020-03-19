@@ -123,7 +123,7 @@ class ProductList extends Component {
             </div>
           </CardHeader>
           <CardBody>
-            <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
+            <BootstrapTable data={this.state.table} version="4" hover pagination search options={this.options}>
               <TableHeaderColumn dataField="label" dataFormat={this.showProductLabel} dataSort>{i18n.t('static.product.product')}</TableHeaderColumn>
               <TableHeaderColumn dataField="genericLabel" dataFormat={this.showGenericLabel} dataSort>{i18n.t('static.product.productgenericname')}</TableHeaderColumn>
               <TableHeaderColumn dataField="realm" dataFormat={this.showRealmLabel} dataSort>{i18n.t('static.product.realm')}</TableHeaderColumn>

@@ -41,11 +41,15 @@ class DefaultHeader extends Component {
           <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >Dashboard</NavLink>
           </NavItem>
+          <NavItem className="px-3">
+            <NavLink to="/ProgramTree" className="nav-link" >KENYA-FAMILY PLANNING-MOH</NavLink>
+          </NavItem>
         </Nav>
         <Nav className="ml-auto" navbar>
         <UncontrolledDropdown nav direction="down">
             <DropdownToggle nav>
            { localStorage.getItem('lang').toString()}
+           <i class="fa fa-caret-down" aria-hidden="true"></i>
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> English</DropdownItem>

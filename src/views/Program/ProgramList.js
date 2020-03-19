@@ -134,7 +134,7 @@ export default class ProgramList extends Component {
             </div>
           </CardHeader>
           <CardBody>
-            <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
+            <BootstrapTable data={this.state.table} version="4" hover pagination search options={this.options}>
               <TableHeaderColumn dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
               <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>
               <TableHeaderColumn dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >{i18n.t('static.program.realmcountry')}</TableHeaderColumn>

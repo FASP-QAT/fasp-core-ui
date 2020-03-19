@@ -1,1 +1,283 @@
 // Here you can add other styles
+
+
+
+
+/* ————————————————————–
+  Tree core styles
+*/
+.tree { margin: 1em; }
+
+.tree input {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  }
+
+.tree input ~ ul { display: block;  }
+
+.tree input:checked ~ ul { display: none; }
+
+/* ————————————————————–
+  Tree rows
+*/
+.tree li {
+  line-height: 1.2;
+  position: relative;
+  padding: 0 0 1em 1em;
+  }
+
+.tree ul li { padding: 1em 0 0 1em; list-style-type: none;}
+
+.tree > li:last-child { padding-bottom: 0; }
+
+/* ————————————————————–
+  Tree labels
+*/
+.tree_label {
+  position: relative;
+  display: inline-block;
+  background: #fff;
+  }
+
+label.tree_label { cursor: pointer; }
+
+label.tree_label:hover { color: #666; }
+
+/* ————————————————————–
+  Tree expanded icon +-
+*/
+label.tree_label:before {
+  background: orange;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+  float: left;
+  margin: 0 1em 0 -2em;
+  width: 1em;
+  height: 1em;
+  border-radius: 1em;
+  content: '-';
+  text-align: center;
+  line-height: .9em;
+    -webkit-box-shadow: 1px 1px .5px 1px #ccc;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+  -moz-box-shadow:    1px 1px .5px 1px #ccc;  /* Firefox 3.5 - 3.6 */
+  box-shadow:         1px 1px .5px 1px #ccc; 
+  }
+
+:checked ~ label.tree_label:before { content: '+'; }
+
+/* ————————————————————–
+  Tree branches
+*/
+.tree li:before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -.5em;
+  display: block;
+  width: 0;
+  border-left: 1px solid #777;
+  content: "";
+  }
+
+.tree_label:after {
+  position: absolute;
+  top: 0;
+  left: -1.5em;
+  display: block;
+  height: 0.5em;
+  width: 1em;
+  border-bottom: 1px solid #777;
+  border-left: 1px solid #777;
+  border-radius: 0 0 0 .3em;
+  content: '';
+  }
+
+label.tree_label:after { border-bottom: 0; }
+
+:checked ~ label.tree_label:after {
+ /* border-radius: 0 .3em 0 0;*/
+  // border-top: 1px solid #777;
+ /* border-right: 1px solid #777;*/
+  border-bottom: 0;
+  border-left: 0;
+  bottom: 0;
+  /*top: 0.5em;*/
+  height: auto;
+  }
+
+.tree li:last-child:before {
+  height: 1em;
+  bottom: auto;
+  }
+
+.tree > li:last-child:before { display: none; }
+
+.tree_custom {
+  display: block;
+  background: #eee;
+  padding: 1em;
+  border-radius: 0.3em;
+}
+
+#showtick{display: block;}
+.tick-bg{float: left;
+margin-right: 5px;
+background-image: linear-gradient(orange,red);
+padding: 2px;
+color: #fff;}
+.overflow-x{overflow-x: auto;}
+/*end tree*/
+
+
+.checkbox label {
+    position: relative;
+    display: inline-block;
+    
+    /*16px width of fake checkbox + 6px distance between fake checkbox and text*/
+    padding-left: 22px;
+}
+
+.checkbox label::before,
+.checkbox label::after {
+    position: absolute;
+    content: "";
+    
+    /*Needed for the line-height to take effect*/
+    display: inline-block;
+}
+
+/*Outer box of the fake checkbox*/
+.checkbox label::before{
+    height: 13px;
+    width: 13px;
+    
+    border: 1px solid;
+    left: 0px;
+    
+    /*(24px line-height - 16px height of fake checkbox) / 2 - 1px for the border
+     *to vertically center it.
+     */
+    
+}
+
+/*Checkmark of the fake checkbox*/
+.checkbox label::after {
+    height: 5px;
+    width: 9px;
+    border-left: 2px solid;
+    border-bottom: 2px solid;
+    
+    transform: rotate(-45deg);
+    
+    left: 2px;
+    top: 3px;
+}
+
+/*Hide the checkmark by default*/
+.checkbox input[type="checkbox"] + label::after {
+    content: none;
+}
+
+/*Unhide on the checked state*/
+.checkbox input[type="checkbox"]:checked + label::after {
+    content: "";
+}
+
+/*Adding focus styles on the outer-box of the fake checkbox*/
+.checkbox input[type="checkbox"]:focus + label::before {
+    outline: rgb(59, 153, 252) auto 5px;
+}
+.m-0{margin: 0px !important;}
+
+ul.tree{
+  list-style-type: none !important;
+}
+.colps-btn{
+  color: black;
+ 
+  padding: 2px;
+  border-radius: 50%;
+  margin-left: 15px;
+}
+
+.colps-btn:hover{
+color: black;
+  // background-color: #181b1e;
+  // border-color: #121517;
+
+}
+
+
+// arrow label css
+
+.arrow_label{
+  position: absolute;
+  margin-left: 40px;
+  margin-top: 2px;
+  display: inline-block;
+  background: #fff;
+  font: normal normal normal 14px/1 FontAwesome;
+
+}
+
+label.arrow_label { cursor: pointer; }
+
+label.arrow_label:hover { color: #666; }
+.fa-eye{
+color: #000000a8;
+}
+
+label.arrow_label:before {
+ 
+  color:#000000a8;
+  position: relative;
+  z-index: 1;
+  float: left;
+  margin: 0 1em 0 -2em;
+  width: 1em;
+  height: 1em;
+  border-radius: 1em;
+  
+  content: "\f150";
+    text-align: center;
+  line-height: .9em;
+
+  }
+
+  :checked ~ label.arrow_label:before {   content: "\f191";   }
+
+
+  .arrow_label:after {
+    position: absolute;
+    top: 0;
+    left: -1.5em;
+    display: block;
+    height: 0.5em;
+    width: 1em;
+    border-bottom: 1px solid #777;
+    border-left: 1px solid #777;
+    border-radius: 0 0 0 .3em;
+    content: '';
+    }
+
+
+    label.arrow_label:after { border-bottom: 0; }
+
+:checked ~ label.arrow_label:after {
+ /* border-radius: 0 .3em 0 0;*/
+  // border-top: 1px solid #777;
+ /* border-right: 1px solid #777;*/
+  border-bottom: 0;
+  border-left: 0;
+  bottom: 0;
+  /*top: 0.5em;*/
+  height: auto;
+  }
+
+  // End arrow label
+
+
+  .react-bs-table-search-clear-btn{    margin-left: 5px;
+    margin-top: -4px;}
+

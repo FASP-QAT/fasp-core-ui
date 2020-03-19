@@ -5,46 +5,59 @@ export default {
       url: '/dashboard',
       icon: 'icon-speedometer',
     },
-    {
-      name: 'Health Area',
-      url: '/healthArea',
-      icon: 'icon-speedometer',
-      children: [
-        {
-          name: 'Add Health Area',
-          url: '/healthArea/addHealthArea',
-          icon: 'fa fa-code'
-        }
-      ]
-    },
+    // {
+    //   name: 'Health Area',
+    //   url: '/healthArea',
+    //   icon: 'fa fa-list',
+    //   children: [
+    //     {
+    //       name: 'Add Health Area',
+    //       url: '/healthArea/addHealthArea',
+    //       icon: 'fa fa-code'
+    //     }
+    //   ]
+    // },
     {
       name: 'Application Masters',
       icon: 'fa fa-list',
       children: [
-        {
-          name: 'Language',
-          url: '/language/listLanguage',
-          icon: 'fa fa-list-alt'
-        },
+        
         {
           name: 'Country',
           url: '/country/listCountry',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-circle'
         },
         {
           name: 'DataSource Type',
           url: '/dataSourceType/listDataSourceType',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-circle'
         },
         {
           name: 'DataSource',
           url: '/dataSource/listDataSource',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-circle'
         },
         {
           name: 'Currency',
           url: '/currency/listCurrency',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-circle'
+        },
+        {
+          name: 'Dimension Type',
+          url: 'diamension/diamensionlist',
+          icon: 'fa fa-circle'
+        }
+        ,
+        {
+          name: 'Realm',
+          url: 'realm/realmlist',
+          icon: 'fa fa-circle'
+        },
+        
+        {
+          name: 'Language',
+          url: 'language/languagelist',
+          icon: 'fa fa-circle'
         }
       ]
     },
@@ -54,101 +67,89 @@ export default {
       children: [
         {
           name: 'Realm-Country',
-          icon: 'fa fa-bank',
+          icon: 'fa fa-circle',
           url: '/realmCountry/listRealmCountry'
         },
         {
           name: 'Funding Source',
-          icon: 'fa fa-bank',
+          icon: 'fa fa-circle',
           url: '/fundingSource/listFundingSource'
         },
         {
           name: 'Sub Funding Source',
           url: '/subFundingSource/listSubFundingSource',
-          icon: 'fa fa-bank'
+          icon: 'fa fa-circle'
         },
         {
           name: 'Procurement Agent',
           url: '/procurementAgent/listProcurementAgent',
-          icon: 'fa fa-user'
+          icon: 'fa fa-circle'
         },
         {
           name: 'Budget',
           url: '/budget/listBudget',
-          icon: 'fa fa-money'
+          icon: 'fa fa-circle'
         },
         {
           name: 'Manufacturer',
           url: '/manufacturer/listManufacturer',
-          icon: 'fa fa-industry'
+          icon: 'fa fa-circle'
         },
         {
           name: 'Region',
           url: '/region/listRegion',
-          icon: 'fa fa-globe'
+          icon: 'fa fa-circle'
         }
       ]
     },
     {
       name: 'Program Masters',
       url: '/program',
-      icon: 'icon-graph',
+      icon: 'fa fa-list',
       children: [
         {
           name: 'Program',
           url: '/program',
           icon: 'icon-graph',
           children: [
+           
             {
-              name: 'Add Program',
-              url: '/program/addProgram',
-              icon: 'icon-pencil',
-            },
-            {
-              name: 'List Program',
+              name: ' Program',
               url: '/program/listProgram',
-              icon: 'icon-list',
+              icon: 'fa fa-circle',
             }
           ]
         },
         {
           name: 'Product',
           url: '/product',
-          icon: 'icon-graph',
+          icon: 'fa fa-list',
           children: [
-            {
-              name: 'Add Product',
-              url: '/product/addProduct',
-              icon: 'icon-pencil',
-            },
+         
             {
               name: 'List Product',
               url: '/product/listProduct',
-              icon: 'icon-list',
+              icon: 'fa fa-circle',
             }
           ]
         },
         {
           name: 'Program Product',
           url: '/programProduct',
-          icon: 'icon-graph',
+          icon: 'fa fa-list',
           children: [
-            {
-              name: 'Add Program Prodcut',
-              url: '/programProduct/addProgramProduct',
-              icon: 'icon-pencil',
-            },
+        
             {
               name: 'List Program Product',
               url: '/programProduct/listProgramProduct',
-              icon: 'icon-list',
+              icon: 'fa fa-circle',
             }
           ]
         },
         {
           name: 'Product Category',
           url: '/productCategory',
-          icon: 'icon-graph',
+          icon: 'fa fa-list',
           children: [
             {
               name: 'Add Prodcut Category',
@@ -183,12 +184,12 @@ export default {
     {
       name: 'Master Data sync',
       url: '/masterDataSync',
-      icon: 'icon-speedometer',
+      icon: 'fa fa-list',
     },
     {
       name: 'Consumption details',
       url: '/consumptionDetails',
-      icon: 'icon-speedometer',
+      icon: 'fa fa-list',
     },
   ]
 };

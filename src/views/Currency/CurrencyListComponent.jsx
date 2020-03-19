@@ -74,7 +74,7 @@ export default class CurrencyListComponent extends Component {
     addNewCurrency() {
 
         if (navigator.onLine) {
-            this.props.history.push(`/addCurrency`)
+            this.props.history.push(`/currency/addCurrency`)
         } else {
             alert("You must be Online.")
         }
@@ -175,9 +175,15 @@ export default class CurrencyListComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i>{i18n.t('static.currency.currencylist')}
+
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Realm" onClick={this.addNewCurrency}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.currencyList} version="4" striped hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
+                        <BootstrapTable data={this.state.currencyList} version="4" hover pagination search  options={this.options}>
                         <TableHeaderColumn isKey filterFormatted dataField="currencyCode" dataSort dataAlign="center">{i18n.t('static.currency.currencycode')}</TableHeaderColumn>
                         <TableHeaderColumn  filterFormatted dataField="currencySymbol" dataSort dataAlign="center">{i18n.t('static.currency.currencysymbol')}</TableHeaderColumn>
                         <TableHeaderColumn  filterFormatted dataField="label" dataSort dataFormat={this.showCurrencyLabel} dataAlign="center">{i18n.t('static.currency.currency')}</TableHeaderColumn>
