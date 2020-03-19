@@ -17,6 +17,7 @@ class DefaultFooter extends Component {
       <React.Fragment>
         {/* <span><a href=""></a> &copy; </span>
         <span className="ml-auto"> <a href=""></a></span> */}
+
       </React.Fragment>
     );
   }
