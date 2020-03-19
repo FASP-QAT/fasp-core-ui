@@ -23,7 +23,7 @@ class UserService {
         console.log(json);
         // var jsonString=JSON.stringify(json);
 
-        return axios.put(`${API_URL}/api/addNewUser/`, json, {
+        return axios.post(`${API_URL}/api/user/`, json, {
         });
     }
     addNewRole(json) {
@@ -35,7 +35,7 @@ class UserService {
     }
 
     getUserList() {
-        return axios.get(`${API_URL}/api/getUserList`, {
+        return axios.get(`${API_URL}/api/user`, {
         });
     }
     getUserByUserId(userId) {
@@ -43,7 +43,7 @@ class UserService {
         });
     }
     editUser(json) {
-        return axios.put(`${API_URL}/api/editUser/`, json, {
+        return axios.put(`${API_URL}/api/user/`, json, {
         });
     }
 

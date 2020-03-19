@@ -5,7 +5,6 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import UserService from "../../api/UserService";
-import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
@@ -61,9 +60,7 @@ class EditRoleComponent extends Component {
     }
 
     Capitalize(str) {
-        console.log("capitalize");
         if (str != null && str != "") {
-            console.log("str---" + str)
             return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
             return "";
@@ -113,50 +110,56 @@ class EditRoleComponent extends Component {
     }
 
     componentDidMount() {
-        console.log("role---",this.state.role);
         AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
-                console.log("business functions---", response.data);
                 this.setState({
                     businessFunctions: response.data
                 })
             }).catch(
                 error => {
-                    switch (error.response ? error.response.status : "") {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
         UserService.getRoleList()
             .then(response => {
-                console.log("role list---", response.data);
                 this.setState({
                     roles: response.data
                 })
             }).catch(
                 error => {
-                    console.log("console---", error.response);
-                    switch (error.response ? error.response.status : "") {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -202,11 +205,8 @@ class EditRoleComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("state---", this.state.role);
-                                    console.log("values---", values);
                                     UserService.editRole(this.state.role)
                                         .then(response => {
-                                            console.log("response---", response);
                                             if (response.status == 200) {
                                                 this.props.history.push(`/role/listRole/${response.data.messageCode}`)
                                             } else {
@@ -218,19 +218,22 @@ class EditRoleComponent extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.response ? error.response.status : "") {
-
-                                                    case 500:
-                                                    case 401:
-                                                    case 404:
-                                                    case 406:
-                                                    case 412:
-                                                        this.setState({ message: error.response.data.messageCode });
-                                                        break;
-                                                    default:
-                                                        this.setState({ message: 'static.unkownError' });
-                                                        console.log("Error code unkown");
-                                                        break;
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );

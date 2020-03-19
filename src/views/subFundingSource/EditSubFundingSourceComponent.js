@@ -52,9 +52,7 @@ class EditSubFundingSourceComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
     }
     Capitalize(str) {
-        console.log("capitalize");
         if (str != null && str != "") {
-            console.log("str---" + str)
             return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
             return "";
@@ -125,18 +123,22 @@ class EditSubFundingSourceComponent extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.response.status) {
-                                                    case 500:
-                                                    case 401:
-                                                    case 404:
-                                                    case 406:
-                                                    case 412:
-                                                        this.setState({ message: error.response.data.messageCode });
-                                                        break;
-                                                    default:
-                                                        this.setState({ message: 'static.unkownError' });
-                                                        console.log("Error code unkown");
-                                                        break;
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -235,7 +237,7 @@ class EditSubFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + "Action Canceled")
+        this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
     }
 }
 

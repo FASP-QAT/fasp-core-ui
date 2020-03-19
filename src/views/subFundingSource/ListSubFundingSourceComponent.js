@@ -44,7 +44,6 @@ class ListSubFundingSourceComponent extends Component {
         let fundingSourceId = document.getElementById("fundingSourceId").value;
         if (fundingSourceId != 0) {
             const selSubFundingSource = this.state.subFundingSourceList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
-            console.log("selSubFundingSource---", selSubFundingSource);
             this.setState({
                 selSubFundingSource: selSubFundingSource
             });
@@ -76,7 +75,6 @@ class ListSubFundingSourceComponent extends Component {
                 })
             }).catch(
                 error => {
-                    console.log("error---", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -90,7 +88,6 @@ class ListSubFundingSourceComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -105,18 +102,22 @@ class ListSubFundingSourceComponent extends Component {
                 })
             }).catch(
                 error => {
-                    switch (error.response.status) {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -156,14 +157,14 @@ class ListSubFundingSourceComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.subfundingsource.subfundingsourcelisttext')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Sub Funding Source" onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.subfundingsource.subfundingsourceaddtext')} onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
                         <Col md="3">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">Funding Source</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.subfundingsource.fundingsource')}</Label>
                                 <div className="controls">
                                     <InputGroup>
                                         <Input
@@ -172,11 +173,11 @@ class ListSubFundingSourceComponent extends Component {
                                             id="fundingSourceId"
                                             bsSize="lg"
                                         >
-                                            <option value="0">Please select</option>
+                                            <option value="0">{i18n.t('static.common.select')}</option>
                                             {fundingSourceList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
-                                            <Button color="secondary" onClick={this.filterData}>Go</Button>
+                                            <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon>
                                     </InputGroup>
                                 </div>

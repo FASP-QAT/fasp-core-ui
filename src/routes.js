@@ -27,6 +27,7 @@ const ListRole = React.lazy(() => import('./views/role/ListRoleComponent'));
 const EditRole = React.lazy(() => import('./views/role/EditRoleComponent'));
 const AddUser = React.lazy(() => import('./views/user/AddUserComponent'));
 const ListUser = React.lazy(() => import('./views/user/ListUserComponent'));
+const EditUser = React.lazy(() => import('./views/user/EditUserComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -176,9 +177,10 @@ const routes = [
   { path: '/user/listUser/:message', component: ListUser },
   { path: '/user/listUser', exact: true, name: 'User / User List', component: ListUser },
   { path: '/user/addUser', exact: true, name: 'User / Add User', component: AddUser },
+  { path: '/user/editUser', exact: true, name: 'User / Edit User', component: EditUser },
 
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
-  { path: '/dashboard/:message', name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard',exact:true, name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard/:message',component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

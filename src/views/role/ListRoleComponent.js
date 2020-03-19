@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
+    Card, CardHeader, CardBody
 } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
@@ -47,13 +47,11 @@ class ListRoleComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         UserService.getRoleList()
             .then(response => {
-                console.log(response);
                 this.setState({
                     roleList: response.data
                 })
             }).catch(
                 error => {
-                    // conso
                     switch (error.response ? error.response.status : "") {
 
                         case 500:
@@ -65,7 +63,6 @@ class ListRoleComponent extends Component {
                             break;
                         default:
                             this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
                             break;
                     }
                 }
@@ -86,7 +83,7 @@ class ListRoleComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.role.rolelisttext')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Role" onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.role.roleaddtext')} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

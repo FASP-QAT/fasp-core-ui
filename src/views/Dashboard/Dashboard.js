@@ -1,5 +1,5 @@
 import React, { Component, lazy, Suspense } from 'react';
-
+import i18n from '../../i18n'
 
 
 class Dashboard extends Component {
@@ -17,7 +17,8 @@ class Dashboard extends Component {
 
     return (
       <div className="animated fadeIn">
-        
+        <h5>{i18n.t(this.props.match.params.message)}</h5>
+        <h5>{i18n.t(this.state.message)}</h5>
       </div>
     );
   }

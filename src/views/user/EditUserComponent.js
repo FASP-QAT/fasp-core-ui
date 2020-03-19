@@ -14,7 +14,6 @@ const initialValues = {
     realmId: [],
     emailId: "",
     phoneNumber: "",
-    roles: [],
     languageId: []
 }
 
@@ -62,22 +61,14 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-class AddUserComponent extends Component {
+class EditUserComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             realms: [],
             languages: [],
             roles: [],
-            user: {
-                realm: {
-
-                },
-                language: {
-
-                },
-                roles: []
-            },
+            user: this.props.location.state.user,
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -103,6 +94,9 @@ class AddUserComponent extends Component {
         }
         if (event.target.name == "languageId") {
             user.language.languageId = event.target.value;
+        }
+        if (event.target.name == "active") {
+            user.active = event.target.id === "active2" ? false : true;
         }
         this.setState({
             user
@@ -211,6 +205,7 @@ class AddUserComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -257,13 +252,20 @@ class AddUserComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.user.useraddtext')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.user.useredittext')}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                initialValues={initialValues}
+                                initialValues={{
+                                    username: this.state.user.username,
+                                    realmId: this.state.user.realm.realmId,
+                                    emailId: this.state.user.emailId,
+                                    phoneNumber: this.state.user.phoneNumber,
+                                    roles: this.state.user.roles,
+                                    languageId: this.state.user.language.languageId
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    UserService.addNewUser(this.state.user)
+                                    UserService.editUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/user/listUser/${response.data.messageCode}`)
@@ -289,6 +291,7 @@ class AddUserComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -414,11 +417,46 @@ class AddUserComponent extends Component {
                                                         </Input>
                                                         <FormFeedback>{errors.languageId}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label>{i18n.t('static.common.status')}</Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="active"
+                                                                value={true}
+                                                                checked={this.state.user.active === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active2"
+                                                                name="active"
+                                                                value={false}
+                                                                checked={this.state.user.active === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.common.disabled')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
                           </FormGroup>
@@ -436,4 +474,4 @@ class AddUserComponent extends Component {
     }
 }
 
-export default AddUserComponent;
+export default EditUserComponent;
