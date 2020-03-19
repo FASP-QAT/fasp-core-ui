@@ -595,10 +595,10 @@ export default class AddProgram extends Component {
                                                         invalid={touched.userId && !!errors.userId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        <option value="1">user #1</option>
-                                                        <option value="2">user #2</option>
-                                                        <option value="3">user #3</option>
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        <option value="1">Anchal</option>
+                                                        {/* <option value="2">Akil</option>
+                                                        <option value="3">Sameer</option> */}
                                                     </Input>
                                                     <FormFeedback>{errors.userId}</FormFeedback>
                                                 </Col>
@@ -760,7 +760,7 @@ export default class AddProgram extends Component {
                                             <FormGroup>
                                             {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                             <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                            <Button type="submit" size="sm" color="primary" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
+                                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                             {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
                                             &nbsp;
                                         </FormGroup>

@@ -225,11 +225,11 @@ class AddProgramProduct extends Component {
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="company">Min Month Stock</Label>
-                                    <Input type="number" name="minMonth" id="minMonth" value={this.state.minMonth} placeholder="Enter your budget amount" onChange={event => this.setTextAndValue(event)} />
+                                    <Input type="number" min='0' name="minMonth" id="minMonth" value={this.state.minMonth} placeholder="Enter min month stock" onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="company">Max Month Stock</Label>
-                                    <Input type="number" name="maxMonth" id="maxMonth" value={this.state.maxMonth} placeholder="Enter your budget amount" onChange={event => this.setTextAndValue(event)} />
+                                    <Input type="number" min="0" name="maxMonth" id="maxMonth" value={this.state.maxMonth} placeholder="Enter max month stock" onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
                                     <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Delete Last Row</Button>
