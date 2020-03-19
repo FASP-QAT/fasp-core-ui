@@ -33,7 +33,7 @@ class DefaultHeader extends Component {
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
-          full={{ src: logo, width: 160, height: 200, alt: 'QAT Logo' }}
+          full={{ src: logo, width: 150, height: 140, alt: 'QAT Logo' }}
           // minimized={{ src: QAT, width: 30, height: 30, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
@@ -42,10 +42,12 @@ class DefaultHeader extends Component {
             <NavLink to="/dashboard" className="nav-link" >Dashboard</NavLink>
           </NavItem> */}
         </Nav>
-        <Nav className="ml-auto" navbar>
-        <UncontrolledDropdown nav direction="down">
+        <Nav className="ml-auto " navbar>
+        <UncontrolledDropdown nav direction="down" className="lang-btn">
             <DropdownToggle nav>
+          
            { localStorage.getItem('lang').toString()}
+           &nbsp;<i className="fa fa-caret-down"></i>
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> English</DropdownItem>

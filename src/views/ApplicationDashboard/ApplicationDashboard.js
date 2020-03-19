@@ -186,7 +186,7 @@ class ApplicationDashboard extends Component {
           <Col md="9">
           <Card>
             <CardHeader>
-              <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Toatal Realms Count : <span className="count-clr">98</span></b>
+              <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">98</span></b>
               <div className="card-header-actions">
               <a className="card-header-action">
                   {/* <small className="text-muted">98</small> */}
