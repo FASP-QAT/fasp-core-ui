@@ -94,11 +94,11 @@ class Login extends Component {
       <div className="main-content flex-row align-items-center">
 
         <div className="Login-component">
-          <br></br>
+          
           <div>
             <img src={'assets/img/QAT-logo.png'} className="img-fluid upper-logo" />
           </div>
-          <br></br>
+         
           <Col>
             <Row className="justify-content-center">
               <Col md="4">
@@ -260,7 +260,7 @@ class Login extends Component {
             < Col className="Login-bttom ">
               <Col xs="12">
                 <CardBody>
-                  <br></br>
+                  
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
                   (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.
                   GHSC-PSM connects technical solutions and proven commercial processes to
