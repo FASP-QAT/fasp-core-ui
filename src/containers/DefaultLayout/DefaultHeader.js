@@ -7,9 +7,15 @@ import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/reac
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
 <<<<<<< HEAD
+<<<<<<< HEAD
 // import QAT from '../../assets/img/brand/QAT.svg'
 =======
 import sygnet from '../../assets/img/brand/sygnet.svg'
+import i18n from '../../i18n'
+>>>>>>> i18n dashboard
+=======
+
+// import QAT from '../../assets/img/brand/QAT.svg'
 import i18n from '../../i18n'
 >>>>>>> i18n dashboard
 
@@ -44,10 +50,17 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
 
+<<<<<<< HEAD
           {/* 
           <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
           </NavItem>*/}
+=======
+{/*          <NavItem className="px-3">
+            <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
+          </NavItem>
+*/}
+>>>>>>> i18n dashboard
         </Nav>
         <Nav className="ml-auto " navbar>
         <UncontrolledDropdown nav direction="down" className="lang-btn">

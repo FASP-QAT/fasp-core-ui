@@ -2,7 +2,7 @@ import i18n from './i18n'
 export default {
   items: [
     {
-<<<<<<< HEAD
+
       name: 'Application Dashboard  ',
       url: '/ApplicationDashboard',
       icon: 'cui-dashboard icons',
@@ -16,11 +16,6 @@ export default {
       name: 'Program Dashboard',
       url: '/ProgramDashboard',
       icon: 'cui-dashboard icons',
-=======
-      name: i18n.t('static.common.dashboard'),
-      url: '/dashboard',
-      icon: 'icon-speedometer',
->>>>>>> i18n dashboard
     },
     {
       name: i18n.t('static.dashboard.healtharea') ,
@@ -39,8 +34,7 @@ export default {
       icon: 'fa fa-list',
       children: [
         {
-<<<<<<< HEAD
-          name: 'Role',
+         name: 'Role',
           url: '/role/listRole',
           icon: 'fa fa-list-alt'
         },
@@ -50,10 +44,7 @@ export default {
           icon: 'fa fa-list-alt'
         },
         {
-          name: 'Language',
-=======
-          name:  i18n.t('static.dashboard.language'),
->>>>>>> i18n dashboard
+       name:  i18n.t('static.dashboard.language'),
           url: '/language/listLanguage',
           icon: 'fa fa-list-alt'
         },
@@ -159,37 +150,6 @@ export default {
             }
           ]
         },
-<<<<<<< HEAD
-        // {
-        //   name: 'Program Product',
-        //   url: '/programProduct',
-        //   icon: 'icon-graph',
-        //   children: [
-        //     {
-        //       name: 'Add Program Prodcut',
-        //       url: '/programProduct/addProgramProduct',
-        //       icon: 'icon-pencil',
-        //     },
-        //     {
-        //       name: 'List Program Product',
-        //       url: '/programProduct/listProgramProduct',
-        //       icon: 'icon-list',
-        //     }
-        //   ]
-        // },
-        // {
-        //   name: 'Product Category',
-        //   url: '/productCategory',
-        //   icon: 'icon-graph',
-        //   children: [
-        //     {
-        //       name: 'Add Prodcut Category',
-        //       url: '/productCategory/addProductCategory',
-        //       icon: 'icon-pencil',
-        //     }
-        //   ]
-        // }
-=======
         {
           name: i18n.t('static.dashboard.programproduct'),
           url: '/programProduct',
@@ -219,8 +179,7 @@ export default {
             }
           ]
         }
->>>>>>> i18n dashboard
-      ]
+     ]
     },
     {
       name: i18n.t('static.dashboard.program') ,
