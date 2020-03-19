@@ -6,7 +6,12 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
+
+
 // import QAT from '../../assets/img/brand/QAT.svg'
+import i18n from '../../i18n'
+
+import i18n from '../../i18n'
 
 const propTypes = {
   children: PropTypes.node,
@@ -38,20 +43,31 @@ class DefaultHeader extends Component {
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
-          {/* <NavItem className="px-3">
-            <NavLink to="/dashboard" className="nav-link" >Dashboard</NavLink>
-          </NavItem> */}
+
+
+{/*          <NavItem className="px-3">
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8a986c3c0afd8152d3eb762fa2dd3d138c048f4c
+            <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
+          </NavItem>
+*/}
         </Nav>
         <Nav className="ml-auto " navbar>
         <UncontrolledDropdown nav direction="down" className="lang-btn">
             <DropdownToggle nav>
-          
-           { localStorage.getItem('lang').toString()}
+<<<<<<< HEAD
            &nbsp;<i className="fa fa-caret-down"></i>
+=======
+>>>>>>> 8a986c3c0afd8152d3eb762fa2dd3d138c048f4c
+           { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
             </DropdownToggle>
             <DropdownMenu right>
-              <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> English</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> Spanish</DropdownItem>
+              <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> {i18n.t('static.language.english')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> {i18n.t('static.language.spanish')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this,'fr')}> {i18n.t('static.language.french')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this,'pr')}> {i18n.t('static.language.pourtegese')}</DropdownItem>
              </DropdownMenu>
           </UncontrolledDropdown>
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword}/>
