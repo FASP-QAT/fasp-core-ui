@@ -16,9 +16,10 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-      .required('Please select Realm'),
+    .required(i18n.t('static.manufaturer.realmtext')) ,
     manufacturer: Yup.string()
-      .required('Please enter Manufacturer')
+    .required(i18n.t('static.manufaturer.manufaturertext'))
+    
   })
 }
 

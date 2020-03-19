@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Progress } from 'reactstrap';
-
+import { Link } from 'react-router-dom';
 const propTypes = {
   notif: PropTypes.bool,
   accnt: PropTypes.bool,
@@ -83,6 +83,9 @@ class DefaultHeaderDropdown extends Component {
           <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
           <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> Change Password</DropdownItem>
           <DropdownItem><i className="fa fa-shield"></i> Language</DropdownItem>
+          <Link to="/ChangePassword" className="link-ds" >
+          <DropdownItem><i className="fa fa-shield"></i> Changes Password</DropdownItem>
+          </Link>
           <DropdownItem onClick={this.props.onLogout}><i className="fa fa-lock"></i> Logout</DropdownItem>
           {/*<DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>*/}
         </DropdownMenu>

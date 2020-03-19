@@ -5,6 +5,7 @@ import {
 } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import i18n from '../../i18n';
 
 
 import RealmService from "../../api/RealmService";
@@ -141,7 +142,7 @@ class ListProcurementAgentComponent extends Component {
                 <h5>{this.state.message}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>Procurement Agent List</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.procurementagent.procurementagentlist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title="Add Procurement Agent" onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
@@ -151,7 +152,7 @@ class ListProcurementAgentComponent extends Component {
                     <CardBody>
                         <Col md="3">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">Realm</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.realm')}</Label>
                                 <div className="controls">
                                     <InputGroup>
                                         <Input
@@ -160,11 +161,11 @@ class ListProcurementAgentComponent extends Component {
                                             id="realmId"
                                             bsSize="lg"
                                         >
-                                            <option value="0">Please select</option>
+                                            <option value="0">{i18n.t('static.common.select')}</option>
                                             {realmList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
-                                            <Button color="secondary" onClick={this.filterData}>Go</Button>
+                                            <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon>
                                     </InputGroup>
                                 </div>
@@ -172,11 +173,11 @@ class ListProcurementAgentComponent extends Component {
                         </Col>
                         <BootstrapTable data={this.state.selProcurementAgent} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField='procurementAgentId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn dataField="procurementAgentCode" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">Procurement Agent Code</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProcurementAgentLabel} dataAlign="center">Procurement Agent Name</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>Realm</TableHeaderColumn>
-                            <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort dataAlign="center">Submitted To Approved Lead Time</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>Status</TableHeaderColumn>
+                            <TableHeaderColumn dataField="procurementAgentCode" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center">{i18n.t('static.procurementagent.procurementagentcode')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProcurementAgentLabel} dataAlign="center">{i18n.t('static.procurementagent.procurementagentname')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataAlign="center" dataSort>{i18n.t('static.procurementagent.realm')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort dataAlign="center">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

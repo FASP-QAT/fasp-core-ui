@@ -23,17 +23,17 @@ const initialValues = {
 const validationSchema = function (values,t) {
     return Yup.object().shape({
         budget: Yup.string()
-            .required(t('static.budget.budgetamountdesc')),
+            .required(i18n.t('static.budget.budgetamountdesc')),
         programId: Yup.string()
-            .required('Please select Program'),
+            .required(i18n.t('static.budget.programtext')),
         subFundingSourceId: Yup.string()
-            .required('Please select Sub Funding source'),
+            .required(i18n.t('static.budget.subfundingtext')),
         budgetAmt: Yup.string()
-            .required('Please enter Budget amount'),
+            .required(i18n.t('static.budget.budgetamounttext')),
         startDate: Yup.string()
-            .required('Please enter Start date'),
+            .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
-            .required('Please enter Stop date')
+            .required(i18n.t('static.budget.stopdatetext'))
     })
 }
 
@@ -133,11 +133,11 @@ class AddBudgetComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramList()
+        ProgramService.getProgramListForDropDown()
             .then(response => {
                 // console.log(response.data);
                 this.setState({
-                    programs: response.data.data
+                    programs: response.data
                 })
             }).catch(
                 error => {
@@ -220,7 +220,9 @@ class AddBudgetComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     BudgetService.addBudget(this.state.budget)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
+                                            console.log("===========",response)
+                                            if (response.status == "200") {
+                                                // this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                                 this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                             } else {
                                                 this.setState({
@@ -364,7 +366,7 @@ class AddBudgetComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
 
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 

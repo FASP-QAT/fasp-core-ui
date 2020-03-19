@@ -16,9 +16,9 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     fundingSourceId: Yup.string()
-      .required('Please select Funding source'),
+    .required( i18n.t('static.fundingsource.validfundingsource')),
     subFundingSource: Yup.string()
-      .required('Please enter Sub Funding source')
+    .required( i18n.t('static.fundingsource.validsubfundingsource'))
   })
 }
 

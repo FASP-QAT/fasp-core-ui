@@ -22,13 +22,13 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         budget: Yup.string()
-            .required('Please enter Budget'),
+        .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
-            .required('Please enter Budget amount'),
+        .required(i18n.t('static.budget.budgetamounttext')),
         startDate: Yup.string()
-            .required('Please enter Start date'),
+        .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
-            .required('Please enter Stop date')
+        .required(i18n.t('static.budget.stopdatetext'))
     })
 }
 
@@ -60,15 +60,15 @@ class EditBudgetComponent extends Component {
         this.state = {
             budget: this.props.location.state.budget,
             message: '',
-            lan:'en'
+            lan: 'en'
         }
         initialValues = {
-            budget:getLabelText(this.props.location.state.budget.label,this.state.lan),
-            programId:this.props.location.state.budget.program.programId,
-            subFundingSourceId:this.props.location.state.budget.subFundingSource.subFundingSourceId,
-            budgetAmt:this.props.location.state.budget.budgetAmt,
-            startDate:this.props.location.state.budget.startDate,
-            stopDate:this.props.location.state.budget.stopDate,
+            budget: getLabelText(this.props.location.state.budget.label, this.state.lan),
+            programId: this.props.location.state.budget.program.programId,
+            subFundingSourceId: this.props.location.state.budget.subFundingSource.subFundingSourceId,
+            budgetAmt: this.props.location.state.budget.budgetAmt,
+            startDate: this.props.location.state.budget.startDate,
+            stopDate: this.props.location.state.budget.stopDate,
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -81,11 +81,11 @@ class EditBudgetComponent extends Component {
         }
         if (event.target.name === "budgetAmt") {
             budget.budgetAmt = event.target.value;
-        }if (event.target.name === "startDate") {
+        } if (event.target.name === "startDate") {
             budget.startDate = event.target.value;
-        }if (event.target.name === "stopDate") {
+        } if (event.target.name === "stopDate") {
             budget.stopDate = event.target.value;
-        }else if (event.target.name === "active") {
+        } else if (event.target.name === "active") {
             budget.active = event.target.id === "active2" ? false : true;
         }
         this.setState({
@@ -136,7 +136,7 @@ class EditBudgetComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
+                                            if (response.status == "200") {
                                                 this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                             } else {
                                                 this.setState({
@@ -185,7 +185,7 @@ class EditBudgetComponent extends Component {
                                                             invalid={touched.budget && !!errors.budget}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.budget.label,this.state.lan)}
+                                                            value={getLabelText(this.state.budget.label, this.state.lan)}
                                                             required />
                                                         <FormFeedback>{errors.budget}</FormFeedback>
                                                     </FormGroup>
@@ -275,7 +275,7 @@ class EditBudgetComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                    <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
 
                                                         <FormGroup check inline>
                                                             <Input
@@ -291,7 +291,7 @@ class EditBudgetComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -307,17 +307,16 @@ class EditBudgetComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> {i18n.t('static.budget.reset')}</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}>{i18n.t('static.budget.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.budget.submit')}</Button>
- &nbsp;
+                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.budget.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

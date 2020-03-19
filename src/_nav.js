@@ -1,9 +1,19 @@
 export default {
   items: [
     {
-      name: 'Dashboard',
-      url: '/dashboard',
-      icon: 'icon-speedometer',
+      name: 'Application Dashboard  ',
+      url: '/ApplicationDashboard',
+      icon: 'cui-dashboard icons',
+    },
+    {
+      name: 'Realm Dashboard',
+      url: '/RealmDashboard',
+      icon: 'cui-dashboard icons',
+    },
+    {
+      name: 'Program Dashboard',
+      url: '/ProgramDashboard',
+      icon: 'cui-dashboard icons',
     },
     {
       name: 'Health Area',
@@ -47,6 +57,11 @@ export default {
           icon: 'fa fa-list-alt'
         }
       ]
+    },
+    {
+      name: 'Login',
+      url: '/login',
+      icon: 'fa fa-sign-in',
     },
     {
       name: 'Realm Masters',
@@ -128,35 +143,35 @@ export default {
             }
           ]
         },
-        {
-          name: 'Program Product',
-          url: '/programProduct',
-          icon: 'icon-graph',
-          children: [
-            {
-              name: 'Add Program Prodcut',
-              url: '/programProduct/addProgramProduct',
-              icon: 'icon-pencil',
-            },
-            {
-              name: 'List Program Product',
-              url: '/programProduct/listProgramProduct',
-              icon: 'icon-list',
-            }
-          ]
-        },
-        {
-          name: 'Product Category',
-          url: '/productCategory',
-          icon: 'icon-graph',
-          children: [
-            {
-              name: 'Add Prodcut Category',
-              url: '/productCategory/addProductCategory',
-              icon: 'icon-pencil',
-            }
-          ]
-        }
+        // {
+        //   name: 'Program Product',
+        //   url: '/programProduct',
+        //   icon: 'icon-graph',
+        //   children: [
+        //     {
+        //       name: 'Add Program Prodcut',
+        //       url: '/programProduct/addProgramProduct',
+        //       icon: 'icon-pencil',
+        //     },
+        //     {
+        //       name: 'List Program Product',
+        //       url: '/programProduct/listProgramProduct',
+        //       icon: 'icon-list',
+        //     }
+        //   ]
+        // },
+        // {
+        //   name: 'Product Category',
+        //   url: '/productCategory',
+        //   icon: 'icon-graph',
+        //   children: [
+        //     {
+        //       name: 'Add Prodcut Category',
+        //       url: '/productCategory/addProductCategory',
+        //       icon: 'icon-pencil',
+        //     }
+        //   ]
+        // }
       ]
     },
     {

@@ -26,7 +26,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
-            .required('Please select program.')
+        .required(i18n.t('static.program.validselectprogramtext'))
     })
 }
 
@@ -76,7 +76,7 @@ export default class ImportProgram extends Component {
     formSubmit() {
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             if (document.querySelector('input[type=file]').files[0] == undefined) {
-                alert(`Please select file`);
+                alert(i18n.t('static.program.selectfile'));
             } else {
                 var file = document.querySelector('input[type=file]').files[0];
                 var selectedPrgArr = this.state.programId;
@@ -140,16 +140,16 @@ export default class ImportProgram extends Component {
                                 })
                             })
                             this.setState({
-                                message: `Data imported successfully`
+                                message:i18n.t('static.program.dataimportsuccess') 
                             })
-                            this.props.history.push(`/dashboard/` + "Data imported successfully.")
+                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataimportsuccess'))
                         } else {
                             confirmAlert({
-                                title: 'Confirm to submit',
-                                message: `Program with same version already exists in the local machine you want to overwirte that program with the new data?`,
+                                title: i18n.t('static.program.confirmsubmit'),
+                                message: i18n.t('static.program.programwithsameversion'),
                                 buttons: [
                                     {
-                                        label: 'Yes',
+                                        label: i18n.t('static.program.yes'),
                                         onClick: () => {
                                             JSZip.loadAsync(file).then(function (zip) {
                                                 Object.keys(zip.files).forEach(function (filename) {
@@ -175,18 +175,18 @@ export default class ImportProgram extends Component {
                                                 })
                                             })
                                             this.setState({
-                                                message: `Data imported successfully`
+                                                message: i18n.t('static.program.dataimportsuccess')
                                             })
-                                            this.props.history.push(`/dashboard/` + "Data imported successfully.")
+                                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataimportsuccess'))
                                         }
                                     },
                                     {
-                                        label: 'No',
+                                        label: i18n.t('static.program.no'),
                                         onClick: () => {
                                             this.setState({
-                                                message: "Action Canceled."
+                                                message: i18n.t('static.program.actioncancelled')
                                             })
-                                            this.props.history.push(`/program/downloadProgram/` + "Action Canceled.")
+                                            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.actioncancelled'))
                                         }
                                     }
                                 ]
@@ -203,7 +203,7 @@ export default class ImportProgram extends Component {
     importFile() {
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             if (document.querySelector('input[type=file]').files[0] == undefined) {
-                alert(`Please select file`);
+                alert(i18n.t('static.program.selectfile'));
             } else {
                 var file = document.querySelector('input[type=file]').files[0];
                 var fileName = file.name;
@@ -254,7 +254,7 @@ export default class ImportProgram extends Component {
 
                     }.bind(this))
                 } else {
-                    alert("Please select zip file")
+                    alert(i18n.t('static.program.selectzipfile'))
                 }
             }
 
@@ -354,7 +354,7 @@ export default class ImportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + "Action Canceled")
+        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
     }
 
 }

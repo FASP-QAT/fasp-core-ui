@@ -14,7 +14,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .required('Please enter country name')
+            .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
 }
 

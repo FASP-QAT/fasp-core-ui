@@ -13,6 +13,11 @@ class ProgramService {
         });
     }
 
+    getProgramListForDropDown() {
+        return axios.get(`${API_URL}/api/getProgramList/`, {
+        });
+    }
+
     addProgram(json) {
         return axios.post(`${API_URL}/api/program/`, json, {}
         );
@@ -38,6 +43,16 @@ class ProgramService {
     }
     getRegionList(json) {
         return axios.get(`${API_URL}/api/region/realmCountryId/${json}`, {}
+        );
+    }
+
+    getProgramProductListByProgramId(json){
+        return axios.get(`${API_URL}/api/programProduct/${json}`, {}
+        );
+    }
+
+    addProgramProductMapping(json){
+        return axios.put(`${API_URL}/api/programProduct/`, json, {}
         );
     }
 }

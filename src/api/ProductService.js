@@ -5,7 +5,7 @@ import { API_URL } from '../Constants.js';
 class ProductService {
 
     addProduct(json) {
-        return axios.post(`${API_URL}/api/product/`, json ,{}
+        return axios.post(`${API_URL}/api/product/`, json, {}
         );
     }
 
@@ -15,8 +15,14 @@ class ProductService {
     }
 
     editProduct(json) {
-        console.log("----json",json);
+        console.log("----json", json);
         return axios.put(`${API_URL}/api/product/`, json, {}
+        );
+    }
+
+    getProdcutCategoryListByRealmId(json) {
+        // /productCategory/realmId/{realmId}/list/{productCategoryId}/{includeCurrentLevel}/{includeAllChildren}
+        return axios.get(`${API_URL}/api/productCategory/realmId/${json}/list/1/1/1`,{}
         );
     }
 

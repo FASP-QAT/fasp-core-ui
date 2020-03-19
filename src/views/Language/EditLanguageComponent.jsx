@@ -13,8 +13,11 @@ let initialValues = {
 }
 const validationSchema = function (values) {
     return Yup.object().shape({
-        languageName: Yup.string().required('Please enter Language'),
-        languageCode: Yup.string().required('Please enter Language code')
+
+        language: Yup.string()
+        .required(i18n.t('static.language.languagetext')) ,
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
+
     })
 }
 
@@ -131,17 +134,21 @@ export default class EditLanguageComponent extends Component {
                                     )
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.response.data
-                                                        })
-                                                        break;
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.messageCode
-                                                        })
-                                                        break;
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         )
@@ -162,30 +169,28 @@ export default class EditLanguageComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody>
                                                     <FormGroup>
-
                                                         <Label for="language">{i18n.t('static.language.language')}</Label>
-
                                                         <Input type="text"
                                                             name="languageName"
                                                             id="languageName"
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
                                                             invalid={touched.languageName && !!errors.languageName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
                                                             required />
                                                         <FormFeedback>{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="languageCode">Language</Label>
+                                                        <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
                                                             bsSize="sm"
                                                             valid={!errors.languageCode}
                                                             invalid={touched.languageCode && !!errors.languageCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
@@ -207,7 +212,7 @@ export default class EditLanguageComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -223,23 +228,27 @@ export default class EditLanguageComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
 
                                         )} />
-
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{i18n.t('this.state.message')}{}</h6>
+                    <h6>{i18n.t('this.props.match.params.message')}{}</h6>
+                </div>
             </div>
         );
     }
