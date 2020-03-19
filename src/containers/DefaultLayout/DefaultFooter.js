@@ -15,14 +15,8 @@ class DefaultFooter extends Component {
 
     return (
       <React.Fragment>
-<<<<<<< HEAD
         {/* <span><a href=""></a> &copy; </span>*/}
-        <span className="ml-auto"> <a href="">Quantification and Analytics Tool</a></span> 
-=======
-        {/* <span><a href=""></a> &copy; </span>
-        <span className="ml-auto"> <a href=""></a></span> */}
-
->>>>>>> i18n dashboard
+        <span className="ml-auto"> <a href="">Quantification and Analytics Tool</a></span>
       </React.Fragment>
     );
   }

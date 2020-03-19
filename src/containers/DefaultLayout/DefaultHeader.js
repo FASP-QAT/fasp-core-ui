@@ -6,18 +6,8 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
-<<<<<<< HEAD
-<<<<<<< HEAD
-// import QAT from '../../assets/img/brand/QAT.svg'
-=======
-import sygnet from '../../assets/img/brand/sygnet.svg'
-import i18n from '../../i18n'
->>>>>>> i18n dashboard
-=======
-
 // import QAT from '../../assets/img/brand/QAT.svg'
 import i18n from '../../i18n'
->>>>>>> i18n dashboard
 
 const propTypes = {
   children: PropTypes.node,
@@ -50,24 +40,17 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
 
-<<<<<<< HEAD
-          {/* 
-          <NavItem className="px-3">
-            <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
-          </NavItem>*/}
-=======
+
 {/*          <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
           </NavItem>
 */}
->>>>>>> i18n dashboard
         </Nav>
         <Nav className="ml-auto " navbar>
         <UncontrolledDropdown nav direction="down" className="lang-btn">
             <DropdownToggle nav>
-          
-           { localStorage.getItem('lang').toString()}
            &nbsp;<i className="fa fa-caret-down"></i>
+           { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> {i18n.t('static.language.english')}</DropdownItem>
