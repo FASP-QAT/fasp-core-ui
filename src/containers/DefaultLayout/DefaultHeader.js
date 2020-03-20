@@ -6,8 +6,6 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
-
-// import QAT from '../../assets/img/brand/QAT.svg'
 import i18n from '../../i18n'
 
 const propTypes = {
