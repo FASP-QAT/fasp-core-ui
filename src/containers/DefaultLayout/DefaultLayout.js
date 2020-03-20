@@ -1,13 +1,8 @@
 import React, { Component, Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
-<<<<<<< HEAD
 import i18n from '../../i18n'
 import { Online, Offline } from "react-detect-offline";
-
-=======
-import i18n from './../../i18n'
->>>>>>> fixed i18n issue
 import {
   AppAside,
   AppBreadcrumb,
@@ -74,7 +69,7 @@ class DefaultLayout extends Component {
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
-            <Suspense>
+            <Suspense
 
               <Online>
                 <AppSidebarNav navConfig={{
