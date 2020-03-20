@@ -91,11 +91,11 @@ export default {
       name: i18n.t('static.dashboard.realmmaster') ,
       icon: 'fa fa-list',
       children: [
-        {
-          name: i18n.t('static.dashboard.realmcountry') ,
-          icon: 'fa fa-bank',
-          url: '/realmCountry/listRealmCountry'
-        },
+        // {
+        //   name: i18n.t('static.dashboard.realmcountry') ,
+        //   icon: 'fa fa-bank',
+        //   url: '/realmCountry/listRealmCountry'
+        // },
         {
           name: i18n.t('static.dashboard.fundingsource'),
           icon: 'fa fa-bank',
