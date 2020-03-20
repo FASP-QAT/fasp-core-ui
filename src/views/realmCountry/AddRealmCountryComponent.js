@@ -8,6 +8,7 @@ import RealmService from "../../api/RealmService";
 import CountryService from "../../api/CountryService";
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from '../common/AuthenticationService.js';
+import i18n from '../../i18n';
 
 const initialValues = {
     realmId: [],
@@ -19,13 +20,13 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required('Please select realm'),
+            .required( i18n.t('static.realmcountry.validrealm')),
         procurementAgentCode: Yup.string()
-            .required('Please enter code'),
+            .required( i18n.t('static.realmcountry.validcode')),
         procurementAgentName: Yup.string()
-            .required('Please enter name'),
+            .required( i18n.t('static.realmcountry.validname')),
         submittedToApprovedLeadTime: Yup.string()
-            .required('Please enter submitted to approved lead time')
+            .required( i18n.t('static.realmcountry.validsubmittoapprove'))
     })
 }
 
@@ -347,7 +348,7 @@ class AddRealmCountryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + "Action Canceled")
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` +i18n.t('static.program.actioncancelled'))
     }
 }
 

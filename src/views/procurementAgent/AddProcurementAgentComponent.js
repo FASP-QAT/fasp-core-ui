@@ -7,7 +7,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../common/AuthenticationService.js';
-
+import i18n from '../../i18n';
 const initialValues = {
     realmId: [],
     procurementAgentCode: "",
@@ -18,13 +18,14 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required('Please select realm'),
+            .required(i18n.t('static.procurementagent.realmtext')),
         procurementAgentCode: Yup.string()
-            .required('Please enter code'),
+            .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
-            .required('Please enter name'),
+            .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
-            .required('Please enter submitted to approved lead time')
+            .matches(/^[0-9]*$/, 'Only numbers allowed')
+            .required("Please enter submitted to approved lead time")
     })
 }
 
@@ -69,7 +70,6 @@ class AddProcurementAgentComponent extends Component {
     }
 
     Capitalize(str) {
-        console.log("capitalize");
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
@@ -134,17 +134,22 @@ class AddProcurementAgentComponent extends Component {
                 })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -162,23 +167,23 @@ class AddProcurementAgentComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Procurement Agent</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.procurementagent.procurementagentadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("this.state.procurementAgent---",this.state.procurementAgent);
+                                    console.log("this.state.procurementAgent---", this.state.procurementAgent);
                                     ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.messageCode}`)
                                             } else {
                                                 this.setState({
                                                     message: response.data.message
@@ -187,17 +192,22 @@ class AddProcurementAgentComponent extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -217,26 +227,27 @@ class AddProcurementAgentComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">Realm</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
                                                         <Input
                                                             type="select"
+                                                            bsSize="sm"
                                                             name="realmId"
                                                             id="realmId"
-                                                            bsSize="lg"
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
                                                         >
-                                                            <option value="">Please select</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">Procurement Agent Code</Label>
+                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
                                                         <Input type="text"
+                                                            bsSize="sm"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
                                                             valid={!errors.procurementAgentCode}
@@ -250,8 +261,9 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentName">Procurement Agent Name</Label>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
                                                         <Input type="text"
+                                                            bsSize="sm"
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
                                                             valid={!errors.procurementAgentName}
@@ -264,8 +276,9 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">Submitted To Approved Lead Time</Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
                                                         <Input type="number"
+                                                            bsSize="sm"
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
                                                             valid={!errors.submittedToApprovedLeadTime}
@@ -280,8 +293,10 @@ class AddProcurementAgentComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Submit</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>Cancel</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

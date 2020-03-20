@@ -14,7 +14,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         subFundingSource: Yup.string()
-            .required('Please enter Sub Funding source')
+        .required( i18n.t('static.fundingsource.validsubfundingsource'))
     })
 }
 
@@ -52,15 +52,13 @@ class EditSubFundingSourceComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
     }
     Capitalize(str) {
-        console.log("capitalize");
         if (str != null && str != "") {
-          console.log("str---" + str)
-          return str.charAt(0).toUpperCase() + str.slice(1);
+            return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
-          return "";
+            return "";
         }
-      }
-    
+    }
+
     dataChange(event) {
         let { subFundingSource } = this.state;
         if (event.target.name == "subFundingSource") {
@@ -105,7 +103,7 @@ class EditSubFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceedittext')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -115,27 +113,32 @@ class EditSubFundingSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -196,7 +199,7 @@ class EditSubFundingSourceComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -212,15 +215,14 @@ class EditSubFundingSourceComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -235,7 +237,7 @@ class EditSubFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + "Action Canceled")
+        this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
     }
 }
 

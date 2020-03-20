@@ -37,37 +37,37 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
-            .required("Please enter programName"),
+        .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
-            .required("Please select realm"),
+            .required(i18n.t('static.program.validrealmtext')),
         realmCountryId: Yup.string()
-            .required('Please select country.'),
+            .required(i18n.t('static.program.validcountrytext')),
         organisationId: Yup.string()
-            .required('Please select organisation'),
+            .required(i18n.t('static.program.validorganisationtext')),
         userId: Yup.string()
-            .required('Please select program manager'),
+            .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.number()
-            .required('Please enter air freight percentage').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.number()
-            .required('Please enter sea freight percentage').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validseafreighttext')).min(0,  i18n.t('static.program.validvaluetext')),
         deliveredToReceivedLeadTime: Yup.number()
-            .required('Please enter deliverd to recived lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         draftToSubmittedLeadTime: Yup.number()
-            .required('Please enter draft to submitted lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validdrafttosubmittext')).min(0,  i18n.t('static.program.validvaluetext')),
         plannedToDraftLeadTime: Yup.number()
-            .required('Please enter plan to draft lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validplantodrafttext')).min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.number()
-            .required('Please enter submit to approved lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.number()
-            .required('Please enter approved to shippedLeadTime').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validapprovetoshiptext')).min(0,  i18n.t('static.program.validvaluetext')),
         monthsInFutureForAmc: Yup.number()
-            .required('Please enter month in funture for AMC').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validfutureamctext')).min(0,  i18n.t('static.program.validvaluetext')),
         monthsInPastForAmc: Yup.number()
-            .required('Please enter month in past for AMC').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validpastamctext')).min(0,  i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
-            .required('Please select health area'),
+            .required(i18n.t('static.program.validhealthareatext')),
         programNotes: Yup.string()
-            .required('Please enter notes')
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -263,6 +263,7 @@ export default class AddProgram extends Component {
                     regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
                 }
                 this.setState({
+                    regionId:'',
                     regionList: regList
                 })
             }).catch(
@@ -415,7 +416,7 @@ export default class AddProgram extends Component {
 
 
         return (
-            <Col xs="12" sm="8">
+            <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                 <Card>
                     <Formik
                         initialValues={initialValues}
@@ -425,7 +426,15 @@ export default class AddProgram extends Component {
                             ProgramService.addProgram(this.state.program).then(response => {
                                 // console.log(this.state.program);
                                 // console.log(response);
-                                this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                if (response.status == "200") {
+                                    console.log(response);
+                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                } else {
+                                    this.setState({
+                                        message: response.data.message
+                                    })
+                                }
+                                
                             }
                             )
                                 .catch(

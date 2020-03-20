@@ -25,7 +25,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
-            .required('Please select program.')
+        .required(i18n.t('static.program.validselectprogramtext'))
     })
 }
 
@@ -131,7 +131,7 @@ export default class ExportProgram extends Component {
                             type: "blob"
                         }).then(function (content) {
                             FileSaver.saveAs(content, "download.zip");
-                            this.props.history.push(`/dashboard/` + "Data exported successfully.")
+                            this.props.history.push(`/dashboard/` + i18n.t('static.program.dataexportsuccess'))
                         }.bind(this));
                     }
                 }
@@ -220,7 +220,7 @@ export default class ExportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + "Action Canceled")
+        this.props.history.push(`/dashboard/` +  i18n.t('static.program.actioncancelled'))
     }
 
 }

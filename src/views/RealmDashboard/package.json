@@ -1,0 +1,6 @@
+{
+  "name": "RealmDashboard",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./RealmDashboard.js"
+}

@@ -40,37 +40,37 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
-            .required("Please enter programName"),
+        .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
-            .required("Please select realm"),
+            .required(i18n.t('static.program.validrealmtext')),
         realmCountryId: Yup.string()
-            .required('Please select country.'),
+            .required(i18n.t('static.program.validcountrytext')),
         organisationId: Yup.string()
-            .required('Please select organisation'),
+            .required(i18n.t('static.program.validorganisationtext')),
         userId: Yup.string()
-            .required('Please select program manager'),
+            .required(i18n.t('static.program.validmanagertext')),
         airFreightPerc: Yup.number()
-            .required('Please enter air freight percentage').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.number()
-            .required('Please enter sea freight percentage').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validseafreighttext')).min(0,  i18n.t('static.program.validvaluetext')),
         deliveredToReceivedLeadTime: Yup.number()
-            .required('Please enter deliverd to recived lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         draftToSubmittedLeadTime: Yup.number()
-            .required('Please enter draft to submitted lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validdrafttosubmittext')).min(0,  i18n.t('static.program.validvaluetext')),
         plannedToDraftLeadTime: Yup.number()
-            .required('Please enter plan to draft lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validplantodrafttext')).min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.number()
-            .required('Please enter submit to approved lead time').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.number()
-            .required('Please enter approved to shippedLeadTime').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validapprovetoshiptext')).min(0,  i18n.t('static.program.validvaluetext')),
         monthsInFutureForAmc: Yup.number()
-            .required('Please enter month in funture for AMC').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validfutureamctext')).min(0,  i18n.t('static.program.validvaluetext')),
         monthsInPastForAmc: Yup.number()
-            .required('Please enter month in past for AMC').min(0, 'Please enter value greater then 0'),
+            .required(i18n.t('static.program.validpastamctext')).min(0,  i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
-            .required('Please select health area'),
+            .required(i18n.t('static.program.validhealthareatext')),
         programNotes: Yup.string()
-            .required('Please enter notes')
+            .required(i18n.t('static.program.validnotestext'))
     })
 }
 
@@ -134,7 +134,7 @@ export default class EditProgram extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
-        this.cancelClicked=this.cancelClicked.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -502,7 +502,7 @@ export default class EditProgram extends Component {
             }, this);
 
         return (
-            <Col xs="12" sm="8">
+            <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                 <Card>
                     <Formik
                         initialValues={initialValues}
@@ -512,7 +512,15 @@ export default class EditProgram extends Component {
                             ProgramService.editProgram(this.state.program).then(response => {
                                 // console.log(this.state.program);
                                 //console.log(response);
-                                this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                if (response.status == "200") {
+                                    console.log(response);
+                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                } else {
+                                    this.setState({
+                                        message: response.data.message
+                                    })
+                                }
+
                             }
                             )
                                 .catch(
@@ -838,8 +846,8 @@ export default class EditProgram extends Component {
                                         <CardFooter>
                                             <FormGroup>
                                                 {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                 &nbsp;
                                                 {/* <Button type="submit" onClick={() => this.touchAll(setTouched, errors)} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Update</Button> */}
                                                 {/* <Button type="submit" size="sm" color="primary" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-dot-circle-o"></i>Submit </Button> */}
