@@ -17,6 +17,7 @@ class Dashboard extends Component {
 
     return (
       <div className="animated fadeIn">
+        {this.props.message}
         <h5>{i18n.t(this.props.match.params.message)}</h5>
         <h5>{i18n.t(this.state.message)}</h5>
       </div>

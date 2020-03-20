@@ -28,6 +28,22 @@ export default {
       ]
     },
     {
+      name: 'Translations',
+      icon: 'fa fa-list',
+      children: [
+        {
+          name: 'Label Translations',
+          url: '/translations/labelTranslations',
+          icon: 'fa fa-list-alt'
+        },
+        {
+          name: 'Database Translations',
+          url: '/translations/databaseTranslations',
+          icon: 'fa fa-list-alt'
+        }
+      ]
+    },
+    {
       name: 'Application Masters',
       icon: 'fa fa-list',
       children: [

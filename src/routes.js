@@ -128,6 +128,8 @@ const EditDataSourceType = React.lazy(() => import('./views/DataSourceType/Updat
 const AddCurrency = React.lazy(() => import('./views/Currency/AddCurrencyComponent'));
 const ListCurrency = React.lazy(() => import('./views/Currency/CurrencyListComponent'));
 const EditCurrency = React.lazy(() => import('./views/Currency/UpdateCurrencyComponent'));
+const DatabaseTranslation = React.lazy(() => import('./views/Translations/DatabaseTranslations'));
+const LabelTranslation=React.lazy(()=>import('./views/Translations/LabelTranslations'))
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/product/editProduct', name: 'Edit Product', component: EditProdct },
@@ -281,6 +283,8 @@ const routes = [
   { path: '/currency/listCurrency', exact: true, name: 'Currency / Currency List', component: ListCurrency },
   { path: '/currency/listCurrency/:message', component: ListCurrency },
   { path: '/currency/editCurrency', name: 'Currency / Edit Currency', component: EditCurrency },
+  { path: '/translations/databaseTranslations', name: 'Database Translations', component: DatabaseTranslation },
+  { path: '/translations/labelTranslations', name: 'Label Translations', component: LabelTranslation },
 ];
 
 export default routes;
