@@ -19,12 +19,13 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.procurementagent.realmtext')),
-         procurementAgentCode: Yup.string()
+        procurementAgentCode: Yup.string()
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
-        .required(i18n.t('static.procurementAgent.procurementagentnametext')),
+            .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
-        .required(i18n.t('static.procurementagent.submittoapprovetext'))
+            .matches(/^[0-9]*$/, 'Only numbers allowed')
+            .required("Please enter submitted to approved lead time")
     })
 }
 
@@ -166,7 +167,7 @@ class AddProcurementAgentComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -181,8 +182,8 @@ class AddProcurementAgentComponent extends Component {
                                     console.log("this.state.procurementAgent---", this.state.procurementAgent);
                                     ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.messageCode}`)
                                             } else {
                                                 this.setState({
                                                     message: response.data.message
@@ -226,12 +227,12 @@ class AddProcurementAgentComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.procurementagent.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
                                                         <Input
                                                             type="select"
+                                                            bsSize="sm"
                                                             name="realmId"
                                                             id="realmId"
-                                                            bsSize="lg"
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -246,6 +247,7 @@ class AddProcurementAgentComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
                                                         <Input type="text"
+                                                            bsSize="sm"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
                                                             valid={!errors.procurementAgentCode}
@@ -261,6 +263,7 @@ class AddProcurementAgentComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
                                                         <Input type="text"
+                                                            bsSize="sm"
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
                                                             valid={!errors.procurementAgentName}
@@ -273,8 +276,9 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback>{errors.procurementAgentName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetosubmittime')}</Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
                                                         <Input type="number"
+                                                            bsSize="sm"
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
                                                             valid={!errors.submittedToApprovedLeadTime}
@@ -289,8 +293,10 @@ class AddProcurementAgentComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

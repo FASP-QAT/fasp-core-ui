@@ -16,7 +16,7 @@ if(lang==null){
     lng: lang,
     backend: {
       /* translation file path */
-      loadPath: 'http://localhost:8084/api/locales/{{lng}}',
+      loadPath: '/locales/{{lng}}.json',
       crossDomain: true
     },
     fallbackLng: 'en',

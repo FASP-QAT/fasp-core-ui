@@ -166,6 +166,13 @@ export default class CountryListComponent extends Component {
 
     //     );
     // }
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
+    }
 
     render() {
 
@@ -173,15 +180,23 @@ export default class CountryListComponent extends Component {
             <div className="animated">
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>{i18n.t('static.country.countrylist')}
+                        {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
+                         <i className="icon-menu"></i><strong>Country List</strong>{' '}
+
+                         <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Realm Country" onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
+                       
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.countryList} version="4" striped hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
+                        <BootstrapTable data={this.state.countryList} version="4"  hover pagination search  options={this.options}>
                             <TableHeaderColumn isKey filterFormatted dataField="label" dataSort dataFormat={this.showCountryLabel} dataAlign="center">{i18n.t('static.country.country')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="countryCode" dataSort dataAlign="center">{i18n.t('static.country.countrycode')}</TableHeaderColumn>
                             {/* <TableHeaderColumn filterFormatted dataField="language" dataSort dataFormat={this.showLanguage} dataAlign="center">Language</TableHeaderColumn> */}
                             {/* <TableHeaderColumn filterFormatted dataField="currencyId" dataSort dataAlign="center">Currency</TableHeaderColumn> */}
-                            <TableHeaderColumn dataField="active" dataSort dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataSort dataFormat={this.showStatus}  dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>
