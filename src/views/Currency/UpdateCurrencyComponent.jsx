@@ -61,9 +61,7 @@ export default class UpdateCurrencyComponent extends Component {
                 currencySymbol: '',
                 label: {
                     label_en: ''
-                    // freLabel: '',
-                    // spaLabel: '',
-                    // porLabel: ''
+               
                 },
                 conversionRateToUsd: ''
             }
@@ -160,8 +158,6 @@ export default class UpdateCurrencyComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                    // alert("----"+this.state.label.label_en);
-                                    // console.log("------IN SUBMIT------", this.state)
                                     CurrencyService.editCurrency(this.state.currency)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -210,6 +206,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <Input type="text"
                                                             name="currencyCode"
                                                             id="currencyCode"
+                                                            bsSize="sm"
                                                             valid={!errors.currencyCode}
                                                             invalid={touched.currencyCode && !!errors.currencyCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -223,6 +220,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <Input type="text"
                                                             name="currencySymbol"
                                                             id="currencySymbol"
+                                                            bsSize="sm"
                                                             valid={!errors.currencySymbol}
                                                             invalid={touched.currencySymbol && !!errors.currencySymbol}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -236,6 +234,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
+                                                            bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
@@ -249,6 +248,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <Input type="text"
                                                             name="conversionRate"
                                                             id="conversionRate"
+                                                            bsSize="sm"
                                                             valid={!errors.conversionRate}
                                                             invalid={touched.conversionRate && !!errors.conversionRate}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -262,8 +262,9 @@ export default class UpdateCurrencyComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                       &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

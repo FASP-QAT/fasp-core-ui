@@ -59,9 +59,7 @@ export default class AddCurrencyComponent extends Component {
             currencySymbol: '',
             label: {
                 label_en: ''
-                // freLabel: '',
-                // spaLabel: '',
-                // porLabel: ''
+              
             },
             conversionRateToUsd: ''
         }
@@ -139,8 +137,6 @@ export default class AddCurrencyComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
-                                    // alert("----"+this.state.label.label_en);
-                                    // console.log("------IN SUBMIT------", this.state)
                                     CurrencyService.addCurrency(this.state)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -189,11 +185,12 @@ export default class AddCurrencyComponent extends Component {
                                                         <Input type="text"
                                                             name="currencyCode"
                                                             id="currencyCode"
+                                                            bsSize="sm"
                                                             valid={!errors.currencyCode}
                                                             invalid={touched.currencyCode && !!errors.currencyCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            // value={this.state.label.label_en}
+                                                          
                                                             required />
                                                         <FormFeedback>{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
@@ -202,6 +199,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <Input type="text"
                                                             name="currencySymbol"
                                                             id="currencySymbol"
+                                                            bsSize="sm"
                                                             valid={!errors.currencySymbol}
                                                             invalid={touched.currencySymbol && !!errors.currencySymbol}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -214,6 +212,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
+                                                            bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
@@ -231,7 +230,8 @@ export default class AddCurrencyComponent extends Component {
                                                             invalid={touched.conversionRate && !!errors.conversionRate}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            // value={this.state.country.label.label_en}
+                                                            bsSize="sm"
+                                                           
                                                             required />
                                                         <FormFeedback>{errors.conversionRate}</FormFeedback>
                                                     </FormGroup>
@@ -240,8 +240,10 @@ export default class AddCurrencyComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" color="danger"className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

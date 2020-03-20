@@ -64,7 +64,7 @@ export default class EditProduct extends Component {
         super(props);
         this.state = {
             product: this.props.location.state.product,
-            lan: 'en',
+            lan: localStorage.getItem('lang'),
             realmList: [],
             productCategoryList: [],
             unitList: []
@@ -316,7 +316,8 @@ export default class EditProduct extends Component {
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.product')}</Label>
                                                         <Input 
-                                                            value={getLabelText(this.state.product.label,this.state.lan)}
+                                                            // value={getLabelText(this.state.product.label,this.state.lan)}
+                                                            value={this.state.product.label.label_en}
                                                             type="text"
                                                             name="productName"
                                                             id="productName"
@@ -331,7 +332,8 @@ export default class EditProduct extends Component {
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
                                                         <Input type="text"
-                                                            value={getLabelText(this.state.product.genericLabel, this.state.lan)}
+                                                            // value={getLabelText(this.state.product.genericLabel, this.state.lan)}
+                                                            value={this.state.product.genericLabel.label_en}
                                                             name="genericName"
                                                             id="genericName"
                                                             bsSize="sm"

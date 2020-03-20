@@ -1,6 +1,6 @@
 import React, { Component, lazy, Suspense } from 'react';
 import i18n from '../../i18n'
-
+import AuthenticationService from '../common/AuthenticationService.js';
 
 class Dashboard extends Component {
   constructor(props) {
@@ -9,10 +9,11 @@ class Dashboard extends Component {
     this.state = {
     };
   }
-
+  componentDidMount() {
+    AuthenticationService.setupAxiosInterceptors();
+  }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
-
   render() {
 
     return (

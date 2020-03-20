@@ -93,6 +93,15 @@ export default class LanguageListComponent extends Component {
 
     }
 
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
+    }
+
+
     render() {
         return (
             <div className="animated">
@@ -108,8 +117,8 @@ export default class LanguageListComponent extends Component {
                     <CardBody>
                         <BootstrapTable data={this.state.langaugeList} version="4" striped hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField="languageName" >{i18n.t('static.language.language')}</TableHeaderColumn>
-                            <TableHeaderColumn isKey dataField="languageCode" >{i18n.t('static.language.languageCode')}</TableHeaderColumn>
-                            <TableHeaderColumn dataField="active" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="languageCode" >{i18n.t('static.language.languageCode')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataFormat={this.showStatus} dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

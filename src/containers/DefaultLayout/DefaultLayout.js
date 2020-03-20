@@ -31,6 +31,7 @@ class DefaultLayout extends Component {
     console.log("----------------123-----------------")
     e.preventDefault();
     console.log("----------------4567-----------------")
+    AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
   signOut(e) {
