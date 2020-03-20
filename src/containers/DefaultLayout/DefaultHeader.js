@@ -6,11 +6,6 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
-
-
-// import QAT from '../../assets/img/brand/QAT.svg'
-import i18n from '../../i18n'
-
 import i18n from '../../i18n'
 
 const propTypes = {
@@ -27,6 +22,7 @@ class DefaultHeader extends Component {
   changeLanguage(lang ) {
    
   localStorage.setItem('lang',lang);
+ console.log('stored updated language');
   window.location.reload();
   }
   render() {
@@ -46,10 +42,6 @@ class DefaultHeader extends Component {
 
 
 {/*          <NavItem className="px-3">
-<<<<<<< HEAD
-=======
-
->>>>>>> 8a986c3c0afd8152d3eb762fa2dd3d138c048f4c
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
           </NavItem>
 */}
@@ -57,10 +49,7 @@ class DefaultHeader extends Component {
         <Nav className="ml-auto " navbar>
         <UncontrolledDropdown nav direction="down" className="lang-btn">
             <DropdownToggle nav>
-<<<<<<< HEAD
            &nbsp;<i className="fa fa-caret-down"></i>
-=======
->>>>>>> 8a986c3c0afd8152d3eb762fa2dd3d138c048f4c
            { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
             </DropdownToggle>
             <DropdownMenu right>
