@@ -51,22 +51,39 @@ export default {
         {
           name: i18n.t('static.dashboard.country'),
           url: '/country/listCountry',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-globe'
         },
         {
           name: i18n.t('static.dashboard.datasourcetype'),
           url: '/dataSourceType/listDataSourceType',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-table'
         },
         {
           name: i18n.t('static.dashboard.datasource') ,
           url: '/dataSource/listDataSource',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-database'
         },
         {
           name:  i18n.t('static.dashboard.currency'),
           url: '/currency/listCurrency',
-          icon: 'fa fa-list-alt'
+          icon: 'fa fa-usd'
+        },
+        {
+          name: 'Dimension',
+          url: 'diamension/diamensionlist',
+          icon: 'fa fa-map'
+        }
+        ,
+        {
+          name: 'Realm',
+          url: 'realm/realmlist',
+          icon: 'fa fa-user'
+        },
+        
+        {
+          name: 'Language',
+          url: 'language/languagelist',
+          icon: 'fa fa-language'
         }
       ]
     },
@@ -87,7 +104,7 @@ export default {
         {
           name: i18n.t('static.dashboard.subfundingsource') ,
           url: '/subFundingSource/listSubFundingSource',
-          icon: 'fa fa-bank'
+          icon: 'fa fa-university'
         },
         {
           name: i18n.t('static.dashboard.procurementagent') ,
@@ -97,7 +114,7 @@ export default {
         {
           name:  i18n.t('static.dashboard.budget'),
           url: '/budget/listBudget',
-          icon: 'fa fa-money'
+          icon: 'fa fa-line-chart'
         },
         {
           name: i18n.t('static.dashboard.manufacturer') ,
@@ -107,14 +124,14 @@ export default {
         {
           name: i18n.t('static.dashboard.region'),
           url: '/region/listRegion',
-          icon: 'fa fa-globe'
+          icon: 'fa fa-pie-chart'
         }
       ]
     },
     {
       name: i18n.t('static.dashboard.programmaster') ,
       url: '/program',
-      icon: 'icon-graph',
+      icon: 'fa fa-list',
       children: [
         {
           name:  i18n.t('static.dashboard.program'),
@@ -129,10 +146,12 @@ export default {
             {
               name: i18n.t('static.dashboard.listprogram') ,
               url: '/program/listProgram',
-              icon: 'icon-list',
-            }
-          ]
+              icon: 'fa fa-object-group',
+          
+          
         },
+          ]},
+
         {
           name:  i18n.t('static.dashboard.product'),
           url: '/product',
@@ -146,9 +165,9 @@ export default {
             {
               name: i18n.t('static.dashboard.listproduct') ,
               url: '/product/listProduct',
-              icon: 'icon-list',
-            }
-          ]
+              icon: 'fa fa-th-large',
+           
+          
         },
 
             //     {
@@ -189,29 +208,31 @@ export default {
         {
           name: i18n.t('static.dashboard.downloadprogram') ,
           url: '/program/downloadProgram',
-          icon: 'fa fa-code',
+          icon: 'fa fa-download',
         },
         {
           name: i18n.t('static.dashboard.exportprogram') ,
           url: '/program/exportProgram',
-          icon: 'fa fa-code',
+          icon: 'fa fa-upload',
         },
         {
           name: i18n.t('static.dashboard.importprogram'),
           url: '/program/importProgram',
-          icon: 'fa fa-code',
+          icon: 'fa fa-long-arrow-up',
         }
       ]
     },
     {
       name:  i18n.t('static.dashboard.datasync'),
       url: '/masterDataSync',
-      icon: 'icon-speedometer',
+      icon: 'fa fa-list',
     },
     {
       name: i18n.t('static.dashboard.consumptiondetails') ,
       url: '/consumptionDetails',
-      icon: 'icon-speedometer',
+      icon: 'fa fa-list',
     },
   ]
-};
+    }
+]
+}

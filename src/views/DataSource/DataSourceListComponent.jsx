@@ -23,7 +23,6 @@ export default class DataSourceListComponent extends Component {
             alwaysShowAllBtns: false,
             withFirstAndLast: false,
             onRowClick: function (row) {
-                // console.log("row--------------", row);
                 this.editDataSource(row);
             }.bind(this)
 
@@ -72,7 +71,7 @@ export default class DataSourceListComponent extends Component {
     addNewDataSource() {
 
         if (navigator.onLine) {
-            this.props.history.push(`/addDataSource`)
+            this.props.history.push(`/dataSource/addDataSource`)
         } else {
             alert("You must be Online.")
         }
@@ -86,95 +85,13 @@ export default class DataSourceListComponent extends Component {
     showDataSourceTypeLabel(cell, row) {
         return cell.label.label_en;
     }
-
-    // render() {
-    //     return (
-
-
-
-    //         <div className="page-content-wrap">
-
-
-    //         <div className="row">
-
-    //             <ul class="breadcrumb text-left"><li><a href="#">Home</a></li><li><a href="#">Admin</a></li><li><a href="#">Datasource</a></li><li><a href="#">Datasource list</a></li></ul>
-    //             <div className="help-block">{this.props.match.params.message}</div>
-
-    //             <div className="col-md-12">
-
-    //                 <div className=" mt-2 ">
-
-
-    //                     <div className="panel panel-default">
-
-
-    //                         <div className="panel-heading">
-    //                             <h3 className="panel-title">Language list</h3>
-    //                             <button className="btn btn-info pull-right" onClick={this.addNewDataSource}><i class="fa fa-plus" ></i></button>
-    //                         </div>
-    //                         <div className="panel-body text-left">
-    //                             <div className="col-md-12">
-
-
-
-    //                                 <div className="table-responsive">
-    //                                     <table className="table datatable">
-    //                                         <thead>
-    //                                         <tr>
-    //                             <th>Data source name (English)</th>
-    //                             <th>Data source name (French)</th>
-    //                             <th>Data source name (Spanish)</th>
-    //                             <th>Data source name (portuguese)</th>
-    //                             <th>Data source type name (English)</th>
-    //                             <th>Active</th>
-
-
-    //                         </tr>
-    //                                         </thead>
-    //                                         <tbody>
-    //                                         {
-    //                             this.state.dataSourceList.map(dataSource =>
-
-    //                                 <tr key={dataSource.dataSourceId} onClick={() => this.editDataSource(dataSource)}>
-    //                                     <td>{dataSource.label.label_en}</td>
-    //                                     <td>{dataSource.label.label_fr}</td>
-    //                                     <td>{dataSource.label.label_sp}</td>
-    //                                     <td>{dataSource.label.label_pr}</td>
-    //                                     <td>{dataSource.dataSourceType.label.engLabel}</td>
-    //                                     <td>{dataSource.active.toString() == "true" ? "Active" : "Disabled"}</td>
-    //                                 </tr>
-    //                             )
-
-    //                         }
-
-    //                                         </tbody>
-    //                                     </table>
-    //                                 </div>
-
-    //                             </div>
-
-    //                         </div>
-
-
-
-    //                     </div>
-
-
-    //                 </div>
-
-
-    //             </div>
-
-
-    //         </div>
-
-
-    //     </div>
-
-
-
-    //     );
-    // }
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
+    }
 
     render() {
 
@@ -183,12 +100,18 @@ export default class DataSourceListComponent extends Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i>{i18n.t('static.datasource.datasourcelist')}
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a href="javascript:void();" title="Add Datasource" onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>
+                            </div>
+                        </div>
+
                 </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.dataSourceList} version="4" striped hover pagination search headerStyle={{ background: '#D1EEEE' }} options={this.options}>
+                        <BootstrapTable data={this.state.dataSourceList} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey filterFormatted dataField="label" dataSort dataFormat={this.showDataSourceLabel} dataAlign="center">{i18n.t('static.datasource.datasource')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="dataSourceType" dataSort dataFormat={this.showDataSourceTypeLabel} dataAlign="center">{i18n.t('static.datasource.datasourcetype')}</TableHeaderColumn>
-                            <TableHeaderColumn dataField="active" dataSort dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataSort dataFormat={this.showStatus} dataAlign="center">{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

@@ -148,234 +148,15 @@ export default class UpdateDataSourceComponent extends Component {
                 }
             );
 
-        // $("#updatyeDataSourceForm").validate({
-        //     ignore: [],
-        //     rules: {
-        //         'dataSource.label.label_en': {
-        //             required: true,
-        //             lettersonlywhitespace: true,
-        //             maxlength: 255
-        //         },
-        // 'dataSource.label.freLabel': {
-
-        //     lettersonly: true,
-        //     maxlength: 255
-        // },
-        // 'dataSource.label.spaLabel': {
-
-        //     lettersonly: true,
-        //     maxlength: 255
-        // },
-        // 'dataSource.label.porLabel': {
-
-        //     lettersonly: true,
-        //     maxlength: 255
-        // },
-        //         'dataSource.dataSourceType.dataSourceTypeId': {
-        //             required: true
-        //         }
-        //     },
-        //     errorPlacement: function (error, element) {
-        //         error.insertAfter(element);
-        //     }
-        // });
     }
 
-    // updateFieldData(event) {
-
-    //     let { dataSource } = this.state
-
-    //     if (event.target.name === "label") {
-    //         // console.log("inside if")
-    //         dataSource.label.label_en = event.target.value
-    //     }
-    //     // if (event.target.name === "dataSource.label.freLabel") {
-    //     //     //onsole.log("inside if")
-    //     //     dataSource.label.freLabel = event.target.value
-    //     // } if (event.target.name === "dataSource.label.spaLabel") {
-    //     //     //console.log("inside if")
-    //     //     dataSource.label.spaLabel = event.target.value
-    //     // } if (event.target.name === "dataSource.label.porLabel") {
-    //     //     //console.log("inside if")
-    //     //     dataSource.label.porLabel = event.target.value
-    //     // } 
-    //     if (event.target.name === "dataSourceTypeId") {
-    //         this.state.dataSource.dataSourceType.dataSourceTypeId = event.target.value
-    //     } else if (event.target.name === "active") {
-    //         //console.log("hi----");
-    //         dataSource.active = event.target.id === "active2" ? false : true
-    //     }
-
-
-    //     this.setState(
-    //         {
-    //             dataSource
-    //         }
-    //     )
-
-
-    // }
+    
     Capitalize(str) {
         this.state.dataSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
         this.props.history.push(`/dataSource/listDataSource/` + "Action Canceled")
-    }
-
-    // updateForm() {
-
-    //     if (navigator.onLine) {
-    //         // if ($("#updatyeDataSourceForm").valid()) {
-    //         //console.log(this.state);
-    //         DataSourceService.editDataSource(this.state.dataSource).then(response => {
-    //             this.props.history.push(`/dataSourceList/${response.data.message}`)
-    //             //console.log("success");
-    //         }
-    //         )
-    //             .catch(
-    //                 error => {
-    //                     switch (error.message) {
-    //                         case "Network Error":
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                         default:
-    //                             this.setState({
-    //                                 message: error.message
-    //                             })
-    //                             break
-    //                     }
-    //                 }
-    //             )
-
-
-    //     } else {
-    //         alert("To perform this action you must be online.");
-    //     }
-    // }
-
-    // render() {
-    //     const { dataSourceTypeList } = this.state;
-    //     let dataSourceTypes = dataSourceTypeList.length > 0
-    //         && dataSourceTypeList.map((item, i) => {
-    //             return (
-    //                 <option key={i} value={item.dataSourceTypeId}>{item.label.label_en}</option>
-    //             )
-    //         }, this);
-    //     return (
-
-    //         <div className="page-content-wrap">
-
-
-    //             <div className="row">
-
-    //                 <div className="">
-    //                     <ul class="breadcrumb text-left">
-    //                         <li><a href="#">Home</a></li>
-    //                         <li><a href="#">Admin</a></li>
-    //                         <li><a href="#">Data Source</a></li>
-    //                         <li><a href="#">Update Data Source</a></li>
-    //                     </ul>
-    //                 </div>
-    //                 <div className="help-block"></div>
-
-    //                 <div className="col-md-8 col-md-offset-2">
-
-    //                     <div className="login mt-2 block">
-
-
-    //                         <div className="panel panel-default">
-
-
-    //                             <div className="panel-heading">
-    //                                 <h3 className="panel-title">Update Data Source</h3>
-    //                             </div>
-    //                             <div className="panel-body">
-    //                                 <div className="col-md-8 col-md-offset-2">
-    //                                     <div className="block">
-
-    //                                         <form className="form-horizontal" name="updatyeDataSourceForm" id="updatyeDataSourceForm">
-
-
-
-
-    //                                             <div className="form-group">
-    //                                                 <label className="col-md-5 control-label ">Data source type name (English):</label>
-    //                                                 <div className="col-md-7">
-    //                                                     <input className="form-control" type="text" name="dataSource.label.label_en" value={this.Capitalize(this.state.dataSource.label.label_en)} onChange={this.updateFieldData}></input>
-    //                                                     <span className="help-block"></span>
-    //                                                 </div>
-    //                                             </div>
-    //                                             <div className="form-group">
-    //                                                 <label className="col-md-5 control-label ">Data source type name (English):</label>
-    //                                                 <div className="col-md-7">
-    //                                                     <input className="form-control" type="text" name="dataSource.label.label_en" value={this.Capitalize(this.state.dataSource.label.label_en)} onChange={this.updateFieldData}></input>
-    //                                                     <span className="help-block"></span>
-    //                                                 </div>
-    //                                             </div>
-
-    //                                             <div className="col-md-4">   Status:</div>
-    //                                             <div className="col-md-4"> <input type="radio" id="dataSource.active1" name="dataSource.active" value={true} checked={this.state.dataSource.active === true} onChange={this.updateFieldData} /> Active</div>
-    //                                             <div className="col-md-4">  <input type="radio" id="dataSource.active2" name="dataSource.active" value={false} checked={this.state.dataSource.active === false} onChange={this.updateFieldData} /> Disabled</div>
-
-
-
-    //                                             <div className="form-group">
-    //                                                 <label className="col-md-5 control-label "> Select Data Source Type :</label>
-    //                                                 <div className="col-md-7">
-    //                                                     <select className="select form-control" id="dataSourceTypeId" name="dataSource.dataSourceType.dataSourceTypeId" value={this.state.dataSource.dataSourceType ? this.state.dataSource.dataSourceType.dataSourceTypeId : ''} onChange={this.updateFieldData}>
-    //                                                         <option value="">-Nothing Selected-</option>
-    //                                                         {dataSourceTypes}
-    //                                                     </select>
-    //                                                     <span className="help-block"></span>
-    //                                                 </div>
-    //                                             </div>
-    //                                             <div className="form-group">
-    //                                                 <div className="col-md-12"><input type="hidden" name="dataSource.dataSourceId" value={this.state.dataSource.dataSourceId} />
-    //                                                     <input type="hidden" name="dataSource.label.labelId" value={this.state.dataSource.label.labelId} /></div>
-
-    //                                             </div>
-
-
-
-
-    //                                         </form>
-
-    //                                     </div>
-    //                                 </div>
-
-    //                             </div>
-    //                             <div className="panel-footer">
-
-
-    //                                 <button type="button" className="btn btn-primary pull-right ml-1" onClick={this.cancelClicked}>Cancel</button>
-
-    //                                 <button type="button" className="btn btn-success pull-right" onClick={this.updateForm}>Update</button>
-
-
-    //                             </div>
-
-
-    //                         </div>
-
-
-    //                     </div>
-
-
-    //                 </div>
-
-
-    //             </div>
-
-
-    //         </div>
-    //     );
-
-
-    // }
-
-    render() {
+    } render() {
         const { dataSourceTypeList } = this.state;
         let dataSourceTypes = dataSourceTypeList.length > 0
             && dataSourceTypeList.map((item, i) => {
@@ -444,6 +225,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             type="text"
                                                             name="label"
                                                             id="label"
+                                                            bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
@@ -459,7 +241,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             type="select"
                                                             name="dataSourceTypeId"
                                                             id="dataSourceTypeId"
-                                                            bsSize="lg"
+                                                            bsSize="sm"
                                                             valid={!errors.dataSourceTypeId}
                                                             invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -510,8 +292,9 @@ export default class UpdateDataSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                      &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

@@ -93,6 +93,15 @@ export default class LanguageListComponent extends Component {
 
     }
 
+    showStatus(cell, row) {
+        if (cell) {
+            return "Active";
+        } else {
+            return "Disabled";
+        }
+    }
+
+
     render() {
         return (
             <div className="animated">

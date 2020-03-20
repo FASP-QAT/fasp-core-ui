@@ -336,6 +336,7 @@ export default class AddCountryComponent extends Component {
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
+                                                            bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
@@ -349,6 +350,7 @@ export default class AddCountryComponent extends Component {
                                                         <Input type="text"
                                                             name="countryCode"
                                                             id="countryCode"
+                                                            bsSize="sm"
                                                             valid={!errors.countryCode}
                                                             invalid={touched.countryCode && !!errors.countryCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -362,7 +364,7 @@ export default class AddCountryComponent extends Component {
                                                             type="select"
                                                             name="languageId"
                                                             id="languageId"
-                                                            bsSize="lg"
+                                                            bsSize="sm"
                                                             valid={!errors.languageId}
                                                             invalid={touched.languageId && !!errors.languageId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -381,7 +383,7 @@ export default class AddCountryComponent extends Component {
                                                             type="select"
                                                             name="currencyId"
                                                             id="currencyId"
-                                                            bsSize="lg"
+                                                            bsSize="sm"
                                                             valid={!errors.currencyId}
                                                             invalid={touched.currencyId && !!errors.currencyId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -399,8 +401,10 @@ export default class AddCountryComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" color="success" className="mr-1" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="reset" color="danger" className="mr-1" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="sm"onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                       
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
