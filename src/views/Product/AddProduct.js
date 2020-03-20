@@ -82,7 +82,7 @@ export default class AddProduct extends Component {
                 }
 
             },
-            lan: 'en',
+            lan: localStorage.getItem('lang'),
             realmList: [],
             productCategoryList: [],
             unitList: []

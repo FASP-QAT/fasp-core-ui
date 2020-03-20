@@ -13,7 +13,7 @@ class ProductList extends Component {
     super(props);
     this.state = {
       table: [],
-      lang: 'en'
+      lang: localStorage.getItem('lang')
     }
 
     this.options = {

@@ -595,10 +595,10 @@ export default class AddProgram extends Component {
                                                         invalid={touched.userId && !!errors.userId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        <option value="1">user #1</option>
-                                                        <option value="2">user #2</option>
-                                                        <option value="3">user #3</option>
+                                                        <option value="">{i18n.t('static.common.select')}</option>
+                                                        <option value="1">Anchal</option>
+                                                        {/* <option value="2">Akil</option>
+                                                        <option value="3">Sameer</option> */}
                                                     </Input>
                                                     <FormFeedback>{errors.userId}</FormFeedback>
                                                 </Col>
