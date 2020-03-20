@@ -18,12 +18,6 @@ export default {
       icon: 'cui-dashboard icons',
     },
     {
-<<<<<<< HEAD
-      name: 'Application Masters',
-      icon: 'fa fa-list',
-      children: [
-        
-=======
       name: i18n.t('static.dashboard.healtharea') ,
       url: '/healthArea',
       icon: 'icon-speedometer',
@@ -54,7 +48,6 @@ export default {
           url: '/language/listLanguage',
           icon: 'fa fa-list-alt'
         },
->>>>>>> dev
         {
           name: i18n.t('static.dashboard.country'),
           url: '/country/listCountry',
@@ -99,15 +92,6 @@ export default {
       icon: 'fa fa-list',
       children: [
         {
-<<<<<<< HEAD
-          name: 'Realm-Country',
-          icon: 'fa fa-globe',
-          url: '/realmCountry/listRealmCountry'
-        },
-        {
-          name: 'Funding Source',
-          icon: 'fa fa-university',
-=======
           name: i18n.t('static.dashboard.realmcountry') ,
           icon: 'fa fa-bank',
           url: '/realmCountry/listRealmCountry'
@@ -115,7 +99,6 @@ export default {
         {
           name: i18n.t('static.dashboard.fundingsource'),
           icon: 'fa fa-bank',
->>>>>>> dev
           url: '/fundingSource/listFundingSource'
         },
         {
@@ -151,12 +134,6 @@ export default {
       icon: 'fa fa-list',
       children: [
         {
-<<<<<<< HEAD
-       
-           
-         
-              name: ' Program',
-=======
           name:  i18n.t('static.dashboard.program'),
           url: '/program',
           icon: 'icon-graph',
@@ -168,19 +145,14 @@ export default {
             },
             {
               name: i18n.t('static.dashboard.listprogram') ,
->>>>>>> dev
               url: '/program/listProgram',
               icon: 'fa fa-object-group',
           
           
         },
+          ]},
+
         {
-<<<<<<< HEAD
-        
-         
-          
-              name: ' Product',
-=======
           name:  i18n.t('static.dashboard.product'),
           url: '/product',
           icon: 'icon-graph',
@@ -192,34 +164,11 @@ export default {
             },
             {
               name: i18n.t('static.dashboard.listproduct') ,
->>>>>>> dev
               url: '/product/listProduct',
               icon: 'fa fa-th-large',
            
           
         },
-<<<<<<< HEAD
-        {  name: ' Program Product',
-              url: '/programProduct/listProgramProduct',
-              icon: 'fa fa-sitemap',
-           
-         
-        },
-        {
-          name: 'Product Category',
-          url: '/productCategory',
-          icon: 'fa fa-list',
-          children: [
-            {
-              name: 'Add Prodcut Category',
-              url: '/productCategory/addProductCategory',
-              icon: 'icon-pencil',
-            }
-          ]
-        }
-      ]
-    },
-=======
 
             //     {
     //       name: i18n.t('static.dashboard.programproduct'),
@@ -252,7 +201,6 @@ export default {
     //     }
        ]
      },
->>>>>>> dev
     {
       name: i18n.t('static.dashboard.program') ,
       icon: 'fa fa-list',
@@ -285,4 +233,6 @@ export default {
       icon: 'fa fa-list',
     },
   ]
-};
+    }
+]
+}
