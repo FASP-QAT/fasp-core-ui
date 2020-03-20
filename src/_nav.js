@@ -5,18 +5,6 @@ export default {
       url: '/dashboard',
       icon: 'icon-speedometer',
     },
-    // {
-    //   name: 'Health Area',
-    //   url: '/healthArea',
-    //   icon: 'fa fa-list',
-    //   children: [
-    //     {
-    //       name: 'Add Health Area',
-    //       url: '/healthArea/addHealthArea',
-    //       icon: 'fa fa-code'
-    //     }
-    //   ]
-    // },
     {
       name: 'Application Masters',
       icon: 'fa fa-list',
