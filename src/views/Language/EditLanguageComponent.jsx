@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
-// import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../common/AuthenticationService.js';
 // import * as myConst from '../../Labels.js';
 import LanguageService from '../../api/LanguageService.js'
 
@@ -13,8 +13,11 @@ let initialValues = {
 }
 const validationSchema = function (values) {
     return Yup.object().shape({
-        languageName: Yup.string().required('Please enter Language'),
-        languageCode: Yup.string().required('Please enter Language code')
+
+        language: Yup.string()
+        .required(i18n.t('static.language.languagetext')) ,
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
+
     })
 }
 
@@ -117,7 +120,7 @@ export default class EditLanguageComponent extends Component {
                                 initialValues={{ language: this.state.language }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    // AuthenticationService.setupAxiosInterceptors();
+                                    AuthenticationService.setupAxiosInterceptors();
                                     LanguageService.editLanguage(this.state.language).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)

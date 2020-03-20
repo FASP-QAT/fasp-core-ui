@@ -14,7 +14,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         region: Yup.string()
-            .required('Please enter Region')
+        .required( i18n.t('static.region.validregion'))
     })
 }
 

@@ -52,7 +52,7 @@ export default class CountryListComponent extends Component {
     }
 
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
+        AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryListAll().then(response => {
             this.setState({
                 countryList: response.data

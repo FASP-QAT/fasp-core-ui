@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import AuthenticationService from '../common/AuthenticationService.js';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 // import { HashRouter, Route, Switch } from 'react-router-dom';
@@ -47,7 +48,7 @@ export default class LanguageListComponent extends Component {
         if (navigator.onLine) {
             this.props.history.push(`/language/addLanguage`)
         } else {
-            alert("You must be Online.")
+            alert(i18n.t('static.common.onlinealerttext'))
         }
     }
 
@@ -60,7 +61,7 @@ export default class LanguageListComponent extends Component {
     }
 
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
+        AuthenticationService.setupAxiosInterceptors();
         LanguageService.getLanguageList()
             .then(response => {
                 if (response.status == 200) {
@@ -107,8 +108,8 @@ export default class LanguageListComponent extends Component {
                     <CardBody>
                         <BootstrapTable data={this.state.langaugeList} version="4" striped hover pagination search options={this.options}>
                             <TableHeaderColumn isKey dataField="languageName" >{i18n.t('static.language.language')}</TableHeaderColumn>
-                            <TableHeaderColumn isKey dataField="languageCode" >{i18n.t('static.language.languageCode')}</TableHeaderColumn>
-                            <TableHeaderColumn dataField="active" dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="languageCode" >{i18n.t('static.language.languageCode')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="active" dataFormat={this.showStatus} dataSort>{i18n.t('static.common.status')}</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

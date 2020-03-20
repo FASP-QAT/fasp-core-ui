@@ -50,8 +50,8 @@ class ListBudgetComponent extends Component {
       pathname: "/budget/addBudget"
     });
   }
-  
-  componentDidMount() {    
+
+  componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
@@ -112,14 +112,15 @@ class ListBudgetComponent extends Component {
           </CardHeader>
           <CardBody>
             <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
-              <TableHeaderColumn dataField="label" dataFormat={this.showBudgetLabel} dataSort>{i18n.t('static.budget.budget')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showSubFundingSourceLabel} dataSort>{i18n.t('static.budget.subfundingsource')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="subFundingSource" dataFormat={this.showFundingSourceLabel} dataSort>{i18n.t('static.budget.fundingsource')}</TableHeaderColumn>
-              <TableHeaderColumn isKey dataField="budgetAmt" dataSort>{i18n.t('static.budget.budgetamount')}</TableHeaderColumn>
+              <TableHeaderColumn isKey dataField="budgetId" hidden>Budget Id</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showBudgetLabel} dataSort>{i18n.t('static.budget.budget')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="subFundingSource" dataFormat={this.showSubFundingSourceLabel} dataSort>{i18n.t('static.budget.subfundingsource')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="subFundingSource" dataFormat={this.showFundingSourceLabel} dataSort>{i18n.t('static.budget.fundingsource')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="budgetAmt" dataSort>{i18n.t('static.budget.budgetamount')}</TableHeaderColumn>
               <TableHeaderColumn dataField="startDate" dataSort>{i18n.t('static.common.startdate')}</TableHeaderColumn>
               <TableHeaderColumn dataField="stopDate" dataSort>{i18n.t('static.common.stopdate')}</TableHeaderColumn>
               <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>{i18n.t('static.common.active')}</TableHeaderColumn>
-            </BootstrapTable>
+           </BootstrapTable>
           </CardBody>
         </Card>
       </div>

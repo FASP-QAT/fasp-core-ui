@@ -32,14 +32,14 @@ class ProductList extends Component {
     this.showProductLabel = this.showProductLabel.bind(this);
     this.showGenericLabel = this.showGenericLabel.bind(this);
     this.showRealmLabel = this.showRealmLabel.bind(this);
-    this.showProductCategoryLabel=this.showProductCategoryLabel.bind(this);
-    this.showForcastingUnitLabel=this.showForcastingUnitLabel.bind(this);
+    this.showProductCategoryLabel = this.showProductCategoryLabel.bind(this);
+    this.showForcastingUnitLabel = this.showForcastingUnitLabel.bind(this);
     this.editProduct = this.editProduct.bind(this);
     this.addProduct = this.addProduct.bind(this);
   }
 
   editProduct(product) {
-    
+
     console.log(product);
     this.props.history.push({
       pathname: "/product/editProduct",
@@ -47,13 +47,13 @@ class ProductList extends Component {
     });
   }
 
-  addProduct(){
+  addProduct() {
     this.props.history.push({
       pathname: "/product/addProduct"
     });
   }
-  
-  componentDidMount() {    
+
+  componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     ProductService.getProductList()
       .then(response => {
@@ -74,7 +74,7 @@ class ProductList extends Component {
               this.setState({
                 message: error.message
               })
-              break 
+              break
           }
         }
       );
@@ -124,13 +124,14 @@ class ProductList extends Component {
           </CardHeader>
           <CardBody>
             <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
-              <TableHeaderColumn dataField="label" dataFormat={this.showProductLabel} dataSort>{i18n.t('static.product.product')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="genericLabel" dataFormat={this.showGenericLabel} dataSort>{i18n.t('static.product.productgenericname')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="realm" dataFormat={this.showRealmLabel} dataSort>{i18n.t('static.product.realm')}</TableHeaderColumn>
-              <TableHeaderColumn isKey dataField="productCategory" dataFormat={this.showProductCategoryLabel} dataSort>{i18n.t('static.product.productcategory')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="forecastingUnit" dataFormat={this.showForcastingUnitLabel} dataSort>{i18n.t('static.product.unit')}</TableHeaderColumn>
+              <TableHeaderColumn isKey dataField="productId" hidden>Product Id</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showProductLabel} dataSort>{i18n.t('static.product.product')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="genericLabel" dataFormat={this.showGenericLabel} dataSort>{i18n.t('static.product.productgenericname')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="realm" dataFormat={this.showRealmLabel} dataSort>{i18n.t('static.product.realm')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="productCategory" dataFormat={this.showProductCategoryLabel} dataSort>{i18n.t('static.product.productcategory')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="forecastingUnit" dataFormat={this.showForcastingUnitLabel} dataSort>{i18n.t('static.product.unit')}</TableHeaderColumn>
               {/* <TableHeaderColumn dataField="stopDate" dataSort>Stop date</TableHeaderColumn> */}
-              <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>{i18n.t('static.common.active')}</TableHeaderColumn>
+              <TableHeaderColumn dataFormat={this.showStatus} dataField="active">Active</TableHeaderColumn>
             </BootstrapTable>
           </CardBody>
         </Card>

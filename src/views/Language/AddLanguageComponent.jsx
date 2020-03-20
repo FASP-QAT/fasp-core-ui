@@ -10,7 +10,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 
 import LanguageService from '../../api/LanguageService.js'
-// import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../common/AuthenticationService.js';
 
 const initialValues = {
     languageName: "",
@@ -19,8 +19,11 @@ const initialValues = {
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        languageName: Yup.string().required('Please enter Language'),
-        languageCode: Yup.string().required('Please enter Language code')
+
+        languageName: Yup.string()
+        .required(i18n.t('static.language.languagetext')) ,
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
+
     })
 }
 
@@ -102,7 +105,7 @@ class AddLanguageComponent extends Component {
     }
 
     componentDidMount() {
-        // AuthenticationService.setupAxiosInterceptors();
+        AuthenticationService.setupAxiosInterceptors();
 
     }
 
