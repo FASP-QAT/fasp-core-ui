@@ -7,11 +7,8 @@ import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/reac
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
 
-
 // import QAT from '../../assets/img/brand/QAT.svg'
 import i18n from '../../i18n'
-
-
 
 const propTypes = {
   children: PropTypes.node,
@@ -25,8 +22,8 @@ class DefaultHeader extends Component {
     this.changeLanguage=this.changeLanguage.bind(this)
   }
   changeLanguage(lang ) {
-   
   localStorage.setItem('lang',lang);
+ console.log('stored updated language');
   window.location.reload();
   }
   render() {
@@ -48,7 +45,6 @@ class DefaultHeader extends Component {
 {/*          <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
     </NavItem>*/}
-    
           <NavItem className="px-3">
             <NavLink to="/ProgramTree" className="nav-link" >KENYA-FAMILY PLANNING-MOH</NavLink>
           </NavItem>
@@ -56,6 +52,7 @@ class DefaultHeader extends Component {
         <Nav className="ml-auto " navbar>
         <UncontrolledDropdown nav direction="down" className="lang-btn">
             <DropdownToggle nav>
+           &nbsp;<i className="fa fa-caret-down"></i>
            { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
             </DropdownToggle>
             <DropdownMenu right>

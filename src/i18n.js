@@ -1,6 +1,6 @@
 import i18n from 'i18next';
 import Backend from 'i18next-xhr-backend';
-//import LanguageDetector from 'i18next-browser-languagedetector';
+import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 //import moment from 'moment';
 var lang =localStorage.getItem('lang');
@@ -10,6 +10,7 @@ if(lang==null){
 
 }
     i18n
+  .use(LanguageDetector)
   .use(Backend)
   .use(initReactI18next)
   .init({
@@ -31,8 +32,12 @@ if(lang==null){
     },
     react: {
       wait: true
-    }
+    },debug: true 
   })
 
-
+  i18n.on('initialized', () => {
+    if (i18n.options && i18n.options.second) {
+      // seems 2nd init was done
+    }
+  });
   export default i18n;

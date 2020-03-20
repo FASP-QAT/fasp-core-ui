@@ -42,6 +42,7 @@
     "font-awesome": "^4.7.0",
     "formik": "^1.5.1",
     "i18next": "^19.3.3",
+    "i18next-browser-languagedetector": "^4.0.2",
     "i18next-xhr-backend": "^3.2.2",
     "jexcel": "^3.9.1",
     "jsstore": "^3.7.6",
