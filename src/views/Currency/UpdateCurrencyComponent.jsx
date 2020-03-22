@@ -216,7 +216,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                                 value={this.state.currency.currencyCode}
                                                                 required />
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.currencyCode}</FormFeedback>
+                                                        <FormText className="red">{errors.currencyCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
@@ -233,7 +233,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                                 value={this.state.currency.currencySymbol}
                                                                 required />
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.currencySymbol}</FormFeedback>
+                                                        <FormText className="red">{errors.currencySymbol}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.currency.currency')}</Label>
@@ -250,7 +250,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                                 value={this.state.currency.label.label_en}
                                                                 required />
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}</Label>
@@ -267,7 +267,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                                 value={this.state.currency.conversionRateToUsd}
                                                                 required />
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.conversionRate}</FormFeedback>
+                                                        <FormText className="red">{errors.conversionRate}</FormText>
                                                     </FormGroup>
 
                                                 </CardBody>

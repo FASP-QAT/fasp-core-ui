@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup,FormText, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -334,7 +334,7 @@ class EditUserComponent extends Component {
                                                             {realmList}
                                                         </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
+                                                        <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
@@ -352,7 +352,7 @@ class EditUserComponent extends Component {
                                                             value={this.state.user.username}
                                                         />
                                                          </InputGroupAddon>
-                                                        <FormFeedback>{errors.username}</FormFeedback>
+                                                        <FormText className="red">{errors.username}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.common.emailid')}</Label>
@@ -370,7 +370,7 @@ class EditUserComponent extends Component {
                                                             value={this.state.user.emailId}
                                                         />
                                                          </InputGroupAddon>
-                                                        <FormFeedback>{errors.emailId}</FormFeedback>
+                                                        <FormText className="red">{errors.emailId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.common.phoneNumber')}</Label>
@@ -388,7 +388,7 @@ class EditUserComponent extends Component {
                                                             value={this.state.user.phoneNumber}
                                                         />
                                                          </InputGroupAddon>
-                                                        <FormFeedback>{errors.phoneNumber}</FormFeedback>
+                                                        <FormText className="red">{errors.phoneNumber}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.rolename')}</Label>
@@ -411,7 +411,7 @@ class EditUserComponent extends Component {
                                                             {roleList}
                                                         </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.roleId}</FormFeedback>
+                                                        <FormText className="red">{errors.roleId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
@@ -434,7 +434,7 @@ class EditUserComponent extends Component {
                                                             {languageList}
                                                         </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.languageId}</FormFeedback>
+                                                        <FormText className="red">{errors.languageId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}</Label>

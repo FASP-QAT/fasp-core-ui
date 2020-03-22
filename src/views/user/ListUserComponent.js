@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
+    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon,FormText, Label, Button, Col
 } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';

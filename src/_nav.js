@@ -66,7 +66,7 @@ export default {
         {
           name: 'Realm',
           url: 'realm/realmlist',
-          icon: 'fa fa-user'
+          icon: 'fa fa-th-large'
         },
       ]
     },
@@ -83,12 +83,12 @@ export default {
         {
           name: i18n.t('static.dashboard.subfundingsource'),
           url: '/subFundingSource/listSubFundingSource',
-          icon: 'fa fa-university'
+          icon: 'fa fa-building-o'
         },
         {
           name: i18n.t('static.dashboard.procurementagent'),
           url: '/procurementAgent/listProcurementAgent',
-          icon: 'fa fa-user'
+          icon: 'fa fa-link'
         },
         {
           name: i18n.t('static.dashboard.budget'),
@@ -165,7 +165,7 @@ export default {
             {
               name: i18n.t('static.dashboard.importprogram'),
               url: '/program/importProgram',
-              icon: 'fa fa-long-arrow-up',
+              icon: 'fa fa-long-arrow-down',
             }
           ]
         },

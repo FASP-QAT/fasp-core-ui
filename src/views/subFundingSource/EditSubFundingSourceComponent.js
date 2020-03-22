@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -159,6 +159,8 @@ class EditSubFundingSourceComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="fundingSourceId"
@@ -168,9 +170,12 @@ class EditSubFundingSourceComponent extends Component {
                                                             value={this.state.subFundingSource.fundingSource.label.label_en}
                                                         >
                                                         </Input>
+                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"
@@ -181,6 +186,7 @@ class EditSubFundingSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                                                             required />
+                                                            </InputGroupAddon>
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -221,8 +227,8 @@ class EditSubFundingSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

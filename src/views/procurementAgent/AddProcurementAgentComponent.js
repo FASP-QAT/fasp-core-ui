@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormText,FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -228,73 +228,84 @@ class AddProcurementAgentComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            bsSize="sm"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {realmList}
-                                                        </Input>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
+                                                            <Input
+                                                                type="select"
+                                                                bsSize="sm"
+                                                                name="realmId"
+                                                                id="realmId"
+                                                                valid={!errors.realmId}
+                                                                invalid={touched.realmId && !!errors.realmId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            >
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {realmList}
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
-                                                        <Input type="text"
-                                                            bsSize="sm"
-                                                            name="procurementAgentCode"
-                                                            id="procurementAgentCode"
-                                                            valid={!errors.procurementAgentCode}
-                                                            invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            maxLength={6}
-                                                            value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
-                                                        />
-                                                        <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                bsSize="sm"
+                                                                name="procurementAgentCode"
+                                                                id="procurementAgentCode"
+                                                                valid={!errors.procurementAgentCode}
+                                                                invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                maxLength={6}
+                                                                value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
+                                                            />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.procurementAgentCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
-                                                        <Input type="text"
-                                                            bsSize="sm"
-                                                            name="procurementAgentName"
-                                                            id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.Capitalize(this.state.procurementAgent.label.label_en)}
-                                                        />
-                                                        <FormFeedback>{errors.procurementAgentName}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                bsSize="sm"
+                                                                name="procurementAgentName"
+                                                                id="procurementAgentName"
+                                                                valid={!errors.procurementAgentName}
+                                                                invalid={touched.procurementAgentName && !!errors.procurementAgentName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.Capitalize(this.state.procurementAgent.label.label_en)}
+                                                            />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.procurementAgentName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
-                                                        <Input type="number"
-                                                            bsSize="sm"
-                                                            name="submittedToApprovedLeadTime"
-                                                            id="submittedToApprovedLeadTime"
-                                                            valid={!errors.submittedToApprovedLeadTime}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            min={1}
-                                                        />
-                                                        <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText>
+                                                            <Input type="number"
+                                                                bsSize="sm"
+                                                                name="submittedToApprovedLeadTime"
+                                                                id="submittedToApprovedLeadTime"
+                                                                valid={!errors.submittedToApprovedLeadTime}
+                                                                invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                min={1}
+                                                            /></InputGroupAddon>
+                                                        <FormText className="red">{errors.submittedToApprovedLeadTime}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
                                                     </FormGroup>

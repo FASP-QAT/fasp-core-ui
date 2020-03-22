@@ -183,7 +183,7 @@ export default class EditLanguageComponent extends Component {
                                                                 value={this.state.language.languageName}
                                                                 required />
                                                         </InputGroupAddon>
-                                                         <FormFeedback>{errors.languageName}</FormFeedback>
+                                                         <FormText className="red">{errors.languageName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
@@ -200,7 +200,7 @@ export default class EditLanguageComponent extends Component {
                                                             value={this.state.language.languageCode}
                                                             required />
                                                               </InputGroupAddon>
-                                                        <FormFeedback>{errors.languageCode}</FormFeedback>
+                                                        <FormText className="red">{errors.languageCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>

@@ -269,8 +269,9 @@ export default class AddCountryComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.state.country.label.label_en}
                                                                 required />
-                                                        </InputGroupAddon>
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                      </InputGroupAddon>
+                                                        <FormText  className="red">{errors.label}</FormText>
+                                                        
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="countryCode">{i18n.t('static.country.countrycode')}</Label>
@@ -285,8 +286,8 @@ export default class AddCountryComponent extends Component {
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
                                                                 required />
-                                                        </InputGroupAddon>
-                                                        <FormFeedback>{errors.countryCode}</FormFeedback>
+                                                      </InputGroupAddon>
+                                                        <FormText  className="red">{errors.countryCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.country.language')}</Label>
@@ -308,7 +309,7 @@ export default class AddCountryComponent extends Component {
                                                                 {languageItems}
                                                             </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.languageId}</FormFeedback>
+                                                        <FormText  className="red">{errors.languageId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="currencyId">{i18n.t('static.country.currency')}</Label>
@@ -330,7 +331,7 @@ export default class AddCountryComponent extends Component {
                                                                 {currencyItems}
                                                             </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.currencyId}</FormFeedback>
+                                                        <FormText  className="red">{errors.currencyId}</FormText>
                                                     </FormGroup>
 
                                                 </CardBody>

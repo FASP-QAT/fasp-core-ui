@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText,FormText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -14,7 +14,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         region: Yup.string()
-        .required( i18n.t('static.region.validregion'))
+            .required(i18n.t('static.region.validregion'))
     })
 }
 
@@ -145,29 +145,35 @@ class EditRegionComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="realmCountryId"
-                                                            id="realmCountryId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.region.realmCountry.country.label.label_en}
-                                                        >
-                                                        </Input>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-globe "></i></InputGroupText>
+                                                            <Input
+                                                                type="text"
+                                                                name="realmCountryId"
+                                                                id="realmCountryId"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                value={this.state.region.realmCountry.country.label.label_en}
+                                                            >
+                                                            </Input>
+                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="region">{i18n.t('static.region.region')}</Label>
-                                                        <Input type="text"
-                                                            name="region"
-                                                            id="region"
-                                                            bsSize="sm"
-                                                            valid={!errors.region}
-                                                            invalid={touched.region && !!errors.region}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.region.label.label_en}
-                                                            required />
-                                                        <FormFeedback>{errors.region}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="region"
+                                                                id="region"
+                                                                bsSize="sm"
+                                                                valid={!errors.region}
+                                                                invalid={touched.region && !!errors.region}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.region.label.label_en}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.region}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
@@ -185,7 +191,7 @@ class EditRegionComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -201,15 +207,15 @@ class EditRegionComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

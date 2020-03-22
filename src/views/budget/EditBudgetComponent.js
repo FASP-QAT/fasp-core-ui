@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,FormText, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -177,6 +177,8 @@ class EditBudgetComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="budget">{i18n.t('static.budget.budget')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-money"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="budget"
                                                             id="budget"
@@ -187,10 +189,13 @@ class EditBudgetComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={getLabelText(this.state.budget.label, this.state.lan)}
                                                             required />
-                                                        <FormFeedback>{errors.budget}</FormFeedback>
+                                                             </InputGroupAddon>
+                                                        <FormText className="red">{errors.budget}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa-object-group"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="programId"
@@ -205,10 +210,13 @@ class EditBudgetComponent extends Component {
                                                             value={this.state.budget.program.label.label_en}
                                                         >
                                                         </Input>
-                                                        <FormFeedback>{errors.programId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.programId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="subFundingSourceId"
@@ -223,10 +231,13 @@ class EditBudgetComponent extends Component {
                                                             value={this.state.budget.subFundingSource.label.label_en}
                                                         >
                                                         </Input>
-                                                        <FormFeedback>{errors.subFundingSourceId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.subFundingSourceId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-usd"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
@@ -239,10 +250,13 @@ class EditBudgetComponent extends Component {
                                                             placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
                                                             required />
-                                                        <FormFeedback>{errors.budgetAmt}</FormFeedback>
+                                                            </InputGroupAddon>
+                                                        <FormText className="red">{errors.budgetAmt}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="startDate"
                                                             id="startDate"
@@ -255,10 +269,13 @@ class EditBudgetComponent extends Component {
                                                             value={this.state.budget.startDate}
                                                             placeholder="{i18n.t('static.budget.budgetstartdate')}"
                                                             required />
-                                                        <FormFeedback>{errors.startDate}</FormFeedback>
+                                                             </InputGroupAddon>
+                                                        <FormText className="red">{errors.startDate}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-phone"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="stopDate"
                                                             id="stopDate"
@@ -271,7 +288,8 @@ class EditBudgetComponent extends Component {
                                                             value={this.state.budget.stopDate}
                                                             placeholder="{i18n.t('static.budget.budgetstopdate')}"
                                                             required />
-                                                        <FormFeedback>{errors.stopDate}</FormFeedback>
+                                                             </InputGroupAddon>
+                                                        <FormText className="red">{errors.stopDate}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
 
@@ -314,8 +332,8 @@ class EditBudgetComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

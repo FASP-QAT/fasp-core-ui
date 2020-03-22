@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup,FormText, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -185,6 +185,8 @@ class EditProcurementAgentComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="realmId"
@@ -194,9 +196,12 @@ class EditProcurementAgentComponent extends Component {
                                                             value={this.state.procurementAgent.realm.label.label_en}
                                                         >
                                                         </Input>
+                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             bsSize="sm"
                                                             name="procurementAgentCode"
@@ -204,10 +209,13 @@ class EditProcurementAgentComponent extends Component {
                                                             readOnly={true}
                                                             value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
                                                         />
-                                                        <FormFeedback>{errors.procurementAgentCode}</FormFeedback>
+                                                         </InputGroupAddon>
+                                                        <FormText className="red">{errors.procurementAgentCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             bsSize="sm"
                                                             name="procurementAgentName"
@@ -219,10 +227,13 @@ class EditProcurementAgentComponent extends Component {
                                                             required
                                                             value={this.Capitalize(this.state.procurementAgent.label.label_en)}
                                                         />
-                                                        <FormFeedback>{errors.procurementAgentName}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.procurementAgentName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText>
                                                         <Input type="number"
                                                             bsSize="sm"
                                                             name="submittedToApprovedLeadTime"
@@ -235,7 +246,8 @@ class EditProcurementAgentComponent extends Component {
                                                             min={1}
                                                             value={this.state.procurementAgent.submittedToApprovedLeadTime}
                                                         />
-                                                        <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                         </InputGroupAddon>
+                                                        <FormText className="red">{errors.submittedToApprovedLeadTime}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -275,8 +287,8 @@ class EditProcurementAgentComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

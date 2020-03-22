@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button,FormText ,FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -16,10 +16,10 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-    .required(i18n.t('static.manufaturer.realmtext')) ,
+      .required(i18n.t('static.manufaturer.realmtext')),
     manufacturer: Yup.string()
-    .required(i18n.t('static.manufaturer.manufaturertext'))
-    
+      .required(i18n.t('static.manufaturer.manufaturertext'))
+
   })
 }
 
@@ -190,35 +190,42 @@ class AddManufacturerComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
-                            <Input
-                              type="select"
-                              name="realmId"
-                              id="realmId"
-                              bsSize="sm"
-                              valid={!errors.realmId}
-                              invalid={touched.realmId && !!errors.realmId}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
-                              required
-                              value={this.state.realmId}
-                            >
-                              <option value="0">{i18n.t('static.common.select')}</option>
-                              {realmList}
-                            </Input>
-                            <FormFeedback>{errors.realmId}</FormFeedback>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                              <Input
+                                type="select"
+                                name="realmId"
+                                id="realmId"
+                                bsSize="sm"
+                                valid={!errors.realmId}
+                                invalid={touched.realmId && !!errors.realmId}
+                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                onBlur={handleBlur}
+                                required
+                                value={this.state.realmId}
+                              >
+                                <option value="0">{i18n.t('static.common.select')}</option>
+                                {realmList}
+                              </Input>
+                            </InputGroupAddon>
+
+                            <FormText className="red">{errors.realmId}</FormText>
                           </FormGroup>
                           <FormGroup>
                             <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
-                            <Input type="text"
-                              name="manufacturer"
-                              id="manufacturer"
-                              bsSize="sm"
-                              valid={!errors.manufacturer}
-                              invalid={touched.manufacturer && !!errors.manufacturer}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
-                              required />
-                            <FormFeedback>{errors.manufacturer}</FormFeedback>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText><i className="fa fa-industry"></i></InputGroupText>
+                              <Input type="text"
+                                name="manufacturer"
+                                id="manufacturer"
+                                bsSize="sm"
+                                valid={!errors.manufacturer}
+                                invalid={touched.manufacturer && !!errors.manufacturer}
+                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                onBlur={handleBlur}
+                                required />
+                            </InputGroupAddon>
+                            <FormText className="red">{errors.manufacturer}</FormText>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

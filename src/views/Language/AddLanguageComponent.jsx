@@ -21,7 +21,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         languageName: Yup.string()
-        .required(i18n.t('static.language.languagetext')) ,
+            .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
 
     })
@@ -176,43 +176,43 @@ class AddLanguageComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="languageName">{i18n.t('static.language.language')}</Label>
                                                         <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-language"></i></InputGroupText>
-                                                        <Input type="text"
-                                                            name="languageName"
-                                                            id="languageName"
-                                                            bsSize="sm"
-                                                            valid={!errors.languageName}
-                                                            invalid={touched.languageName && !!errors.languageName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.languageName}
-                                                            required />
-                                                            </InputGroupAddon>
-                                                        <FormFeedback>{errors.languageName}</FormFeedback>
+                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="languageName"
+                                                                id="languageName"
+                                                                bsSize="sm"
+                                                                valid={!errors.languageName}
+                                                                invalid={touched.languageName && !!errors.languageName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.languageName}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.languageName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
                                                         <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
-                                                        <Input type="text"
-                                                            name="languageCode"
-                                                            id="languageCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.languageCpde}
-                                                            invalid={touched.languageCode && !!errors.languageCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.languageCode}
-                                                            required />
-                                                              </InputGroupAddon>
-                                                        <FormFeedback>{errors.languageCode}</FormFeedback>
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="languageCode"
+                                                                id="languageCode"
+                                                                bsSize="sm"
+                                                                valid={!errors.languageCpde}
+                                                                invalid={touched.languageCode && !!errors.languageCode}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.languageCode}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.languageCode}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                       
+
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

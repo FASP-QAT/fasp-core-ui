@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label,InputGroupAddon,InputGroupText,Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, InputGroupAddon, InputGroupText, Input,FormText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -16,9 +16,9 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-    .required( i18n.t('static.region.validcountry')),
+      .required(i18n.t('static.region.validcountry')),
     region: Yup.string()
-    .required( i18n.t('static.region.validregion'))
+      .required(i18n.t('static.region.validregion'))
   })
 }
 
@@ -138,7 +138,7 @@ class AddRegionComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-    <i className="icon-note"></i><strong>{i18n.t('static.region.regionadd')}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.region.regionadd')}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -189,41 +189,44 @@ class AddRegionComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
-                            <Input
-                              type="select"
-                              name="realmCountryId"
-                              id="realmCountryId"
-                              bsSize="sm"
-                              valid={!errors.realmCountryId}
-                              invalid={touched.realmCountryId && !!errors.realmCountryId}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
-                              required
-                              value={this.state.realmCountryId}
-                            >
-                              <option value="0">{i18n.t('static.common.select')}</option>
-                              {realmCountryList}
-                            </Input>
-                            <FormFeedback>{errors.realmCountryId}</FormFeedback>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText><i className="fa fa-globe"></i></InputGroupText>
+                              <Input
+                                type="select"
+                                name="realmCountryId"
+                                id="realmCountryId"
+                                bsSize="sm"
+                                valid={!errors.realmCountryId}
+                                invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                onBlur={handleBlur}
+                                required
+                                value={this.state.realmCountryId}
+                              >
+                                <option value="0">{i18n.t('static.common.select')}</option>
+                                {realmCountryList}
+                              </Input>
+                            </InputGroupAddon>
+                            <FormText className="red">{errors.realmCountryId}</FormText>
                           </FormGroup>
-                        
-                          <FormGroup>
-                          
-                            <Label for="region">{i18n.t('static.region.region')}</Label>
 
-                  
-                            <Input type="text"
-                              name="region"
-                              id="region"
-                              bsSize="sm"
-                              valid={!errors.region}
-                              invalid={touched.region && !!errors.region}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                              onBlur={handleBlur}
-                              required />
-                           
-                            <FormFeedback>{errors.region}</FormFeedback>
-                          
+                          <FormGroup>
+
+                            <Label for="region">{i18n.t('static.region.region')}</Label>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText>
+                              <Input type="text"
+                                name="region"
+                                id="region"
+                                bsSize="sm"
+                                valid={!errors.region}
+                                invalid={touched.region && !!errors.region}
+                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                onBlur={handleBlur}
+                                required />
+                            </InputGroupAddon>
+                            <FormText className="red">{errors.region}</FormText>
+
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

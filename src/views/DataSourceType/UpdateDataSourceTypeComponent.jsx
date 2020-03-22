@@ -184,19 +184,19 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
                                                         <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-table"></i></InputGroupText>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.dataSourceType.label.label_en}
-                                                            required />
-                                                             </InputGroupAddon>
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="label"
+                                                                id="label"
+                                                                bsSize="sm"
+                                                                valid={!errors.label}
+                                                                invalid={touched.label && !!errors.label}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.dataSourceType.label.label_en}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
 
                                                     <FormGroup>
@@ -215,7 +215,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -231,18 +231,18 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
-                                                    
-                                                       
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+
+
                                                         &nbsp;
-                                                       
+
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

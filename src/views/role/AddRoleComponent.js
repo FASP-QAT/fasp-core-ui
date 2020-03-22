@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText,InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -274,7 +274,7 @@ class AddRoleComponent extends Component {
                                                                 value={this.Capitalize(this.state.role.label.label_en)}
                                                             />
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.roleName}</FormFeedback>
+                                                        <FormText className="red">{errors.roleName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label>
@@ -297,7 +297,7 @@ class AddRoleComponent extends Component {
                                                                 {businessFunctionsList}
                                                             </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.businessFunctions}</FormFeedback>
+                                                        <FormText className="red">{errors.businessFunctions}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
@@ -320,7 +320,7 @@ class AddRoleComponent extends Component {
                                                                 {roleList}
                                                             </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.canCreateRole}</FormFeedback>
+                                                        <FormText className="red">{errors.canCreateRole}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Row, Col, Card, CardHeader,
     CardFooter, Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input
+    Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText,FormText
 } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -26,13 +26,13 @@ const validationSchema = function (values) {
         productName: Yup.string()
             .required(i18n.t('static.product.productnametext')),
         genericName: Yup.string()
-        .required(i18n.t('static.product.generictext')),
+            .required(i18n.t('static.product.generictext')),
         realmId: Yup.string()
-        .required(i18n.t('static.product.realmtext')),
+            .required(i18n.t('static.product.realmtext')),
         productCategoryId: Yup.string()
-        .required(i18n.t('static.product.productcategorytext')),
+            .required(i18n.t('static.product.productcategorytext')),
         unitId: Yup.string()
-        .required(i18n.t('static.product.productunittext'))
+            .required(i18n.t('static.product.productunittext'))
     })
 }
 
@@ -89,7 +89,7 @@ export default class AddProduct extends Component {
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.getDependentLists=this.getDependentLists.bind(this);
+        this.getDependentLists = this.getDependentLists.bind(this);
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -298,89 +298,105 @@ export default class AddProduct extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.product')}</Label>
-                                                        <Input type="text"
-                                                            name="productName"
-                                                            id="productName"
-                                                            bsSize="sm"
-                                                            valid={!errors.productName}
-                                                            invalid={touched.productName && !!errors.productName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required />
-                                                        <FormFeedback>{errors.productName}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="productName"
+                                                                id="productName"
+                                                                bsSize="sm"
+                                                                valid={!errors.productName}
+                                                                invalid={touched.productName && !!errors.productName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.productName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
-                                                        <Input type="text"
-                                                            name="genericName"
-                                                            id="genericName"
-                                                            bsSize="sm"
-                                                            valid={!errors.genericName}
-                                                            invalid={touched.genericName && !!errors.genericName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required />
-                                                        <FormFeedback>{errors.genericName}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="genericName"
+                                                                id="genericName"
+                                                                bsSize="sm"
+                                                                valid={!errors.genericName}
+                                                                invalid={touched.genericName && !!errors.genericName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.genericName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.product.realm')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.getDependentLists(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.realmId}
-                                                        >
-                                                            <option value="">Please select</option>
-                                                            {realms}
-                                                        </Input>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-th-large"></i></InputGroupText>
+                                                            <Input
+                                                                type="select"
+                                                                name="realmId"
+                                                                id="realmId"
+                                                                bsSize="sm"
+                                                                valid={!errors.realmId}
+                                                                invalid={touched.realmId && !!errors.realmId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.realmId}
+                                                            >
+                                                                <option value="">Please select</option>
+                                                                {realms}
+                                                            </Input>
+                                                        </InputGroupAddon>
+
+                                                        <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="">{i18n.t('static.product.productcategory')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="productCategoryId"
-                                                            id="productCategoryId"
-                                                            bsSize="sm"
-                                                            valid={!errors.productCategoryId}
-                                                            invalid={touched.productCategoryId && !!errors.productCategoryId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.productCategoryId}
-                                                        >
-                                                            <option value="">Please select</option>
-                                                            {/* <option value="1">Product Category One</option>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-bar-chart"></i></InputGroupText>
+                                                            <Input
+                                                                type="select"
+                                                                name="productCategoryId"
+                                                                id="productCategoryId"
+                                                                bsSize="sm"
+                                                                valid={!errors.productCategoryId}
+                                                                invalid={touched.productCategoryId && !!errors.productCategoryId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.productCategoryId}
+                                                            >
+                                                                <option value="">Please select</option>
+                                                                {/* <option value="1">Product Category One</option>
                                                             <option value="2">Product Category Two</option>
                                                             <option value="3">Product Category Three</option> */}
-                                                            {productCategories}
-                                                        </Input>
-                                                        <FormFeedback>{errors.productCategoryId}</FormFeedback>
+                                                                {productCategories}
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.productCategoryId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="unitId">{i18n.t('static.product.unit')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="unitId"
-                                                            id="unitId"
-                                                            bsSize="sm"
-                                                            valid={!errors.unitId}
-                                                            invalid={touched.unitId && !!errors.unitId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.unitId}
-                                                        >
-                                                            <option value="">Please select</option>
-                                                            {units}
-                                                        </Input>
-                                                        <FormFeedback>{errors.unitId}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                            <Input
+                                                                type="select"
+                                                                name="unitId"
+                                                                id="unitId"
+                                                                bsSize="sm"
+                                                                valid={!errors.unitId}
+                                                                invalid={touched.unitId && !!errors.unitId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.unitId}
+                                                            >
+                                                                <option value="">Please select</option>
+                                                                {units}
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.unitId}</FormText>
                                                     </FormGroup>
 
                                                 </CardBody>
@@ -388,8 +404,8 @@ export default class AddProduct extends Component {
                                                     <FormGroup>
 
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                 </FormGroup>
                                                 </CardFooter>

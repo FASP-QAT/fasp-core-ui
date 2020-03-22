@@ -178,7 +178,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                                 value={this.state.dataSourceType.label.label_en}
                                                                 required />
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
 

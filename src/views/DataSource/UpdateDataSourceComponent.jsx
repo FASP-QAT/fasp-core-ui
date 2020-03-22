@@ -237,6 +237,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         >
                                                         </Input>
                                                         </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
@@ -258,7 +259,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             {dataSourceTypes}
                                                         </Input>
                                                         </InputGroupAddon>
-                                                        <FormFeedback>{errors.dataSourceTypeId}</FormFeedback>
+                                                        <FormText className="red">{errors.dataSourceTypeId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>

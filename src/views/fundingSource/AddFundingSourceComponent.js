@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback,FormText, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -197,6 +197,8 @@ class AddFundingSourceComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label>
+                            <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
                             <Input
                               type="select"
                               name="realmId"
@@ -212,10 +214,13 @@ class AddFundingSourceComponent extends Component {
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
-                            <FormFeedback>{errors.realmId}</FormFeedback>
+                            </InputGroupAddon>
+                            <FormText className="red">{errors.realmId}</FormText>
                           </FormGroup>
                           <FormGroup>
                             <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
+                            <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                             <Input type="text"
                               name="fundingSource"
                               id="fundingSource"
@@ -225,14 +230,15 @@ class AddFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required />
-                            <FormFeedback>{errors.fundingSource}</FormFeedback>
+                             </InputGroupAddon>
+                            <FormText className="red">{errors.fundingSource}</FormText>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
 
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             
                                                         &nbsp;
                           </FormGroup>
