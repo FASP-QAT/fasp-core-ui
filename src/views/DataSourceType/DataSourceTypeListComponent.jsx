@@ -22,7 +22,6 @@ export default class DataSourceListComponent extends Component {
             alwaysShowAllBtns: false,
             withFirstAndLast: false,
             onRowClick: function (row) {
-                // console.log("row--------------", row);
                 this.editDataSourceType(row);
             }.bind(this)
 
@@ -38,7 +37,7 @@ export default class DataSourceListComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeList().then(response => {
-            //console.log(response.data)
+           
             this.setState({
                 dataSourceList: response.data
             })
@@ -83,91 +82,6 @@ export default class DataSourceListComponent extends Component {
     showCountryLabel(cell, row) {
         return cell.label_en;
     }
-
-
-    // render() {
-    //     return (
-
-
-
-
-    //         <div className="page-content-wrap">
-
-
-    //             <div className="row">
-
-    //                 <ul class="breadcrumb text-left"><li><a href="#">Home</a></li><li><a href="#">Admin</a></li><li><a href="#">Datasource type</a></li><li><a href="#">Datasource type list</a></li></ul>
-    //                 <div className="help-block">{this.props.match.params.message}</div>
-
-    //                 <div className="col-md-12">
-
-    //                     <div className=" mt-2 ">
-
-
-    //                         <div className="panel panel-default">
-
-
-    //                             <div className="panel-heading">
-    //                                 <h3 className="panel-title">Language list</h3>
-    //                                 <button className="btn btn-info pull-right" onClick={this.addNewDataSourceType}><i class="fa fa-plus" ></i></button>
-    //                             </div>
-    //                             <div className="panel-body text-left">
-    //                                 <div className="col-md-12">
-
-
-
-    //                                     <div className="table-responsive">
-    //                                         <table className="table datatable">
-    //                                             <thead>
-    //                                             <tr>
-    //                 <th>Data source type name (English)</th>
-    //                 <th>Data source type name (French)</th>
-    //                 <th>Data source type name (Spanish)</th>
-    //                 <th>Data source type name (portuguese)</th>
-    //                 <th>Status</th>
-
-    //             </tr>
-    //                                             </thead>
-    //                                             <tbody>
-    //                                             {
-    //                 this.state.dataSourceList.map(dataSourceType =>
-
-    //                     <tr key={dataSourceType.dataSourceTypeId} onClick={() => this.editDataSourceType(dataSourceType)}>
-    //                         <td>{dataSourceType.label.label_en}</td>
-    //                         <td>{dataSourceType.label.label_fr}</td>
-    //                         <td>{dataSourceType.label.label_sp}</td>
-    //                         <td>{dataSourceType.label.label_pr}</td>
-    //                         <td>{dataSourceType.active.toString() == "true" ? "Active" : "Disabled"}</td>
-    //                     </tr>
-    //                 )
-
-    //             }
-
-    //                                             </tbody>
-    //                                         </table>
-    //                                     </div>
-
-    //                                 </div>
-
-    //                             </div>
-
-
-
-    //                         </div>
-
-
-    //                     </div>
-
-
-    //                 </div>
-
-
-    //             </div>
-
-
-    //         </div>
-    //     );
-    // }
     showStatus(cell, row) {
         if (cell) {
             return "Active";

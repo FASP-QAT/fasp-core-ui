@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -313,40 +313,50 @@ class AddUserComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.user.realm.realmId}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {realmList}
-                                                        </Input>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
+
+                                                            <Input
+                                                                type="select"
+                                                                name="realmId"
+                                                                id="realmId"
+                                                                bsSize="sm"
+                                                                valid={!errors.realmId}
+                                                                invalid={touched.realmId && !!errors.realmId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.user.realm.realmId}
+                                                            >
+                                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                                {realmList}
+                                                            </Input>
+                                                        </InputGroupAddon>
                                                         <FormFeedback>{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
-                                                        <Input type="text"
-                                                            name="username"
-                                                            id="username"
-                                                            bsSize="sm"
-                                                            valid={!errors.username}
-                                                            invalid={touched.username && !!errors.username}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.user.username}
-                                                        />
-                                                        <FormFeedback>{errors.username}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-user"></i></InputGroupText>
+
+                                                            <Input type="text"
+                                                                name="username"
+                                                                id="username"
+                                                                bsSize="sm"
+                                                                valid={!errors.username}
+                                                                invalid={touched.username && !!errors.username}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.user.username}
+                                                            />
+                                                        </InputGroupAddon>
+                                                         <FormFeedback>{errors.username}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.common.emailid')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-envelope-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
@@ -358,10 +368,13 @@ class AddUserComponent extends Component {
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
+                                                        </InputGroupAddon>
                                                         <FormFeedback>{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.common.phoneNumber')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-phone"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -373,10 +386,13 @@ class AddUserComponent extends Component {
                                                             required
                                                             value={this.state.user.phoneNumber}
                                                         />
+                                                        </InputGroupAddon>
                                                         <FormFeedback>{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.rolename')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="roleId"
@@ -393,10 +409,13 @@ class AddUserComponent extends Component {
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
                                                         </Input>
+                                                        </InputGroupAddon>
                                                         <FormFeedback>{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="languageId"
@@ -412,13 +431,14 @@ class AddUserComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {languageList}
                                                         </Input>
+                                                        </InputGroupAddon>
                                                         <FormFeedback>{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
                           </FormGroup>

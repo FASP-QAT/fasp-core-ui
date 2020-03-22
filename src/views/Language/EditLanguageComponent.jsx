@@ -15,7 +15,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
 
         language: Yup.string()
-        .required(i18n.t('static.language.languagetext')) ,
+            .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
 
     })
@@ -170,20 +170,25 @@ export default class EditLanguageComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="language">{i18n.t('static.language.language')}</Label>
-                                                        <Input type="text"
-                                                            name="languageName"
-                                                            id="languageName"
-                                                            bsSize="sm"
-                                                            valid={!errors.languageName}
-                                                            invalid={touched.languageName && !!errors.languageName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.language.languageName}
-                                                            required />
-                                                        <FormFeedback>{errors.languageName}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
+                                                             <Input type="text"
+                                                                name="languageName"
+                                                                id="languageName"
+                                                                bsSize="sm"
+                                                                valid={!errors.languageName}
+                                                                invalid={touched.languageName && !!errors.languageName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.language.languageName}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                         <FormFeedback>{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
@@ -194,6 +199,7 @@ export default class EditLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
+                                                              </InputGroupAddon>
                                                         <FormFeedback>{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -234,8 +240,8 @@ export default class EditLanguageComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

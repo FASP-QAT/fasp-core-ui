@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label,InputGroupAddon,InputGroupText,Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -206,8 +206,12 @@ class AddRegionComponent extends Component {
                             </Input>
                             <FormFeedback>{errors.realmCountryId}</FormFeedback>
                           </FormGroup>
+                        
                           <FormGroup>
+                          
                             <Label for="region">{i18n.t('static.region.region')}</Label>
+
+                  
                             <Input type="text"
                               name="region"
                               id="region"
@@ -217,7 +221,9 @@ class AddRegionComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required />
+                           
                             <FormFeedback>{errors.region}</FormFeedback>
+                          
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

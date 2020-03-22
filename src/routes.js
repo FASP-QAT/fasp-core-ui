@@ -158,10 +158,10 @@ const routes = [
 
   
   { path: '/product/editProduct', name: 'Edit Product', component: EditProdct },
-  { path: '/product/listProduct', name: 'Product List', component: ListProdct },
+  { path: '/product/listProduct', name: 'Product ', component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
   { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
-  { path: '/program/listProgram', name: 'Program List', component: Programs },
+  { path: '/program/listProgram', name: 'Program ', component: Programs },
   { path: '/program/editProgram', name: 'Edit Program', component: EditProgram },
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },

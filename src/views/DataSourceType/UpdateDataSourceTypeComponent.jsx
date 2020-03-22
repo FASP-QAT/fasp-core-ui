@@ -138,9 +138,6 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-
-                                    // alert("----"+this.state);
-                                    // console.log("------IN SUBMIT------" + this.state.country)
                                     DataSourceTypeService.editDataSourceType(this.state.dataSourceType)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -186,6 +183,8 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-table"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -196,6 +195,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.dataSourceType.label.label_en}
                                                             required />
+                                                             </InputGroupAddon>
                                                         <FormFeedback>{errors.label}</FormFeedback>
                                                     </FormGroup>
 
@@ -237,8 +237,8 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
                                                     
                                                        
                                                         &nbsp;

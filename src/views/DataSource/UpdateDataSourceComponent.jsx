@@ -221,6 +221,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-database"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="label"
@@ -234,9 +236,12 @@ export default class UpdateDataSourceComponent extends Component {
                                                             required
                                                         >
                                                         </Input>
+                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="dataSourceTypeId"
@@ -252,6 +257,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {dataSourceTypes}
                                                         </Input>
+                                                        </InputGroupAddon>
                                                         <FormFeedback>{errors.dataSourceTypeId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -292,8 +298,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                       &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

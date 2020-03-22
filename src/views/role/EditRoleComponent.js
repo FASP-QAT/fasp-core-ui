@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -256,6 +256,9 @@ class EditRoleComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="roleName">{i18n.t('static.role.rolename')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-user"></i>
+                                                            </InputGroupText>
                                                         <Input type="text"
                                                             name="roleName"
                                                             id="roleName"
@@ -267,10 +270,13 @@ class EditRoleComponent extends Component {
                                                             required
                                                             value={this.Capitalize(this.state.role.label.label_en)}
                                                         />
+                                                         </InputGroupAddon>
                                                         <FormFeedback>{errors.roleName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className=" fa fa-building"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="businessFunctions"
@@ -286,11 +292,16 @@ class EditRoleComponent extends Component {
                                                         >
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {businessFunctionsList}
+                                                            
                                                         </Input>
+                                                        </InputGroupAddon>
+
                                                         <FormFeedback>{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-users"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="canCreateRole"
@@ -307,13 +318,15 @@ class EditRoleComponent extends Component {
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
                                                         </Input>
+                                                        </InputGroupAddon>
+
                                                         <FormFeedback>{errors.canCreateRole}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="button" size="lg" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="lg" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
                           </FormGroup>
