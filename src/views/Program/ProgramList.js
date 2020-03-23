@@ -6,7 +6,7 @@ import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import programDate from './ProgramData';
 import ProgramService from "../../api/ProgramService";
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 export default class ProgramList extends Component {
 

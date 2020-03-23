@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import DataSourceService from '../../api/DataSourceService';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 let initialValues = {
     label: '',

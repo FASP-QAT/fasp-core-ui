@@ -13,7 +13,7 @@ import HealthAreaService from "../../api/HealthAreaService";
 import RealmService from "../../api/RealmService";
 import RealmCountryService from "../../api/RealmCountryService";
 
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 const initialValues = {
   realmId: [],

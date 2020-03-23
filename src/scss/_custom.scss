@@ -431,3 +431,16 @@ font-weight: 500;
 .navbar-nav .nav-link {
         color: #333;
     }
+
+
+
+    @media (min-width: 992px){
+      .sidebar .nav{
+        font-size: 14px !important;
+      }
+      .sidebar .nav-link {
+       
+        padding: 0.75rem .2rem !important;}
+    }
+
+

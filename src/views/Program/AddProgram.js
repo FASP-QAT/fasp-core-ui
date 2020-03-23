@@ -12,7 +12,7 @@ import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
 import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
 const initialValues = {
@@ -153,10 +153,13 @@ export default class AddProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
-                // console.log("realm list---", response.data.data);
+                if (response.status == "Success") {
+                 console.log("realm list---", response.data.data);
                 this.setState({
                     realmList: response.data.data
-                })
+                })  } else {
+                    this.setState({ message: response.data.messageCode })
+                }
             }).catch(
                 error => {
                     switch (error.message) {

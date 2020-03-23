@@ -9,7 +9,7 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css';
 import RealmServcie from '../../api/RealmService';
 import UnitService from '../../api/UnitService';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import ProductService from '../../api/ProductService';
 import i18n from '../../i18n'

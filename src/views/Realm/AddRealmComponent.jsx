@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 const initialValues = {
     realmCode: '',
@@ -319,7 +319,7 @@ export default class AddRealmComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/realm/listRealm/` + "Action Canceled")
+        this.props.history.push(`/realm/realmlist/` +i18n.t('static.program.actioncancelled'))
     }
 
 }
