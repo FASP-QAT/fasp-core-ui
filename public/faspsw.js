@@ -1,4 +1,4 @@
-var cacheName = 'fasp-v3';
+var cacheName = 'fasp-v5';
 var assets = [
   '/',
   '/index.html',
@@ -8,7 +8,9 @@ var assets = [
   '/QAT-logo512x512.png',
   '/QAT-logo150x61.png',
   '/build',
-  'node_modules'
+  '/node_modules',
+  '/assets',
+  '/locales',
 ];
 
 self.addEventListener('install', event => {
