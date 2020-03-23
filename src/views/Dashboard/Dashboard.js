@@ -1,6 +1,6 @@
 import React, { Component, lazy, Suspense } from 'react';
 import i18n from '../../i18n'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 class Dashboard extends Component {
   constructor(props) {

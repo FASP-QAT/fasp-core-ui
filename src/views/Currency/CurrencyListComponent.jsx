@@ -1,5 +1,5 @@
 import React, { Compoent, Component } from 'react';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import CurrencyService from '../../api/CurrencyService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';

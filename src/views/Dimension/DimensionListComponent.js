@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import UnitTypeService from '../../api/UnitTypeService.js';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
