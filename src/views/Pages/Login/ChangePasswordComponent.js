@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
 
 import CryptoJS from 'crypto-js'
-import AuthenticationService from '../../common/AuthenticationService.js';
+import AuthenticationService from '../../Common/AuthenticationService.js';
 import { Online } from "react-detect-offline";
 import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'

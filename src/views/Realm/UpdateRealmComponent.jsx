@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 let initialValues = {
     realmCode: '',

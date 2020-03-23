@@ -14,7 +14,7 @@ import { lang } from "moment";
 import i18n from "../../i18n"
 import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 
 

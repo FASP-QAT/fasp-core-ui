@@ -20,7 +20,7 @@ import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
 import LogoutService from "../../api/LogoutService";
-import AuthenticationService from '../../views/common/AuthenticationService.js';
+import AuthenticationService from '../../views/Common/AuthenticationService.js';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));

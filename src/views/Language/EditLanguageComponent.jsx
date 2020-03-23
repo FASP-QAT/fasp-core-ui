@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 // import * as myConst from '../../Labels.js';
 import LanguageService from '../../api/LanguageService.js'
 

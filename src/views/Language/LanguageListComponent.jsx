@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 // import { HashRouter, Route, Switch } from 'react-router-dom';
