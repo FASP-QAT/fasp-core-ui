@@ -8,6 +8,7 @@ import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
 // import QAT from '../../assets/img/brand/QAT.svg'
 import i18n from '../../i18n'
+
 const propTypes = {
   children: PropTypes.node,
 };
@@ -49,6 +50,7 @@ class DefaultHeader extends Component {
         </Nav>
         <Nav className="ml-auto " navbar>
         <UncontrolledDropdown nav direction="down" className="lang-btn">
+
             <DropdownToggle nav
            { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
             </DropdownToggle>

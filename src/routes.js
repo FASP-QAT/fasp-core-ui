@@ -156,6 +156,7 @@ const routes = [
 
 
 
+
   { path: '/product/editProduct', name: i18n.t('static.product.productedit'), component: EditProdct },
   { path: '/product/listProduct', name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
