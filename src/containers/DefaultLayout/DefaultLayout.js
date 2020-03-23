@@ -2,6 +2,7 @@ import React, { Component, Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import i18n from '../../i18n'
+import { Online, Offline } from "react-detect-offline";
 
 import {
   AppAside,
@@ -70,9 +71,9 @@ class DefaultLayout extends Component {
             <AppSidebarHeader />
             <AppSidebarForm />
             <Suspense>
-              <AppSidebarNav navConfig={{
+              <Online>
+                <AppSidebarNav navConfig={{
                   items:
-                  navigator.onLine ?
                     [
                       {
                         name: i18n.t('static.dashboard.applicationdashboard'),
@@ -89,7 +90,7 @@ class DefaultLayout extends Component {
                         url: '/ProgramDashboard',
                         icon: 'cui-dashboard icons',
                       },
-              
+
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
@@ -146,7 +147,7 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.realmmaster'),
                         icon: 'fa fa-list',
                         children: [
-              
+
                           {
                             name: i18n.t('static.dashboard.fundingsource'),
                             icon: 'fa fa-bank',
@@ -218,8 +219,8 @@ class DefaultLayout extends Component {
                               },
                             ]
                           },
-              
-              
+
+
                           {
                             name: i18n.t('static.dashboard.program'),
                             icon: 'fa fa-list',
@@ -254,7 +255,12 @@ class DefaultLayout extends Component {
                         ]
                       }
                     ]
-                    :
+
+                }} {...this.props} />
+              </Online>
+              <Offline>
+                <AppSidebarNav navConfig={{
+                  items:
                     [
                       {
                         name: i18n.t('static.dashboard.program'),
@@ -278,7 +284,8 @@ class DefaultLayout extends Component {
                         ]
                       }
                     ]
-              }} {...this.props} />
+                }} {...this.props} />
+              </Offline>
             </Suspense>
             <AppSidebarFooter />
             <AppSidebarMinimizer />
