@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText,InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -258,64 +258,75 @@ class AddRoleComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="roleName">{i18n.t('static.role.rolename')}</Label>
-                                                        <Input type="text"
-                                                            name="roleName"
-                                                            id="roleName"
-                                                            bsSize="sm"
-                                                            valid={!errors.roleName}
-                                                            invalid={touched.roleName && !!errors.roleName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.Capitalize(this.state.role.label.label_en)}
-                                                        />
-                                                        <FormFeedback>{errors.roleName}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-user"></i>
+                                                            </InputGroupText>
+
+                                                            <Input type="text"
+                                                                name="roleName"
+                                                                id="roleName"
+                                                                bsSize="sm"
+                                                                valid={!errors.roleName}
+                                                                invalid={touched.roleName && !!errors.roleName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.Capitalize(this.state.role.label.label_en)}
+                                                            />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.roleName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="businessFunctions"
-                                                            id="businessFunctions"
-                                                            bsSize="sm"
-                                                            valid={!errors.businessFunctions}
-                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.role.businessFunctions}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                            {businessFunctionsList}
-                                                        </Input>
-                                                        <FormFeedback>{errors.businessFunctions}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className=" fa fa-building"></i></InputGroupText>
+                                                            <Input
+                                                                type="select"
+                                                                name="businessFunctions"
+                                                                id="businessFunctions"
+                                                                bsSize="sm"
+                                                                valid={!errors.businessFunctions}
+                                                                invalid={touched.businessFunctions && !!errors.businessFunctions}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.role.businessFunctions}
+                                                                multiple={true}
+                                                            >
+                                                                <option value="0" disabled>{i18n.t('static.common.select')}</option>
+                                                                {businessFunctionsList}
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.businessFunctions}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="canCreateRole"
-                                                            id="canCreateRole"
-                                                            bsSize="sm"
-                                                            valid={!errors.canCreateRole}
-                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.role.canCreateRole}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                            {roleList}
-                                                        </Input>
-                                                        <FormFeedback>{errors.canCreateRole}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-users"></i></InputGroupText>
+                                                            <Input
+                                                                type="select"
+                                                                name="canCreateRole"
+                                                                id="canCreateRole"
+                                                                bsSize="sm"
+                                                                valid={!errors.canCreateRole}
+                                                                invalid={touched.canCreateRole && !!errors.canCreateRole}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.role.canCreateRole}
+                                                                multiple={true}
+                                                            >
+                                                                <option value="0" disabled>{i18n.t('static.common.select')}</option>
+                                                                {roleList}
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.canCreateRole}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
                           </FormGroup>

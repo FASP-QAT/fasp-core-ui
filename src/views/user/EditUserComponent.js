@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup,FormText, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -316,6 +316,8 @@ class EditUserComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -331,10 +333,13 @@ class EditUserComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="username"
                                                             id="username"
@@ -346,10 +351,13 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.username}
                                                         />
-                                                        <FormFeedback>{errors.username}</FormFeedback>
+                                                         </InputGroupAddon>
+                                                        <FormText className="red">{errors.username}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.common.emailid')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-envelope-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
@@ -361,10 +369,13 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
-                                                        <FormFeedback>{errors.emailId}</FormFeedback>
+                                                         </InputGroupAddon>
+                                                        <FormText className="red">{errors.emailId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.common.phoneNumber')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-phone"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -376,10 +387,13 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.phoneNumber}
                                                         />
-                                                        <FormFeedback>{errors.phoneNumber}</FormFeedback>
+                                                         </InputGroupAddon>
+                                                        <FormText className="red">{errors.phoneNumber}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.rolename')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="roleId"
@@ -396,10 +410,14 @@ class EditUserComponent extends Component {
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
                                                         </Input>
-                                                        <FormFeedback>{errors.roleId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.roleId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
+
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="languageId"
@@ -415,7 +433,8 @@ class EditUserComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {languageList}
                                                         </Input>
-                                                        <FormFeedback>{errors.languageId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.languageId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}</Label>
@@ -455,8 +474,8 @@ class EditUserComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
                           </FormGroup>

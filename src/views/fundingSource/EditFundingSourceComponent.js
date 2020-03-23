@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormText,FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -169,7 +169,7 @@ class EditFundingSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
                                                             required />
-                                                        <FormFeedback>{errors.fundingSource}</FormFeedback>
+                                                        <FormText className="red">{errors.fundingSource}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>

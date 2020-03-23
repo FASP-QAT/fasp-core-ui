@@ -132,6 +132,8 @@ const EditDataSourceType = React.lazy(() => import('./views/DataSourceType/Updat
 const AddCurrency = React.lazy(() => import('./views/Currency/AddCurrencyComponent'));
 const ListCurrency = React.lazy(() => import('./views/Currency/CurrencyListComponent'));
 const EditCurrency = React.lazy(() => import('./views/Currency/UpdateCurrencyComponent'));
+const DatabaseTranslation = React.lazy(() => import('./views/Translations/DatabaseTranslations'));
+const LabelTranslation=React.lazy(()=>import('./views/Translations/LabelTranslations'))
 const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 
 
@@ -156,10 +158,10 @@ const routes = [
 
   
   { path: '/product/editProduct', name: 'Edit Product', component: EditProdct },
-  { path: '/product/listProduct', name: 'Product List', component: ListProdct },
+  { path: '/product/listProduct', name: 'Product ', component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
   { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
-  { path: '/program/listProgram', name: 'Program List', component: Programs },
+  { path: '/program/listProgram', name: 'Program ', component: Programs },
   { path: '/program/editProgram', name: 'Edit Program', component: EditProgram },
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
@@ -305,6 +307,8 @@ const routes = [
   { path: '/currency/listCurrency', exact: true, name: 'Currency / Currency List', component: ListCurrency },
   { path: '/currency/listCurrency/:message', component: ListCurrency },
   { path: '/currency/editCurrency', name: 'Currency / Edit Currency', component: EditCurrency },
+  { path: '/translations/databaseTranslations', name: 'Database Translations', component: DatabaseTranslation },
+  { path: '/translations/labelTranslations', name: 'Label Translations', component: LabelTranslation },
 ];
 
 export default routes;

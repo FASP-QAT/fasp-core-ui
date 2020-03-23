@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -207,6 +207,8 @@ class AddSubFundingSourceComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
+                            <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
                             <Input
                               type="select"
                               name="fundingSourceId"
@@ -222,10 +224,13 @@ class AddSubFundingSourceComponent extends Component {
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {fundingSourceList}
                             </Input>
+                             </InputGroupAddon>
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
+                            <InputGroupAddon addonType="prepend">
+                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                             <Input type="text"
                               name="subFundingSource"
                               id="subFundingSource"
@@ -237,13 +242,14 @@ class AddSubFundingSourceComponent extends Component {
                               required
                               value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                             />
+                             </InputGroupAddon>
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
                           </FormGroup>

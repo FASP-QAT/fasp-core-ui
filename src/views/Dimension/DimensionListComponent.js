@@ -77,55 +77,7 @@ export default class UnitTypeListComponent extends Component {
             alert("You must be Online.")
         }
 
-    }
-    // render() {
-
-    //     return (
-    //         <>
-    //             <p>{this.props.match.params.message}</p>
-    //             <div>
-    //                 <button type="button" style={{ marginLeft: '-999px' }} onClick={this.addNewUnitType}>{myConst.ADD_NEW_UNIT_TYPE}</button><br /><br />
-    //             </div>
-
-    //             <div className="unitTypeList">
-
-    //                 <h1>{myConst.UNIT_TYPE_LIST}</h1>
-    //                 <table border="1" align="center">
-    //                     <thead>
-    //                         <tr>
-    //                             <th>{myConst.UNIT_TYPE_NAME_EN}</th>
-    //                             <th>{myConst.UNIT_TYPE_NAME_FR}</th>
-    //                             <th>{myConst.UNIT_TYPE_NAME_SP}</th>
-    //                             <th>{myConst.UNIT_TYPE_NAME_PO}</th>
-                               
-
-    //                         </tr>
-    //                     </thead>
-    //                     <tbody>
-    //                         {
-    //                             this.state.unitTypeList.map(unityType =>
-
-    //                                 <tr key={unityType.unitTypeId} onClick={() => this.editUnitType(unityType)}>
-    //                                     <td>{unityType.label.label_en}</td>
-    //                                     <td>{unityType.label.label_fr}</td>
-    //                                     <td>{unityType.label.label_sp}</td>
-    //                                     <td>{unityType.label.label_pr}</td>
-                                       
-    //                                 </tr>
-    //                             )
-
-    //                         }
-    //                     </tbody>
-    //                 </table>
-    //             </div>
-
-
-    //         </>
-    //     );
-    // }
-
-
-    render() {
+    }render() {
 
         return (
             <div className="animated">

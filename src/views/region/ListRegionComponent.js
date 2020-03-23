@@ -99,7 +99,7 @@ class RegionListComponent extends Component {
                         </div>
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.regionList} version="4" hover pagination search headerStyle={ { background: '#D1EEEE' } }  options={this.options}>
+                        <BootstrapTable data={this.state.regionList} version="4" hover pagination search  options={this.options}>
                             <TableHeaderColumn isKey dataField='regionId' hidden>ID</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showRegionLabel} dataAlign="center">{i18n.t('static.region.region')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="realmCountry" dataFormat={this.showRealmCountryLabel} dataAlign="center" dataSort>{i18n.t('static.region.country')}</TableHeaderColumn>
