@@ -94,11 +94,11 @@ class Login extends Component {
       <div className="main-content flex-row align-items-center">
 
         <div className="Login-component">
-          
+
           <div>
             <img src={'assets/img/QAT-logo.png'} className="img-fluid upper-logo" />
           </div>
-         
+
           <Col>
             <Row className="justify-content-center">
               <Col md="4">
@@ -170,10 +170,16 @@ class Login extends Component {
                                   this.setState({ message: 'Error occured' });
                                 }
                                 if (res) {
+                                  let tempUser = localStorage.getItem("tempUser");
+                                  let encryptedUser = localStorage.getItem("user-" + localStorage.getItem("tempUser"));
+                                  console.log("encrypteduser---", encryptedUser);
+                                  let user = CryptoJS.AES.decrypt(encryptedUser, `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                  console.log("user -------", user);
                                   localStorage.setItem('typeOfSession', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt(localStorage.getItem("tempUser").toString(), `${SECRET_KEY}`));
+                                  // localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.removeItem("tempUser");
-                                  this.props.history.push(`/welcome`)
+                                  this.props.history.push(`/dashboard`)
                                 } else {
                                   this.setState({ message: 'Bad credentials.' });
                                 }
@@ -260,7 +266,7 @@ class Login extends Component {
             < Col className="Login-bttom ">
               <Col xs="12">
                 <CardBody>
-                  
+
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
                   (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.
                   GHSC-PSM connects technical solutions and proven commercial processes to

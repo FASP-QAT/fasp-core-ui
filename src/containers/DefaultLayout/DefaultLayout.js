@@ -28,29 +28,31 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 class DefaultLayout extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
-    console.log("----------------123-----------------")
     e.preventDefault();
-    console.log("----------------4567-----------------")
     AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
   signOut(e) {
     e.preventDefault();
-    console.log("sign out called---");
-    AuthenticationService.setupAxiosInterceptors();
-    console.log("interceptors set up---");
-    LogoutService.logout()
-      .then(response => {
-        console.log("logout response---", response);
-        if (response.status == 200) {
-          localStorage.removeItem("token-" + AuthenticationService.getLoggedInUserId());
-          this.props.history.push(`/login/static.logoutSuccess`)
-        }
-      }).catch(
-        error => {
-          console.log("logout error---", error);
-        }
-      );
+    if (navigator.onLine) {
+      AuthenticationService.setupAxiosInterceptors();
+      LogoutService.logout()
+        .then(response => {
+          if (response.status == 200) {
+            localStorage.removeItem("token-" + AuthenticationService.getLoggedInUserId());
+            localStorage.removeItem("curUser");
+            localStorage.removeItem("lang");
+            this.props.history.push(`/login/static.logoutSuccess`)
+          }
+        }).catch(
+          error => {
+          }
+        );
+    } else {
+      localStorage.removeItem("token-" + AuthenticationService.getLoggedInUserId());
+      localStorage.removeItem("curUser");
+      localStorage.removeItem("lang");
+    }
     // this.props.history.push('/login')
   }
 

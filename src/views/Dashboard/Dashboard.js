@@ -10,7 +10,9 @@ class Dashboard extends Component {
     };
   }
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    if (navigator.onLine) {
+      AuthenticationService.setupAxiosInterceptors();
+    }
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
