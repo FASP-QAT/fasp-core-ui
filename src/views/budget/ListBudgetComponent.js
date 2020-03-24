@@ -12,7 +12,8 @@ class ListBudgetComponent extends Component {
     super(props);
     this.state = {
       table: [],
-      lang: 'en'
+      lang: localStorage.getItem('lang'),
+      message: ''
     }
 
     this.options = {
@@ -36,11 +37,9 @@ class ListBudgetComponent extends Component {
   }
 
   editBudget(budget) {
-    console.log("going to Edit Budget");
-    console.log(budget);
+    var budgetId = budget.budgetId
     this.props.history.push({
-      pathname: "/budget/editBudget",
-      state: { budget }
+      pathname: `/budget/editBudget/${budgetId}`
     });
   }
 
@@ -52,6 +51,7 @@ class ListBudgetComponent extends Component {
   }
 
   componentDidMount() {
+    console.log("message------------->"+this.props.match.params.message);
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
@@ -101,6 +101,8 @@ class ListBudgetComponent extends Component {
   render() {
     return (
       <div className="animated">
+        <h5>{i18n.t(this.props.match.params.message)}</h5>
+        <h5>{i18n.t(this.state.message)}</h5>
         <Card>
           <CardHeader>
             <i className="icon-menu"></i>{i18n.t('static.budget.budgetlist')}{' '}
@@ -120,7 +122,7 @@ class ListBudgetComponent extends Component {
               <TableHeaderColumn dataField="startDate" dataSort>{i18n.t('static.common.startdate')}</TableHeaderColumn>
               <TableHeaderColumn dataField="stopDate" dataSort>{i18n.t('static.common.stopdate')}</TableHeaderColumn>
               <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>{i18n.t('static.common.active')}</TableHeaderColumn>
-           </BootstrapTable>
+            </BootstrapTable>
           </CardBody>
         </Card>
       </div>

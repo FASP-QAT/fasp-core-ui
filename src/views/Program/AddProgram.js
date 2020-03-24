@@ -155,7 +155,7 @@ export default class AddProgram extends Component {
             .then(response => {
                 // console.log("realm list---", response.data.data);
                 this.setState({
-                    realmList: response.data.data
+                    realmList: response.data
                 })
             }).catch(
                 error => {
@@ -181,9 +181,9 @@ export default class AddProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRealmCountryList(e.target.value)
             .then(response => {
-                console.log("realm list---", response.data.data);
+                console.log("realm list---", response.data);
                 this.setState({
-                    realmCountryList: response.data.data
+                    realmCountryList: response.data
                 })
             }).catch(
                 error => {
@@ -205,9 +205,9 @@ export default class AddProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getOrganisationList(e.target.value)
             .then(response => {
-                console.log("organisation list---", response.data.data);
+                console.log("organisation list---", response.data);
                 this.setState({
-                    organisationList: response.data.data
+                    organisationList: response.data
                 })
             }).catch(
                 error => {
@@ -229,9 +229,9 @@ export default class AddProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getHealthAreaList(e.target.value)
             .then(response => {
-                console.log("health area list---", response.data.data);
+                console.log("health area list---", response.data);
                 this.setState({
-                    healthAreaList: response.data.data
+                    healthAreaList: response.data
                 })
             }).catch(
                 error => {
@@ -256,8 +256,8 @@ export default class AddProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRegionList(e.target.value)
             .then(response => {
-                console.log("health area list---", response.data.data);
-                var json = response.data.data;
+                console.log("health area list---", response.data);
+                var json = response.data;
                 var regList = [];
                 for (var i = 0; i < json.length; i++) {
                     regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }

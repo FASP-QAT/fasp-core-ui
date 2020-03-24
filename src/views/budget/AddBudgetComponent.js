@@ -8,6 +8,9 @@ import BudgetService from "../../api/BudgetService";
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../common/AuthenticationService.js';
 import SubFundingSourceService from '../../api/SubFundingSourceService';
+import getLabelText from '../../CommonComponent/getLabelText'
+import { Date } from 'core-js';
+
 
 const initialValues = {
     budget: '',
@@ -20,7 +23,7 @@ const initialValues = {
     subFundingSourceList: []
 }
 
-const validationSchema = function (values,t) {
+const validationSchema = function (values, t) {
     return Yup.object().shape({
         budget: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
@@ -39,7 +42,7 @@ const validationSchema = function (values,t) {
 
 const validate = (getValidationSchema) => {
     return (values) => {
-        const validationSchema = getValidationSchema(values,i18n.t)
+        const validationSchema = getValidationSchema(values, i18n.t)
         try {
             validationSchema.validateSync(values, { abortEarly: false })
             return {}
@@ -60,22 +63,42 @@ const getErrorsFromValidationError = (validationError) => {
 }
 class AddBudgetComponent extends Component {
     constructor(props) {
+
+
         super(props);
         this.state = {
             programs: [],
             subFundingSources: [],
+            message: '',
+            lang: localStorage.getItem('lang'),
             budget: {
                 program: {
                 },
                 subFundingSource: {
                 },
                 label: {
-                }
+                },
+                startDate: '',
+                stopDate: ''
+
             },
-            message: ''
+            
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.currentDate=this.currentDate.bind(this);
+    }
+
+    currentDate() {
+        var todaysDate = new Date();
+        var yyyy = todaysDate.getFullYear().toString();
+        var mm = (todaysDate.getMonth() + 1).toString();
+        var dd = todaysDate.getDate().toString();
+        var mmChars = mm.split('');
+        var ddChars = dd.split('');
+        let date = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+        // console.log("------date", date)
+        return date;
     }
 
     dataChange(event) {
@@ -94,6 +117,7 @@ class AddBudgetComponent extends Component {
         }
         if (event.target.name === "startDate") {
             budget.startDate = event.target.value;
+            budget.stopDate=''
         }
         if (event.target.name === "stopDate") {
             budget.stopDate = event.target.value;
@@ -101,7 +125,7 @@ class AddBudgetComponent extends Component {
         this.setState({
             budget
         },
-            () => { });
+            () => {});
     };
 
     touchAll(setTouched, errors) {
@@ -163,8 +187,9 @@ class AddBudgetComponent extends Component {
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
+                console.log("--------res", response);
                 this.setState({
-                    subFundingSources: response.data.data
+                    subFundingSources: response.data
                 })
             }).catch(
                 error => {
@@ -190,19 +215,21 @@ class AddBudgetComponent extends Component {
     }
 
     render() {
+
         const { programs } = this.state;
         const { subFundingSources } = this.state;
+
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {item.label.label_en}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);
         let subFundingSourceList = subFundingSources.length > 0 && subFundingSources.map((item, i) => {
             return (
                 <option key={i} value={item.subFundingSourceId}>
-                    {item.label.label_en}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);
@@ -212,7 +239,7 @@ class AddBudgetComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-        <i className="icon-note"></i><strong>{i18n.t('static.budget.budgetadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.budget.budgetadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -220,9 +247,7 @@ class AddBudgetComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     BudgetService.addBudget(this.state.budget)
                                         .then(response => {
-                                            console.log("===========",response)
                                             if (response.status == "200") {
-                                                // this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                                 this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                             } else {
                                                 this.setState({
@@ -334,7 +359,8 @@ class AddBudgetComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                        <Input type="text"
+                                                        <Input
+                                                            
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -343,13 +369,15 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="date"
+                                                            min={this.currentDate()}
                                                             placeholder="{i18n.t('static.budget.budgetstartdate')}"
                                                             required />
                                                         <FormFeedback>{errors.startDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                                        <Input type="text"
+                                                        <Input
+                                                            value={this.state.budget.stopDate}
                                                             name="stopDate"
                                                             id="stopDate"
                                                             bsSize="sm"
@@ -358,6 +386,7 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="date"
+                                                            min={this.state.budget.startDate}
                                                             placeholder={i18n.t('static.budget.budgetstopdate')}
                                                             required />
                                                         <FormFeedback>{errors.stopDate}</FormFeedback>
@@ -379,8 +408,8 @@ class AddBudgetComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{this.state.message}</h6>
-                    <h6>{this.props.match.params.message}</h6>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
                 </div>
             </div>
         );
