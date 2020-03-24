@@ -22,11 +22,11 @@ const initialValues = {
     programList: [],
     subFundingSourceList: []
 }
-
+const entityname=i18n.t('static.budget.budget');
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         budget: Yup.string()
-            .required(i18n.t('static.budget.budgetamountdesc')),
+            .required(i18n.t('static.budget.budgetdesctext')),
         programId: Yup.string()
             .required(i18n.t('static.budget.programtext')),
         subFundingSourceId: Yup.string()
@@ -174,7 +174,7 @@ class AddBudgetComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: i18n.t(error.response.data.messageCode ,{entityname})});
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
@@ -191,6 +191,7 @@ class AddBudgetComponent extends Component {
                 this.setState({
                     subFundingSources: response.data
                 })
+                
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -202,7 +203,7 @@ class AddBudgetComponent extends Component {
                             case 404:
                             case 406:
                             case 412:
-                                this.setState({ message: error.response.data.messageCode });
+                                this.setState({ message: i18n.t(error.response.data.messageCode ,{entityname}) });
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
@@ -248,7 +249,7 @@ class AddBudgetComponent extends Component {
                                     BudgetService.addBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                this.props.history.push(`/budget/listBudget/${response.data.message}`)
+                                                this.props.history.push(`/budget/listBudget/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.message
@@ -266,7 +267,7 @@ class AddBudgetComponent extends Component {
                                                         case 404:
                                                         case 406:
                                                         case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
+                                                            this.setState({ message:i18n.t( error.response.data.messageCode,{entityname}) });
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
@@ -433,7 +434,7 @@ class AddBudgetComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/budget/listBudget/` + "Action Canceled")
+        this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled',{entityname}))
     }
 }
 
