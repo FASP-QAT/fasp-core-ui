@@ -374,17 +374,17 @@ class AddBudgetComponent extends Component {
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText>
                                                             <Input
-                                                            value={this.state.budget.stopDate}
-                                                            name="stopDate"
-                                                            id="stopDate"
+                                                            // value={this.state.budget.st}
+                                                            name="startDate"
+                                                            id="startDate"
                                                             bsSize="sm"
-                                                            valid={!errors.stopDate}
-                                                            invalid={touched.stopDate && !!errors.stopDate}
+                                                            valid={!errors.startDate}
+                                                            invalid={touched.startDate && !!errors.startDate}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="date"
-                                                            min={this.state.budget.startDate}
-                                                            placeholder={i18n.t('static.budget.budgetstopdate')}
+                                                            min={this.currentDate()}
+                                                            placeholder={i18n.t('static.budget.budgetstartdate')}
                                                             required />
                                                         </InputGroupAddon>
                                                         <FormText className="red">{errors.startDate}</FormText>
