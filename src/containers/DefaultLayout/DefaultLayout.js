@@ -91,7 +91,22 @@ class DefaultLayout extends Component {
                         url: '/ProgramDashboard',
                         icon: 'cui-dashboard icons',
                       },
-
+                      {
+                        name: i18n.t('static.translations.translations'),
+                        icon: 'fa fa-list',
+                        children: [
+                          {
+                            name: i18n.t('static.label.labelTranslations'),
+                            url: '/translations/labelTranslations',
+                            icon: 'fa fa-list-alt'
+                          },
+                          {
+                            name: i18n.t('static.label.databaseTranslations'),
+                            url: '/translations/databaseTranslations',
+                            icon: 'fa fa-list-alt'
+                          }
+                        ]
+                      },
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
