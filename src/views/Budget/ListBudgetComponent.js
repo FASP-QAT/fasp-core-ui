@@ -7,6 +7,7 @@ import BudgetServcie from '../../api/BudgetService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import i18n from '../../i18n'
+const entityname=i18n.t('static.budget.budget');
 class ListBudgetComponent extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +16,6 @@ class ListBudgetComponent extends Component {
       lang: localStorage.getItem('lang'),
       message: ''
     }
-
     this.options = {
       sortIndicator: true,
       hideSizePerPage: true,
@@ -74,7 +74,7 @@ class ListBudgetComponent extends Component {
                 case 404:
                 case 406:
                 case 412:
-                    this.setState({ message: error.response.data.messageCode });
+                    this.setState({ message: i18n.t(error.response.data.messageCode,{entityname}) });
                     break;
                 default:
                     this.setState({ message: 'static.unkownError' });
@@ -109,8 +109,8 @@ class ListBudgetComponent extends Component {
   render() {
     return (
       <div className="animated">
-        <h5>{i18n.t(this.props.match.params.message)}</h5>
-        <h5>{i18n.t(this.state.message)}</h5>
+        <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
+        <h5>{i18n.t(this.state.message,{entityname})}</h5>
         <Card>
           <CardHeader>
             <i className="icon-menu"></i>{i18n.t('static.budget.budgetlist')}{' '}
