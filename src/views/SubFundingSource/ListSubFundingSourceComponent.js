@@ -145,7 +145,7 @@ class ListSubFundingSourceComponent extends Component {
             headerAlign: 'center'
         }, {
             dataField: 'active',
-            text: 'Active',
+            text: 'Status',
             sort: true,
             align: 'center',
             headerAlign: 'center',
