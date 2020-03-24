@@ -166,9 +166,10 @@ const routes = [
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
   { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
-  { path: '/budget/listBudget', name: 'Budget List', component: ListBudgetComponent },
+  
+  { path: '/budget/listBudget',exact: true, name: 'Budget List', component: ListBudgetComponent },
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
-  { path: '/budget/editBudget', name: 'Update Budget', component: EditBudgetComponent },
+  { path: '/budget/editBudget/:budgetId', name: 'Update Budget', component: EditBudgetComponent },
   { path: '/', exact: true, name: 'Home' },
   // { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
   { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
