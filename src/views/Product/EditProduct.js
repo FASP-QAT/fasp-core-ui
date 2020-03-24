@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import {
     Row, Col, Card, CardHeader,
     CardFooter, Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input
+    Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText,FormText
 } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css';
 import RealmServcie from '../../api/RealmService';
 import UnitService from '../../api/UnitService';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import ProductService from '../../api/ProductService';
 import i18n from '../../i18n'
@@ -315,6 +315,8 @@ export default class EditProduct extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.product')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input 
                                                             // value={getLabelText(this.state.product.label,this.state.lan)}
                                                             value={this.state.product.label.label_en}
@@ -327,10 +329,13 @@ export default class EditProduct extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.productName}</FormFeedback>
+                                                             </InputGroupAddon>
+                                                        <FormText className="red"back>{errors.productName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             // value={getLabelText(this.state.product.genericLabel, this.state.lan)}
                                                             value={this.state.product.genericLabel.label_en}
@@ -342,10 +347,13 @@ export default class EditProduct extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.genericName}</FormFeedback>
+                                                               </InputGroupAddon>
+                                                        <FormText className="red">{errors.genericName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.product.realm')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-th-large"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -362,10 +370,13 @@ export default class EditProduct extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {realms}
                                                         </Input>
-                                                        <FormFeedback>{errors.realmId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="">{i18n.t('static.product.productcategory')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-bar-chart"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="productCategoryId"
@@ -384,10 +395,13 @@ export default class EditProduct extends Component {
                                                             <option value="3">Product Category Three</option> */}
                                                             {productCategories}
                                                         </Input>
-                                                        <FormFeedback>{errors.productCategoryId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.productCategoryId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="unitId">Forcasting Unit</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="unitId"
@@ -403,7 +417,8 @@ export default class EditProduct extends Component {
                                                             {/* <option value="0">Please select</option> */}
                                                             {units}
                                                         </Input>
-                                                        <FormFeedback>{errors.unitId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                         <FormText className="red">{errors.unitId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                     <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
@@ -445,8 +460,8 @@ export default class EditProduct extends Component {
                                                     <FormGroup>
 
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                 </FormGroup>
                                                 </CardFooter>

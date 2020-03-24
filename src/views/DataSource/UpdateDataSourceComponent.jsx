@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import DataSourceService from '../../api/DataSourceService';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 let initialValues = {
     label: '',
@@ -221,6 +221,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-database"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="label"
@@ -234,9 +236,13 @@ export default class UpdateDataSourceComponent extends Component {
                                                             required
                                                         >
                                                         </Input>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="dataSourceTypeId"
@@ -252,7 +258,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {dataSourceTypes}
                                                         </Input>
-                                                        <FormFeedback>{errors.dataSourceTypeId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.dataSourceTypeId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -292,8 +299,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                       &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import UnitTypeService from '../../api/UnitTypeService.js';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 const initialValues = {
     label: ""
@@ -117,7 +117,7 @@ export default class AddUnitTypeComponent extends Component {
                             </CardHeader>
                             <CardBody>
                                 <Formik
-                                    // initialValues={initialValues}
+
                                     validate={validate(validationSchema)}
 
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -125,11 +125,11 @@ export default class AddUnitTypeComponent extends Component {
                                         UnitTypeService.addUniType(this.state.unitType).then(response => {
                                             if (response.data.status == "Success") {
                                                 this.props.history.push(`/diamension/diamensionlist/${response.data.message}`)
-                                              } else {
+                                            } else {
                                                 this.setState({
-                                                  message: response.data.message
+                                                    message: response.data.message
                                                 })
-                                              }
+                                            }
                                         }
                                         )
                                             .catch(
@@ -171,23 +171,26 @@ export default class AddUnitTypeComponent extends Component {
 
                                                     <FormGroup>
                                                         <Label for="label">Dimension Type</Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.unitType.label.label_en}
-                                                            required />
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="label"
+                                                                id="label"
+                                                                bsSize="sm"
+                                                                valid={!errors.label}
+                                                                invalid={touched.label && !!errors.label}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.unitType.label.label_en}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        
-                                                    <Button type="reset" color="danger"className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </Form>

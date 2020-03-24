@@ -5,36 +5,36 @@ const AddDimension = React.lazy(() => import('./views/Dimension/AddDimensionComp
 const DimensionList = React.lazy(() => import('./views/Dimension/DimensionListComponent'));
 const EditDimension = React.lazy(() => import('./views/Dimension/EditDimensionComponent'));
 // const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
-const AddSubFundingSource = React.lazy(() => import('./views/subFundingSource/AddSubFundingSourceComponent'));
-const ListSubFundingSource = React.lazy(() => import('./views/subFundingSource/ListSubFundingSourceComponent'));
-const EditSubFundingSource = React.lazy(() => import('./views/subFundingSource/EditSubFundingSourceComponent'));
+const AddSubFundingSource = React.lazy(() => import('./views/SubFundingSource/AddSubFundingSourceComponent'));
+const ListSubFundingSource = React.lazy(() => import('./views/SubFundingSource/ListSubFundingSourceComponent'));
+const EditSubFundingSource = React.lazy(() => import('./views/SubFundingSource/EditSubFundingSourceComponent'));
 const ApplicationDashboard = React.lazy(() => import('./views/ApplicationDashboard'));
 const RealmDashboard = React.lazy(() => import('./views/RealmDashboard'));
 const ProgramDashboard = React.lazy(() => import('./views/ProgramDashboard'));
-const AddFundingSource = React.lazy(() => import('./views/fundingSource/AddFundingSourceComponent'));
-const ListFundingSource = React.lazy(() => import('./views/fundingSource/ListFundingSourceComponent'));
-const EditFundingSource = React.lazy(() => import('./views/fundingSource/EditFundingSourceComponent'));
-const AddProcurementAgent = React.lazy(() => import('./views/procurementAgent/AddProcurementAgentComponent'));
-const ListProcurementAgent = React.lazy(() => import('./views/procurementAgent/ListProcurementAgentComponent'));
-const EditProcurementAgent = React.lazy(() => import('./views/procurementAgent/EditProcurementAgentComponent'));
-const AddManufacturer = React.lazy(() => import('./views/manufacturer/AddManufacturerComponent'));
-const ListManufacturer = React.lazy(() => import('./views/manufacturer/ListManufacturerComponent'));
-const EditManufacturer = React.lazy(() => import('./views/manufacturer/EditManufacturerComponent'));
-const AddRegion = React.lazy(() => import('./views/region/AddRegionComponent'));
-const ListRegion = React.lazy(() => import('./views/region/ListRegionComponent'));
-const EditRegion = React.lazy(() => import('./views/region/EditRegionComponent'));
-const ListRealmCountry = React.lazy(() => import('./views/realmCountry/ListRealmCountryComponent'));
-const AddRealmCountry = React.lazy(() => import('./views/realmCountry/AddRealmCountryComponent'));
+const AddFundingSource = React.lazy(() => import('./views/FundingSource/AddFundingSourceComponent'));
+const ListFundingSource = React.lazy(() => import('./views/FundingSource/ListFundingSourceComponent'));
+const EditFundingSource = React.lazy(() => import('./views/FundingSource/EditFundingSourceComponent'));
+const AddProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/AddProcurementAgentComponent'));
+const ListProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/ListProcurementAgentComponent'));
+const EditProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/EditProcurementAgentComponent'));
+const AddManufacturer = React.lazy(() => import('./views/Manufacturer/AddManufacturerComponent'));
+const ListManufacturer = React.lazy(() => import('./views/Manufacturer/ListManufacturerComponent'));
+const EditManufacturer = React.lazy(() => import('./views/Manufacturer/EditManufacturerComponent'));
+const AddRegion = React.lazy(() => import('./views/Region/AddRegionComponent'));
+const ListRegion = React.lazy(() => import('./views/Region/ListRegionComponent'));
+const EditRegion = React.lazy(() => import('./views/Region/EditRegionComponent'));
+const ListRealmCountry = React.lazy(() => import('./views/RealmCountry/ListRealmCountryComponent'));
+const AddRealmCountry = React.lazy(() => import('./views/RealmCountry/AddRealmCountryComponent'));
 const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswordComponent'));
 const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ChangePassword = React.lazy(() => import('./views/Pages/Login/ChangePasswordComponent'));
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
-const AddRole = React.lazy(() => import('./views/role/AddRoleComponent'));
-const ListRole = React.lazy(() => import('./views/role/ListRoleComponent'));
-const EditRole = React.lazy(() => import('./views/role/EditRoleComponent'));
-const AddUser = React.lazy(() => import('./views/user/AddUserComponent'));
-const ListUser = React.lazy(() => import('./views/user/ListUserComponent'));
-const EditUser = React.lazy(() => import('./views/user/EditUserComponent'));
+const AddRole = React.lazy(() => import('./views/Role/AddRoleComponent'));
+const ListRole = React.lazy(() => import('./views/Role/ListRoleComponent'));
+const EditRole = React.lazy(() => import('./views/Role/EditRoleComponent'));
+const AddUser = React.lazy(() => import('./views/User/AddUserComponent'));
+const ListUser = React.lazy(() => import('./views/User/ListUserComponent'));
+const EditUser = React.lazy(() => import('./views/User/EditUserComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -95,15 +95,15 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
-const AddBudgetComponent = React.lazy(() => import('./views/budget/AddBudgetComponent'));
-const ListBudgetComponent = React.lazy(() => import('./views/budget/ListBudgetComponent'));
-const EditBudgetComponent = React.lazy(() => import('./views/budget/EditBudgetComponent'));
+const AddBudgetComponent = React.lazy(() => import('./views/Budget/AddBudgetComponent'));
+const ListBudgetComponent = React.lazy(() => import('./views/Budget/ListBudgetComponent'));
+const EditBudgetComponent = React.lazy(() => import('./views/Budget/EditBudgetComponent'));
 const AddProgramProduct = React.lazy(() => import('./views/ProgramProduct/AddProgramProduct'));
 const AddProductCategory = React.lazy(() => import('./views/ProductCategory/AddProductCategory'));
 const AddProgram = React.lazy(() => import('./views/Program/AddProgram'));
 const Programs = React.lazy(() => import('./views/Program/ProgramList'));
 const EditProgram = React.lazy(() => import('./views/Program/EditProgram'));
-const SubFundingSourceList = React.lazy(() => import('./views/subFundingSource/ListSubFundingSourceComponent'));
+const SubFundingSourceList = React.lazy(() => import('./views/SubFundingSource/ListSubFundingSourceComponent'));
 const AddProduct = React.lazy(() => import('./views/Product/AddProduct'));
 const ListProdct = React.lazy(() => import('./views/Product/ProductList'));
 const EditProdct = React.lazy(() => import('./views/Product/EditProduct'));
@@ -132,6 +132,8 @@ const EditDataSourceType = React.lazy(() => import('./views/DataSourceType/Updat
 const AddCurrency = React.lazy(() => import('./views/Currency/AddCurrencyComponent'));
 const ListCurrency = React.lazy(() => import('./views/Currency/CurrencyListComponent'));
 const EditCurrency = React.lazy(() => import('./views/Currency/UpdateCurrencyComponent'));
+const DatabaseTranslation = React.lazy(() => import('./views/Translations/DatabaseTranslations'));
+const LabelTranslation=React.lazy(()=>import('./views/Translations/LabelTranslations'))
 const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 
 
@@ -154,12 +156,12 @@ const routes = [
 
 
 
-  
-  { path: '/product/editProduct', name: 'Edit Product', component: EditProdct },
-  { path: '/product/listProduct', name: 'Product List', component: ListProdct },
+
+  { path: '/product/editProduct', name: i18n.t('static.product.productedit'), component: EditProdct },
+  { path: '/product/listProduct', name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
   { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
-  { path: '/program/listProgram', name: 'Program List', component: Programs },
+  { path: '/program/listProgram', name: 'Program ', component: Programs },
   { path: '/program/editProgram', name: 'Edit Program', component: EditProgram },
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
@@ -283,8 +285,8 @@ const routes = [
   { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
   { path: '/consumptionDetails', name: 'Consumption Data', component: ConsumptionDetails },
   { path: '/language/addLanguage', name: 'Language / Add Language', component: AddLanguage },
-  { path: '/language/languagelist', exact: true, name: 'Language / Language List', component: ListLanguage },
-  { path: '/language/languagelist/:message', component: ListLanguage },
+  { path: '/language/listLanguage', exact: true, name: 'Language / Language List', component: ListLanguage },
+  { path: '/language/listLanguage/:message', component: ListLanguage },
   { path: '/language/editLanguage', name: 'Language / Edit Language', component: EditLanguage },
 
   { path: '/country/addCountry', name: 'Country / Add Country', component: AddCountry },
@@ -306,6 +308,8 @@ const routes = [
   { path: '/currency/listCurrency', exact: true, name: 'Currency / Currency List', component: ListCurrency },
   { path: '/currency/listCurrency/:message', component: ListCurrency },
   { path: '/currency/editCurrency', name: 'Currency / Edit Currency', component: EditCurrency },
+  { path: '/translations/databaseTranslations', name: 'Database Translations', component: DatabaseTranslation },
+  { path: '/translations/labelTranslations', name: 'Label Translations', component: LabelTranslation },
 ];
 
 export default routes;

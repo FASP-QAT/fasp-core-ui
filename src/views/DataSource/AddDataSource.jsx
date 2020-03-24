@@ -3,7 +3,7 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import i18n from '../../i18n';
@@ -130,11 +130,11 @@ export default class AddDataSource extends Component {
                     }
                 }
             );
-        
+
 
     }
 
-    
+
     Capitalize(str) {
         this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
@@ -154,12 +154,12 @@ export default class AddDataSource extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-        <i className="icon-note"></i><strong>{i18n.t('static.datasource.datasourceadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.datasource.datasourceadd')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {  
+                                onSubmit={(values, { setSubmitting, setErrors }) => {
                                     DataSourceService.addDataSource(this.state)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -205,43 +205,49 @@ export default class AddDataSource extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasource.datasource')}</Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.label.label_en}
-                                                            required />
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-database"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="label"
+                                                                id="label"
+                                                                bsSize="sm"
+                                                                valid={!errors.label}
+                                                                invalid={touched.label && !!errors.label}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.label.label_en}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="dataSourceTypeId"
-                                                            id="dataSourceTypeId"
-                                                            bsSize="sm"
-                                                            valid={!errors.dataSourceTypeId}
-                                                            invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required>
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {dataSourceTypes}
-                                                        </Input>
-                                                        <FormFeedback>{errors.dataSourceTypeId}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
+                                                            <Input
+                                                                type="select"
+                                                                name="dataSourceTypeId"
+                                                                id="dataSourceTypeId"
+                                                                bsSize="sm"
+                                                                valid={!errors.dataSourceTypeId}
+                                                                invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required>
+                                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                                {dataSourceTypes}
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.dataSourceTypeId}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                         <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
-                                                       
+
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

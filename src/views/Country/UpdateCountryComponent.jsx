@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import CountryService from '../../api/CountryService.js';
 import LanguageService from '../../api/LanguageService.js';
 import CurrencyService from '../../api/CurrencyService.js';
@@ -97,13 +97,6 @@ export default class UpdateCountryComponent extends Component {
         if (event.target.name === "countryCode") {
             country.countryCode = event.target.value
         }
-        // if (event.target.name === "country.label.freLabel") {
-        //     this.state.country.label.freLabel = event.target.value
-        // } if (event.target.name === "country.label.spaLabel") {
-        //     this.state.country.label.spaLabel = event.target.value
-        // } if (event.target.name === "country.label.porLabel") {
-        //     this.state.country.label.porLabel = event.target.value
-        // }
         if (event.target.name === "currencyId") {
             country.currency.currencyId = event.target.value
         } if (event.target.name === "languageId") {
@@ -231,9 +224,6 @@ export default class UpdateCountryComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-
-                                    // alert("----"+this.state);
-                                    // console.log("------IN SUBMIT------" + this.state.country)
                                     CountryService.editCountry(this.state.country)
                                         .then(response => {
                                             if (response.data.status == "Success") {
@@ -279,6 +269,8 @@ export default class UpdateCountryComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.country')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-globe"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -289,10 +281,13 @@ export default class UpdateCountryComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.country.label.label_en}
                                                             required />
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                            </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="countryCode">{i18n.t('static.country.countrycode')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="countryCode"
                                                             id="countryCode"
@@ -303,10 +298,13 @@ export default class UpdateCountryComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode}
                                                             required />
-                                                        <FormFeedback>{errors.countryCode}</FormFeedback>
+                                                             </InputGroupAddon>
+                                                        <FormText className="red">{errors.countryCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.country.language')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="languageId"
@@ -322,10 +320,13 @@ export default class UpdateCountryComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
                                                         </Input>
-                                                        <FormFeedback>{errors.languageId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.languageId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="currencyId">{i18n.t('static.country.currency')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-money"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="currencyId"
@@ -341,7 +342,8 @@ export default class UpdateCountryComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {currencyItems}
                                                         </Input>
-                                                        <FormFeedback>{errors.currencyId}</FormFeedback>
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.currencyId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -381,8 +383,8 @@ export default class UpdateCountryComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="submit" color="success"className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.submit')}</Button>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="submit" color="success"className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.submit')}</Button>
                                                     
                                                       
                                                         

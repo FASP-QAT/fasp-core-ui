@@ -4,7 +4,7 @@ import { Card, CardHeader, CardBody } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import ProductService from '../../api/ProductService'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import i18n from '../../i18n'
 
@@ -123,7 +123,7 @@ class ProductList extends Component {
             </div>
           </CardHeader>
           <CardBody>
-            <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
+            <BootstrapTable data={this.state.table} version="4" hover pagination search options={this.options}>
               <TableHeaderColumn isKey dataField="productId" hidden>Product Id</TableHeaderColumn>
               <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showProductLabel} dataSort>{i18n.t('static.product.product')}</TableHeaderColumn>
               <TableHeaderColumn filterFormatted dataField="genericLabel" dataFormat={this.showGenericLabel} dataSort>{i18n.t('static.product.productgenericname')}</TableHeaderColumn>

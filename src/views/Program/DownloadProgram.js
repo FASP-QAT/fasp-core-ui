@@ -15,7 +15,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
