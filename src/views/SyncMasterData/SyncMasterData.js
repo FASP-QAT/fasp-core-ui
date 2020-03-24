@@ -9,7 +9,7 @@ import * as JsStoreFunction from "../../CommonComponent/JsStoreFunctions.js"
 import * as JsStoreFunctionCore from "../../CommonComponent/JsStoreFunctionsCore"
 import moment from 'moment';
 import MasterSyncService from '../../api/MasterSyncService.js';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 export default class SyncMasterData extends Component {
 

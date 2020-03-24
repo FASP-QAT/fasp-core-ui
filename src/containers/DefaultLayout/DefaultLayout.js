@@ -3,7 +3,6 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import i18n from '../../i18n'
 import { Online, Offline } from "react-detect-offline";
-
 import {
   AppAside,
   AppBreadcrumb,
@@ -21,7 +20,7 @@ import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
 import LogoutService from "../../api/LogoutService";
-import AuthenticationService from '../../views/common/AuthenticationService.js';
+import AuthenticationService from '../../views/Common/AuthenticationService.js';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -70,7 +69,9 @@ class DefaultLayout extends Component {
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
+
             <Suspense>
+
               <Online>
                 <AppSidebarNav navConfig={{
                   items:
@@ -132,13 +133,13 @@ class DefaultLayout extends Component {
                           },
                           {
                             name: 'Dimension',
-                            url: 'diamension/diamensionlist',
+                            url: '/diamension/diamensionlist',
                             icon: 'fa fa-map'
                           }
                           ,
                           {
                             name: 'Realm',
-                            url: 'realm/realmlist',
+                            url: '/realm/realmlist',
                             icon: 'fa fa-th-large'
                           },
                         ]
