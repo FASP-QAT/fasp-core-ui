@@ -50,10 +50,10 @@ class DefaultHeader extends Component {
         </Nav>
         <Nav className="ml-auto " navbar>
         <UncontrolledDropdown nav direction="down" className="lang-btn">
-
-            <DropdownToggle nav>
-           { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
-            </DropdownToggle>
+        <DropdownToggle nav>
+        { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
+          &nbsp;<i className="fa fa-caret-down"></i>
+           </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> {i18n.t('static.language.english')}</DropdownItem>
               <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> {i18n.t('static.language.spanish')}</DropdownItem>
