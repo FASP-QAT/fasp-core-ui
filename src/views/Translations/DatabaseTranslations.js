@@ -35,16 +35,18 @@ export default class DatabaseTranslations extends React.Component {
             for (var i = 0; i < json.length; i++) {
                 data = [];
                 data[0] = json[i].labelId;// A
-                data[1] = json[i].label_en;//B
-                data[2] = json[i].label_fr;//C
-                data[3] = json[i].label_pr;//D
-                data[4] = json[i].label_sp;//E
+                data[1]=json[i].labelFor;
+                data[2] = json[i].label_en;//B
+                data[3] = json[i].label_fr;//C
+                data[4] = json[i].label_pr;//D
+                data[5] = json[i].label_sp;//E
                 label[i] = data;
             }
             var options = {
                 data: label,
                 colHeaders: [
                     `${i18n.t('static.translation.labelId')}`,
+                    `${i18n.t('static.translation.labelFor')}`,
                     `${i18n.t('static.translation.english')}`,
                     `${i18n.t('static.translation.french')}`,
                     `${i18n.t('static.translation.pourtegese')}`,
@@ -53,6 +55,7 @@ export default class DatabaseTranslations extends React.Component {
                 colWidths: [80, 80, 80, 80, 80],
                 columns: [
                     { type: 'hidden' },
+                    { type: 'text', readOnly: true }
                 ],
                 pagination: 25,
                 search: true,
@@ -97,10 +100,10 @@ export default class DatabaseTranslations extends React.Component {
         var mapOfLastRow = new Map(Object.entries(tableJson))
         var jsonOfLastRow = {
             labelId: mapOfLastRow.get("0"),
-            label_en: mapOfLastRow.get("1"),
-            label_sp: mapOfLastRow.get("4"),
-            label_fr: mapOfLastRow.get("2"),
-            label_pr: mapOfLastRow.get("3")
+            label_en: mapOfLastRow.get("2"),
+            label_sp: mapOfLastRow.get("5"),
+            label_fr: mapOfLastRow.get("3"),
+            label_pr: mapOfLastRow.get("4")
         }
         labelList[this.state.rowId] = (JSON.stringify(jsonOfLastRow));
         this.setState({
@@ -165,8 +168,8 @@ export default class DatabaseTranslations extends React.Component {
     }
 
     changed = function (instance, cell, x, y, value) {
-        if (x == 1) {
-            var col = ("B").concat(parseInt(y) + 1);
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
             this.el.setStyle(col, "background-color", "yellow");
             if (value == "") {
@@ -174,16 +177,16 @@ export default class DatabaseTranslations extends React.Component {
             } else {
                 this.el.setComments(col, "");
             }
-        } else if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            this.el.setStyle(col, "background-color", "transparent");
-            this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
             this.el.setStyle(col, "background-color", "yellow");
         } else if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+        } else if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
             this.el.setStyle(col, "background-color", "transparent");
             this.el.setStyle(col, "background-color", "yellow");
         }
@@ -193,10 +196,10 @@ export default class DatabaseTranslations extends React.Component {
         var map = new Map(Object.entries(tableJson))
         var json = {
             labelId: map.get("0"),
-            label_en: map.get("1"),
-            label_sp: map.get("4"),
-            label_fr: map.get("2"),
-            label_pr: map.get("3")
+            label_en: map.get("2"),
+            label_sp: map.get("5"),
+            label_fr: map.get("3"),
+            label_pr: map.get("4")
         }
         labelList[y] = (JSON.stringify(json));
         this.setState({

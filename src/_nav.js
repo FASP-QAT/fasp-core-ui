@@ -30,7 +30,6 @@ export default {
       ]
     },
     {
-<<<<<<< HEAD
       name: 'Translations',
       icon: 'fa fa-list',
       children: [
@@ -48,9 +47,7 @@ export default {
     },
     {
       name: 'Application Masters',
-=======
       name: i18n.t('static.dashboard.applicationmaster') ,
->>>>>>> dev
       icon: 'fa fa-list',
       children: [
         {
