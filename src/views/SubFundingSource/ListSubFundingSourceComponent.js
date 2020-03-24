@@ -1,10 +1,13 @@
-
 import React, { Component } from 'react';
 import {
     Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
 } from 'reactstrap';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator'
+
 import i18n from '../../i18n'
 
 import FundingSourceService from "../../api/FundingSourceService";
@@ -14,19 +17,6 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 class ListSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
-        this.options = {
-            sortIndicator: true,
-            hideSizePerPage: false,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                this.editSubFundingSource(row);
-            }.bind(this)
-
-        }
         this.state = {
             fundingSources: [],
             subFundingSourceList: [],
@@ -97,8 +87,8 @@ class ListSubFundingSourceComponent extends Component {
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    subFundingSourceList: response.data.data,
-                    selSubFundingSource: response.data.data
+                    subFundingSourceList: response.data,
+                    selSubFundingSource: response.data
                 })
             }).catch(
                 error => {
@@ -123,22 +113,14 @@ class ListSubFundingSourceComponent extends Component {
             );
     }
 
-    showSubFundingSourceLabel(cell, row) {
-        return cell.label_en;
-    }
-
-    showFundingSourceLabel(cell, row) {
-        return cell.label.label_en;
-    }
-
-    showStatus(cell, row) {
-        if (cell) {
-            return "Active";
-        } else {
-            return "Disabled";
-        }
-    }
     render() {
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                Showing {from} to {to} of {size} Results
+            </span>
+        );
+
         const { fundingSources } = this.state;
         let fundingSourceList = fundingSources.length > 0
             && fundingSources.map((item, i) => {
@@ -148,6 +130,59 @@ class ListSubFundingSourceComponent extends Component {
                     </option>
                 )
             }, this);
+
+        const columns = [{
+            dataField: 'fundingSource.label.label_en',
+            text: 'Funding Source',
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'label.label_en',
+            text: 'Sub Funding Source',
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'active',
+            text: 'Active',
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
+                return (
+                    (row.active ? "Active" : "Disabled")
+                );
+            }
+        }];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: 'First',
+            prePageText: 'Back',
+            nextPageText: 'Next',
+            lastPageText: 'Last',
+            nextPageTitle: 'First page',
+            prePageTitle: 'Pre page',
+            firstPageTitle: 'Next page',
+            lastPageTitle: 'Last page',
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.selSubFundingSource.length
+            }]
+        }
+
+
         return (
             <div className="animated">
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
@@ -183,12 +218,33 @@ class ListSubFundingSourceComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        <BootstrapTable data={this.state.selSubFundingSource} version="4" hover pagination search options={this.options}>
-                            <TableHeaderColumn isKey dataField='subFundingSourceId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="fundingSource" dataFormat={this.showFundingSourceLabel} dataAlign="center" dataSort><strong>{i18n.t('static.subfundingsource.fundingsource')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showSubFundingSourceLabel} dataAlign="center"><strong>{i18n.t('static.subfundingsource.subfundingsource')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort><strong>{i18n.t('static.common.status')}</strong></TableHeaderColumn>
-                        </BootstrapTable>
+                        <ToolkitProvider
+                            keyField="subFundingSourceId"
+                            data={this.state.selSubFundingSource}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                        >
+                            {
+                                props => (
+                                    <div>
+                                        <hr />
+                                        <SearchBar {...props.searchProps} />
+                                        <ClearSearchButton {...props.searchProps} />
+                                        <BootstrapTable noDataIndication="Data not found" tabIndexCell
+                                            pagination={paginationFactory(options)}
+                                            rowEvents={{
+                                                onClick: (e, row, rowIndex) => {
+                                                    this.editSubFundingSource(row);
+                                                }
+                                            }}
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
                     </CardBody>
                 </Card>
             </div>
