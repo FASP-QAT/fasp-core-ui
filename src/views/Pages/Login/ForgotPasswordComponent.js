@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
 
 import UserService from '../../../api/UserService.js';
-import AuthenticationService from '../../common/AuthenticationService.js';
+import AuthenticationService from '../../Common/AuthenticationService.js';
 
 const initialValues = {
     username: ""

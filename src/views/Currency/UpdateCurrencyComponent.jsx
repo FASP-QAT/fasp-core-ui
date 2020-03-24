@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -17,8 +17,8 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         currencyCode: Yup.string()
-        .required(i18n.t('static.currency.currencycodetext')),
-         
+            .required(i18n.t('static.currency.currencycodetext')),
+
         currencySymbol: Yup.string()
             .required(i18n.t('static.currency.currencysymboltext')),
         label: Yup.string()
@@ -61,7 +61,7 @@ export default class UpdateCurrencyComponent extends Component {
                 currencySymbol: '',
                 label: {
                     label_en: ''
-               
+
                 },
                 conversionRateToUsd: ''
             }
@@ -203,67 +203,79 @@ export default class UpdateCurrencyComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
-                                                        <Input type="text"
-                                                            name="currencyCode"
-                                                            id="currencyCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.currencyCode}
-                                                            invalid={touched.currencyCode && !!errors.currencyCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.currency.currencyCode}
-                                                            required />
-                                                        <FormFeedback>{errors.currencyCode}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="currencyCode"
+                                                                id="currencyCode"
+                                                                bsSize="sm"
+                                                                valid={!errors.currencyCode}
+                                                                invalid={touched.currencyCode && !!errors.currencyCode}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.currency.currencyCode}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.currencyCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
-                                                        <Input type="text"
-                                                            name="currencySymbol"
-                                                            id="currencySymbol"
-                                                            bsSize="sm"
-                                                            valid={!errors.currencySymbol}
-                                                            invalid={touched.currencySymbol && !!errors.currencySymbol}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.currency.currencySymbol}
-                                                            required />
-                                                        <FormFeedback>{errors.currencySymbol}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-usd"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="currencySymbol"
+                                                                id="currencySymbol"
+                                                                bsSize="sm"
+                                                                valid={!errors.currencySymbol}
+                                                                invalid={touched.currencySymbol && !!errors.currencySymbol}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.currency.currencySymbol}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.currencySymbol}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.currency.currency')}</Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.currency.label.label_en}
-                                                            required />
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-money"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="label"
+                                                                id="label"
+                                                                bsSize="sm"
+                                                                valid={!errors.label}
+                                                                invalid={touched.label && !!errors.label}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.currency.label.label_en}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}</Label>
-                                                        <Input type="text"
-                                                            name="conversionRate"
-                                                            id="conversionRate"
-                                                            bsSize="sm"
-                                                            valid={!errors.conversionRate}
-                                                            invalid={touched.conversionRate && !!errors.conversionRate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.currency.conversionRateToUsd}
-                                                            required />
-                                                        <FormFeedback>{errors.conversionRate}</FormFeedback>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-exchange"></i></InputGroupText>
+                                                            <Input type="text"
+                                                                name="conversionRate"
+                                                                id="conversionRate"
+                                                                bsSize="sm"
+                                                                valid={!errors.conversionRate}
+                                                                invalid={touched.conversionRate && !!errors.conversionRate}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.currency.conversionRateToUsd}
+                                                                required />
+                                                        </InputGroupAddon>
+                                                        <FormText className="red">{errors.conversionRate}</FormText>
                                                     </FormGroup>
 
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

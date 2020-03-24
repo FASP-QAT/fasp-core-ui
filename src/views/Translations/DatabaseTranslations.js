@@ -9,7 +9,7 @@ import {
     CardFooter, Button, Col
 } from 'reactstrap';
 import i18n from '../../i18n';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import LabelsService from '../../api/LabelService.js';
 
 export default class DatabaseTranslations extends React.Component {
@@ -35,11 +35,11 @@ export default class DatabaseTranslations extends React.Component {
             for (var i = 0; i < json.length; i++) {
                 data = [];
                 data[0] = json[i].labelId;// A
-                data[1]=json[i].labelFor;
-                data[2] = json[i].label_en;//B
-                data[3] = json[i].label_fr;//C
-                data[4] = json[i].label_pr;//D
-                data[5] = json[i].label_sp;//E
+                data[1]=`${i18n.t(json[i].labelFor)}`;//B
+                data[2] = json[i].label_en;//C
+                data[3] = json[i].label_fr;//D
+                data[4] = json[i].label_pr;//E
+                data[5] = json[i].label_sp;//F
                 label[i] = data;
             }
             var options = {

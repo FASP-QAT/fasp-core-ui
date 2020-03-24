@@ -6,7 +6,7 @@ import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import programDate from './ProgramData';
 import ProgramService from "../../api/ProgramService";
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 export default class ProgramList extends Component {
 
@@ -223,12 +223,12 @@ render() {
           <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
           <div className="card-header-actions">
             <div className="card-header-action">
-              <a href="javascript:void();" title="Add Budget" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+              <a href="javascript:void();" title="Add Program" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
             </div>
           </div>
         </CardHeader>
         <CardBody>
-          <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
+          <BootstrapTable data={this.state.table} version="4"  hover pagination search options={this.options}>
             <TableHeaderColumn isKey dataField="programId" hidden >Program Id</TableHeaderColumn>
             <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
             <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>

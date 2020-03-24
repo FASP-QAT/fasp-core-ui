@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 
@@ -182,6 +182,8 @@ export default class AddCurrencyComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="currencyCode"
                                                             id="currencyCode"
@@ -190,12 +192,14 @@ export default class AddCurrencyComponent extends Component {
                                                             invalid={touched.currencyCode && !!errors.currencyCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                          
-                                                            required />
-                                                        <FormFeedback>{errors.currencyCode}</FormFeedback>
+                                                             required />
+                                                             </InputGroupAddon>
+                                                        <FormText className="red">{errors.currencyCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-usd"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="currencySymbol"
                                                             id="currencySymbol"
@@ -205,10 +209,13 @@ export default class AddCurrencyComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.currencySymbol}</FormFeedback>
+                                                             </InputGroupAddon>
+                                                        <FormText className="red">{errors.currencySymbol}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.currency.currency')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-money"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -219,10 +226,13 @@ export default class AddCurrencyComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.label.label_en}
                                                             required />
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                             </InputGroupAddon>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-exchange"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="conversionRate"
                                                             id="conversionRate"
@@ -231,17 +241,17 @@ export default class AddCurrencyComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             bsSize="sm"
-                                                           
-                                                            required />
-                                                        <FormFeedback>{errors.conversionRate}</FormFeedback>
+                                                             required />
+                                                              </InputGroupAddon>
+                                                        <FormText className="red">{errors.conversionRate}</FormText>
                                                     </FormGroup>
 
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger"className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                    <Button type="reset" color="danger"className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         
                                                         &nbsp;
                                                     </FormGroup>

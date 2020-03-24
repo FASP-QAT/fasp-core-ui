@@ -8,7 +8,7 @@ import {
 import DeleteSpecificRow from './TableFeatureTwo';
 import ProgramService from "../../api/ProgramService";
 import ProductService from "../../api/ProductService"
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 class AddProgramProduct extends Component {
 
@@ -24,8 +24,6 @@ class AddProgramProduct extends Component {
             programList: [],
             productList: []
         }
-        // console.log("kam kam", this.state.rows);
-        // console.log("------------in", this.state.programProduct);
         this.addRow = this.addRow.bind(this);
         this.deleteLastRow = this.deleteLastRow.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
@@ -96,17 +94,22 @@ class AddProgramProduct extends Component {
 
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -130,17 +133,22 @@ class AddProgramProduct extends Component {
 
         }).catch(
             error => {
-                switch (error.message) {
-                    case "Network Error":
-                        this.setState({
-                            message: error.message
-                        })
-                        break
-                    default:
-                        this.setState({
-                            message: error.message
-                        })
-                        break
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
                 }
             }
         );
@@ -158,17 +166,22 @@ class AddProgramProduct extends Component {
 
         }).catch(
             error => {
-                switch (error.message) {
-                    case "Network Error":
-                        this.setState({
-                            message: error.message
-                        })
-                        break
-                    default:
-                        this.setState({
-                            message: error.message
-                        })
-                        break
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
                 }
             }
         );
@@ -204,24 +217,15 @@ class AddProgramProduct extends Component {
                                 <FormGroup>
                                     <Label htmlFor="select">Select Program</Label>
                                     <Input type="select" value={this.state.programProduct.programId} name="programId" id="programId" disabled>
-                                        {/* <option value="0">Please select</option>
-                                        <option value="1">Program #1</option>
-                                        <option value="2">Program #2</option>
-                                        <option value="3">Program #3</option> */}
                                         {programs}
                                     </Input>
                                 </FormGroup>
-                                <FormGroup>
+                                <FormGroup> 
                                     <Label htmlFor="select">Select Product</Label>
                                     <Input type="select" name="productId" id="select" value={this.state.productId} onChange={event => this.setTextAndValue(event)}>
-
                                         <option value="">Please select</option>
-                                        {/*<option value="1">product #1</option>
-                                        <option value="2">product #2</option>
-                                        <option value="3">product #3</option> */}
                                         {products}
                                     </Input>
-
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="company">Min Month Stock</Label>
@@ -232,7 +236,7 @@ class AddProgramProduct extends Component {
                                     <Input type="number" min="0" name="maxMonth" id="maxMonth" value={this.state.maxMonth} placeholder="Enter max month stock" onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Delete Last Row</Button>
+                                    <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button>
                                     <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>Add</Button>
                                     &nbsp;
 

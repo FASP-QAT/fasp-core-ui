@@ -277,9 +277,21 @@ label.arrow_label:before {
 
   // End arrow label
 
-
-  .react-bs-table-search-clear-btn{    margin-left: 5px;
+  // search button
+   .react-bs-table-search-clear-btn{    margin-left: 5px;
     margin-top: -4px;}
+    // add button
+    .card-header-action a i{font-size: 30px;}
+    tbody{
+      font-size: 13px;
+    }
+    // radio button
+    .form-check {
+      padding-left: 1.25rem !important;
+    }
+
+    .breadcrumb{font-size: 13px;}
+    .red{color: #f86c6b !important;}
 
 // Login Css//
 .Login-component {
@@ -431,3 +443,13 @@ font-weight: 500;
 .navbar-nav .nav-link {
         color: #333;
     }
+
+    @media (min-width: 992px){
+      .sidebar .nav{
+        font-size: 14px !important;
+      }
+      .sidebar .nav-link {
+       
+        padding: 0.75rem .2rem !important;}
+    }
+

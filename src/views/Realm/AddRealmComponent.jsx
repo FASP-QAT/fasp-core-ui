@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService'
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 const initialValues = {
     realmCode: '',
@@ -209,7 +209,7 @@ export default class AddRealmComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.realmCode}</FormFeedback>
+                                                        <FormText className="red">{errors.realmCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">Realm Name (English)</Label>
@@ -222,7 +222,7 @@ export default class AddRealmComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.label}</FormFeedback>
+                                                        <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="monthInPastForAmc">Month In Past For AMC</Label>
@@ -235,7 +235,7 @@ export default class AddRealmComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.monthInPastForAmc}</FormFeedback>
+                                                        <FormText className="red">{errors.monthInPastForAmc}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="monthInFutureForAmc">Month In Future For AMC</Label>
@@ -248,7 +248,7 @@ export default class AddRealmComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.monthInFutureForAmc}</FormFeedback>
+                                                        <FormText className="red">{errors.monthInFutureForAmc}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="orderFrequency">Order Frequency</Label>
@@ -261,7 +261,7 @@ export default class AddRealmComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required />
-                                                        <FormFeedback>{errors.orderFrequency}</FormFeedback>
+                                                        <FormText className="red">{errors.orderFrequency}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>Default  </Label>
@@ -319,7 +319,7 @@ export default class AddRealmComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/realm/listRealm/` + "Action Canceled")
+        this.props.history.push(`/realm/realmlist/` +i18n.t('static.program.actioncancelled'))
     }
 
 }
