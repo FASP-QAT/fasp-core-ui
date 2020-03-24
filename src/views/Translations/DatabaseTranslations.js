@@ -9,7 +9,7 @@ import {
     CardFooter, Button, Col
 } from 'reactstrap';
 import i18n from '../../i18n';
-import AuthenticationService from '../common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService';
 import LabelsService from '../../api/LabelService.js';
 
 export default class DatabaseTranslations extends React.Component {
