@@ -133,13 +133,13 @@ class DefaultLayout extends Component {
                           },
                           {
                             name: 'Dimension',
-                            url: 'diamension/diamensionlist',
+                            url: '/diamension/diamensionlist',
                             icon: 'fa fa-map'
                           }
                           ,
                           {
                             name: 'Realm',
-                            url: 'realm/realmlist',
+                            url: '/realm/realmlist',
                             icon: 'fa fa-th-large'
                           },
                         ]

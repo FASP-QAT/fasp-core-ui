@@ -168,7 +168,7 @@ class AddUserComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
-                    realms: response.data.data
+                    realms: response.data
                 })
             }).catch(
                 error => {
@@ -452,7 +452,10 @@ class AddUserComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/` + "static.actionCancelled")
+        const master = { 
+            name: 'User'
+        };
+        this.props.history.push(`/user/listUser/` + i18n.t('static.program.actioncancelled',{master}))
     }
 }
 
