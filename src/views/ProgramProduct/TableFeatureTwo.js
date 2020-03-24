@@ -8,7 +8,7 @@ export default class DeleteSpecificRow extends Component {
     render() {
 
         return (
-            <Button type="button" size="sm" color="danger" onClick={()=>this.props.handleRemoveSpecificRow(this.props.rowId)} ><i className="fa fa-dot-circle-o"></i> Delete  Row </Button>
+            <Button type="button" size="sm" color="danger" onClick={()=>this.props.handleRemoveSpecificRow(this.props.rowId)} ><i className="fa fa-times"></i>Remove</Button>
         );
     }
 

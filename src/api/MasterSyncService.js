@@ -51,68 +51,74 @@ class MasterSyncService {
         });
     }
 
-    getOrganisationListForSync(lastSyncDate) {
+    getOrganisationListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getOrganisationListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getOrganisationListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 
-    getHealthAreaListForSync(lastSyncDate) {
+    getHealthAreaListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getHealthAreaListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getHealthAreaListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 
-    getRegionListForSync(lastSyncDate) {
+    getRegionListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getRegionListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getRegionListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 
-    getFundingSourceListForSync(lastSyncDate) {
+    getFundingSourceListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getFundingSourceListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getFundingSourceListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
-    getSubFundingSourceListForSync(lastSyncDate) {
+    getSubFundingSourceListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getSubFundingSourceListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getSubFundingSourceListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 
-    getProductListForSync(lastSyncDate) {
+    getProductListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getProductListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getProductListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 
@@ -171,36 +177,39 @@ class MasterSyncService {
         });
     }
 
-    getPlanningUnitListForSync(lastSyncDate) {
+    getPlanningUnitListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getPlanningUnitListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getPlanningUnitListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 
-    getLogisticsUnitListForSync(lastSyncDate) {
+    getLogisticsUnitListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getLogisticsUnitListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getLogisticsUnitListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 
-    getManufacturerListForSync(lastSyncDate) {
+    getManufacturerListForSync(lastSyncDate,realmId) {
         var lastSyncDate;
         if (lastSyncDate == null) {
             lastSyncDate = null
         } else {
             lastSyncDate = lastSyncDate.lastSyncDate
         }
-        return axios.get(`${API_URL}/api/getManufacturerListForSync?lastSyncDate=${lastSyncDate}`, {
+        var realmId = parseInt(realmId);
+        return axios.get(`${API_URL}/api/getManufacturerListForSync?lastSyncDate=${lastSyncDate}&realmId=${realmId}`, {
         });
     }
 

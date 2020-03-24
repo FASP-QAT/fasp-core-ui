@@ -2,13 +2,23 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 
 class LabelsService {
-    getLabelsListAll() {
-        return axios.get(`${API_URL}/api/getLabelsListAll/`, {
+    getDatabaseLabelsList() {
+        return axios.get(`${API_URL}/api/getDatabaseLabelsListAll/`, {
         });
-    } 
+    }
 
-    updateLabels(json) {
-        return axios.put(`${API_URL}/api/updateLabels/`, json, {}
+    getStaticLabelsList(){
+        return axios.get(`${API_URL}/api/getStaticLabelsListAll/`, {
+        });
+    }
+
+    saveDatabaseLabels(json) {
+        return axios.put(`${API_URL}/api/saveDatabaseLabels/`, json, {}
+        );
+    }
+
+    saveStaticLabels(json) {
+        return axios.put(`${API_URL}/api/saveStaticLabels/`, json, {}
         );
     }
 

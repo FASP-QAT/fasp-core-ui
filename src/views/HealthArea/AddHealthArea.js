@@ -3,13 +3,17 @@ import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
+import i18n from '../../i18n'
 // React select
 import states from '../Forms/AdvancedForms/data/states';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 
 import HealthAreaService from "../../api/HealthAreaService";
-import CountryService from "../../api/CountryService";
+import RealmService from "../../api/RealmService";
+import RealmCountryService from "../../api/RealmCountryService";
+
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 const initialValues = {
   realmId: [],
@@ -20,11 +24,11 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-      .required('Please select realm.'),
-    countryId: Yup.string()
-      .required('Please select country'),
+    .required(i18n.t('static.healtharea.realmtext')),
+     countryId: Yup.string()
+      .required(i18n.t('static.healtharea.countrytext')),
     healthAreaName: Yup.string()
-      .required('Please enter health area')
+      .required(i18n.t('static.healtharea.healthareatext'))
   })
 }
 
@@ -81,20 +85,21 @@ class AddHealthArea extends Component {
     }
     this.submitClicked = this.submitClicked.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
-    // this.dataChange = this.dataChange.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.dataChange = this.dataChange.bind(this);
+    // this.handleChange = this.handleChange.bind(this);
     this.getCountryListByRealmId = this.getCountryListByRealmId.bind(this);
   }
   // handleChange(values) {
   //   console.log("handle change called===" , values);
   // }
-  handleChange(event) {
+  dataChange(event) {
     // let { healthArea } = this.state.healthArea
     console.log("handle change called===", event.target.name);
     console.log("handle change called===", event.target.value);
-    // if (event.target.name === "realmId") {
-    //   realmId = event.target.value
-    // }
+    if (event.target.name === "realmId") {
+      //   realmId = event.target.value
+      this.getCountryListByRealmId(event.target.value);
+    }
     // this.setState({
     //   healthArea
     // }, (
@@ -141,11 +146,12 @@ class AddHealthArea extends Component {
   }
 
   componentDidMount() {
-    CountryService.getRealmCountryList()
+    AuthenticationService.setupAxiosInterceptors();
+    RealmCountryService.getRealmCountryListAll()
       .then(response => {
-        console.log("country list---", response.data);
+        // console.log("country list---", response.data);
         this.setState({
-          countries: response.data
+          countries: response.data.data
         })
       }).catch(
         error => {
@@ -163,11 +169,11 @@ class AddHealthArea extends Component {
           }
         }
       );
-    HealthAreaService.getRealmList()
+    // AuthenticationService.setupAxiosInterceptors();
+    RealmService.getRealmListAll()
       .then(response => {
-        console.log("realm list---", response.data);
         this.setState({
-          realms: response.data
+          realms: response.data.data
         })
       }).catch(
         error => {
@@ -190,7 +196,6 @@ class AddHealthArea extends Component {
   render() {
     const { selCountries } = this.state;
     const { realms } = this.state;
-
     let realmList = realms.length > 0
       && realms.map((item, i) => {
         return (
@@ -235,7 +240,8 @@ class AddHealthArea extends Component {
                     }) => (
                         <Form onSubmit={handleSubmit} noValidate name='simpleForm'>
                           <FormGroup>
-                            <Label htmlFor="realmId">Realm</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.healtharea.realm')}</Label>
+
                             <Input
                               type="select"
                               name="realmId"
@@ -243,7 +249,7 @@ class AddHealthArea extends Component {
                               bsSize="lg"
                               valid={!errors.realmId}
                               invalid={touched.realmId && !!errors.realmId}
-                              onChange={this.handleChange}
+                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required
                               value={this.state.realmId}
@@ -255,7 +261,7 @@ class AddHealthArea extends Component {
                           </FormGroup>
                           <FormGroup>
                             <Label>Country</Label>
-                            <Select
+                            <Input type="select"
                               name="countryId"
                               id="countryId"
                               bsSize="lg"
@@ -265,10 +271,10 @@ class AddHealthArea extends Component {
                               onBlur={handleBlur}
                               required
                               multiple
-                            />
-                              {/* <option value="0">Please select</option>
-                              {realmList} */}
-                            {/* </Input> */}
+                            >
+                            <option value="0">Please select</option>
+                            {countryList}
+                            </Input>
                             <FormFeedback>{errors.countryId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
@@ -302,9 +308,10 @@ class AddHealthArea extends Component {
       </div>
     );
   }
-  getCountryListByRealmId(event) {
-    let realmId = event.target.value;
+  getCountryListByRealmId(realmId) {
+    // let realmId = event.target.value;
     const selCountries = this.state.countries.filter(c => c.realm.realmId == realmId)
+    console.log("selected values---", selCountries);
     this.setState({
       selCountries: selCountries
     });

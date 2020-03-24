@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_URL } from "../Constants";
 class HealthAreaService {
     getRealmList() {
-        return axios.get(`http://localhost:8080/FASP/api/getRealmList`, {
+        return axios.get(`${API_URL}/api/realm`, {
         });
     }
 }

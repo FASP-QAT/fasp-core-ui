@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Progress } from 'reactstrap';
-
+import { Link } from 'react-router-dom';
+import { Online } from "react-detect-offline";
 const propTypes = {
   notif: PropTypes.bool,
   accnt: PropTypes.bool,
@@ -81,8 +82,8 @@ class DefaultHeaderDropdown extends Component {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
-          <DropdownItem><i className="fa fa-user"></i> Profile</DropdownItem>
-          <DropdownItem><i className="fa fa-shield"></i> Language</DropdownItem>
+          <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> Change Password</DropdownItem></Online>
+          {/* <DropdownItem><i className="fa fa-shield"></i> Language</DropdownItem> */}
           <DropdownItem onClick={this.props.onLogout}><i className="fa fa-lock"></i> Logout</DropdownItem>
           {/*<DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>*/}
         </DropdownMenu>

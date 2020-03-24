@@ -12,14 +12,12 @@ class FundingSourceService {
     getFundingSourceListAll() {
         return axios.get(`${API_URL}/api/fundingSource/`, {
         });
-    } 
+    }
 
     updateFundingSource(json) {
         return axios.put(`${API_URL}/api/fundingSource/`, json, {
         });
     }
-
-
 }
 
 export default new FundingSourceService();
