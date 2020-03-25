@@ -188,39 +188,39 @@ class DefaultLayout extends Component {
                         children: [
                           {
                             name: i18n.t('static.dashboard.program'),
-                            url: '/program',
+                            url: '/program/listProgram',
                             icon: 'icon-graph',
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.addprogram'),
-                                url: '/program/addProgram',
-                                icon: 'icon-pencil',
-                              },
-                              {
-                                name: i18n.t('static.dashboard.listprogram'),
-                                url: '/program/listProgram',
-                                icon: 'fa fa-object-group',
-                              },
-                            ]
+                        //     children: [
+                        //       // {
+                        //       //   name: i18n.t('static.dashboard.addprogram'),
+                        //       //   url: '/program/addProgram',
+                        //       //   icon: 'icon-pencil',
+                        //       // },
+                        //       {
+                        //         name: i18n.t('static.dashboard.listprogram'),
+                        //         url: '/program/listProgram',
+                        //         icon: 'fa fa-object-group',
+                        //       }
+                        //     ]
                           },
                           {
                             name: i18n.t('static.dashboard.product'),
-                            url: '/product',
+                            url: '/product/listProduct',
                             icon: 'icon-graph',
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.addproduct'),
-                                url: '/product/addProduct',
-                                icon: 'icon-pencil',
-                              },
-                              {
-                                name: i18n.t('static.dashboard.listproduct'),
-                                url: '/product/listProduct',
-                                icon: 'fa fa-th-large',
-                              },
-                            ]
+                            // children: [
+                            //   // {
+                            //   //   name: i18n.t('static.dashboard.addproduct'),
+                            //   //   url: '/product/addProduct',
+                            //   //   icon: 'icon-pencil',
+                            //   // },
+                            //   {
+                            //     name: i18n.t('static.dashboard.listproduct'),
+                            //     url: '/product/listProduct',
+                            //     icon: 'fa fa-th-large',
+                            //   }
+                            // ]
                           },
-
+                        
 
                           {
                             name: i18n.t('static.dashboard.program'),

@@ -45,8 +45,8 @@ export default class ProgramList extends Component {
 
   editProgram(program) {
     this.props.history.push({
-      pathname: "/program/editProgram",
-      state: { program }
+      pathname: `/program/editProgram/${program.programId}`,
+      // state: { program }
     });
   }
   // just an example
@@ -61,7 +61,7 @@ export default class ProgramList extends Component {
     AuthenticationService.setupAxiosInterceptors();
     ProgramService.getProgramList().then(response => {
       this.setState({
-        table: response.data.data
+        table: response.data
       })
     })
       .catch(

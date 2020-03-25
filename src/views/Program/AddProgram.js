@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, FormFeedback, Form, InputGroupAddon, InputGroupText,FormText
+    CardFooter, Button, Col, FormFeedback, Form, InputGroupAddon, InputGroupText, FormText
 } from 'reactstrap';
 import Select from 'react-select';
 import { Formik } from 'formik';
@@ -128,12 +128,13 @@ export default class AddProgram extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
-                lan: 'en'
+                
 
             },
             // regionList: [{ value: '1', label: 'R1' },
             // { value: '2', label: 'R2' },
             // { value: '3', label: 'R3' }],
+            lan: 'en',
             regionId: '',
             realmList: [],
             realmCountryList: [],
@@ -154,10 +155,11 @@ export default class AddProgram extends Component {
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == "Success") {
-                //  console.log("realm list---", response.data.data);
-                this.setState({
-                    realmList: response.data
-                })  } else {
+                    //  console.log("realm list---", response.data.data);
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
                     this.setState({ message: response.data.messageCode })
                 }
             }).catch(
@@ -476,57 +478,57 @@ export default class AddProgram extends Component {
                                         </CardHeader>
                                         <CardBody>
                                             <FormGroup>
-                                                 <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
-                                                 
-                                                    <Input
-                                                        type="text" name="programName" valid={!errors.programName}
-                                                        invalid={touched.programName && !!errors.programName}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        onBlur={handleBlur}
-                                                        id="programName" placeholder={i18n.t('static.program.programtext')} />
-                                              
+                                                <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
+
+                                                <Input
+                                                    type="text" name="programName" valid={!errors.programName}
+                                                    invalid={touched.programName && !!errors.programName}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                    onBlur={handleBlur}
+                                                    id="programName" placeholder={i18n.t('static.program.programtext')} />
+
                                                 <FormFeedback className="red">{errors.programName}</FormFeedback>
-                                                 </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
-                                                  
-                                                    <Input
-                                                        value={this.state.program.realm.realmId}
-                                                        valid={!errors.realmId}
-                                                        invalid={touched.realmId && !!errors.realmId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
-                                                        onBlur={handleBlur}
-                                                        type="select" name="realmId" id="realmId">
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {realms}
-                                                    </Input>
-                                               
+                                                <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+
+                                                <Input
+                                                    value={this.state.program.realm.realmId}
+                                                    valid={!errors.realmId}
+                                                    invalid={touched.realmId && !!errors.realmId}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
+                                                    onBlur={handleBlur}
+                                                    type="select" name="realmId" id="realmId">
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {realms}
+                                                </Input>
+
                                                 <FormFeedback>{errors.realmId}</FormFeedback>
-                                                </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
 
                                                 <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
-                                               
-                                                    <Input
-                                                        value={this.state.program.realmCountry.realmCountryId}
-                                                        valid={!errors.realmCountryId}
-                                                        invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
-                                                        onBlur={handleBlur}
-                                                        type="select" name="realmCountryId" id="realmCountryId">
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {/* <option value="1">Country #1</option>
+
+                                                <Input
+                                                    value={this.state.program.realmCountry.realmCountryId}
+                                                    valid={!errors.realmCountryId}
+                                                    invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
+                                                    onBlur={handleBlur}
+                                                    type="select" name="realmCountryId" id="realmCountryId">
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {/* <option value="1">Country #1</option>
                                                         <option value="2">Country #2</option>
                                                         <option value="3">Country #3</option> */}
-                                                        {realmCountries}
-                                                    </Input>
-                                               
+                                                    {realmCountries}
+                                                </Input>
+
                                                 <FormFeedback>{errors.realmCountryId}</FormFeedback>
-                                                 </FormGroup>
+                                            </FormGroup>
                                             <FormGroup >
-                                                 <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
-                                                 
-                                                 <Select
+                                                <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
+
+                                                <Select
                                                     valid={!errors.regionId}
                                                     invalid={touched.reagonId && !!errors.regionId}
                                                     onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -536,10 +538,10 @@ export default class AddProgram extends Component {
                                                     value={this.state.regionId}
                                                 />
                                                 <FormFeedback>{errors.regionId}</FormFeedback>
-                                                </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
-                                                   <Input
+                                                <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
+                                                <Input
                                                     value={this.state.program.organisation.organisationId}
                                                     valid={!errors.organisationId}
                                                     invalid={touched.organisationId && !!errors.organisationId}
@@ -553,10 +555,10 @@ export default class AddProgram extends Component {
                                                         <option value="3">product #3</option> */}
                                                 </Input>
                                                 <FormFeedback>{errors.organisationId}</FormFeedback>
-                                                </FormGroup>
-                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
-                                                  <Input
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
+                                                <Input
                                                     value={this.state.program.healthArea.healthAreaId}
                                                     valid={!errors.healthAreaId}
                                                     invalid={touched.healthAreaId && !!errors.healthAreaId}
@@ -573,7 +575,7 @@ export default class AddProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
-                                                 <Input
+                                                <Input
                                                     value={this.state.program.programManager.userId}
                                                     valid={!errors.userId}
                                                     invalid={touched.userId && !!errors.userId}
@@ -588,8 +590,8 @@ export default class AddProgram extends Component {
 
                                             </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                                 <Input
+                                                <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                                <Input
                                                     value={this.state.program.programNotes}
                                                     valid={!errors.programNotes}
                                                     invalid={touched.programNotes && !!errors.programNotes}
@@ -597,10 +599,10 @@ export default class AddProgram extends Component {
                                                     onBlur={handleBlur}
                                                     type="textarea" name="programNotes" id="programNotes" />
                                                 <FormFeedback>{errors.programNotes}</FormFeedback>
-                                                </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
-                                                  <Input
+                                                <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
+                                                <Input
                                                     value={this.state.program.airFreightPerc}
                                                     valid={!errors.airFreightPerc}
                                                     invalid={touched.airFreightPerc && !!errors.airFreightPerc}
@@ -608,17 +610,17 @@ export default class AddProgram extends Component {
                                                     onBlur={handleBlur}
                                                     type="number" name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
                                                 <FormFeedback>{errors.airFreightPerc}</FormFeedback>
-                                                 </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
-                                                   <Input
+                                                <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
+                                                <Input
                                                     value={this.state.program.seaFreightPerc}
                                                     valid={!errors.seaFreightPerc}
                                                     invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
                                                     onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                     onBlur={handleBlur}
                                                     type="number" name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
-                                                     </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
 
                                                 <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
@@ -726,7 +728,7 @@ export default class AddProgram extends Component {
                                                 <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                 {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
-                                            &nbsp;
+                                                &nbsp;
                                         </FormGroup>
                                         </CardFooter>
                                     </Form>

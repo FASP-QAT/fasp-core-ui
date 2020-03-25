@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
     Row, Col, Card, CardHeader,
-    CardFooter, Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText,FormText
+    CardFooter, Button, CardBody,
+    Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText, FormFeedback
 } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -85,7 +85,8 @@ export default class AddProduct extends Component {
             lan: localStorage.getItem('lang'),
             realmList: [],
             productCategoryList: [],
-            unitList: []
+            unitList: [],
+            message:''
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -95,46 +96,64 @@ export default class AddProduct extends Component {
         AuthenticationService.setupAxiosInterceptors();
         RealmServcie.getRealmListAll()
             .then(response => {
-                if (response.status == "Success") {   this.setState({
-                    realmList: response.data.data
-                })} else {
+                if (response.status == 200) {
+                    console.log(response.data);
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
+            })
+            .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
             );
 
         UnitService.getUnitListAll()
             .then(response => {
-                this.setState({
-                    unitList: response.data.data
-                })
-            }).catch(
+                if (response.status == 200) {
+                    console.log(response.data);
+                    this.setState({
+                        unitList: response.data
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            })
+            .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
             );
@@ -144,23 +163,32 @@ export default class AddProduct extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
-                console.log(response);
-                this.setState({
-                    productCategoryList: response.data.data
-                })
-            }).catch(
+                if (response.status == 200) {
+                    console.log(response.data);
+                    this.setState({
+                        productCategoryList: response.data
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            })
+            .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
             );
@@ -258,7 +286,7 @@ export default class AddProduct extends Component {
                                     // console.log("==============",this.state.product);
                                     ProductService.addProduct(this.state.product)
                                         .then(response => {
-                                            if (response.status == "200") {
+                                            if (response.status == 200) {
                                                 console.log(response);
                                                 this.props.history.push(`/product/listProduct/${response.data.message}`)
                                             } else {
@@ -269,17 +297,22 @@ export default class AddProduct extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -311,8 +344,9 @@ export default class AddProduct extends Component {
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
                                                                 required />
+                                                        <FormFeedback className="red">{errors.productName}</FormFeedback>
                                                         </InputGroupAddon>
-                                                        <FormText className="red">{errors.productName}</FormText>
+                                                        
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
@@ -327,8 +361,9 @@ export default class AddProduct extends Component {
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
                                                                 required />
+                                                        <FormFeedback className="red">{errors.genericName}</FormFeedback>
                                                         </InputGroupAddon>
-                                                        <FormText className="red">{errors.genericName}</FormText>
+                                                        
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.product.realm')}</Label>
@@ -349,9 +384,10 @@ export default class AddProduct extends Component {
                                                                 <option value="">Please select</option>
                                                                 {realms}
                                                             </Input>
+                                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                         </InputGroupAddon>
 
-                                                        <FormText className="red">{errors.realmId}</FormText>
+                                                       
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="">{i18n.t('static.product.productcategory')}</Label>
@@ -375,8 +411,9 @@ export default class AddProduct extends Component {
                                                             <option value="3">Product Category Three</option> */}
                                                                 {productCategories}
                                                             </Input>
+                                                            <FormFeedback className="red">{errors.productCategoryId}</FormFeedback>
                                                         </InputGroupAddon>
-                                                        <FormText className="red">{errors.productCategoryId}</FormText>
+                                                       
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="unitId">{i18n.t('static.product.unit')}</Label>
@@ -397,8 +434,9 @@ export default class AddProduct extends Component {
                                                                 <option value="">Please select</option>
                                                                 {units}
                                                             </Input>
+                                                            <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                         </InputGroupAddon>
-                                                        <FormText className="red">{errors.unitId}</FormText>
+                                                        
                                                     </FormGroup>
 
                                                 </CardBody>
@@ -416,6 +454,10 @@ export default class AddProduct extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
