@@ -16,7 +16,7 @@ let initialValues = {
     startDate: '',
     stopDate: ''
 }
-
+const entityname=i18n.t('static.budget.budget');
 const validationSchema = function (values) {
     return Yup.object().shape({
         budget: Yup.string()
@@ -192,7 +192,7 @@ class EditBudgetComponent extends Component {
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                this.props.history.push(`/budget/listBudget/${response.data.message}`)
+                                                this.props.history.push(`/budget/listBudget/`+i18n.t(response.data.message,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.message
@@ -204,12 +204,12 @@ class EditBudgetComponent extends Component {
                                                 switch (error.message) {
                                                     case "Network Error":
                                                         this.setState({
-                                                            message: error.message
+                                                            message: i18n.t(error.message,{entityname})
                                                         })
                                                         break
                                                     default:
                                                         this.setState({
-                                                            message: error.response.data.message
+                                                            message: i18n.t(error.response.data.message,{entityname})
                                                         })
                                                         break
                                                 }
@@ -421,7 +421,7 @@ class EditBudgetComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/budget/listBudget/` + "Action Canceled")
+        this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled',{entityname}))
     }
 }
 

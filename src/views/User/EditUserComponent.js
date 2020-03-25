@@ -161,9 +161,13 @@ class EditUserComponent extends Component {
 
         RealmService.getRealmListAll()
             .then(response => {
+                if (response.status == 200) {
                 this.setState({
-                    realms: response.data.data
-                })
+                    realms: response.data
+                }) } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })}
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
