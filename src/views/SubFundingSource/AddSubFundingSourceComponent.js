@@ -12,7 +12,7 @@ const initialValues = {
   fundingSourceId: [],
   subFundingSource: ""
 }
-
+const entityname=i18n.t('static.subfundingsource.subfundingsource');
 const validationSchema = function (values) {
   return Yup.object().shape({
     fundingSourceId: Yup.string()
@@ -163,7 +163,7 @@ class AddSubFundingSourceComponent extends Component {
                   SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
                     .then(response => {
                       if (response.status == 200) {
-                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
+                        this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
                       } else {
                         this.setState({
                           message: response.data.message
@@ -263,7 +263,7 @@ class AddSubFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
+    this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}))
   }
 }
 
