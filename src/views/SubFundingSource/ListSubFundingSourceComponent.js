@@ -13,7 +13,7 @@ import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-
+const entityname=i18n.t('static.subfundingsource.subfundingsource');
 class ListSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
@@ -117,7 +117,7 @@ class ListSubFundingSourceComponent extends Component {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
-                Showing {from} to {to} of {size} Results
+               {i18n.t('static.common.result',{from,to,size}) }
             </span>
         );
 
@@ -133,38 +133,38 @@ class ListSubFundingSourceComponent extends Component {
 
         const columns = [{
             dataField: 'fundingSource.label.label_en',
-            text: 'Funding Source',
+            text: i18n.t('static.subfundingsource.fundingsource'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
             dataField: 'label.label_en',
-            text: 'Sub Funding Source',
+            text: i18n.t('static.subfundingsource.subfundingsource'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
             dataField: 'active',
-            text: 'Status',
+            text: i18n.t('static.common.status'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.active ? "Active" : "Disabled")
+                    (row.active ? i18n.t('static.common.active') :i18n.t('static.common.disabled'))
                 );
             }
         }];
         const options = {
             hidePageListOnlyOnePage: true,
-            firstPageText: 'First',
-            prePageText: 'Back',
-            nextPageText: 'Next',
-            lastPageText: 'Last',
-            nextPageTitle: 'First page',
-            prePageTitle: 'Pre page',
-            firstPageTitle: 'Next page',
-            lastPageTitle: 'Last page',
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage') ,
+            prePageTitle: i18n.t('static.common.prevPage') ,
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage') ,
             showTotal: true,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
@@ -185,8 +185,8 @@ class ListSubFundingSourceComponent extends Component {
 
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.subfundingsource.subfundingsourcelisttext')}</strong>{' '}
@@ -232,7 +232,7 @@ class ListSubFundingSourceComponent extends Component {
                                         <hr />
                                         <SearchBar {...props.searchProps} />
                                         <ClearSearchButton {...props.searchProps} />
-                                        <BootstrapTable noDataIndication="Data not found" tabIndexCell
+                                        <BootstrapTable noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {

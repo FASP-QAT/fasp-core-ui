@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 let initialValues = {
     subFundingSource: ""
 }
-
+const entityname=i18n.t('static.subfundingsource.subfundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         subFundingSource: Yup.string()
@@ -113,9 +113,10 @@ class EditSubFundingSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
+                                            console.log(response.data.messageCode)
                                             if (response.status == 200) {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
-                                            } else {
+                                                this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
+                                                } else {
                                                 this.setState({
                                                     message: response.data.messageCode
                                                 })
@@ -243,7 +244,7 @@ class EditSubFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
+        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}));
     }
 }
 

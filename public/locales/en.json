@@ -35,5 +35,5 @@
 ,"static.label.listFailed":"Failed to load list. Please try again"
 ,"static.label.labelTranslations":"Label Translations"
 ,"static.translation.labelCode":"Label code"
-,"static.translations.translations":"Translations","static.message.addsuccess":"{{entityname}} added successfully", "static.message.updatesuccess":"{{entityname}} updated successfully", "static.message.cancelled":"{{entityname}} action cancelled","static.budget.budgetdesctext":"Please enter Budget description"
+,"static.translations.translations":"Translations","static.message.addSuccess":"{{entityname}} added successfully", "static.message.updateSuccess":"{{entityname}} updated successfully", "static.message.cancelled":"{{entityname}} Action Cancelled","static.budget.budgetdesctext":"Please enter Budget description","static.message.listFailed":"{{entityname}} list failed","static.common.update":"Update","static.common.result":"  Showing {{from}} to {{to}} of {{size}} Results","static.common.first":"First","static.common.back":"Back","static.common.next":"Next","static.common.last":"Last","static.common.firstPage":"First Page","static.common.prevPage":"Pre page","static.common.nextPage":"Next page","static.common.lastPage":"Last page","static.common.noData":"Data not found"
 }
