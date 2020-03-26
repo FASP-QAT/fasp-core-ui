@@ -100,7 +100,10 @@ export default class AddProgram extends Component {
         this.state = {
             program: {
                 label: {
-                    label_en: ''
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
                 },
                 realm: {
                     realmId: ''
@@ -128,13 +131,13 @@ export default class AddProgram extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
-                
+
 
             },
             // regionList: [{ value: '1', label: 'R1' },
             // { value: '2', label: 'R2' },
             // { value: '3', label: 'R3' }],
-            lan: 'en',
+            lang: localStorage.getItem('lang'),
             regionId: '',
             realmList: [],
             realmCountryList: [],
@@ -154,7 +157,7 @@ export default class AddProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
-                if (response.status == "Success") {
+                if (response.status == 200) {
                     //  console.log("realm list---", response.data.data);
                     this.setState({
                         realmList: response.data
@@ -265,7 +268,7 @@ export default class AddProgram extends Component {
                 var json = response.data;
                 var regList = [];
                 for (var i = 0; i < json.length; i++) {
-                    regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                    regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
                 }
                 this.setState({
                     regionId: '',
@@ -387,7 +390,7 @@ export default class AddProgram extends Component {
             && realmList.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lan)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -396,7 +399,7 @@ export default class AddProgram extends Component {
             && realmCountryList.map((item, i) => {
                 return (
                     <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lan)}
+                        {getLabelText(item.country.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -405,7 +408,7 @@ export default class AddProgram extends Component {
             && organisationList.map((item, i) => {
                 return (
                     <option key={i} value={item.organisationId}>
-                        {getLabelText(item.label, this.state.lan)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -414,7 +417,7 @@ export default class AddProgram extends Component {
             && healthAreaList.map((item, i) => {
                 return (
                     <option key={i} value={item.healthAreaId}>
-                        {getLabelText(item.label, this.state.lan)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

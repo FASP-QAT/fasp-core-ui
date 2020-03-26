@@ -213,8 +213,8 @@ export default class EditProgram extends Component {
             AuthenticationService.setupAxiosInterceptors();
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
-                    console.log("region list---", response.data.data);
-                    var json = response.data.data;
+                    console.log("region list---", response.data);
+                    var json = response.data;
                     var regList = [];
                     for (var i = 0; i < json.length; i++) {
                         regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
@@ -232,7 +232,7 @@ export default class EditProgram extends Component {
                                 break
                             default:
                                 this.setState({
-                                    message: error.response.data.message
+                                    message: "error accured"
                                 })
                                 break
                         }
