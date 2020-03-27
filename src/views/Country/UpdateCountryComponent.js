@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import CountryService from '../../api/CountryService.js';
 import LanguageService from '../../api/LanguageService.js';
@@ -8,19 +8,24 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
+
+import getLabelText from '../../CommonComponent/getLabelText';
+
+
+const entityname = i18n.t('static.country.countryMaster');
 let initialValues = {
     label: '',
     countryCode: '',
     languageId: '',
     currencyId: '',
-    languageList: [],
-    currencyList: [],
+    // languageList: [],
+    // currencyList: [],
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-        .required(i18n.t('static.country.countrytext')),
+            .required(i18n.t('static.country.countrytext')),
         countryCode: Yup.string()
             .max(3, i18n.t('static.country.countrycodemax3digittext'))
             .required(i18n.t('static.country.countrycodetext')),
@@ -58,34 +63,21 @@ export default class UpdateCountryComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            country: {
-                countryId: '',
-                countryCode: '',
-                label: {
-                    label_en: '',
-                    labelId: ''
-                },
-                currency: {
-                    curencyId: ''
-                },
-                language: {
-                    languageId: ''
-                },
-                active: ''
-
-            },
+            country: this.props.location.state.country,
             languageList: [],
-            currencyList: []
+            currencyList: [],
+            lang: localStorage.getItem('lang'),
+            message: ''
         }
 
-        this.Capitalize = this.Capitalize.bind(this);
+        // this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         initialValues = {
-            label: this.props.location.state.country.label.label_en,
-            countryCode: this.props.location.state.country.countryCode,
-            languageId: this.props.location.state.country.language.languageId,
-            currencyId: this.props.location.state.country.currency.currencyId
+            label:getLabelText(this.state.country.label,this.state.lang),
+            countryCode: this.state.country.countryCode,
+            languageId: this.state.country.language.languageId,
+            currencyId: this.state.country.currency.currencyId
         }
     }
 
@@ -115,10 +107,10 @@ export default class UpdateCountryComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            'label': true,
-            'countryCode': true,
-            'languageId': true,
-            'currencyId': true
+            label: true,
+            countryCode: true,
+            languageId: true,
+            currencyId: true
         }
         )
         this.validateForm(errors)
@@ -140,61 +132,75 @@ export default class UpdateCountryComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        this.setState({
-            country: this.props.location.state.country
-        });
-
         LanguageService.getLanguageListActive().then(response => {
-            this.setState({
-                languageList: response.data
-            })
+            if (response.status == 200) {
+                this.setState({
+                    languageList: response.data
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode
+                })
+            }
         })
             .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 });
 
         CurrencyService.getCurrencyListActive().then(response => {
-            this.setState({
-                currencyList: response.data
-            })
+            if (response.status == 200) {
+                this.setState({
+                    currencyList: response.data
+                })
+            } else {
+                this.setState({
+                    message: response.data.messageCode
+                })
+            }
         })
             .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 });
 
     }
-    Capitalize(str) {
-        let { country } = this.state
-        country.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
-    }
-
-    cancelClicked() {
-        this.props.history.push(`/country/listCountry/` + "Action Canceled")
-    }
+    // Capitalize(event) {
+    //     let { country } = this.state
+    //     country.label.label_en = event.target.value.charAt(0).toUpperCase() + event.target.value.slice(1)
+    // }
 
     render() {
         const { languageList } = this.state;
@@ -209,7 +215,7 @@ export default class UpdateCountryComponent extends Component {
         let currencyItems = currencyList.length > 0
             && currencyList.map((itemOne, i) => {
                 return (
-                    <option key={i} value={itemOne.currencyId}>{itemOne.label.label_en}</option>
+                    <option key={i} value={itemOne.currencyId}>{getLabelText(itemOne.label, this.state.lang)}</option>
                 )
             }, this);
         return (
@@ -226,8 +232,8 @@ export default class UpdateCountryComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     CountryService.editCountry(this.state.country)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/country/listCountry/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/country/listCountry/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.message
@@ -236,17 +242,22 @@ export default class UpdateCountryComponent extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -269,25 +280,25 @@ export default class UpdateCountryComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.country')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-globe"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
                                                             valid={!errors.label}
                                                             bsSize="sm"
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e)}}
                                                             onBlur={handleBlur}
-                                                            value={this.state.country.label.label_en}
+                                                            value={getLabelText(this.state.country.label,this.state.lang)}
                                                             required />
-                                                            </InputGroupAddon>
-                                                        <FormText className="red">{errors.label}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="countryCode">{i18n.t('static.country.countrycode')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input type="text"
                                                             name="countryCode"
                                                             id="countryCode"
@@ -298,13 +309,13 @@ export default class UpdateCountryComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.country.countryCode}
                                                             required />
-                                                             </InputGroupAddon>
-                                                        <FormText className="red">{errors.countryCode}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.country.language')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-language"></i></InputGroupText> */}
                                                         <Input
                                                             type="select"
                                                             name="languageId"
@@ -320,13 +331,13 @@ export default class UpdateCountryComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
                                                         </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.languageId}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="currencyId">{i18n.t('static.country.currency')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-money"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
                                                         <Input
                                                             type="select"
                                                             name="currencyId"
@@ -342,8 +353,8 @@ export default class UpdateCountryComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {currencyItems}
                                                         </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.currencyId}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.currencyId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -361,7 +372,7 @@ export default class UpdateCountryComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -377,17 +388,14 @@ export default class UpdateCountryComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="submit" color="success"className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.submit')}</Button>
-                                                    
-                                                      
-                                                        
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>  {i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -402,7 +410,7 @@ export default class UpdateCountryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/country/listCountry/` + "Action Canceled")
+        this.props.history.push(`/country/listCountry/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

@@ -4,12 +4,12 @@ import { API_URL } from '../Constants.js';
 class CountryService {
 
     addCountry(json) {
-        return axios.put(`${API_URL}/api/addCountry/`, json, {}
+        return axios.post(`${API_URL}/api/country/`, json, {}
         );
     }
 
     getCountryListAll() {
-        return axios.get(`${API_URL}/api/getCountryListAll/`, {
+        return axios.get(`${API_URL}/api/country/all/`, {
         });
     }
     getCountryListActive() {
@@ -19,7 +19,7 @@ class CountryService {
     }
 
     editCountry(json) {
-        return axios.put(`${API_URL}/api/editCountry/`, json, {}
+        return axios.put(`${API_URL}/api/country/`, json, {}
         );
     }
 }

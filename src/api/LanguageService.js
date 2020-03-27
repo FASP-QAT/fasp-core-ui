@@ -12,7 +12,7 @@ getLanguageList() {
     });
 }
 getLanguageListActive() {
-    return axios.get(`${API_URL}/api/langauge/`, {
+    return axios.get(`${API_URL}/api/language/`, {
     });
 }
 editLanguage(json) {

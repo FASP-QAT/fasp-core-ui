@@ -263,7 +263,7 @@ class AddBudgetComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     BudgetService.addBudget(this.state.budget)
                                         .then(response => {
-                                            if (response.status == "200") {
+                                            if (response.status == 200) {
                                                 this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                             } else {
                                                 this.setState({

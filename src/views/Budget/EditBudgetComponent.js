@@ -181,6 +181,10 @@ class EditBudgetComponent extends Component {
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
+<<<<<<< HEAD
+=======
+                                                // this.props.history.push(`/budget/listBudget/`+i18n.t(response.data.messageCode,{entityname}))
+>>>>>>> 85f760f9db1e0ef16b58cee67678ec9bd6a53b5e
                                                 this.props.history.push(`/budget/listBudget/`)
                                             } else {
                                                 this.setState({
