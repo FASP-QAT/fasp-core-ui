@@ -186,7 +186,7 @@ export default class CountryListComponent extends Component {
                     <CardBody>
                         <Col md="3">
                             <FormGroup>
-                                {/* <Label htmlFor="appendedInputButton">Status</Label> */}
+                                <Label htmlFor="appendedInputButton">Status</Label>
                                 <div className="controls">
                                     <InputGroup>
                                         <Input
