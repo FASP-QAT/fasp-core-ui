@@ -1,5 +1,5 @@
 // Here you can add other styles
-
+body{font-size: 0.775rem;}
 
 
 
@@ -281,18 +281,71 @@ label.arrow_label:before {
    .react-bs-table-search-clear-btn{    margin-left: 5px;
     margin-top: -4px;}
     // add button
-    .card-header-action a i{font-size: 30px;}
-    tbody{
-      font-size: 13px;
-    }
+    .card-header-action a i{font-size: 22px;}
+    // tbody{
+    //   font-size: 13px;
+    // }
     // radio button
     .form-check {
       padding-left: 1.25rem !important;
     }
-
-    .breadcrumb{font-size: 13px;}
+    // .breadcrumb{font-size: 13px;}
     .red{color: #f86c6b !important;}
 
+    // TABLE SUCCESS MESSAGE
+    .mt-success{
+      margin-top: .5rem;
+    }
+    .Gobtn{margin-left: 5px;width: 60px;border-radius: 0.25rem !important;}
+    .input-group select{border-radius: 0.25rem !important;}
+    
+    .TableCust .btn-default {color: #23282c;
+      background-color: #c8ced3;
+      border-color: #c8ced3;
+      margin-left: 5px;
+      margin-bottom: 3px;
+      width: 60px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.76562rem;
+      line-height: 1.5;
+    }
+    .SelectGo{width:200px;}
+    .TableCust label{width: 137px;}
+    .TableCust input{height: calc(1.5em + 0.5rem + 2px);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.76562rem;
+      line-height: 1.5;}
+  
+    .table-bordered thead th, .table-bordered thead td {
+    text-align: left !important;} 
+    .table-bordered th, .table-bordered td {
+    text-align: left !important;
+  }
+  .table th, .table td { padding: 0.50rem;}
+  .react-bootstrap-table-page-btns-ul{float: right;}
+
+  .pagination li a{padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    text-align: center;}
+
+    // pageignation btn
+    .dropdown #pageDropDown{width: 50px!important;}
+    .react-bs-table-sizePerPage-dropdown .dropdown-menu {min-width: 5rem;}
+    .app-footer{font-size: 11px;}
+    .react-bs-table-sizePerPage-dropdown btn{width: 50px;}
+    // search mobile view
+    @media only screen and (max-width: 600px) {
+      .mob-Left{padding-left: 0px !important;
+        text-align: left !important;}
+    }
+    
+    .Disable{
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    // search mob view
+   
 // Login Css//
 .Login-component {
     background: url(../assets/img/bg-image/bg-login.jpg) no-repeat center center fixed;
@@ -451,5 +504,6 @@ font-weight: 500;
       .sidebar .nav-link {
        
         padding: 0.75rem .2rem !important;}
+        
     }
 

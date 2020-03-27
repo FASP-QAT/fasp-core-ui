@@ -185,7 +185,7 @@ class ListSubFundingSourceComponent extends Component {
 
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
+                <h6 className="mt-success">{i18n.t(this.props.match.params.message,{entityname})}</h6>
                 <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Card>
                     <CardHeader>
@@ -197,27 +197,28 @@ class ListSubFundingSourceComponent extends Component {
                         </div>
                     </CardHeader>
                     <CardBody>
-                        <Col md="3">
+                        <Col md="3 pl-0">
                             <FormGroup>
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.subfundingsource.fundingsource')}</Label>
-                                <div className="controls">
+                                <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
                                             name="fundingSourceId"
                                             id="fundingSourceId"
-                                            bsSize="lg"
+                                            bsSize="sm"
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
                                             {fundingSourceList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
-                                            <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon>
                                     </InputGroup>
                                 </div>
                             </FormGroup>
                         </Col>
+                        
                         <ToolkitProvider
                             keyField="subFundingSourceId"
                             data={this.state.selSubFundingSource}
@@ -228,11 +229,11 @@ class ListSubFundingSourceComponent extends Component {
                         >
                             {
                                 props => (
-                                    <div>
-                                        <hr />
-                                        <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
-                                        <BootstrapTable noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                    <div className="TableCust">
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                            <SearchBar {...props.searchProps} />
+                                        <ClearSearchButton {...props.searchProps} /></div>
+                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
