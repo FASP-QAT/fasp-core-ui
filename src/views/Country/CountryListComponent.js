@@ -11,6 +11,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
 import i18n from '../../i18n';
+import { boolean } from 'yup';
 
 
 
@@ -29,13 +30,20 @@ export default class CountryListComponent extends Component {
         this.filterData = this.filterData.bind(this);
     }
     filterData() {
-        let status = document.getElementById("active").value;
-        console.log(status);
-        if (status != "") {
-            const selCountry = this.state.countryList.filter(c => c.active == status);
-            this.setState({
-                selCountry: selCountry
-            });
+        var selStatus = document.getElementById("active").value;
+        if (selStatus != "") {
+            if (selStatus == "true") {
+                const selCountry = this.state.countryList.filter(c => c.active == true);
+                this.setState({
+                    selCountry: selCountry
+                });
+            } else if (selStatus == "false") {
+                const selCountry = this.state.countryList.filter(c => c.active == false);
+                this.setState({
+                    selCountry: selCountry
+                });
+            }
+
         } else {
             this.setState({
                 selCountry: this.state.countryList
@@ -65,10 +73,10 @@ export default class CountryListComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         CountryService.getCountryListAll().then(response => {
             if (response.status == 200) {
-                console.log("response--->",response.data);
+                console.log("response--->", response.data);
                 this.setState({
                     countryList: response.data,
-                    selCountry:response.data
+                    selCountry: response.data
                 })
             } else {
                 this.setState({ message: response.data.messageCode })
@@ -181,7 +189,7 @@ export default class CountryListComponent extends Component {
                                 {/* <Label htmlFor="appendedInputButton">Status</Label> */}
                                 <div className="controls">
                                     <InputGroup>
-                                        {/* <Input
+                                        <Input
                                             type="select"
                                             name="active"
                                             id="active"
@@ -194,7 +202,7 @@ export default class CountryListComponent extends Component {
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon> */}
+                                        </InputGroupAddon>
                                     </InputGroup>
                                 </div>
                             </FormGroup>
