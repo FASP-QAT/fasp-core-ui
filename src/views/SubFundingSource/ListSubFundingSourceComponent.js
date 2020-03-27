@@ -230,7 +230,9 @@ class ListSubFundingSourceComponent extends Component {
                                 props => (
                                     <div>
                                         <hr />
-                                        <SearchBar {...props.searchProps} />
+                                        <SearchBar
+                                        searchPosition="right"
+                                        {...props.searchProps} />
                                         <ClearSearchButton {...props.searchProps} />
                                         <BootstrapTable noDataIndication="Data not found" tabIndexCell
                                             pagination={paginationFactory(options)}
