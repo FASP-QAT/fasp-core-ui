@@ -19,8 +19,8 @@ workbox.setConfig({
 
 // This will work!
 workbox.routing.registerRoute(
-  new RegExp('\\.(?:js|css|scss|html|gif|svg|jpg|png)'),
-  new workbox.strategies.NetworkFirst()
+  new RegExp('\\.(?:js|css|scss|html|gif|svg|jpg|png|map)'),
+  new workbox.strategies.CacheFirst()
 );
 
 
