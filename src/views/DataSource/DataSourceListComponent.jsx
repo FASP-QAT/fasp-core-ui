@@ -42,7 +42,7 @@ export default class DataSourceListComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        DataSourceService.getDataSourceList().then(response => {
+        DataSourceService.getAllDataSourceList().then(response => {
             this.setState({
                 dataSourceList: response.data,
                 selSource: response.data
