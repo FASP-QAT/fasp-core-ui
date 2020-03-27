@@ -23,7 +23,8 @@ class RegionListComponent extends Component {
             regionList: [],
             message: '',
             selRegion: [],
-            realmCountryList: []
+            realmCountryList: [],
+            lang: localStorage.getItem('lang')
         }
         this.editRegion = this.editRegion.bind(this);
         this.addRegion = this.addRegion.bind(this);

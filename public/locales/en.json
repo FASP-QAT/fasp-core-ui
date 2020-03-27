@@ -51,5 +51,8 @@
 "static.realm.monthInPastForAmcText":"Please enter month in past for amc",
 "static.realm.monthInFutureForAmcText":"Please enter month in future for amc",
 "static.realm.orderFrequencyText":"Please enter order frequency",
-"static.realm.realmCodeLength":"Please Enter Length Less Then or Equal To 6"
+"static.realm.realmCodeLength":"Please Enter Length Less Then or Equal To 6",
+
+"static.procurementagent.procurmentAgentMaster":"Procurment Agent",
+"static.procurementagent.procurementagentsubmittoapprovetime":"Submit to approve time"
 }
