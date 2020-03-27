@@ -10,6 +10,7 @@ import i18n from '../../i18n';
 let initialValues = {
     label: ""
 }
+const entityname=i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -105,7 +106,7 @@ export default class UpdateUnitTypeComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` + "Action Canceled")
+        this.props.history.push(`/diamension/diamensionlist/` +i18n.t('static.message.cancelled',{entityname}))
     } render() {
         return (
             <div className="animated fadeIn">
@@ -113,7 +114,7 @@ export default class UpdateUnitTypeComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Edit Diamension</strong>{' '}
+        <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -121,11 +122,11 @@ export default class UpdateUnitTypeComponent extends Component {
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                      UnitTypeService.updateUnitType(this.state.unitType).then(response => {
-                                        if (response.data.status == "Success") {
-                                            this.props.history.push(`/diamension/diamensionlist/${response.data.message}`)
+                                        if (response.status == 200) {
+                                            this.props.history.push(`/diamension/diamensionlist/`+i18n.t(response.data.messageCode,{entityname}))
                                         } else {
                                             this.setState({
-                                                message: response.data.message
+                                                message: response.data.messageCode
                                             })
                                         }
 
@@ -164,7 +165,7 @@ export default class UpdateUnitTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='diamensionForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">Dimension Type</Label>
+                                    <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                                                         <Input type="text"
@@ -184,7 +185,7 @@ export default class UpdateUnitTypeComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                          <Button type="reset" color="danger"className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -195,6 +196,10 @@ export default class UpdateUnitTypeComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                <h6>{i18n.t(this.state.message)}</h6>
+               <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
