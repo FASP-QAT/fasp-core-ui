@@ -8,13 +8,16 @@ import programDate from './ProgramData';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+
+const entityname = i18n.t('static.program.programMaster');
 export default class ProgramList extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       table: [],
-      lang: 'en'
+      lang: 'en',
+      message:''
     }
     // this.table = programDate.rows;
     this.options = {
@@ -118,15 +121,15 @@ export default class ProgramList extends Component {
     AuthenticationService.setupAxiosInterceptors();
     ProgramService.getProgramProductListByProgramId(cell)
       .then(response => {
-        
-        let myReasponse=response.data.data;
-        console.log("myResponce=========",response.data.data);
+
+        let myReasponse = response.data.data;
+        console.log("myResponce=========", response.data.data);
         this.props.history.push({
           pathname: "/programProduct/addProgramProduct",
           state: {
-            programProduct:myReasponse     
+            programProduct: myReasponse
           }
-          
+
         })
       }).catch(
         error => {
@@ -150,13 +153,13 @@ export default class ProgramList extends Component {
     // this.props.history.push({
     //   pathname: "/programProduct/addProgramProduct",
     //   state: {
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     //     'programProduct':
 
     //     {
@@ -211,39 +214,41 @@ export default class ProgramList extends Component {
     // ]
     // }
 
-  
 
 
-}
-render() {
-  return (
-    <div className="animated">
-      <Card>
-        <CardHeader>
-          <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
-          <div className="card-header-actions">
-            <div className="card-header-action">
-              <a href="javascript:void();" title="Add Program" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+
+  }
+  render() {
+    return (
+      <div className="animated">
+        <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+        <h5>{i18n.t(this.state.message, { entityname })}</h5>
+        <Card>
+          <CardHeader>
+            <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
+            <div className="card-header-actions">
+              <div className="card-header-action">
+                <a href="javascript:void();" title="Add Program" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardBody>
-          <BootstrapTable data={this.state.table} version="4"  hover pagination search options={this.options}>
-            <TableHeaderColumn isKey dataField="programId" hidden >Program Id</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >{i18n.t('static.program.realmcountry')}</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >{i18n.t('static.program.organisation')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="airFreightPerc" dataSort >{i18n.t('static.program.airfreightperc')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="seaFreightPerc" dataSort>{i18n.t('static.program.seafreightperc')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>{i18n.t('static.program.draftleadtime')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>{i18n.t('static.program.drafttosubmitleadtime')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>{i18n.t('static.program.submittoapproveleadtime')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="programId" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn>
-          </BootstrapTable>
-        </CardBody>
-      </Card>
-    </div>
-  )
-}
+          </CardHeader>
+          <CardBody>
+            <BootstrapTable data={this.state.table} version="4" hover pagination search options={this.options}>
+              <TableHeaderColumn isKey dataField="programId" hidden >Program Id</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >{i18n.t('static.program.realmcountry')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >{i18n.t('static.program.organisation')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="airFreightPerc" dataSort >{i18n.t('static.program.airfreightperc')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="seaFreightPerc" dataSort>{i18n.t('static.program.seafreightperc')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>{i18n.t('static.program.draftleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>{i18n.t('static.program.drafttosubmitleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>{i18n.t('static.program.submittoapproveleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="programId" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn>
+            </BootstrapTable>
+          </CardBody>
+        </Card>
+      </div>
+    )
+  }
 }

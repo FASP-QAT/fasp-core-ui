@@ -15,6 +15,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
+const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
     programName: '',
     realmId: '',
@@ -158,26 +159,32 @@ export default class AddProgram extends Component {
         HealthAreaService.getRealmList()
             .then(response => {
                 if (response.status == 200) {
-                    //  console.log("realm list---", response.data.data);
                     this.setState({
                         realmList: response.data
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+                    this.setState({
+                        message: response.data.messageCode
+                    })
                 }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -190,22 +197,33 @@ export default class AddProgram extends Component {
         ProgramService.getRealmCountryList(e.target.value)
             .then(response => {
                 console.log("realm list---", response.data);
-                this.setState({
-                    realmCountryList: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        realmCountryList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -214,22 +232,33 @@ export default class AddProgram extends Component {
         ProgramService.getOrganisationList(e.target.value)
             .then(response => {
                 console.log("organisation list---", response.data);
-                this.setState({
-                    organisationList: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        organisationList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -238,22 +267,33 @@ export default class AddProgram extends Component {
         ProgramService.getHealthAreaList(e.target.value)
             .then(response => {
                 console.log("health area list---", response.data);
-                this.setState({
-                    healthAreaList: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        healthAreaList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -265,28 +305,39 @@ export default class AddProgram extends Component {
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 console.log("health area list---", response.data);
-                var json = response.data;
-                var regList = [];
-                for (var i = 0; i < json.length; i++) {
-                    regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
+                if (response.status == 200) {
+                    var json = response.data;
+                    var regList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        regionId: '',
+                        regionList: regList
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
                 }
-                this.setState({
-                    regionId: '',
-                    regionList: regList
-                })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -432,32 +483,33 @@ export default class AddProgram extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             AuthenticationService.setupAxiosInterceptors();
                             ProgramService.addProgram(this.state.program).then(response => {
-                                // console.log(this.state.program);
-                                // console.log(response);
                                 if (response.status == "200") {
-                                    console.log(response);
-                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
                                 } else {
                                     this.setState({
-                                        message: response.data.message
+                                        message: response.data.messageCode
                                     })
                                 }
-
                             }
                             )
                                 .catch(
                                     error => {
-                                        switch (error.message) {
-                                            case "Network Error":
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
-                                            default:
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
+                                        if (error.message === "Network Error") {
+                                            this.setState({ message: error.message });
+                                        } else {
+                                            switch (error.response.status) {
+                                                case 500:
+                                                case 401:
+                                                case 404:
+                                                case 406:
+                                                case 412:
+                                                    this.setState({ message: error.response.data.messageCode });
+                                                    break;
+                                                default:
+                                                    this.setState({ message: 'static.unkownError' });
+                                                    console.log("Error code unkown");
+                                                    break;
+                                            }
                                         }
                                     }
                                 )
@@ -742,6 +794,6 @@ export default class AddProgram extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + "Action Canceled")
+        this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
