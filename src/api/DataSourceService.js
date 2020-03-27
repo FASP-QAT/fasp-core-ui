@@ -8,8 +8,12 @@ class DataSourceService {
         );
     }
 
-    getDataSourceList() {
+    getActiveDataSourceList() {
         return axios.get(`${API_URL}/api/dataSource/`, {
+        });
+    }
+    getAllDataSourceList() {
+        return axios.get(`${API_URL}/api/dataSource/all`, {
         });
     }
 
