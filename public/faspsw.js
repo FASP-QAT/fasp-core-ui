@@ -6,11 +6,7 @@ var assets = [
   '/manifest.json',
   '/QAT-logo192x192.png',
   '/QAT-logo512x512.png',
-  '/QAT-logo150x61.png',
-  '/build/',
-  '/node_modules/',
-  '/assets/',
-  '/locales/',
+  '/QAT-logo150x61.png'
 ];
 
 self.addEventListener('install', event => {
