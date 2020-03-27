@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 let initialValues = {
     fundingSource: ""
 }
-
+const entityname=i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
@@ -94,7 +94,7 @@ class EditFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.fundingsource.fundingsourceedittext')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -105,7 +105,7 @@ class EditFundingSourceComponent extends Component {
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/fundingSource/listFundingSource/${response.data.messageCode}`)
+                                                this.props.history.push(`/fundingSource/listFundingSource/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({ message: response.data.messageCode })
                                             }
@@ -209,9 +209,8 @@ class EditFundingSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -223,14 +222,14 @@ class EditFundingSourceComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{this.state.message}</h6>
-                    <h6>{this.props.match.params.messageCode}</h6>
-                </div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/fundingSource/listFundingSource/` + "static.actionCancelled")
+        this.props.history.push(`/fundingSource/listFundingSource/` +i18n.t('static.message.cancelled',{entityname}))
     }
 }
 

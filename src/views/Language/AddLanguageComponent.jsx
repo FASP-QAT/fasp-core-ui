@@ -16,7 +16,7 @@ const initialValues = {
     languageName: "",
     languageCode: ""
 }
-
+const entityname=i18n.t('static.language.language');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
@@ -124,14 +124,14 @@ class AddLanguageComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.language.languageadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     LanguageService.addLanguage(values).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)
+                                            this.props.history.push(`/language/listLanguage/`+i18n.t(response.data.messageCode,{entityname}))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -222,15 +222,15 @@ class AddLanguageComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{i18n.t('this.state.message')}{}</h6>
-                    <h6>{i18n.t('this.props.match.params.message')}{}</h6>
-                </div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
             </div>
         );
     }
 
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` + "static.actionCancelled")
+        this.props.history.push(`/language/listLanguage/` +i18n.t('static.message.cancelled',{entityname}))
     }
 
 

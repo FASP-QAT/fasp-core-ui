@@ -12,7 +12,7 @@ const initialValues = {
   fundingSourceId: [],
   subFundingSource: ""
 }
-
+const entityname=i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
@@ -144,7 +144,7 @@ class AddFundingSourceComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.fundingsource.fundingsourceaddttext')}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -155,7 +155,7 @@ class AddFundingSourceComponent extends Component {
                     .then(response => {
                       console.log("Response->", response);
                       if (response.status == 200) {
-                        this.props.history.push(`/fundingSource/listFundingSource/${response.data.messageCode}`)
+                        this.props.history.push(`/fundingSource/listFundingSource/`+i18n.t(response.data.messageCode,{entityname}))
                       } else {
                         this.setState({ message: response.data.messageCode })
                       }
@@ -251,14 +251,14 @@ class AddFundingSourceComponent extends Component {
           </Col>
         </Row>
         <div>
-          <h6>{this.state.messageCode}</h6>
-          <h6>{this.props.match.params.messageCode}</h6>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
         </div>
       </div>
     );
   }
   cancelClicked() {
-    this.props.history.push(`/fundingSource/listFundingSource/` + "static.actionCancelled")
+    this.props.history.push(`/fundingSource/listFundingSource/` +i18n.t('static.message.cancelled',{entityname}))
   }
 }
 

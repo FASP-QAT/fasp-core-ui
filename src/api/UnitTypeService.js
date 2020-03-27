@@ -4,17 +4,17 @@ import { API_URL } from '../Constants.js';
 class UnitTypeSerice {
 
     addUniType(json) {
-        return axios.put(`${API_URL}/api/addUnitType/`, json, {
+        return axios.post(`${API_URL}/api/unitType/`, json, {
         });
     }
 
     getUnitTypeListAll() {
-        return axios.get(`${API_URL}/api/unitTypeList/`, {
+        return axios.get(`${API_URL}/api/unitType/`, {
         });
     } 
 
     updateUnitType(json) {
-        return axios.put(`${API_URL}/api/editUnitType/`, json, {
+        return axios.put(`${API_URL}/api/unitType/`, json, {
         });
     }
 }
