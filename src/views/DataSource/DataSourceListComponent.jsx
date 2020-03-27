@@ -97,6 +97,12 @@ export default class DataSourceListComponent extends Component {
         );
 
         const columns = [{
+            dataField: 'realm.label.label_en',
+            text: i18n.t('static.realm.realm'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        },{
             dataField: 'dataSourceType.label.label_en',
             text: i18n.t('static.datasourcetype.datasourcetype'),
             sort: true,
@@ -155,7 +161,7 @@ export default class DataSourceListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity',{entityname})}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Datasource" onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewDataSource}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
 

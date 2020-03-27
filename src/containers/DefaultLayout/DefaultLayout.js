@@ -132,16 +132,6 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-globe'
                           },
                           {
-                            name: i18n.t('static.dashboard.datasourcetype'),
-                            url: '/dataSourceType/listDataSourceType',
-                            icon: 'fa fa-table'
-                          },
-                          {
-                            name: i18n.t('static.dashboard.datasource'),
-                            url: '/dataSource/listDataSource',
-                            icon: 'fa fa-database'
-                          },
-                          {
                             name: i18n.t('static.dashboard.currency'),
                             url: '/currency/listCurrency',
                             icon: 'fa fa-money'
@@ -163,7 +153,16 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.realmmaster'),
                         icon: 'fa fa-list',
                         children: [
-
+                          {
+                            name: i18n.t('static.dashboard.datasourcetype'),
+                            url: '/dataSourceType/listDataSourceType',
+                            icon: 'fa fa-table'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.datasource'),
+                            url: '/dataSource/listDataSource',
+                            icon: 'fa fa-database'
+                          },
                           {
                             name: i18n.t('static.dashboard.fundingsource'),
                             icon: 'fa fa-bank',
