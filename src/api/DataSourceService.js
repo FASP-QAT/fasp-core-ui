@@ -4,17 +4,17 @@ import { API_URL } from '../Constants.js';
 class DataSourceService {
 
     addDataSource(json) {
-        return axios.put(`${API_URL}/api/addDataSource/`, json, {}
+        return axios.post(`${API_URL}/api/dataSource/`, json, {}
         );
     }
 
     getDataSourceList() {
-        return axios.get(`${API_URL}/api/getDataSourceList/`, {
+        return axios.get(`${API_URL}/api/dataSource/`, {
         });
     }
 
     editDataSource(json) {
-        return axios.put(`${API_URL}/api/editDataSource/`,json,{}
+        return axios.put(`${API_URL}/api/dataSource/`,json,{}
             );
         }
     

@@ -242,7 +242,7 @@ export default class DownloadProgram extends Component {
                 )
 
         } else {
-            alert( i18n.t('static.common.onlinealerttext'))
+            alert( i18n.t('static.common.online'))
         }
     }
 
