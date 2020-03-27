@@ -160,7 +160,7 @@ export default class LanguageListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Language" onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

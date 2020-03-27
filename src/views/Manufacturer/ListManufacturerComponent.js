@@ -134,7 +134,7 @@ class ManufacturerListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.manufacturer.manufacturerlist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Manufacturer" onClick={this.addManufacturer}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addManufacturer}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
