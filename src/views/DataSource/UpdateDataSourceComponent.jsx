@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import DataSourceService from '../../api/DataSourceService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+
+const entityname=i18n.t('static.datasource.datasource');
 let initialValues = {
     label: '',
     dataSourceTypeId: '',
@@ -62,7 +63,11 @@ export default class UpdateDataSourceComponent extends Component {
                 },
                 dataSourceType: {
                     dataSourceTypeId: ''
+                },realm:{
+                    realmId:'',
+                    label:{label_en:''
                 }
+            }
             },
             dataSourceTypeList: []
         }
@@ -133,17 +138,22 @@ export default class UpdateDataSourceComponent extends Component {
         })
             .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -155,8 +165,10 @@ export default class UpdateDataSourceComponent extends Component {
         this.state.dataSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
-        this.props.history.push(`/dataSource/listDataSource/` + "Action Canceled")
-    } render() {
+        this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled',{entityname}))
+    } 
+    
+    render() {
         const { dataSourceTypeList } = this.state;
         let dataSourceTypes = dataSourceTypeList.length > 0
             && dataSourceTypeList.map((item, i) => {
@@ -170,7 +182,7 @@ export default class UpdateDataSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.datasource.datasourceedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -180,27 +192,32 @@ export default class UpdateDataSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     DataSourceService.editDataSource(this.state.dataSource)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/dataSource/listDataSource/${response.data.message}`)
+                                             if (response.status == 200) {
+                                                this.props.history.push(`/dataSource/listDataSource/`+ i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -219,6 +236,21 @@ export default class UpdateDataSourceComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceForm'>
                                                 <CardBody>
+                                                <FormGroup>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                            <Input
+                                                                type="text"
+                                                                name="realmId"
+                                                                id="realmId"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                value={this.state.dataSource.realm.label.label_en}
+                                                            >
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                    </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}</Label>
                                                         <InputGroupAddon addonType="prepend">
@@ -300,7 +332,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                     <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                       &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -311,6 +343,10 @@ export default class UpdateDataSourceComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
             </div>
         );
     }
