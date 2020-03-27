@@ -84,7 +84,8 @@ export default class UnitTypeListComponent extends Component {
             alert("You must be Online.")
         }
 
-    }render() {
+    }
+    render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -134,7 +135,7 @@ export default class UnitTypeListComponent extends Component {
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity',{entityname})}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Realm" onClick={this.addNewUnitType}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewUnitType}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
 
