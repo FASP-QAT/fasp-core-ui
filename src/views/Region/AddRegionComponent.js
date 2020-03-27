@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, InputGroupAddon, InputGroupText, Input,FormText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, InputGroupAddon, InputGroupText, Input} from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -7,6 +7,9 @@ import i18n from '../../i18n'
 import RegionService from "../../api/RegionService";
 import RealmCountryService from "../../api/RealmCountryService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+
+const entityname = i18n.t('static.region.region');
 
 const initialValues = {
   realmCountryId: [],
@@ -15,7 +18,7 @@ const initialValues = {
 
 const validationSchema = function (values) {
   return Yup.object().shape({
-    realmId: Yup.string()
+    realmCountryId: Yup.string()
       .required(i18n.t('static.region.validcountry')),
     region: Yup.string()
       .required(i18n.t('static.region.validregion'))
@@ -52,9 +55,14 @@ class AddRegionComponent extends Component {
         realmCountry: {
         },
         label: {
+          label_en:'',
+          label_fr:'',
+          label_sp:'',
+          label_pr:''
         }
       },
-      message: ''
+      message: '',
+      lang: localStorage.getItem('lang')
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -76,7 +84,7 @@ class AddRegionComponent extends Component {
 
   touchAll(setTouched, errors) {
     setTouched({
-      realmId: true,
+      realmCountryId: true,
       region: true
     }
     );
@@ -101,22 +109,33 @@ class AddRegionComponent extends Component {
     AuthenticationService.setupAxiosInterceptors();
     RealmCountryService.getRealmCountryListAll()
       .then(response => {
-        this.setState({
-          realmCountries: response.data.data
-        })
+        if (response.status == 200) {
+          this.setState({
+            realmCountries: response.data
+          })
+        } else {
+          this.setState({
+            message: response.data.messageCode
+          })
+        }
       }).catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                console.log("Error code unkown");
+                break;
+            }
           }
         }
       );
@@ -128,7 +147,7 @@ class AddRegionComponent extends Component {
       && realmCountries.map((item, i) => {
         return (
           <option key={i} value={item.realmCountryId}>
-            {item.country.label.label_en}
+            {getLabelText(item.country.label,this.state.lang)}
           </option>
         )
       }, this);
@@ -148,27 +167,31 @@ class AddRegionComponent extends Component {
                   RegionService.addRegion(this.state.region)
                     .then(response => {
                       console.log("Response->", response);
-                      if (response.data.status == "Success") {
-                        this.props.history.push(`/region/listRegion/${response.data.message}`)
+                      if (response.status == 200) {
+                        this.props.history.push(`/region/listRegion/` + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({
-                          message: response.data.message
+                          message: response.data.messageCode
                         })
                       }
                     })
                     .catch(
                       error => {
-                        switch (error.message) {
-                          case "Network Error":
-                            this.setState({
-                              message: error.message
-                            })
-                            break
-                          default:
-                            this.setState({
-                              message: error.response.data.message
-                            })
-                            break
+                        if (error.message === "Network Error") {
+                          this.setState({ message: error.message });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                              this.setState({ message: error.response.data.messageCode });
+                              break;
+                            default:
+                              this.setState({ message: 'static.unkownError' });
+                              break;
+                          }
                         }
                       }
                     );
@@ -189,8 +212,8 @@ class AddRegionComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText><i className="fa fa-globe"></i></InputGroupText>
+                            {/* <InputGroupAddon addonType="prepend"> */}
+                              {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
                               <Input
                                 type="select"
                                 name="realmCountryId"
@@ -206,15 +229,15 @@ class AddRegionComponent extends Component {
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {realmCountryList}
                               </Input>
-                            </InputGroupAddon>
-                            <FormText className="red">{errors.realmCountryId}</FormText>
+                            {/* </InputGroupAddon> */}
+                            <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
                           </FormGroup>
 
                           <FormGroup>
 
                             <Label for="region">{i18n.t('static.region.region')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText>
+                            {/* <InputGroupAddon addonType="prepend"> */}
+                              {/* <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText> */}
                               <Input type="text"
                                 name="region"
                                 id="region"
@@ -224,17 +247,17 @@ class AddRegionComponent extends Component {
                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                 onBlur={handleBlur}
                                 required />
-                            </InputGroupAddon>
-                            <FormText className="red">{errors.region}</FormText>
+                            {/* </InputGroupAddon> */}
+                            <FormFeedback className="red">{errors.region}</FormFeedback>
 
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                            {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                             <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.region.submit')}</Button>
-                                                        &nbsp;
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>
@@ -246,7 +269,7 @@ class AddRegionComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/region/listRegion/` + "Action Canceled")
+    this.props.history.push(`/region/listRegion/` + i18n.t('static.message.cancelled', { entityname }))
   }
 }
 

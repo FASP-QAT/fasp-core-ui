@@ -14,7 +14,7 @@ class CurrencyService {
     }
     
     getCurrencyListActive() {
-        return axios.get(`${API_URL}/api/getCurrencyListActive/`, {
+        return axios.get(`${API_URL}/api/currency/`, {
         });
     }
     editCurrency(json) {

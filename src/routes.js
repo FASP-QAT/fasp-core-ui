@@ -138,8 +138,8 @@ const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 
 
 const AddRealm = React.lazy(() => import('./views/Realm/AddRealmComponent'));
-const RealmList = React.lazy(() => import('./views/Realm/RealmListComponent'));
-const EditRealm = React.lazy(() => import('./views/Realm/UpdateRealmComponent'));
+const RealmList = React.lazy(() => import('./views/Realm/ListRealmComponent'));
+const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/programTree', name: 'Program', component: ProgramTree },
