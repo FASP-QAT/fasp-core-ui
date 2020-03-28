@@ -129,16 +129,6 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-globe'
                           },
                           {
-                            name: i18n.t('static.dashboard.datasourcetype'),
-                            url: '/dataSourceType/listDataSourceType',
-                            icon: 'fa fa-table'
-                          },
-                          {
-                            name: i18n.t('static.dashboard.datasource'),
-                            url: '/dataSource/listDataSource',
-                            icon: 'fa fa-database'
-                          },
-                          {
                             name: i18n.t('static.dashboard.currency'),
                             url: '/currency/listCurrency',
                             icon: 'fa fa-money'
@@ -160,7 +150,16 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.realmmaster'),
                         icon: 'fa fa-list',
                         children: [
-
+                          {
+                            name: i18n.t('static.dashboard.datasourcetype'),
+                            url: '/dataSourceType/listDataSourceType',
+                            icon: 'fa fa-table'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.datasource'),
+                            url: '/dataSource/listDataSource',
+                            icon: 'fa fa-database'
+                          },
                           {
                             name: i18n.t('static.dashboard.fundingsource'),
                             icon: 'fa fa-bank',
@@ -200,39 +199,39 @@ class DefaultLayout extends Component {
                         children: [
                           {
                             name: i18n.t('static.dashboard.program'),
-                            url: '/program',
+                            url: '/program/listProgram',
                             icon: 'icon-graph',
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.addprogram'),
-                                url: '/program/addProgram',
-                                icon: 'icon-pencil',
-                              },
-                              {
-                                name: i18n.t('static.dashboard.listprogram'),
-                                url: '/program/listProgram',
-                                icon: 'fa fa-object-group',
-                              },
-                            ]
+                        //     children: [
+                        //       // {
+                        //       //   name: i18n.t('static.dashboard.addprogram'),
+                        //       //   url: '/program/addProgram',
+                        //       //   icon: 'icon-pencil',
+                        //       // },
+                        //       {
+                        //         name: i18n.t('static.dashboard.listprogram'),
+                        //         url: '/program/listProgram',
+                        //         icon: 'fa fa-object-group',
+                        //       }
+                        //     ]
                           },
                           {
                             name: i18n.t('static.dashboard.product'),
-                            url: '/product',
+                            url: '/product/listProduct',
                             icon: 'icon-graph',
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.addproduct'),
-                                url: '/product/addProduct',
-                                icon: 'icon-pencil',
-                              },
-                              {
-                                name: i18n.t('static.dashboard.listproduct'),
-                                url: '/product/listProduct',
-                                icon: 'fa fa-th-large',
-                              },
-                            ]
+                            // children: [
+                            //   // {
+                            //   //   name: i18n.t('static.dashboard.addproduct'),
+                            //   //   url: '/product/addProduct',
+                            //   //   icon: 'icon-pencil',
+                            //   // },
+                            //   {
+                            //     name: i18n.t('static.dashboard.listproduct'),
+                            //     url: '/product/listProduct',
+                            //     icon: 'fa fa-th-large',
+                            //   }
+                            // ]
                           },
-
+                        
 
                           {
                             name: i18n.t('static.dashboard.program'),

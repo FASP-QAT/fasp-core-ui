@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,FormText, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, FormText, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -72,21 +72,37 @@ class AddBudgetComponent extends Component {
             message: '',
             lang: localStorage.getItem('lang'),
             budget: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
                 program: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
                 },
                 subFundingSource: {
-                },
-                label: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
                 },
                 startDate: '',
                 stopDate: ''
 
             },
-            
+
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.currentDate=this.currentDate.bind(this);
+        this.currentDate = this.currentDate.bind(this);
     }
 
     currentDate() {
@@ -117,7 +133,7 @@ class AddBudgetComponent extends Component {
         }
         if (event.target.name === "startDate") {
             budget.startDate = event.target.value;
-            budget.stopDate=''
+            budget.stopDate = ''
         }
         if (event.target.name === "stopDate") {
             budget.stopDate = event.target.value;
@@ -125,7 +141,7 @@ class AddBudgetComponent extends Component {
         this.setState({
             budget
         },
-            () => {});
+            () => { });
     };
 
     touchAll(setTouched, errors) {
@@ -157,9 +173,9 @@ class AddBudgetComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramListForDropDown()
+        ProgramService.getProgramList()
             .then(response => {
-                // console.log(response.data);
+                console.log("program list fro drop down----",response.data);
                 this.setState({
                     programs: response.data
                 })
@@ -247,7 +263,7 @@ class AddBudgetComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     BudgetService.addBudget(this.state.budget)
                                         .then(response => {
-                                            if (response.status == "200") {
+                                            if (response.status == 200) {
                                                 this.props.history.push(`/budget/listBudget/${response.data.message}`)
                                             } else {
                                                 this.setState({
@@ -293,8 +309,8 @@ class AddBudgetComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="budget">{i18n.t('static.budget.budget')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-money"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
                                                             <Input type="text"
                                                                 name="budget"
                                                                 id="budget"
@@ -304,13 +320,13 @@ class AddBudgetComponent extends Component {
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
                                                                 required />
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.budget}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa-object-group"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa-object-group"></i></InputGroupText> */}
                                                             <Input
                                                                 type="select"
                                                                 name="programId"
@@ -326,13 +342,13 @@ class AddBudgetComponent extends Component {
                                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                                 {programList}
                                                             </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.programId}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
                                                             <Input
                                                                 type="select"
                                                                 name="subFundingSourceId"
@@ -348,13 +364,13 @@ class AddBudgetComponent extends Component {
                                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                                 {subFundingSourceList}
                                                             </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.subFundingSourceId}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.subFundingSourceId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-usd"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                             <Input type="text"
                                                                 name="budgetAmt"
                                                                 id="budgetAmt"
@@ -366,48 +382,48 @@ class AddBudgetComponent extends Component {
                                                                 type="number"
                                                                 placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                                 required />
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.budgetAmt}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText> */}
                                                             <Input
-                                                            // value={this.state.budget.st}
-                                                            name="startDate"
-                                                            id="startDate"
-                                                            bsSize="sm"
-                                                            valid={!errors.startDate}
-                                                            invalid={touched.startDate && !!errors.startDate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            type="date"
-                                                            min={this.currentDate()}
-                                                            placeholder={i18n.t('static.budget.budgetstartdate')}
-                                                            required />
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.startDate}</FormText>
+                                                                // value={this.state.budget.st}
+                                                                name="startDate"
+                                                                id="startDate"
+                                                                bsSize="sm"
+                                                                valid={!errors.startDate}
+                                                                invalid={touched.startDate && !!errors.startDate}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                type="date"
+                                                                min={this.currentDate()}
+                                                                placeholder={i18n.t('static.budget.budgetstartdate')}
+                                                                required />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.startDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText> */}
                                                             <Input
-                                                            value={this.state.budget.stopDate}
-                                                            name="stopDate"
-                                                            id="stopDate"
-                                                            bsSize="sm"
-                                                            valid={!errors.stopDate}
-                                                            invalid={touched.stopDate && !!errors.stopDate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            type="date"
-                                                            min={this.state.budget.startDate}
-                                                            placeholder={i18n.t('static.budget.budgetstopdate')}
-                                                            required />
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.stopDate}</FormText>
+                                                                value={this.state.budget.stopDate}
+                                                                name="stopDate"
+                                                                id="stopDate"
+                                                                bsSize="sm"
+                                                                valid={!errors.stopDate}
+                                                                invalid={touched.stopDate && !!errors.stopDate}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                type="date"
+                                                                min={this.state.budget.startDate}
+                                                                placeholder={i18n.t('static.budget.budgetstopdate')}
+                                                                required />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

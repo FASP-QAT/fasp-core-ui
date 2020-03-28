@@ -37,9 +37,10 @@ class ListBudgetComponent extends Component {
   }
 
   editBudget(budget) {
-    var budgetId = budget.budgetId
+    // var budgetId = budget.budgetId
     this.props.history.push({
-      pathname: `/budget/editBudget/${budgetId}`
+      pathname: `/budget/editBudget/`,
+      state: { budget }
     });
   }
 
@@ -51,38 +52,39 @@ class ListBudgetComponent extends Component {
   }
 
   componentDidMount() {
-    console.log("message------------->"+this.props.match.params.message);
+    console.log("message------------->" + this.props.match.params.message);
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
         if (response.status == 200) {
-        console.log(response.data);
-        this.setState({
-          table: response.data
-        }) } else {
+          console.log(response.data);
+          this.setState({
+            table: response.data
+          })
+        } else {
           this.setState({ message: response.data.messageCode })
-      }
+        }
       })
       .catch(
         error => {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
-        } else {
+          } else {
             switch (error.response.status) {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                    this.setState({ message: error.response.data.messageCode });
-                    break;
-                default:
-                    this.setState({ message: 'static.unkownError' });
-                    break;
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
             }
+          }
         }
-    }
-);
+      );
 
   }
 

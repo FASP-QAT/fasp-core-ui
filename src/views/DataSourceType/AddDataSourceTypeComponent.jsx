@@ -4,15 +4,19 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
-// import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceTypeService from '../../api/DataSourceTypeService.js'
+import RealmService from "../../api/RealmService";
 
 const initialValues = {
+    realmId: [],
     label: ''
 }
-
+const entityname=i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
+        realmId: Yup.string()
+        .required(i18n.t('static.manufaturer.realmtext')),
         label: Yup.string()
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
@@ -46,10 +50,12 @@ export default class AddDataSourceTypeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            realms: [],
             dataSourceType:
             {
                 active: '',
-
+                realm: {
+                },
                 label: {
                     label_en: '',
                     labelId: 0,
@@ -68,6 +74,9 @@ export default class AddDataSourceTypeComponent extends Component {
         if (event.target.name === "label") {
             dataSourceType.label.label_en = event.target.value
         }
+        if (event.target.name == "realmId") {
+            dataSourceType.realm.realmId = event.target.value;
+          }
 
         this.setState(
             {
@@ -79,6 +88,7 @@ export default class AddDataSourceTypeComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
+            realmId: true,
             'label': true,
         }
         )
@@ -100,7 +110,32 @@ export default class AddDataSourceTypeComponent extends Component {
     }
 
     componentDidMount() {
-
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
+        .then(response => {
+          this.setState({
+            realms: response.data
+          })
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+            } else {
+                switch (error.response.status) {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                        this.setState({ message: error.response.data.messageCode });
+                        break;
+                    default:
+                        this.setState({ message: 'static.unkownError' });
+                        break;
+                }
+            }
+        }
+    );
     }
 
     Capitalize(str) {
@@ -108,44 +143,57 @@ export default class AddDataSourceTypeComponent extends Component {
         dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     render() {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+          && realms.map((item, i) => {
+            return (
+              <option key={i} value={item.realmId}>
+                {item.label.label_en}
+              </option>
+            )
+          }, this);
         return (
             <div className="animated fadeIn">
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.datasourcetype.datasourcetypeadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    DataSourceTypeService.addDataSourceType(this.state.dataSourceType.label)
+                                    DataSourceTypeService.addDataSourceType(this.state.dataSourceType)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/dataSourceType/listDataSourceType/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/dataSourceType/listDataSourceType/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                  this.setState({ message: error.message });
+                                                } else {
+                                                  switch (error.response ? error.response.status : "") {
+                                                    case 500:
+                                                    case 401:
+                                                    case 404:
+                                                    case 406:
+                                                    case 412:
+                                                      this.setState({ message: error.response.data.messageCode });
+                                                      break;
                                                     default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                      this.setState({ message: 'static.unkownError' });
+                                                      break;
+                                                  }
                                                 }
-                                            }
-                                        );
+                                              }
+                                            );
                                 }}
 
 
@@ -163,6 +211,29 @@ export default class AddDataSourceTypeComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceType'>
                                                 <CardBody>
+                                                <FormGroup>
+                            <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                              <Input
+                                type="select"
+                                name="realmId"
+                                id="realmId"
+                                bsSize="sm"
+                                valid={!errors.realmId}
+                                invalid={touched.realmId && !!errors.realmId}
+                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                onBlur={handleBlur}
+                                required
+                                value={this.state.realmId}
+                              >
+                                <option value="0">{i18n.t('static.common.select')}</option>
+                                {realmList}
+                              </Input>
+                            </InputGroupAddon>
+
+                            <FormText className="red">{errors.realmId}</FormText>
+                          </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
                                                         <InputGroupAddon addonType="prepend">
@@ -197,10 +268,14 @@ export default class AddDataSourceTypeComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/dataSourceType/listDataSourceType/` + "Action Canceled")
+        this.props.history.push(`/dataSourceType/listDataSourceType/` +i18n.t('static.message.cancelled',{entityname}))
     }
 }

@@ -1,74 +1,88 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import i18n from '../../i18n'
-import RegionService from "../../api/RegionService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
-import RealmCountryService from "../../api/RealmCountryService.js";
-
+import CountryService from '../../api/CountryService.js';
+import { NavLink } from 'react-router-dom'
+import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
+import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
+import i18n from '../../i18n';
+import { boolean } from 'yup';
 
 
-const entityname = i18n.t('static.region.region');
 
-class RegionListComponent extends Component {
+const entityname = i18n.t('static.country.countryMaster');
+export default class CountryListComponent extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
-            regionList: [],
+            countryList: [],
             message: '',
-            selRegion: [],
-            realmCountryList: [],
-            lang: localStorage.getItem('lang')
+            selCountry: []
         }
-        this.editRegion = this.editRegion.bind(this);
-        this.addRegion = this.addRegion.bind(this);
+        this.addNewCountry = this.addNewCountry.bind(this);
+        this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
     }
     filterData() {
-        let countryId = document.getElementById("realmCountryId").value;
-        if (countryId != 0) {
-            const selRegion = this.state.regionList.filter(c => c.realmCountry.realmCountryId == countryId)
-            this.setState({
-                selRegion: selRegion
-            });
+        var selStatus = document.getElementById("active").value;
+        if (selStatus != "") {
+            if (selStatus == "true") {
+                const selCountry = this.state.countryList.filter(c => c.active == true);
+                this.setState({
+                    selCountry: selCountry
+                });
+            } else if (selStatus == "false") {
+                const selCountry = this.state.countryList.filter(c => c.active == false);
+                this.setState({
+                    selCountry: selCountry
+                });
+            }
+
         } else {
             this.setState({
-                selRegion: this.state.regionList
+                selCountry: this.state.countryList
             });
         }
     }
-    editRegion(region) {
-        this.props.history.push({
-            pathname: "/region/editRegion",
-            state: { region }
-        });
+
+
+    addNewCountry() {
+        if (navigator.onLine) {
+            this.props.history.push(`/country/addCountry`)
+        } else {
+            alert("You must be Online.")
+        }
+
     }
-    addRegion(region) {
+    editCountry(country) {
+        console.log(country);
         this.props.history.push({
-            pathname: "/region/addRegion"
+            pathname: "/country/editCountry",
+            state: { country: country }
         });
+
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RegionService.getRegionList()
-            .then(response => {
-                console.log(response.data);
-                if (response.status == 200) {
-                    this.setState({
-                        regionList: response.data,
-                        selRegion: response.data
-                    })
-                } else {
-                    this.setState({ message: response.data.messageCode })
-                }
-            }).catch(
+        CountryService.getCountryListAll().then(response => {
+            if (response.status == 200) {
+                console.log("response--->", response.data);
+                this.setState({
+                    countryList: response.data,
+                    selCountry: response.data
+                })
+            } else {
+                this.setState({ message: response.data.messageCode })
+            }
+        })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
@@ -89,38 +103,6 @@ class RegionListComponent extends Component {
                 }
             );
 
-        RealmCountryService.getRealmCountryListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realmCountryList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
     }
 
     render() {
@@ -132,31 +114,21 @@ class RegionListComponent extends Component {
             </span>
         );
 
-        const { realmCountryList } = this.state;
-        let realmCountries = realmCountryList.length > 0
-            && realmCountryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
         const columns = [
             {
-                dataField: 'realmCountry.country.label.label_en',
-                text: i18n.t('static.region.country'),
+                dataField: 'label.label_en',
+                text: i18n.t('static.country.countryMaster'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
-                dataField: 'label.label_en',
-                text: i18n.t('static.region.region'),
+                dataField: 'countryCode',
+                text: i18n.t('static.country.countrycode'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
-            }, 
+            },
             {
                 dataField: 'active',
                 text: i18n.t('static.common.status'),
@@ -192,7 +164,7 @@ class RegionListComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selRegion.length
+                text: 'All', value: this.state.selCountry.length
             }]
         }
         return (
@@ -201,27 +173,32 @@ class RegionListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.region.regionlist')}</strong>{' '}
+                        {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.country.countrylist')}</strong>{' '}
+
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Region" onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title="Add Realm Country" onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
+
                     </CardHeader>
                     <CardBody>
                         <Col md="3">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+                                <Label htmlFor="appendedInputButton">Status</Label>
                                 <div className="controls">
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="realmCountryId"
-                                            id="realmCountryId"
+                                            name="active"
+                                            id="active"
                                             bsSize="lg"
                                         >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                            {realmCountries}
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            <option value="true">{i18n.t('static.common.active')}</option>
+                                            <option value="false">{i18n.t('static.common.disabled')}</option>
+
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -231,8 +208,8 @@ class RegionListComponent extends Component {
                             </FormGroup>
                         </Col>
                         <ToolkitProvider
-                            keyField="regionId"
-                            data={this.state.selRegion}
+                            keyField="countryId"
+                            data={this.state.selCountry}
                             columns={columns}
                             search={{ searchFormatted: true }}
                             hover
@@ -248,7 +225,7 @@ class RegionListComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editRegion(row);
+                                                    this.editCountry(row);
                                                 }
                                             }}
                                             {...props.baseProps}
@@ -262,5 +239,5 @@ class RegionListComponent extends Component {
             </div>
         );
     }
+
 }
-export default RegionListComponent;

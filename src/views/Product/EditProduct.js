@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Row, Col, Card, CardHeader,
     CardFooter, Button, FormFeedback, CardBody,
-    Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText,FormText
+    Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText
 } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -23,15 +23,15 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         productName: Yup.string()
-        .required(i18n.t('static.product.productnametext')),
-    genericName: Yup.string()
-    .required(i18n.t('static.product.generictext')),
-    realmId: Yup.string()
-    .required(i18n.t('static.product.realmtext')),
-    productCategoryId: Yup.string()
-    .required(i18n.t('static.product.productcategorytext')),
-    unitId: Yup.string()
-    .required(i18n.t('static.product.productunittext'))
+            .required(i18n.t('static.product.productnametext')),
+        genericName: Yup.string()
+            .required(i18n.t('static.product.generictext')),
+        realmId: Yup.string()
+            .required(i18n.t('static.product.realmtext')),
+        productCategoryId: Yup.string()
+            .required(i18n.t('static.product.productcategorytext')),
+        unitId: Yup.string()
+            .required(i18n.t('static.product.productunittext'))
     })
 }
 
@@ -63,20 +63,38 @@ export default class EditProduct extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            product: this.props.location.state.product,
+            product: {
+                label: {
+                    label_en: ''
+                },
+                genericLabel: {
+                    label_en: ''
+                },
+                realm: {
+                    realmId: ''
+                },
+                productCategory: {
+                    productCategoryId: ''
+                },
+                forecastingUnit: {
+                    unitId: ''
+                }
+
+            },
             lan: localStorage.getItem('lang'),
             realmList: [],
             productCategoryList: [],
-            unitList: []
+            unitList: [],
+            message: ''
         }
-        initialValues = {
-            productName: getLabelText(this.props.location.state.product.label, this.state.lan),
-            genericName: getLabelText(this.props.location.state.product.genericLabel, this.state.lan),
-            realmId: this.props.location.state.product.realm.realmId,
-            productCategoryId: this.props.location.state.product.productCategory.productCategoryId,
-            unitId: this.props.location.state.product.forecastingUnit.unitId,
+        // initialValues = {
+        //     productName: getLabelText(this.props.location.state.product.label, this.state.lan),
+        //     genericName: getLabelText(this.props.location.state.product.genericLabel, this.state.lan),
+        //     realmId: this.props.location.state.product.realm.realmId,
+        //     productCategoryId: this.props.location.state.product.productCategory.productCategoryId,
+        //     unitId: this.props.location.state.product.forecastingUnit.unitId,
 
-        }
+        // }
 
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -84,12 +102,57 @@ export default class EditProduct extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmServcie.getRealmListAll()
+        ProductService.getProductDataById(this.props.match.params.productId)
             .then(response => {
-                this.setState({
-                    realmList: response.data.data
-                })
-            }).catch(
+                // console.log("------>", response.data);
+                if (response.status == 200) {
+                    var product = response.data;
+                    this.setState({ product: product });
+                    initialValues = {
+                        productName: getLabelText(product.label, this.state.lan),
+                        genericName: getLabelText(product.genericLabel, this.state.lan),
+                        realmId: product.realm.realmId,
+                        productCategoryId: product.productCategory.productCategoryId,
+                        unitId: product.forecastingUnit.unitId,
+
+                    }
+                    ProductService.getProdcutCategoryListByRealmId(this.state.product.realm.realmId)
+                        .then(response => {
+                            if (response.status == 200) {
+                                console.log(response.data);
+                                this.setState({
+                                    productCategoryList: response.data
+                                })
+                            } else {
+                                this.setState({ message: response.data.messageCode })
+                            }
+                        })
+                        .catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response.status) {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: error.response.data.messageCode });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+
+            })
+            .catch(
                 error => {
                     switch (error.message) {
                         case "Network Error":
@@ -99,56 +162,77 @@ export default class EditProduct extends Component {
                             break
                         default:
                             this.setState({
-                                message: error.response.data.message
+                                message: error.message
                             })
                             break
                     }
                 }
             );
 
+        RealmServcie.getRealmListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    console.log(response.data);
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
         UnitService.getUnitListAll()
             .then(response => {
-                this.setState({
-                    unitList: response.data.data
-                })
-            }).catch(
+                if (response.status == 200) {
+                    console.log(response.data);
+                    this.setState({
+                        unitList: response.data
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            })
+            .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
             );
-        ProductService.getProdcutCategoryListByRealmId(this.props.location.state.product.realm.realmId)
-            .then(response => {
-                console.log(response);
-                this.setState({
-                    productCategoryList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
+
 
 
     }
@@ -156,23 +240,32 @@ export default class EditProduct extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProductService.getProdcutCategoryListByRealmId(event.target.value)
             .then(response => {
-                console.log(response);
-                this.setState({
-                    productCategoryList: response.data.data
-                })
-            }).catch(
+                if (response.status == 200) {
+                    console.log(response.data);
+                    this.setState({
+                        productCategoryList: response.data
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            })
+            .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
             );
@@ -204,7 +297,7 @@ export default class EditProduct extends Component {
         this.setState({
             product
         },
-            () => { console.log(product) });
+            () => { console.log(product); console.log(initialValues.realmId); });
     };
 
     touchAll(setTouched, errors) {
@@ -284,17 +377,22 @@ export default class EditProduct extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -317,111 +415,116 @@ export default class EditProduct extends Component {
                                                         <Label for="product">{i18n.t('static.product.product')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
-                                                        <Input 
-                                                            // value={getLabelText(this.state.product.label,this.state.lan)}
-                                                            value={this.state.product.label.label_en}
-                                                            type="text"
-                                                            name="productName"
-                                                            id="productName"
-                                                            bsSize="sm"
-                                                            valid={!errors.productName}
-                                                            invalid={touched.productName && !!errors.productName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required />
-                                                             </InputGroupAddon>
-                                                        <FormText className="red"back>{errors.productName}</FormText>
+                                                            <Input
+                                                                // value={getLabelText(this.state.product.label,this.state.lan)}
+                                                                value={this.state.product.label.label_en}
+                                                                type="text"
+                                                                name="productName"
+                                                                id="productName"
+                                                                bsSize="sm"
+                                                                valid={!errors.productName}
+                                                                invalid={touched.productName && !!errors.productName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required />
+                                                            <FormFeedback className="red" back>{errors.productName}</FormFeedback>
+                                                        </InputGroupAddon>
+
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="product">{i18n.t('static.product.productgenericname')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                        <Input type="text"
-                                                            // value={getLabelText(this.state.product.genericLabel, this.state.lan)}
-                                                            value={this.state.product.genericLabel.label_en}
-                                                            name="genericName"
-                                                            id="genericName"
-                                                            bsSize="sm"
-                                                            valid={!errors.genericName}
-                                                            invalid={touched.genericName && !!errors.genericName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required />
-                                                               </InputGroupAddon>
-                                                        <FormText className="red">{errors.genericName}</FormText>
+                                                            <Input type="text"
+                                                                // value={getLabelText(this.state.product.genericLabel, this.state.lan)}
+                                                                value={this.state.product.genericLabel.label_en}
+                                                                name="genericName"
+                                                                id="genericName"
+                                                                bsSize="sm"
+                                                                valid={!errors.genericName}
+                                                                invalid={touched.genericName && !!errors.genericName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required />
+                                                            <FormFeedback className="red">{errors.genericName}</FormFeedback>
+                                                        </InputGroupAddon>
+
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.product.realm')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-th-large"></i></InputGroupText>
-                                                        <Input
-                                                            type="select"
-                                                            name="realmId"
-                                                            id="realmId"
-                                                            bsSize="sm"
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            disabled
-                                                            value={this.state.product.realm.realmId}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {realms}
-                                                        </Input>
+                                                            <Input
+                                                                type="select"
+                                                                name="realmId"
+                                                                id="realmId"
+                                                                bsSize="sm"
+                                                                valid={!errors.realmId}
+                                                                invalid={touched.realmId && !!errors.realmId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                disabled
+                                                                value={this.state.product.realm.realmId}
+                                                            >
+                                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                                {realms}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                         </InputGroupAddon>
-                                                        <FormText className="red">{errors.realmId}</FormText>
+
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="">{i18n.t('static.product.productcategory')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-bar-chart"></i></InputGroupText>
-                                                        <Input
-                                                            type="select"
-                                                            name="productCategoryId"
-                                                            id="productCategoryId"
-                                                            bsSize="sm"
-                                                            valid={!errors.productCategoryId}
-                                                            invalid={touched.productCategoryId && !!errors.productCategoryId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.product.productCategory.productCategoryId}
-                                                        >
-                                                            {/* <option value="0">Please select</option> */}
-                                                            {/* <option value="1">Product Category One</option>
+                                                            <Input
+                                                                type="select"
+                                                                name="productCategoryId"
+                                                                id="productCategoryId"
+                                                                bsSize="sm"
+                                                                valid={!errors.productCategoryId}
+                                                                invalid={touched.productCategoryId && !!errors.productCategoryId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.product.productCategory.productCategoryId}
+                                                            >
+                                                                {/* <option value="0">Please select</option> */}
+                                                                {/* <option value="1">Product Category One</option>
                                                             <option value="2">Product Category Two</option>
                                                             <option value="3">Product Category Three</option> */}
-                                                            {productCategories}
-                                                        </Input>
+                                                                {productCategories}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.productCategoryId}</FormFeedback>
                                                         </InputGroupAddon>
-                                                        <FormText className="red">{errors.productCategoryId}</FormText>
+
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="unitId">Forcasting Unit</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                        <Input
-                                                            type="select"
-                                                            name="unitId"
-                                                            id="unitId"
-                                                            bsSize="sm"
-                                                            valid={!errors.unitId}
-                                                            invalid={touched.unitId && !!errors.unitId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.product.forecastingUnit.unitId}
-                                                        >
-                                                            {/* <option value="0">Please select</option> */}
-                                                            {units}
-                                                        </Input>
+                                                            <Input
+                                                                type="select"
+                                                                name="unitId"
+                                                                id="unitId"
+                                                                bsSize="sm"
+                                                                valid={!errors.unitId}
+                                                                invalid={touched.unitId && !!errors.unitId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.state.product.forecastingUnit.unitId}
+                                                            >
+                                                                {/* <option value="0">Please select</option> */}
+                                                                {units}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                         </InputGroupAddon>
-                                         <FormText className="red">{errors.unitId}</FormText>
+
                                                     </FormGroup>
                                                     <FormGroup>
-                                                    <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -436,7 +539,7 @@ export default class EditProduct extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -452,7 +555,7 @@ export default class EditProduct extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
@@ -470,6 +573,10 @@ export default class EditProduct extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }

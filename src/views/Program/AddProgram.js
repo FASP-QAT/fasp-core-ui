@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, FormFeedback, Form, InputGroupAddon, InputGroupText,FormText
+    CardFooter, Button, Col, FormFeedback, Form, InputGroupAddon, InputGroupText, FormText
 } from 'reactstrap';
 import Select from 'react-select';
 import { Formik } from 'formik';
@@ -15,6 +15,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
+const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
     programName: '',
     realmId: '',
@@ -100,7 +101,10 @@ export default class AddProgram extends Component {
         this.state = {
             program: {
                 label: {
-                    label_en: ''
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
                 },
                 realm: {
                     realmId: ''
@@ -128,12 +132,13 @@ export default class AddProgram extends Component {
                 },
                 programNotes: '',
                 regionArray: [],
-                lan: 'en'
+
 
             },
             // regionList: [{ value: '1', label: 'R1' },
             // { value: '2', label: 'R2' },
             // { value: '3', label: 'R3' }],
+            lang: localStorage.getItem('lang'),
             regionId: '',
             realmList: [],
             realmCountryList: [],
@@ -153,26 +158,33 @@ export default class AddProgram extends Component {
         AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
-                if (response.status == "Success") {
-                //  console.log("realm list---", response.data.data);
-                this.setState({
-                    realmList: response.data
-                })  } else {
-                    this.setState({ message: response.data.messageCode })
+                if (response.status == 200) {
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
                 }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -185,22 +197,33 @@ export default class AddProgram extends Component {
         ProgramService.getRealmCountryList(e.target.value)
             .then(response => {
                 console.log("realm list---", response.data);
-                this.setState({
-                    realmCountryList: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        realmCountryList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -209,22 +232,33 @@ export default class AddProgram extends Component {
         ProgramService.getOrganisationList(e.target.value)
             .then(response => {
                 console.log("organisation list---", response.data);
-                this.setState({
-                    organisationList: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        organisationList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -233,22 +267,33 @@ export default class AddProgram extends Component {
         ProgramService.getHealthAreaList(e.target.value)
             .then(response => {
                 console.log("health area list---", response.data);
-                this.setState({
-                    healthAreaList: response.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        healthAreaList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -260,28 +305,39 @@ export default class AddProgram extends Component {
         ProgramService.getRegionList(e.target.value)
             .then(response => {
                 console.log("health area list---", response.data);
-                var json = response.data;
-                var regList = [];
-                for (var i = 0; i < json.length; i++) {
-                    regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                if (response.status == 200) {
+                    var json = response.data;
+                    var regList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        regionId: '',
+                        regionList: regList
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
                 }
-                this.setState({
-                    regionId: '',
-                    regionList: regList
-                })
             }).catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
             );
@@ -385,7 +441,7 @@ export default class AddProgram extends Component {
             && realmList.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lan)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -394,7 +450,7 @@ export default class AddProgram extends Component {
             && realmCountryList.map((item, i) => {
                 return (
                     <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lan)}
+                        {getLabelText(item.country.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -403,7 +459,7 @@ export default class AddProgram extends Component {
             && organisationList.map((item, i) => {
                 return (
                     <option key={i} value={item.organisationId}>
-                        {getLabelText(item.label, this.state.lan)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -412,7 +468,7 @@ export default class AddProgram extends Component {
             && healthAreaList.map((item, i) => {
                 return (
                     <option key={i} value={item.healthAreaId}>
-                        {getLabelText(item.label, this.state.lan)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -427,32 +483,33 @@ export default class AddProgram extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             AuthenticationService.setupAxiosInterceptors();
                             ProgramService.addProgram(this.state.program).then(response => {
-                                // console.log(this.state.program);
-                                // console.log(response);
                                 if (response.status == "200") {
-                                    console.log(response);
-                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
                                 } else {
                                     this.setState({
-                                        message: response.data.message
+                                        message: response.data.messageCode
                                     })
                                 }
-
                             }
                             )
                                 .catch(
                                     error => {
-                                        switch (error.message) {
-                                            case "Network Error":
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
-                                            default:
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
+                                        if (error.message === "Network Error") {
+                                            this.setState({ message: error.message });
+                                        } else {
+                                            switch (error.response.status) {
+                                                case 500:
+                                                case 401:
+                                                case 404:
+                                                case 406:
+                                                case 412:
+                                                    this.setState({ message: error.response.data.messageCode });
+                                                    break;
+                                                default:
+                                                    this.setState({ message: 'static.unkownError' });
+                                                    console.log("Error code unkown");
+                                                    break;
+                                            }
                                         }
                                     }
                                 )
@@ -476,57 +533,57 @@ export default class AddProgram extends Component {
                                         </CardHeader>
                                         <CardBody>
                                             <FormGroup>
-                                                 <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
-                                                 
-                                                    <Input
-                                                        type="text" name="programName" valid={!errors.programName}
-                                                        invalid={touched.programName && !!errors.programName}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        onBlur={handleBlur}
-                                                        id="programName" placeholder={i18n.t('static.program.programtext')} />
-                                              
+                                                <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
+
+                                                <Input
+                                                    type="text" name="programName" valid={!errors.programName}
+                                                    invalid={touched.programName && !!errors.programName}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                    onBlur={handleBlur}
+                                                    id="programName" placeholder={i18n.t('static.program.programtext')} />
+
                                                 <FormFeedback className="red">{errors.programName}</FormFeedback>
-                                                 </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
-                                                  
-                                                    <Input
-                                                        value={this.state.program.realm.realmId}
-                                                        valid={!errors.realmId}
-                                                        invalid={touched.realmId && !!errors.realmId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
-                                                        onBlur={handleBlur}
-                                                        type="select" name="realmId" id="realmId">
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {realms}
-                                                    </Input>
-                                               
+                                                <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+
+                                                <Input
+                                                    value={this.state.program.realm.realmId}
+                                                    valid={!errors.realmId}
+                                                    invalid={touched.realmId && !!errors.realmId}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
+                                                    onBlur={handleBlur}
+                                                    type="select" name="realmId" id="realmId">
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {realms}
+                                                </Input>
+
                                                 <FormFeedback>{errors.realmId}</FormFeedback>
-                                                </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
 
                                                 <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
-                                               
-                                                    <Input
-                                                        value={this.state.program.realmCountry.realmCountryId}
-                                                        valid={!errors.realmCountryId}
-                                                        invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                        onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
-                                                        onBlur={handleBlur}
-                                                        type="select" name="realmCountryId" id="realmCountryId">
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {/* <option value="1">Country #1</option>
+
+                                                <Input
+                                                    value={this.state.program.realmCountry.realmCountryId}
+                                                    valid={!errors.realmCountryId}
+                                                    invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                                    onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
+                                                    onBlur={handleBlur}
+                                                    type="select" name="realmCountryId" id="realmCountryId">
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {/* <option value="1">Country #1</option>
                                                         <option value="2">Country #2</option>
                                                         <option value="3">Country #3</option> */}
-                                                        {realmCountries}
-                                                    </Input>
-                                               
+                                                    {realmCountries}
+                                                </Input>
+
                                                 <FormFeedback>{errors.realmCountryId}</FormFeedback>
-                                                 </FormGroup>
+                                            </FormGroup>
                                             <FormGroup >
-                                                 <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
-                                                 
-                                                 <Select
+                                                <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
+
+                                                <Select
                                                     valid={!errors.regionId}
                                                     invalid={touched.reagonId && !!errors.regionId}
                                                     onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -536,10 +593,10 @@ export default class AddProgram extends Component {
                                                     value={this.state.regionId}
                                                 />
                                                 <FormFeedback>{errors.regionId}</FormFeedback>
-                                                </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
-                                                   <Input
+                                                <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
+                                                <Input
                                                     value={this.state.program.organisation.organisationId}
                                                     valid={!errors.organisationId}
                                                     invalid={touched.organisationId && !!errors.organisationId}
@@ -553,10 +610,10 @@ export default class AddProgram extends Component {
                                                         <option value="3">product #3</option> */}
                                                 </Input>
                                                 <FormFeedback>{errors.organisationId}</FormFeedback>
-                                                </FormGroup>
-                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
-                                                  <Input
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
+                                                <Input
                                                     value={this.state.program.healthArea.healthAreaId}
                                                     valid={!errors.healthAreaId}
                                                     invalid={touched.healthAreaId && !!errors.healthAreaId}
@@ -573,7 +630,7 @@ export default class AddProgram extends Component {
                                             </FormGroup>
                                             <FormGroup>
                                                 <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
-                                                 <Input
+                                                <Input
                                                     value={this.state.program.programManager.userId}
                                                     valid={!errors.userId}
                                                     invalid={touched.userId && !!errors.userId}
@@ -588,8 +645,8 @@ export default class AddProgram extends Component {
 
                                             </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                                 <Input
+                                                <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                                <Input
                                                     value={this.state.program.programNotes}
                                                     valid={!errors.programNotes}
                                                     invalid={touched.programNotes && !!errors.programNotes}
@@ -597,10 +654,10 @@ export default class AddProgram extends Component {
                                                     onBlur={handleBlur}
                                                     type="textarea" name="programNotes" id="programNotes" />
                                                 <FormFeedback>{errors.programNotes}</FormFeedback>
-                                                </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
-                                                  <Input
+                                                <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
+                                                <Input
                                                     value={this.state.program.airFreightPerc}
                                                     valid={!errors.airFreightPerc}
                                                     invalid={touched.airFreightPerc && !!errors.airFreightPerc}
@@ -608,17 +665,17 @@ export default class AddProgram extends Component {
                                                     onBlur={handleBlur}
                                                     type="number" name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
                                                 <FormFeedback>{errors.airFreightPerc}</FormFeedback>
-                                                 </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
-                                                 <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
-                                                   <Input
+                                                <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
+                                                <Input
                                                     value={this.state.program.seaFreightPerc}
                                                     valid={!errors.seaFreightPerc}
                                                     invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
                                                     onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                     onBlur={handleBlur}
                                                     type="number" name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
-                                                     </FormGroup>
+                                            </FormGroup>
                                             <FormGroup>
 
                                                 <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
@@ -726,7 +783,7 @@ export default class AddProgram extends Component {
                                                 <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                 <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                 {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
-                                            &nbsp;
+                                                &nbsp;
                                         </FormGroup>
                                         </CardFooter>
                                     </Form>
@@ -737,6 +794,6 @@ export default class AddProgram extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + "Action Canceled")
+        this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }

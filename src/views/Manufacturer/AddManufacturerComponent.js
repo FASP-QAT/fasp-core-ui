@@ -12,7 +12,7 @@ const initialValues = {
   realmId: [],
   manufacturer: ""
 }
-
+const entityname=i18n.t('static.manufacturer.manufacturer');
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
@@ -103,24 +103,28 @@ class AddManufacturerComponent extends Component {
     RealmService.getRealmListAll()
       .then(response => {
         this.setState({
-          realms: response.data.data
+          realms: response.data
         })
       }).catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
+          if (error.message === "Network Error") {
+              this.setState({ message: error.message });
+          } else {
+              switch (error.response.status) {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                      this.setState({ message: error.response.data.messageCode });
+                      break;
+                  default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+              }
           }
-        }
-      );
+      }
+  );
   }
 
   render() {
@@ -139,7 +143,7 @@ class AddManufacturerComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.manufacturer.manufactureradd')}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -149,30 +153,34 @@ class AddManufacturerComponent extends Component {
                   ManufacturerService.addManufacturer(this.state.manufacturer)
                     .then(response => {
                       console.log("Response->", response);
-                      if (response.data.status == "Success") {
-                        this.props.history.push(`/manufacturer/listManufacturer/${response.data.message}`)
+                      if (response.status ==200) {
+                        this.props.history.push(`/manufacturer/listManufacturer/`+i18n.t(response.data.messageCode,{entityname}))
                       } else {
                         this.setState({
-                          message: response.data.message
+                          message: response.data.messagCodee
                         })
                       }
                     })
                     .catch(
                       error => {
-                        switch (error.message) {
-                          case "Network Error":
-                            this.setState({
-                              message: error.message
-                            })
-                            break
-                          default:
-                            this.setState({
-                              message: error.response.data.message
-                            })
-                            break
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response.status) {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
                         }
-                      }
-                    );
+                    }
+                );
                 }}
                 render={
                   ({
@@ -230,9 +238,8 @@ class AddManufacturerComponent extends Component {
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                             <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                           </FormGroup>
                         </CardFooter>
@@ -243,11 +250,15 @@ class AddManufacturerComponent extends Component {
             </Card>
           </Col>
         </Row>
+        <div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
       </div>
     );
   }
   cancelClicked() {
-    this.props.history.push(`/manufacturer/listManufacturer/` + "Action Canceled")
+    this.props.history.push(`/manufacturer/listManufacturer/`+i18n.t('static.message.cancelled',{entityname}))
   }
 }
 

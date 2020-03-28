@@ -4,21 +4,21 @@ import { API_URL } from '../Constants.js';
 class CurrencyService {
 
     addCurrency(json) {
-        return axios.put(`${API_URL}/api/addCurrency/`, json, {}
+        return axios.post(`${API_URL}/api/currency/`, json, {}
         );
     }
 
     getCurrencyList() {
-        return axios.get(`${API_URL}/api/getCurrencyList/`, {
+        return axios.get(`${API_URL}/api/currency/all/`, {
         });
     }
     
     getCurrencyListActive() {
-        return axios.get(`${API_URL}/api/getCurrencyListActive/`, {
+        return axios.get(`${API_URL}/api/currency/`, {
         });
     }
     editCurrency(json) {
-        return axios.put(`${API_URL}/api/editCurrency/`, json, {}
+        return axios.put(`${API_URL}/api/currency/`, json, {}
         );
     }
 }

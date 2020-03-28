@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody,FormText, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import Select from 'react-select';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import getLabelText from '../../CommonComponent/getLabelText'
+import * as Yup from 'yup';
+import '../Forms/ValidationForms/ValidationForms.css';
+import 'react-select/dist/react-select.min.css';
+import i18n from '../../i18n';
+import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 
 let initialValues = {
-    budget: '',
-    programId: '',
-    subFundingSourceId: '',
+    budgetName: '',
     budgetAmt: '',
     startDate: '',
     stopDate: ''
@@ -19,7 +19,7 @@ let initialValues = {
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        budget: Yup.string()
+        budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.string()
             .required(i18n.t('static.budget.budgetamounttext')),
@@ -54,33 +54,59 @@ const getErrorsFromValidationError = (validationError) => {
 
 class EditBudgetComponent extends Component {
     constructor(props) {
+        console.log("in constructor-----------------");
         super(props);
         this.state = {
-            budget: {
-                label: {
-                    label_en: ''
-                },
-                program: {
-                    label: {
-                        label_en: ''
-                    }
-                },
-                subFundingSource: {
-                    label: {
-                        label_en: ''
-                    }
-                },
-                startDate: '',
-                stopDate: ''
-
-            },
+            budget: this.props.location.state.budget,
             message: '',
             lang: localStorage.getItem('lang'),
         }
+        initialValues = {
+            budgetName: getLabelText(this.state.budget.label, this.state.lang),
+            budgetAmt: this.state.budget.budgetAmt,
+            startDate: this.state.budget.startDate,
+            stopDate: this.state.budget.stopDate
+        }
+
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.currentDate=this.currentDate.bind(this);
+        this.currentDate = this.currentDate.bind(this);
     }
+
+    // componentDidMount() {
+    //     console.log("in componentdidmount---------------");
+    //     AuthenticationService.setupAxiosInterceptors();
+    //     BudgetService.getBudgetDataById(this.props.match.params.budgetId)
+    //         .then(response => {
+    //             this.setState({
+    //                 budget: response.data
+    //             });
+    //             initialValues = {
+    //                 budgetName: getLabelText(this.state.budget.label, this.state.lang),
+    //                 budgetAmt: this.state.budget.budgetAmt,
+    //                 startDate: this.state.budget.startDate,
+    //                 stopDate: this.state.budget.stopDate
+    //             }
+    //         })
+    //         .catch(
+    //             error => {
+    //                 switch (error.message) {
+    //                     case "Network Error":
+    //                         this.setState({
+    //                             message: error.message
+    //                         })
+    //                         break
+    //                     default:
+    //                         this.setState({
+    //                             message: error.message
+    //                         })
+    //                         break
+    //                 }
+    //             }
+    //         );
+
+
+    // }
     currentDate() {
         var todaysDate = new Date();
         var yyyy = todaysDate.getFullYear().toString();
@@ -89,55 +115,18 @@ class EditBudgetComponent extends Component {
         var mmChars = mm.split('');
         var ddChars = dd.split('');
         let date = yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
-        // console.log("------date", date)
         return date;
-    }
-    componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
-        BudgetService.getBudgetDataById(this.props.match.params.budgetId)
-            .then(response => {
-                // console.log("------>", response.data);
-                var budget = response.data;
-                this.setState({ budget: budget });
-                initialValues = {
-                    budget: getLabelText(budget.label, this.state.lang),
-                    programId: budget.program.programId,
-                    subFundingSourceId: budget.subFundingSource.subFundingSourceId,
-                    budgetAmt: budget.budgetAmt,
-                    startDate: budget.startDate,
-                    stopDate: budget.stopDate,
-                }
-
-            })
-            .catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                    }
-                }
-            );
-
-
     }
     dataChange(event) {
         let { budget } = this.state;
-        if (event.target.name === "budget") {
+        if (event.target.name === "budgetName") {
             budget.label.label_en = event.target.value;
         }
         if (event.target.name === "budgetAmt") {
             budget.budgetAmt = event.target.value;
         } if (event.target.name === "startDate") {
             budget.startDate = event.target.value;
-            budget.stopDate=''
+            budget.stopDate = ''
         } if (event.target.name === "stopDate") {
             budget.stopDate = event.target.value;
         } else if (event.target.name === "active") {
@@ -151,12 +140,11 @@ class EditBudgetComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            budget: true,
+            budgetName: true,
             budgetAmt: true,
             startDate: true,
             stopDate: true
-        }
-        )
+        });
         this.validateForm(errors)
     }
     validateForm(errors) {
@@ -175,6 +163,7 @@ class EditBudgetComponent extends Component {
     }
 
     render() {
+        console.log("in outer render----->");
         return (
             <div className="animated fadeIn">
                 <Row>
@@ -192,10 +181,11 @@ class EditBudgetComponent extends Component {
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                this.props.history.push(`/budget/listBudget/${response.data.message}`)
+                                                // this.props.history.push(`/budget/listBudget/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/budget/listBudget/`)
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
@@ -217,6 +207,7 @@ class EditBudgetComponent extends Component {
                                         );
                                 }}
                                 render={
+
                                     ({
                                         values,
                                         errors,
@@ -232,25 +223,24 @@ class EditBudgetComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="budget">{i18n.t('static.budget.budget')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-money"></i></InputGroupText>
-                                                        <Input type="text"
-                                                            name="budget"
+
+                                                        <Input
+                                                            type="text"
+                                                            name="budgetName"
                                                             id="budget"
-                                                            bsSize="sm"
-                                                            valid={!errors.budget}
-                                                            invalid={touched.budget && !!errors.budget}
+                                                            valid={!errors.budgetName}
+                                                            invalid={touched.budgetName && !!errors.budgetName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={getLabelText(this.state.budget.label, this.state.lang)}
-                                                            required />
-                                                             </InputGroupAddon>
-                                                        <FormText className="red">{errors.budget}</FormText>
+
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa-object-group"></i></InputGroupText>
+
                                                         <Input
                                                             type="text"
                                                             name="programId"
@@ -261,17 +251,16 @@ class EditBudgetComponent extends Component {
                                                             invalid={touched.programId && !!errors.programId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            required
+
                                                             value={this.state.budget.program.label.label_en}
                                                         >
                                                         </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.programId}</FormText>
+
+                                                        <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
+
                                                         <Input
                                                             type="text"
                                                             name="subFundingSourceId"
@@ -282,17 +271,16 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly
-                                                            required
+
                                                             value={this.state.budget.subFundingSource.label.label_en}
                                                         >
                                                         </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.subFundingSourceId}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.subFundingSourceId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-usd"></i></InputGroupText>
+
                                                         <Input type="text"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
@@ -304,14 +292,13 @@ class EditBudgetComponent extends Component {
                                                             type="number"
                                                             placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
-                                                            required />
-                                                            </InputGroupAddon>
-                                                        <FormText className="red">{errors.budgetAmt}</FormText>
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText>
+
                                                         <Input type="text"
                                                             name="startDate"
                                                             id="startDate"
@@ -324,14 +311,13 @@ class EditBudgetComponent extends Component {
                                                             min={this.currentDate()}
                                                             value={this.state.budget.startDate}
                                                             placeholder="{i18n.t('static.budget.budgetstartdate')}"
-                                                            required />
-                                                             </InputGroupAddon>
-                                                        <FormText className="red">{errors.startDate}</FormText>
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.startDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-phone"></i></InputGroupText>
+
                                                         <Input type="text"
                                                             name="stopDate"
                                                             id="stopDate"
@@ -344,9 +330,9 @@ class EditBudgetComponent extends Component {
                                                             min={this.state.budget.startDate}
                                                             value={this.state.budget.stopDate}
                                                             placeholder="{i18n.t('static.budget.budgetstopdate')}"
-                                                            required />
-                                                             </InputGroupAddon>
-                                                        <FormText className="red">{errors.stopDate}</FormText>
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
 
@@ -388,7 +374,7 @@ class EditBudgetComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
+
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
