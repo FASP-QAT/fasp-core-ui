@@ -62,14 +62,16 @@ export default class UpdateDataSourceComponent extends Component {
                     labelId: '',
                 },
                 dataSourceType: {
-                    dataSourceTypeId: ''
+                    dataSourceTypeId: '',
+                    label:{label_en:''
+                }
                 },realm:{
                     realmId:'',
                     label:{label_en:''
                 }
             }
             },
-            dataSourceTypeList: []
+           
         }
 
         this.Capitalize = this.Capitalize.bind(this);
@@ -125,39 +127,11 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         this.setState({
             dataSource: this.props.location.state.dataSource
         });
 
-        DataSourceTypeService.getDataSourceTypeListActive().then(response => {
-            //console.log(response.data)
-            this.setState({
-                dataSourceTypeList: response.data
-            })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+      
     }
 
     
@@ -169,13 +143,7 @@ export default class UpdateDataSourceComponent extends Component {
     } 
     
     render() {
-        const { dataSourceTypeList } = this.state;
-        let dataSourceTypes = dataSourceTypeList.length > 0
-            && dataSourceTypeList.map((item, i) => {
-                return (
-                    <option key={i} value={item.dataSourceTypeId}>{item.label.label_en}</option>
-                )
-            }, this);
+        
         return (
             <div className="animated fadeIn">
                 <Row>
@@ -252,6 +220,21 @@ export default class UpdateDataSourceComponent extends Component {
                                                         </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                    <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
+                                                         <InputGroupAddon addonType="prepend">
+                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                            <Input
+                                                                type="text"
+                                                                name="dataSourceTypeId"
+                                                                id="dataSourceTypeId"
+                                                                bsSize="sm"
+                                                                readOnly
+                                                                value={this.state.dataSource.dataSourceType.label.label_en}
+                                                            >
+                                                            </Input>
+                                                        </InputGroupAddon>
+                                                    </FormGroup>
+                                                    <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-database"></i></InputGroupText>
@@ -271,29 +254,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         </InputGroupAddon>
                                                         <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
-                                                        <Input
-                                                            type="select"
-                                                            name="dataSourceTypeId"
-                                                            id="dataSourceTypeId"
-                                                            bsSize="sm"
-                                                            valid={!errors.dataSourceTypeId}
-                                                            invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.dataSource.dataSourceType.dataSourceTypeId}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {dataSourceTypes}
-                                                        </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.dataSourceTypeId}</FormText>
-                                                    </FormGroup>
-                                                    <FormGroup>
+                                                   <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input

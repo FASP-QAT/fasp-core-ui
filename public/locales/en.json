@@ -57,5 +57,6 @@
 "static.currency.currencyMaster":"Currency",
 "static.currency.conversionrateNumber":"Please enter positive integer or decimal number.",
 "static.currency.conversionrateMin":"Please enter number greater then 0.",
-"static.program.programMaster":"Program"
+"static.program.programMaster":"Program",
+"static.language.languageCode":"Language Code","static.realm.realm":"Realm","static.dimension.dimension":"Dimension"
 }
