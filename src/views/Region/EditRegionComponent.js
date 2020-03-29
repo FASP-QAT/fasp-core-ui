@@ -91,7 +91,7 @@ class EditRegionComponent extends Component {
         }
     }
     Capitalize(str) {
-        this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        this.state.region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
 
     render() {

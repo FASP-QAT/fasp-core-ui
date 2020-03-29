@@ -66,7 +66,7 @@ class AddRegionComponent extends Component {
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
-    this.Capitalize-this.Capitalize.bind(this);
+    this.Capitalize = this.Capitalize.bind(this);
   }
 
   dataChange(event) {
@@ -143,7 +143,9 @@ class AddRegionComponent extends Component {
   }
 
   Capitalize(str) {
-    this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    // console.log("in method");
+    this.state.region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
+    // return str.charAt(0).toUpperCase() + str.slice(1);
   }
   render() {
     const { realmCountries } = this.state;
@@ -248,8 +250,9 @@ class AddRegionComponent extends Component {
                               bsSize="sm"
                               valid={!errors.region}
                               invalid={touched.region && !!errors.region}
-                              onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value)}}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                               onBlur={handleBlur}
+                              value={this.state.region.label.label_en}
                               required />
                             {/* </InputGroupAddon> */}
                             <FormFeedback className="red">{errors.region}</FormFeedback>
