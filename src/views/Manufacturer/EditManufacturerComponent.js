@@ -149,9 +149,7 @@ class EditManufacturerComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                            <Input
+                                                         <Input
                                                                 type="text"
                                                                 name="realmId"
                                                                 id="realmId"
@@ -160,12 +158,9 @@ class EditManufacturerComponent extends Component {
                                                                 value={this.state.manufacturer.realm.label.label_en}
                                                             >
                                                             </Input>
-                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-industry"></i></InputGroupText>
                                                             <Input type="text"
                                                                 name="manufacturer"
                                                                 id="manufacturer"
@@ -176,7 +171,6 @@ class EditManufacturerComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.state.manufacturer.label.label_en}
                                                                 required />
-                                                        </InputGroupAddon>
                                                         <FormText className="red">{errors.manufacturer}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>

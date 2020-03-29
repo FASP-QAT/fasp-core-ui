@@ -172,9 +172,7 @@ export default class EditLanguageComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="language">{i18n.t('static.language.language')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
-                                                             <Input type="text"
+                                                       <Input type="text"
                                                                 name="languageName"
                                                                 id="languageName"
                                                                 bsSize="sm"
@@ -184,14 +182,11 @@ export default class EditLanguageComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.state.language.languageName}
                                                                 required />
-                                                        </InputGroupAddon>
-                                                         <FormText className="red">{errors.languageName}</FormText>
+                                                                <FormText className="red">{errors.languageName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
-                                                        <Input type="text"
+                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
                                                             bsSize="sm"
@@ -201,8 +196,7 @@ export default class EditLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
-                                                              </InputGroupAddon>
-                                                        <FormText className="red">{errors.languageCode}</FormText>
+                                                              <FormText className="red">{errors.languageCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
