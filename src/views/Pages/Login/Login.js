@@ -115,17 +115,11 @@ class Login extends Component {
                             LoginService.authenticate(username, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                localStorage.removeItem("token-" + decoded.userId);
-                                localStorage.removeItem("user-" + decoded.userId);
-                                localStorage.removeItem('username-' + decoded.userId);
-                                localStorage.removeItem('password-' + decoded.userId);
-                                localStorage.removeItem('curUser');
-                                localStorage.removeItem('lang');
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession"];
+                                keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-                                localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user).toString(), `${SECRET_KEY}`));
-                                localStorage.setItem('username-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.username).toString(), `${SECRET_KEY}`));
-                                localStorage.setItem('password-' + decoded.userId, CryptoJS.AES.encrypt((decoded.user.password).toString(), `${SECRET_KEY}`));
+                                localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
@@ -163,7 +157,7 @@ class Login extends Component {
                               );
                           }
                           else {
-                            var decryptedPassword = AuthenticationService.isUserLoggedIn(username, password);
+                            var decryptedPassword = AuthenticationService.isUserLoggedIn(username);
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
@@ -171,13 +165,13 @@ class Login extends Component {
                                 }
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
-                                  let encryptedUser = localStorage.getItem("user-" + localStorage.getItem("tempUser"));
-                                  console.log("encrypteduser---", encryptedUser);
-                                  let user = CryptoJS.AES.decrypt(encryptedUser, `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                                  console.log("user -------", user);
+                                  let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession"];
+                                  keysToRemove.forEach(k => localStorage.removeItem(k))
+
                                   localStorage.setItem('typeOfSession', "Offline");
-                                  localStorage.setItem('curUser', CryptoJS.AES.encrypt(localStorage.getItem("tempUser").toString(), `${SECRET_KEY}`));
-                                  // localStorage.setItem('lang', user.language.languageCode);
+                                  localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
+                                  localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.removeItem("tempUser");
                                   this.props.history.push(`/dashboard`)
                                 } else {

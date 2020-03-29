@@ -25,10 +25,7 @@ const ListRegion = React.lazy(() => import('./views/Region/ListRegionComponent')
 const EditRegion = React.lazy(() => import('./views/Region/EditRegionComponent'));
 const ListRealmCountry = React.lazy(() => import('./views/RealmCountry/ListRealmCountryComponent'));
 const AddRealmCountry = React.lazy(() => import('./views/RealmCountry/AddRealmCountryComponent'));
-const ForgotPassword = React.lazy(() => import('./views/Pages/Login/ForgotPasswordComponent'));
-const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ChangePassword = React.lazy(() => import('./views/Pages/Login/ChangePasswordComponent'));
-const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
 const AddRole = React.lazy(() => import('./views/Role/AddRoleComponent'));
 const ListRole = React.lazy(() => import('./views/Role/ListRoleComponent'));
 const EditRole = React.lazy(() => import('./views/Role/EditRoleComponent'));
@@ -192,7 +189,6 @@ const routes = [
   { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'Procurement Agent / Procurement Agent List', component: ListProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
-
   { path: '/manufacturer/addManufacturer', name: 'Manufacturer / Add Manufacturer', component: AddManufacturer },
   { path: '/manufacturer/listManufacturer', exact: true, name: 'Manufacturer / Manufacturer List', component: ListManufacturer },
   { path: '/manufacturer/editManufacturer', name: 'Manufacturer / Edit Manufacturer', component: EditManufacturer },
@@ -204,10 +200,7 @@ const routes = [
   { path: '/realmCountry/listRealmCountry/:message', component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: 'Realm Country / Realm Country List', component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: 'Realm Country / Add Realm Country', component: AddRealmCountry },
-  { path: '/forgotPassword', exact: true, name: 'Forgot Password', component: ForgotPassword },
-  { path: '/updateExpiredPassword', exact: true, name: 'Update expired password', component: UpdateExpiredPassword },
   { path: '/changePassword', exact: true, name: 'Change password', component: ChangePassword },
-  { path: '/resetPassword/:username/:token', exact: true, name: 'Reset password', component: ResetPassword },
   { path: '/role/listRole/:message', component: ListRole },
   { path: '/role/listRole', exact: true, name: 'Role / Role List', component: ListRole },
   { path: '/role/addRole', exact: true, name: 'Role / Add Role', component: AddRole },
@@ -216,7 +209,6 @@ const routes = [
   { path: '/user/listUser', exact: true, name: 'User / User List', component: ListUser },
   { path: '/user/addUser', exact: true, name: 'User / Add User', component: AddUser },
   { path: '/user/editUser', exact: true, name: 'User / Edit User', component: EditUser },
-
   { path: '/dashboard/:message',component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
