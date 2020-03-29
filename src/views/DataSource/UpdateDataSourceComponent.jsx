@@ -7,7 +7,7 @@ import DataSourceService from '../../api/DataSourceService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
-const entityname=i18n.t('static.datasource.datasource');
+const entityname = i18n.t('static.datasource.datasource');
 let initialValues = {
     label: '',
     dataSourceTypeId: '',
@@ -63,15 +63,17 @@ export default class UpdateDataSourceComponent extends Component {
                 },
                 dataSourceType: {
                     dataSourceTypeId: '',
-                    label:{label_en:''
+                    label: {
+                        label_en: ''
+                    }
+                }, realm: {
+                    realmId: '',
+                    label: {
+                        label_en: ''
+                    }
                 }
-                },realm:{
-                    realmId:'',
-                    label:{label_en:''
-                }
-            }
             },
-           
+
         }
 
         this.Capitalize = this.Capitalize.bind(this);
@@ -131,26 +133,26 @@ export default class UpdateDataSourceComponent extends Component {
             dataSource: this.props.location.state.dataSource
         });
 
-      
+
     }
 
-    
+
     Capitalize(str) {
         this.state.dataSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
-        this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled',{entityname}))
-    } 
-    
+        this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
     render() {
-        
+
         return (
             <div className="animated fadeIn">
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -160,8 +162,8 @@ export default class UpdateDataSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     DataSourceService.editDataSource(this.state.dataSource)
                                         .then(response => {
-                                             if (response.status == 200) {
-                                                this.props.history.push(`/dataSource/listDataSource/`+ i18n.t(response.data.messageCode,{entityname}))
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/dataSource/listDataSource/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -204,41 +206,33 @@ export default class UpdateDataSourceComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceForm'>
                                                 <CardBody>
-                                                <FormGroup>
+                                                    <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                            <Input
-                                                                type="text"
-                                                                name="realmId"
-                                                                id="realmId"
-                                                                bsSize="sm"
-                                                                readOnly
-                                                                value={this.state.dataSource.realm.label.label_en}
-                                                            >
-                                                            </Input>
-                                                        </InputGroupAddon>
+                                                        <Input
+                                                            type="text"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSource.realm.label.label_en}
+                                                        >
+                                                        </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                    <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
-                                                         <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                            <Input
-                                                                type="text"
-                                                                name="dataSourceTypeId"
-                                                                id="dataSourceTypeId"
-                                                                bsSize="sm"
-                                                                readOnly
-                                                                value={this.state.dataSource.dataSourceType.label.label_en}
-                                                            >
-                                                            </Input>
-                                                        </InputGroupAddon>
+                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="dataSourceTypeId"
+                                                            id="dataSourceTypeId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSource.dataSourceType.label.label_en}
+                                                        >
+                                                        </Input>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-database"></i></InputGroupText>
-                                                        <Input
+                                                         <Input
                                                             type="text"
                                                             name="label"
                                                             id="label"
@@ -251,10 +245,9 @@ export default class UpdateDataSourceComponent extends Component {
                                                             required
                                                         >
                                                         </Input>
-                                                        </InputGroupAddon>
                                                         <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
-                                                   <FormGroup>
+                                                    <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
@@ -270,7 +263,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
                                                                 {i18n.t('static.common.active')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -286,14 +279,14 @@ export default class UpdateDataSourceComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                       &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -305,9 +298,9 @@ export default class UpdateDataSourceComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-        <h6>{i18n.t(this.state.message)}</h6>
-       <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }

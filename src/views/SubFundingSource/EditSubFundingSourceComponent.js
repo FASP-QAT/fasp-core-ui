@@ -160,8 +160,6 @@ class EditSubFundingSourceComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="fundingSourceId"
@@ -171,12 +169,9 @@ class EditSubFundingSourceComponent extends Component {
                                                             value={this.state.subFundingSource.fundingSource.label.label_en}
                                                         >
                                                         </Input>
-                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"
@@ -187,7 +182,6 @@ class EditSubFundingSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                                                             required />
-                                                            </InputGroupAddon>
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
