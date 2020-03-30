@@ -76,7 +76,7 @@ export default class ReactListComponent extends Component {
         }
 
     }
-    
+
     render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -132,7 +132,7 @@ export default class ReactListComponent extends Component {
             //             (row.defaultRealm ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
             //         );
             //     }
-            ];
+        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -184,11 +184,12 @@ export default class ReactListComponent extends Component {
                         >
                             {
                                 props => (
-                                    <div>
-                                        <hr />
+                                    <div className="TableCust">
+                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                         <SearchBar {...props.searchProps} />
                                         <ClearSearchButton {...props.searchProps} />
-                                        <BootstrapTable noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        </div>
+                                        <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {

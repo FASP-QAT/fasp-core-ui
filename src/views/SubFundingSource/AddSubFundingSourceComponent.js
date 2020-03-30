@@ -207,8 +207,6 @@ class AddSubFundingSourceComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
                             <Input
                               type="select"
                               name="fundingSourceId"
@@ -224,13 +222,10 @@ class AddSubFundingSourceComponent extends Component {
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {fundingSourceList}
                             </Input>
-                             </InputGroupAddon>
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                             <Input type="text"
                               name="subFundingSource"
                               id="subFundingSource"
@@ -242,7 +237,6 @@ class AddSubFundingSourceComponent extends Component {
                               required
                               value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                             />
-                             </InputGroupAddon>
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>

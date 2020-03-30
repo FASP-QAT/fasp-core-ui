@@ -197,6 +197,7 @@ export default class AddCurrencyComponent extends Component {
                                                             invalid={touched.currencyCode && !!errors.currencyCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.currencyCode}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>

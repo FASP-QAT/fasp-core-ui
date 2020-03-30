@@ -198,8 +198,6 @@ class AddManufacturerComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
                               <Input
                                 type="select"
                                 name="realmId"
@@ -215,14 +213,10 @@ class AddManufacturerComponent extends Component {
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {realmList}
                               </Input>
-                            </InputGroupAddon>
-
-                            <FormText className="red">{errors.realmId}</FormText>
+                               <FormText className="red">{errors.realmId}</FormText>
                           </FormGroup>
                           <FormGroup>
                             <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText><i className="fa fa-industry"></i></InputGroupText>
                               <Input type="text"
                                 name="manufacturer"
                                 id="manufacturer"
@@ -232,14 +226,13 @@ class AddManufacturerComponent extends Component {
                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                 onBlur={handleBlur}
                                 required />
-                            </InputGroupAddon>
                             <FormText className="red">{errors.manufacturer}</FormText>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                           </FormGroup>
                         </CardFooter>

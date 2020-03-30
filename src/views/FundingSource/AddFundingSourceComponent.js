@@ -196,10 +196,7 @@ class AddFundingSourceComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
-                            <Input
+                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label><Input
                               type="select"
                               name="realmId"
                               id="realmId"
@@ -214,13 +211,10 @@ class AddFundingSourceComponent extends Component {
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
-                            </InputGroupAddon>
-                            <FormText className="red">{errors.realmId}</FormText>
+                          <FormText className="red">{errors.realmId}</FormText>
                           </FormGroup>
                           <FormGroup>
                             <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                             <Input type="text"
                               name="fundingSource"
                               id="fundingSource"
@@ -230,8 +224,7 @@ class AddFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required />
-                             </InputGroupAddon>
-                            <FormText className="red">{errors.fundingSource}</FormText>
+                              <FormText className="red">{errors.fundingSource}</FormText>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

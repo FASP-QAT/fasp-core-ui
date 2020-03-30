@@ -166,11 +166,10 @@ class FundingSourceListComponent extends Component {
                         >
                             {
                                 props => (
-                                    <div>
-                                        <hr />
-                                        <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
-                                        <BootstrapTable noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                    <div className="TableCust">
+                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left"><SearchBar {...props.searchProps} />
+                                        <ClearSearchButton {...props.searchProps} /></div>
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {

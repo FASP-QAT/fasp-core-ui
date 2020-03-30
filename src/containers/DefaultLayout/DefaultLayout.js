@@ -78,11 +78,11 @@ class DefaultLayout extends Component {
                         url: '/ApplicationDashboard',
                         icon: 'cui-dashboard icons',
                       },
-                      {
-                        name: i18n.t('static.dashboard.realmdashboard'),
-                        url: '/RealmDashboard',
-                        icon: 'cui-dashboard icons',
-                      },
+                      // {
+                      //   name: i18n.t('static.dashboard.realmdashboard'),
+                      //   url: '/RealmDashboard',
+                      //   icon: 'cui-dashboard icons',
+                      // },
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',

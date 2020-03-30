@@ -257,62 +257,52 @@ export default class AddDataSource extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                            <Input
-                                                                type="select"
-                                                                name="realmId"
-                                                                id="realmId"
-                                                                bsSize="sm"
-                                                                valid={!errors.realmId}
-                                                                invalid={touched.realmId && !!errors.realmId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.state.realmId}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {realmList}
-                                                            </Input>
-                                                        </InputGroupAddon>
-
+                                                        <Input
+                                                            type="select"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            valid={!errors.realmId}
+                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.realmId}
+                                                        >
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {realmList}
+                                                        </Input>
                                                         <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasource.datasource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-database"></i></InputGroupText>
-                                                            <Input type="text"
-                                                                name="label"
-                                                                id="label"
-                                                                bsSize="sm"
-                                                                valid={!errors.label}
-                                                                invalid={touched.label && !!errors.label}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.label.label_en}
-                                                                required />
-                                                        </InputGroupAddon>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.label.label_en}
+                                                            required />
                                                         <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
-                                                            <Input
-                                                                type="select"
-                                                                name="dataSourceTypeId"
-                                                                id="dataSourceTypeId"
-                                                                bsSize="sm"
-                                                                valid={!errors.dataSourceTypeId}
-                                                                invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required>
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {dataSourceTypes}
-                                                            </Input>
-                                                        </InputGroupAddon>
+                                                        <Input
+                                                            type="select"
+                                                            name="dataSourceTypeId"
+                                                            id="dataSourceTypeId"
+                                                            bsSize="sm"
+                                                            valid={!errors.dataSourceTypeId}
+                                                            invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {dataSourceTypes}
+                                                        </Input>
                                                         <FormText className="red">{errors.dataSourceTypeId}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
@@ -341,7 +331,7 @@ export default class AddDataSource extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }
