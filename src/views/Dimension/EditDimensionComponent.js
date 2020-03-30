@@ -10,7 +10,7 @@ import i18n from '../../i18n';
 let initialValues = {
     label: ""
 }
-const entityname=i18n.t('static.dimension.dimension');
+const entityname = i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -106,7 +106,7 @@ export default class UpdateUnitTypeComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/diamension/diamensionlist/` + i18n.t('static.message.cancelled', { entityname }))
     } render() {
         return (
             <div className="animated fadeIn">
@@ -114,16 +114,16 @@ export default class UpdateUnitTypeComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-        <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={{ language: this.state.language }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                     UnitTypeService.updateUnitType(this.state.unitType).then(response => {
+                                    UnitTypeService.updateUnitType(this.state.unitType).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/diamension/diamensionlist/`+i18n.t(response.data.messageCode,{entityname}))
+                                            this.props.history.push(`/diamension/diamensionlist/` + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -165,9 +165,7 @@ export default class UpdateUnitTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='diamensionForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                    <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                        <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -178,17 +176,16 @@ export default class UpdateUnitTypeComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.unitType.label.label_en}
                                                             required />
-                                                             </InputGroupAddon>
-                                                        <FormText className="red">{errors.label}</FormText>
+                                                            <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                         <Button type="reset" color="danger"className="mr-1 float-right"size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                            <CardFooter>
+                                                <FormGroup>
+                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
-                                                </CardFooter>
+                                            </CardFooter>
                                             </Form>
 
                                         )} />
@@ -197,8 +194,8 @@ export default class UpdateUnitTypeComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                <h6>{i18n.t(this.state.message)}</h6>
-               <h6>{i18n.t(this.props.match.params.message)}</h6>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
                 </div>
             </div>
         );

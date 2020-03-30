@@ -52,6 +52,7 @@ class EditRegionComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize= this.Capitalize.bind(this);
     }
 
     dataChange(event) {
@@ -89,6 +90,9 @@ class EditRegionComponent extends Component {
             }
         }
     }
+    Capitalize(str) {
+        this.state.region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    }
 
     render() {
         return (
@@ -107,7 +111,7 @@ class EditRegionComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     RegionService.updateRegion(this.state.region)
                                         .then(response => {
-                                            console.log("---------->",response);
+                                            console.log("---------->", response);
                                             if (response.status == 200) {
                                                 this.props.history.push(`/region/listRegion/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
@@ -154,9 +158,7 @@ class EditRegionComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-globe "></i></InputGroupText>
-                                                            <Input
+                                                        <Input
                                                                 type="text"
                                                                 name="realmCountryId"
                                                                 id="realmCountryId"
@@ -165,23 +167,20 @@ class EditRegionComponent extends Component {
                                                                 value={getLabelText(this.state.region.realmCountry.country.label, this.state.lang)}
                                                             >
                                                             </Input>
-                                                        </InputGroupAddon>
-                                                    </FormGroup>
+                                                      </FormGroup>
                                                     <FormGroup>
                                                         <Label for="region">{i18n.t('static.region.region')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText>
-                                                            <Input type="text"
+                                                                                                                  <Input type="text"
                                                                 name="region"
                                                                 id="region"
                                                                 bsSize="sm"
                                                                 valid={!errors.region}
                                                                 invalid={touched.region && !!errors.region}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
                                                                 onBlur={handleBlur}
-                                                                value={this.state.region.label.label_en}
+                                                                value={getLabelText(this.state.region.label,this.state.lang)}
                                                                 required />
-                                                        </InputGroupAddon>
+                                                       
                                                         <FormText className="red">{errors.region}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>

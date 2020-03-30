@@ -6,11 +6,7 @@ var assets = [
   '/manifest.json',
   '/QAT-logo192x192.png',
   '/QAT-logo512x512.png',
-  '/QAT-logo150x61.png',
-  '/build/',
-  '/node_modules/',
-  '/assets/',
-  '/locales/',
+  '/QAT-logo150x61.png'
 ];
 
 self.addEventListener('install', event => {
@@ -54,3 +50,11 @@ self.addEventListener('fetch', evt => {
 self.addEventListener('message', (event) => {
   console.log('[Service Worker] Message Event: ', event.data)
 });
+
+// This will work!
+workbox.routing.registerRoute(
+  new RegExp('\\.(?:js|css|scss|html|gif|svg|jpg|png|map)'),
+  new workbox.strategies.CacheFirst()
+);
+
+

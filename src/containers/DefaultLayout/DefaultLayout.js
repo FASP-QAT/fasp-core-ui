@@ -35,14 +35,13 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
+    let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession"];
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       LogoutService.logout()
         .then(response => {
           if (response.status == 200) {
-            localStorage.removeItem("token-" + AuthenticationService.getLoggedInUserId());
-            localStorage.removeItem("curUser");
-            // localStorage.removeItem("lang");
+            keysToRemove.forEach(k => localStorage.removeItem(k))
             this.props.history.push(`/login/static.logoutSuccess`)
           }
         }).catch(
@@ -50,11 +49,9 @@ class DefaultLayout extends Component {
           }
         );
     } else {
-      localStorage.removeItem("token-" + AuthenticationService.getLoggedInUserId());
-      localStorage.removeItem("curUser");
-      localStorage.removeItem("lang");
+      keysToRemove.forEach(k => localStorage.removeItem(k))
+      this.props.history.push(`/login/static.logoutSuccess`)
     }
-    // this.props.history.push('/login')
   }
 
   render() {
@@ -81,11 +78,11 @@ class DefaultLayout extends Component {
                         url: '/ApplicationDashboard',
                         icon: 'cui-dashboard icons',
                       },
-                      {
-                        name: i18n.t('static.dashboard.realmdashboard'),
-                        url: '/RealmDashboard',
-                        icon: 'cui-dashboard icons',
-                      },
+                      // {
+                      //   name: i18n.t('static.dashboard.realmdashboard'),
+                      //   url: '/RealmDashboard',
+                      //   icon: 'cui-dashboard icons',
+                      // },
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
