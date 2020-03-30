@@ -104,6 +104,11 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.label.databaseTranslations'),
                             url: '/translations/databaseTranslations',
                             icon: 'fa fa-list-alt'
+                          },
+                          {
+                            name: "Supply Plan",
+                            url: '/supplyPlan',
+                            icon: 'fa fa-list-alt'
                           }
                         ]
                       },

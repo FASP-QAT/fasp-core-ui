@@ -440,6 +440,19 @@ font-weight: 500;
     font-size: 17px;
     font-weight: 500;
     }
+
+.hoverTd:hover{
+  background-color: #E5E5E5;
+}
+
+.modalWidth{
+  max-width:80%!important;
+}
+
+.table-responsive{
+  overflow-x: auto;
+}
+
 .navbar-nav .nav-link {
         color: #333;
     }
