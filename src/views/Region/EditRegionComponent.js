@@ -154,9 +154,7 @@ class EditRegionComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-globe "></i></InputGroupText>
-                                                            <Input
+                                                        <Input
                                                                 type="text"
                                                                 name="realmCountryId"
                                                                 id="realmCountryId"
@@ -165,13 +163,10 @@ class EditRegionComponent extends Component {
                                                                 value={getLabelText(this.state.region.realmCountry.country.label, this.state.lang)}
                                                             >
                                                             </Input>
-                                                        </InputGroupAddon>
-                                                    </FormGroup>
+                                                      </FormGroup>
                                                     <FormGroup>
                                                         <Label for="region">{i18n.t('static.region.region')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText>
-                                                            <Input type="text"
+                                                                                                                  <Input type="text"
                                                                 name="region"
                                                                 id="region"
                                                                 bsSize="sm"
@@ -181,7 +176,7 @@ class EditRegionComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.state.region.label.label_en}
                                                                 required />
-                                                        </InputGroupAddon>
+                                                       
                                                         <FormText className="red">{errors.region}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
