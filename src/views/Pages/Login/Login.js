@@ -130,7 +130,7 @@ class Login extends Component {
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 AuthenticationService.setupAxiosInterceptors();
-                                this.props.history.push(`/dashboard`)
+                                this.props.history.push(`/ApplicationDashboard`)
                               })
                               .catch(
                                 error => {
@@ -179,7 +179,7 @@ class Login extends Component {
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt(localStorage.getItem("tempUser").toString(), `${SECRET_KEY}`));
                                   // localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.removeItem("tempUser");
-                                  this.props.history.push(`/dashboard`)
+                                  this.props.history.push(`/ApplicationDashboard`)
                                 } else {
                                   this.setState({ message: 'Bad credentials.' });
                                 }
@@ -203,10 +203,12 @@ class Login extends Component {
                             setTouched
                           }) => (
                               <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                                <h5>{i18n.t(this.props.match.params.message)}</h5>
-                                <h5>{i18n.t(this.state.message)}</h5>
-                                <h1>{i18n.t('static.login.login')}</h1>
+                                {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
+                                {/* <h5>{i18n.t(this.state.message)}</h5> */}
+                                {/* <h1>{i18n.t('static.login.login')}</h1> */}
+                                
                                 <p className="text-muted">{i18n.t('static.login.signintext')}</p>
+                                
                                 <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
@@ -266,7 +268,7 @@ class Login extends Component {
             < Col className="Login-bttom ">
               <Col xs="12">
                 <CardBody>
-
+                
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
                   (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.
                   GHSC-PSM connects technical solutions and proven commercial processes to

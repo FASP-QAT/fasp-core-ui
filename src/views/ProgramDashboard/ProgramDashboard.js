@@ -124,8 +124,9 @@ class ProgramDashboard extends Component {
          <Row>
           <Col md="6">
           <Card>
-            <CardHeader>
-            Program Inventory Threshold
+            <CardHeader className="text-center">
+           
+            <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels : <span className="count-clr">89</span></b>
               <div className="card-header-actions">
                
               </div>
@@ -138,13 +139,11 @@ class ProgramDashboard extends Component {
             </CardBody>
           </Card>
           </Col> 
-        </Row> 
-
-        <Row>
-        <Col md="8">
+       
+        <Col md="6">
             <Card>
-              <CardHeader>
-              Program Inventory Threshold
+              <CardHeader className="text-center">
+              <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels : <span className="count-clr">89</span></b>
               </CardHeader>
               <CardBody>
                 <Row>
