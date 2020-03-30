@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon,FormText, Label, Button, Col
+    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, FormText, Label, Button, Col
 } from 'reactstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
@@ -36,6 +36,23 @@ class ListUserComponent extends Component {
         this.editUser = this.editUser.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewUser = this.addNewUser.bind(this);
+        this.buttonFormatter = this.buttonFormatter.bind(this);
+        this.addAccessControls = this.addAccessControls.bind(this);
+    }
+
+    buttonFormatter(cell, row) {
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i> Add</Button>;
+    }
+    addAccessControls(event, row) {
+        event.stopPropagation();
+        console.log("row---", row);
+        this.props.history.push({
+            pathname: "/user/accessControl",
+            state: {
+                user: row
+            }
+
+        })
     }
     addNewUser() {
         this.props.history.push("/user/addUser");
@@ -65,9 +82,10 @@ class ListUserComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == "Success") {
-                       this.setState({
-                    realms: response.data.data
-                })} else {
+                    this.setState({
+                        realms: response.data.data
+                    })
+                } else {
                     this.setState({ message: response.data.messageCode })
                 }
             }).catch(
@@ -77,7 +95,7 @@ class ListUserComponent extends Component {
                     } else {
                         switch (error.response ? error.response.status : "") {
                             case 500:
-                            case     401:
+                            case 401:
                             case 404:
                             case 406:
                             case 412:
@@ -192,6 +210,7 @@ class ListUserComponent extends Component {
                             <TableHeaderColumn filterFormatted dataField="lastLoginDate" dataAlign="center" dataSort><strong>{i18n.t('static.common.lastlogindate')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="faildAttempts" dataAlign="center" dataSort><strong>{i18n.t('static.common.faildAttempts')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort><strong>{i18n.t('static.common.status')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn dataField="userId" dataFormat={this.buttonFormatter}>Map Access Controls</TableHeaderColumn>
                         </BootstrapTable>
                     </CardBody>
                 </Card>

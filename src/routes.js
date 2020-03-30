@@ -32,6 +32,7 @@ const EditRole = React.lazy(() => import('./views/Role/EditRoleComponent'));
 const AddUser = React.lazy(() => import('./views/User/AddUserComponent'));
 const ListUser = React.lazy(() => import('./views/User/ListUserComponent'));
 const EditUser = React.lazy(() => import('./views/User/EditUserComponent'));
+const AccessControl = React.lazy(() => import('./views/User/AccessControlComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -130,7 +131,7 @@ const AddCurrency = React.lazy(() => import('./views/Currency/AddCurrencyCompone
 const ListCurrency = React.lazy(() => import('./views/Currency/CurrencyListComponent'));
 const EditCurrency = React.lazy(() => import('./views/Currency/UpdateCurrencyComponent'));
 const DatabaseTranslation = React.lazy(() => import('./views/Translations/DatabaseTranslations'));
-const LabelTranslation=React.lazy(()=>import('./views/Translations/LabelTranslations'))
+const LabelTranslation = React.lazy(() => import('./views/Translations/LabelTranslations'))
 const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 
 
@@ -142,31 +143,31 @@ const routes = [
   { path: '/programTree', name: 'Program', component: ProgramTree },
 
   { path: '/diamension/AddDiamension', name: 'Dimension / Add Dimension', component: AddDimension },
-  { path: '/diamension/diamensionlist',exact: true,  name: 'Dimension / Dimension List', component: DimensionList },
- { path: '/diamension/diamensionlist/:message', component: DimensionList },
+  { path: '/diamension/diamensionlist', exact: true, name: 'Dimension / Dimension List', component: DimensionList },
+  { path: '/diamension/diamensionlist/:message', component: DimensionList },
   { path: '/diamension/editDiamension', name: 'Dimension / Edit Dimension', component: EditDimension },
 
   { path: '/realm/addrealm', name: ' Realm / Add Realm', component: AddRealm },
-  { path: '/realm/realmlist',exact: true, name: 'Realm / Realm List', component: RealmList },
+  { path: '/realm/realmlist', exact: true, name: 'Realm / Realm List', component: RealmList },
   { path: '/realm/updaterealm', name: 'Realm / Edit Realm', component: EditRealm },
-  { path: '/realm/realmlist/:message',component: RealmList },
+  { path: '/realm/realmlist/:message', component: RealmList },
 
 
 
 
   { path: '/product/editProduct/:productId', name: i18n.t('static.product.productedit'), component: EditProdct },
-  { path: '/product/listProduct', exact: true,name: i18n.t('static.product.productlist'), component: ListProdct },
-  { path: '/product/listProduct/:message',name: i18n.t('static.product.productlist'), component: ListProdct },
+  { path: '/product/listProduct', exact: true, name: i18n.t('static.product.productlist'), component: ListProdct },
+  { path: '/product/listProduct/:message', name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
   { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
-  { path: '/program/listProgram',exact: true,name: 'Program ', component: Programs },
+  { path: '/program/listProgram', exact: true, name: 'Program ', component: Programs },
   { path: '/program/listProgram/:message', name: 'Program ', component: Programs },
   { path: '/program/editProgram/:programId', name: 'Edit Program', component: EditProgram },
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
   { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
-  
-  { path: '/budget/listBudget',exact: true, name: 'Budget List', component: ListBudgetComponent },
+
+  { path: '/budget/listBudget', exact: true, name: 'Budget List', component: ListBudgetComponent },
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
   { path: '/budget/editBudget/', name: 'Update Budget', component: EditBudgetComponent },
   { path: '/', exact: true, name: 'Home' },
@@ -178,11 +179,11 @@ const routes = [
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
-   { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
-    { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
+  { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
+  { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
+  { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
   { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
-  { path: '/dashboard',exact:true, name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard', exact: true, name: 'Dashboard', component: Dashboard },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/subFundingSource/listSubFundingSource/:message', component: ListSubFundingSource },
   { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
@@ -209,7 +210,8 @@ const routes = [
   { path: '/user/listUser', exact: true, name: 'User / User List', component: ListUser },
   { path: '/user/addUser', exact: true, name: 'User / Add User', component: AddUser },
   { path: '/user/editUser', exact: true, name: 'User / Edit User', component: EditUser },
-  { path: '/dashboard/:message',component: Dashboard },
+  { path: '/user/accessControl', exact: true, name: 'User / Access Control', component: AccessControl },
+  { path: '/dashboard/:message', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

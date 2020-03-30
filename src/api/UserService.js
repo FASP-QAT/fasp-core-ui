@@ -76,6 +76,10 @@ class UserService {
     updatePassword(username, token, password) {
         return axios.post(`${API_URL}/api/updatePassword/`, { username, token, password }, {});
     }
+    accessControls(json) {
+        return axios.put(`${API_URL}/api/accessControls/`, json, {
+        });
+    }
 }
 
 export default new UserService()
