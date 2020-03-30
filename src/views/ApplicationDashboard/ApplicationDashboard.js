@@ -185,7 +185,7 @@ class ApplicationDashboard extends Component {
         <Row>
           <Col md="9">
           <Card>
-            <CardHeader>
+            <CardHeader className="text-center">
               <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">98</span></b>
               <div className="card-header-actions">
               <a className="card-header-action">
@@ -201,7 +201,7 @@ class ApplicationDashboard extends Component {
           </Card>
           </Col> 
         </Row>
-        <Row>
+        {/* <Row>
         <Col md="8">
             <Card>
               <CardHeader>
@@ -322,7 +322,7 @@ class ApplicationDashboard extends Component {
                 </Card>
                 </Col>
                 
-        </Row>
+        </Row> */}
 
        
     </div>
