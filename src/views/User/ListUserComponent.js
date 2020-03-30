@@ -10,6 +10,7 @@ import i18n from '../../i18n'
 import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import moment from 'moment';
 
 class ListUserComponent extends Component {
     constructor(props) {
@@ -41,7 +42,7 @@ class ListUserComponent extends Component {
     }
 
     buttonFormatter(cell, row) {
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i> Add</Button>;
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>;
     }
     addAccessControls(event, row) {
         event.stopPropagation();
@@ -155,6 +156,13 @@ class ListUserComponent extends Component {
             return "Disabled";
         }
     }
+    formatDate(cell, row) {
+        if (cell != null && cell != "") {
+            return moment(cell).format('MM-DD-YYYY hh:mm A');
+        } else {
+            return "";
+        }
+    }
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -207,7 +215,7 @@ class ListUserComponent extends Component {
                             <TableHeaderColumn dataField="emailId" dataSort dataAlign="center"><strong>{i18n.t('static.common.emailid')}</strong></TableHeaderColumn>
                             <TableHeaderColumn dataField="phoneNumber" dataSort dataAlign="center"><strong>{i18n.t('static.common.phoneNumber')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="language" dataSort dataFormat={this.showLanguageLabel} dataAlign="center"><strong>{i18n.t('static.language.language')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="lastLoginDate" dataAlign="center" dataSort><strong>{i18n.t('static.common.lastlogindate')}</strong></TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="lastLoginDate" dataFormat={this.formatDate} dataAlign="center" dataSort><strong>{i18n.t('static.common.lastlogindate')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="faildAttempts" dataAlign="center" dataSort><strong>{i18n.t('static.common.faildAttempts')}</strong></TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort><strong>{i18n.t('static.common.status')}</strong></TableHeaderColumn>
                             <TableHeaderColumn dataField="userId" dataFormat={this.buttonFormatter}>Map Access Controls</TableHeaderColumn>

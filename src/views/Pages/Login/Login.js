@@ -115,7 +115,7 @@ class Login extends Component {
                             LoginService.authenticate(username, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
@@ -166,7 +166,7 @@ class Login extends Component {
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
@@ -200,9 +200,9 @@ class Login extends Component {
                                 {/* <h5>{i18n.t(this.props.match.params.message)}</h5> */}
                                 {/* <h5>{i18n.t(this.state.message)}</h5> */}
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
-                                
+
                                 <p className="text-muted">{i18n.t('static.login.signintext')}</p>
-                                
+
                                 <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>
@@ -262,7 +262,7 @@ class Login extends Component {
             < Col className="Login-bttom ">
               <Col xs="12">
                 <CardBody>
-                
+
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
                   (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.
                   GHSC-PSM connects technical solutions and proven commercial processes to
