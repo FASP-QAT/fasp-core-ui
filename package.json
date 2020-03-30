@@ -85,6 +85,7 @@
   },
   "devDependencies": {
     "mutationobserver-shim": "^0.3.3",
+    "offline-plugin": "^5.0.7",
     "react-scripts": "^3.0.1"
   },
   "scripts": {

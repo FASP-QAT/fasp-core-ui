@@ -10,6 +10,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 
+const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
     budgetName: '',
     budgetAmt: '',
@@ -181,8 +182,7 @@ class EditBudgetComponent extends Component {
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                // this.props.history.push(`/budget/listBudget/`+i18n.t(response.data.messageCode,{entityname}))
-                                                this.props.history.push(`/budget/listBudget/`)
+                                                this.props.history.push(`/budget/listBudget/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -395,7 +395,7 @@ class EditBudgetComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/budget/listBudget/` + "Action Canceled")
+        this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

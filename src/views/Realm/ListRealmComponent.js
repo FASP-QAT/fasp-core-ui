@@ -76,7 +76,7 @@ export default class ReactListComponent extends Component {
         }
 
     }
-    
+
     render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -132,7 +132,7 @@ export default class ReactListComponent extends Component {
             //             (row.defaultRealm ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
             //         );
             //     }
-            ];
+        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, Container } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
@@ -76,95 +76,100 @@ class ForgotPasswordComponent extends Component {
 
     render() {
         return (
-            <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
-                <Row>
-                    <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
-                        <Card>
-                            <CardHeader>
-                                <i className="icon-note"></i><strong>Forgot Password</strong>{' '}
-                            </CardHeader>
-                            <Formik
-                                initialValues={initialValues}
-                                validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    if (navigator.onLine) {
-                                        console.log(values.username);
-                                        UserService.forgotPassword(values.username)
-                                            .then(response => {
-                                                console.log(response)
-                                                this.props.history.push(`/login/${response.statusText}`)
-                                            })
-                                            .catch(
-                                                error => {
-                                                    if (error.message === "Network Error") {
-                                                        this.setState({ message: error.message });
-                                                    } else {
-                                                        switch (error.response.status) {
-                                                            case 500:
-                                                            case 401:
-                                                            case 404:
-                                                            case 406:
-                                                            case 412:
-                                                                this.setState({ message: error.response.data.messageCode });
-                                                                break;
-                                                            default:
-                                                                this.setState({ message: 'static.unkownError' });
-                                                                console.log("Error code unkown");
-                                                                break;
+            <div className="main-content flex-row align-items-center">
+                
+                <Container>
+                    <Row className="justify-content-center">
+                    
+                        <Col md="9" lg="7" xl="6">
+                        <h5 className="mx-4">{this.state.message}</h5>
+                            <Card className="mx-4">
+                                
+                                <CardHeader>
+                                    <i className="icon-note"></i><strong>Forgot Password</strong>{' '}
+                                </CardHeader>
+                                <Formik
+                                    initialValues={initialValues}
+                                    validate={validate(validationSchema)}
+                                    onSubmit={(values, { setSubmitting, setErrors }) => {
+                                        if (navigator.onLine) {
+                                            console.log(values.username);
+                                            UserService.forgotPassword(values.username)
+                                                .then(response => {
+                                                    console.log(response)
+                                                    this.props.history.push(`/login/${response.statusText}`)
+                                                })
+                                                .catch(
+                                                    error => {
+                                                        if (error.message === "Network Error") {
+                                                            this.setState({ message: error.message });
+                                                        } else {
+                                                            switch (error.response.status) {
+                                                                case 500:
+                                                                case 401:
+                                                                case 404:
+                                                                case 406:
+                                                                case 412:
+                                                                    this.setState({ message: error.response.data.messageCode });
+                                                                    break;
+                                                                default:
+                                                                    this.setState({ message: 'static.unkownError' });
+                                                                    console.log("Error code unkown");
+                                                                    break;
+                                                            }
                                                         }
                                                     }
-                                                }
-                                            );
+                                                );
 
-                                    } else {
-                                        this.setState({
-                                            message: "You must be online to update the password."
-                                        });
-                                    }
-                                }}
-                                render={
-                                    ({
-                                        values,
-                                        errors,
-                                        touched,
-                                        handleChange,
-                                        handleBlur,
-                                        handleSubmit,
-                                        isSubmitting,
-                                        isValid,
-                                        setTouched
-                                    }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
-                                                <CardBody>
+                                        } else {
+                                            this.setState({
+                                                message: "You must be online to update the password."
+                                            });
+                                        }
+                                    }}
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched
+                                        }) => (
+                                                <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
+                                                    <CardBody className="p-4">
 
-                                                    <FormGroup>
-                                                        <Label for="username">Username</Label>
-                                                        <Input type="text"
-                                                            name="username"
-                                                            id="username"
-                                                            bsSize="sm"
-                                                            valid={!errors.username}
-                                                            invalid={touched.username && !!errors.username}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                        />
-                                                        <FormFeedback>{errors.username}</FormFeedback>
-                                                    </FormGroup>
-                                                </CardBody>
-                                                <CardFooter>
-                                                    <FormGroup>
-                                                        <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
-                                                        &nbsp;
+                                                        <FormGroup>
+                                                            <Label for="username">Username</Label>
+                                                            <Input type="text"
+                                                                name="username"
+                                                                id="username"
+                                                                bsSize="sm"
+                                                                valid={!errors.username}
+                                                                invalid={touched.username && !!errors.username}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                            />
+                                                            <FormFeedback>{errors.username}</FormFeedback>
+                                                        </FormGroup>
+                                                    </CardBody>
+                                                    <CardFooter>
+                                                        <FormGroup>
+                                                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                            &nbsp;
                           </FormGroup>
-                                                </CardFooter>
-                                            </Form>
-                                        )} />
-                        </Card>
-                    </Col>
-                </Row>
+                                                    </CardFooter>
+                                                </Form>
+                                            )} />
+                            </Card>
+                        </Col>
+                    </Row>
+                </Container>
             </div>
         );
     }

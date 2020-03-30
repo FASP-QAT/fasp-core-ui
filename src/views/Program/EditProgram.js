@@ -17,7 +17,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 
 
-
+const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
     programName: '',
     realmId: '',
@@ -213,44 +213,60 @@ export default class EditProgram extends Component {
             AuthenticationService.setupAxiosInterceptors();
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
-                    console.log("region list---", response.data);
-                    var json = response.data;
-                    var regList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                    if (response.status == 200) {
+                        console.log("region list---", response.data);
+                        var json = response.data;
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                        }
+                        this.setState({
+                            regionList: regList
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
                     }
-                    this.setState({
-                        regionList: regList
-                    })
                 }).catch(
                     error => {
-                        switch (error.message) {
-                            case "Network Error":
-                                this.setState({
-                                    message: error.message
-                                })
-                                break
-                            default:
-                                this.setState({
-                                    message: "error accured"
-                                })
-                                break
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response.status) {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
                 );
         }).catch(
             error => {
-                switch (error.message) {
-                    case "Network Error":
-                        this.setState({
-                            message: error.message
-                        })
-                        break
-                    default:
-                        this.setState({
-                            message: error.response
-                        })
-                        break
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response.status) {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
                 }
             }
         );
@@ -355,11 +371,11 @@ export default class EditProgram extends Component {
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             AuthenticationService.setupAxiosInterceptors();
                             ProgramService.editProgram(this.state.program).then(response => {
-                                if (response.status == "200") {
-                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                if (response.status == 200) {
+                                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
                                 } else {
                                     this.setState({
-                                        message: response.data.message
+                                        message: response.data.messageCode
                                     })
                                 }
 
@@ -367,17 +383,22 @@ export default class EditProgram extends Component {
                             )
                                 .catch(
                                     error => {
-                                        switch (error.message) {
-                                            case "Network Error":
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
-                                            default:
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
+                                        if (error.message === "Network Error") {
+                                            this.setState({ message: error.message });
+                                        } else {
+                                            switch (error.response.status) {
+                                                case 500:
+                                                case 401:
+                                                case 404:
+                                                case 406:
+                                                case 412:
+                                                    this.setState({ message: error.response.data.messageCode });
+                                                    break;
+                                                default:
+                                                    this.setState({ message: 'static.unkownError' });
+                                                    console.log("Error code unkown");
+                                                    break;
+                                            }
                                         }
                                     }
                                 )
@@ -421,7 +442,7 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={getLabelText(this.state.program.realmCountry.realm.label,this.state.lang)}
+                                                        value={getLabelText(this.state.program.realmCountry.realm.label, this.state.lang)}
                                                         valid={!errors.realmId}
                                                         invalid={touched.realmId && !!errors.realmId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -440,7 +461,7 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={getLabelText(this.state.program.realmCountry.country.label,this.state.lang)}
+                                                        value={getLabelText(this.state.program.realmCountry.country.label, this.state.lang)}
                                                         valid={!errors.realmCountryId}
                                                         invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -476,7 +497,7 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={getLabelText(this.state.program.organisation.label,this.state.lang)}
+                                                        value={getLabelText(this.state.program.organisation.label, this.state.lang)}
                                                         valid={!errors.organisationId}
                                                         invalid={touched.organisationId && !!errors.organisationId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -494,7 +515,7 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={getLabelText(this.state.program.healthArea.label,this.state.lang)}
+                                                        value={getLabelText(this.state.program.healthArea.label, this.state.lang)}
                                                         valid={!errors.healthAreaId}
                                                         invalid={touched.healthAreaId && !!errors.healthAreaId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
@@ -677,8 +698,8 @@ export default class EditProgram extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                 &nbsp;
                                             </FormGroup>
                                         </CardFooter>
@@ -690,7 +711,7 @@ export default class EditProgram extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + "Action Canceled")
+        this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

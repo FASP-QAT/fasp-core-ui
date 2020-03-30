@@ -156,7 +156,7 @@ class RegionListComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
-            }, 
+            },
             {
                 dataField: 'active',
                 text: i18n.t('static.common.status'),
@@ -209,22 +209,22 @@ class RegionListComponent extends Component {
                         </div>
                     </CardHeader>
                     <CardBody>
-                        <Col md="3">
+                        <Col md="3 pl-0">
                             <FormGroup>
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
-                                <div className="controls">
+                                <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
                                             name="realmCountryId"
                                             id="realmCountryId"
-                                            bsSize="lg"
+                                            bsSize="sm"
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
                                             {realmCountries}
                                         </Input>
                                         <InputGroupAddon addonType="append">
-                                            <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon>
                                     </InputGroup>
                                 </div>
@@ -240,12 +240,13 @@ class RegionListComponent extends Component {
                         >
                             {
                                 props => (
+
                                     <div className="TableCust">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                        <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
+                                            <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
