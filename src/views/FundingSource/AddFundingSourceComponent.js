@@ -58,6 +58,7 @@ class AddFundingSourceComponent extends Component {
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
+    this.Capitalize = this.Capitalize.bind(this);
   }
 
   dataChange(event) {
@@ -96,7 +97,13 @@ class AddFundingSourceComponent extends Component {
       }
     }
   }
-
+  Capitalize(str) {
+    if (str != null && str != "") {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    } else {
+      return "";
+    }
+  }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
@@ -223,15 +230,19 @@ class AddFundingSourceComponent extends Component {
                               invalid={touched.fundingSource && !!errors.fundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
+                              value={this.Capitalize(this.state.fundingSource.label.label_en)}
                               required />
                               <FormText className="red">{errors.fundingSource}</FormText>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
-                          <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+
+                            
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            &nbsp;
+                            
+                                                        &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>

@@ -140,13 +140,12 @@ const RealmList = React.lazy(() => import('./views/Realm/ListRealmComponent'));
 const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: 'Program', component: ProgramTree },
-
   { path: '/diamension/AddDiamension', name: 'Dimension / Add Dimension', component: AddDimension },
   { path: '/diamension/diamensionlist', exact: true, name: 'Dimension / Dimension List', component: DimensionList },
   { path: '/diamension/diamensionlist/:message', component: DimensionList },
   { path: '/diamension/editDiamension', name: 'Dimension / Edit Dimension', component: EditDimension },
-
   { path: '/realm/addrealm', name: ' Realm / Add Realm', component: AddRealm },
   { path: '/realm/realmlist', exact: true, name: 'Realm / Realm List', component: RealmList },
   { path: '/realm/updaterealm', name: 'Realm / Edit Realm', component: EditRealm },
@@ -159,19 +158,20 @@ const routes = [
   { path: '/product/listProduct', exact: true, name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/listProduct/:message', name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
-  { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
-  { path: '/program/listProgram', exact: true, name: 'Program ', component: Programs },
-  { path: '/program/listProgram/:message', name: 'Program ', component: Programs },
-  { path: '/program/editProgram/:programId', name: 'Edit Program', component: EditProgram },
+
+  { path: '/program/addProgram', name: 'Program / Add Program', component: AddProgram },
+  { path: '/program/listProgram', exact: true, name: 'Program / Program List', component: Programs },
+  { path: '/program/listProgram/:message', name: 'Program / Program List', component: Programs },
+  { path: '/program/editProgram/:programId', name: 'Program / Edit Program', component: EditProgram },
+  
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
-  { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
 
-  { path: '/budget/listBudget', exact: true, name: 'Budget List', component: ListBudgetComponent },
-  { path: '/budget/listBudget/:message', component: ListBudgetComponent },
-  { path: '/budget/editBudget/', name: 'Update Budget', component: EditBudgetComponent },
-  { path: '/', exact: true, name: 'Home' },
-  // { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
+  { path: '/budget/addBudget', name: 'Budget / Add Budget', component: AddBudgetComponent },
+  { path: '/budget/listBudget', exact: true, name: 'Budget / Budget List', component: ListBudgetComponent },
+  { path: '/budget/listBudget/:message',name:'Budget / Budget List', component: ListBudgetComponent },
+  { path: '/budget/editBudget/', name: 'Budget / Edit Budget', component: EditBudgetComponent },
+  
   { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },

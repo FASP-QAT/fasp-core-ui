@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -22,7 +22,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmNameText')).max(6,i18n.t('static.realm.realmCodeLength')),
+            .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
         monthInPastForAmc: Yup.number()
@@ -85,7 +85,7 @@ export default class UpdateDataSourceComponent extends Component {
             realm.label.label_en = event.target.value
         }
         if (event.target.name === "realmCode") {
-            realm.realmCode = event.target.value
+            realm.realmCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "monthInPastForAmc") {
             realm.monthInPastForAmc = event.target.value
@@ -133,12 +133,13 @@ export default class UpdateDataSourceComponent extends Component {
         }
     }
 
-    componentDidMount() {
-
+    componentDidMount(str) {
+      
     }
 
     Capitalize(str) {
-
+        let { realm } = this.state
+        realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
         this.props.history.push(`/realm/realmList/` + i18n.t('static.message.cancelled', { entityname }))
@@ -148,6 +149,7 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -163,7 +165,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/realm/realmList/`+i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/realm/realmList/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -215,7 +217,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmCode}
                                                             invalid={touched.realmCode && !!errors.realmCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.realmCode}
                                                             required />
@@ -229,7 +231,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.label.label_en}
                                                             required />

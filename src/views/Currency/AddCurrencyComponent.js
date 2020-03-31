@@ -62,7 +62,7 @@ export default class AddCurrencyComponent extends Component {
                 label_en: ''
 
             },
-            conversionRateToUsd: ''   
+            conversionRateToUsd: ''
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -126,6 +126,7 @@ export default class AddCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -140,7 +141,7 @@ export default class AddCurrencyComponent extends Component {
                                     CurrencyService.addCurrency(this.state)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                // console.log("----------after add",response.data.data);
+                                                console.log("----------after add", response.data);
                                                 this.props.history.push(`/currency/listCurrency/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({

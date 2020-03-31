@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 // import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import BudgetServcie from '../../api/BudgetService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
@@ -13,6 +13,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import SubFundingSourceService from '../../api/SubFundingSourceService';
+import moment from 'moment';
 
 const entityname = i18n.t('static.dashboard.budget');
 
@@ -46,6 +47,7 @@ class ListBudgetComponent extends Component {
     this.editBudget = this.editBudget.bind(this);
     this.addBudget = this.addBudget.bind(this);
     this.filterData = this.filterData.bind(this);
+    this.formatDate = this.formatDate.bind(this);
   }
 
 
@@ -61,6 +63,14 @@ class ListBudgetComponent extends Component {
       this.setState({
         selBudget: this.state.budgetList
       });
+    }
+  }
+  formatDate(cell, row) {
+    if (cell != null && cell != "") {
+      var modifiedDate = moment(cell).format('MM-DD-YYYY');
+      return modifiedDate;
+    } else {
+      return "";
     }
   }
   editBudget(budget) {
@@ -79,12 +89,11 @@ class ListBudgetComponent extends Component {
   }
 
   componentDidMount() {
-    console.log("message------------->" + this.props.match.params.message);
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
         if (response.status == 200) {
-          console.log(response.data);
+          console.log("budget after status 200---->", response.data);
           this.setState({
             budgetList: response.data,
             selBudget: response.data
@@ -98,7 +107,7 @@ class ListBudgetComponent extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -115,16 +124,20 @@ class ListBudgetComponent extends Component {
       );
     SubFundingSourceService.getSubFundingSourceListAll()
       .then(response => {
-        console.log("--------res", response);
-        this.setState({
-          subFundingSourceList: response.data
-        })
+        if (response.status == 200) {
+          console.log("sub funding source after status 200--->" + response.data)
+          this.setState({
+            subFundingSourceList: response.data
+          })
+        } else {
+          this.setState({ message: response.data.messageCode })
+        }
       }).catch(
         error => {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -216,14 +229,16 @@ class ListBudgetComponent extends Component {
         text: i18n.t('static.common.startdate'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatDate
       },
       {
         dataField: 'stopDate',
         text: i18n.t('static.common.stopdate'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatDate
       },
       {
         dataField: 'active',
@@ -327,6 +342,8 @@ class ListBudgetComponent extends Component {
                       pagination={paginationFactory(options)}
                       rowEvents={{
                         onClick: (e, row, rowIndex) => {
+                          row.startDate = moment(row.startDate).format('YYYY-MM-DD');
+                          row.stopDate = moment(row.stopDate).format('YYYY-MM-DD');
                           this.editBudget(row);
                         }
                       }}

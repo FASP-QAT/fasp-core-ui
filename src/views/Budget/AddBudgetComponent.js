@@ -103,6 +103,12 @@ class AddBudgetComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
+        this.Capitalize=this.Capitalize.bind(this);
+    }
+    
+    Capitalize(str) {
+        let { budget } = this.state
+        budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
 
     currentDate() {
@@ -184,7 +190,7 @@ class AddBudgetComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -212,7 +218,7 @@ class AddBudgetComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -251,6 +257,7 @@ class AddBudgetComponent extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -276,7 +283,7 @@ class AddBudgetComponent extends Component {
                                                 if (error.message === "Network Error") {
                                                     this.setState({ message: error.message });
                                                 } else {
-                                                    switch (error.response.status) {
+                                                    switch (error.response ? error.response.status : "") {
                                                         case 500:
                                                         case 401:
                                                         case 404:
@@ -315,10 +322,11 @@ class AddBudgetComponent extends Component {
                                                             name="budget"
                                                             id="budget"
                                                             bsSize="sm"
-                                                            valid={!errors.budget}
+                                                            valid={!errors.budget} 
                                                             invalid={touched.budget && !!errors.budget}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.budget.label.label_en}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.budget}</FormFeedback>
@@ -444,7 +452,7 @@ class AddBudgetComponent extends Component {
                 <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div> 
+                </div>
             </div>
         );
     }

@@ -210,7 +210,7 @@ class ApplicationDashboard extends Component {
               <CardBody>
                 <Row>
                   <Col xs="12" sm="12" md="12">
-                   <Table hover responsive className="table-outline mb-0 d-none d-sm-table">
+                   <Table hover responsive className="table-outline mb-0  d-sm-table">
                   <thead className="thead-light">
                   <tr>
                   <th>Total Realms</th>
