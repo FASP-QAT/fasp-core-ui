@@ -369,8 +369,9 @@ label.arrow_label:before {
 }
 .main-content {width:100%;}
 .upper-logo{
-    margin-left:2%;
-    width: 500px;
+    // margin-left:2%;
+    width: 421px;
+    margin-top:1%;
 }
 .Login-card {
     position: relative;
@@ -433,10 +434,11 @@ font-weight: 500;
     font-family: sans-serif;
     font-style: italic;
     font-size: 13px;
+    margin-top: 10px;
     text-align: justify;
 }
 .Login-bttom-logo {
-   margin-top: -5%; 
+   margin-top: -4%; 
 }
 .Input-form{
     background-color:#e9e9e9;
@@ -459,7 +461,7 @@ font-weight: 500;
   .count-text{
       font-size: 24px;
       color: #73818f;
-      text-align: right;
+      text-align: center;
       font-weight: normal;
   }
 
@@ -488,7 +490,7 @@ font-weight: 500;
     color:#333;
 }
 .chart-graph{
-    height:280px;
+    height:250px;
 }
 
 .lang-btn{
@@ -497,7 +499,7 @@ font-weight: 500;
     color: #000 !important;
     background-color: #ddd;
     border-radius: 7px;
-    width: 80px;
+    width: 100%;
     padding: 5px 0px 5px !important;
     // border: 1px solid #ccc;
     font-size: 17px;
@@ -520,3 +522,4 @@ font-weight: 500;
 h5, .h5 {
   font-size: 14px!important;
 }
+

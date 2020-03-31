@@ -131,7 +131,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                             UserService.updateExpiredPassword(values.username, values.oldPassword, values.newPassword)
                                                 .then(response => {
                                                     var decoded = jwt_decode(response.data.token);
-                                                    let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession"];
+                                                    let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
                                                     keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                                     localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));

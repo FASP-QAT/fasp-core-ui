@@ -115,7 +115,7 @@ class Login extends Component {
                             LoginService.authenticate(username, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
@@ -124,7 +124,7 @@ class Login extends Component {
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 AuthenticationService.setupAxiosInterceptors();
-                                this.props.history.push(`/dashboard`)
+                                this.props.history.push(`/ApplicationDashboard`)
                               })
                               .catch(
                                 error => {
@@ -166,14 +166,14 @@ class Login extends Component {
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.removeItem("tempUser");
-                                  this.props.history.push(`/dashboard`)
+                                  this.props.history.push(`/ApplicationDashboard`)
                                 } else {
                                   this.setState({ message: 'Bad credentials.' });
                                 }
@@ -199,8 +199,10 @@ class Login extends Component {
                               <Form onSubmit={handleSubmit} noValidate name="loginForm">
                                 <h5>{i18n.t(this.props.match.params.message)}</h5>
                                 <h5>{i18n.t(this.state.message)}</h5>
-                                <h1>{i18n.t('static.login.login')}</h1>
+                                {/* <h1>{i18n.t('static.login.login')}</h1> */}
+
                                 <p className="text-muted">{i18n.t('static.login.signintext')}</p>
+
                                 <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
                                     <InputGroupText>

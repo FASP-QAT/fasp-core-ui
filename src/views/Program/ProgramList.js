@@ -153,6 +153,7 @@ export default class ProgramList extends Component {
     // console.log(cell);
     event.stopPropagation();
     AuthenticationService.setupAxiosInterceptors();
+    console.log("cell------", cell);
     ProgramService.getProgramProductListByProgramId(cell)
       .then(response => {
 

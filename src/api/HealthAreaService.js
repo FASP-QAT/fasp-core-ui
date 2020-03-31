@@ -5,5 +5,9 @@ class HealthAreaService {
         return axios.get(`${API_URL}/api/realm`, {
         });
     }
+    getHealthAreaList() {
+        return axios.get(`${API_URL}/api/healthArea/`, {
+        });
+    }
 }
 export default new HealthAreaService()
