@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 // import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import BudgetServcie from '../../api/BudgetService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
@@ -79,12 +79,11 @@ class ListBudgetComponent extends Component {
   }
 
   componentDidMount() {
-    console.log("message------------->" + this.props.match.params.message);
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
         if (response.status == 200) {
-          console.log(response.data);
+          console.log("budget after status 200---->", response.data);
           this.setState({
             budgetList: response.data,
             selBudget: response.data
@@ -98,7 +97,7 @@ class ListBudgetComponent extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -115,16 +114,20 @@ class ListBudgetComponent extends Component {
       );
     SubFundingSourceService.getSubFundingSourceListAll()
       .then(response => {
-        console.log("--------res", response);
-        this.setState({
-          subFundingSourceList: response.data
-        })
+        if (response.status == 200) {
+          console.log("sub funding source after status 200--->"+response.data)
+          this.setState({
+            subFundingSourceList: response.data
+          })
+        } else {
+          this.setState({ message: response.data.messageCode })
+        }
       }).catch(
         error => {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -216,7 +219,8 @@ class ListBudgetComponent extends Component {
         text: i18n.t('static.common.startdate'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        // formatter:'MM-dd-yyyy'
       },
       {
         dataField: 'stopDate',

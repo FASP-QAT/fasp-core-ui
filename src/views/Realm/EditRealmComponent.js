@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -22,7 +22,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmNameText')).max(6,i18n.t('static.realm.realmCodeLength')),
+            .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
         monthInPastForAmc: Yup.number()
@@ -148,6 +148,7 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -163,7 +164,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/realm/realmList/`+i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/realm/realmList/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
