@@ -190,13 +190,13 @@ class ListUserComponent extends Component {
                         <Col md="3">
                             <FormGroup>
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmname')}</Label>
-                                <div className="controls">
+                                <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
                                             name="realmId"
                                             id="realmId"
-                                            bsSize="lg"
+                                            bsSize="sm"
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
                                             {realmList}
