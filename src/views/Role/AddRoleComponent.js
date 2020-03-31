@@ -12,15 +12,15 @@ const initialValues = {
     businessFunctions: [],
     canCreateRole: []
 }
-
+const entityname=i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required('Please enter role name'),
+            .required(i18n.t('static.role.roletext')),
         businessFunctions: Yup.string()
-            .required('Please select business functions'),
+            .required(i18n.t('static.role.businessfunctiontext')),
         canCreateRole: Yup.string()
-            .required('Please select can create role')
+            .required(i18n.t('static.role.cancreateroletext'))
     })
 }
 
@@ -201,7 +201,7 @@ class AddRoleComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.role.roleaddtext')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -210,7 +210,7 @@ class AddRoleComponent extends Component {
                                     UserService.addNewRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/role/listRole/${response.data.messageCode}`)
+                                                this.props.history.push(`/role/listRole/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -257,7 +257,7 @@ class AddRoleComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="roleName">{i18n.t('static.role.rolename')}</Label>
+                                                        <Label for="roleName">{i18n.t('static.role.role')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-user"></i>
                                                             </InputGroupText>
@@ -340,7 +340,7 @@ class AddRoleComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/role/listRole/` + "static.actionCancelled")
+        this.props.history.push(`/role/listRole/` +i18n.t('static.message.cancelled',{entityname}))
     }
 }
 
