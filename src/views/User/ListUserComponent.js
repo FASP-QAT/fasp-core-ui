@@ -82,11 +82,10 @@ class ListUserComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
-                if (response.status == "Success") {
-                    this.setState({
-                        realms: response.data.data
-                    })
-                } else {
+                if (response.status == 200) {
+                       this.setState({
+                    realms: response.data
+                })} else {
                     this.setState({ message: response.data.messageCode })
                 }
             }).catch(
