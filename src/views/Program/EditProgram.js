@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {
-    Row,Card, CardBody, CardHeader,
+    Row, Card, CardBody, CardHeader,
     Label, Input, FormGroup,
     CardFooter, Button, Col, FormFeedback, Form
 } from 'reactstrap';
@@ -184,13 +184,19 @@ export default class EditProgram extends Component {
             healthAreaList: [],
             programManagerList: [],
             regionList: [],
-            message:''
+            message: ''
 
         }
 
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.Capitalize=this.Capitalize.bind(this);
 
+    }
+
+    Capitalize(str) {
+        let { program } = this.state
+        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -483,9 +489,9 @@ export default class EditProgram extends Component {
                                                             <Input
                                                                 type="text" name="programName" valid={!errors.programName}
                                                                 invalid={touched.programName && !!errors.programName}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
                                                                 onBlur={handleBlur}
-                                                                value={getLabelText(this.state.program.label, this.state.lang)}
+                                                                value={this.state.program.label.label_en}
                                                                 id="programName" placeholder={i18n.t('static.program.programtext')} />
                                                             <FormFeedback>{errors.programName}</FormFeedback>
                                                         </Col>

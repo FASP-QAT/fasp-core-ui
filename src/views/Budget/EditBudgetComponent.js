@@ -72,6 +72,8 @@ class EditBudgetComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
+        this.Capitalize=this.Capitalize.bind(this);
+        // console.log(this.state);
     }
 
     // componentDidMount() {
@@ -108,6 +110,10 @@ class EditBudgetComponent extends Component {
 
 
     // }
+    Capitalize(str) {
+        let { budget } = this.state
+        budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    }
     currentDate() {
         var todaysDate = new Date();
         var yyyy = todaysDate.getFullYear().toString();
@@ -136,7 +142,7 @@ class EditBudgetComponent extends Component {
         this.setState({
             budget
         },
-            () => { console.log(this.state)});
+            () => { console.log(this.state) });
     };
 
     touchAll(setTouched, errors) {
@@ -236,9 +242,9 @@ class EditBudgetComponent extends Component {
                                                             id="budget"
                                                             valid={!errors.budgetName}
                                                             invalid={touched.budgetName && !!errors.budgetName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.budget.label, this.state.lang)}
+                                                            value={this.state.budget.label.label_en}
 
                                                         />
 
@@ -258,7 +264,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
 
-                                                            value={this.state.budget.program.label.label_en}
+                                                            value={getLabelText(this.state.budget.program.label,this.state.lang)}
                                                         >
                                                         </Input>
 
@@ -305,7 +311,8 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
-                                                        <Input type="text"
+                                                        <Input
+
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -324,7 +331,8 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
-                                                        <Input type="text"
+                                                        <Input
+
                                                             name="stopDate"
                                                             id="stopDate"
                                                             bsSize="sm"

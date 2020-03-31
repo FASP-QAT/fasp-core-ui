@@ -159,7 +159,13 @@ export default class AddProgram extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.Capitalize=this.Capitalize.bind(this);
 
+    }
+
+    Capitalize(str) {
+        let { program } = this.state
+        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -592,8 +598,9 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             type="text" name="programName" valid={!errors.programName}
                                                             invalid={touched.programName && !!errors.programName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.program.label.label_en}
                                                             id="programName" placeholder={i18n.t('static.program.programtext')} />
 
                                                         <FormFeedback className="red">{errors.programName}</FormFeedback>

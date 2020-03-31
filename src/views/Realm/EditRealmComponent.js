@@ -85,7 +85,7 @@ export default class UpdateDataSourceComponent extends Component {
             realm.label.label_en = event.target.value
         }
         if (event.target.name === "realmCode") {
-            realm.realmCode = event.target.value
+            realm.realmCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "monthInPastForAmc") {
             realm.monthInPastForAmc = event.target.value
@@ -133,12 +133,13 @@ export default class UpdateDataSourceComponent extends Component {
         }
     }
 
-    componentDidMount() {
-
+    componentDidMount(str) {
+      
     }
 
     Capitalize(str) {
-
+        let { realm } = this.state
+        realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     cancelClicked() {
         this.props.history.push(`/realm/realmList/` + i18n.t('static.message.cancelled', { entityname }))
@@ -216,7 +217,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmCode}
                                                             invalid={touched.realmCode && !!errors.realmCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.realmCode}
                                                             required />
@@ -230,7 +231,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.label.label_en}
                                                             required />
