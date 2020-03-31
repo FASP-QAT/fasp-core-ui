@@ -12,7 +12,7 @@ const initialValues = {
     businessFunctions: [],
     canCreateRole: []
 }
-
+const entityname=i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
@@ -195,7 +195,7 @@ class EditRoleComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.role.roleedittext')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={{
@@ -208,7 +208,7 @@ class EditRoleComponent extends Component {
                                     UserService.editRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/role/listRole/${response.data.messageCode}`)
+                                                this.props.history.push(`/role/listRole/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -255,7 +255,7 @@ class EditRoleComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="roleName">{i18n.t('static.role.rolename')}</Label>
+                                                        <Label for="roleName">{i18n.t('static.role.role')}</Label>
                                                         <InputGroupAddon addonType="prepend">
                                                             <InputGroupText><i className="fa fa-user"></i>
                                                             </InputGroupText>
@@ -325,8 +325,8 @@ class EditRoleComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="lg" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="lg" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="button" size="mg" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="mg" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
                           </FormGroup>
@@ -340,7 +340,7 @@ class EditRoleComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/role/listRole/` + "static.actionCancelled")
+        this.props.history.push(`/role/listRole/` +i18n.t('static.message.cancelled',{entityname}))
     }
 }
 
