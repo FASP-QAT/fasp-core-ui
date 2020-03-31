@@ -109,7 +109,7 @@ export default class LanguageListComponent extends Component {
             headerAlign: 'center'
         }, {
             dataField: 'languageCode',
-            text: i18n.t('static.language.languagecode'),
+            text: i18n.t('static.language.languageCode'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
