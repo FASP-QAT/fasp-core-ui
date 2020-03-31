@@ -10,26 +10,26 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 // import { HashRouter, Route, Switch } from 'react-router-dom';
-const entityname=i18n.t('static.language.language');
+const entityname = i18n.t('static.language.language');
 export default class LanguageListComponent extends Component {
 
     constructor(props) {
         super(props);
-       /* this.table = data.rows;
-        this.options = {
-            sortIndicator: true,
-            hideSizePerPage: true,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                // console.log("row--------------", row);
-                this.editLanguage(row);
-            }.bind(this)
-
-        }*/
+        /* this.table = data.rows;
+         this.options = {
+             sortIndicator: true,
+             hideSizePerPage: true,
+             paginationSize: 3,
+             hidePageListOnlyOnePage: true,
+             clearSearch: true,
+             alwaysShowAllBtns: false,
+             withFirstAndLast: false,
+             onRowClick: function (row) {
+                 // console.log("row--------------", row);
+                 this.editLanguage(row);
+             }.bind(this)
+ 
+         }*/
 
         this.state = {
             langaugeList: [],
@@ -38,7 +38,7 @@ export default class LanguageListComponent extends Component {
         }
         this.editLanguage = this.editLanguage.bind(this);
         this.addLanguage = this.addLanguage.bind(this);
-        
+
     }
 
     editLanguage(language) {
@@ -56,7 +56,7 @@ export default class LanguageListComponent extends Component {
         }
     }
 
-   
+
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -64,7 +64,7 @@ export default class LanguageListComponent extends Component {
             .then(response => {
                 console.log(response.data)
                 if (response.status == 200) {
-                    this.setState({ langaugeList: response.data,selSource:response.data })
+                    this.setState({ langaugeList: response.data, selSource: response.data })
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
@@ -92,12 +92,12 @@ export default class LanguageListComponent extends Component {
 
     }
 
-    
+
     render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
-               {i18n.t('static.common.result',{from,to,size}) }
+                {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
 
@@ -107,7 +107,7 @@ export default class LanguageListComponent extends Component {
             sort: true,
             align: 'center',
             headerAlign: 'center'
-        },{
+        }, {
             dataField: 'languageCode',
             text: i18n.t('static.language.languagecode'),
             sort: true,
@@ -121,7 +121,7 @@ export default class LanguageListComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.active ? i18n.t('static.common.active') :i18n.t('static.common.disabled'))
+                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
             }
         }];
@@ -131,10 +131,10 @@ export default class LanguageListComponent extends Component {
             prePageText: i18n.t('static.common.back'),
             nextPageText: i18n.t('static.common.next'),
             lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage') ,
-            prePageTitle: i18n.t('static.common.prevPage') ,
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
             firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage') ,
+            lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
@@ -153,19 +153,19 @@ export default class LanguageListComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
-        <Card>
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addLanguage}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
-                    <ToolkitProvider
+                        <ToolkitProvider
                             keyField="languageId"
                             data={this.state.selSource}
                             columns={columns}
@@ -175,11 +175,13 @@ export default class LanguageListComponent extends Component {
                         >
                             {
                                 props => (
-                                    <div>
-                                        <hr />
-                                        <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
-                                        <BootstrapTable noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+
+                                    <div className="TableCust">
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                            <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
+                                        </div>
+                                        <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
@@ -195,7 +197,7 @@ export default class LanguageListComponent extends Component {
 
                     </CardBody>
                 </Card>
-               
+
             </div>
         );
     }

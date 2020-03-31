@@ -10,7 +10,7 @@ import i18n from '../../i18n'
 let initialValues = {
     label: ''
 }
-const entityname=i18n.t('static.datasourcetype.datasourcetype');
+const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -58,10 +58,12 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     // porLabel: '',
                     labelId: '',
                 },
-                realm:{
-                    realmId:'',
-                    label:{label_en:''
-                }}
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: ''
+                    }
+                }
             }
         }
 
@@ -136,7 +138,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -145,7 +147,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                     DataSourceTypeService.editDataSourceType(this.state.dataSourceType)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/dataSourceType/listDataSourceType/`+ i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/dataSourceType/listDataSourceType/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -190,36 +192,30 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm'>
                                                 <CardBody>
-                                                <FormGroup>
+                                                    <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                            <Input
-                                                                type="text"
-                                                                name="realmId"
-                                                                id="realmId"
-                                                                bsSize="sm"
-                                                                readOnly
-                                                                value={this.state.dataSourceType.realm.label.label_en}
-                                                            >
-                                                            </Input>
-                                                        </InputGroupAddon>
+                                                        <Input
+                                                            type="text"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSourceType.realm.label.label_en}
+                                                        >
+                                                        </Input>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
-                                                            <Input type="text"
-                                                                name="label"
-                                                                id="label"
-                                                                bsSize="sm"
-                                                                valid={!errors.label}
-                                                                invalid={touched.label && !!errors.label}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.dataSourceType.label.label_en}
-                                                                required />
-                                                        </InputGroupAddon>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.dataSourceType.label.label_en}
+                                                            required />
                                                         <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
 
@@ -277,14 +273,14 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-        <h6>{i18n.t(this.state.message)}</h6>
-       <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/dataSourceType/listDataSourceType/` + i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/dataSourceType/listDataSourceType/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

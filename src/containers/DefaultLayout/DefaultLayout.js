@@ -35,7 +35,7 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession"];
+    let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng"];
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       LogoutService.logout()
@@ -78,11 +78,11 @@ class DefaultLayout extends Component {
                         url: '/ApplicationDashboard',
                         icon: 'cui-dashboard icons',
                       },
-                      {
-                        name: i18n.t('static.dashboard.realmdashboard'),
-                        url: '/RealmDashboard',
-                        icon: 'cui-dashboard icons',
-                      },
+                      // {
+                      //   name: i18n.t('static.dashboard.realmdashboard'),
+                      //   url: '/RealmDashboard',
+                      //   icon: 'cui-dashboard icons',
+                      // },
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
@@ -201,18 +201,18 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.program'),
                             url: '/program/listProgram',
                             icon: 'icon-graph',
-                        //     children: [
-                        //       // {
-                        //       //   name: i18n.t('static.dashboard.addprogram'),
-                        //       //   url: '/program/addProgram',
-                        //       //   icon: 'icon-pencil',
-                        //       // },
-                        //       {
-                        //         name: i18n.t('static.dashboard.listprogram'),
-                        //         url: '/program/listProgram',
-                        //         icon: 'fa fa-object-group',
-                        //       }
-                        //     ]
+                            //     children: [
+                            //       // {
+                            //       //   name: i18n.t('static.dashboard.addprogram'),
+                            //       //   url: '/program/addProgram',
+                            //       //   icon: 'icon-pencil',
+                            //       // },
+                            //       {
+                            //         name: i18n.t('static.dashboard.listprogram'),
+                            //         url: '/program/listProgram',
+                            //         icon: 'fa fa-object-group',
+                            //       }
+                            //     ]
                           },
                           {
                             name: i18n.t('static.dashboard.product'),
@@ -231,7 +231,7 @@ class DefaultLayout extends Component {
                             //   }
                             // ]
                           },
-                        
+
 
                           {
                             name: i18n.t('static.dashboard.program'),

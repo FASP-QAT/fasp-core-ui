@@ -185,11 +185,11 @@ export default class ReactListComponent extends Component {
                             {
                                 props => (
                                     <div className="TableCust">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                            <SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} />
+                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                        <SearchBar {...props.searchProps} />
+                                        <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
