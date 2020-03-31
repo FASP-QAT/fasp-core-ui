@@ -3,32 +3,21 @@ import React, { Component } from 'react';
 import {
     Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, FormText, Label, Button, Col
 } from 'reactstrap';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator'
 import i18n from '../../i18n'
 
 import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
-
+const entityname=i18n.t('static.user.user')
 class ListUserComponent extends Component {
     constructor(props) {
         super(props);
-        this.options = {
-            sortIndicator: true,
-            hideSizePerPage: false,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                this.editUser(row);
-            }.bind(this)
-
-        }
-        this.state = {
+              this.state = {
             realms: [],
             userList: [],
             message: '',
@@ -111,6 +100,7 @@ class ListUserComponent extends Component {
 
         UserService.getUserList()
             .then(response => {
+                console.log(response.data)
                 this.setState({
                     userList: response.data,
                     selUserList: response.data
@@ -172,53 +162,161 @@ class ListUserComponent extends Component {
                     </option>
                 )
             }, this);
-        return (
-            <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
-                <Card>
+            const { SearchBar, ClearSearchButton } = Search;
+            const customTotal = (from, to, size) => (
+                <span className="react-bootstrap-table-pagination-total">
+                    {i18n.t('static.common.result', { from, to, size })}
+                </span>
+            );
+    
+            const columns = [{
+                dataField: 'realm.label.label_en',
+                text: i18n.t('static.realm.realm'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'username',
+                text: i18n.t('static.user.username'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'phoneNumber',
+                text: i18n.t('static.user.phoneNumber'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'emailId',
+                text: i18n.t('static.user.emailid'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'faildAttempts',
+                text: i18n.t('static.user.failedAttempts'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'lastLoginDate',
+                text: i18n.t('static.user.lastLoginDate'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'active',
+                text: i18n.t('static.common.status'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+                    );
+                }
+            },      {
+                dataField: 'userId',
+                text: 'ACTION',
+                formatter: (cellContent, row) => {
+                  return ( <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>   
+                   )
+                }
+            }               
+];
+            const options = {
+                hidePageListOnlyOnePage: true,
+                firstPageText: i18n.t('static.common.first'),
+                prePageText: i18n.t('static.common.back'),
+                nextPageText: i18n.t('static.common.next'),
+                lastPageText: i18n.t('static.common.last'),
+                nextPageTitle: i18n.t('static.common.firstPage'),
+                prePageTitle: i18n.t('static.common.prevPage'),
+                firstPageTitle: i18n.t('static.common.nextPage'),
+                lastPageTitle: i18n.t('static.common.lastPage'),
+                showTotal: true,
+                paginationTotalRenderer: customTotal,
+                disablePageTitle: true,
+                sizePerPageList: [{
+                    text: '10', value: 10
+                }, {
+                    text: '30', value: 30
+                }
+                    ,
+                {
+                    text: '50', value: 50
+                },
+                {
+                    text: 'All', value: this.state.selUserList.length
+                }]
+            }
+            return (
+                <div className="animated">
+                    <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                    <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                      <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.user.userlisttext')}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.user.useraddtext')} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
                         <Col md="3">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmname')}</Label>
-                                <div className="controls">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
                                             name="realmId"
                                             id="realmId"
-                                            bsSize="lg"
+                                            bsSize="sm"
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
                                             {realmList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
-                                            <Button color="secondary" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                         </InputGroupAddon>
                                     </InputGroup>
                                 </div>
                             </FormGroup>
                         </Col>
-                        <BootstrapTable data={this.state.selUserList} version="4" hover pagination search options={this.options}>
-                            <TableHeaderColumn isKey dataField='userId' hidden>ID</TableHeaderColumn>
-                            <TableHeaderColumn dataField="username" dataSort dataAlign="center"><strong>{i18n.t('static.user.username')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="realm" dataSort dataFormat={this.showRealmLabel} dataAlign="center" ><strong>{i18n.t('static.realm.realmname')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn dataField="emailId" dataSort dataAlign="center"><strong>{i18n.t('static.common.emailid')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn dataField="phoneNumber" dataSort dataAlign="center"><strong>{i18n.t('static.common.phoneNumber')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="language" dataSort dataFormat={this.showLanguageLabel} dataAlign="center"><strong>{i18n.t('static.language.language')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="lastLoginDate" dataFormat={this.formatDate} dataAlign="center" dataSort><strong>{i18n.t('static.common.lastlogindate')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="faildAttempts" dataAlign="center" dataSort><strong>{i18n.t('static.common.faildAttempts')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="active" dataFormat={this.showStatus} dataAlign="center" dataSort><strong>{i18n.t('static.common.status')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn dataField="userId" dataFormat={this.buttonFormatter}>Map Access Controls</TableHeaderColumn>
-                        </BootstrapTable>
+                        <ToolkitProvider
+                            keyField="userId"
+                            data={this.state.selUserList}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                        >
+                            {
+                                props => (
+
+                                    <div className="TableCust">
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                            <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
+                                        </div>
+                                        <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                            pagination={paginationFactory(options)}
+                                            rowEvents={{
+                                                onClick: (e, row, rowIndex) => {
+                                                    this.editUser(row);
+                                                }
+                                            }}
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
+
                     </CardBody>
                 </Card>
             </div>
