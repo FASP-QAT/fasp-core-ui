@@ -13,6 +13,7 @@ import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
+<<<<<<< HEAD
 const entityname = i18n.t('static.user.user')
 class ListUserComponent extends Component {
     constructor(props) {
@@ -100,6 +101,7 @@ class ListUserComponent extends Component {
 
         UserService.getUserList()
             .then(response => {
+                console.log(response.data)
                 this.setState({
                     userList: response.data,
                     selUserList: response.data
