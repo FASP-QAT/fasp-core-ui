@@ -52,7 +52,7 @@ class EditRegionComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        this.Capitalize= this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
 
     dataChange(event) {
@@ -97,6 +97,7 @@ class EditRegionComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -176,9 +177,9 @@ class EditRegionComponent extends Component {
                                                                 bsSize="sm"
                                                                 valid={!errors.region}
                                                                 invalid={touched.region && !!errors.region}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                                 onBlur={handleBlur}
-                                                                value={getLabelText(this.state.region.label,this.state.lang)}
+                                                                value={getLabelText(this.state.region.label, this.state.lang)}
                                                                 required />
                                                        
                                                         <FormText className="red">{errors.region}</FormText>

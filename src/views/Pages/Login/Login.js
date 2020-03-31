@@ -200,6 +200,7 @@ class Login extends Component {
                               <Form onSubmit={handleSubmit} noValidate name="loginForm">
                                 <h5 >{i18n.t(this.props.match.params.message)}</h5>
                                 <h5 >{i18n.t(this.state.message)}</h5>
+                              
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
                                 <p className="text-muted">{i18n.t('static.login.signintext')}</p>

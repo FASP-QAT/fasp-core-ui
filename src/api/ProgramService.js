@@ -60,5 +60,10 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/${json}`, {}
         );
     }
+
+    getProgramManagerList(json) {
+        return axios.get(`${API_URL}/api/user/realmId/${json}`, {}
+        );
+    }
 }
 export default new ProgramService()
