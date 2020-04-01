@@ -94,16 +94,17 @@ class Login extends Component {
       <div className="main-content flex-row align-items-center">
 
         <div className="Login-component">
-
-          <div>
-            <img src={'assets/img/QAT-logo.png'} className="img-fluid upper-logo" />
-          </div>
-
-          <Col>
+          <Container className="container-login">
+        
             <Row className="justify-content-center">
-              <Col md="4">
+            <Col md="12">
+              <div className="upper-logo mt-1">
+               <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+             </div>
+             </Col>
+            <Col lg="7" md="7" xl="4">
                 <CardGroup>
-                  <Card className="p-4 Login-card">
+                  <Card className="p-4 Login-card mt-2">
                     <CardBody>
                       <Formik
                         initialValues={initialValues}
@@ -197,8 +198,9 @@ class Login extends Component {
                             setTouched
                           }) => (
                               <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                                <h5>{i18n.t(this.props.match.params.message)}</h5>
-                                <h5>{i18n.t(this.state.message)}</h5>
+                                <h5 >{i18n.t(this.props.match.params.message)}</h5>
+                                <h5 >{i18n.t(this.state.message)}</h5>
+                              
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
                                 <p className="text-muted">{i18n.t('static.login.signintext')}</p>
@@ -257,10 +259,9 @@ class Login extends Component {
 
                 </CardGroup>
               </Col>
-            </Row>
+           
 
-            < Col className="Login-bttom ">
-              <Col xs="12">
+            <Col xs="12"className="Login-bttom ">
                 <CardBody>
 
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
@@ -276,8 +277,7 @@ class Login extends Component {
                   Development or the U.S. government.
               </p>
                 </CardBody>
-              </Col>
-              <Row className="text-center Login-bttom-logo">
+                <Row className="text-center Login-bttom-logo">
                 <Col md="4">
                   <CardBody>
                     <img src={'assets/img/wordmark.png'} className="img-fluid" width="420" />
@@ -294,9 +294,11 @@ class Login extends Component {
                   </CardBody>
                 </Col>
               </Row>
-            </ Col>
 
-          </Col>
+              </Col>
+             
+              </Row>
+          </Container>
         </div>
       </div>
 

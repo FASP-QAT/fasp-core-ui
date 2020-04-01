@@ -79,11 +79,11 @@ class ForgotPasswordComponent extends Component {
             <div className="main-content flex-row align-items-center">
                 
                 <Container>
-                    <Row className="justify-content-center">
+                    <Row className="justify-content-center mt-5">
                     
                         <Col md="9" lg="7" xl="6">
                         <h5 className="mx-4">{this.state.message}</h5>
-                            <Card className="mx-4">
+                            <Card className="mx-4 ">
                                 
                                 <CardHeader>
                                     <i className="icon-note"></i><strong>Forgot Password</strong>{' '}
@@ -159,8 +159,8 @@ class ForgotPasswordComponent extends Component {
                                                     </CardBody>
                                                     <CardFooter>
                                                         <FormGroup>
-                                                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
                                                             &nbsp;
                           </FormGroup>
                                                     </CardFooter>

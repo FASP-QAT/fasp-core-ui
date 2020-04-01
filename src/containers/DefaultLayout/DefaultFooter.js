@@ -16,7 +16,7 @@ class DefaultFooter extends Component {
     return (
       <React.Fragment>
         {/* <span><a href=""></a> &copy; </span>*/}
-        <span className="ml-auto"> <a href="#">Quantification and Analytics Tool</a></span>
+        <span className="ml-auto footerlink">Quantification and Analytics Tool</span>
       </React.Fragment>
     );
   }

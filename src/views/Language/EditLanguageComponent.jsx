@@ -11,7 +11,7 @@ import '../Forms/ValidationForms/ValidationForms.css';
 let initialValues = {
     language: ""
 }
-const entityname=i18n.t('static.language.language');
+const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
@@ -114,7 +114,7 @@ export default class EditLanguageComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -125,7 +125,7 @@ export default class EditLanguageComponent extends Component {
                                     LanguageService.editLanguage(this.state.language).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {
-                                            this.props.history.push(`/language/listLanguage/`+i18n.t(response.data.messageCode,{entityname}))
+                                            this.props.history.push(`/language/listLanguage/` + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -172,21 +172,21 @@ export default class EditLanguageComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="language">{i18n.t('static.language.language')}</Label>
-                                                       <Input type="text"
-                                                                name="languageName"
-                                                                id="languageName"
-                                                                bsSize="sm"
-                                                                valid={!errors.languageName}
-                                                                invalid={touched.languageName && !!errors.languageName}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.language.languageName}
-                                                                required />
-                                                                <FormText className="red">{errors.languageName}</FormText>
+                                                        <Input type="text"
+                                                            name="languageName"
+                                                            id="languageName"
+                                                            bsSize="sm"
+                                                            valid={!errors.languageName}
+                                                            invalid={touched.languageName && !!errors.languageName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.language.languageName}
+                                                            required />
+                                                        <FormText className="red">{errors.languageName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
-                                                         <Input type="text"
+                                                        <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
                                                             bsSize="sm"
@@ -196,7 +196,7 @@ export default class EditLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
-                                                              <FormText className="red">{errors.languageCode}</FormText>
+                                                            <FormText className="red">{errors.languageCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -236,7 +236,7 @@ export default class EditLanguageComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -248,14 +248,14 @@ export default class EditLanguageComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-        <h6>{i18n.t(this.state.message)}</h6>
-       <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/language/listLanguage/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }
