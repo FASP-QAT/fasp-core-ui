@@ -285,7 +285,7 @@ export default class ProgramList extends Component {
             <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title="Add Program" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+                <a href="javascript:void();" title={i18n.t('static.program.programadd')} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
               </div>
             </div>
           </CardHeader>

@@ -287,7 +287,7 @@ class ListBudgetComponent extends Component {
             <i className="icon-menu"></i>{i18n.t('static.budget.budgetlist')}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title="Add Budget" onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
+                <a href="javascript:void();" title={i18n.t('static.budget.budgetadd')} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
               </div>
             </div>
           </CardHeader>

@@ -204,7 +204,7 @@ class RegionListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.region.regionlist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Region" onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.region.regionadd')} onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

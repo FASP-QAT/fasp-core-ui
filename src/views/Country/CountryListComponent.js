@@ -178,7 +178,7 @@ export default class CountryListComponent extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Realm Country" onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.country.countryadd')} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
 

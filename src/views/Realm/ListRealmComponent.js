@@ -169,7 +169,7 @@ export default class ReactListComponent extends Component {
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Realm" onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.realm.realmAdd')} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
