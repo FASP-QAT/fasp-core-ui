@@ -201,10 +201,10 @@ class RegionListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.region.regionlist')}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.region.regionadd')} onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

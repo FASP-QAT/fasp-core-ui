@@ -116,8 +116,8 @@ const ListLanguage = React.lazy(() => import('./views/Language/LanguageListCompo
 const EditLanguage = React.lazy(() => import('./views/Language/EditLanguageComponent'));
 
 const AddCountry = React.lazy(() => import('./views/Country/AddCountryComponent'));
-const ListCountry = React.lazy(() => import('./views/Country/CountryListComponent'));
-const EditCountry = React.lazy(() => import('./views/Country/UpdateCountryComponent'));
+const ListCountry = React.lazy(() => import('./views/Country/ListCountryComponent'));
+const EditCountry = React.lazy(() => import('./views/Country/EditCountryComponent'));
 
 const AddDataSource = React.lazy(() => import('./views/DataSource/AddDataSource'));
 const ListDataSource = React.lazy(() => import('./views/DataSource/DataSourceListComponent'));
@@ -128,8 +128,8 @@ const ListDataSourceType = React.lazy(() => import('./views/DataSourceType/DataS
 const EditDataSourceType = React.lazy(() => import('./views/DataSourceType/UpdateDataSourceTypeComponent'));
 
 const AddCurrency = React.lazy(() => import('./views/Currency/AddCurrencyComponent'));
-const ListCurrency = React.lazy(() => import('./views/Currency/CurrencyListComponent'));
-const EditCurrency = React.lazy(() => import('./views/Currency/UpdateCurrencyComponent'));
+const ListCurrency = React.lazy(() => import('./views/Currency/ListCurrencyComponent'));
+const EditCurrency = React.lazy(() => import('./views/Currency/EditCurrencyComponent'));
 const DatabaseTranslation = React.lazy(() => import('./views/Translations/DatabaseTranslations'));
 const LabelTranslation = React.lazy(() => import('./views/Translations/LabelTranslations'))
 const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));

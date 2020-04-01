@@ -189,10 +189,10 @@ class ListSubFundingSourceComponent extends Component {
                 <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.subfundingsource.subfundingsourcelisttext')}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.subfundingsource.subfundingsourceaddtext')} onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

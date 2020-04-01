@@ -1,82 +1,55 @@
-import React, { Component } from 'react';
+import React, { Compoent, Component } from 'react';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import CountryService from '../../api/CountryService.js';
+import CurrencyService from '../../api/CurrencyService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-import BootstrapTable from 'react-bootstrap-table-next';
+
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import getLabelText from '../../CommonComponent/getLabelText';
+import data from '../Tables/DataTable/_data';
+import i18n from '../../i18n';
+
+import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
-import i18n from '../../i18n';
-import { boolean } from 'yup';
+const entityname = i18n.t('static.currency.currencyMaster');
+export default class CurrencyListComponent extends Component {
 
-
-
-const entityname = i18n.t('static.country.countryMaster');
-export default class CountryListComponent extends Component {
 
     constructor(props) {
         super(props);
+        // this.table = data.rows;
+        // this.options = {
+        //     sortIndicator: true,
+        //     hideSizePerPage: true,
+        //     paginationSize: 3,
+        //     hidePageListOnlyOnePage: true,
+        //     clearSearch: true,
+        //     alwaysShowAllBtns: false,
+        //     withFirstAndLast: false,
+        //     onRowClick: function (row) {
+        //             this.editCurrency(row);
+        //     }.bind(this)
+
+        // }
         this.state = {
-            countryList: [],
+            currencyList: [],
             message: '',
-            selCountry: []
+            lang: localStorage.getItem('lang'),
+            selCurrency: []
         }
-        this.addNewCountry = this.addNewCountry.bind(this);
-        this.editCountry = this.editCountry.bind(this);
-        this.filterData = this.filterData.bind(this);
-    }
-    filterData() {
-        var selStatus = document.getElementById("active").value;
-        if (selStatus != "") {
-            if (selStatus == "true") {
-                const selCountry = this.state.countryList.filter(c => c.active == true);
-                this.setState({
-                    selCountry: selCountry
-                });
-            } else if (selStatus == "false") {
-                const selCountry = this.state.countryList.filter(c => c.active == false);
-                this.setState({
-                    selCountry: selCountry
-                });
-            }
-
-        } else {
-            this.setState({
-                selCountry: this.state.countryList
-            });
-        }
-    }
-
-
-    addNewCountry() {
-        if (navigator.onLine) {
-            this.props.history.push(`/country/addCountry`)
-        } else {
-            alert("You must be Online.")
-        }
-
-    }
-    editCountry(country) {
-        console.log(country);
-        this.props.history.push({
-            pathname: "/country/editCountry",
-            state: { country: country }
-        });
-
+        this.editCurrency = this.editCurrency.bind(this);
+        this.addNewCurrency = this.addNewCurrency.bind(this);
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        CountryService.getCountryListAll().then(response => {
+        CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
-                console.log("response--->", response.data);
                 this.setState({
-                    countryList: response.data,
-                    selCountry: response.data
+                    currencyList: response.data,
+                    selCurrency: response.data
                 })
             } else {
                 this.setState({ message: response.data.messageCode })
@@ -103,8 +76,30 @@ export default class CountryListComponent extends Component {
                 }
             );
 
+
     }
 
+    editCurrency(currency) {
+        this.props.history.push({
+            pathname: "/currency/editCurrency",
+            state: { currency: currency }
+        });
+
+    }
+
+    addNewCurrency() {
+
+        if (navigator.onLine) {
+            this.props.history.push(`/currency/addCurrency`)
+        } else {
+            alert("You must be Online.")
+        }
+
+    }
+
+    // showCurrencyLabel(cell, row) {
+    //     return cell.label_en;
+    // }
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -113,34 +108,48 @@ export default class CountryListComponent extends Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
-
         const columns = [
             {
+                dataField: 'currencyCode',
+                text: i18n.t('static.currency.currencycode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'currencySymbol',
+                text: i18n.t('static.currency.currencysymbol'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
                 dataField: 'label.label_en',
-                text: i18n.t('static.country.countryMaster'),
+                text: i18n.t('static.currency.currency'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
             },
             {
-                dataField: 'countryCode',
-                text: i18n.t('static.country.countrycode'),
+                dataField: 'conversionRateToUsd',
+                text: i18n.t('static.currency.conversionrateusd'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
-            },
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            }];
+            }
+            // {
+            //     dataField: 'active',
+            //     text: i18n.t('static.common.status'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center',
+            //     formatter: (cellContent, row) => {
+            //         return (
+            //             (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+            //         );
+            //     }
+            // }
+        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -164,52 +173,34 @@ export default class CountryListComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selCountry.length
+                text: 'All', value: this.state.selCurrency.length
             }]
         }
+
         return (
             <div className="animated">
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
-                        <i className="icon-menu"></i><strong>{i18n.t('static.country.countrylist')}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.country.countryadd')} onClick={this.addNewCountry}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCurrency}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
-
                     </CardHeader>
                     <CardBody>
-                        <Col md="3 pl-0">
-                            <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="active"
-                                            id="active"
-                                            bsSize="sm"
-                                        >
-                                            <option value="">{i18n.t('static.common.select')}</option>
-                                            <option value="true">{i18n.t('static.common.active')}</option>
-                                            <option value="false">{i18n.t('static.common.disabled')}</option>
-
-                                        </Input>
-                                        <InputGroupAddon addonType="append">
-                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
-                        </Col>
+                        {/* <BootstrapTable data={this.state.currencyList} version="4" hover pagination search options={this.options}>
+                            <TableHeaderColumn isKey filterFormatted dataField="currencyCode" dataSort dataAlign="center">{i18n.t('static.currency.currencycode')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="currencySymbol" dataSort dataAlign="center">{i18n.t('static.currency.currencysymbol')}</TableHeaderColumn>
+                            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showCurrencyLabel} dataAlign="center">{i18n.t('static.currency.currency')}</TableHeaderColumn>
+                            <TableHeaderColumn dataField="conversionRateToUsd" dataSort dataAlign="center">{i18n.t('static.currency.conversionrateusd')}</TableHeaderColumn>
+                        </BootstrapTable> */}
                         <ToolkitProvider
-                            keyField="countryId"
-                            data={this.state.selCountry}
+                            keyField="currencyId"
+                            data={this.state.selCurrency}
                             columns={columns}
                             search={{ searchFormatted: true }}
                             hover
@@ -226,7 +217,7 @@ export default class CountryListComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editCountry(row);
+                                                    this.editCurrency(row);
                                                 }
                                             }}
                                             {...props.baseProps}
