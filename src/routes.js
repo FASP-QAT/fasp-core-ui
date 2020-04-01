@@ -182,7 +182,7 @@ const routes = [
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
   { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
-  { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
+  { path: '/ProgramDashboard', name: 'Program Dashboard', component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: 'Dashboard', component: Dashboard },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/subFundingSource/listSubFundingSource/:message', component: ListSubFundingSource },

@@ -260,11 +260,8 @@ label.arrow_label:before {
     border-radius: 0 0 0 .3em;
     content: '';
     }
-
-
     label.arrow_label:after { border-bottom: 0; }
-
-:checked ~ label.arrow_label:after {
+    :checked ~ label.arrow_label:after {
  /* border-radius: 0 .3em 0 0;*/
   // border-top: 1px solid #777;
  /* border-right: 1px solid #777;*/
@@ -274,6 +271,8 @@ label.arrow_label:before {
   /*top: 0.5em;*/
   height: auto;
   }
+
+  // table
  .react-bootstrap-table-pagination-total{font-size: 12px;}
   .Gobtn{margin-left: 5px;    border-radius: 0.2rem !important;}
   .SelectGo select{ border-radius: 0.2rem !important;}
@@ -309,9 +308,8 @@ label.arrow_label:before {
         padding-left: 0px !important;
         text-align: left !important;
       }
-
-      
     }
+    
 
   // End arrow label
   .react-bootstrap-table{overflow-x: auto;}
@@ -320,6 +318,8 @@ label.arrow_label:before {
 
     .table th, .table td {
       padding: 0.55rem;}
+// end table
+
 
     // add button
     .card-header-action a i{font-size: 25px;}
@@ -328,9 +328,19 @@ label.arrow_label:before {
     .form-check {
       padding-left: 1.25rem !important;
     }
-
+    // breadcrumb font size
     .breadcrumb{font-size: 13px;}
     .red{color: #f86c6b !important;}
+
+    // Inp-icon-right
+.Fa-right::before{position: absolute;
+right: 43px;font-size:12px;margin-right: 1px;}
+    
+
+
+
+
+
 
 // Login Css//
 .Login-component {

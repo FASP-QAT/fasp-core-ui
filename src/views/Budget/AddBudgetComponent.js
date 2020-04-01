@@ -417,7 +417,8 @@ class AddBudgetComponent extends Component {
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText> */}
-                                                        <Input
+                                                       
+                                                        <Input 
                                                             value={this.state.budget.stopDate}
                                                             name="stopDate"
                                                             id="stopDate"
@@ -430,7 +431,7 @@ class AddBudgetComponent extends Component {
                                                             min={this.state.budget.startDate}
                                                             placeholder={i18n.t('static.budget.budgetstopdate')}
                                                             required />
-                                                        {/* </InputGroupAddon> */}
+                                                             {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
