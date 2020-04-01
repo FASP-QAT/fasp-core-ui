@@ -27,14 +27,12 @@ const validationSchema = function (values) {
             .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
             .test('username', "New password should not be same as username ",
                 function (value) {
-                    console.log("values---", values.username);
                     if ((values.username != value)) {
                         return true;
                     }
                 })
             .test('oldPassword', "New password should not be same as old password ",
                 function (value) {
-                    console.log("values---", values.username);
                     if (values.oldPassword != value) {
                         return true;
                     }
@@ -108,7 +106,7 @@ class ChangePasswordComponent extends Component {
     componentDidMount() {
         let username = AuthenticationService.getLoggedInUsername();
         this.setState({ username },
-            () => { console.log("state---", this.state.username) });
+            () => {  });
     }
     render() {
         return (
@@ -133,13 +131,11 @@ class ChangePasswordComponent extends Component {
                                         AuthenticationService.setupAxiosInterceptors();
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {
-                                                console.log("response.data---",response.data);
                                                 localStorage.setItem('password', CryptoJS.AES.encrypt((response.data.hashPass).toString(), `${SECRET_KEY}`));
                                                 this.props.history.push(`/dashboard`)
                                             })
                                             .catch(
                                                 error => {
-                                                    console.log("error---", error)
                                                     if (error.message === "Network Error") {
                                                         this.setState({ message: error.message });
                                                     } else {
@@ -153,7 +149,6 @@ class ChangePasswordComponent extends Component {
                                                                 break;
                                                             default:
                                                                 this.setState({ message: 'static.unkownError' });
-                                                                console.log("Error code unkown");
                                                                 break;
                                                         }
                                                     }

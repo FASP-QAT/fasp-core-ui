@@ -26,9 +26,6 @@ class SignUpService {
     }
 
     saveRegistration(json) {
-        console.log(json);
-        // var jsonString=JSON.stringify(json);
-
         return axios.put(`${API_URL}/api/saveRegistration/`, json, {
         });
     }

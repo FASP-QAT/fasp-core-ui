@@ -45,7 +45,6 @@ class ListRealmCountryComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
             const selRealmCountry = this.state.realmCountryList.filter(c => c.realm.realmId == realmId)
-            console.log("selRealmCountry---", selRealmCountry);
             this.setState({
                 selRealmCountry
             });

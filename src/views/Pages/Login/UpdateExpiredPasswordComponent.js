@@ -27,14 +27,12 @@ const validationSchema = function (values) {
             .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
             .test('username', "New password should not be same as username ",
                 function (value) {
-                    console.log("values---", values.username);
                     if ((values.username != value)) {
                         return true;
                     }
                 })
             .test('oldPassword', "New password should not be same as old password ",
                 function (value) {
-                    console.log("values---", values.username);
                     if (values.oldPassword != value) {
                         return true;
                     }
@@ -127,7 +125,6 @@ class UpdateExpiredPasswordComponent extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (navigator.onLine) {
-                                            console.log(values.username);
                                             UserService.updateExpiredPassword(values.username, values.oldPassword, values.newPassword)
                                                 .then(response => {
                                                     var decoded = jwt_decode(response.data.token);
@@ -156,7 +153,6 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                     break;
                                                                 default:
                                                                     this.setState({ message: 'static.unkownError' });
-                                                                    console.log("Error code unkown");
                                                                     break;
                                                             }
                                                         }

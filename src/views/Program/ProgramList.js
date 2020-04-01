@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from 'react-router-dom';
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import programDate from './ProgramData';
 import ProgramService from "../../api/ProgramService";
@@ -70,7 +70,7 @@ export default class ProgramList extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -100,7 +100,7 @@ export default class ProgramList extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -177,7 +177,7 @@ export default class ProgramList extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
