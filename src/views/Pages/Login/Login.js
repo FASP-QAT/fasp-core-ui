@@ -102,7 +102,7 @@ class Login extends Component {
                <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
              </div>
              </Col>
-            <Col lg="7" md="7" xl="4">
+            <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <Card className="p-4 Login-card mt-2">
                     <CardBody>
