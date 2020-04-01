@@ -58,5 +58,7 @@
 "static.currency.conversionrateNumber":"Please enter positive integer or decimal number.",
 "static.currency.conversionrateMin":"Please enter number greater then 0.",
 "static.program.programMaster":"Program",
-"static.language.languageCode":"Language Code","static.realm.realm":"Realm","static.dimension.dimension":"Dimension"
+"static.language.languageCode":"Language Code","static.realm.realm":"Realm","static.dimension.dimension":"Dimension",
+"static.procurementagent.onlynumberText":"Only numbers allowed",
+"static.procurementagent.submitToApproveLeadTime":"Please enter submitted to approved lead time"
 }
