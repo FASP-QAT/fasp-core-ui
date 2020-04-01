@@ -31,8 +31,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.programtext')),
         subFundingSourceId: Yup.string()
             .required(i18n.t('static.budget.subfundingtext')),
-        budgetAmt: Yup.string()
-            .required(i18n.t('static.budget.budgetamounttext')),
+        budgetAmt: Yup.number()
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
@@ -103,9 +103,9 @@ class AddBudgetComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
-        this.Capitalize=this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
-    
+
     Capitalize(str) {
         let { budget } = this.state
         budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -322,9 +322,9 @@ class AddBudgetComponent extends Component {
                                                             name="budget"
                                                             id="budget"
                                                             bsSize="sm"
-                                                            valid={!errors.budget} 
+                                                            valid={!errors.budget}
                                                             invalid={touched.budget && !!errors.budget}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.budget.label.label_en}
                                                             required />
@@ -379,7 +379,7 @@ class AddBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
-                                                        <Input type="text"
+                                                        <Input type="number"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
@@ -450,10 +450,10 @@ class AddBudgetComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div>
+                {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+                </div> */}
             </div>
         );
     }

@@ -88,6 +88,7 @@ class ListBudgetComponent extends Component {
     });
   }
 
+
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
@@ -284,10 +285,10 @@ class ListBudgetComponent extends Component {
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>{i18n.t('static.budget.budgetlist')}{' '}
+            <i className="icon-menu"></i>{i18n.t('static.common.listEntity',{entityname})}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title="Add Budget" onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
+                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
               </div>
             </div>
           </CardHeader>

@@ -208,7 +208,7 @@ class ListProcurementAgentComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.procurementagent.procurementagentlist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Procurement Agent" onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.procurementagent.procurementagentadd')} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
