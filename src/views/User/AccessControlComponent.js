@@ -457,7 +457,7 @@ class AccessControlComponent extends Component {
                                             <th className="text-left"> Health Area</th>
                                             <th className="text-left"> Organisation </th>
                                             <th className="text-left">Program</th>
-                                            <th className="text-left">Delete Row</th>
+                                            <th className="text-left">Remove Row</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -491,8 +491,8 @@ class AccessControlComponent extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                    {this.state.rows.length > 0 && <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>Submit</Button>}
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                    {this.state.rows.length > 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>Submit</Button>}
                                     &nbsp;
                                 </FormGroup>
 
