@@ -22,8 +22,8 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
-        budgetAmt: Yup.string()
-            .required(i18n.t('static.budget.budgetamounttext')),
+        budgetAmt: Yup.number()
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
@@ -55,7 +55,6 @@ const getErrorsFromValidationError = (validationError) => {
 
 class EditBudgetComponent extends Component {
     constructor(props) {
-        console.log("in constructor-----------------");
         super(props);
         this.state = {
             budget: this.props.location.state.budget,
@@ -72,6 +71,8 @@ class EditBudgetComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
+        // console.log(this.state);
     }
 
     // componentDidMount() {
@@ -108,6 +109,10 @@ class EditBudgetComponent extends Component {
 
 
     // }
+    Capitalize(str) {
+        let { budget } = this.state
+        budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    }
     currentDate() {
         var todaysDate = new Date();
         var yyyy = todaysDate.getFullYear().toString();
@@ -136,7 +141,7 @@ class EditBudgetComponent extends Component {
         this.setState({
             budget
         },
-            () => { });
+            () => { console.log(this.state) });
     };
 
     touchAll(setTouched, errors) {
@@ -164,9 +169,9 @@ class EditBudgetComponent extends Component {
     }
 
     render() {
-        console.log("in outer render----->");
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -191,17 +196,21 @@ class EditBudgetComponent extends Component {
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -230,9 +239,9 @@ class EditBudgetComponent extends Component {
                                                             id="budget"
                                                             valid={!errors.budgetName}
                                                             invalid={touched.budgetName && !!errors.budgetName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.budget.label, this.state.lang)}
+                                                            value={this.state.budget.label.label_en}
 
                                                         />
 
@@ -252,7 +261,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
 
-                                                            value={this.state.budget.program.label.label_en}
+                                                            value={getLabelText(this.state.budget.program.label, this.state.lang)}
                                                         >
                                                         </Input>
 
@@ -281,7 +290,8 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
 
-                                                        <Input type="text"
+                                                        <Input type="number"
+                                                            min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
@@ -299,7 +309,8 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
-                                                        <Input type="text"
+                                                        <Input
+
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -318,7 +329,8 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
-                                                        <Input type="text"
+                                                        <Input
+
                                                             name="stopDate"
                                                             id="stopDate"
                                                             bsSize="sm"
@@ -386,10 +398,10 @@ class EditBudgetComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div>
+                {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+                </div> */}
             </div>
 
         );

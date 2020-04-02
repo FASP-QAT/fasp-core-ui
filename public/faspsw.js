@@ -10,18 +10,14 @@ var assets = [
 ];
 
 self.addEventListener('install', event => {
-  console.log('service worker installed');
   event.waitUntil(
     caches.open(cacheName).then((cahce) => {
-      console.log("Going to add assets")
       cahce.addAll(assets);
     }).then(() => self.skipWaiting()).catch(function (err) { console.log("Error occured while installing service worker---" + err) })
   )
 });
 self.addEventListener('activate', function (event) {
-  console.log('service worker activated');
   caches.open(cacheName).then((cahce) => {
-    console.log("Going to add assessts")
     cahce.addAll(assets);
   }).then(() => self.skipWaiting()).catch(function (err) { console.log("Error occured while installing service worker---" + err) })
 
@@ -35,7 +31,7 @@ self.addEventListener('activate', function (event) {
         }
       })
     )).then(() => {
-      console.log('V2 now ready to handle fetches!');
+      // console.log('V2 now ready to handle fetches!');
     })
   );
 })
@@ -48,7 +44,7 @@ self.addEventListener('fetch', evt => {
   );
 });
 self.addEventListener('message', (event) => {
-  console.log('[Service Worker] Message Event: ', event.data)
+  // console.log('[Service Worker] Message Event: ', event.data)
 });
 
 // This will work!

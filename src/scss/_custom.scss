@@ -1,5 +1,5 @@
 // Here you can add other styles
-
+body{ font-size: 0.775rem;}
 
 
 
@@ -274,17 +274,56 @@ label.arrow_label:before {
   /*top: 0.5em;*/
   height: auto;
   }
+ .react-bootstrap-table-pagination-total{font-size: 12px;}
+  .Gobtn{margin-left: 5px;    border-radius: 0.2rem !important;}
+  .SelectGo select{ border-radius: 0.2rem !important;}
+  .SelectGo{width: 180px;}
+  .TableCust .btn-default{    color: #23282c !important;
+    background-color: #c8ced3 !important;
+    border-color: #c8ced3 !important;
+    margin-left: 5px;
+    margin-top: -2px;
+    height: calc(1.5em + 0.5rem + 2px);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.76562rem;
+      line-height: 1.5;
+      border-radius: 0.2rem;
+  }
+    .TableCust input{    height: calc(1.5em + 0.5rem + 2px);
+      padding: 0.25rem 0.5rem;
+      font-size: 0.76562rem;
+      line-height: 1.5;
+      border-radius: 0.2rem;
+      width: 130px;
+    }
+    .page-link {
+      line-height: 1;}
+    .pagination{float: right;} 
+    .dropdown-menu {
+      min-width: 5rem;}
+      .page-link {
+        padding: 0.3rem 0.65rem;}
+       
+    @media only screen and (max-width: 600px) {
+      .mob-Left {
+        padding-left: 0px !important;
+        text-align: left !important;
+      }
+
+      
+    }
 
   // End arrow label
-
+  .react-bootstrap-table{overflow-x: auto;}
   // search button
-   .react-bs-table-search-clear-btn{    margin-left: 5px;
-    margin-top: -4px;}
+
+
+    .table th, .table td {
+      padding: 0.55rem;}
+
     // add button
-    .card-header-action a i{font-size: 30px;}
-    tbody{
-      font-size: 13px;
-    }
+    .card-header-action a i{font-size: 25px;}
+   
     // radio button
     .form-check {
       padding-left: 1.25rem !important;
@@ -329,17 +368,33 @@ label.arrow_label:before {
     position: fixed;
     width: 100%;
   }
+
+ 
 }
 .main-content {width:100%;}
 .upper-logo{
-    margin-left:2%;
-    width: 500px;
+    max-width: 325px;
+    margin-top: 2% !important;
+    margin-left: -2%;
 }
+
+@media only screen and (max-width: 767px){
+
+  .upper-logo{
+    // min-width: 100%;
+    min-width: 300px;
+    // margin-top: 1%;
+    margin:0 auto;
+    // margin-left: 2%;
+}
+}
+
 .Login-card {
     position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
+    margin: auto;
     padding: 0px!important;
     word-wrap: break-word;
     background-color: #f6f6f6!important;
@@ -350,7 +405,9 @@ label.arrow_label:before {
 .frdpsd{
     margin-top: 6%;
 }
-
+.container-login {
+  max-width: 1270px!important;
+}
 .Loginicon {
     color:#bb3430;
     }
@@ -398,8 +455,15 @@ font-weight: 500;
     font-size: 13px;
     text-align: justify;
 }
+.Login-msg{
+  color:#4dbd74;
+}
+
+.Login-bttom{
+  margin-top: 1%;
+}
 .Login-bttom-logo {
-   margin-top: -5%; 
+   margin-top: -3%; 
 }
 .Input-form{
     background-color:#e9e9e9;
@@ -460,12 +524,14 @@ font-weight: 500;
     color: #000 !important;
     background-color: #ddd;
     border-radius: 7px;
-    width: 80px;
+    width: 100%;
     padding: 5px 0px 5px !important;
-    // border: 1px solid #ccc;
+  
     font-size: 17px;
     font-weight: 500;
     }
+
+
 .navbar-nav .nav-link {
         color: #333;
     }
@@ -483,3 +549,8 @@ font-weight: 500;
 h5, .h5 {
   font-size: 14px!important;
 }
+
+.footerlink{
+  color:#20a8d8;
+}
+

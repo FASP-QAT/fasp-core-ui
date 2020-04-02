@@ -87,7 +87,7 @@ export default class UpdateCountryComponent extends Component {
             country.label.label_en = event.target.value
         }
         if (event.target.name === "countryCode") {
-            country.countryCode = event.target.value
+            country.countryCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "currencyId") {
             country.currency.currencyId = event.target.value
@@ -104,6 +104,7 @@ export default class UpdateCountryComponent extends Component {
         )
 
     };
+
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -220,6 +221,7 @@ export default class UpdateCountryComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -279,7 +281,7 @@ export default class UpdateCountryComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='countryForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.country.country')}</Label>
+                                                        <Label for="label">{i18n.t('static.country.countryName')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
                                                         <Input type="text"

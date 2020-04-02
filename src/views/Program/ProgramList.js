@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from 'react-router-dom';
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import programDate from './ProgramData';
 import ProgramService from "../../api/ProgramService";
@@ -70,7 +70,7 @@ export default class ProgramList extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -100,7 +100,7 @@ export default class ProgramList extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -153,6 +153,7 @@ export default class ProgramList extends Component {
     // console.log(cell);
     event.stopPropagation();
     AuthenticationService.setupAxiosInterceptors();
+    console.log("cell------", cell);
     ProgramService.getProgramProductListByProgramId(cell)
       .then(response => {
 
@@ -176,7 +177,7 @@ export default class ProgramList extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -281,10 +282,10 @@ export default class ProgramList extends Component {
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
+            <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title="Add Program" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
               </div>
             </div>
           </CardHeader>

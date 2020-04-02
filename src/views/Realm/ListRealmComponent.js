@@ -4,7 +4,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
 
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import i18n from '../../i18n';
 
 import BootstrapTable from 'react-bootstrap-table-next';
@@ -43,7 +43,7 @@ export default class ReactListComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -62,7 +62,7 @@ export default class ReactListComponent extends Component {
     }
     editRealm(realm) {
         this.props.history.push({
-            pathname: "/realm/updateRealm/",
+            pathname: "/realm/updateRealm",
             state: { realm: realm }
         });
 
@@ -165,11 +165,11 @@ export default class ReactListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>Realm List
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Realm" onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

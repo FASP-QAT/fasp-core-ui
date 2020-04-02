@@ -25,7 +25,6 @@ const validationSchema = function (values) {
             .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
             .test('username', "New password should not be same as username ",
                 function (value) {
-                    console.log("values---", values.username);
                     if ((values.username != value)) {
                         return true;
                     }
@@ -98,13 +97,11 @@ class ResetPasswordComponent extends Component {
     componentDidMount() {
         UserService.confirmForgotPasswordToken(this.state.username, this.state.token)
             .then(response => {
-                console.log("response---", response);
                 this.setState({
                     message: response.data.messageCode
                 })
             }).catch(
                 error => {
-                    console.log("error---", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -118,7 +115,6 @@ class ResetPasswordComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -148,12 +144,10 @@ class ResetPasswordComponent extends Component {
                                         if (navigator.onLine) {
                                             UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
                                                 .then(response => {
-                                                    console.log("response---", response);
                                                     this.props.history.push(`/login`)
                                                 })
                                                 .catch(
                                                     error => {
-                                                        console.log("error---", error)
                                                         if (error.message === "Network Error") {
                                                             this.setState({ message: error.message });
                                                         } else {
@@ -167,7 +161,6 @@ class ResetPasswordComponent extends Component {
                                                                     break;
                                                                 default:
                                                                     this.setState({ message: 'static.unkownError' });
-                                                                    console.log("Error code unkown");
                                                                     break;
                                                             }
                                                         }

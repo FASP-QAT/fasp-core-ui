@@ -17,27 +17,27 @@ const initialValues = {
     roles: [],
     languageId: []
 }
-
+const entityname=i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
         username: Yup.string()
-            .min(6, `Username has to be at least 6 characters`)
-            .max(30, `Password could be max 30 characters`)
-            .matches(/^(?=.*[a-zA-Z]).*$/, 'Username must contain atleast 1 alphabet')
-            .matches(/^\S*$/, 'Username should not contain spaces')
-            .required('Please enter username'),
+            .min(6, i18n.t('static.user.valid6char'))
+            .max(30,i18n.t('static.user.validpasswordlength'))
+            .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
+            .matches(/^\S*$/, i18n.t('static.user.nospace'))
+            .required(i18n.t('static.user.validusername')),
         roleId: Yup.string()
-            .required('Please select role'),
+            .required(i18n.t('static.user.validrole')),
         languageId: Yup.string()
-            .required('Please select language'),
+            .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
-            .email('Invalid email address')
-            .required('Please enter email id'),
+            .email(i18n.t('static.user.invalidemail'))
+            .required(i18n.t('static.user.validemail')),
         phoneNumber: Yup.string()
-            .min(4, `Phone number has to be at least 6 characters`)
-            .max(15, `Phone number could be max 15 characters`)
-            .matches(/^[0-9]*$/, 'Only numbers allowed')
-            .required('Please enter phone number.')
+            .min(4, i18n.t('static.user.validphonemindigit'))
+            .max(15, i18n.t('static.user.validphonemaxdigit'))
+            .matches(/^[0-9]*$/, i18n.t('static.user.validnumber'))
+            .required(i18n.t('static.user.validphone'))
     })
 }
 
@@ -257,7 +257,7 @@ class AddUserComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.user.useraddtext')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -266,7 +266,7 @@ class AddUserComponent extends Component {
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/${response.data.messageCode}`)
+                                                this.props.history.push(`/user/listUser/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -312,11 +312,8 @@ class AddUserComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='userForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
-
-                                                            <Input
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Input
                                                                 type="select"
                                                                 name="realmId"
                                                                 id="realmId"
@@ -331,15 +328,11 @@ class AddUserComponent extends Component {
                                                                 <option value="0">{i18n.t('static.common.select')}</option>
                                                                 {realmList}
                                                             </Input>
-                                                        </InputGroupAddon>
                                                         <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-user"></i></InputGroupText>
-
-                                                            <Input type="text"
+                                                         <Input type="text"
                                                                 name="username"
                                                                 id="username"
                                                                 bsSize="sm"
@@ -349,15 +342,11 @@ class AddUserComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 required
                                                                 value={this.state.user.username}
-                                                            />
-                                                        </InputGroupAddon>
-                                                         <FormText className="red">{errors.username}</FormText>
+                                                            /><FormText className="red">{errors.username}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="emailId">{i18n.t('static.common.emailid')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-envelope-o"></i></InputGroupText>
-                                                        <Input type="text"
+                                                        <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
+                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"
@@ -368,13 +357,10 @@ class AddUserComponent extends Component {
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
-                                                        </InputGroupAddon>
                                                         <FormText className="red">{errors.emailId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="phoneNumber">{i18n.t('static.common.phoneNumber')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-phone"></i></InputGroupText>
+                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -385,15 +371,11 @@ class AddUserComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.user.phoneNumber}
-                                                        />
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.phoneNumber}</FormText>
+                                                        /><FormText className="red">{errors.phoneNumber}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="roleId">{i18n.t('static.role.rolename')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
-                                                        <Input
+                                                        <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
+                                                       <Input
                                                             type="select"
                                                             name="roleId"
                                                             id="roleId"
@@ -409,14 +391,11 @@ class AddUserComponent extends Component {
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
                                                         </Input>
-                                                        </InputGroupAddon>
                                                         <FormFeedback>{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
-                                                        <Input
+                                                     <Input
                                                             type="select"
                                                             name="languageId"
                                                             id="languageId"
@@ -431,8 +410,7 @@ class AddUserComponent extends Component {
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {languageList}
                                                         </Input>
-                                                        </InputGroupAddon>
-                                                        <FormFeedback>{errors.languageId}</FormFeedback>
+                                                         <FormFeedback>{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
@@ -452,10 +430,8 @@ class AddUserComponent extends Component {
         );
     }
     cancelClicked() {
-        const master = { 
-            name: 'User'
-        };
-        this.props.history.push(`/user/listUser/` + i18n.t('static.program.actioncancelled',{master}))
+        
+        this.props.history.push(`/user/listUser/` + i18n.t('static.message.cancelled',{entityname}))
     }
 }
 

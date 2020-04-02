@@ -1796,8 +1796,8 @@ class Program extends Component {
 
               </CardBody>
               <CardFooter>
-                <Button type="submit" size="sm" color="primary"><i className="fa fa-dot-circle-o"></i> Import</Button>
-                <Button className="ml-1" type="reset" size="sm" color="danger"><i className="fa fa-dot-circle-o"></i> Export</Button>
+                <Button type="submit" size="md" color="success"><i className="fa fa-dot-circle-o"></i> Import</Button>
+                <Button className="ml-1" type="reset" size="md" color="danger"><i className="fa fa-dot-circle-o"></i> Export</Button>
                 <button className="btn btn-outline-secondary float-right" type="file"><i className="fa fa-lightbulb-o"></i>&nbsp;Download</button>
               </CardFooter>
             </Card>

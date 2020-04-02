@@ -4,7 +4,7 @@ import CurrencyService from '../../api/CurrencyService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
+import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
 
@@ -60,7 +60,7 @@ export default class CurrencyListComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -183,11 +183,11 @@ export default class CurrencyListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>{i18n.t('static.currency.currencylist')}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Realm" onClick={this.addNewCurrency}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewCurrency}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
