@@ -615,7 +615,7 @@ export default class AddProgram extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                             onBlur={handleBlur}
                                                             type="select" name="realmId" id="realmId">
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realms}
                                                         </Input>
 
@@ -632,7 +632,7 @@ export default class AddProgram extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
                                                             onBlur={handleBlur}
                                                             type="select" name="realmCountryId" id="realmCountryId">
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {/* <option value="1">Country #1</option>
                                                         <option value="2">Country #2</option>
                                                         <option value="3">Country #3</option> */}
@@ -664,7 +664,7 @@ export default class AddProgram extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="select" name="organisationId" id="organisationId">
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmOrganisation}
                                                             {/* <option value="1">product #1</option>
                                                         <option value="2">product #2</option>
@@ -680,7 +680,7 @@ export default class AddProgram extends Component {
                                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur} type="select" name="healthAreaId" id="healthAreaId">
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmHealthArea}
                                                             {/* <option value="1">Health Area #1</option>
                                                         <option value="2">Health Area #2</option>

@@ -342,7 +342,7 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.programId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {programList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
@@ -364,7 +364,7 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.subFundingSourceId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {subFundingSourceList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
