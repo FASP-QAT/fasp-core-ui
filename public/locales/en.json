@@ -152,6 +152,7 @@
     "static.program.validairfreighttext": "Please enter air freight percentage",
     "static.dashboard.realmmaster": "Realm Masters",
     "static.dashboard.supplier": "Supplier",
+    "static.dashboard.manufacturer": "Manufacturer",
     "static.fundingsource.realm": "Realm",
     "static.common.active": "Active",
     "static.program.validhealthareatext": "Please select health area",
@@ -182,6 +183,7 @@
     "static.budget.budgetamountttext": "Please enter Budget amount",
     "static.product.productnametext": "Please enter product name",
     "static.manufaturer.manufaturertext": "Please enter Supplier",
+    "static.manufaturer.manufaturertext": "Please enter Manufacturer",
     "static.datasource.datasourcetext": "Please enter datasource name",
     "static.country.countryadd": "Add Country",
     "static.message.user.forgotPasswordTokenExpired": "Token expired",
@@ -430,6 +432,8 @@
     "static.unit.unitCode":"Unit Code",
     "static.dashboard.dimension":"Dimension",
     "static.dashboard.unit":"Unit",
-    "static.dashboard.realm":"Realm"
+    "static.dashboard.realm":"Realm",
+    "static.unit.unittext": "Please enter unit ",
+    "static.unit.unitcodetext":"Please enter unit code"
 }
 

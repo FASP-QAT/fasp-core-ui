@@ -234,7 +234,7 @@ class ListUserComponent extends Component {
                   return ( <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>   
                    )
                 }
-            }               
+            }
 ];
             const options = {
                 hidePageListOnlyOnePage: true,
