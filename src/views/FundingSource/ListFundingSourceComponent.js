@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody } from 'reactstrap';
+import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
@@ -10,30 +10,34 @@ import i18n from '../../i18n'
 
 import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import RealmService from '../../api/RealmService';
+import getLabelText from '../../CommonComponent/getLabelText';
 const entityname=i18n.t('static.fundingsource.fundingsource');
 class FundingSourceListComponent extends Component {
     constructor(props) {
         super(props);
-       /* this.options = {
-            sortIndicator: true,
-            hideSizePerPage: false,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                this.editFundingSource(row);
-            }.bind(this)
-
-        }*/
         this.state = {
+            realms: [],
             fundingSourceList: [],
             message: '',
             selSource: []
         }
         this.editFundingSource = this.editFundingSource.bind(this);
         this.addFundingSource = this.addFundingSource.bind(this);
+        this.filterData = this.filterData.bind(this);
+    }
+    filterData() {
+        let realmId = document.getElementById("realmId").value;
+        if (realmId != 0) {
+            const selSource = this.state.fundingSourceList.filter(c => c.realm.realmId == realmId)
+            this.setState({
+                selSource
+            });
+        } else {
+            this.setState({
+                selSource: this.state.fundingSourceList
+            });
+        }
     }
     editFundingSource(fundingSource) {
         this.props.history.push({
@@ -50,6 +54,36 @@ class FundingSourceListComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
+        .then(response => {
+            if (response.status == 200) {
+                this.setState({
+                    realms: response.data
+                })
+            } else {
+                this.setState({ message: response.data.messageCode })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            break;
+                    }
+                }
+            }
+        );
+
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -85,6 +119,16 @@ class FundingSourceListComponent extends Component {
 
     
     render() {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -156,6 +200,27 @@ class FundingSourceListComponent extends Component {
                         </div>
                     </CardHeader>
                     <CardBody>
+                    <Col md="3 pl-0">
+                            <FormGroup>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmMaster')}</Label>
+                                <div className="controls SelectGo">
+                                    <InputGroup>
+                                        <Input
+                                            type="select"
+                                            name="realmId"
+                                            id="realmId"
+                                            bsSize="sm"
+                                        >
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <InputGroupAddon addonType="append">
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </div>
+                            </FormGroup>
+                        </Col>
                     <ToolkitProvider
                             keyField="fundingSourceId"
                             data={this.state.selSource}

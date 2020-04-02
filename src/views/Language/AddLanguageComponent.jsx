@@ -61,6 +61,7 @@ class AddLanguageComponent extends Component {
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
 
     dataChange(event) {
@@ -77,10 +78,13 @@ class AddLanguageComponent extends Component {
             () => { });
     };
 
-    // Capitalize(str) {
-    //     this.setState({language: str.charAt(0).toUpperCase() + str.slice(1)});
-    // }
-
+    Capitalize(str) {
+        if (str != null && str != "") {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
     touchAll(setTouched, errors) {
         setTouched({
             languageName: true,
@@ -183,8 +187,8 @@ class AddLanguageComponent extends Component {
                                                             invalid={touched.languageName && !!errors.languageName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.languageName}
-                                                            required />
+                                                            value={this.Capitalize(this.state.langaugeName)}
+                                                      required />
                                                         <FormText className="red">{errors.languageName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>

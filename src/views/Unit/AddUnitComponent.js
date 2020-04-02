@@ -20,7 +20,8 @@ const initialValues = {
 const entityname = i18n.t('static.unit.unit');
 const validationSchema = function (values) {
     return Yup.object().shape({
-
+        dimensionId: Yup.string()
+        .required(i18n.t('static.unit.dimensiontext')),
         unitName: Yup.string()
             .required(i18n.t('static.unit.unittext')),
         unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
@@ -63,7 +64,7 @@ class AddUnitComponent extends Component {
             dimensions:[]
         }
 
-        // this.Capitalize = this.Capitalize.bind(this);
+         this.Capitalize = this.Capitalize.bind(this);
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -86,9 +87,13 @@ class AddUnitComponent extends Component {
             () => { });
     };
 
-    // Capitalize(str) {
-    //     this.setState({unit: str.charAt(0).toUpperCase() + str.slice(1)});
-    // }
+    Capitalize(str) {
+        if (str != null && str != "") {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -254,7 +259,8 @@ class AddUnitComponent extends Component {
                                                             invalid={touched.unitName && !!errors.unitName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.unitName}
+                                                            value={this.Capitalize(this.state.unit.label.label_en)}
+                                                      
                                                             required />
                                                         <FormText className="red">{errors.unitName}</FormText>
                                                     </FormGroup>

@@ -1,36 +1,23 @@
-import React, { Compoent, Component } from 'react';
-import DataSourceService from '../../api/DataSourceService';
-import AuthenticationService from '../Common/AuthenticationService.js';
-import { NavLink } from 'react-router-dom'
-import { Card, CardHeader, CardBody } from 'reactstrap';
+import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
-
-import data from '../Tables/DataTable/_data';
+import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
+import DataSourceService from '../../api/DataSourceService';
+import DataSourceTypeService from '../../api/DataSourceTypeService';
+import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+
 
 const entityname=i18n.t('static.datasource.datasource');
 export default class DataSourceListComponent extends Component {
 
     constructor(props) {
         super(props);
-       /* this.table = data.rows;
-        this.options = {
-            sortIndicator: true,
-            hideSizePerPage: true,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                this.editDataSource(row);
-            }.bind(this)
-
-        }*/
         this.state = {
+            dataSourceTypes:[],
             dataSourceList: [],
             message: '',
             selSource: []
@@ -38,10 +25,53 @@ export default class DataSourceListComponent extends Component {
         }
         this.editDataSource = this.editDataSource.bind(this);
         this.addNewDataSource = this.addNewDataSource.bind(this);
+        this.filterData = this.filterData.bind(this);
+    }
+
+    filterData() {
+        let dataSourceTypeId = document.getElementById("dataSourceTypeId").value;
+        if (dataSourceTypeId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.dataSourceTypeId == dataSourceTypeId)
+            this.setState({
+                selSource
+            });
+        } else {
+            this.setState({
+                selSource: this.state.dataSourceList
+            });
+        }
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        DataSourceTypeService.getDataSourceTypeList().then(response => {
+            console.log(response.data)
+             this.setState({
+                 dataSourceTypes: response.data,
+                 
+             })
+         })
+             .catch(
+                 error => {
+                     if (error.message === "Network Error") {
+                         this.setState({ message: error.message });
+                     } else {
+                         switch (error.response.status) {
+                             case 500:
+                             case 401:
+                             case 404:
+                             case 406:
+                             case 412:
+                                 this.setState({ message: error.response.data.messageCode });
+                                 break;
+                             default:
+                                 this.setState({ message: 'static.unkownError' });
+                                 break;
+                         }
+                     }
+                 }
+             );
+     
         DataSourceService.getAllDataSourceList().then(response => {
             this.setState({
                 dataSourceList: response.data,
@@ -89,6 +119,16 @@ export default class DataSourceListComponent extends Component {
     }
 
     render() {
+        const { dataSourceTypes } = this.state;
+        let dataSourceTypeList = dataSourceTypes.length > 0
+            && dataSourceTypes.map((item, i) => {
+                return (
+                    <option key={i} value={item.dataSourceTypeId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -167,6 +207,27 @@ export default class DataSourceListComponent extends Component {
 
                 </CardHeader>
                     <CardBody>
+                    <Col md="3 pl-0">
+                            <FormGroup>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
+                                <div className="controls SelectGo">
+                                    <InputGroup>
+                                        <Input
+                                            type="select"
+                                            name="dataSourceTypeId"
+                                            id="dataSourceTypeId"
+                                            bsSize="sm"
+                                        >
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {dataSourceTypeList}
+                                        </Input>
+                                        <InputGroupAddon addonType="append">
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </div>
+                            </FormGroup>
+                        </Col>
                     <ToolkitProvider
                             keyField="dataSourceId"
                             data={this.state.selSource}

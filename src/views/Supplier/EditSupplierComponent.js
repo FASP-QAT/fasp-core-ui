@@ -12,9 +12,10 @@ let initialValues = {
 }
 const entityname=i18n.t('static.supplier.supplier');
 const validationSchema = function (values) {
-    return Yup.object().shape({
+    return Yup.object().shape({realmId: Yup.string()
+        .required(i18n.t('static.fundingsource.errorrealm')),
         supplier: Yup.string()
-            .required(i18n.t('static.manufaturer.manufaturertext'))
+            .required(i18n.t('static.supplier.suppliertext'))
     })
 }
 
@@ -49,8 +50,15 @@ class EditSupplierComponent extends Component {
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
-
+    Capitalize(str) {
+        if (str != null && str != "") {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
     dataChange(event) {
         let { supplier } = this.state;
         if (event.target.name == "supplier") {
@@ -158,6 +166,7 @@ class EditSupplierComponent extends Component {
                                                                 value={this.state.supplier.realm.label.label_en}
                                                             >
                                                             </Input>
+                                                            <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
@@ -169,7 +178,7 @@ class EditSupplierComponent extends Component {
                                                                 invalid={touched.supplier && !!errors.supplier}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                value={this.state.supplier.label.label_en}
+                                                                value={this.Capitalize(this.state.supplier.label.label_en)}
                                                                 required />
                                                         <FormText className="red">{errors.supplier}</FormText>
                                                     </FormGroup>

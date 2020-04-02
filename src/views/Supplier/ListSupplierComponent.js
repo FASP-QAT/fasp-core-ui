@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody } from 'reactstrap';
+import { Card, CardHeader, CardBody , FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col} from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
@@ -9,18 +9,22 @@ import i18n from '../../i18n'
 
 import SupplierService from "../../api/SupplierService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import RealmService from '../../api/RealmService';
+import getLabelText from '../../CommonComponent/getLabelText';
 const entityname=i18n.t('static.supplier.supplier');
 class SupplierListComponent extends Component {
     constructor(props) {
         super(props);
        
         this.state = {
+            realms: [],
             supplierList: [],
             message: '',
             selSource: []
         }
         this.editSupplier = this.editSupplier.bind(this);
         this.addSupplier = this.addSupplier.bind(this);
+        this.filterData = this.filterData.bind(this);
     }
     editSupplier(supplier) {
         this.props.history.push({
@@ -33,9 +37,52 @@ class SupplierListComponent extends Component {
             pathname: "/supplier/addSupplier"
         });
     }
+    filterData() {
+        let realmId = document.getElementById("realmId").value;
+        if (realmId != 0) {
+            const selSource = this.state.supplierList.filter(c => c.realm.realmId == realmId)
+            this.setState({
+                selSource
+            });
+        } else {
+            this.setState({
+                selSource: this.state.supplierList
+            });
+        }
+    }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
+        .then(response => {
+            if (response.status == 200) {
+                this.setState({
+                    realms: response.data
+                })
+            } else {
+                this.setState({ message: response.data.messageCode })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            break;
+                    }
+                }
+            }
+        );
+
         SupplierService.getSupplierListAll()
             .then(response => {
                 console.log(response.data)
@@ -68,6 +115,16 @@ class SupplierListComponent extends Component {
 
    
     render() {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -140,6 +197,27 @@ class SupplierListComponent extends Component {
                         </div>
                     </CardHeader>
                     <CardBody>
+                    <Col md="3 pl-0">
+                            <FormGroup>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmMaster')}</Label>
+                                <div className="controls SelectGo">
+                                    <InputGroup>
+                                        <Input
+                                            type="select"
+                                            name="realmId"
+                                            id="realmId"
+                                            bsSize="sm"
+                                        >
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <InputGroupAddon addonType="append">
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </div>
+                            </FormGroup>
+                        </Col>
                     <ToolkitProvider
                             keyField="supplierId"
                             data={this.state.selSource}

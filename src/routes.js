@@ -1,5 +1,5 @@
 import React from 'react';
-import i18n from './i18n'
+import i18n from './i18n';
 
 const AddDimension = React.lazy(() => import('./views/Dimension/AddDimensionComponent'));
 const DimensionList = React.lazy(() => import('./views/Dimension/DimensionListComponent'));
@@ -149,84 +149,134 @@ const SupplyPlan = React.lazy(() => import('./views/SupplyPlan/SupplyPlanCompone
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/programTree', name: 'Program', component: ProgramTree },
-  { path: '/diamension/AddDiamension', name: 'Dimension / Add Dimension', component: AddDimension },
-  { path: '/diamension/diamensionlist', exact: true, name: 'Dimension / Dimension List', component: DimensionList },
+  { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
+  { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.dimension.dimension')}), component: AddDimension },
+  { path: '/diamension/diamensionlist', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.dimension.dimension')}), component: DimensionList },
   { path: '/diamension/diamensionlist/:message', component: DimensionList },
-  { path: '/diamension/editDiamension', name: 'Dimension / Edit Dimension', component: EditDimension },
-  { path: '/realm/addrealm', name: ' Realm / Add Realm', component: AddRealm },
-  { path: '/realm/realmlist', exact: true, name: 'Realm / Realm List', component: RealmList },
-  { path: '/realm/updaterealm', name: 'Realm / Edit Realm', component: EditRealm },
+  { path: '/diamension/editDiamension', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.dimension.dimension')}), component: EditDimension },
+
+  { path: '/realm/addrealm', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.realm.realm')}), component: AddRealm },
+  { path: '/realm/realmlist', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.realm.realm')}), component: RealmList },
+  { path: '/realm/updaterealm', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.realm.realm')}), component: EditRealm },
   { path: '/realm/realmlist/:message', component: RealmList },
 
+  { path: '/product/editProduct/:productId', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.product.product')}), component: EditProdct },
+  { path: '/product/listProduct', exact: true, name:i18n.t('static.breadcrum.list',{entityname:i18n.t('static.product.product')}), component: ListProdct },
+  { path: '/product/listProduct/:message', name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.product.product')}), component: ListProdct },
+  { path: '/product/addProduct', name:i18n.t('static.breadcrum.add',{entityname:i18n.t('static.product.product')}), component: AddProduct },
 
-
-
-  { path: '/product/editProduct/:productId', name: i18n.t('static.product.productedit'), component: EditProdct },
-  { path: '/product/listProduct', exact: true, name: i18n.t('static.product.productlist'), component: ListProdct },
-  { path: '/product/listProduct/:message', name: i18n.t('static.product.productlist'), component: ListProdct },
-  { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
-
-  { path: '/program/addProgram', name: 'Program / Add Program', component: AddProgram },
-  { path: '/program/listProgram', exact: true, name: 'Program / Program List', component: Programs },
+  { path: '/program/addProgram', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.program.program')}), component: AddProgram },
+  { path: '/program/listProgram', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.program.program')}), component: Programs },
   { path: '/program/listProgram/:message', component: Programs },
-  { path: '/program/editProgram/:programId', name: 'Program / Edit Program', component: EditProgram },
+  { path: '/program/editProgram/:programId', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.program.program')}), component: EditProgram },
   
-  { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
-  { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
+  { path: '/productCategory/addProductCategory', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.productcategory.productcategory')}), component: AddProductCategory },
+  { path: '/programProduct/addProgramProduct', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.programproduct.programproduct')}), component: AddProgramProduct },
 
-  { path: '/budget/addBudget', name: 'Budget / Add Budget', component: AddBudgetComponent },
-  { path: '/budget/listBudget', exact: true, name: 'Budget / Budget List', component: ListBudgetComponent },
-  { path: '/budget/editBudget/', name: 'Budget / Edit Budget', component: EditBudgetComponent },
+  { path: '/budget/addBudget', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.budget.budget')}), component: AddBudgetComponent },
+  { path: '/budget/listBudget', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.budget.budget')}), component: ListBudgetComponent },
+  { path: '/budget/editBudget/', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.budget.budget')}), component: EditBudgetComponent },
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
   
-  
-  { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
-  { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
-  { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },
+  { path: '/fundingSource/addFundingSource', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.fundingsource.fundingsource')}), component: AddFundingSource },
+  { path: '/fundingSource/listFundingSource', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.fundingsource.fundingsource')}), component: ListFundingSource },
+  { path: '/fundingSource/editFundingSource', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.fundingsource.fundingsource')}), component: EditFundingSource },
   { path: '/fundingSource/listFundingSource/:message', component: ListFundingSource },
   
-  { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
-  { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
-  { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
+  { path: '/subFundingSource/addSubFundingSource', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.subfundingsource.subfundingsource')}), component: AddSubFundingSource },
+  { path: '/subFundingSource/listSubFundingSource', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.subfundingsource.subfundingsource')}), component: ListSubFundingSource },
+  { path: '/subFundingSource/editSubFundingSource', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.subfundingsource.subfundingsource')}), component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   
-  { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
-  { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
-  { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
-  { path: '/dashboard', exact: true, name: 'Dashboard', component: Dashboard },
+  { path: '/ApplicationDashboard', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+  { path: '/RealmDashboard', name:i18n.t('static.dashboard.realmdashboard') , component: RealmDashboard },
+  { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
+  { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },
+ 
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/subFundingSource/listSubFundingSource/:message', component: ListSubFundingSource },
-  { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
-  { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'Procurement Agent / Procurement Agent List', component: ListProcurementAgent },
+ 
+  { path: '/procurementAgent/addProcurementAgent', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.dashboard.procurementagent')}), component: AddProcurementAgent },
+  { path: '/procurementAgent/listProcurementAgent', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.dashboard.procurementagent')}), component: ListProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
-  { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
-  { path: '/tracerCategory/addTracerCategory', name: 'Tracer Category / Add Tracer Category', component: AddTracerCategory },
-  { path: '/tracerCategory/listTracerCategory', exact: true, name: 'Tracer Category / Tracer Category List', component: ListTracerCategory },
+  { path: '/procurementAgent/editProcurementAgent', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.dashboard.procurementagent')}), component: EditProcurementAgent },
+ 
+  { path: '/tracerCategory/addTracerCategory', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.tracercategory.tracercategory')}), component: AddTracerCategory },
+  { path: '/tracerCategory/listTracerCategory', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.tracercategory.tracercategory')}), component: ListTracerCategory },
   { path: '/tracerCategory/listTracerCategory/:message', component: ListTracerCategory },
-  { path: '/tracerCategory/editTracerCategory', name: 'Tracer Category / Edit Tracer Category', component: EditTracerCategory },
-   { path: '/supplier/addSupplier', name: 'Supplier / Add Supplier', component: AddSupplier },
-  { path: '/supplier/listSupplier', exact: true, name: 'Supplier / Supplier List', component: ListSupplier },
-  { path: '/supplier/editSupplier', name: 'Supplier / Edit Supplier', component: EditSupplier },
+  { path: '/tracerCategory/editTracerCategory', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.tracercategory.tracercategory')}), component: EditTracerCategory },
+  
+  { path: '/supplier/addSupplier', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.supplier.supplier')}), component: AddSupplier },
+  { path: '/supplier/listSupplier', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.supplier.supplier')}), component: ListSupplier },
+  { path: '/supplier/editSupplier', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.supplier.supplier')}), component: EditSupplier },
   { path: '/supplier/listSupplier/:message', component: ListSupplier },
-  { path: '/region/addRegion', name: 'Region / Add Region', component: AddRegion },
-  { path: '/region/listRegion', exact: true, name: 'Region / Region List', component: ListRegion },
-  { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
+  
+  { path: '/region/addRegion', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.region.region')}), component: AddRegion },
+  { path: '/region/listRegion', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.region.region')}), component: ListRegion },
+  { path: '/region/editRegion', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.region.region')}), component: EditRegion },
   { path: '/region/listRegion/:message', component: ListRegion },
+  
   { path: '/realmCountry/listRealmCountry/:message', component: ListRealmCountry },
-  { path: '/realmCountry/listRealmCountry', exact: true, name: 'Realm Country / Realm Country List', component: ListRealmCountry },
-  { path: '/realmCountry/addRealmCountry', exact: true, name: 'Realm Country / Add Realm Country', component: AddRealmCountry },
-  { path: '/changePassword', exact: true, name: 'Change password', component: ChangePassword },
+  { path: '/realmCountry/listRealmCountry', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.realmcountry.realmcountry')}), component: ListRealmCountry },
+  { path: '/realmCountry/addRealmCountry', exact: true, name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.realmcountry.realmcountry')}), component: AddRealmCountry },
+ 
+  { path: '/changePassword', exact: true, name: i18n.t('static.dashboard.changepassword'), component: ChangePassword },
+ 
   { path: '/role/listRole/:message', component: ListRole },
-  { path: '/role/listRole', exact: true, name: 'Role / Role List', component: ListRole },
-  { path: '/role/addRole', exact: true, name: 'Role / Add Role', component: AddRole },
-  { path: '/role/editRole', exact: true, name: 'Role / Edit Role', component: EditRole },
+  { path: '/role/listRole', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.role.role')}), component: ListRole },
+  { path: '/role/addRole', exact: true, name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.role.role')}), component: AddRole },
+  { path: '/role/editRole', exact: true, name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.role.role')}), component: EditRole },
+ 
   { path: '/user/listUser/:message', component: ListUser },
-  { path: '/user/listUser', exact: true, name: 'User / User List', component: ListUser },
-  { path: '/user/addUser', exact: true, name: 'User / Add User', component: AddUser },
-  { path: '/user/editUser', exact: true, name: 'User / Edit User', component: EditUser },
-  { path: '/user/accessControl', exact: true, name: 'User / Access Control', component: AccessControl },
+  { path: '/user/listUser', exact: true, name:i18n.t('static.breadcrum.list',{entityname:i18n.t('static.user.user')}), component: ListUser },
+  { path: '/user/addUser', exact: true, name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.user.user')}), component: AddUser },
+  { path: '/user/editUser', exact: true, name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.supplier.edit')}), component: EditUser },
+  { path: '/user/accessControl', exact: true, name:i18n.t('static.dashboard.useraccessctrl'), component: AccessControl },
+ 
   { path: '/dashboard/:message', component: Dashboard },
+ 
+  { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: DownloadProgram },
+  { path: '/program/downloadProgram/:message', component: DownloadProgram },
+  { path: '/program/exportProgram', name: i18n.t('static.dashboard.exportprogram'), component: ExportProgram },
+  { path: '/program/importProgram', name: i18n.t('static.dashboard.importprogram'), component: ImportProgram },
+ 
+  { path: '/masterDataSync', name: i18n.t('static.dashboard.masterdatasync'), component: MasterDataSync },
+ 
+  { path: '/consumptionDetails', name: i18n.t('static.dashboard.consumptiondata'), component: ConsumptionDetails },
+ 
+  { path: '/language/addLanguage', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.dashboard.language')}), component: AddLanguage },
+  { path: '/language/listLanguage', exact: true, name:i18n.t('static.breadcrum.list',{entityname:i18n.t('static.dashboard.language')}), component: ListLanguage },
+  { path: '/language/listLanguage/:message', component: ListLanguage },
+  { path: '/language/editLanguage', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.dashboard.language')}), component: EditLanguage },
+ 
+  { path: '/unit/addUnit', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.unit.unit')}), component: AddUnit },
+  { path: '/unit/listUnit', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.unit.unit')}), component: ListUnit },
+  { path: '/unit/listUnit/:message', component: ListUnit },
+  { path: '/unit/editUnit', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.unit.unit')}), component: EditUnit },
+
+  { path: '/country/addCountry', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.dashboard.country')}), component: AddCountry },
+  { path: '/country/listCountry', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.dashboard.country')}), component: ListCountry },
+  { path: '/country/listCountry/:message', component: ListCountry },
+  { path: '/country/editCountry', name:i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.dashboard.country')}), component: EditCountry },
+
+  { path: '/dataSourceType/addDataSourceType', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.datasourcetype.datasourcetype')}), component: AddDataSourceType },
+  { path: '/dataSourceType/listDataSourceType', exact: true, name:i18n.t('static.breadcrum.list',{entityname:i18n.t('static.datasourcetype.datasourcetype')}), component: ListDataSourceType },
+  { path: '/dataSourceType/listDataSourceType/:message', component: ListDataSourceType },
+  { path: '/dataSourceType/editDataSourceType', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.datasourcetype.datasourcetype')}), component: EditDataSourceType },
+
+  { path: '/dataSource/addDataSource', name:i18n.t('static.breadcrum.add',{entityname:i18n.t('static.datasource.datasource')}), component: AddDataSource },
+  { path: '/dataSource/listDataSource', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.datasource.datasource')}), component: ListDataSource },
+  { path: '/dataSource/listDataSource/:message', component: ListDataSource },
+  { path: '/dataSource/editDataSource', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.datasource.datasource')}), component: EditDataSource },
+
+  { path: '/currency/addCurrency', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.currency.currency')}), component: AddCurrency },
+  { path: '/currency/listCurrency', exact: true, name:i18n.t('static.breadcrum.list',{entityname:i18n.t('static.currency.currency')}), component: ListCurrency },
+  { path: '/currency/listCurrency/:message', component: ListCurrency },
+  { path: '/currency/editCurrency', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.currency.currency')}), component: EditCurrency },
+  
+  { path: '/translations/databaseTranslations', name: i18n.t('static.label.databasetranslations'), component: DatabaseTranslation },
+  { path: '/translations/labelTranslations', name: i18n.t('static.label.labeltranslation'), component: LabelTranslation },
+
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
@@ -289,43 +339,6 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
-  { path: '/program/downloadProgram', name: 'Download Program', component: DownloadProgram },
-  { path: '/program/downloadProgram/:message', component: DownloadProgram },
-  { path: '/program/exportProgram', name: 'Export Program', component: ExportProgram },
-  { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
-  { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
-  { path: '/consumptionDetails', name: 'Consumption Data', component: ConsumptionDetails },
-  { path: '/language/addLanguage', name: 'Language / Add Language', component: AddLanguage },
-  { path: '/language/listLanguage', exact: true, name: 'Language / Language List', component: ListLanguage },
-  { path: '/language/listLanguage/:message', component: ListLanguage },
-  { path: '/language/editLanguage', name: 'Language / Edit Language', component: EditUnit },
-  { path: '/unit/addUnit', name: 'Unit / Add Unit', component: AddUnit },
-  { path: '/unit/listUnit', exact: true, name: 'Unit / Unit List', component: ListUnit },
-  { path: '/unit/listUnit/:message', component: ListUnit },
-  { path: '/unit/editUnit', name: 'Unit / Edit Unit', component: EditUnit },
-
-  { path: '/country/addCountry', name: 'Country / Add Country', component: AddCountry },
-  { path: '/country/listCountry', exact: true, name: 'Country / Country List', component: ListCountry },
-  { path: '/country/listCountry/:message', component: ListCountry },
-  { path: '/country/editCountry', name: 'Country / Edit Country', component: EditCountry },
-
-  { path: '/dataSourceType/addDataSourceType', name: 'DataSource Type / Add DataSource Type', component: AddDataSourceType },
-  { path: '/dataSourceType/listDataSourceType', exact: true, name: 'DataSource Type / DataSource Type List', component: ListDataSourceType },
-  { path: '/dataSourceType/listDataSourceType/:message', component: ListDataSourceType },
-  { path: '/dataSourceType/editDataSourceType', name: 'DataSource Type / Edit DataSource Type', component: EditDataSourceType },
-
-  { path: '/dataSource/addDataSource', name: 'DataSource / Add DataSource', component: AddDataSource },
-  { path: '/dataSource/listDataSource', exact: true, name: 'DataSource / DataSource List', component: ListDataSource },
-  { path: '/dataSource/listDataSource/:message', component: ListDataSource },
-  { path: '/dataSource/editDataSource', name: 'DataSource / Edit DataSource', component: EditDataSource },
-
-  { path: '/currency/addCurrency', name: 'Currency / Add Currency', component: AddCurrency },
-  { path: '/currency/listCurrency', exact: true, name: 'Currency / Currency List', component: ListCurrency },
-  { path: '/currency/listCurrency/:message', component: ListCurrency },
-  { path: '/currency/editCurrency', name: 'Currency / Edit Currency', component: EditCurrency },
-  { path: '/translations/databaseTranslations', name: 'Database Translations', component: DatabaseTranslation },
-  { path: '/translations/labelTranslations', name: 'Label Translations', component: LabelTranslation },
   { path: '/supplyPlan', name: 'Supply plan / Supply plan', component: SupplyPlan },
 ];
-
 export default routes;

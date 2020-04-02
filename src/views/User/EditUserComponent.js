@@ -329,7 +329,7 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.realm.realmId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input> <FormText className="red">{errors.realmId}</FormText>
                                                     </FormGroup>
@@ -410,7 +410,7 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.language.languageId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageList}
                                                         </Input> <FormText className="red">{errors.languageId}</FormText>
                                                     </FormGroup>

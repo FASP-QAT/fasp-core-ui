@@ -16,7 +16,7 @@
     "static.common.dashboard": "Dashboard",
     "static.program.realmcountry": "Country",
     "static.realmcountry.validrealm": "Please select realm",
-    "static.program.program": "Program Name",
+    "static.program.program": "Program",
     "static.message.user.usernameExists": "Username already exists",
     "static.budget.budgetstartdate": "Start Date of Budget",
     "static.dashboard.product": "Product",
@@ -451,4 +451,14 @@
     "static.common.retry":"Retry",
     "static.masterDataSync.success":"Master data synced successfully.",
     "static.masterDataSync.syncFailed":"Master data synced failed. Please try again."
+    "static.breadcrum.add":"{{entityname}} / Add {{entityname}}",
+    "static.breadcrum.edit":"{{entityname}} / Update {{entityname}}",
+    "static.breadcrum.list":"{{entityname}} / {{entityname}} List",
+    "static.dashboard.changepassword":"Change Password",
+    "static.dashboard.useraccessctrl":"User / Access Control",
+    "static.productcategory.productcategory": "Product Category",
+    "static.programproduct.programproduct":"Program Product",
+    "static.unit.dimensiontext":"Please select dimension"
+    
 }
+

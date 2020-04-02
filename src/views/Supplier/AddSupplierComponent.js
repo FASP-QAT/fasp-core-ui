@@ -218,7 +218,7 @@ class AddSupplierComponent extends Component {
                                 required
                                 value={this.state.realmId}
                               >
-                                <option value="0">{i18n.t('static.common.select')}</option>
+                                <option value="">{i18n.t('static.common.select')}</option>
                                 {realmList}
                               </Input>
                                <FormText className="red">{errors.realmId}</FormText>
