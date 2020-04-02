@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css';
@@ -189,7 +189,7 @@ class AddLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.Capitalize(this.state.langaugeName)}
                                                       required />
-                                                        <FormText className="red">{errors.languageName}</FormText>
+                                                        <FormFeedback className="red">{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
@@ -203,7 +203,7 @@ class AddLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.languageCode}
                                                             required />
-                                                        <FormText className="red">{errors.languageCode}</FormText>
+                                                        <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, FormText, Label, Button, Col
+    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
 } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';

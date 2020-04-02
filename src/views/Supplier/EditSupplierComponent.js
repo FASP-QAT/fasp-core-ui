@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText, FormText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText, FormFeedback } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -166,7 +166,7 @@ class EditSupplierComponent extends Component {
                                                                 value={this.state.supplier.realm.label.label_en}
                                                             >
                                                             </Input>
-                                                            <FormText className="red">{errors.realmId}</FormText>
+                                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
@@ -180,7 +180,7 @@ class EditSupplierComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.Capitalize(this.state.supplier.label.label_en)}
                                                                 required />
-                                                        <FormText className="red">{errors.supplier}</FormText>
+                                                        <FormFeedback className="red">{errors.supplier}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>

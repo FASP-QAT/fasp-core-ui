@@ -1,7 +1,7 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
 import 'react-select/dist/react-select.min.css';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
 import DimensionService from '../../api/DimensionService';
 import UnitService from '../../api/UnitService.js';
@@ -262,7 +262,7 @@ class AddUnitComponent extends Component {
                                                             value={this.Capitalize(this.state.unit.label.label_en)}
                                                       
                                                             required />
-                                                        <FormText className="red">{errors.unitName}</FormText>
+                                                        <FormFeedback className="red">{errors.unitName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
@@ -276,7 +276,7 @@ class AddUnitComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.unitCode}
                                                             required />
-                                                        <FormText className="red">{errors.unitCode}</FormText>
+                                                        <FormFeedback className="red">{errors.unitCode}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

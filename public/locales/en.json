@@ -450,7 +450,7 @@
     "static.masterDataSync.masters":"masters",
     "static.common.retry":"Retry",
     "static.masterDataSync.success":"Master data synced successfully.",
-    "static.masterDataSync.syncFailed":"Master data synced failed. Please try again."
+    "static.masterDataSync.syncFailed":"Master data synced failed. Please try again.",
     "static.breadcrum.add":"{{entityname}} / Add {{entityname}}",
     "static.breadcrum.edit":"{{entityname}} / Update {{entityname}}",
     "static.breadcrum.list":"{{entityname}} / {{entityname}} List",
@@ -458,7 +458,8 @@
     "static.dashboard.useraccessctrl":"User / Access Control",
     "static.productcategory.productcategory": "Product Category",
     "static.programproduct.programproduct":"Program Product",
-    "static.unit.dimensiontext":"Please select dimension"
-    
+    "static.unit.dimensiontext":"Please select dimension",
+    "static.supplyplan.supplyplan":"Supply plan / Supply plan" ,
+    "static.dashboard.masterdatasync":"Master Data Sync"  
 }
 
