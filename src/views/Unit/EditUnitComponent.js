@@ -1,20 +1,25 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import SubFundingSourceService from "../../api/SubFundingSourceService";
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, FormFeedback,InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+// import * as myConst from '../../Labels.js';
+import UnitService from '../../api/UnitService.js';
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
+import '../Forms/ValidationForms/ValidationForms.css';
+import getLabelText from '../../CommonComponent/getLabelText.js';
 
 let initialValues = {
-    subFundingSource: ""
+    unit: ""
 }
-const entityname=i18n.t('static.subfundingsource.subfundingsource');
+const entityname=i18n.t('static.unit.unit');
 const validationSchema = function (values) {
     return Yup.object().shape({
-        subFundingSource: Yup.string()
-        .required( i18n.t('static.fundingsource.validsubfundingsource'))
+
+        unit: Yup.string()
+            .required(i18n.t('static.unit.unittext')),
+        unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
+
     })
 }
 
@@ -40,18 +45,21 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-class EditSubFundingSourceComponent extends Component {
+export default class EditUnitComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subFundingSource: this.props.location.state.subFundingSource,
+            unit: this.props.location.state.unit,
             message: ''
         }
-        this.cancelClicked = this.cancelClicked.bind(this);
+
+        // this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
     Capitalize(str) {
+        console.log("capitalize");
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
@@ -60,28 +68,33 @@ class EditSubFundingSourceComponent extends Component {
     }
 
     dataChange(event) {
-        let { subFundingSource } = this.state;
-        if (event.target.name == "subFundingSource") {
-            subFundingSource.label.label_en = event.target.value;
+        let { unit } = this.state
+        if (event.target.name === "unitName") {
+            unit.unitName = event.target.value
+        } else if (event.target.name === "unitCode") {
+            unit.unitCode = event.target.value
+        } else if (event.target.name === "active") {
+            unit.active = event.target.id === "active2" ? false : true
         }
-        if (event.target.name == "active") {
-            subFundingSource.active = event.target.id === "active2" ? false : true;
-        }
-        this.setState({
-            subFundingSource
-        },
-            () => { });
+
+        this.setState(
+            {
+                unit
+            },
+            () => { }
+        );
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            subFundingSource: true
+            unitName: true,
+            unitCode: true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('subFundingSourceForm', (fieldName) => {
+        this.findFirstError('unitForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -94,39 +107,48 @@ class EditSubFundingSourceComponent extends Component {
             }
         }
     }
+    componentDidMount() {
+
+    }
+
+    // Capitalize(str) {
+    //     let { unit } = this.state
+    //     unit.unitName = str.charAt(0).toUpperCase() + str.slice(1)
+    // }
 
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceedittext')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ subFundingSource: this.state.subFundingSource.label.label_en }}
+                                initialValues={{ unit: this.state.unit }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
-                                    SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
-                                        .then(response => {
-                                            if (response.status == 200) {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
-                                                } else {
-                                                this.setState({
-                                                    message: response.data.messageCode
-                                                })
-                                            }
-                                        })
+                                    UnitService.updateUnit(this.state.unit).then(response => {
+                                        console.log(response)
+                                        if (response.status == 200) {
+                                            this.props.history.push(`/unit/listUnit/`+i18n.t(response.data.messageCode,{entityname}))
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            })
+                                        }
+
+                                    }
+                                    )
                                         .catch(
                                             error => {
                                                 if (error.message === "Network Error") {
                                                     this.setState({ message: error.message });
                                                 } else {
-                                                    switch (error.response ? error.response.status : "") {
+                                                    switch (error.response.status) {
                                                         case 500:
                                                         case 401:
                                                         case 404:
@@ -140,7 +162,8 @@ class EditSubFundingSourceComponent extends Component {
                                                     }
                                                 }
                                             }
-                                        );
+                                        )
+
                                 }}
                                 render={
                                     ({
@@ -154,36 +177,61 @@ class EditSubFundingSourceComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='unitForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="fundingSourceId"
-                                                            id="fundingSourceId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={this.state.subFundingSource.fundingSource.label.label_en}
-                                                        >
-                                                        </Input>
+                                                <FormGroup>
+                                                        <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}</Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                            <Input
+                                                                type="text"
+                                                                bsSize="sm"
+                                                                name="dimensionId"
+                                                                id="dimensionId"
+                                                                valid={!errors.dimensionId}
+                                                                invalid={touched.dimensionId && !!errors.dimensionId}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                readOnly={true}
+                                                                value={getLabelText(this.state.unit.dimension.label,this.state.lang)}
+                                                                >
+                                                               
+                                                            </Input>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
                                                     </FormGroup>
+                                                  
                                                     <FormGroup>
-                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
+                                                        <Label for="unitName">{i18n.t('static.unit.unit')}</Label>
                                                         <Input type="text"
-                                                            name="subFundingSource"
-                                                            id="subFundingSource"
+                                                            name="unitName"
+                                                            id="unitName"
                                                             bsSize="sm"
-                                                            valid={!errors.subFundingSource}
-                                                            invalid={touched.subFundingSource && !!errors.subFundingSource}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            valid={!errors.unitName}
+                                                            invalid={touched.unitName && !!errors.unitName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.subFundingSource.label.label_en)}
+                                                            value={this.Capitalize(getLabelText(this.state.unit.label,this.state.lang))}
                                                             required />
-                                                        <FormFeedback>{errors.subFundingSource}</FormFeedback>
+                                                        <FormText className="red">{errors.unitName}</FormText>
+                                                    </FormGroup>
+                                                <FormGroup>
+                                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
+                                                         <Input type="text"
+                                                            name="unitCode"
+                                                            id="unitCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.unitCode}
+                                                            invalid={touched.unitCode && !!errors.unitCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.unit.unitCode}
+                                                             />
+                                                              <FormText className="red">{errors.unitCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label>{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -191,7 +239,7 @@ class EditSubFundingSourceComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.subFundingSource.active === true}
+                                                                checked={this.state.unit.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -207,7 +255,7 @@ class EditSubFundingSourceComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.subFundingSource.active === false}
+                                                                checked={this.state.unit.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -220,24 +268,26 @@ class EditSubFundingSourceComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
 
                                         )} />
-
                         </Card>
                     </Col>
                 </Row>
+                <div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}));
+        this.props.history.push(`/unit/listUnit/` +i18n.t('static.message.cancelled',{entityname}))
     }
-}
 
-export default EditSubFundingSourceComponent;
+}

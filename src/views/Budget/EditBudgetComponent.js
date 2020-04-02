@@ -55,7 +55,6 @@ const getErrorsFromValidationError = (validationError) => {
 
 class EditBudgetComponent extends Component {
     constructor(props) {
-        console.log("in constructor-----------------");
         super(props);
         this.state = {
             budget: this.props.location.state.budget,
@@ -170,7 +169,6 @@ class EditBudgetComponent extends Component {
     }
 
     render() {
-        console.log("in outer render----->");
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message)}</h5>
@@ -211,7 +209,6 @@ class EditBudgetComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -294,6 +291,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
 
                                                         <Input type="number"
+                                                            min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
@@ -312,7 +310,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
                                                         <Input
-
+                                                            className="fa fa-calendar Fa-right"
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -332,7 +330,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
                                                         <Input
-
+                                                            className="fa fa-calendar Fa-right"
                                                             name="stopDate"
                                                             id="stopDate"
                                                             bsSize="sm"

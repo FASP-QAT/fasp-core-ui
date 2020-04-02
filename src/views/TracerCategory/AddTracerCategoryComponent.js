@@ -1,26 +1,30 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText,InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormFeedback, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-import i18n from '../../i18n'
-import UserService from "../../api/UserService";
+
+import RealmService from "../../api/RealmService";
+import TracerCategoryService from "../../api/TracerCategoryService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import i18n from '../../i18n';
+
+import getLabelText from '../../CommonComponent/getLabelText';
+const entityname = i18n.t('static.tracercategory.tracercategory');
 
 const initialValues = {
-    roleName: "",
-    businessFunctions: [],
-    canCreateRole: []
+    realmId: [],
+    tracerCategoryCode: "",
+    tracerCategoryName: "",
+    submittedToApprovedLeadTime: ""
 }
-const entityname=i18n.t('static.role.role');
+
 const validationSchema = function (values) {
     return Yup.object().shape({
-        roleName: Yup.string()
-            .required(i18n.t('static.role.roletext')),
-        businessFunctions: Yup.string()
-            .required(i18n.t('static.role.businessfunctiontext')),
-        canCreateRole: Yup.string()
-            .required(i18n.t('static.role.cancreateroletext'))
+        realmId: Yup.string()
+            .required(i18n.t('static.tracercategory.realmtext')),
+       tracerCategoryName: Yup.string()
+            .required(i18n.t('static.tracerCategory.tracercategorytext'))
     })
 }
 
@@ -45,20 +49,20 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-class AddRoleComponent extends Component {
+class AddTracerCategoryComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            businessFunctions: [],
-            roles: [],
-            role: {
-                businessFunctions: [],
-                canCreateRole: [],
+            realms: [],
+            tracerCategory: {
+                realm: {
+                },
                 label: {
 
                 }
             },
-            message: ''
+            message: '',
+            lang: localStorage.getItem('lang')
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -75,33 +79,35 @@ class AddRoleComponent extends Component {
 
 
     dataChange(event) {
-        let { role } = this.state;
-        if (event.target.name == "roleName") {
-            role.label.label_en = event.target.value;
+        let { tracerCategory } = this.state;
+        if (event.target.name == "realmId") {
+            tracerCategory.realm.realmId = event.target.value;
         }
-        if (event.target.name == "businessFunctions") {
-            role.businessFunctions = Array.from(event.target.selectedOptions, (item) => item.value);
+       
+        if (event.target.name == "tracerCategoryName") {
+            tracerCategory.label.label_en = event.target.value;
         }
-        if (event.target.name == "canCreateRole") {
-            role.canCreateRole = Array.from(event.target.selectedOptions, (item) => item.value);
-        }
+       
+
+
         this.setState({
-            role
+            tracerCategory
         },
             () => { });
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            roleName: true,
-            businessFunctions: true,
-            canCreateRole: true
+            realmId: true,
+            tracerCategoryCode: true,
+            tracerCategoryName: true,
+            submittedToApprovedLeadTime: true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('roleForm', (fieldName) => {
+        this.findFirstError('tracerCategoryForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -117,36 +123,17 @@ class AddRoleComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        UserService.getBusinessFunctionList()
+        RealmService.getRealmListAll()
             .then(response => {
-                this.setState({
-                    businessFunctions: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
                 }
-            );
-        UserService.getRoleList()
-            .then(response => {
-                this.setState({
-                    roles: response.data
-                })
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -162,6 +149,7 @@ class AddRoleComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -170,34 +158,22 @@ class AddRoleComponent extends Component {
     }
 
     render() {
-        const { businessFunctions } = this.state;
-        const { roles } = this.state;
-
-        let businessFunctionsList = businessFunctions.length > 0
-            && businessFunctions.map((item, i) => {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
                 return (
-                    <>
-                        <option key={i} value={item.businessFunctionId}>
-                            {item.label.label_en}
-                        </option>
-                    </>
-                )
-            }, this);
-        let roleList = roles.length > 0
-            && roles.map((item, i) => {
-                return (
-                    <option key={i} value={item.roleId}>
-                        {item.label.label_en}
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
-
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
+
                             <CardHeader>
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
@@ -205,16 +181,16 @@ class AddRoleComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    UserService.addNewRole(this.state.role)
+                                    console.log("this.state.tracerCategory---", this.state.tracerCategory);
+                                    TracerCategoryService.addTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/role/listRole/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/tracerCategory/listTracerCategory/`+ i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
                                                 })
                                             }
-
                                         })
                                         .catch(
                                             error => {
@@ -231,13 +207,12 @@ class AddRoleComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
                                             }
                                         );
-
-
                                 }}
                                 render={
                                     ({
@@ -251,71 +226,61 @@ class AddRoleComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='roleForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="roleName">{i18n.t('static.role.role')}</Label>
-                                                        <Input type="text"
-                                                                name="roleName"
-                                                                id="roleName"
-                                                                bsSize="sm"
-                                                                valid={!errors.roleName}
-                                                                invalid={touched.roleName && !!errors.roleName}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.Capitalize(this.state.role.label.label_en)}
-                                                            /><FormText className="red">{errors.roleName}</FormText>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label> <Input
-                                                                type="select"
-                                                                name="businessFunctions"
-                                                                id="businessFunctions"
-                                                                bsSize="sm"
-                                                                valid={!errors.businessFunctions}
-                                                                invalid={touched.businessFunctions && !!errors.businessFunctions}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.state.role.businessFunctions}
-                                                                multiple={true}
-                                                            >
-                                                                <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                                {businessFunctionsList}
-                                                            </Input><FormText className="red">{errors.businessFunctions}</FormText>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                             <Input
                                                                 type="select"
-                                                                name="canCreateRole"
-                                                                id="canCreateRole"
                                                                 bsSize="sm"
-                                                                valid={!errors.canCreateRole}
-                                                                invalid={touched.canCreateRole && !!errors.canCreateRole}
+                                                                name="realmId"
+                                                                id="realmId"
+                                                                valid={!errors.realmId}
+                                                                invalid={touched.realmId && !!errors.realmId}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
                                                                 required
-                                                                value={this.state.role.canCreateRole}
-                                                                multiple={true}
                                                             >
-                                                                <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                                {roleList}
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {realmList}
                                                             </Input>
-                                                        <FormText className="red">{errors.canCreateRole}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
-                                                </CardBody>
+                                                    <FormGroup>
+                                                        <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
+                                                            <Input type="text"
+                                                                bsSize="sm"
+                                                                name="tracerCategoryName"
+                                                                id="tracerCategoryName"
+                                                                valid={!errors.tracerCategoryName}
+                                                                invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                                onBlur={handleBlur}
+                                                                required
+                                                                value={this.Capitalize(this.state.tracerCategory.label.label_en)}
+                                                            />
+                                                        {/* </InputGroupAddon> */}
+                                                         <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
+                                                    </FormGroup>
+                                                   
+                                                    </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
-                          </FormGroup>
+                                                    </FormGroup>
                                                 </CardFooter>
                                             </Form>
+
                                         )} />
+
                         </Card>
                     </Col>
                 </Row>
@@ -323,8 +288,8 @@ class AddRoleComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/role/listRole/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/tracerCategory/listTracerCategory/`+ i18n.t('static.message.cancelled', { entityname }))
     }
 }
 
-export default AddRoleComponent;
+export default AddTracerCategoryComponent;

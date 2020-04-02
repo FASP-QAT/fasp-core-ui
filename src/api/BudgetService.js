@@ -18,7 +18,6 @@ class BudgetService {
         );
     }
     getBudgetDataById(json) {
-        console.log("in budget service-----",json);
             return axios.get(`${API_URL}/api/budget/${json}`, {}
             );
     }

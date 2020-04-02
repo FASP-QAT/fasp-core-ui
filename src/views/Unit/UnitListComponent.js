@@ -1,69 +1,122 @@
 import React, { Component } from 'react';
-import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
-} from 'reactstrap';
-
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
-
-import i18n from '../../i18n'
-
-import FundingSourceService from "../../api/FundingSourceService";
-import SubFundingSourceService from "../../api/SubFundingSourceService";
+import { Card, CardBody, CardHeader,FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
+import UnitService from '../../api/UnitService.js';
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-const entityname=i18n.t('static.subfundingsource.subfundingsource');
-class ListSubFundingSourceComponent extends Component {
+import DimensionService from '../../api/DimensionService.js';
+import getLabelText from '../../CommonComponent/getLabelText.js';
+
+// import { HashRouter, Route, Switch } from 'react-router-dom';
+const entityname = i18n.t('static.unit.unit');
+export default class UnitListComponent extends Component {
+
     constructor(props) {
         super(props);
+        /* this.table = data.rows;
+         this.options = {
+             sortIndicator: true,
+             hideSizePerPage: true,
+             paginationSize: 3,
+             hidePageListOnlyOnePage: true,
+             clearSearch: true,
+             alwaysShowAllBtns: false,
+             withFirstAndLast: false,
+             onRowClick: function (row) {
+                 // console.log("row--------------", row);
+                 this.editUnit(row);
+             }.bind(this)
+ 
+         }*/
+
         this.state = {
-            fundingSources: [],
-            subFundingSourceList: [],
+            unitList: [],
             message: '',
-            selSubFundingSource: []
+            selSource: [],
+            dimensions:[]
         }
-        this.editSubFundingSource = this.editSubFundingSource.bind(this);
+        this.editUnit = this.editUnit.bind(this);
+        this.addUnit = this.addUnit.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.addNewSubFundingSource = this.addNewSubFundingSource.bind(this);
+       
     }
-    addNewSubFundingSource() {
-        this.props.history.push("/subFundingSource/addSubFundingSource");
+
+    editUnit(unit) {
+        this.props.history.push({
+            pathname: "/unit/editUnit",
+            state: { unit }
+        });
     }
+
+    addUnit() {
+        if (navigator.onLine) {
+            this.props.history.push(`/unit/addUnit`)
+        } else {
+            alert(i18n.t('static.common.online'))
+        }
+    }
+
     filterData() {
-        let fundingSourceId = document.getElementById("fundingSourceId").value;
-        if (fundingSourceId != 0) {
-            const selSubFundingSource = this.state.subFundingSourceList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
+        let dimensionId = document.getElementById("dimensionId").value;
+        if (dimensionId != 0) {
+            const selSource = this.state.unitList.filter(c => c.dimension.dimensionId == dimensionId)
             this.setState({
-                selSubFundingSource: selSubFundingSource
+                selSource
             });
         } else {
             this.setState({
-                selSubFundingSource: this.state.subFundingSourceList
+                selSource: this.state.unitList
             });
         }
-    }
-    editSubFundingSource(subFundingSource) {
-        this.props.history.push({
-            pathname: "/subFundingSource/editSubFundingSource",
-            state: { subFundingSource }
-        });
-    }
-
-    addSubFundingSource(subFundingSource) {
-        this.props.history.push({
-            pathname: "/subFundingSource/addSubFundingSource"
-        });
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        FundingSourceService.getFundingSourceListAll()
-            .then(response => {
+         DimensionService.getDimensionListAll()
+        .then(response => {
+            if (response.status == 200) {
                 this.setState({
-                    fundingSources: response.data
+                    dimensions: response.data
                 })
-            }).catch(
+            } else {
+                this.setState({ message: response.data.messageCode })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+
+        UnitService.getUnitListAll()
+            .then(response => {
+                console.log(response)
+
+                this.setState({
+                    unitList: response.data,
+                    selSource: response.data
+                })
+
+            })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
@@ -84,61 +137,42 @@ class ListSubFundingSourceComponent extends Component {
                 }
             );
 
-        SubFundingSourceService.getSubFundingSourceListAll()
-            .then(response => {
-                this.setState({
-                    subFundingSourceList: response.data,
-                    selSubFundingSource: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
     }
 
-    render() {
-        const { SearchBar, ClearSearchButton } = Search;
-        const customTotal = (from, to, size) => (
-            <span className="react-bootstrap-table-pagination-total">
-               {i18n.t('static.common.result',{from,to,size}) }
-            </span>
-        );
 
-        const { fundingSources } = this.state;
-        let fundingSourceList = fundingSources.length > 0
-            && fundingSources.map((item, i) => {
+    render() {
+        const { dimensions } = this.state;
+        let dimensionList = dimensions.length > 0
+            && dimensions.map((item, i) => {
                 return (
-                    <option key={i} value={item.fundingSourceId}>
-                        {item.label.label_en}
+                    <option key={i} value={item.dimensionId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
 
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
+
         const columns = [{
-            dataField: 'fundingSource.label.label_en',
-            text: i18n.t('static.subfundingsource.fundingsource'),
+            dataField: 'label.label_en',
+            text: i18n.t('static.unit.unit'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'label.label_en',
-            text: i18n.t('static.subfundingsource.subfundingsource'),
+            dataField: 'unitCode',
+            text: i18n.t('static.unit.unitCode'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'dimension.label.label_en',
+            text: i18n.t('static.dimension.dimension'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
@@ -150,7 +184,7 @@ class ListSubFundingSourceComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.active ? i18n.t('static.common.active') :i18n.t('static.common.disabled'))
+                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
             }
         }];
@@ -160,10 +194,10 @@ class ListSubFundingSourceComponent extends Component {
             prePageText: i18n.t('static.common.back'),
             nextPageText: i18n.t('static.common.next'),
             lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage') ,
-            prePageTitle: i18n.t('static.common.prevPage') ,
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
             firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage') ,
+            lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
@@ -177,38 +211,35 @@ class ListSubFundingSourceComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selSubFundingSource.length
+                text: 'All', value: this.state.selSource.length
             }]
         }
-
-
         return (
             <div className="animated">
-                <h6 className="mt-success">{i18n.t(this.props.match.params.message,{entityname})}</h6>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewSubFundingSource}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
-                        <Col md="3 pl-0">
+                    <CardBody>   <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.subfundingsource.fundingsource')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.dimension.dimension')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="fundingSourceId"
-                                            id="fundingSourceId"
+                                            name="dimensionId"
+                                            id="dimensionId"
                                             bsSize="sm"
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
-                                            {fundingSourceList}
+                                            {dimensionList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -217,10 +248,10 @@ class ListSubFundingSourceComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        
+                     
                         <ToolkitProvider
-                            keyField="subFundingSourceId"
-                            data={this.state.selSubFundingSource}
+                            keyField="unitId"
+                            data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
                             hover
@@ -228,16 +259,17 @@ class ListSubFundingSourceComponent extends Component {
                         >
                             {
                                 props => (
+
                                     <div className="TableCust">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editSubFundingSource(row);
+                                                    this.editUnit(row);
                                                 }
                                             }}
                                             {...props.baseProps}
@@ -246,10 +278,11 @@ class ListSubFundingSourceComponent extends Component {
                                 )
                             }
                         </ToolkitProvider>
+
                     </CardBody>
                 </Card>
+
             </div>
         );
     }
 }
-export default ListSubFundingSourceComponent;

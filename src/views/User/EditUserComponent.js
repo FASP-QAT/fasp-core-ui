@@ -209,7 +209,6 @@ class EditUserComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -295,7 +294,6 @@ class EditUserComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -351,7 +349,6 @@ class EditUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
-                                                       
                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
@@ -367,7 +364,6 @@ class EditUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
-                                                        
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"

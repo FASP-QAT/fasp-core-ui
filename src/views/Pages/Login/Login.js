@@ -129,7 +129,6 @@ class Login extends Component {
                               })
                               .catch(
                                 error => {
-                                  console.log(error);
                                   if (error.message === "Network Error") {
                                     this.setState({ message: error.message });
                                   } else {
@@ -150,7 +149,6 @@ class Login extends Component {
                                         break;
                                       default:
                                         this.setState({ message: 'static.unkownError' });
-                                        console.log("Error code unkown");
                                         break;
                                     }
                                   }

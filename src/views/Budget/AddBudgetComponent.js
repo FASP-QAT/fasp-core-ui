@@ -181,7 +181,6 @@ class AddBudgetComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList()
             .then(response => {
-                console.log("program list fro drop down----", response.data);
                 this.setState({
                     programs: response.data
                 })
@@ -200,7 +199,6 @@ class AddBudgetComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -209,7 +207,6 @@ class AddBudgetComponent extends Component {
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
-                console.log("--------res", response);
                 this.setState({
                     subFundingSources: response.data
                 })
@@ -228,7 +225,6 @@ class AddBudgetComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -293,7 +289,6 @@ class AddBudgetComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -379,7 +374,10 @@ class AddBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
-                                                        <Input type="number"
+                                                        <Input
+
+                                                            type="number"
+                                                            min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
@@ -399,6 +397,7 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText> */}
                                                         <Input
                                                             // value={this.state.budget.st}
+                                                            className="fa fa-calendar Fa-right"
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -417,8 +416,9 @@ class AddBudgetComponent extends Component {
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText> */}
-                                                       
-                                                        <Input 
+                                                        <Input
+
+                                                            className="fa fa-calendar Fa-right"
                                                             value={this.state.budget.stopDate}
                                                             name="stopDate"
                                                             id="stopDate"

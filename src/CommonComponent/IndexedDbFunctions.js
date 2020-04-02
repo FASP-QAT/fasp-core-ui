@@ -2,13 +2,10 @@
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../Constants.js'
 export function getDatabase() {
-    console.log("in function")
     var db1;
     var storeOS;
     var openRequest = indexedDB.open('fasp', 1);
-    console.log("in open request", openRequest);
     openRequest.onupgradeneeded = function (e) {
-        console.log("in on upgrade needed");
         db1 = e.target.result;
         if (!db1.objectStoreNames.contains('programData')) {
             storeOS = db1.createObjectStore('programData', { keyPath: 'id'});

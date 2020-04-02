@@ -15,7 +15,6 @@ const entityname=i18n.t('static.role.role');
 class ListRoleComponent extends Component {
     constructor(props) {
         super(props);
-       
         this.state = {
             roleList: [],
             message: '',
@@ -66,14 +65,13 @@ class ListRoleComponent extends Component {
     }
 
     render() {
-      
             const { SearchBar, ClearSearchButton } = Search;
             const customTotal = (from, to, size) => (
                 <span className="react-bootstrap-table-pagination-total">
                    {i18n.t('static.common.result',{from,to,size}) }
                 </span>
             );
-    
+
             const columns = [{
                 dataField: 'roleId',
                 text: i18n.t('static.role.roleid'),
@@ -128,7 +126,7 @@ class ListRoleComponent extends Component {
                     </CardHeader>
                     <CardBody>
                     <ToolkitProvider
-                            keyField="manufacturerId"
+                            keyField="roleId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}

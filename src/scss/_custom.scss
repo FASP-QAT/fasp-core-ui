@@ -564,3 +564,8 @@ h5, .h5 {
   color:#20a8d8;
 }
 
+.Fa-right::before{position: absolute;
+  right: 43px;font-size:10px;margin-right: 2px;}
+  .form-control-sm:hover{
+  padding-right: calc(1.5em + 0.75rem);}
+  .form-control:focus{padding-right: calc(1.5em + 0.75rem);}

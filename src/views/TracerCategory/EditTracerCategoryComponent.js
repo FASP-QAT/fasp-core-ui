@@ -1,29 +1,26 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, FormFeedback, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormGroup,FormFeedback, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n';
 import RealmService from "../../api/RealmService";
-import ProcurementAgentService from "../../api/ProcurementAgentService";
+import TracerCategoryService from "../../api/TracerCategoryService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 
 import getLabelText from '../../CommonComponent/getLabelText';
-const entityname = i18n.t('static.procurementagent.procurmentAgentMaster');
+const entityname = i18n.t('static.tracercategory.tracercategory');
 
 const initialValues = {
-    procurementAgentName: "",
+    tracerCategoryName: "",
     submittedToApprovedLeadTime: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        procurementAgentName: Yup.string()
-            .required(i18n.t('static.procurementAgent.procurementagentnametext')),
-        submittedToApprovedLeadTime: Yup.string()
-            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-    })
+        tracerCategoryName: Yup.string()
+            .required("Please enter procurement agent name"),
+        })
 }
 
 const validate = (getValidationSchema) => {
@@ -47,12 +44,12 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-class EditProcurementAgentComponent extends Component {
+class EditTracerCategoryComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             realms: [],
-            procurementAgent: this.props.location.state.procurementAgent,
+            tracerCategory: this.props.location.state.tracerCategory,
             message: '',
             lang: localStorage.getItem('lang')
         }
@@ -62,6 +59,7 @@ class EditProcurementAgentComponent extends Component {
     }
 
     Capitalize(str) {
+        console.log("capitalize");
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
@@ -71,40 +69,34 @@ class EditProcurementAgentComponent extends Component {
 
 
     dataChange(event) {
-        let { procurementAgent } = this.state;
+        let { tracerCategory } = this.state;
         if (event.target.name == "realmId") {
-            procurementAgent.realm.realmId = event.target.value;
+            tracerCategory.realm.realmId = event.target.value;
         }
-        if (event.target.name == "procurementAgentCode") {
-            procurementAgent.procurementAgentCode = event.target.value;
+         if (event.target.name == "tracerCategoryName") {
+            tracerCategory.label.label_en = event.target.value;
         }
-        if (event.target.name == "procurementAgentName") {
-            procurementAgent.label.label_en = event.target.value;
-        }
-        if (event.target.name == "submittedToApprovedLeadTime") {
-            procurementAgent.submittedToApprovedLeadTime = event.target.value;
-        }
-        if (event.target.name == "active") {
-            procurementAgent.active = event.target.id === "active2" ? false : true;
+         if (event.target.name == "active") {
+            tracerCategory.active = event.target.id === "active2" ? false : true;
         }
 
 
         this.setState({
-            procurementAgent
+            tracerCategory
         },
             () => { });
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            procurementAgentName: true,
+            tracerCategoryName: true,
             submittedToApprovedLeadTime: true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('procurementAgentForm', (fieldName) => {
+        this.findFirstError('tracerCategoryForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -127,22 +119,23 @@ class EditProcurementAgentComponent extends Component {
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.procurementAgent.procurementagentedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={
                                     {
-                                        procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
-                                        procurementAgentName: this.state.procurementAgent.label.label_en,
-                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime
+                                        tracerCategoryCode: this.state.tracerCategory.tracerCategoryCode,
+                                        tracerCategoryName: this.state.tracerCategory.label.label_en,
+                                        submittedToApprovedLeadTime: this.state.tracerCategory.submittedToApprovedLeadTime
                                     }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    console.log("this.state.tracerCategory---", this.state.tracerCategory);
                                     AuthenticationService.setupAxiosInterceptors();
-                                    ProcurementAgentService.updateProcurementAgent(this.state.procurementAgent)
+                                    TracerCategoryService.updateTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/tracerCategory/listTracerCategory/`+ i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -164,6 +157,7 @@ class EditProcurementAgentComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -182,73 +176,41 @@ class EditProcurementAgentComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input
                                                             type="text"
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
                                                             readOnly={true}
-                                                            value={getLabelText(this.state.procurementAgent.realm.label, this.state.lang)}
+                                                            value={getLabelText(this.state.tracerCategory.realm.label,this.state.lang)}
                                                         >
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
                                                     </FormGroup>
+                                                    
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
+                                                        <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                         <Input type="text"
                                                             bsSize="sm"
-                                                            name="procurementAgentCode"
-                                                            id="procurementAgentCode"
-                                                            readOnly={true}
-                                                            value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            bsSize="sm"
-                                                            name="procurementAgentName"
-                                                            id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName}
-                                                            invalid={touched.procurementAgentName && !!errors.procurementAgentName}
+                                                            name="tracerCategoryName"
+                                                            id="tracerCategoryName"
+                                                            valid={!errors.tracerCategoryName}
+                                                            invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.Capitalize(getLabelText(this.state.procurementAgent.label, this.state.lang))}
+                                                            value={this.Capitalize(getLabelText(this.state.tracerCategory.label,this.state.lang))}
                                                         />
                                                         {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
-                                                        <Input type="number"
-                                                            bsSize="sm"
-                                                            name="submittedToApprovedLeadTime"
-                                                            id="submittedToApprovedLeadTime"
-                                                            valid={!errors.submittedToApprovedLeadTime}
-                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            min={1}
-                                                            value={this.state.procurementAgent.submittedToApprovedLeadTime}
-                                                        />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -259,7 +221,7 @@ class EditProcurementAgentComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.procurementAgent.active === true}
+                                                                checked={this.state.tracerCategory.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -275,7 +237,7 @@ class EditProcurementAgentComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.procurementAgent.active === false}
+                                                                checked={this.state.tracerCategory.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -304,8 +266,8 @@ class EditProcurementAgentComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/tracerCategory/listTracerCategory/` +i18n.t('static.message.cancelled', { entityname }))
     }
 }
 
-export default EditProcurementAgentComponent;
+export default EditTracerCategoryComponent;

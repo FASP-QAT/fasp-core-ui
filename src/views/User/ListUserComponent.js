@@ -13,11 +13,11 @@ import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
-const entityname=i18n.t('static.user.user')
+const entityname = i18n.t('static.user.user')
 class ListUserComponent extends Component {
     constructor(props) {
         super(props);
-              this.state = {
+        this.state = {
             realms: [],
             userList: [],
             message: '',
@@ -28,14 +28,22 @@ class ListUserComponent extends Component {
         this.addNewUser = this.addNewUser.bind(this);
         this.buttonFormatter = this.buttonFormatter.bind(this);
         this.addAccessControls = this.addAccessControls.bind(this);
+        this.formatDate = this.formatDate.bind(this);
     }
+    formatDate(cell, row) {
+        if (cell != null && cell != "") {
+          var modifiedDate = moment(cell).format('MM-DD-YYYY');
+          return modifiedDate;
+        } else {
+          return "";
+        }
+      }
 
     buttonFormatter(cell, row) {
         return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>;
     }
     addAccessControls(event, row) {
         event.stopPropagation();
-        console.log("row---", row);
         this.props.history.push({
             pathname: "/user/accessControl",
             state: {
@@ -72,9 +80,10 @@ class ListUserComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                       this.setState({
-                    realms: response.data
-                })} else {
+                    this.setState({
+                        realms: response.data
+                    })
+                } else {
                     this.setState({ message: response.data.messageCode })
                 }
             }).catch(
@@ -120,7 +129,6 @@ class ListUserComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -162,106 +170,112 @@ class ListUserComponent extends Component {
                     </option>
                 )
             }, this);
-            const { SearchBar, ClearSearchButton } = Search;
-            const customTotal = (from, to, size) => (
-                <span className="react-bootstrap-table-pagination-total">
-                    {i18n.t('static.common.result', { from, to, size })}
-                </span>
-            );
-    
-            const columns = [{
-                dataField: 'realm.label.label_en',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
+
+        const columns = [{
+            dataField: 'realm.label.label_en',
+            text: i18n.t('static.realm.realm'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'username',
+            text: i18n.t('static.user.username'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'phoneNumber',
+            text: i18n.t('static.user.phoneNumber'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'emailId',
+            text: i18n.t('static.user.emailid'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            dataField: 'faildAttempts',
+            text: i18n.t('static.user.failedAttempts'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'lastLoginDate',
+            text: i18n.t('static.user.lastLoginDate'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
+                return (
+                    (row.lastLoginDate ? moment(row.lastLoginDate).format('MM-DD-YYYY hh:mm A') : "")
+                );
+            }
+        }, {
+            dataField: 'active',
+            text: i18n.t('static.common.status'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
+                return (
+                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+                );
+            }
+        }, {
+            dataField: 'userId',
+            text: 'ACTION',
+            formatter: (cellContent, row) => {
+                return (<Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>
+                )
+            }
+        }
+        ];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage'),
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
             }, {
-                dataField: 'username',
-                text: i18n.t('static.user.username'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }, {
-                dataField: 'phoneNumber',
-                text: i18n.t('static.user.phoneNumber'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }, {
-                dataField: 'emailId',
-                text: i18n.t('static.user.emailid'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
             },
             {
-                dataField: 'faildAttempts',
-                text: i18n.t('static.user.failedAttempts'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }, {
-                dataField: 'lastLoginDate',
-                text: i18n.t('static.user.lastLoginDate'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            }, {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            },      {
-                dataField: 'userId',
-                text: 'ACTION',
-                formatter: (cellContent, row) => {
-                  return ( <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>   
-                   )
-                }
-            }               
-];
-            const options = {
-                hidePageListOnlyOnePage: true,
-                firstPageText: i18n.t('static.common.first'),
-                prePageText: i18n.t('static.common.back'),
-                nextPageText: i18n.t('static.common.next'),
-                lastPageText: i18n.t('static.common.last'),
-                nextPageTitle: i18n.t('static.common.firstPage'),
-                prePageTitle: i18n.t('static.common.prevPage'),
-                firstPageTitle: i18n.t('static.common.nextPage'),
-                lastPageTitle: i18n.t('static.common.lastPage'),
-                showTotal: true,
-                paginationTotalRenderer: customTotal,
-                disablePageTitle: true,
-                sizePerPageList: [{
-                    text: '10', value: 10
-                }, {
-                    text: '30', value: 30
-                }
-                    ,
-                {
-                    text: '50', value: 50
-                },
-                {
-                    text: 'All', value: this.state.selUserList.length
-                }]
-            }
-            return (
-                <div className="animated">
-                    <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                    <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                      <Card>
+
+                text: 'All', value: this.state.selUserList.length
+            }]
+        }
+        return (
+            <div className="animated">
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
@@ -307,6 +321,7 @@ class ListUserComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
+                                                    row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
                                                     this.editUser(row);
                                                 }
                                             }}

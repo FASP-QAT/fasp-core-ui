@@ -630,7 +630,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.airFreightPerc && !!errors.airFreightPerc}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
                                                             <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
@@ -645,7 +647,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperctext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperctext')} />
                                                             <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
@@ -660,7 +664,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
                                                             <FormFeedback>{errors.plannedToDraftLeadTime}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
@@ -675,7 +681,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
                                                             <FormFeedback>{errors.draftToSubmittedLeadTime}</FormFeedback>
 
                                                         </Col>
@@ -691,7 +699,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
                                                             <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
@@ -706,7 +716,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
                                                             <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
@@ -721,7 +733,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                                             <FormFeedback>{errors.deliveredToReceivedLeadTime}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
@@ -736,7 +750,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
                                                             <FormFeedback>{errors.monthsInPastForAmc}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
@@ -751,7 +767,9 @@ export default class EditProgram extends Component {
                                                                 invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                type="number" name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
+                                                                type="number" 
+                                                                min="0"
+                                                                name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
                                                             <FormFeedback>{errors.monthsInFutureForAmc}</FormFeedback>
                                                         </Col>
                                                     </FormGroup>
