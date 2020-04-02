@@ -4,16 +4,16 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
-import ManufacturerService from "../../api/ManufacturerService";
+import SupplierService from "../../api/SupplierService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 
 let initialValues = {
-    manufacturer: ""
+    supplier: ""
 }
-const entityname=i18n.t('static.manufacturer.manufacturer');
+const entityname=i18n.t('static.supplier.supplier');
 const validationSchema = function (values) {
     return Yup.object().shape({
-        manufacturer: Yup.string()
+        supplier: Yup.string()
             .required(i18n.t('static.manufaturer.manufaturertext'))
     })
 }
@@ -40,11 +40,11 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-class EditManufacturerComponent extends Component {
+class EditSupplierComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            manufacturer: this.props.location.state.manufacturer,
+            supplier: this.props.location.state.supplier,
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -52,28 +52,28 @@ class EditManufacturerComponent extends Component {
     }
 
     dataChange(event) {
-        let { manufacturer } = this.state;
-        if (event.target.name == "manufacturer") {
-            manufacturer.label.label_en = event.target.value;
+        let { supplier } = this.state;
+        if (event.target.name == "supplier") {
+            supplier.label.label_en = event.target.value;
         }
         if (event.target.name == "active") {
-            manufacturer.active = event.target.id === "active2" ? false : true;
+            supplier.active = event.target.id === "active2" ? false : true;
         }
         this.setState({
-            manufacturer
+            supplier
         },
             () => { });
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            manufacturer: true
+            supplier: true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('manufacturerForm', (fieldName) => {
+        this.findFirstError('supplierForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -98,14 +98,14 @@ class EditManufacturerComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ manufacturer: this.state.manufacturer.label.label_en }}
+                                initialValues={{ supplier: this.state.supplier.label.label_en }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
-                                    ManufacturerService.updateManufacturer(this.state.manufacturer)
+                                    SupplierService.updateSupplier(this.state.supplier)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/manufacturer/listManufacturer/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/supplier/listSupplier/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -145,33 +145,33 @@ class EditManufacturerComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='manufacturerForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='supplierForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
                                                          <Input
                                                                 type="text"
                                                                 name="realmId"
                                                                 id="realmId"
                                                                 bsSize="sm"
                                                                 readOnly
-                                                                value={this.state.manufacturer.realm.label.label_en}
+                                                                value={this.state.supplier.realm.label.label_en}
                                                             >
                                                             </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
+                                                        <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
                                                             <Input type="text"
-                                                                name="manufacturer"
-                                                                id="manufacturer"
+                                                                name="supplier"
+                                                                id="supplier"
                                                                 bsSize="sm"
-                                                                valid={!errors.manufacturer}
-                                                                invalid={touched.manufacturer && !!errors.manufacturer}
+                                                                valid={!errors.supplier}
+                                                                invalid={touched.supplier && !!errors.supplier}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                                 onBlur={handleBlur}
-                                                                value={this.state.manufacturer.label.label_en}
+                                                                value={this.state.supplier.label.label_en}
                                                                 required />
-                                                        <FormText className="red">{errors.manufacturer}</FormText>
+                                                        <FormText className="red">{errors.supplier}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
@@ -182,7 +182,7 @@ class EditManufacturerComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.manufacturer.active === true}
+                                                                checked={this.state.supplier.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -198,7 +198,7 @@ class EditManufacturerComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.manufacturer.active === false}
+                                                                checked={this.state.supplier.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -231,8 +231,8 @@ class EditManufacturerComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/manufacturer/listManufacturer/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/supplier/listSupplier/` +i18n.t('static.message.cancelled',{entityname}))
     }
 }
 
-export default EditManufacturerComponent;
+export default EditSupplierComponent;
