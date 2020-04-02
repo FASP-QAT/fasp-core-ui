@@ -93,6 +93,7 @@ class ListBudgetComponent extends Component {
     AuthenticationService.setupAxiosInterceptors();
     BudgetServcie.getBudgetList()
       .then(response => {
+        console.log(response)
         if (response.status == 200) {
           console.log("budget after status 200---->", response.data);
           this.setState({

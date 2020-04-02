@@ -19,6 +19,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 
 const initialValues = {
     programId: ''
@@ -111,6 +112,7 @@ export default class DownloadProgram extends Component {
                     console.log("Json", json);
                     console.log("Json length", json.length)
                     var db1;
+                    getDatabase();
                     var openRequest = indexedDB.open('fasp', 1);
                     openRequest.onsuccess = function (e) {
                         console.log("in success");

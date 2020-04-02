@@ -262,7 +262,6 @@ class ListUserComponent extends Component {
                 text: '50', value: 50
             },
             {
-
                 text: 'All', value: this.state.selUserList.length
             }]
         }

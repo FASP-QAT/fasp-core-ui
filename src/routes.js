@@ -145,6 +145,7 @@ const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 const AddRealm = React.lazy(() => import('./views/Realm/AddRealmComponent'));
 const RealmList = React.lazy(() => import('./views/Realm/ListRealmComponent'));
 const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
+const SupplyPlan = React.lazy(() => import('./views/SupplyPlan/SupplyPlanComponent'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -324,6 +325,7 @@ const routes = [
   { path: '/currency/editCurrency', name: 'Currency / Edit Currency', component: EditCurrency },
   { path: '/translations/databaseTranslations', name: 'Database Translations', component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: 'Label Translations', component: LabelTranslation },
+  { path: '/supplyPlan', name: 'Supply plan / Supply plan', component: SupplyPlan },
 ];
 
 export default routes;

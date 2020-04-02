@@ -71,7 +71,6 @@ class ListRoleComponent extends Component {
                    {i18n.t('static.common.result',{from,to,size}) }
                 </span>
             );
-
             const columns = [{
                 dataField: 'roleId',
                 text: i18n.t('static.role.roleid'),

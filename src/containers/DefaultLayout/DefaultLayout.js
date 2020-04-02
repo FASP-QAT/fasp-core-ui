@@ -273,7 +273,18 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                           },
                         ]
-                      }
+                      },
+                      {
+                        name: "Supply plan",
+                        icon: 'fa fa-list',
+                        children: [
+                          {
+                            name: "Supply Plan",
+                            url: '/supplyPlan',
+                            icon: 'fa fa-list-alt'
+                          }
+                        ]
+                      },
                     ]
 
                 }} {...this.props} />
