@@ -161,7 +161,7 @@ const routes = [
 
   { path: '/program/addProgram', name: 'Program / Add Program', component: AddProgram },
   { path: '/program/listProgram', exact: true, name: 'Program / Program List', component: Programs },
-  { path: '/program/listProgram/:message', name: 'Program / Program List', component: Programs },
+  { path: '/program/listProgram/:message', component: Programs },
   { path: '/program/editProgram/:programId', name: 'Program / Edit Program', component: EditProgram },
   
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
@@ -169,17 +169,20 @@ const routes = [
 
   { path: '/budget/addBudget', name: 'Budget / Add Budget', component: AddBudgetComponent },
   { path: '/budget/listBudget', exact: true, name: 'Budget / Budget List', component: ListBudgetComponent },
-  { path: '/budget/listBudget/:message',name:'Budget / Budget List', component: ListBudgetComponent },
   { path: '/budget/editBudget/', name: 'Budget / Edit Budget', component: EditBudgetComponent },
+  { path: '/budget/listBudget/:message', component: ListBudgetComponent },
+  
   
   { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },
   { path: '/fundingSource/listFundingSource/:message', component: ListFundingSource },
+  
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
+  
   { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
   { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
   { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
@@ -275,7 +278,7 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/program/downloadProgram', name: 'Download Program', component: DownloadProgram },
-  { path: '/program/downloadProgram/:message', name: 'Download Program', component: DownloadProgram },
+  { path: '/program/downloadProgram/:message', component: DownloadProgram },
   { path: '/program/exportProgram', name: 'Export Program', component: ExportProgram },
   { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
   { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },
