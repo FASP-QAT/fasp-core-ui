@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button,FormText ,FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button ,FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -218,10 +218,10 @@ class AddSupplierComponent extends Component {
                                 required
                                 value={this.state.realmId}
                               >
-                                <option value="0">{i18n.t('static.common.select')}</option>
+                                <option value="">{i18n.t('static.common.select')}</option>
                                 {realmList}
                               </Input>
-                               <FormText className="red">{errors.realmId}</FormText>
+                               <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
@@ -236,7 +236,7 @@ class AddSupplierComponent extends Component {
                                 required
                                 value={this.Capitalize(this.state.supplier.label.label_en)}
                                 />
-                            <FormText className="red">{errors.supplier}</FormText>
+                            <FormFeedback className="red">{errors.supplier}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

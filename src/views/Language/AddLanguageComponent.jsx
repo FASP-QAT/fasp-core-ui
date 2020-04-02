@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css';
@@ -61,6 +61,7 @@ class AddLanguageComponent extends Component {
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
 
     dataChange(event) {
@@ -77,10 +78,13 @@ class AddLanguageComponent extends Component {
             () => { });
     };
 
-    // Capitalize(str) {
-    //     this.setState({language: str.charAt(0).toUpperCase() + str.slice(1)});
-    // }
-
+    Capitalize(str) {
+        if (str != null && str != "") {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
     touchAll(setTouched, errors) {
         setTouched({
             languageName: true,
@@ -183,9 +187,9 @@ class AddLanguageComponent extends Component {
                                                             invalid={touched.languageName && !!errors.languageName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.languageName}
-                                                            required />
-                                                        <FormText className="red">{errors.languageName}</FormText>
+                                                            value={this.Capitalize(this.state.langaugeName)}
+                                                      required />
+                                                        <FormFeedback className="red">{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
@@ -199,7 +203,7 @@ class AddLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.languageCode}
                                                             required />
-                                                        <FormText className="red">{errors.languageCode}</FormText>
+                                                        <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

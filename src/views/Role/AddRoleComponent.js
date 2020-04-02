@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText,InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -265,7 +265,7 @@ class AddRoleComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 required
                                                                 value={this.Capitalize(this.state.role.label.label_en)}
-                                                            /><FormText className="red">{errors.roleName}</FormText>
+                                                            /><FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label> <Input
@@ -283,7 +283,7 @@ class AddRoleComponent extends Component {
                                                             >
                                                                 <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                                 {businessFunctionsList}
-                                                            </Input><FormText className="red">{errors.businessFunctions}</FormText>
+                                                            </Input><FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
@@ -303,7 +303,7 @@ class AddRoleComponent extends Component {
                                                                 <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                                 {roleList}
                                                             </Input>
-                                                        <FormText className="red">{errors.canCreateRole}</FormText>
+                                                        <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

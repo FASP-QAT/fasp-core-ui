@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, FormFeedback,InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, FormFeedback,InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
 // import * as myConst from '../../Labels.js';
 import UnitService from '../../api/UnitService.js';
@@ -213,7 +213,7 @@ export default class EditUnitComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.Capitalize(getLabelText(this.state.unit.label,this.state.lang))}
                                                             required />
-                                                        <FormText className="red">{errors.unitName}</FormText>
+                                                        <FormFeedback className="red">{errors.unitName}</FormFeedback>
                                                     </FormGroup>
                                                 <FormGroup>
                                                         <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
@@ -228,7 +228,7 @@ export default class EditUnitComponent extends Component {
                                                             required
                                                             value={this.state.unit.unitCode}
                                                              />
-                                                              <FormText className="red">{errors.unitCode}</FormText>
+                                                              <FormFeedback className="red">{errors.unitCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>

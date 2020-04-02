@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import DataSourceTypeService from '../../api/DataSourceTypeService';
@@ -245,7 +245,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             required
                                                         >
                                                         </Input>
-                                                        <FormText className="red">{errors.label}</FormText>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
