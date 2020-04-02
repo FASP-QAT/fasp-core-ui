@@ -374,8 +374,8 @@ class AddBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
-                                                        <Input 
-                                                            
+                                                        <Input
+
                                                             type="number"
                                                             min="0"
                                                             name="budgetAmt"
@@ -397,6 +397,7 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText> */}
                                                         <Input
                                                             // value={this.state.budget.st}
+                                                            className="fa fa-calendar Fa-right"
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -416,6 +417,8 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText> */}
                                                         <Input
+
+                                                            className="fa fa-calendar Fa-right"
                                                             value={this.state.budget.stopDate}
                                                             name="stopDate"
                                                             id="stopDate"

@@ -310,7 +310,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
                                                         <Input
-
+                                                            className="fa fa-calendar Fa-right"
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -330,7 +330,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
                                                         <Input
-
+                                                            className="fa fa-calendar Fa-right"
                                                             name="stopDate"
                                                             id="stopDate"
                                                             bsSize="sm"
