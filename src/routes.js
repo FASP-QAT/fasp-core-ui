@@ -17,9 +17,12 @@ const EditFundingSource = React.lazy(() => import('./views/FundingSource/EditFun
 const AddProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/AddProcurementAgentComponent'));
 const ListProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/ListProcurementAgentComponent'));
 const EditProcurementAgent = React.lazy(() => import('./views/ProcurementAgent/EditProcurementAgentComponent'));
-const AddManufacturer = React.lazy(() => import('./views/Manufacturer/AddManufacturerComponent'));
-const ListManufacturer = React.lazy(() => import('./views/Manufacturer/ListManufacturerComponent'));
-const EditManufacturer = React.lazy(() => import('./views/Manufacturer/EditManufacturerComponent'));
+const AddTracerCategory = React.lazy(() => import('./views/TracerCategory/AddTracerCategoryComponent'));
+const ListTracerCategory = React.lazy(() => import('./views/TracerCategory/ListTracerCategoryComponent'));
+const EditTracerCategory = React.lazy(() => import('./views/TracerCategory/EditTracerCategoryComponent'));
+const AddSupplier = React.lazy(() => import('./views/Supplier/AddSupplierComponent'));
+const ListSupplier = React.lazy(() => import('./views/Supplier/ListSupplierComponent'));
+const EditSupplier = React.lazy(() => import('./views/Supplier/EditSupplierComponent'));
 const AddRegion = React.lazy(() => import('./views/Region/AddRegionComponent'));
 const ListRegion = React.lazy(() => import('./views/Region/ListRegionComponent'));
 const EditRegion = React.lazy(() => import('./views/Region/EditRegionComponent'));
@@ -115,6 +118,10 @@ const AddLanguage = React.lazy(() => import('./views/Language/AddLanguageCompone
 const ListLanguage = React.lazy(() => import('./views/Language/LanguageListComponent'));
 const EditLanguage = React.lazy(() => import('./views/Language/EditLanguageComponent'));
 
+const AddUnit = React.lazy(() => import('./views/Unit/AddUnitComponent'));
+const ListUnit = React.lazy(() => import('./views/Unit/UnitListComponent'));
+const EditUnit = React.lazy(() => import('./views/Unit/EditUnitComponent'));
+
 const AddCountry = React.lazy(() => import('./views/Country/AddCountryComponent'));
 const ListCountry = React.lazy(() => import('./views/Country/CountryListComponent'));
 const EditCountry = React.lazy(() => import('./views/Country/UpdateCountryComponent'));
@@ -190,10 +197,14 @@ const routes = [
   { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'Procurement Agent / Procurement Agent List', component: ListProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent/:message', component: ListProcurementAgent },
   { path: '/procurementAgent/editProcurementAgent', name: 'Procurement Agent / Edit Procurement Agent', component: EditProcurementAgent },
-  { path: '/manufacturer/addManufacturer', name: 'Manufacturer / Add Manufacturer', component: AddManufacturer },
-  { path: '/manufacturer/listManufacturer', exact: true, name: 'Manufacturer / Manufacturer List', component: ListManufacturer },
-  { path: '/manufacturer/editManufacturer', name: 'Manufacturer / Edit Manufacturer', component: EditManufacturer },
-  { path: '/manufacturer/listManufacturer/:message', component: ListManufacturer },
+  { path: '/tracerCategory/addTracerCategory', name: 'Tracer Category / Add Tracer Category', component: AddTracerCategory },
+  { path: '/tracerCategory/listTracerCategory', exact: true, name: 'Tracer Category / Tracer Category List', component: ListTracerCategory },
+  { path: '/tracerCategory/listTracerCategory/:message', component: ListTracerCategory },
+  { path: '/tracerCategory/editTracerCategory', name: 'Tracer Category / Edit Tracer Category', component: EditTracerCategory },
+   { path: '/supplier/addSupplier', name: 'Supplier / Add Supplier', component: AddSupplier },
+  { path: '/supplier/listSupplier', exact: true, name: 'Supplier / Supplier List', component: ListSupplier },
+  { path: '/supplier/editSupplier', name: 'Supplier / Edit Supplier', component: EditSupplier },
+  { path: '/supplier/listSupplier/:message', component: ListSupplier },
   { path: '/region/addRegion', name: 'Region / Add Region', component: AddRegion },
   { path: '/region/listRegion', exact: true, name: 'Region / Region List', component: ListRegion },
   { path: '/region/editRegion', name: 'Region / Edit Region', component: EditRegion },
@@ -283,7 +294,11 @@ const routes = [
   { path: '/language/addLanguage', name: 'Language / Add Language', component: AddLanguage },
   { path: '/language/listLanguage', exact: true, name: 'Language / Language List', component: ListLanguage },
   { path: '/language/listLanguage/:message', component: ListLanguage },
-  { path: '/language/editLanguage', name: 'Language / Edit Language', component: EditLanguage },
+  { path: '/language/editLanguage', name: 'Language / Edit Language', component: EditUnit },
+  { path: '/unit/addUnit', name: 'Unit / Add Unit', component: AddUnit },
+  { path: '/unit/listUnit', exact: true, name: 'Unit / Unit List', component: ListUnit },
+  { path: '/unit/listUnit/:message', component: ListUnit },
+  { path: '/unit/editUnit', name: 'Unit / Edit Unit', component: EditUnit },
 
   { path: '/country/addCountry', name: 'Country / Add Country', component: AddCountry },
   { path: '/country/listCountry', exact: true, name: 'Country / Country List', component: ListCountry },

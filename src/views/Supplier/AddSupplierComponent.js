@@ -4,20 +4,20 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
-import ManufacturerService from "../../api/ManufacturerService";
+import SupplierService from "../../api/SupplierService";
 import RealmService from "../../api/RealmService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 
 const initialValues = {
   realmId: [],
-  manufacturer: ""
+  supplier: ""
 }
-const entityname=i18n.t('static.manufacturer.manufacturer');
+const entityname=i18n.t('static.supplier.supplier');
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
       .required(i18n.t('static.manufaturer.realmtext')),
-    manufacturer: Yup.string()
+    supplier: Yup.string()
       .required(i18n.t('static.manufaturer.manufaturertext'))
 
   })
@@ -44,12 +44,12 @@ const getErrorsFromValidationError = (validationError) => {
     }
   }, {})
 }
-class AddManufacturerComponent extends Component {
+class AddSupplierComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
       realms: [],
-      manufacturer: {
+      supplier: {
         realm: {
         },
         label: {
@@ -59,18 +59,26 @@ class AddManufacturerComponent extends Component {
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
+    this.Capitalize = this.Capitalize.bind(this);
   }
+  Capitalize(str) {
+    if (str != null && str != "") {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    } else {
+        return "";
+    }
+}
 
   dataChange(event) {
-    let { manufacturer } = this.state;
+    let { supplier } = this.state;
     if (event.target.name == "realmId") {
-      manufacturer.realm.realmId = event.target.value;
+      supplier.realm.realmId = event.target.value;
     }
-    if (event.target.name == "manufacturer") {
-      manufacturer.label.label_en = event.target.value;
+    if (event.target.name == "supplier") {
+      supplier.label.label_en = event.target.value;
     }
     this.setState({
-      manufacturer
+      supplier
     },
       () => { });
   };
@@ -78,13 +86,13 @@ class AddManufacturerComponent extends Component {
   touchAll(setTouched, errors) {
     setTouched({
       realmId: true,
-      manufacturer: true
+      supplier: true
     }
     );
     this.validateForm(errors);
   }
   validateForm(errors) {
-    this.findFirstError('manufacturerForm', (fieldName) => {
+    this.findFirstError('supplierForm', (fieldName) => {
       return Boolean(errors[fieldName])
     })
   }
@@ -150,11 +158,11 @@ class AddManufacturerComponent extends Component {
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
                   console.log("Submit clicked");
-                  ManufacturerService.addManufacturer(this.state.manufacturer)
+                  SupplierService.addSupplier(this.state.supplier)
                     .then(response => {
                       console.log("Response->", response);
                       if (response.status ==200) {
-                        this.props.history.push(`/manufacturer/listManufacturer/`+i18n.t(response.data.messageCode,{entityname}))
+                        this.props.history.push(`/supplier/listSupplier/`+i18n.t(response.data.messageCode,{entityname}))
                       } else {
                         this.setState({
                           message: response.data.messagCodee
@@ -194,10 +202,10 @@ class AddManufacturerComponent extends Component {
                     isValid,
                     setTouched
                   }) => (
-                      <Form onSubmit={handleSubmit} noValidate name='manufacturerForm'>
+                      <Form onSubmit={handleSubmit} noValidate name='supplierForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
                               <Input
                                 type="select"
                                 name="realmId"
@@ -216,17 +224,19 @@ class AddManufacturerComponent extends Component {
                                <FormText className="red">{errors.realmId}</FormText>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
+                            <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
                               <Input type="text"
-                                name="manufacturer"
-                                id="manufacturer"
+                                name="supplier"
+                                id="supplier"
                                 bsSize="sm"
-                                valid={!errors.manufacturer}
-                                invalid={touched.manufacturer && !!errors.manufacturer}
+                                valid={!errors.supplier}
+                                invalid={touched.supplier && !!errors.supplier}
                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                 onBlur={handleBlur}
-                                required />
-                            <FormText className="red">{errors.manufacturer}</FormText>
+                                required
+                                value={this.Capitalize(this.state.supplier.label.label_en)}
+                                />
+                            <FormText className="red">{errors.supplier}</FormText>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
@@ -251,8 +261,8 @@ class AddManufacturerComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/manufacturer/listManufacturer/`+i18n.t('static.message.cancelled',{entityname}))
+    this.props.history.push(`/supplier/listSupplier/`+i18n.t('static.message.cancelled',{entityname}))
   }
 }
 
-export default AddManufacturerComponent;
+export default AddSupplierComponent;
