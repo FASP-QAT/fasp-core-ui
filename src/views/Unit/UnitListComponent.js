@@ -1,117 +1,127 @@
-
 import React, { Component } from 'react';
-import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, FormText, Label, Button, Col
-} from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
-import i18n from '../../i18n'
-
-import RealmService from "../../api/RealmService";
-import UserService from "../../api/UserService";
+import { Card, CardBody, CardHeader,FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
+import UnitService from '../../api/UnitService.js';
+import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import moment from 'moment';
-const entityname = i18n.t('static.user.user')
-class ListUserComponent extends Component {
+import DimensionService from '../../api/DimensionService.js';
+import getLabelText from '../../CommonComponent/getLabelText.js';
+
+// import { HashRouter, Route, Switch } from 'react-router-dom';
+const entityname = i18n.t('static.unit.unit');
+export default class UnitListComponent extends Component {
+
     constructor(props) {
         super(props);
+        /* this.table = data.rows;
+         this.options = {
+             sortIndicator: true,
+             hideSizePerPage: true,
+             paginationSize: 3,
+             hidePageListOnlyOnePage: true,
+             clearSearch: true,
+             alwaysShowAllBtns: false,
+             withFirstAndLast: false,
+             onRowClick: function (row) {
+                 // console.log("row--------------", row);
+                 this.editUnit(row);
+             }.bind(this)
+ 
+         }*/
+
         this.state = {
-            realms: [],
-            userList: [],
+            unitList: [],
             message: '',
-            selUserList: []
+            selSource: [],
+            dimensions:[]
         }
-        this.editUser = this.editUser.bind(this);
+        this.editUnit = this.editUnit.bind(this);
+        this.addUnit = this.addUnit.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.addNewUser = this.addNewUser.bind(this);
-        this.buttonFormatter = this.buttonFormatter.bind(this);
-        this.addAccessControls = this.addAccessControls.bind(this);
-        this.formatDate = this.formatDate.bind(this);
+       
     }
 
-    buttonFormatter(cell, row) {
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>;
-    }
-    addAccessControls(event, row) {
-        event.stopPropagation();
+    editUnit(unit) {
         this.props.history.push({
-            pathname: "/user/accessControl",
-            state: {
-                user: row
-            }
+            pathname: "/unit/editUnit",
+            state: { unit }
+        });
+    }
 
-        })
+    addUnit() {
+        if (navigator.onLine) {
+            this.props.history.push(`/unit/addUnit`)
+        } else {
+            alert(i18n.t('static.common.online'))
+        }
     }
-    addNewUser() {
-        this.props.history.push("/user/addUser");
-    }
+
     filterData() {
-        let realmId = document.getElementById("realmId").value;
-        if (realmId != 0) {
-            const selUserList = this.state.userList.filter(c => c.realm.realmId == realmId)
+        let dimensionId = document.getElementById("dimensionId").value;
+        if (dimensionId != 0) {
+            const selSource = this.state.unitList.filter(c => c.dimension.dimensionId == dimensionId)
             this.setState({
-                selUserList
+                selSource
             });
         } else {
             this.setState({
-                selUserList: this.state.userList
+                selSource: this.state.unitList
             });
         }
-    }
-    editUser(user) {
-        this.props.history.push({
-            pathname: "/user/editUser",
-            state: { user }
-        });
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realms: response.data
-                    })
-                } else {
-                    this.setState({ message: response.data.messageCode })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-        UserService.getUserList()
-            .then(response => {
-                console.log(response.data)
+         DimensionService.getDimensionListAll()
+        .then(response => {
+            if (response.status == 200) {
                 this.setState({
-                    userList: response.data,
-                    selUserList: response.data
+                    dimensions: response.data
                 })
-            }).catch(
+            } else {
+                this.setState({ message: response.data.messageCode })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+
+        UnitService.getUnitListAll()
+            .then(response => {
+                console.log(response)
+
+                this.setState({
+                    unitList: response.data,
+                    selSource: response.data
+                })
+
+            })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        switch (error.response.status) {
                             case 500:
                             case 401:
                             case 404:
@@ -126,42 +136,21 @@ class ListUserComponent extends Component {
                     }
                 }
             );
+
     }
 
-    showRealmLabel(cell, row) {
-        return cell.label.label_en;
-    }
 
-    showRoleLabel(cell, row) {
-        return cell.label.label_en;
-    }
-    showLanguageLabel(cell, row) {
-        return cell.languageName;
-    }
-    showStatus(cell, row) {
-        if (cell) {
-            return "Active";
-        } else {
-            return "Disabled";
-        }
-    }
-    formatDate(cell, row) {
-        if (cell != null && cell != "") {
-            return moment(cell).format('MM-DD-YYYY hh:mm A');
-        } else {
-            return "";
-        }
-    }
     render() {
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
+        const { dimensions } = this.state;
+        let dimensionList = dimensions.length > 0
+            && dimensions.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                    <option key={i} value={item.dimensionId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -170,47 +159,23 @@ class ListUserComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'realm.label.label_en',
-            text: i18n.t('static.realm.realm'),
+            dataField: 'label.label_en',
+            text: i18n.t('static.unit.unit'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'username',
-            text: i18n.t('static.user.username'),
+            dataField: 'unitCode',
+            text: i18n.t('static.unit.unitCode'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'phoneNumber',
-            text: i18n.t('static.user.phoneNumber'),
+            dataField: 'dimension.label.label_en',
+            text: i18n.t('static.dimension.dimension'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
-        }, {
-            dataField: 'emailId',
-            text: i18n.t('static.user.emailid'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        },
-        {
-            dataField: 'faildAttempts',
-            text: i18n.t('static.user.failedAttempts'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center'
-        }, {
-            dataField: 'lastLoginDate',
-            text: i18n.t('static.user.lastLoginDate'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (
-                    (row.lastLoginDate ? moment(row.lastLoginDate).format('MM-DD-YYYY hh:mm A') : "")
-                );
-            }
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -222,15 +187,7 @@ class ListUserComponent extends Component {
                     (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
             }
-        }, {
-            dataField: 'userId',
-            text: 'ACTION',
-            formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>
-                )
-            }
-        }
-        ];
+        }];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -254,7 +211,7 @@ class ListUserComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selUserList.length
+                text: 'All', value: this.state.selSource.length
             }]
         }
         return (
@@ -266,24 +223,23 @@ class ListUserComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addUnit}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
-                        <Col md="3" className="pl-0">
+                    <CardBody>   <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.dimension.dimension')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="realmId"
-                                            id="realmId"
+                                            name="dimensionId"
+                                            id="dimensionId"
                                             bsSize="sm"
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
-                                            {realmList}
+                                            {dimensionList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -292,9 +248,10 @@ class ListUserComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
+                     
                         <ToolkitProvider
-                            keyField="userId"
-                            data={this.state.selUserList}
+                            keyField="unitId"
+                            data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
                             hover
@@ -312,8 +269,7 @@ class ListUserComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
-                                                    this.editUser(row);
+                                                    this.editUnit(row);
                                                 }
                                             }}
                                             {...props.baseProps}
@@ -325,8 +281,8 @@ class ListUserComponent extends Component {
 
                     </CardBody>
                 </Card>
+
             </div>
         );
     }
 }
-export default ListUserComponent;

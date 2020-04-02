@@ -7,40 +7,40 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import i18n from '../../i18n'
 
-import ManufacturerService from "../../api/ManufacturerService";
+import SupplierService from "../../api/SupplierService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-const entityname=i18n.t('static.manufacturer.manufacturer');
-class ManufacturerListComponent extends Component {
+const entityname=i18n.t('static.supplier.supplier');
+class SupplierListComponent extends Component {
     constructor(props) {
         super(props);
        
         this.state = {
-            manufacturerList: [],
+            supplierList: [],
             message: '',
             selSource: []
         }
-        this.editManufacturer = this.editManufacturer.bind(this);
-        this.addManufacturer = this.addManufacturer.bind(this);
+        this.editSupplier = this.editSupplier.bind(this);
+        this.addSupplier = this.addSupplier.bind(this);
     }
-    editManufacturer(manufacturer) {
+    editSupplier(supplier) {
         this.props.history.push({
-            pathname: "/manufacturer/editManufacturer",
-            state: { manufacturer }
+            pathname: "/supplier/editSupplier",
+            state: { supplier }
         });
     }
-    addManufacturer(manufacturer) {
+    addSupplier(supplier) {
         this.props.history.push({
-            pathname: "/manufacturer/addManufacturer"
+            pathname: "/supplier/addSupplier"
         });
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        ManufacturerService.getManufacturerListAll()
+        SupplierService.getSupplierListAll()
             .then(response => {
                 console.log(response.data)
                 this.setState({
-                    manufacturerList: response.data,
+                    supplierList: response.data,
                     selSource: response.data
                 })
             }).catch(
@@ -83,7 +83,7 @@ class ManufacturerListComponent extends Component {
             headerAlign: 'center'
         },{
             dataField: 'label.label_en',
-            text: i18n.t('static.manufacturer.manufacturer'),
+            text: i18n.t('static.supplier.supplier'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
@@ -134,13 +134,13 @@ class ManufacturerListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addManufacturer}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
                     <ToolkitProvider
-                            keyField="manufacturerId"
+                            keyField="supplierId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
@@ -158,7 +158,7 @@ class ManufacturerListComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editManufacturer(row);
+                                                    this.editSupplier(row);
                                                 }
                                             }}
                                             {...props.baseProps}
@@ -174,4 +174,4 @@ class ManufacturerListComponent extends Component {
         );
     }
 }
-export default ManufacturerListComponent;
+export default SupplierListComponent;

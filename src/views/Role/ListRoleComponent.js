@@ -128,7 +128,7 @@ class ListRoleComponent extends Component {
                     </CardHeader>
                     <CardBody>
                     <ToolkitProvider
-                            keyField="manufacturerId"
+                            keyField="supplierId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
