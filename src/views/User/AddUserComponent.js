@@ -375,7 +375,7 @@ class AddUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
-                                                       <Input
+                                                        <Input
                                                             type="select"
                                                             name="roleId"
                                                             id="roleId"

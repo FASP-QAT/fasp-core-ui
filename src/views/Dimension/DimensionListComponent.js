@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import UnitTypeService from '../../api/UnitTypeService.js';
+import DimensionService from '../../api/DimensionService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
@@ -10,7 +10,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 
 import i18n from '../../i18n';
 const entityname=i18n.t('static.dimension.dimension');
-export default class UnitTypeListComponent extends Component {
+export default class DimensionListComponent extends Component {
 
     constructor(props) {
         super(props);
@@ -25,25 +25,25 @@ export default class UnitTypeListComponent extends Component {
             withFirstAndLast: false,
             onRowClick: function (row) {
                 // console.log("row--------------", row);
-                this.editUnitType(row);
+                this.editDimension(row);
             }.bind(this)
 
         }*/
         this.state = {
-            unitTypeList: [],
+            dimensionList: [],
             message: '',
             selSource: []
         }
-        this.addNewUnitType = this.addNewUnitType.bind(this);
-        this.editUnitType = this.editUnitType.bind(this);
+        this.addNewDimension = this.addNewDimension.bind(this);
+        this.editDimension = this.editDimension.bind(this);
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        UnitTypeService.getUnitTypeListAll().then(response => {
+        DimensionService.getDimensionListAll().then(response => {
             console.log(response.data)
             this.setState({
-                unitTypeList: response.data,
+                dimensionList: response.data,
                 selSource: response.data
             })
         })
@@ -70,14 +70,14 @@ export default class UnitTypeListComponent extends Component {
     }
 
    
-    editUnitType(unitType) {
+    editDimension(dimension) {
         this.props.history.push({
             pathname: "/diamension/editDiamension",
-            state: { unitType: unitType }
+            state: { dimension: dimension }
         });
     }
 
-    addNewUnitType() {
+    addNewDimension() {
         if (navigator.onLine) {
             this.props.history.push(`/diamension/addDiamension`)
         } else {
@@ -135,7 +135,7 @@ export default class UnitTypeListComponent extends Component {
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewUnitType}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewDimension}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
 
@@ -160,7 +160,7 @@ export default class UnitTypeListComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editUnitType(row);
+                                                    this.editDimension(row);
                                                 }
                                             }}
                                             {...props.baseProps}
