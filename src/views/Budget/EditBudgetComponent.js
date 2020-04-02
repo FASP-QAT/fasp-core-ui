@@ -291,6 +291,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
 
                                                         <Input type="number"
+                                                            min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"

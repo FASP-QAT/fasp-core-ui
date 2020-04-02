@@ -374,7 +374,10 @@ class AddBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
-                                                        <Input type="number"
+                                                        <Input 
+                                                            
+                                                            type="number"
+                                                            min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
