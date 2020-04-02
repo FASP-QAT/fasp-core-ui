@@ -30,6 +30,14 @@ class ListUserComponent extends Component {
         this.addAccessControls = this.addAccessControls.bind(this);
         this.formatDate = this.formatDate.bind(this);
     }
+    formatDate(cell, row) {
+        if (cell != null && cell != "") {
+          var modifiedDate = moment(cell).format('MM-DD-YYYY');
+          return modifiedDate;
+        } else {
+          return "";
+        }
+      }
 
     buttonFormatter(cell, row) {
         return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>;
@@ -254,6 +262,7 @@ class ListUserComponent extends Component {
                 text: '50', value: 50
             },
             {
+
                 text: 'All', value: this.state.selUserList.length
             }]
         }

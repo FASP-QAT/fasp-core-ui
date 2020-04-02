@@ -479,19 +479,12 @@ class AccessControlComponent extends Component {
 
                                     <thead>
                                         <tr>
-<<<<<<< HEAD
-=======
-
->>>>>>> user
                                             <th className="text-left"> {i18n.t('static.program.realmcountry')} </th>
                                             <th className="text-left"> {i18n.t('static.healtharea.healtharea')}</th>
                                             <th className="text-left"> {i18n.t('static.organisation.organisation')} </th>
                                             <th className="text-left">{i18n.t('static.program.program')}</th>
-<<<<<<< HEAD
                                             <th className="text-left">{i18n.t('static.common.remove')}</th>
-=======
-                                            <th className="text-left">{i18n.t('static.common.deleterow')}</th>
->>>>>>> user
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -525,13 +518,8 @@ class AccessControlComponent extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-<<<<<<< HEAD
                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.rows.length > 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-=======
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    {this.state.rows.length > 0 && <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
->>>>>>> user
                                     &nbsp;
                                 </FormGroup>
 
