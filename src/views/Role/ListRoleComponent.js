@@ -3,32 +3,23 @@ import React, { Component } from 'react';
 import {
     Card, CardHeader, CardBody
 } from 'reactstrap';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator'
 import i18n from '../../i18n'
 
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-
+const entityname=i18n.t('static.role.role');
 class ListRoleComponent extends Component {
     constructor(props) {
         super(props);
-        this.options = {
-            sortIndicator: true,
-            hideSizePerPage: false,
-            paginationSize: 3,
-            hidePageListOnlyOnePage: true,
-            clearSearch: true,
-            alwaysShowAllBtns: false,
-            withFirstAndLast: false,
-            onRowClick: function (row) {
-                this.editRole(row);
-            }.bind(this)
-
-        }
+       
         this.state = {
             roleList: [],
-            message: ''
+            message: '',
+            selSource: []
         }
         this.editRole = this.editRole.bind(this);
         this.addNewRole = this.addNewRole.bind(this);
@@ -48,7 +39,8 @@ class ListRoleComponent extends Component {
         UserService.getRoleList()
             .then(response => {
                 this.setState({
-                    roleList: response.data
+                    roleList: response.data,
+                    selSource: response.data
                 })
             }).catch(
                 error => {
@@ -74,25 +66,95 @@ class ListRoleComponent extends Component {
     }
 
     render() {
-        return (
-            <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message)}</h5>
-                <Card>
+      
+            const { SearchBar, ClearSearchButton } = Search;
+            const customTotal = (from, to, size) => (
+                <span className="react-bootstrap-table-pagination-total">
+                   {i18n.t('static.common.result',{from,to,size}) }
+                </span>
+            );
+    
+            const columns = [{
+                dataField: 'roleId',
+                text: i18n.t('static.role.roleid'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },{
+                dataField: 'label.label_en',
+                text: i18n.t('static.role.role'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }];
+            const options = {
+                hidePageListOnlyOnePage: true,
+                firstPageText: i18n.t('static.common.first'),
+                prePageText: i18n.t('static.common.back'),
+                nextPageText: i18n.t('static.common.next'),
+                lastPageText: i18n.t('static.common.last'),
+                nextPageTitle: i18n.t('static.common.firstPage') ,
+                prePageTitle: i18n.t('static.common.prevPage') ,
+                firstPageTitle: i18n.t('static.common.nextPage'),
+                lastPageTitle: i18n.t('static.common.lastPage') ,
+                showTotal: true,
+                paginationTotalRenderer: customTotal,
+                disablePageTitle: true,
+                sizePerPageList: [{
+                    text: '10', value: 10
+                }, {
+                    text: '30', value: 30
+                }
+                    ,
+                {
+                    text: '50', value: 50
+                },
+                {
+                    text: 'All', value: this.state.selSource.length
+                }]
+            }
+            return (
+                <div className="animated">
+                    <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
+                    <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.role.rolelisttext')}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.role.roleaddtext')} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewRole}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.roleList} version="4" hover pagination search options={this.options}>
-                            <TableHeaderColumn isKey filterFormatted dataField="roleId" dataSort dataAlign="center"><strong>{i18n.t('static.role.roleid')}</strong></TableHeaderColumn>
-                            <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showRoleLabel} dataAlign="center" dataSort><strong>{i18n.t('static.role.rolename')}</strong></TableHeaderColumn>
-                        </BootstrapTable>
-                    </CardBody>
+                    <ToolkitProvider
+                            keyField="manufacturerId"
+                            data={this.state.selSource}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                        >
+                            {
+                                props => ( <div className="TableCust">
+                                <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                        <SearchBar {...props.searchProps} />
+                                        <ClearSearchButton {...props.searchProps} />
+                                        </div>
+                                        <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                            pagination={paginationFactory(options)}
+                                            rowEvents={{
+                                                onClick: (e, row, rowIndex) => {
+                                                    this.editRole(row);
+                                                }
+                                            }}
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
+ </CardBody>
                 </Card>
             </div>
         );

@@ -4,7 +4,6 @@ import { API_URL } from '../Constants.js';
 class OrganisationService {
 
     addOrganisation(json) {
-        console.log(json);
         return axios.post(`${API_URL}/api/organisation/`, json, {}
         );
     }

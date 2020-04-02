@@ -22,7 +22,6 @@ class DefaultHeader extends Component {
   }
   changeLanguage(lang ) {
   localStorage.setItem('lang',lang);
- console.log('stored updated language');
   window.location.reload();
   }
   render() {
@@ -34,7 +33,7 @@ class DefaultHeader extends Component {
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
-          full={{ src: logo, width: 150, height: 140, alt: 'QAT Logo' }}
+          full={{ src: logo, width: 150, height: 50, alt: 'QAT Logo' }}
           // minimized={{ src: QAT, width: 30, height: 30, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />

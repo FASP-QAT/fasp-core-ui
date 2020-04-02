@@ -32,6 +32,7 @@ const EditRole = React.lazy(() => import('./views/Role/EditRoleComponent'));
 const AddUser = React.lazy(() => import('./views/User/AddUserComponent'));
 const ListUser = React.lazy(() => import('./views/User/ListUserComponent'));
 const EditUser = React.lazy(() => import('./views/User/EditUserComponent'));
+const AccessControl = React.lazy(() => import('./views/User/AccessControlComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -115,8 +116,8 @@ const ListLanguage = React.lazy(() => import('./views/Language/LanguageListCompo
 const EditLanguage = React.lazy(() => import('./views/Language/EditLanguageComponent'));
 
 const AddCountry = React.lazy(() => import('./views/Country/AddCountryComponent'));
-const ListCountry = React.lazy(() => import('./views/Country/CountryListComponent'));
-const EditCountry = React.lazy(() => import('./views/Country/UpdateCountryComponent'));
+const ListCountry = React.lazy(() => import('./views/Country/ListCountryComponent'));
+const EditCountry = React.lazy(() => import('./views/Country/EditCountryComponent'));
 
 const AddDataSource = React.lazy(() => import('./views/DataSource/AddDataSource'));
 const ListDataSource = React.lazy(() => import('./views/DataSource/DataSourceListComponent'));
@@ -127,10 +128,10 @@ const ListDataSourceType = React.lazy(() => import('./views/DataSourceType/DataS
 const EditDataSourceType = React.lazy(() => import('./views/DataSourceType/UpdateDataSourceTypeComponent'));
 
 const AddCurrency = React.lazy(() => import('./views/Currency/AddCurrencyComponent'));
-const ListCurrency = React.lazy(() => import('./views/Currency/CurrencyListComponent'));
-const EditCurrency = React.lazy(() => import('./views/Currency/UpdateCurrencyComponent'));
+const ListCurrency = React.lazy(() => import('./views/Currency/ListCurrencyComponent'));
+const EditCurrency = React.lazy(() => import('./views/Currency/EditCurrencyComponent'));
 const DatabaseTranslation = React.lazy(() => import('./views/Translations/DatabaseTranslations'));
-const LabelTranslation=React.lazy(()=>import('./views/Translations/LabelTranslations'))
+const LabelTranslation = React.lazy(() => import('./views/Translations/LabelTranslations'))
 const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 
 
@@ -140,50 +141,53 @@ const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
 const SupplyPlan = React.lazy(() => import('./views/SupplyPlan/SupplyPlanComponent'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: 'Program', component: ProgramTree },
-
   { path: '/diamension/AddDiamension', name: 'Dimension / Add Dimension', component: AddDimension },
-  { path: '/diamension/diamensionlist',exact: true,  name: 'Dimension / Dimension List', component: DimensionList },
- { path: '/diamension/diamensionlist/:message', component: DimensionList },
+  { path: '/diamension/diamensionlist', exact: true, name: 'Dimension / Dimension List', component: DimensionList },
+  { path: '/diamension/diamensionlist/:message', component: DimensionList },
   { path: '/diamension/editDiamension', name: 'Dimension / Edit Dimension', component: EditDimension },
-
   { path: '/realm/addrealm', name: ' Realm / Add Realm', component: AddRealm },
-  { path: '/realm/realmlist',exact: true, name: 'Realm / Realm List', component: RealmList },
+  { path: '/realm/realmlist', exact: true, name: 'Realm / Realm List', component: RealmList },
   { path: '/realm/updaterealm', name: 'Realm / Edit Realm', component: EditRealm },
-  { path: '/realm/realmlist/:message',component: RealmList },
+  { path: '/realm/realmlist/:message', component: RealmList },
 
 
 
 
   { path: '/product/editProduct/:productId', name: i18n.t('static.product.productedit'), component: EditProdct },
-  { path: '/product/listProduct', exact: true,name: i18n.t('static.product.productlist'), component: ListProdct },
-  { path: '/product/listProduct/:message',name: i18n.t('static.product.productlist'), component: ListProdct },
+  { path: '/product/listProduct', exact: true, name: i18n.t('static.product.productlist'), component: ListProdct },
+  { path: '/product/listProduct/:message', name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
-  { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
-  { path: '/program/listProgram',exact: true,name: 'Program ', component: Programs },
-  { path: '/program/listProgram/:message', name: 'Program ', component: Programs },
-  { path: '/program/editProgram/:programId', name: 'Edit Program', component: EditProgram },
+
+  { path: '/program/addProgram', name: 'Program / Add Program', component: AddProgram },
+  { path: '/program/listProgram', exact: true, name: 'Program / Program List', component: Programs },
+  { path: '/program/listProgram/:message', component: Programs },
+  { path: '/program/editProgram/:programId', name: 'Program / Edit Program', component: EditProgram },
+  
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
-  { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
-  
-  { path: '/budget/listBudget',exact: true, name: 'Budget List', component: ListBudgetComponent },
+
+  { path: '/budget/addBudget', name: 'Budget / Add Budget', component: AddBudgetComponent },
+  { path: '/budget/listBudget', exact: true, name: 'Budget / Budget List', component: ListBudgetComponent },
+  { path: '/budget/editBudget/', name: 'Budget / Edit Budget', component: EditBudgetComponent },
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
-  { path: '/budget/editBudget/', name: 'Edit Budget', component: EditBudgetComponent },
-  { path: '/', exact: true, name: 'Home' },
-  // { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
+  
+  
   { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },
   { path: '/fundingSource/listFundingSource/:message', component: ListFundingSource },
+  
   { path: '/subFundingSource/addSubFundingSource', name: 'Sub Funding Source / Add Sub Funding Source', component: AddSubFundingSource },
   { path: '/subFundingSource/listSubFundingSource', exact: true, name: 'Sub Funding Source / Sub Funding Source List', component: ListSubFundingSource },
   { path: '/subFundingSource/editSubFundingSource', name: 'Sub Funding Source / Edit Sub Funding Source', component: EditSubFundingSource },
-  { path: '/subFundingSource/subFundingSourceList/:message',component: SubFundingSourceList },
-   { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
-    { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
+  { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
+  
+  { path: '/ApplicationDashboard', name: 'ApplicationDashboard', component: ApplicationDashboard },
+  { path: '/RealmDashboard', name: 'RealmDashboard', component: RealmDashboard },
   { path: '/ProgramDashboard', name: 'ProgramDashboard', component: ProgramDashboard },
-  { path: '/dashboard',exact:true, name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard', exact: true, name: 'Dashboard', component: Dashboard },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
   { path: '/subFundingSource/listSubFundingSource/:message', component: ListSubFundingSource },
   { path: '/procurementAgent/addProcurementAgent', name: 'Procurement Agent / Add Procurement Agent', component: AddProcurementAgent },
@@ -210,7 +214,8 @@ const routes = [
   { path: '/user/listUser', exact: true, name: 'User / User List', component: ListUser },
   { path: '/user/addUser', exact: true, name: 'User / Add User', component: AddUser },
   { path: '/user/editUser', exact: true, name: 'User / Edit User', component: EditUser },
-  { path: '/dashboard/:message',component: Dashboard },
+  { path: '/user/accessControl', exact: true, name: 'User / Access Control', component: AccessControl },
+  { path: '/dashboard/:message', component: Dashboard },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
@@ -274,7 +279,7 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/program/downloadProgram', name: 'Download Program', component: DownloadProgram },
-  { path: '/program/downloadProgram/:message', name: 'Download Program', component: DownloadProgram },
+  { path: '/program/downloadProgram/:message', component: DownloadProgram },
   { path: '/program/exportProgram', name: 'Export Program', component: ExportProgram },
   { path: '/program/importProgram', name: 'Import Program', component: ImportProgram },
   { path: '/masterDataSync', name: 'Master Data sync', component: MasterDataSync },

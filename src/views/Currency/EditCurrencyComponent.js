@@ -27,7 +27,7 @@ const validationSchema = function (values) {
         label: Yup.string()
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.number()
-        .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
+            .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
     })
 }
 
@@ -60,7 +60,7 @@ export default class UpdateCurrencyComponent extends Component {
         super(props);
         this.state = {
             currency: this.props.location.state.currency,
-            message:'',
+            message: '',
             lang: localStorage.getItem('lang')
         }
         this.Capitalize = this.Capitalize.bind(this);
@@ -69,7 +69,7 @@ export default class UpdateCurrencyComponent extends Component {
         initialValues = {
             currencyCode: this.props.location.state.currency.currencyCode,
             currencySymbol: this.props.location.state.currency.currencySymbol,
-            label: getLabelText(this.props.location.state.currency.label,this.state.lang),
+            label: getLabelText(this.props.location.state.currency.label, this.state.lang),
             conversionRate: this.props.location.state.currency.conversionRateToUsd
         }
     }
@@ -144,6 +144,7 @@ export default class UpdateCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -248,7 +249,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.currency.label,this.state.lang)}
+                                                            value={getLabelText(this.state.currency.label, this.state.lang)}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormText className="red">{errors.label}</FormText>

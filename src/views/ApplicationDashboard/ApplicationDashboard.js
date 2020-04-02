@@ -185,7 +185,7 @@ class ApplicationDashboard extends Component {
         <Row>
           <Col md="9">
           <Card>
-            <CardHeader>
+            <CardHeader className="text-center">
               <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">98</span></b>
               <div className="card-header-actions">
               <a className="card-header-action">
@@ -201,7 +201,7 @@ class ApplicationDashboard extends Component {
           </Card>
           </Col> 
         </Row>
-        <Row>
+        {/* <Row>
         <Col md="8">
             <Card>
               <CardHeader>
@@ -210,7 +210,7 @@ class ApplicationDashboard extends Component {
               <CardBody>
                 <Row>
                   <Col xs="12" sm="12" md="12">
-                   <Table hover responsive className="table-outline mb-0 d-none d-sm-table">
+                   <Table hover responsive className="table-outline mb-0  d-sm-table">
                   <thead className="thead-light">
                   <tr>
                   <th>Total Realms</th>
@@ -322,7 +322,7 @@ class ApplicationDashboard extends Component {
                 </Card>
                 </Col>
                 
-        </Row>
+        </Row> */}
 
        
     </div>

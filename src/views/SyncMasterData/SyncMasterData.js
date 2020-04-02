@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import {
     Card, CardBody, CardHeader,
-    CardFooter, Button, Col, Progress, FormGroup
+    CardFooter, Button, Col, Progress, FormGroup,Row
 } from 'reactstrap';
 import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
-import * as JsStoreFunction from "../../CommonComponent/JsStoreFunctions.js"
-import * as JsStoreFunctionCore from "../../CommonComponent/JsStoreFunctionsCore"
 import moment from 'moment';
 import MasterSyncService from '../../api/MasterSyncService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -33,29 +31,29 @@ export default class SyncMasterData extends Component {
 
     render() {
         return (
-            <>
-                <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                </div>
-                <Col xs="12" sm="12">
-                    <Card>
-                        <CardHeader>
-                            <strong>{i18n.t('static.masterDataSync.masterDataSync')}</strong>
-                        </CardHeader>
-                        <CardBody>
-                            <div className="text-center">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
-                            <Progress value={this.state.syncedMasters} max={this.state.totalMasters} />
-                        </CardBody>
+            <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
+                <Row>
+                    <Col xs="12" sm="12">
+                        <Card>
+                            <CardHeader>
+                                <strong>{i18n.t('static.masterDataSync.masterDataSync')}</strong>
+                            </CardHeader>
+                            <CardBody>
+                                <div className="text-center">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
+                                <Progress value={this.state.syncedMasters} max={this.state.totalMasters} />
+                            </CardBody>
 
-                        <CardFooter id="retryButtonDiv">
-                            <FormGroup>
-                                <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.retryClicked()}><i className="fa fa-refresh"></i> {i18n.t('static.common.retry')}</Button>
-                                &nbsp;
+                            <CardFooter id="retryButtonDiv">
+                                <FormGroup>
+                                    <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.retryClicked()}><i className="fa fa-refresh"></i> {i18n.t('static.common.retry')}</Button>
+                                    &nbsp;
                             </FormGroup>
-                        </CardFooter>
-                    </Card>
-                </Col>
-            </>
+                            </CardFooter>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
         )
 
     }
@@ -76,19 +74,19 @@ export default class SyncMasterData extends Component {
                 var lastSyncDateRequest = lastSyncDateTransaction.getAll();
                 lastSyncDateRequest.onsuccess = function (event) {
                     var lastSyncDate = lastSyncDateRequest.result[0];
-                    console.log("lastsyncDate",lastSyncDate);
+                    console.log("lastsyncDate", lastSyncDate);
                     var result = lastSyncDateRequest.result;
-                    console.log("Result",result)
-                    console.log("RealmId",realmId)
+                    console.log("Result", result)
+                    console.log("RealmId", realmId)
                     for (var i = 0; i < result.length; i++) {
                         if (result[i].id == realmId) {
                             console.log("in if")
                             var lastSyncDateRealm = lastSyncDateRequest.result[i];
-                            console.log("last sync date in realm",lastSyncDateRealm)
+                            console.log("last sync date in realm", lastSyncDateRealm)
                         }
-                        if(result[i].id==0){
+                        if (result[i].id == 0) {
                             var lastSyncDate = lastSyncDateRequest.result[i];
-                            console.log("last sync date",lastSyncDate)
+                            console.log("last sync date", lastSyncDate)
                         }
                     }
                     if (lastSyncDate == undefined) {
@@ -101,7 +99,7 @@ export default class SyncMasterData extends Component {
                     } else {
                         lastSyncDateRealm = lastSyncDateRealm.lastSyncDate;
                     }
-                    console.log("Last sync date above",lastSyncDateRealm)
+                    console.log("Last sync date above", lastSyncDateRealm)
                     AuthenticationService.setupAxiosInterceptors();
                     if (navigator.onLine) {
                         //Code to Sync Country list
@@ -121,7 +119,7 @@ export default class SyncMasterData extends Component {
                                     })
                                     if (navigator.onLine) {
                                         //Code to Sync Budget list
-                                        console.log("Last sync date realm",lastSyncDateRealm)
+                                        console.log("Last sync date realm", lastSyncDateRealm)
                                         MasterSyncService.getBudgetListForSync(lastSyncDateRealm)
                                             .then(response => {
                                                 if (response.status == 200) {
@@ -447,7 +445,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                                                                                                             message: `static.masterDataSync.syncFailed`
                                                                                                                                                                                                                                                                                                                                                         })
                                                                                                                                                                                                                                                                                                                                                     }
-                                                                                                                                                                                                                                                                                                                                                    
+
                                                                                                                                                                                                                                                                                                                                                 } else {
                                                                                                                                                                                                                                                                                                                                                     this.setState({
                                                                                                                                                                                                                                                                                                                                                         message: response.data.messageCode
