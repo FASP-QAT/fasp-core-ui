@@ -93,10 +93,8 @@ class ForgotPasswordComponent extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (navigator.onLine) {
-                                            console.log(values.username);
                                             UserService.forgotPassword(values.username)
                                                 .then(response => {
-                                                    console.log(response)
                                                     this.props.history.push(`/login/${response.statusText}`)
                                                 })
                                                 .catch(
@@ -114,7 +112,6 @@ class ForgotPasswordComponent extends Component {
                                                                     break;
                                                                 default:
                                                                     this.setState({ message: 'static.unkownError' });
-                                                                    console.log("Error code unkown");
                                                                     break;
                                                             }
                                                         }

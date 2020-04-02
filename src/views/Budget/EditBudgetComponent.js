@@ -55,7 +55,6 @@ const getErrorsFromValidationError = (validationError) => {
 
 class EditBudgetComponent extends Component {
     constructor(props) {
-        console.log("in constructor-----------------");
         super(props);
         this.state = {
             budget: this.props.location.state.budget,
@@ -170,7 +169,6 @@ class EditBudgetComponent extends Component {
     }
 
     render() {
-        console.log("in outer render----->");
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message)}</h5>
@@ -211,7 +209,6 @@ class EditBudgetComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }

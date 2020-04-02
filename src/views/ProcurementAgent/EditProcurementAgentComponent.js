@@ -62,7 +62,6 @@ class EditProcurementAgentComponent extends Component {
     }
 
     Capitalize(str) {
-        console.log("capitalize");
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
@@ -139,7 +138,6 @@ class EditProcurementAgentComponent extends Component {
                                     }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("this.state.procurementAgent---", this.state.procurementAgent);
                                     AuthenticationService.setupAxiosInterceptors();
                                     ProcurementAgentService.updateProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
@@ -166,7 +164,6 @@ class EditProcurementAgentComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }

@@ -15,7 +15,6 @@ class ProductService {
     }
 
     editProduct(json) {
-        console.log("----json", json);
         return axios.put(`${API_URL}/api/product/`, json, {}
         );
     }

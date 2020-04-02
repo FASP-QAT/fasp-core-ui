@@ -181,7 +181,6 @@ class AddBudgetComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList()
             .then(response => {
-                console.log("program list fro drop down----", response.data);
                 this.setState({
                     programs: response.data
                 })
@@ -200,7 +199,6 @@ class AddBudgetComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -209,7 +207,6 @@ class AddBudgetComponent extends Component {
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
-                console.log("--------res", response);
                 this.setState({
                     subFundingSources: response.data
                 })
@@ -228,7 +225,6 @@ class AddBudgetComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -293,7 +289,6 @@ class AddBudgetComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }

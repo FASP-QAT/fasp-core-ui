@@ -113,7 +113,6 @@ class EditSubFundingSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
-                                            console.log(response.data.messageCode)
                                             if (response.status == 200) {
                                                 this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
                                                 } else {
@@ -137,7 +136,6 @@ class EditSubFundingSourceComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
