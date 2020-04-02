@@ -31,7 +31,7 @@ class ProgramService {
     getRealmCountryList(json) {
         return axios.get(`${API_URL}/api/realmCountry/realmId/${json}`, {}
         );
-        
+
     }
     getOrganisationList(json) {
         return axios.get(`${API_URL}/api/organisation/realmId/${json}`, {}
@@ -46,13 +46,18 @@ class ProgramService {
         );
     }
 
-    getProgramProductListByProgramId(json){
+    getProgramProductListByProgramId(json) {
         return axios.get(`${API_URL}/api/programProduct/${json}`, {}
         );
     }
 
-    addProgramProductMapping(json){
+    addProgramProductMapping(json) {
         return axios.put(`${API_URL}/api/programProduct/`, json, {}
+        );
+    }
+
+    getProgramById(json) {
+        return axios.get(`${API_URL}/api/program/${json}`, {}
         );
     }
 }

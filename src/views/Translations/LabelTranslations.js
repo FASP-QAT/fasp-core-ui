@@ -151,7 +151,6 @@ export default class DatabaseTranslations extends React.Component {
         return (
             <>
                 <Col xs="12" sm="12">
-                    <h5>{i18n.t(this.state.message)}</h5>
                     <Card>
                         <CardHeader>
                             <strong>{i18n.t('static.label.labelTranslations')}</strong>
@@ -160,13 +159,14 @@ export default class DatabaseTranslations extends React.Component {
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
-                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="button" size="sm" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                 &nbsp;
                             </FormGroup>
                         </CardFooter>
                     </Card>
                 </Col>
+                <h6>{i18n.t(this.state.message)}</h6>
             </>
         )
     }

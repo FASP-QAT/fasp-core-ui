@@ -12,7 +12,7 @@ const initialValues = {
   fundingSourceId: [],
   subFundingSource: ""
 }
-
+const entityname=i18n.t('static.subfundingsource.subfundingsource');
 const validationSchema = function (values) {
   return Yup.object().shape({
     fundingSourceId: Yup.string()
@@ -163,7 +163,7 @@ class AddSubFundingSourceComponent extends Component {
                   SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
                     .then(response => {
                       if (response.status == 200) {
-                        this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
+                        this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
                       } else {
                         this.setState({
                           message: response.data.message
@@ -207,8 +207,6 @@ class AddSubFundingSourceComponent extends Component {
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
                             <Input
                               type="select"
                               name="fundingSourceId"
@@ -224,13 +222,10 @@ class AddSubFundingSourceComponent extends Component {
                               <option value="0">{i18n.t('static.common.select')}</option>
                               {fundingSourceList}
                             </Input>
-                             </InputGroupAddon>
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
-                            <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                             <Input type="text"
                               name="subFundingSource"
                               id="subFundingSource"
@@ -242,7 +237,6 @@ class AddSubFundingSourceComponent extends Component {
                               required
                               value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                             />
-                             </InputGroupAddon>
                             <FormFeedback>{errors.subFundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
@@ -263,7 +257,7 @@ class AddSubFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
+    this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}))
   }
 }
 

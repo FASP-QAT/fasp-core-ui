@@ -13,7 +13,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 const initialValues = {
     label: ""
 }
-
+const entityname = i18n.t('static.dimension.dimension');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -113,7 +113,7 @@ export default class AddUnitTypeComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Add Dimension Type</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <CardBody>
                                 <Formik
@@ -123,28 +123,33 @@ export default class AddUnitTypeComponent extends Component {
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         console.log(this.state.unitType)
                                         UnitTypeService.addUniType(this.state.unitType).then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/diamension/diamensionlist/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/diamension/diamensionlist/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         }
                                         )
                                             .catch(
                                                 error => {
-                                                    switch (error.message) {
-                                                        case "Network Error":
-                                                            this.setState({
-                                                                message: error.message
-                                                            })
-                                                            break
-                                                        default:
-                                                            this.setState({
-                                                                message: error.response.data.message
-                                                            })
-                                                            break
+                                                    if (error.message === "Network Error") {
+                                                        this.setState({ message: error.message });
+                                                    } else {
+                                                        switch (error.response ? error.response.status : "") {
+                                                            case 500:
+                                                            case 401:
+                                                            case 404:
+                                                            case 406:
+                                                            case 412:
+                                                                this.setState({ message: error.response.data.messageCode });
+                                                                break;
+                                                            default:
+                                                                this.setState({ message: 'static.unkownError' });
+                                                                break;
+                                                        }
+
                                                     }
                                                 }
                                             )
@@ -170,20 +175,17 @@ export default class AddUnitTypeComponent extends Component {
 
 
                                                     <FormGroup>
-                                                        <Label for="label">Dimension Type</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                            <Input type="text"
-                                                                name="label"
-                                                                id="label"
-                                                                bsSize="sm"
-                                                                valid={!errors.label}
-                                                                invalid={touched.label && !!errors.label}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.unitType.label.label_en}
-                                                                required />
-                                                        </InputGroupAddon>
+                                                        <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.unitType.label.label_en}
+                                                            required />
                                                         <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
 
@@ -201,6 +203,10 @@ export default class AddUnitTypeComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }

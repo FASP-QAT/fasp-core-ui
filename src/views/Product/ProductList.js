@@ -13,7 +13,8 @@ class ProductList extends Component {
     super(props);
     this.state = {
       table: [],
-      lang: localStorage.getItem('lang')
+      lang: localStorage.getItem('lang'),
+      message:''
     }
 
     this.options = {
@@ -39,11 +40,11 @@ class ProductList extends Component {
   }
 
   editProduct(product) {
-
     console.log(product);
+    var productId=product.productId;
     this.props.history.push({
-      pathname: "/product/editProduct",
-      state: { product }
+      pathname: `/product/editProduct/${productId}`,
+      // state: { product }
     });
   }
 
@@ -51,30 +52,38 @@ class ProductList extends Component {
     this.props.history.push({
       pathname: "/product/addProduct"
     });
-  }
+  } 
 
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     ProductService.getProductList()
       .then(response => {
-        console.log(response);
-        this.setState({
-          table: response.data.data
-        })
+        if (response.status == 200) {
+          console.log(response.data);
+          this.setState({
+            table: response.data
+          })
+        } else {
+          this.setState({ message: response.data.messageCode })
+        }
       })
       .catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.message
-              })
-              break
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
           }
         }
       );
@@ -113,6 +122,8 @@ class ProductList extends Component {
   render() {
     return (
       <div className="animated">
+        <h5>{i18n.t(this.props.match.params.message)}</h5>
+        <h5>{i18n.t(this.state.message)}</h5>
         <Card>
           <CardHeader>
             <i className="icon-menu"></i>{i18n.t('static.product.productlist')}{' '}

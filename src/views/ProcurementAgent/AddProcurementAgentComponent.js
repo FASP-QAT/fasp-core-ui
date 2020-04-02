@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormText,FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormFeedback, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -8,6 +8,10 @@ import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+
+import getLabelText from '../../CommonComponent/getLabelText';
+const entityname = i18n.t('static.procurementagent.procurmentAgentMaster');
+
 const initialValues = {
     realmId: [],
     procurementAgentCode: "",
@@ -62,7 +66,8 @@ class AddProcurementAgentComponent extends Component {
 
                 }
             },
-            message: ''
+            message: '',
+            lang: localStorage.getItem('lang')
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -129,9 +134,15 @@ class AddProcurementAgentComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
-                this.setState({
-                    realms: response.data.data
-                })
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -161,7 +172,7 @@ class AddProcurementAgentComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -183,10 +194,10 @@ class AddProcurementAgentComponent extends Component {
                                     ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.messageCode}`)
+                                                this.props.history.push(`/procurementAgent/listProcurementAgent/`+ i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
@@ -227,9 +238,9 @@ class AddProcurementAgentComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmname')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}</Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                             <Input
                                                                 type="select"
                                                                 bsSize="sm"
@@ -244,13 +255,13 @@ class AddProcurementAgentComponent extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {realmList}
                                                             </Input>
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.realmId}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                             <Input type="text"
                                                                 bsSize="sm"
                                                                 name="procurementAgentCode"
@@ -263,13 +274,13 @@ class AddProcurementAgentComponent extends Component {
                                                                 maxLength={6}
                                                                 value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
                                                             />
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.procurementAgentCode}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                             <Input type="text"
                                                                 bsSize="sm"
                                                                 name="procurementAgentName"
@@ -281,13 +292,13 @@ class AddProcurementAgentComponent extends Component {
                                                                 required
                                                                 value={this.Capitalize(this.state.procurementAgent.label.label_en)}
                                                             />
-                                                        </InputGroupAddon>
-                                                        <FormText className="red">{errors.procurementAgentName}</FormText>
+                                                        {/* </InputGroupAddon> */}
+                                                        {/* <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                            {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                             <Input type="number"
                                                                 bsSize="sm"
                                                                 name="submittedToApprovedLeadTime"
@@ -298,8 +309,9 @@ class AddProcurementAgentComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 required
                                                                 min={1}
-                                                            /></InputGroupAddon>
-                                                        <FormText className="red">{errors.submittedToApprovedLeadTime}</FormText>
+                                                            />
+                                                            {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
@@ -321,7 +333,7 @@ class AddProcurementAgentComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + "Action Canceled")
+        this.props.history.push(`/procurementAgent/listProcurementAgent/`+ i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

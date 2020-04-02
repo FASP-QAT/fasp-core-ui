@@ -3,15 +3,18 @@ import UnitTypeService from '../../api/UnitTypeService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
-import data from '../Tables/DataTable/_data';
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator'
 
+import i18n from '../../i18n';
+const entityname=i18n.t('static.dimension.dimension');
 export default class UnitTypeListComponent extends Component {
 
     constructor(props) {
         super(props);
-        this.table = data.rows;
+        /*this.table = data.rows;
         this.options = {
             sortIndicator: true,
             hideSizePerPage: true,
@@ -25,9 +28,11 @@ export default class UnitTypeListComponent extends Component {
                 this.editUnitType(row);
             }.bind(this)
 
-        }
+        }*/
         this.state = {
-            unitTypeList: []
+            unitTypeList: [],
+            message: '',
+            selSource: []
         }
         this.addNewUnitType = this.addNewUnitType.bind(this);
         this.editUnitType = this.editUnitType.bind(this);
@@ -38,31 +43,33 @@ export default class UnitTypeListComponent extends Component {
         UnitTypeService.getUnitTypeListAll().then(response => {
             console.log(response.data)
             this.setState({
-                unitTypeList: response.data
+                unitTypeList: response.data,
+                selSource: response.data
             })
         })
             .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
             );
     }
 
-    showUnitTypeLabel(cell,row){
-        return cell.label_en;
-    }
-
+   
     editUnitType(unitType) {
         this.props.history.push({
             pathname: "/diamension/editDiamension",
@@ -77,24 +84,92 @@ export default class UnitTypeListComponent extends Component {
             alert("You must be Online.")
         }
 
-    }render() {
+    }
+    render() {
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+               {i18n.t('static.common.result',{from,to,size}) }
+            </span>
+        );
 
+        const columns = [{
+            dataField: 'label.label_en',
+            text: i18n.t('static.dimension.dimension'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }];
+        const options = {
+            hidePageListOnlyOnePage: true,
+            firstPageText: i18n.t('static.common.first'),
+            prePageText: i18n.t('static.common.back'),
+            nextPageText: i18n.t('static.common.next'),
+            lastPageText: i18n.t('static.common.last'),
+            nextPageTitle: i18n.t('static.common.firstPage') ,
+            prePageTitle: i18n.t('static.common.prevPage') ,
+            firstPageTitle: i18n.t('static.common.nextPage'),
+            lastPageTitle: i18n.t('static.common.lastPage') ,
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+                text: '10', value: 10
+            }, {
+                text: '30', value: 30
+            }
+                ,
+            {
+                text: '50', value: 50
+            },
+            {
+                text: 'All', value: this.state.selSource.length
+            }]
+        }
         return (
             <div className="animated">
-                <Card>
+                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+            <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>Dimension List
+                        <i className="icon-menu"></i>{i18n.t('static.common.listEntity',{entityname})}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title="Add Realm" onClick={this.addNewUnitType}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewUnitType}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
 
                     </CardHeader>
                     <CardBody>
-                        <BootstrapTable data={this.state.unitTypeList} version="4"  hover pagination search options={this.options}>
-                            <TableHeaderColumn isKey filterFormatted dataField="label" dataSort dataFormat={this.showUnitTypeLabel} dataAlign="center">Dimension List</TableHeaderColumn>
-                        </BootstrapTable>
+                         <ToolkitProvider
+                            keyField="dataSourceTypeId"
+                            data={this.state.selSource}
+                            columns={columns}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                        >
+                            {
+                                props => (
+                                    <div className="TableCust">
+                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                        <SearchBar {...props.searchProps} />
+                                        <ClearSearchButton {...props.searchProps} />
+                                        </div>
+                                        <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                            pagination={paginationFactory(options)}
+                                            rowEvents={{
+                                                onClick: (e, row, rowIndex) => {
+                                                    this.editUnitType(row);
+                                                }
+                                            }}
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
+
                     </CardBody>
                 </Card>
             </div>

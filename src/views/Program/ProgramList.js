@@ -1,108 +1,145 @@
 import React, { Component } from "react";
 import { NavLink } from 'react-router-dom';
-import { Card, CardHeader, CardBody, Button } from 'reactstrap';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
 import programDate from './ProgramData';
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+import CountryService from '../../api/CountryService.js';
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+
+const entityname = i18n.t('static.program.programMaster');
 export default class ProgramList extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      table: [],
-      lang: 'en'
+      programlist: [],
+      lang: 'en',
+      message: '',
+      selProgram: [],
+      countryList: [],
+      lang: localStorage.getItem('lang')
     }
-    // this.table = programDate.rows;
-    this.options = {
-      sortIndicator: true,
-      hideSizePerPage: true,
-      paginationSize: 3,
-      hidePageListOnlyOnePage: true,
-      clearSearch: true,
-      alwaysShowAllBtns: false,
-      withFirstAndLast: false,
-      onRowClick: function (row) {
-        this.editProgram(row);
-      }.bind(this)
-    }
-
-    this.showProgramLabel = this.showProgramLabel.bind(this);
-    this.showRealmLabel = this.showRealmLabel.bind(this);
-    this.showCountryLabel = this.showCountryLabel.bind(this);
-    this.showOrganisationLabel = this.showOrganisationLabel.bind(this);
     this.editProgram = this.editProgram.bind(this);
     this.addNewProgram = this.addNewProgram.bind(this);
     this.buttonFormatter = this.buttonFormatter.bind(this);
     this.addProductMapping = this.addProductMapping.bind(this);
+    this.filterData = this.filterData.bind(this);
+  }
 
-
-
+  filterData() {
+    let countryId = document.getElementById("countryId").value;
+    if (countryId != 0) {
+      const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+      this.setState({
+        selProgram: selProgram
+      });
+    } else {
+      this.setState({
+        selProgram: this.state.programList
+      });
+    }
   }
 
   editProgram(program) {
     this.props.history.push({
-      pathname: "/program/editProgram",
-      state: { program }
+      pathname: `/program/editProgram/${program.programId}`,
+      // state: { program }
     });
   }
-  // just an example
-  // nameFormat(cell, row) {
-  //   const id = `/budgets/${row.id}`
-  //   return (
-  //     <NavLink strict to={id}> {cell} </NavLink>
-  //   );
-  // };
-
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     ProgramService.getProgramList().then(response => {
-      this.setState({
-        table: response.data.data
-      })
+      if (response.status == 200) {
+        this.setState({
+          programList: response.data,
+          selProgram: response.data
+        })
+      } else {
+        this.setState({ message: response.data.messageCode })
+      }
     })
       .catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.message
-              })
-              break
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
+          }
+        }
+      );
+    CountryService.getCountryListActive().then(response => {
+      if (response.status == 200) {
+        console.log("response--->", response.data);
+        this.setState({
+          countryList: response.data,
+        })
+      } else {
+        this.setState({ message: response.data.messageCode })
+      }
+    })
+      .catch(
+        error => {
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
           }
         }
       );
 
-  }
 
-  showProgramLabel(cell, row) {
-    // console.log("========", cell);
-    return getLabelText(cell, this.state.lang);
 
   }
-  showRealmLabel(cell, row) {
-    // console.log("========>",cell);
-    return getLabelText(cell.realm.label, this.state.lang);
 
-  }
-  showCountryLabel(cell, row) {
-    // console.log("========>",cell);
-    return getLabelText(cell.country.label, this.state.lang);
+  // showProgramLabel(cell, row) {
+  //   // console.log("========", cell);
+  //   return getLabelText(cell, this.state.lang);
 
-  }
-  showOrganisationLabel(cell, row) {
-    // console.log("========>",cell);
-    return getLabelText(cell.label, this.state.lang);
+  // }
+  // showRealmLabel(cell, row) {
+  //   // console.log("========>",cell);
+  //   return getLabelText(cell.realm.label, this.state.lang);
 
-  }
+  // }
+  // showCountryLabel(cell, row) {
+  //   // console.log("========>",cell);
+  //   return getLabelText(cell.country.label, this.state.lang);
+
+  // }
+  // showOrganisationLabel(cell, row) {
+  //   // console.log("========>",cell);
+  //   return getLabelText(cell.label, this.state.lang);
+
+  // }
   addNewProgram() {
     this.props.history.push({
       pathname: "/program/addProgram"
@@ -110,7 +147,7 @@ export default class ProgramList extends Component {
   }
   buttonFormatter(cell, row) {
     // console.log("-----------", cell);
-    return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} className="float-right mr-1" ><i className="fa fa-check"></i> Add</Button>;
+    return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
   }
   addProductMapping(event, cell) {
     // console.log(cell);
@@ -118,132 +155,206 @@ export default class ProgramList extends Component {
     AuthenticationService.setupAxiosInterceptors();
     ProgramService.getProgramProductListByProgramId(cell)
       .then(response => {
-        
-        let myReasponse=response.data.data;
-        console.log("myResponce=========",response.data.data);
-        this.props.history.push({
-          pathname: "/programProduct/addProgramProduct",
-          state: {
-            programProduct:myReasponse     
-          }
-          
-        })
+
+        if (response.status == 200) {
+          let myReasponse = response.data;
+          console.log("myResponce=========", response.data);
+          this.props.history.push({
+            pathname: "/programProduct/addProgramProduct",
+            state: {
+              programProduct: myReasponse
+            }
+
+          })
+        } else {
+          this.setState({
+            message: response.data.messageCode
+          })
+        }
       }).catch(
         error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.response
-              })
-              break
-            default:
-              this.setState({
-                message: error.response
-              })
-              break
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response.status) {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: error.response.data.messageCode });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                console.log("Error code unkown");
+                break;
+            }
           }
         }
       );
+  }
+  render() {
 
+    const { SearchBar, ClearSearchButton } = Search;
+    const customTotal = (from, to, size) => (
+      <span className="react-bootstrap-table-pagination-total">
+        {i18n.t('static.common.result', { from, to, size })}
+      </span>
+    );
+    const { countryList } = this.state;
+    let countries = countryList.length > 0
+      && countryList.map((item, i) => {
+        return (
+          <option key={i} value={item.countryId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
 
-
-    // this.props.history.push({
-    //   pathname: "/programProduct/addProgramProduct",
-    //   state: {
-    
-    
-    
-    
-    
-    
-    
-    //     'programProduct':
-
-    //     {
-    //       'programId': 1,
-    //       'label': {
-    //         'label_en': "Kenya Malaria"
-    //       },
-    //       'prodcuts':
-    //         [
-    //           {
-    //             'productId': 2,
-    //             'label': {
-    //               'label_en': "Abacavir"
-    //             },
-    //             'minMonth': 1,
-    //             'maxMonth': 3
-    //           },
-    //           {
-    //             'productId': 4,
-    //             'label': {
-    //               'label_en': "Condoms"
-    //             },
-    //             'minMonth': 1,
-    //             'maxMonth': 3
-    //           }
-    //         ]
-    //     }
-
-
-
-
-
-    // programId: 1,
-    // label: 'program 1',
-    // rows: [
-    //   {
-    //     programId: '1',
-    //     programName: 'Program 1',
-    //     productId: '1',
-    //     productName: 'product 1',
-    //     minMonth: '2',
-    //     maxMonth: '2'
-    //   },
-    //   {
-    //     programId: '1',
-    //     programName: 'Program 1',
-    //     productId: '2',
-    //     productName: 'product 2',
-    //     minMonth: '3',
-    //     maxMonth: '4'
-    //   }
-    // ]
-    // }
-
-  
-
-
-}
-render() {
-  return (
-    <div className="animated">
-      <Card>
-        <CardHeader>
-          <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
-          <div className="card-header-actions">
-            <div className="card-header-action">
-              <a href="javascript:void();" title="Add Program" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+    const columns = [
+      {
+        dataField: 'label.label_en',
+        text: i18n.t('static.program.program'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center'
+      },
+      {
+        dataField: 'realmCountry.realm.label.label_en',
+        text: i18n.t('static.program.realm'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center'
+      },
+      {
+        dataField: 'realmCountry.country.label.label_en',
+        text: i18n.t('static.program.realmcountry'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center'
+      },
+      {
+        dataField: 'organisation.label.label_en',
+        text: i18n.t('static.program.organisation'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center'
+      },
+      {
+        dataField: 'programId',
+        text: 'Map Product To Program',
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.buttonFormatter
+      }
+    ];
+    const options = {
+      hidePageListOnlyOnePage: true,
+      firstPageText: i18n.t('static.common.first'),
+      prePageText: i18n.t('static.common.back'),
+      nextPageText: i18n.t('static.common.next'),
+      lastPageText: i18n.t('static.common.last'),
+      nextPageTitle: i18n.t('static.common.firstPage'),
+      prePageTitle: i18n.t('static.common.prevPage'),
+      firstPageTitle: i18n.t('static.common.nextPage'),
+      lastPageTitle: i18n.t('static.common.lastPage'),
+      showTotal: true,
+      paginationTotalRenderer: customTotal,
+      disablePageTitle: true,
+      sizePerPageList: [{
+        text: '10', value: 10
+      }, {
+        text: '30', value: 30
+      }
+        ,
+      {
+        text: '50', value: 50
+      },
+      {
+        text: 'All', value: this.state.selProgram.length
+      }]
+    }
+    return (
+      <div className="animated">
+        <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+        <h5>{i18n.t(this.state.message, { entityname })}</h5>
+        <Card>
+          <CardHeader>
+            <i className="icon-menu"></i>{i18n.t('static.program.programlist')}{' '}
+            <div className="card-header-actions">
+              <div className="card-header-action">
+                <a href="javascript:void();" title="Add Program" onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardBody>
-          <BootstrapTable data={this.state.table} version="4"  hover pagination search options={this.options}>
-            <TableHeaderColumn isKey dataField="programId" hidden >Program Id</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >{i18n.t('static.program.realmcountry')}</TableHeaderColumn>
-            <TableHeaderColumn filterFormatted dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >{i18n.t('static.program.organisation')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="airFreightPerc" dataSort >{i18n.t('static.program.airfreightperc')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="seaFreightPerc" dataSort>{i18n.t('static.program.seafreightperc')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>{i18n.t('static.program.draftleadtime')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>{i18n.t('static.program.drafttosubmitleadtime')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>{i18n.t('static.program.submittoapproveleadtime')}</TableHeaderColumn>
-            <TableHeaderColumn dataField="programId" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn>
-          </BootstrapTable>
-        </CardBody>
-      </Card>
-    </div>
-  )
-}
+          </CardHeader>
+          <CardBody>
+            <Col md="3 pl-0" >
+              <FormGroup>
+                <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+
+                <div className="controls SelectGo">
+                  <InputGroup>
+                    <Input
+                      type="select"
+                      name="countryId"
+                      id="countryId"
+                      bsSize="sm"
+                    >
+                      <option value="0">{i18n.t('static.common.select')}</option>
+                      {countries}
+                    </Input>
+                    <InputGroupAddon addonType="append">
+                      <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </div>
+              </FormGroup>
+            </Col>
+            {/* <BootstrapTable data={this.state.table} version="4" hover pagination search options={this.options}>
+              <TableHeaderColumn isKey dataField="programId" hidden >Program Id</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >{i18n.t('static.program.realmcountry')}</TableHeaderColumn>
+              <TableHeaderColumn filterFormatted dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >{i18n.t('static.program.organisation')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="airFreightPerc" dataSort >{i18n.t('static.program.airfreightperc')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="seaFreightPerc" dataSort>{i18n.t('static.program.seafreightperc')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>{i18n.t('static.program.draftleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>{i18n.t('static.program.drafttosubmitleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>{i18n.t('static.program.submittoapproveleadtime')}</TableHeaderColumn>
+              <TableHeaderColumn dataField="programId" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn>
+            </BootstrapTable> */}
+            <ToolkitProvider
+              keyField="programId"
+              data={this.state.selProgram}
+              columns={columns}
+              search={{ searchFormatted: true }}
+              hover
+              filter={filterFactory()}
+            >
+              {
+                props => (
+                  <div className="TableCust">
+                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                      <SearchBar {...props.searchProps} />
+                      <ClearSearchButton {...props.searchProps} />
+                    </div>
+                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                      pagination={paginationFactory(options)}
+                      rowEvents={{
+                        onClick: (e, row, rowIndex) => {
+                          this.editProgram(row);
+                        }
+                      }}
+                      {...props.baseProps}
+                    />
+                  </div>
+                )
+              }
+            </ToolkitProvider>
+          </CardBody>
+        </Card>
+      </div>
+    )
+  }
 }

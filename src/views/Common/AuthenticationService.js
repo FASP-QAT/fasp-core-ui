@@ -9,25 +9,28 @@ import bcrypt from 'bcryptjs';
 let myDt;
 class AuthenticationService {
 
-    isUserLoggedIn(username, password) {
+    isUserLoggedIn(username) {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
             var value = localStorage.getItem(localStorage.key(i));
-            let decryptedUsername = CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-            if (decryptedUsername == username) {
-                var key = localStorage.key(i).substring(9, 10);
-                localStorage.setItem("tempUser", key);
-                decryptedPassword = CryptoJS.AES.decrypt(localStorage.getItem("password-" + key).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            console.log(localStorage.key(i))
+            if (localStorage.key(i).includes("user-")) {
+                let user = JSON.parse(CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+                let decryptedUsername = user.username;
+                if (decryptedUsername == username) {
+                    localStorage.setItem("tempUser", user.userId);
+                    decryptedPassword = user.password;
+                }
             }
+
         }
         return decryptedPassword;
     }
 
     getLoggedInUsername() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        var decoded = jwt_decode(decryptedToken);
-        return decoded.sub;
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        return decryptedUser.username;
     }
 
     getLoggedInUserId() {
@@ -37,19 +40,15 @@ class AuthenticationService {
 
     getLanguageId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        // console.log("decryptedCurUser---" + decryptedCurUser);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        var decoded = jwt_decode(decryptedToken);
-        return decoded.user.language.languageId;
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        return decryptedUser.language.languageId;
     }
 
-    getRealmId(){
+    getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---" + decryptedCurUser);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        var decoded = jwt_decode(decryptedToken);
-        console.log("Decoded",decoded);
-        return decoded.user.realm.realmId;
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        console.log(decryptedUser);
+        return decryptedUser.realm.realmId;
     }
 
     checkTypeOfSession() {
@@ -110,11 +109,8 @@ class AuthenticationService {
 
     checkSessionTimeOut() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        var decoded = jwt_decode(decryptedToken);
-        // console.log("decoded---", decoded);
-        // console.log("Session expires on---" + decoded.user.sessionExpiresOn);
-        return decoded.user.sessionExpiresOn;
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+        return decryptedUser.sessionExpiresOn;
     }
 
     // refreshToken() {

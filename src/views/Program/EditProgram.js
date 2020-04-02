@@ -17,7 +17,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 
 
-
+const entityname = i18n.t('static.program.programMaster');
 let initialValues = {
     programName: '',
     realmId: '',
@@ -40,7 +40,7 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programName: Yup.string()
-        .required(i18n.t('static.program.validprogramtext')),
+            .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
             .required(i18n.t('static.program.validrealmtext')),
         realmCountryId: Yup.string()
@@ -52,21 +52,21 @@ const validationSchema = function (values) {
         airFreightPerc: Yup.number()
             .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.number()
-            .required(i18n.t('static.program.validseafreighttext')).min(0,  i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         deliveredToReceivedLeadTime: Yup.number()
             .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         draftToSubmittedLeadTime: Yup.number()
-            .required(i18n.t('static.program.validdrafttosubmittext')).min(0,  i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToDraftLeadTime: Yup.number()
             .required(i18n.t('static.program.validplantodrafttext')).min(0, i18n.t('static.program.validvaluetext')),
         submittedToApprovedLeadTime: Yup.number()
             .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
         approvedToShippedLeadTime: Yup.number()
-            .required(i18n.t('static.program.validapprovetoshiptext')).min(0,  i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
         monthsInFutureForAmc: Yup.number()
-            .required(i18n.t('static.program.validfutureamctext')).min(0,  i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
         monthsInPastForAmc: Yup.number()
-            .required(i18n.t('static.program.validpastamctext')).min(0,  i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
         programNotes: Yup.string()
@@ -97,278 +97,179 @@ const getErrorsFromValidationError = (validationError) => {
 }
 export default class EditProgram extends Component {
     constructor(props) {
+        console.log("in constructor");
         super(props);
         this.state = {
-            program: this.props.location.state.program,
+            // program: this.props.location.state.program,
+            program: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                realm: {
+                    realmId: '',
+                },
+                realmCountry: {
+                    realmCountryId: '',
+                    country: {
+                        label: {
+                            label_en: '',
+                            label_sp: '',
+                            label_pr: '',
+                            label_fr: ''
+                        }
+                    },
+                    realm: {
+                        realmId: '',
+                        label: {
+                            label_en: '',
+                            label_sp: '',
+                            label_pr: '',
+                            label_fr: ''
+                        }
+                    }
+                },
+                organisation: {
+                    organisationId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+
+                },
+                programManager: {
+                    userId: ''
+                },
+                airFreightPerc: '',
+                seaFreightPerc: '',
+                deliveredToReceivedLeadTime: '',
+                draftToSubmittedLeadTime: '',
+                plannedToDraftLeadTime: '',
+                submittedToApprovedLeadTime: '',
+                approvedToShippedLeadTime: '',
+                monthsInFutureForAmc: '',
+                monthsInPastForAmc: '',
+                healthArea: {
+                    healthAreaId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                programNotes: '',
+                regionArray: [],
+
+
+            },
             // regionList: [{ value: '1', label: 'R1' },
             // { value: '2', label: 'R2' },
             // { value: '3', label: 'R3' }],
             regionId: '',
-            lang: 'en',
+            lang: localStorage.getItem('lang'),
             realmList: [],
             realmCountryList: [],
             organisationList: [],
             healthAreaList: [],
             programManagerList: [],
-            regionList: []
+            regionList: [],
+
         }
-        initialValues = {
-            programName: getLabelText(this.props.location.state.program.label, lang),
-            realmId: this.props.location.state.program.realmCountry.realm.realmId,
-            realmCountryId: this.props.location.state.program.realmCountry.realmCountryId,
-            organisationId: this.props.location.state.program.organisation.organisationId,
-            userId: this.props.location.state.program.programManager.userId,
-            airFreightPerc: this.props.location.state.program.airFreightPerc,
-            seaFreightPerc: this.props.location.state.program.seaFreightPerc,
-            deliveredToReceivedLeadTime: this.props.location.state.program.deliveredToReceivedLeadTime,
-            draftToSubmittedLeadTime: this.props.location.state.program.draftToSubmittedLeadTime,
-            plannedToDraftLeadTime: this.props.location.state.program.plannedToDraftLeadTime,
-            submittedToApprovedLeadTime: this.props.location.state.program.submittedToApprovedLeadTime,
-            approvedToShippedLeadTime: this.props.location.state.program.approvedToShippedLeadTime,
-            monthsInFutureForAmc: this.props.location.state.program.monthsInFutureForAmc,
-            monthsInPastForAmc: this.props.location.state.program.monthsInPastForAmc,
-            healthAreaId: this.props.location.state.program.healthArea.healthAreaId,
-            programNotes: this.props.location.state.program.programNotes,
-            regionArray: this.props.location.state.program.regionArray
-        }
+
         this.dataChange = this.dataChange.bind(this);
-        this.getDependentLists = this.getDependentLists.bind(this);
-        this.getRegionList = this.getRegionList.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        HealthAreaService.getRealmList()
-            .then(response => {
-                // console.log("realm list---", response.data.data);
-                this.setState({
-                    realmList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+        ProgramService.getProgramById(this.props.match.params.programId).then(response => {
+            this.setState({
+                program: response.data
+            })
+            initialValues = {
+                programName: getLabelText(this.state.program.label, lang),
+                realmId: this.state.program.realmCountry.realm.realmId,
+                realmCountryId: this.state.program.realmCountry.realmCountryId,
+                organisationId: this.state.program.organisation.organisationId,
+                userId: this.state.program.programManager.userId,
+                airFreightPerc: this.state.program.airFreightPerc,
+                seaFreightPerc: this.state.program.seaFreightPerc,
+                deliveredToReceivedLeadTime: this.state.program.deliveredToReceivedLeadTime,
+                draftToSubmittedLeadTime: this.state.program.draftToSubmittedLeadTime,
+                plannedToDraftLeadTime: this.state.program.plannedToDraftLeadTime,
+                submittedToApprovedLeadTime: this.state.program.submittedToApprovedLeadTime,
+                approvedToShippedLeadTime: this.state.program.approvedToShippedLeadTime,
+                monthsInFutureForAmc: this.state.program.monthsInFutureForAmc,
+                monthsInPastForAmc: this.state.program.monthsInPastForAmc,
+                healthAreaId: this.state.program.healthArea.healthAreaId,
+                programNotes: this.state.program.programNotes,
+                regionArray: this.state.program.regionArray
+            }
+            AuthenticationService.setupAxiosInterceptors();
+            ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
+                .then(response => {
+                    if (response.status == 200) {
+                        console.log("region list---", response.data);
+                        var json = response.data;
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                        }
+                        this.setState({
+                            regionList: regList
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response.status) {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response.status) {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
                         default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
                     }
                 }
-            );
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getRealmCountryList(this.props.location.state.program.realmCountry.realm.realmId)
-            .then(response => {
-                console.log("realm list---", response.data.data);
-                this.setState({
-                    realmCountryList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(this.props.location.state.program.realmCountry.realm.realmId)
-            .then(response => {
-                console.log("organisation list---", response.data.data);
-                this.setState({
-                    organisationList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(this.props.location.state.program.realmCountry.realm.realmId)
-            .then(response => {
-                console.log("health area list---", response.data.data);
-                this.setState({
-                    healthAreaList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getRegionList(this.props.location.state.program.realmCountry.realmCountryId)
-            .then(response => {
-                console.log("health area list---", response.data.data);
-                var json = response.data.data;
-                var regList = [];
-                for (var i = 0; i < json.length; i++) {
-                    regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
-                }
-                this.setState({
-                    regionList: regList
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-
-    }
-
-    getDependentLists(e) {
-        console.log(e.target.value)
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getRealmCountryList(e.target.value)
-            .then(response => {
-                console.log("realm list---", response.data.data);
-                this.setState({
-                    realmCountryList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getOrganisationList(e.target.value)
-            .then(response => {
-                console.log("organisation list---", response.data.data);
-                this.setState({
-                    organisationList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(e.target.value)
-            .then(response => {
-                console.log("health area list---", response.data.data);
-                this.setState({
-                    healthAreaList: response.data.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-    }
-
-    getRegionList(e) {
-        AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getRegionList(e.target.value)
-            .then(response => {
-                console.log("health area list---", response.data.data);
-                var json = response.data.data;
-                var regList = [];
-                for (var i = 0; i < json.length; i++) {
-                    regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
-                }
-                this.setState({
-                    regionList: regList
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
+            }
+        );
 
     }
     updateFieldData(value) {
@@ -460,64 +361,21 @@ export default class EditProgram extends Component {
     }
 
     render() {
-        const { realmList } = this.state;
-        const { realmCountryList } = this.state;
-        const { organisationList } = this.state;
-        const { healthAreaList } = this.state;
-
-        let realms = realmList.length > 0
-            && realmList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lan)}
-                    </option>
-                )
-            }, this);
-
-        let realmCountries = realmCountryList.length > 0
-            && realmCountryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmCountryId}>
-                        {getLabelText(item.country.label, this.state.lan)}
-                    </option>
-                )
-            }, this);
-
-        let realmOrganisation = organisationList.length > 0
-            && organisationList.map((item, i) => {
-                return (
-                    <option key={i} value={item.organisationId}>
-                        {getLabelText(item.label, this.state.lan)}
-                    </option>
-                )
-            }, this);
-
-        let realmHealthArea = healthAreaList.length > 0
-            && healthAreaList.map((item, i) => {
-                return (
-                    <option key={i} value={item.healthAreaId}>
-                        {getLabelText(item.label, this.state.lan)}
-                    </option>
-                )
-            }, this);
-
         return (
             <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                 <Card>
                     <Formik
+                        enableReinitialize={true}
                         initialValues={initialValues}
                         validate={validate(validationSchema)}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
                             AuthenticationService.setupAxiosInterceptors();
                             ProgramService.editProgram(this.state.program).then(response => {
-                                // console.log(this.state.program);
-                                //console.log(response);
-                                if (response.status == "200") {
-                                    console.log(response);
-                                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                                if (response.status == 200) {
+                                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
                                 } else {
                                     this.setState({
-                                        message: response.data.message
+                                        message: response.data.messageCode
                                     })
                                 }
 
@@ -525,17 +383,22 @@ export default class EditProgram extends Component {
                             )
                                 .catch(
                                     error => {
-                                        switch (error.message) {
-                                            case "Network Error":
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
-                                            default:
-                                                this.setState({
-                                                    message: error.message
-                                                })
-                                                break
+                                        if (error.message === "Network Error") {
+                                            this.setState({ message: error.message });
+                                        } else {
+                                            switch (error.response.status) {
+                                                case 500:
+                                                case 401:
+                                                case 404:
+                                                case 406:
+                                                case 412:
+                                                    this.setState({ message: error.response.data.messageCode });
+                                                    break;
+                                                default:
+                                                    this.setState({ message: 'static.unkownError' });
+                                                    console.log("Error code unkown");
+                                                    break;
+                                            }
                                         }
                                     }
                                 )
@@ -568,7 +431,7 @@ export default class EditProgram extends Component {
                                                         invalid={touched.programName && !!errors.programName}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        value={getLabelText(this.state.program.label, lang)}
+                                                        value={getLabelText(this.state.program.label, this.state.lang)}
                                                         id="programName" placeholder={i18n.t('static.program.programtext')} />
                                                     <FormFeedback>{errors.programName}</FormFeedback>
                                                 </Col>
@@ -579,15 +442,15 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={this.state.program.realmCountry.realm.realmId}
+                                                        value={getLabelText(this.state.program.realmCountry.realm.label, this.state.lang)}
                                                         valid={!errors.realmId}
                                                         invalid={touched.realmId && !!errors.realmId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         disabled
-                                                        type="select" name="realmId" id="realmId">
-                                                        {/* <option value="0">Please select</option> */}
-                                                        {realms}
+                                                        type="text"
+                                                        name="realmId" id="realmId">
+
                                                     </Input>
                                                     <FormFeedback>{errors.realmId}</FormFeedback>
                                                 </Col>
@@ -598,15 +461,14 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={this.state.program.realmCountry.realmCountryId}
+                                                        value={getLabelText(this.state.program.realmCountry.country.label, this.state.lang)}
                                                         valid={!errors.realmCountryId}
                                                         invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         disabled
-                                                        type="select" name="realmCountryId" id="realmCountryId">
-                                                        {/* <option value="0">Please select</option> */}
-                                                        {realmCountries}
+                                                        type="text" name="realmCountryId" id="realmCountryId">
+
                                                     </Input>
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                 </Col>
@@ -635,18 +497,14 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={this.state.program.organisation.organisationId}
+                                                        value={getLabelText(this.state.program.organisation.label, this.state.lang)}
                                                         valid={!errors.organisationId}
                                                         invalid={touched.organisationId && !!errors.organisationId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         disabled
-                                                        type="select" name="organisationId" id="organisationId">
-                                                        {/* <option value="0">Please select</option> */}
-                                                        {/* <option value="1">product #1</option>
-                                                        <option value="2">product #2</option>
-                                                        <option value="3">product #3</option> */}
-                                                        {realmOrganisation}
+                                                        type="text" name="organisationId" id="organisationId">
+
                                                     </Input>
                                                     <FormFeedback>{errors.organisationId}</FormFeedback>
                                                 </Col>
@@ -657,16 +515,12 @@ export default class EditProgram extends Component {
                                                 </Col>
                                                 <Col xs="12" md="9">
                                                     <Input
-                                                        value={this.state.program.healthArea.healthAreaId}
+                                                        value={getLabelText(this.state.program.healthArea.label, this.state.lang)}
                                                         valid={!errors.healthAreaId}
                                                         invalid={touched.healthAreaId && !!errors.healthAreaId}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                        onBlur={handleBlur} disabled type="select" name="healthAreaId" id="healthAreaId">
-                                                        {/* <option value="0">Please select</option> */}
-                                                        {realmHealthArea}
-                                                        {/* <option value="1">Health Area #1</option>
-                                                        <option value="2">Health Area #2</option>
-                                                        <option value="3">Health Area #3</option> */}
+                                                        onBlur={handleBlur} disabled type="text" name="healthAreaId" id="healthAreaId">
+
                                                     </Input>
                                                     <FormFeedback>{errors.healthAreaId}</FormFeedback>
                                                 </Col>
@@ -684,8 +538,7 @@ export default class EditProgram extends Component {
                                                         onBlur={handleBlur} type="select" name="userId" id="userId">
                                                         {/* <option value="0">Please select</option> */}
                                                         <option value="1">Anchal</option>
-                                                        {/* <option value="2">Akil </option>
-                                                        <option value="3">Sameer</option> */}
+
                                                     </Input>
                                                     <FormFeedback>{errors.userId}</FormFeedback>
                                                 </Col>
@@ -746,7 +599,7 @@ export default class EditProgram extends Component {
                                                         invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        type="number" name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')}/>
+                                                        type="number" name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
                                                     <FormFeedback>{errors.plannedToDraftLeadTime}</FormFeedback>
                                                 </Col>
                                             </FormGroup>
@@ -845,12 +698,9 @@ export default class EditProgram extends Component {
                                         </CardBody>
                                         <CardFooter>
                                             <FormGroup>
-                                                {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button> */}
-                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
+                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                 &nbsp;
-                                                {/* <Button type="submit" onClick={() => this.touchAll(setTouched, errors)} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Update</Button> */}
-                                                {/* <Button type="submit" size="sm" color="primary" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-dot-circle-o"></i>Submit </Button> */}
                                             </FormGroup>
                                         </CardFooter>
                                     </Form>
@@ -861,7 +711,7 @@ export default class EditProgram extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + "Action Canceled")
+        this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

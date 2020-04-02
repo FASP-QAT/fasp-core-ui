@@ -22,8 +22,13 @@ class ProductService {
 
     getProdcutCategoryListByRealmId(json) {
         // /productCategory/realmId/{realmId}/list/{productCategoryId}/{includeCurrentLevel}/{includeAllChildren}
-        return axios.get(`${API_URL}/api/productCategory/realmId/${json}/list/1/1/1`,{}
+        return axios.get(`${API_URL}/api/productCategory/realmId/${json}/list/1/1/1`, {}
         );
+    }
+    getProductDataById(json) {
+        return axios.get(`${API_URL}/api/product/${json}`, {}
+        );
+
     }
 
 

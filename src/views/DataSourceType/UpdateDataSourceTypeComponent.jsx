@@ -10,7 +10,7 @@ import i18n from '../../i18n'
 let initialValues = {
     label: ''
 }
-
+const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
@@ -57,6 +57,12 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     // freLabel: '',
                     // porLabel: '',
                     labelId: '',
+                },
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: ''
+                    }
                 }
             }
         }
@@ -132,7 +138,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.datasourcetype.datasourcetypeedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -140,27 +146,32 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     DataSourceTypeService.editDataSourceType(this.state.dataSourceType)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/dataSourceType/listDataSourceType/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/dataSourceType/listDataSourceType/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -182,20 +193,29 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm'>
                                                 <CardBody>
                                                     <FormGroup>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSourceType.realm.label.label_en}
+                                                        >
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
-                                                            <Input type="text"
-                                                                name="label"
-                                                                id="label"
-                                                                bsSize="sm"
-                                                                valid={!errors.label}
-                                                                invalid={touched.label && !!errors.label}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.dataSourceType.label.label_en}
-                                                                required />
-                                                        </InputGroupAddon>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.dataSourceType.label.label_en}
+                                                            required />
                                                         <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
 
@@ -238,7 +258,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.update')}</Button>
 
 
                                                         &nbsp;
@@ -252,11 +272,15 @@ export default class UpdateDataSourceTypeComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/dataSourceType/listDataSourceType/` + "Action Canceled")
+        this.props.history.push(`/dataSourceType/listDataSourceType/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

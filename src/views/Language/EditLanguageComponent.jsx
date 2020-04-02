@@ -1,16 +1,17 @@
-import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
-import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
+import * as Yup from 'yup';
+// import * as myConst from '../../Labels.js';
+import LanguageService from '../../api/LanguageService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
-// import * as myConst from '../../Labels.js';
-import LanguageService from '../../api/LanguageService.js'
+import '../Forms/ValidationForms/ValidationForms.css';
 
 let initialValues = {
     language: ""
 }
+const entityname=i18n.t('static.language.language');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
@@ -113,7 +114,7 @@ export default class EditLanguageComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.language.languageedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -122,8 +123,9 @@ export default class EditLanguageComponent extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
                                     LanguageService.editLanguage(this.state.language).then(response => {
+                                        console.log(response)
                                         if (response.status == 200) {
-                                            this.props.history.push(`/language/listLanguage/${response.data.messageCode}`)
+                                            this.props.history.push(`/language/listLanguage/`+i18n.t(response.data.messageCode,{entityname}))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -170,9 +172,7 @@ export default class EditLanguageComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="language">{i18n.t('static.language.language')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-language"></i></InputGroupText>
-                                                             <Input type="text"
+                                                       <Input type="text"
                                                                 name="languageName"
                                                                 id="languageName"
                                                                 bsSize="sm"
@@ -182,14 +182,11 @@ export default class EditLanguageComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.state.language.languageName}
                                                                 required />
-                                                        </InputGroupAddon>
-                                                         <FormText className="red">{errors.languageName}</FormText>
+                                                                <FormText className="red">{errors.languageName}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil"></i></InputGroupText>
-                                                        <Input type="text"
+                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"
                                                             bsSize="sm"
@@ -199,8 +196,7 @@ export default class EditLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
-                                                              </InputGroupAddon>
-                                                        <FormText className="red">{errors.languageCode}</FormText>
+                                                              <FormText className="red">{errors.languageCode}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -240,8 +236,8 @@ export default class EditLanguageComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -252,14 +248,14 @@ export default class EditLanguageComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{i18n.t('this.state.message')}{}</h6>
-                    <h6>{i18n.t('this.props.match.params.message')}{}</h6>
-                </div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` + "static.actionCancelled")
+        this.props.history.push(`/language/listLanguage/` +i18n.t('static.message.cancelled',{entityname}))
     }
 
 }

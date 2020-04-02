@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 let initialValues = {
     manufacturer: ""
 }
-
+const entityname=i18n.t('static.manufacturer.manufacturer');
 const validationSchema = function (values) {
     return Yup.object().shape({
         manufacturer: Yup.string()
@@ -94,7 +94,7 @@ class EditManufacturerComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.manufacturer.manufactureredit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -104,27 +104,31 @@ class EditManufacturerComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     ManufacturerService.updateManufacturer(this.state.manufacturer)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/manufacturer/listManufacturer/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/manufacturer/listManufacturer/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response.status) {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -145,9 +149,7 @@ class EditManufacturerComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.manufacturer.realm')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText>
-                                                            <Input
+                                                         <Input
                                                                 type="text"
                                                                 name="realmId"
                                                                 id="realmId"
@@ -156,12 +158,9 @@ class EditManufacturerComponent extends Component {
                                                                 value={this.state.manufacturer.realm.label.label_en}
                                                             >
                                                             </Input>
-                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="manufacturer">{i18n.t('static.manufacturer.manufacturer')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-industry"></i></InputGroupText>
                                                             <Input type="text"
                                                                 name="manufacturer"
                                                                 id="manufacturer"
@@ -172,7 +171,6 @@ class EditManufacturerComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.state.manufacturer.label.label_en}
                                                                 required />
-                                                        </InputGroupAddon>
                                                         <FormText className="red">{errors.manufacturer}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -213,9 +211,8 @@ class EditManufacturerComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
@@ -226,11 +223,15 @@ class EditManufacturerComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+        <h6>{i18n.t(this.state.message)}</h6>
+       <h6>{i18n.t(this.props.match.params.message)}</h6>
+        </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/manufacturer/listManufacturer/` + "Action Canceled")
+        this.props.history.push(`/manufacturer/listManufacturer/` +i18n.t('static.message.cancelled',{entityname}))
     }
 }
 

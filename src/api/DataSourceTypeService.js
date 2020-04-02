@@ -4,22 +4,22 @@ import {API_URL} from '../Constants.js';
 class DataSourceTypeService{
 
 addDataSourceType(json){
-return axios.put(`${API_URL}/api/addDataSourceType/`,json,{}
+return axios.post(`${API_URL}/api/dataSourceType/`,json,{}
 );
 }
 
 getDataSourceTypeList() {
-    return axios.get(`${API_URL}/api/getDataSourceTypeList/`, {
+    return axios.get(`${API_URL}/api/dataSourceType/all/`, {
     });
 }
 
 getDataSourceTypeListActive() {
-    return axios.get(`${API_URL}/api/getDataSourceTypeListActive/`, {
+    return axios.get(`${API_URL}/api/dataSourceType/`, {
     });
 }
 
 editDataSourceType(json) {
-    return axios.put(`${API_URL}/api/editDataSourceType/`, json, {
+    return axios.put(`${API_URL}/api/dataSourceType/`, json, {
     });
 }
 }

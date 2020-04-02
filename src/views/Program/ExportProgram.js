@@ -17,6 +17,7 @@ import { SECRET_KEY } from '../../Constants.js'
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 import i18n from '../../i18n';
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 
 const initialValues = {
     programId: ''
@@ -67,6 +68,7 @@ export default class ExportProgram extends Component {
     componentDidMount() {
         const lan = 'en'
         var db1;
+        getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             console.log("in success");
@@ -107,6 +109,7 @@ export default class ExportProgram extends Component {
         var programId = this.state.programId;
         var db1;
         var storeOS;
+        getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;

@@ -7,16 +7,20 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import i18n from '../../i18n';
+import RealmService from "../../api/RealmService";
 
 const initialValues = {
+    realmId: [],
     label: '',
     dataSourceTypeId: '',
     dataSourceTypeList: []
 }
-
+const entityname = i18n.t('static.datasource.datasource');
 
 const validationSchema = function (values) {
     return Yup.object().shape({
+        realmId: Yup.string()
+            .required(i18n.t('static.manufaturer.realmtext')),
         label: Yup.string()
             .required(i18n.t('static.datasource.datasourcetext')),
         dataSourceTypeId: Yup.string()
@@ -52,7 +56,10 @@ export default class AddDataSource extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            realms: [],
             message: '',
+            realm: {
+            },
             label: {
                 label_en: ''
             },
@@ -74,7 +81,9 @@ export default class AddDataSource extends Component {
         else if (event.target.name === "dataSourceTypeId") {
             this.state.dataSourceType.dataSourceTypeId = event.target.value
         }
-
+        if (event.target.name === "realmId") {
+            this.state.realm.realmId = event.target.value;
+        }
         let { dataSource } = this.state
         this.setState(
             {
@@ -109,6 +118,32 @@ export default class AddDataSource extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
+            .then(response => {
+                this.setState({
+                    realms: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+        AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeListActive().then(response => {
             this.setState({
                 dataSourceTypeList: response.data
@@ -116,21 +151,24 @@ export default class AddDataSource extends Component {
         })
             .catch(
                 error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
             );
-
 
     }
 
@@ -139,6 +177,16 @@ export default class AddDataSource extends Component {
         this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     render() {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
+
 
         const { dataSourceTypeList } = this.state;
         let dataSourceTypes = dataSourceTypeList.length > 0
@@ -154,7 +202,7 @@ export default class AddDataSource extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.datasource.datasourceadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -162,27 +210,31 @@ export default class AddDataSource extends Component {
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     DataSourceService.addDataSource(this.state)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/dataSource/listDataSource/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/dataSource/listDataSource/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -204,40 +256,53 @@ export default class AddDataSource extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            valid={!errors.realmId}
+                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.realmId}
+                                                        >
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {realmList}
+                                                        </Input>
+                                                        <FormText className="red">{errors.realmId}</FormText>
+                                                    </FormGroup>
+                                                    <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasource.datasource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-database"></i></InputGroupText>
-                                                            <Input type="text"
-                                                                name="label"
-                                                                id="label"
-                                                                bsSize="sm"
-                                                                valid={!errors.label}
-                                                                invalid={touched.label && !!errors.label}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.label.label_en}
-                                                                required />
-                                                        </InputGroupAddon>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.label.label_en}
+                                                            required />
                                                         <FormText className="red">{errors.label}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-table"></i></InputGroupText>
-                                                            <Input
-                                                                type="select"
-                                                                name="dataSourceTypeId"
-                                                                id="dataSourceTypeId"
-                                                                bsSize="sm"
-                                                                valid={!errors.dataSourceTypeId}
-                                                                invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required>
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {dataSourceTypes}
-                                                            </Input>
-                                                        </InputGroupAddon>
+                                                        <Input
+                                                            type="select"
+                                                            name="dataSourceTypeId"
+                                                            id="dataSourceTypeId"
+                                                            bsSize="sm"
+                                                            valid={!errors.dataSourceTypeId}
+                                                            invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required>
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {dataSourceTypes}
+                                                        </Input>
                                                         <FormText className="red">{errors.dataSourceTypeId}</FormText>
                                                     </FormGroup>
                                                 </CardBody>
@@ -257,12 +322,16 @@ export default class AddDataSource extends Component {
                         </Card>
                     </Col>
                 </Row>
+                <div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
 
     cancelClicked() {
-        this.props.history.push(`/dataSource/listDataSource/` + "Action Canceled")
+        this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

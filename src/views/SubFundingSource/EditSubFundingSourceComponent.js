@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 let initialValues = {
     subFundingSource: ""
 }
-
+const entityname=i18n.t('static.subfundingsource.subfundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         subFundingSource: Yup.string()
@@ -113,9 +113,10 @@ class EditSubFundingSourceComponent extends Component {
                                     AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
+                                            console.log(response.data.messageCode)
                                             if (response.status == 200) {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/${response.data.messageCode}`)
-                                            } else {
+                                                this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
+                                                } else {
                                                 this.setState({
                                                     message: response.data.messageCode
                                                 })
@@ -159,8 +160,6 @@ class EditSubFundingSourceComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-bank"></i></InputGroupText>
                                                         <Input
                                                             type="text"
                                                             name="fundingSourceId"
@@ -170,12 +169,9 @@ class EditSubFundingSourceComponent extends Component {
                                                             value={this.state.subFundingSource.fundingSource.label.label_en}
                                                         >
                                                         </Input>
-                                                        </InputGroupAddon>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                      <InputGroupText><i className="fa fa-building-o"></i></InputGroupText>
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"
@@ -186,7 +182,6 @@ class EditSubFundingSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.Capitalize(this.state.subFundingSource.label.label_en)}
                                                             required />
-                                                            </InputGroupAddon>
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -243,7 +238,7 @@ class EditSubFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + "static.actionCancelled")
+        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}));
     }
 }
 

@@ -1,33 +1,36 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 
+
+const entityname = i18n.t('static.realm.realmMaster');
 let initialValues = {
     realmCode: '',
     label: '',
     monthInPastForAmc: '',
     monthInFutureForAmc: '',
     orderFrequency: '',
-    
+
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required('Please enter realm code'),
+            .required(i18n.t('static.realm.realmNameText')).max(6,i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
-            .required('Please enter realm name'),
-        monthInPastForAmc: Yup.string()
-            .required('Please enter month in past for amc'),
-        monthInFutureForAmc: Yup.string()
-            .required('Please enter month in future for amc'),
-        orderFrequency: Yup.string()
-            .required('Please enter order frequency')
+            .required(i18n.t('static.realm.realmCodeText')),
+        monthInPastForAmc: Yup.number()
+            .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
+        monthInFutureForAmc: Yup.number()
+            .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
+        orderFrequency: Yup.number()
+            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))
     })
 }
 
@@ -58,21 +61,22 @@ export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-        
-            realm: this.props.location.state.realm
+            realm: this.props.location.state.realm,
+            lang: localStorage.getItem('lang'),
+            message: ''
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         initialValues = {
             realmCode: this.state.realm.realmCode,
-            label: this.state.realm.label.label_en,
+            label: getLabelText(this.state.realm.label, this.state.lang),
             monthInPastForAmc: this.state.realm.monthInPastForAmc,
             monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
             orderFrequency: this.state.realm.orderFrequency,
             defaultRealm: this.state.realm.defaultRealm,
         }
-        
+
     }
 
     dataChange(event) {
@@ -105,11 +109,11 @@ export default class UpdateDataSourceComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            'realmCode': true,
-            'label': true,
-            'monthInPastForAmc': true,
-            'monthInFutureForAmc': true,
-            'orderFrequency': true
+            realmCode: true,
+            label: true,
+            monthInPastForAmc: true,
+            monthInFutureForAmc: true,
+            orderFrequency: true
         }
         )
         this.validateForm(errors)
@@ -130,16 +134,16 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount() {
-     
+
     }
 
     Capitalize(str) {
-        
+
     }
     cancelClicked() {
-        this.props.history.push(`/realm/listRealm/` + "Action Canceled")
+        this.props.history.push(`/realm/realmList/` + i18n.t('static.message.cancelled', { entityname }))
     }
-    
+
     render() {
 
         return (
@@ -148,36 +152,41 @@ export default class UpdateDataSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Edit Realm</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.realm.realmEdit')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    AuthenticationService.setupAxiosInterceptors();
                                     RealmService.updateRealm(this.state.realm)
                                         .then(response => {
-                                            if (response.data.status == "Success") {
-                                                this.props.history.push(`/realm/listRealm/${response.data.message}`)
+                                            if (response.status == 200) {
+                                                this.props.history.push(`/realm/realmList/`+i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -199,7 +208,7 @@ export default class UpdateDataSourceComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='realmForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="realmCode">Realm Code:</Label>
+                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
                                                         <Input type="text"
                                                             name="realmCode"
                                                             id="realmCode"
@@ -210,10 +219,10 @@ export default class UpdateDataSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.realmCode}
                                                             required />
-                                                        <FormText className="red">{errors.realmCode}</FormText>
+                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">Realm Name (English)</Label>
+                                                        <Label for="label">{i18n.t('static.realm.realmName')}</Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -224,11 +233,11 @@ export default class UpdateDataSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.label.label_en}
                                                             required />
-                                                        <FormText className="red">{errors.label}</FormText>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="monthInPastForAmc">Month In Past For AMC</Label>
-                                                        <Input type="text"
+                                                        <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
+                                                        <Input type="number"
                                                             name="monthInPastForAmc"
                                                             id="monthInPastForAmc"
                                                             bsSize="sm"
@@ -238,12 +247,12 @@ export default class UpdateDataSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.monthInPastForAmc}
                                                             required />
-                                                        <FormText className="red">{errors.monthInPastForAmc}</FormText>
+                                                        <FormFeedback className="red">{errors.monthInPastForAmc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="monthInFutureForAmc">Month In Future For AMC</Label>
-                                                        <Input type="text"
-                                                        bsSize="sm"
+                                                        <Label for="monthInFutureForAmc">{i18n.t('static.realm.monthInFutureForAmc')}</Label>
+                                                        <Input type="number"
+                                                            bsSize="sm"
                                                             name="monthInFutureForAmc"
                                                             id="monthInFutureForAmc"
                                                             valid={!errors.monthInFutureForAmc}
@@ -252,11 +261,11 @@ export default class UpdateDataSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.monthInFutureForAmc}
                                                             required />
-                                                        <FormText className="red">{errors.monthInFutureForAmc}</FormText>
+                                                        <FormFeedback className="red">{errors.monthInFutureForAmc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="orderFrequency">Order Frequency</Label>
-                                                        <Input type="text"
+                                                        <Label for="orderFrequency">{i18n.t('static.realm.orderFrequency')}</Label>
+                                                        <Input type="number"
                                                             name="orderFrequency"
                                                             id="orderFrequency"
                                                             bsSize="sm"
@@ -266,10 +275,10 @@ export default class UpdateDataSourceComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.realm.orderFrequency}
                                                             required />
-                                                        <FormText className="red">{errors.orderFrequency}</FormText>
+                                                        <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>Default  </Label>
+                                                        <Label>{i18n.t('static.realm.default')}</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -283,8 +292,8 @@ export default class UpdateDataSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                Active
-                                                                </Label>
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -299,16 +308,16 @@ export default class UpdateDataSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                Disabled
-                                                                </Label>
+                                                                {i18n.t('static.common.disabled')}
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="reset" color="danger"className="mr-1 float-right"size="sm" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right"size="sm" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>

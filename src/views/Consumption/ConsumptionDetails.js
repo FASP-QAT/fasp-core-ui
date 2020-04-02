@@ -15,6 +15,7 @@ import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -37,6 +38,7 @@ export default class ConsumptionDetails extends React.Component {
         console.log("In component did mount", new Date())
         const lan = 'en';
         var db1;
+        getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
@@ -590,6 +592,7 @@ export default class ConsumptionDetails extends React.Component {
         const lan = 'en';
         var db1;
         var storeOS;
+        getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;

@@ -119,7 +119,7 @@ class AddProgramProduct extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getProgramListForDropDown().then(response => {
+        ProgramService.getProgramList().then(response => {
             console.log(response.data);
             if (response.status == "200") {
                 this.setState({
@@ -154,13 +154,13 @@ class AddProgramProduct extends Component {
         );
         ProductService.getProductList().then(response => {
             console.log(response.data.data);
-            if (response.status == "200") {
+            if (response.status == 200) {
                 this.setState({
-                    productList: response.data.data
+                    productList: response.data
                 });
             } else {
                 this.setState({
-                    message: response.data.message
+                    message: response.data.messageCode
                 })
             }
 
