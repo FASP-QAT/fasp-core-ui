@@ -155,8 +155,8 @@ class AuthenticationService {
                 if (!db.objectStoreNames.contains('unit')) {
                     customerObjectStore = db.createObjectStore('unit', { keyPath: 'unitId', autoIncrement: true });
                 }
-                if (!db.objectStoreNames.contains('unitType')) {
-                    customerObjectStore = db.createObjectStore('unitType', { keyPath: 'unitTypeId', autoIncrement: true });
+                if (!db.objectStoreNames.contains('dimension')) {
+                    customerObjectStore = db.createObjectStore('dimension', { keyPath: 'dimensionId', autoIncrement: true });
                 }
                 if (!db.objectStoreNames.contains('organisation')) {
                     customerObjectStore = db.createObjectStore('organisation', { keyPath: 'organisationId', autoIncrement: true });
@@ -191,8 +191,8 @@ class AuthenticationService {
                 if (!db.objectStoreNames.contains('shipmentStatusAllowed')) {
                     customerObjectStore = db.createObjectStore('shipmentStatusAllowed', { keyPath: 'shipmentStatusAllowedId', autoIncrement: true });
                 }
-                if (!db.objectStoreNames.contains('manufacturer')) {
-                    customerObjectStore = db.createObjectStore('manufacturer', { keyPath: 'manufacturerId', autoIncrement: true });
+                if (!db.objectStoreNames.contains('supplier')) {
+                    customerObjectStore = db.createObjectStore('supplier', { keyPath: 'supplierId', autoIncrement: true });
                 }
                 if (!db.objectStoreNames.contains('logisticsUnit')) {
                     customerObjectStore = db.createObjectStore('logisticsUnit', { keyPath: 'logisticsUnitId', autoIncrement: true });

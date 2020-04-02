@@ -349,7 +349,10 @@ class EditUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
+<<<<<<< HEAD
                                                        
+=======
+>>>>>>> cd4d0b4e312abe967d488fd722f80f0e39380bfb
                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
@@ -365,7 +368,10 @@ class EditUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
+<<<<<<< HEAD
                                                         
+=======
+>>>>>>> cd4d0b4e312abe967d488fd722f80f0e39380bfb
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"

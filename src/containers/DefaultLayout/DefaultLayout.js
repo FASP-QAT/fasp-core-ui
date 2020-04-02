@@ -134,13 +134,18 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-money'
                           },
                           {
-                            name: 'Dimension',
+                            name: i18n.t('static.dashboard.dimension'),
                             url: '/diamension/diamensionlist',
+                            icon: 'fa fa-map'
+                          }
+                          , {
+                            name: i18n.t('static.dashboard.unit'),
+                            url: '/unit/listUnit',
                             icon: 'fa fa-map'
                           }
                           ,
                           {
-                            name: 'Realm',
+                            name: i18n.t('static.dashboard.realm'),
                             url: '/realm/realmlist',
                             icon: 'fa fa-th-large'
                           },
@@ -181,8 +186,8 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-line-chart'
                           },
                           {
-                            name: i18n.t('static.dashboard.manufacturer'),
-                            url: '/manufacturer/listManufacturer',
+                            name: i18n.t('static.dashboard.supplier'),
+                            url: '/supplier/listSupplier',
                             icon: 'fa fa-industry'
                           },
                           {
@@ -213,7 +218,10 @@ class DefaultLayout extends Component {
                             //         icon: 'fa fa-object-group',
                             //       }
                             //     ]
-                          },
+                          },{
+                            name: i18n.t('static.dashboard.tracercategory'),
+                            url: '/tracerCategory/listTracerCategory',
+                            icon: 'icon-graph'},
                           {
                             name: i18n.t('static.dashboard.product'),
                             url: '/product/listProduct',
