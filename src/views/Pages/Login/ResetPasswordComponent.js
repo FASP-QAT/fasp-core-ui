@@ -25,7 +25,6 @@ const validationSchema = function (values) {
             .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
             .test('username', "New password should not be same as username ",
                 function (value) {
-                    console.log("values---", values.username);
                     if ((values.username != value)) {
                         return true;
                     }
@@ -98,13 +97,11 @@ class ResetPasswordComponent extends Component {
     componentDidMount() {
         UserService.confirmForgotPasswordToken(this.state.username, this.state.token)
             .then(response => {
-                console.log("response---", response);
                 this.setState({
                     message: response.data.messageCode
                 })
             }).catch(
                 error => {
-                    console.log("error---", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -118,7 +115,6 @@ class ResetPasswordComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -128,14 +124,14 @@ class ResetPasswordComponent extends Component {
     }
     render() {
         return (
-            <div className="main-content flex-row align-items-center">
+            <div className="app flex-row align-items-center">
                 <Container>
                     <Row className="justify-content-center">
                         <Col md="9" lg="7" xl="6">
                             <h5 className="mx-4">{this.state.message}</h5>
                             <Card className="mx-4">
                                 <CardHeader>
-                                    <i className="icon-note"></i><strong>Reset Password</strong>{' '}
+                                    <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Reset Password</strong>{' '}
                                 </CardHeader>
                                 <Formik
                                     initialValues={{
@@ -148,12 +144,10 @@ class ResetPasswordComponent extends Component {
                                         if (navigator.onLine) {
                                             UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
                                                 .then(response => {
-                                                    console.log("response---", response);
                                                     this.props.history.push(`/login`)
                                                 })
                                                 .catch(
                                                     error => {
-                                                        console.log("error---", error)
                                                         if (error.message === "Network Error") {
                                                             this.setState({ message: error.message });
                                                         } else {
@@ -167,7 +161,6 @@ class ResetPasswordComponent extends Component {
                                                                     break;
                                                                 default:
                                                                     this.setState({ message: 'static.unkownError' });
-                                                                    console.log("Error code unkown");
                                                                     break;
                                                             }
                                                         }

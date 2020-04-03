@@ -158,7 +158,6 @@ class AddProcurementAgentComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -190,7 +189,6 @@ class AddProcurementAgentComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("this.state.procurementAgent---", this.state.procurementAgent);
                                     ProcurementAgentService.addProcurementAgent(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -216,7 +214,6 @@ class AddProcurementAgentComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }

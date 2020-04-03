@@ -4,7 +4,6 @@ import { API_URL } from '../Constants.js';
 class FundingSourceService {
 
     addFundingSource(json) {
-        //console.log(json);
         return axios.post(`${API_URL}/api/fundingSource/`, json, {}
         );
     }

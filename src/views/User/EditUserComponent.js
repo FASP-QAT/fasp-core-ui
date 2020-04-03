@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup,FormText, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -209,7 +209,6 @@ class EditUserComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -295,7 +294,6 @@ class EditUserComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -331,9 +329,9 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.realm.realmId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
-                                                        </Input> <FormText className="red">{errors.realmId}</FormText>
+                                                        </Input> <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
@@ -347,11 +345,10 @@ class EditUserComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.user.username}
-                                                        /> <FormText className="red">{errors.username}</FormText>
+                                                        /> <FormFeedback className="red">{errors.username}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
-                                                       
                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
@@ -363,11 +360,10 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
-                                                        <FormText className="red">{errors.emailId}</FormText>
+                                                        <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
-                                                        
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -379,7 +375,7 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.phoneNumber}
                                                         />
-                                                        <FormText className="red">{errors.phoneNumber}</FormText>
+                                                        <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
@@ -398,7 +394,7 @@ class EditUserComponent extends Component {
                                                         >
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
-                                                        </Input><FormText className="red">{errors.roleId}</FormText>
+                                                        </Input><FormFeedback className="red">{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
@@ -414,9 +410,9 @@ class EditUserComponent extends Component {
                                                             required
                                                             value={this.state.user.language.languageId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageList}
-                                                        </Input> <FormText className="red">{errors.languageId}</FormText>
+                                                        </Input> <FormFeedback className="red">{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}</Label>

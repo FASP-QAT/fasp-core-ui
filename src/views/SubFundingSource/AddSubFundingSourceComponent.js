@@ -219,7 +219,7 @@ class AddSubFundingSourceComponent extends Component {
                               required
                               value={this.state.fundingSourceId}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {fundingSourceList}
                             </Input>
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>

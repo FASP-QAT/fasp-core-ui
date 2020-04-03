@@ -341,7 +341,7 @@ export default class AddCountryComponent extends Component {
                                                             required
                                                             value={this.state.country.language.languageId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
@@ -363,7 +363,7 @@ export default class AddCountryComponent extends Component {
                                                             required
                                                             value={this.state.country.currency.currencyId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {currencyItems}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}

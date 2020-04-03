@@ -6,8 +6,6 @@ class LoginService {
 
 
     authenticate(username, password) {
-        console.log("username---"+username);
-        console.log("password---"+password);
         return axios.post(`${API_URL}/authenticate`,{username, password},{});
     }
 

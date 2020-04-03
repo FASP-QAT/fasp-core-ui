@@ -76,27 +76,25 @@ class ForgotPasswordComponent extends Component {
 
     render() {
         return (
-            <div className="main-content flex-row align-items-center">
+            <div className="app flex-row align-items-center">
                 
                 <Container>
-                    <Row className="justify-content-center mt-5">
+                    <Row className="justify-content-center ">
                     
                         <Col md="9" lg="7" xl="6">
                         <h5 className="mx-4">{this.state.message}</h5>
                             <Card className="mx-4 ">
                                 
                                 <CardHeader>
-                                    <i className="icon-note"></i><strong>Forgot Password</strong>{' '}
+                                    <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Forgot Password</strong>{' '}
                                 </CardHeader>
                                 <Formik
                                     initialValues={initialValues}
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (navigator.onLine) {
-                                            console.log(values.username);
                                             UserService.forgotPassword(values.username)
                                                 .then(response => {
-                                                    console.log(response)
                                                     this.props.history.push(`/login/${response.statusText}`)
                                                 })
                                                 .catch(
@@ -114,7 +112,6 @@ class ForgotPasswordComponent extends Component {
                                                                     break;
                                                                 default:
                                                                     this.setState({ message: 'static.unkownError' });
-                                                                    console.log("Error code unkown");
                                                                     break;
                                                             }
                                                         }

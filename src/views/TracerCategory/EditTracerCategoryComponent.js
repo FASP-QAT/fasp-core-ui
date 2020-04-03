@@ -19,7 +19,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         tracerCategoryName: Yup.string()
-            .required("Please enter procurement agent name"),
+            .required(i18n.t('static.tracerCategory.tracercategorytext')),
         })
 }
 

@@ -13,7 +13,6 @@ class AuthenticationService {
         var decryptedPassword = "";
         for (var i = 0; i < localStorage.length; i++) {
             var value = localStorage.getItem(localStorage.key(i));
-            console.log(localStorage.key(i))
             if (localStorage.key(i).includes("user-")) {
                 let user = JSON.parse(CryptoJS.AES.decrypt(value.toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                 let decryptedUsername = user.username;
@@ -47,18 +46,15 @@ class AuthenticationService {
     getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
 
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
-        // console.log("typeofsession---" + typeOfSession);
-        // console.log("network----" + navigator.onLine);
         if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && !navigator.onLine)) {
-            console.log("true");
             return true;
         } else {
-            console.log("false");
             return false;
 
 
@@ -67,13 +63,10 @@ class AuthenticationService {
     }
 
     checkIfDifferentUserIsLoggedIn(newUsername) {
-        // console.log("token username---" + newUsername);
         let usernameStored = localStorage.getItem('username');
-        // console.log("usernameStored---" + usernameStored);
         if (usernameStored !== null && usernameStored !== "") {
             var usernameDecrypted = CryptoJS.AES.decrypt(usernameStored, `${SECRET_KEY}`)
             var originalText = usernameDecrypted.toString(CryptoJS.enc.Utf8);
-            // console.log("usernameDecrypted---" + originalText);
             if (originalText !== newUsername) {
                 if (window.confirm("Are you sure you want to overrride already logged in user's details?")) {
                     return true;
@@ -91,17 +84,11 @@ class AuthenticationService {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
         var decoded = jwt_decode(decryptedToken);
-        // console.log(decoded);
         let tokenExpiryTime = new Date(decoded.exp * 1000);
         var curDate = new Date();
-        // console.log(new Date(decoded.exp * 1000));
-        // console.log("cur date---" + curDate);
-
         if (new Date(decoded.exp * 1000) > new Date()) {
-            console.log("Token not expired");
             return true;
         } else {
-            console.log("Token expired");
             return false;
         }
     }
@@ -114,29 +101,22 @@ class AuthenticationService {
 
     // refreshToken() {
     //     let token = localStorage.getItem('token');
-    //     console.log("token---" + token);
     //     this.setupAxiosInterceptors();
     //     return axios.get(`${API_URL}/refresh`, {}).then(response => {
-    //         console.log("response----------------", response)
     //     }).catch(
     //         error => {
-    //             console.log("error----------", error);
     //         })
     // }
 
     setupAxiosInterceptors() {
-        // console.log(localStorage.getItem('curUser'));
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
         let basicAuthHeader = 'Bearer ' + decryptedToken
-        // console.log("headers=" + basicAuthHeader);
         axios.interceptors.request.use(
-            // if (this.isUserLoggedIn) {
             (config) => {
                 config.headers.authorization = basicAuthHeader
                 return config;
             }
-            // }
         )
 
     }
@@ -176,8 +156,8 @@ class AuthenticationService {
                 if (!db.objectStoreNames.contains('unit')) {
                     customerObjectStore = db.createObjectStore('unit', { keyPath: 'unitId', autoIncrement: true });
                 }
-                if (!db.objectStoreNames.contains('unitType')) {
-                    customerObjectStore = db.createObjectStore('unitType', { keyPath: 'unitTypeId', autoIncrement: true });
+                if (!db.objectStoreNames.contains('dimension')) {
+                    customerObjectStore = db.createObjectStore('dimension', { keyPath: 'dimensionId', autoIncrement: true });
                 }
                 if (!db.objectStoreNames.contains('organisation')) {
                     customerObjectStore = db.createObjectStore('organisation', { keyPath: 'organisationId', autoIncrement: true });
@@ -212,8 +192,8 @@ class AuthenticationService {
                 if (!db.objectStoreNames.contains('shipmentStatusAllowed')) {
                     customerObjectStore = db.createObjectStore('shipmentStatusAllowed', { keyPath: 'shipmentStatusAllowedId', autoIncrement: true });
                 }
-                if (!db.objectStoreNames.contains('manufacturer')) {
-                    customerObjectStore = db.createObjectStore('manufacturer', { keyPath: 'manufacturerId', autoIncrement: true });
+                if (!db.objectStoreNames.contains('supplier')) {
+                    customerObjectStore = db.createObjectStore('supplier', { keyPath: 'supplierId', autoIncrement: true });
                 }
                 if (!db.objectStoreNames.contains('logisticsUnit')) {
                     customerObjectStore = db.createObjectStore('logisticsUnit', { keyPath: 'logisticsUnitId', autoIncrement: true });
@@ -295,7 +275,6 @@ class AuthenticationService {
 
                     result.onsuccess = function (event) {
                         userObj = result.result;
-                        console.log("userObj---", userObj);
                         return userObj;
                     };
                 };

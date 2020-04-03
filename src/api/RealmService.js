@@ -4,7 +4,6 @@ import { API_URL } from '../Constants.js';
 class RealmService {
 
     addRealm(json) {
-        console.log(json);
         return axios.post(`${API_URL}/api/realm/`, json, {}
         );
     }

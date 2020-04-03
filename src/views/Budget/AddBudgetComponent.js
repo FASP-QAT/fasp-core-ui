@@ -31,8 +31,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.programtext')),
         subFundingSourceId: Yup.string()
             .required(i18n.t('static.budget.subfundingtext')),
-        budgetAmt: Yup.string()
-            .required(i18n.t('static.budget.budgetamounttext')),
+        budgetAmt: Yup.number()
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
@@ -103,9 +103,9 @@ class AddBudgetComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
-        this.Capitalize=this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
     }
-    
+
     Capitalize(str) {
         let { budget } = this.state
         budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -181,7 +181,6 @@ class AddBudgetComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getProgramList()
             .then(response => {
-                console.log("program list fro drop down----", response.data);
                 this.setState({
                     programs: response.data
                 })
@@ -200,7 +199,6 @@ class AddBudgetComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -209,7 +207,6 @@ class AddBudgetComponent extends Component {
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
-                console.log("--------res", response);
                 this.setState({
                     subFundingSources: response.data
                 })
@@ -228,7 +225,6 @@ class AddBudgetComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -293,7 +289,6 @@ class AddBudgetComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -322,9 +317,9 @@ class AddBudgetComponent extends Component {
                                                             name="budget"
                                                             id="budget"
                                                             bsSize="sm"
-                                                            valid={!errors.budget} 
+                                                            valid={!errors.budget}
                                                             invalid={touched.budget && !!errors.budget}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.budget.label.label_en}
                                                             required />
@@ -347,7 +342,7 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.programId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {programList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
@@ -369,7 +364,7 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.subFundingSourceId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {subFundingSourceList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
@@ -379,7 +374,10 @@ class AddBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
-                                                        <Input type="text"
+                                                        <Input
+
+                                                            type="number"
+                                                            min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
@@ -399,6 +397,7 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupText><i className="fa fa-calendar-plus-o"></i></InputGroupText> */}
                                                         <Input
                                                             // value={this.state.budget.st}
+                                                            className="fa fa-calendar Fa-right"
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -418,6 +417,8 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText> */}
                                                         <Input
+
+                                                            className="fa fa-calendar Fa-right"
                                                             value={this.state.budget.stopDate}
                                                             name="stopDate"
                                                             id="stopDate"
@@ -449,10 +450,10 @@ class AddBudgetComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div>
+                {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+                </div> */}
             </div>
         );
     }

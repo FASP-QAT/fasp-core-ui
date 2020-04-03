@@ -27,14 +27,12 @@ const validationSchema = function (values) {
             .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
             .test('username', "New password should not be same as username ",
                 function (value) {
-                    console.log("values---", values.username);
                     if ((values.username != value)) {
                         return true;
                     }
                 })
             .test('oldPassword', "New password should not be same as old password ",
                 function (value) {
-                    console.log("values---", values.username);
                     if (values.oldPassword != value) {
                         return true;
                     }
@@ -108,14 +106,14 @@ class UpdateExpiredPasswordComponent extends Component {
 
     render() {
         return (
-            <div className="main-content flex-row align-items-center">
+            <div className="app flex-row align-items-center">
                 <Container>
                     <Row className="justify-content-center">
                         <Col md="9" lg="7" xl="6">
                             <h5 className="mx-4">{this.state.message}</h5>
                             <Card className="mx-4">
                                 <CardHeader>
-                                    <i className="icon-note"></i><strong>Update Expired Password</strong>{' '}
+                                    <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Update Expired Password</strong>{' '}
                                 </CardHeader>
                                 <Formik
                                     initialValues={{
@@ -127,7 +125,6 @@ class UpdateExpiredPasswordComponent extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         if (navigator.onLine) {
-                                            console.log(values.username);
                                             UserService.updateExpiredPassword(values.username, values.oldPassword, values.newPassword)
                                                 .then(response => {
                                                     var decoded = jwt_decode(response.data.token);
@@ -156,7 +153,6 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                     break;
                                                                 default:
                                                                     this.setState({ message: 'static.unkownError' });
-                                                                    console.log("Error code unkown");
                                                                     break;
                                                             }
                                                         }

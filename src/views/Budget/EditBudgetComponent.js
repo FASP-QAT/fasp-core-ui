@@ -22,8 +22,8 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
-        budgetAmt: Yup.string()
-            .required(i18n.t('static.budget.budgetamounttext')),
+        budgetAmt: Yup.number()
+            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
@@ -55,7 +55,6 @@ const getErrorsFromValidationError = (validationError) => {
 
 class EditBudgetComponent extends Component {
     constructor(props) {
-        console.log("in constructor-----------------");
         super(props);
         this.state = {
             budget: this.props.location.state.budget,
@@ -72,7 +71,7 @@ class EditBudgetComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
-        this.Capitalize=this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
         // console.log(this.state);
     }
 
@@ -170,7 +169,6 @@ class EditBudgetComponent extends Component {
     }
 
     render() {
-        console.log("in outer render----->");
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message)}</h5>
@@ -211,7 +209,6 @@ class EditBudgetComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -242,7 +239,7 @@ class EditBudgetComponent extends Component {
                                                             id="budget"
                                                             valid={!errors.budgetName}
                                                             invalid={touched.budgetName && !!errors.budgetName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.budget.label.label_en}
 
@@ -264,7 +261,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
 
-                                                            value={getLabelText(this.state.budget.program.label,this.state.lang)}
+                                                            value={getLabelText(this.state.budget.program.label, this.state.lang)}
                                                         >
                                                         </Input>
 
@@ -293,7 +290,8 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
 
-                                                        <Input type="text"
+                                                        <Input type="number"
+                                                            min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
@@ -312,7 +310,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
                                                         <Input
-
+                                                            className="fa fa-calendar Fa-right"
                                                             name="startDate"
                                                             id="startDate"
                                                             bsSize="sm"
@@ -332,7 +330,7 @@ class EditBudgetComponent extends Component {
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
                                                         <Input
-
+                                                            className="fa fa-calendar Fa-right"
                                                             name="stopDate"
                                                             id="stopDate"
                                                             bsSize="sm"
@@ -400,10 +398,10 @@ class EditBudgetComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div>
+                {/* <div>
                     <h6>{i18n.t(this.state.message)}</h6>
                     <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+                </div> */}
             </div>
 
         );

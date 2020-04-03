@@ -233,7 +233,7 @@ class AddRegionComponent extends Component {
                               required
                               value={this.state.realmCountryId}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {realmCountryList}
                             </Input>
                             {/* </InputGroupAddon> */}
