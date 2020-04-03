@@ -9,7 +9,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 
 let initialValues = {
-    language: ""
+    language: "",
+    languageCode:''
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
