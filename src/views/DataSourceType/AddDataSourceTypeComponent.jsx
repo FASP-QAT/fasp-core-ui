@@ -16,7 +16,7 @@ const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required(i18n.t('static.manufaturer.realmtext')),
+            .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
