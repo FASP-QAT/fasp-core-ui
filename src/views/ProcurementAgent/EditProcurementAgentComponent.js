@@ -9,7 +9,7 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 
 import getLabelText from '../../CommonComponent/getLabelText';
-const entityname = i18n.t('static.procurementagent.procurmentAgentMaster');
+const entityname = i18n.t('static.procurementagent.procurementagent');
 
 const initialValues = {
     procurementAgentName: "",
@@ -127,7 +127,7 @@ class EditProcurementAgentComponent extends Component {
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.procurementAgent.procurementagentedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={

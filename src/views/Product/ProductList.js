@@ -7,7 +7,7 @@ import ProductService from '../../api/ProductService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText'
 import i18n from '../../i18n'
-
+const entityname=i18n.t('static.product.product')
 class ProductList extends Component {
   constructor(props) {
     super(props);
@@ -126,7 +126,7 @@ class ProductList extends Component {
         <h5>{i18n.t(this.state.message)}</h5>
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>{i18n.t('static.product.productlist')}{' '}
+            <i className="icon-menu"></i>{i18n.t('static.common.listEntity',{entityname})}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
                 <a href="javascript:void();" title="Add product" onClick={this.addProduct}><i className="fa fa-plus-square"></i></a>
