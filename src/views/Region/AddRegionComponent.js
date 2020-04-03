@@ -124,7 +124,7 @@ class AddRegionComponent extends Component {
           if (error.message === "Network Error") {
             this.setState({ message: error.message });
           } else {
-            switch (error.response.status) {
+            switch (error.response ? error.response.status : "") {
               case 500:
               case 401:
               case 404:
@@ -159,6 +159,7 @@ class AddRegionComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
+        <h5>{i18n.t(this.state.message)}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -232,7 +233,7 @@ class AddRegionComponent extends Component {
                               required
                               value={this.state.realmCountryId}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {realmCountryList}
                             </Input>
                             {/* </InputGroupAddon> */}

@@ -22,7 +22,6 @@ class DefaultHeader extends Component {
   }
   changeLanguage(lang ) {
   localStorage.setItem('lang',lang);
- console.log('stored updated language');
   window.location.reload();
   }
   render() {

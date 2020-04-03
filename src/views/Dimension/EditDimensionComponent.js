@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-import UnitTypeService from '../../api/UnitTypeService.js';
+import DimensionService from '../../api/DimensionService.js';
 import i18n from '../../i18n';
 
 let initialValues = {
@@ -41,13 +41,13 @@ const getErrorsFromValidationError = (validationError) => {
 }
 
 
-export default class UpdateUnitTypeComponent extends Component {
+export default class UpdateDimensionComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            unitType: {
-                unitTypeId: '',
+            dimension: {
+                dimensionId: '',
                 label: {
                     labelId: '',
                     label_en: ''
@@ -60,13 +60,13 @@ export default class UpdateUnitTypeComponent extends Component {
     }
 
     dataChange(event) {
-        let { unitType } = this.state
+        let { dimension } = this.state
         if (event.target.name === "label") {
-            unitType.label.label_en = event.target.value
+            dimension.label.label_en = event.target.value
         }
         this.setState(
             {
-                unitType
+                dimension
             }
         )
     };
@@ -96,13 +96,13 @@ export default class UpdateUnitTypeComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.setState({
-            unitType: this.props.location.state.unitType
+            dimension: this.props.location.state.dimension
         });
 
     }
 
     Capitalize(str) {
-        this.state.unitType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        this.state.dimension.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
 
     cancelClicked() {
@@ -121,7 +121,7 @@ export default class UpdateUnitTypeComponent extends Component {
                                 initialValues={{ language: this.state.language }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    UnitTypeService.updateUnitType(this.state.unitType).then(response => {
+                                    DimensionService.updateDimension(this.state.dimension).then(response => {
                                         if (response.status == 200) {
                                             this.props.history.push(`/diamension/diamensionlist/` + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
@@ -174,9 +174,9 @@ export default class UpdateUnitTypeComponent extends Component {
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.unitType.label.label_en}
+                                                            value={this.state.dimension.label.label_en}
                                                             required />
-                                                            <FormText className="red">{errors.label}</FormText>
+                                                            <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                             <CardFooter>

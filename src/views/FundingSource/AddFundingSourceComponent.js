@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback,FormText, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -58,6 +58,7 @@ class AddFundingSourceComponent extends Component {
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
+    this.Capitalize = this.Capitalize.bind(this);
   }
 
   dataChange(event) {
@@ -96,7 +97,13 @@ class AddFundingSourceComponent extends Component {
       }
     }
   }
-
+  Capitalize(str) {
+    if (str != null && str != "") {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    } else {
+      return "";
+    }
+  }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
@@ -208,10 +215,10 @@ class AddFundingSourceComponent extends Component {
                               required
                               value={this.state.realmId}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
-                          <FormText className="red">{errors.realmId}</FormText>
+                          <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
@@ -223,15 +230,17 @@ class AddFundingSourceComponent extends Component {
                               invalid={touched.fundingSource && !!errors.fundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
+                              value={this.Capitalize(this.state.fundingSource.label.label_en)}
                               required />
-                              <FormText className="red">{errors.fundingSource}</FormText>
+                              <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
 
-                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             
                                                         &nbsp;
                           </FormGroup>

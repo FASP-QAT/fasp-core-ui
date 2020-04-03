@@ -95,7 +95,7 @@ export default class AddCountryComponent extends Component {
             country.label.label_en = event.target.value
         }
         if (event.target.name === "countryCode") {
-            country.countryCode = event.target.value
+            country.countryCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "currencyId") {
             country.currency.currencyId = event.target.value
@@ -156,7 +156,7 @@ export default class AddCountryComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -188,7 +188,7 @@ export default class AddCountryComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -228,6 +228,7 @@ export default class AddCountryComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -290,7 +291,7 @@ export default class AddCountryComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='countryForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.country.country')}</Label>
+                                                        <Label for="label">{i18n.t('static.country.countryName')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -319,6 +320,7 @@ export default class AddCountryComponent extends Component {
                                                             invalid={touched.countryCode && !!errors.countryCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.country.countryCode}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
@@ -339,7 +341,7 @@ export default class AddCountryComponent extends Component {
                                                             required
                                                             value={this.state.country.language.languageId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
@@ -361,7 +363,7 @@ export default class AddCountryComponent extends Component {
                                                             required
                                                             value={this.state.country.currency.currencyId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {currencyItems}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}

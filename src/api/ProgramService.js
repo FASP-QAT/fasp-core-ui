@@ -3,7 +3,6 @@ import { API_URL } from '../Constants.js'
 
 class ProgramService {
     getProgramData(programId) {
-        console.log(programId)
         return axios.get(`${API_URL}/api/getProgramData?programId=${programId}`, {
         });
     }
@@ -58,6 +57,11 @@ class ProgramService {
 
     getProgramById(json) {
         return axios.get(`${API_URL}/api/program/${json}`, {}
+        );
+    }
+
+    getProgramManagerList(json) {
+        return axios.get(`${API_URL}/api/user/realmId/${json}`, {}
         );
     }
 }

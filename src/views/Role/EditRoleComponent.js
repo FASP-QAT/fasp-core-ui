@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText ,FormText} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -12,7 +12,7 @@ const initialValues = {
     businessFunctions: [],
     canCreateRole: []
 }
-
+const entityname=i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
@@ -131,7 +131,6 @@ class EditRoleComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -157,7 +156,6 @@ class EditRoleComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -195,7 +193,7 @@ class EditRoleComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.role.roleedittext')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={{
@@ -208,7 +206,7 @@ class EditRoleComponent extends Component {
                                     UserService.editRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/role/listRole/${response.data.messageCode}`)
+                                                this.props.history.push(`/role/listRole/`+i18n.t(response.data.messageCode,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -231,7 +229,6 @@ class EditRoleComponent extends Component {
                                                             break;
                                                         default:
                                                             this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
                                                             break;
                                                     }
                                                 }
@@ -255,10 +252,7 @@ class EditRoleComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="roleName">{i18n.t('static.role.rolename')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-user"></i>
-                                                            </InputGroupText>
+                                                        <Label for="roleName">{i18n.t('static.role.role')}</Label>
                                                         <Input type="text"
                                                             name="roleName"
                                                             id="roleName"
@@ -270,14 +264,10 @@ class EditRoleComponent extends Component {
                                                             required
                                                             value={this.Capitalize(this.state.role.label.label_en)}
                                                         />
-                                                         </InputGroupAddon>
-                                                        <FormText className="red">{errors.roleName}</FormText>
+                                                          <FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className=" fa fa-building"></i></InputGroupText>
-                                                        <Input
+                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label><Input
                                                             type="select"
                                                             name="businessFunctions"
                                                             id="businessFunctions"
@@ -294,14 +284,10 @@ class EditRoleComponent extends Component {
                                                             {businessFunctionsList}
                                                             
                                                         </Input>
-                                                        </InputGroupAddon>
-
-                                                        <FormText className="red">{errors.businessFunctions}</FormText>
+                                                        <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
-                                                        <InputGroupAddon addonType="prepend">
-                                                            <InputGroupText><i className="fa fa-users"></i></InputGroupText>
                                                         <Input
                                                             type="select"
                                                             name="canCreateRole"
@@ -317,19 +303,16 @@ class EditRoleComponent extends Component {
                                                         >
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
-                                                        </Input>
-                                                        </InputGroupAddon>
-
-                                                        <FormText className="red">{errors.canCreateRole}</FormText>
+                                                        </Input> <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="lg" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" size="lg" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
-                          </FormGroup>
+                                                 </FormGroup>
                                                 </CardFooter>
                                             </Form>
                                         )} />
@@ -340,7 +323,7 @@ class EditRoleComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/role/listRole/` + "static.actionCancelled")
+        this.props.history.push(`/role/listRole/` +i18n.t('static.message.cancelled',{entityname}))
     }
 }
 

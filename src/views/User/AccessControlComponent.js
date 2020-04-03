@@ -106,7 +106,10 @@ class AccessControlComponent extends Component {
         }
     }
     addRow() {
-        this.state.rows.push(
+        if (this.state.realmCountryId != "" && this.state.healthAreaId != "" && this.state.organisationId != "" && this.state.programId != "") {
+            // let id = [];
+            // id.push(this.state.realmCountryId + "" + this.state.healthAreaId + "" + this.state.organisationId + "" + this.state.programId);
+            var json =
             {
                 userId: this.state.user.userId,
                 realmCountryId: this.state.realmCountryId,
@@ -129,11 +132,35 @@ class AccessControlComponent extends Component {
                 {
                     label_en: this.state.programName
                 }
-            })
-
-        this.setState({ rows: this.state.rows })
-        this.setState({ realmCountryId: '', healthAreaId: '', organisationId: '', programId: '', countryName: '', healthAreaName: '', organisationName: '', programName: '' });
-
+            }
+            // var array = [];
+            // console.log("length---", this.state.rows.length)
+            // if (this.state.rows.length > 0) {
+            //     for (let i = 0; i <= this.state.rows.length; i++) {
+            //         console.log(this.state.rows[i]);
+            //         if(this.state.rows[i] != null && this.state.rows[i] != ""){
+            //         let newId = this.state.rows[i].realmCountryId + "" + this.state.rows[i].healthAreaId + "" + this.state.rows[i].organisationId + "" + this.state.rows[i].programId;
+            //         array.push(newId);
+            //         }
+            //     }
+            //     if (array.length > 0) {
+            //     for (let i = 0; i < array.length; i++) {
+            //         if (id.indexOf(array[i]) === -1) {
+            //             this.state.rows.push(json)
+            //         }
+            //     }
+            // }
+            // } else {
+                this.state.rows.push(json)
+            // }
+            // var uniqueNames = [];
+            // $.each(this.state.rows, function (i, el) {
+            //     if ($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
+            // });
+            // console.log("unique name---", uniqueNames);
+            this.setState({ rows: this.state.rows })
+            // this.setState({ realmCountryId: '', healthAreaId: '', organisationId: '', programId: '', countryName: '', healthAreaName: '', organisationName: '', programName: '' });
+        }
     }
     deleteLastRow() {
         this.setState({
@@ -233,7 +260,7 @@ class AccessControlComponent extends Component {
                     }
                 }
             );
-        
+
         OrganisationService.getOrganisationList().then(response => {
             if (response.status == "200") {
                 this.setState({
@@ -410,41 +437,41 @@ class AccessControlComponent extends Component {
                             </CardHeader>
                             <CardBody>
                                 <FormGroup>
-                                    <Label htmlFor="select">Username</Label>
+                                    <Label htmlFor="select">{i18n.t('static.user.username')}</Label>
                                     <Input type="text" value={this.state.user.username} name="username" id="username" disabled>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Country</Label>
+                                    <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
                                     <Input type="select" name="realmCountryId" id="select" value={this.state.realmCountryId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {countryList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Health Area</Label>
+                                    <Label htmlFor="select">{i18n.t('static.healtharea.healtharea')}</Label>
                                     <Input type="select" name="healthAreaId" id="select" value={this.state.healthAreaId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {healthAreaList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Organisation</Label>
+                                    <Label htmlFor="select">{i18n.t('static.organisation.organisation')}</Label>
                                     <Input type="select" name="organisationId" id="select" value={this.state.organisationId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {organisationList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Program</Label>
+                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                     <Input type="select" name="programId" id="select" value={this.state.programId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {programList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>Add</Button>
+                                    <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>
+                                    <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                     &nbsp;
 
                         </FormGroup>
@@ -452,12 +479,11 @@ class AccessControlComponent extends Component {
 
                                     <thead>
                                         <tr>
-
-                                            <th className="text-left"> Country </th>
-                                            <th className="text-left"> Health Area</th>
-                                            <th className="text-left"> Organisation </th>
-                                            <th className="text-left">Program</th>
-                                            <th className="text-left">Delete Row</th>
+                                            <th className="text-left"> {i18n.t('static.program.realmcountry')} </th>
+                                            <th className="text-left"> {i18n.t('static.healtharea.healtharea')}</th>
+                                            <th className="text-left"> {i18n.t('static.organisation.organisation')} </th>
+                                            <th className="text-left">{i18n.t('static.program.program')}</th>
+                                            <th className="text-left">{i18n.t('static.common.remove')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -491,8 +517,8 @@ class AccessControlComponent extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                    {this.state.rows.length > 0 && <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>Submit</Button>}
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    {this.state.rows.length > 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                     &nbsp;
                                 </FormGroup>
 
@@ -505,7 +531,7 @@ class AccessControlComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/` + "Action Canceled")
+        this.props.history.push(`/user/listUser/` + i18n.t('static.actionCancelled'))
     }
 
 }

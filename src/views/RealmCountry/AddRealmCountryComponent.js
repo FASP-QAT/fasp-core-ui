@@ -72,7 +72,6 @@ class AddRealmCountryComponent extends Component {
     }
 
     Capitalize(str) {
-        console.log("capitalize");
         if (str != null && str != "") {
             return str.charAt(0).toUpperCase() + str.slice(1);
         } else {
@@ -153,7 +152,6 @@ class AddRealmCountryComponent extends Component {
             );
         CountryService.getCountryListAll()
             .then(response => {
-                console.log("countries---",response.data.data);
                 this.setState({
                     countries: response.data.data
                 })
@@ -209,7 +207,6 @@ class AddRealmCountryComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log("this.state.procurementAgent---", this.state.procurementAgent);
                                     RealmCountryService.addRealmCountry(this.state.procurementAgent)
                                         .then(response => {
                                             if (response.data.status == "Success") {
