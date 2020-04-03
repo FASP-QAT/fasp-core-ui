@@ -18,5 +18,10 @@ class OrganisationService {
         );
     }
 
+    getRealmCountryList(json) {
+        return axios.get(`${API_URL}/api/realmCountry/realmId/${json}`, {}
+        );
+    }
+
 }
 export default new OrganisationService();

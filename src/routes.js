@@ -4,7 +4,15 @@ import i18n from './i18n'
 const AddDimension = React.lazy(() => import('./views/Dimension/AddDimensionComponent'));
 const DimensionList = React.lazy(() => import('./views/Dimension/DimensionListComponent'));
 const EditDimension = React.lazy(() => import('./views/Dimension/EditDimensionComponent'));
-// const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
+
+const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
+const HealthAreaList = React.lazy(() => import('./views/HealthArea/HealthAreaList'));
+const EditHealthArea = React.lazy(() => import('./views/HealthArea/EditHealthArea'));
+
+const AddOrganisation = React.lazy(() => import('./views/Organisation/AddOrganisation'));
+const OrganisationList = React.lazy(() => import('./views/Organisation/OrganisationList'));
+const EditOrganisation = React.lazy(() => import('./views/Organisation/EditOrganisation'));
+
 const AddSubFundingSource = React.lazy(() => import('./views/SubFundingSource/AddSubFundingSourceComponent'));
 const ListSubFundingSource = React.lazy(() => import('./views/SubFundingSource/ListSubFundingSourceComponent'));
 const EditSubFundingSource = React.lazy(() => import('./views/SubFundingSource/EditSubFundingSourceComponent'));
@@ -152,9 +160,6 @@ const routes = [
   { path: '/realm/updaterealm', name: 'Realm / Edit Realm', component: EditRealm },
   { path: '/realm/realmlist/:message', component: RealmList },
 
-
-
-
   { path: '/product/editProduct/:productId', name: i18n.t('static.product.productedit'), component: EditProdct },
   { path: '/product/listProduct', exact: true, name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/listProduct/:message', name: i18n.t('static.product.productlist'), component: ListProdct },
@@ -171,7 +176,17 @@ const routes = [
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
   { path: '/budget/editBudget/', name: 'Update Budget', component: EditBudgetComponent },
   { path: '/', exact: true, name: 'Home' },
-  // { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
+
+  { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
+  { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
+  { path: '/healthArea/listHealthArea', exact: true, name: 'Health Area / Health Area List', component: HealthAreaList },
+  { path: '/healthArea/editHealthArea/', name: 'Edit HealthArea', component: EditHealthArea },
+
+  { path: '/organisation/addOrganisation', name: 'Organisation / Add Organisation', component: AddOrganisation },
+  { path: '/organisation/listOrganisation/:message', component: OrganisationList },
+  { path: '/organisation/listOrganisation', exact: true, name: 'Organisation / Organisation List', component: OrganisationList },
+  { path: '/organisation/editOrganisation/', name: 'Edit Organisation', component: EditOrganisation },
+
   { path: '/fundingSource/addFundingSource', name: 'Funding Source / Add Funding Source', component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: 'Funding Source / Funding Source List', component: ListFundingSource },
   { path: '/fundingSource/editFundingSource', name: 'Funding Source / Edit Funding Source', component: EditFundingSource },

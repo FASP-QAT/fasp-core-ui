@@ -5,8 +5,20 @@ class HealthAreaService {
         return axios.get(`${API_URL}/api/realm`, {
         });
     }
+    addHealthArea(json) {
+        return axios.post(`${API_URL}/api/healthArea/`, json, {}
+        );
+    }
     getHealthAreaList() {
         return axios.get(`${API_URL}/api/healthArea/`, {
+        });
+    }
+    getRealmCountryList(json) {
+        return axios.get(`${API_URL}/api/realmCountry/realmId/${json}`, {}
+        );
+    }
+    editHealthArea(json) {
+        return axios.put(`${API_URL}/api/healthArea/`, json, {
         });
     }
 }

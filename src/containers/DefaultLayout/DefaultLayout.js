@@ -189,6 +189,16 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.region'),
                             url: '/region/listRegion',
                             icon: 'fa fa-pie-chart'
+                          },
+                          {
+                            name: 'List HealthArea',
+                            url: '/healthArea/listHealthArea',
+                            icon: 'fa fa-pie-chart'
+                          },
+                          {
+                            name: 'List Organisation',
+                            url: '/organisation/listOrganisation',
+                            icon: 'fa fa-pie-chart'
                           }
                         ]
                       },
