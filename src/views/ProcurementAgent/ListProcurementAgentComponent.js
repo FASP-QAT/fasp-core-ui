@@ -13,7 +13,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
-
+const entityname=i18n.t('static.procurementagent.procurementagent')
 class ListProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
@@ -133,7 +133,7 @@ class ListProcurementAgentComponent extends Component {
         const columns = [
             {
                 dataField: 'realm.label.label_en',
-                text: i18n.t('static.realm.realmMaster'),
+                text: i18n.t('static.realm.realm'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -203,17 +203,17 @@ class ListProcurementAgentComponent extends Component {
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.procurementagent.procurementagentlist')}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.procurementagent.procurementagentadd')} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
                         <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmMaster')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input

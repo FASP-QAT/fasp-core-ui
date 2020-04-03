@@ -154,7 +154,7 @@ class AddSubFundingSourceComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.subfundingsource.subfundingsourceaddttext')}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -219,7 +219,7 @@ class AddSubFundingSourceComponent extends Component {
                               required
                               value={this.state.fundingSourceId}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {fundingSourceList}
                             </Input>
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>

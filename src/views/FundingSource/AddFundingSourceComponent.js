@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback,FormText, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -16,7 +16,7 @@ const entityname=i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-      .required(i18n.t('static.fundingsource.realmtext')),
+      .required(i18n.t('static.common.realmtext')),
     fundingSource: Yup.string()
       .required(i18n.t('static.fundingsource.fundingsourcetext'))
   })
@@ -215,10 +215,10 @@ class AddFundingSourceComponent extends Component {
                               required
                               value={this.state.realmId}
                             >
-                              <option value="0">{i18n.t('static.common.select')}</option>
+                              <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
-                          <FormText className="red">{errors.realmId}</FormText>
+                          <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
@@ -232,7 +232,7 @@ class AddFundingSourceComponent extends Component {
                               onBlur={handleBlur}
                               value={this.Capitalize(this.state.fundingSource.label.label_en)}
                               required />
-                              <FormText className="red">{errors.fundingSource}</FormText>
+                              <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>

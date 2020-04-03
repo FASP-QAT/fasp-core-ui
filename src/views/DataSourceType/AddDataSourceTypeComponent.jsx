@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -16,7 +16,7 @@ const entityname = i18n.t('static.datasourcetype.datasourcetype');
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required(i18n.t('static.manufaturer.realmtext')),
+            .required(i18n.t('static.common.realmtext')),
         label: Yup.string()
             .required(i18n.t('static.datasourcetype.datasourcetypetext'))
     })
@@ -225,10 +225,10 @@ export default class AddDataSourceTypeComponent extends Component {
                                                             required
                                                             value={this.state.realmId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
-                                                        <FormText className="red">{errors.realmId}</FormText>
+                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label> <Input type="text"
@@ -241,7 +241,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={this.state.dataSourceType.label.label_en}
                                                                 required />
-                                                         <FormText className="red">{errors.label}</FormText>
+                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
 

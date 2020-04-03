@@ -40,7 +40,7 @@ const validationSchema = function (values) {
         programName: Yup.string()
             .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
-            .required(i18n.t('static.program.validrealmtext')),
+            .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         organisationId: Yup.string()

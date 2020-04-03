@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, FormText, Input, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, InputGroupAddon, InputGroupText, Label, Row,FormFeedback } from 'reactstrap';
 import * as Yup from 'yup';
 // import * as myConst from '../../Labels.js';
 import LanguageService from '../../api/LanguageService.js';
@@ -9,7 +9,8 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 
 let initialValues = {
-    language: ""
+    language: "",
+    languageCode:''
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
@@ -182,7 +183,7 @@ export default class EditLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
                                                             required />
-                                                        <FormText className="red">{errors.languageName}</FormText>
+                                                        <FormFeedback className="red">{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
@@ -196,7 +197,7 @@ export default class EditLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
-                                                            <FormText className="red">{errors.languageCode}</FormText>
+                                                            <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>

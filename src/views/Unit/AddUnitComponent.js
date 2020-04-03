@@ -1,7 +1,7 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
 import 'react-select/dist/react-select.min.css';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, FormText, Input, Label, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
 import DimensionService from '../../api/DimensionService';
 import UnitService from '../../api/UnitService.js';
@@ -20,7 +20,8 @@ const initialValues = {
 const entityname = i18n.t('static.unit.unit');
 const validationSchema = function (values) {
     return Yup.object().shape({
-
+        dimensionId: Yup.string()
+        .required(i18n.t('static.unit.dimensiontext')),
         unitName: Yup.string()
             .required(i18n.t('static.unit.unittext')),
         unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
@@ -63,7 +64,7 @@ class AddUnitComponent extends Component {
             dimensions:[]
         }
 
-        // this.Capitalize = this.Capitalize.bind(this);
+         this.Capitalize = this.Capitalize.bind(this);
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -86,9 +87,13 @@ class AddUnitComponent extends Component {
             () => { });
     };
 
-    // Capitalize(str) {
-    //     this.setState({unit: str.charAt(0).toUpperCase() + str.slice(1)});
-    // }
+    Capitalize(str) {
+        if (str != null && str != "") {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        } else {
+            return "";
+        }
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -254,9 +259,10 @@ class AddUnitComponent extends Component {
                                                             invalid={touched.unitName && !!errors.unitName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.unitName}
+                                                            value={this.Capitalize(this.state.unit.label.label_en)}
+                                                      
                                                             required />
-                                                        <FormText className="red">{errors.unitName}</FormText>
+                                                        <FormFeedback className="red">{errors.unitName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
@@ -270,7 +276,7 @@ class AddUnitComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.unitCode}
                                                             required />
-                                                        <FormText className="red">{errors.unitCode}</FormText>
+                                                        <FormFeedback className="red">{errors.unitCode}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

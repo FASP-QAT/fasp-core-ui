@@ -325,7 +325,7 @@ class AddUserComponent extends Component {
                                                                 required
                                                                 value={this.state.user.realm.realmId}
                                                             >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                <option value=" ">{i18n.t('static.common.select')}</option>
                                                                 {realmList}
                                                             </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
