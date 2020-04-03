@@ -218,10 +218,16 @@ class DefaultLayout extends Component {
                             //         icon: 'fa fa-object-group',
                             //       }
                             //     ]
-                          },{
+                          }, {
                             name: i18n.t('static.dashboard.tracercategory'),
                             url: '/tracerCategory/listTracerCategory',
-                            icon: 'icon-graph'},
+                            icon: 'icon-graph'
+                          },
+                          {
+                            name: 'Product Category',
+                            url: '/ProductCategory/AddProductCategory',
+                            icon: 'icon-graph'
+                          },
                           {
                             name: i18n.t('static.dashboard.product'),
                             url: '/product/listProduct',
