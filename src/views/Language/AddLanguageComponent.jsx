@@ -187,7 +187,7 @@ class AddLanguageComponent extends Component {
                                                             invalid={touched.languageName && !!errors.languageName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.langaugeName)}
+                                                            value={this.state.langaugeName}
                                                       required />
                                                         <FormFeedback className="red">{errors.languageName}</FormFeedback>
                                                     </FormGroup>
