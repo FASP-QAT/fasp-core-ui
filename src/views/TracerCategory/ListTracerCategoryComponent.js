@@ -135,7 +135,7 @@ class ListTracerCategoryComponent extends Component {
         const columns = [
             {
                 dataField: 'realm.label.label_en',
-                text: i18n.t('static.realm.realmMaster'),
+                text: i18n.t('static.realm.realm'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
@@ -203,7 +203,7 @@ class ListTracerCategoryComponent extends Component {
                     <CardBody>
                         <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmMaster')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input

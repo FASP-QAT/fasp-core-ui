@@ -131,7 +131,7 @@ export default class AddCurrencyComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.currency.currencyadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}

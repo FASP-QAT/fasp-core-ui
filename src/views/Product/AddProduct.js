@@ -28,7 +28,7 @@ const validationSchema = function (values) {
         genericName: Yup.string()
             .required(i18n.t('static.product.generictext')),
         realmId: Yup.string()
-            .required(i18n.t('static.product.realmtext')),
+            .required(i18n.t('static.common.realmtext')),
         productCategoryId: Yup.string()
             .required(i18n.t('static.product.productcategorytext')),
         unitId: Yup.string()
@@ -58,7 +58,7 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-
+const entityname=i18n.t('static.product.product')
 export default class AddProduct extends Component {
 
     constructor(props) {
@@ -276,7 +276,7 @@ export default class AddProduct extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.product.productadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -288,7 +288,7 @@ export default class AddProduct extends Component {
                                         .then(response => {
                                             if (response.status == 200) {
                                                 console.log(response);
-                                                this.props.history.push(`/product/listProduct/${response.data.message}`)
+                                                this.props.history.push(`/product/listProduct/`+i18n.t(response.data.message,{entityname}))
                                             } else {
                                                 this.setState({
                                                     message: response.data.message

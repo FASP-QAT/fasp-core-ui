@@ -8,7 +8,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
 
-const entityname = i18n.t('static.realm.realmMaster');
+const entityname = i18n.t('static.realm.realm');
 const initialValues = {
     realmCode: '',
     label: '',
@@ -150,7 +150,7 @@ export default class AddRealmComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.realm.realmAdd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}

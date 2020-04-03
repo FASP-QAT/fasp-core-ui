@@ -13,7 +13,7 @@ let initialValues = {
 const entityname=i18n.t('static.supplier.supplier');
 const validationSchema = function (values) {
     return Yup.object().shape({realmId: Yup.string()
-        .required(i18n.t('static.fundingsource.errorrealm')),
+        .required(i18n.t('static.common.realmtext')),
         supplier: Yup.string()
             .required(i18n.t('static.supplier.suppliertext'))
     })

@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
 import getLabelText from '../../CommonComponent/getLabelText';
-const entityname = i18n.t('static.procurementagent.procurmentAgentMaster');
+const entityname=i18n.t('static.procurementagent.procurementagent')
 
 const initialValues = {
     realmId: [],
@@ -22,7 +22,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required(i18n.t('static.procurementagent.realmtext')),
+            .required(i18n.t('static.common.realmtext')),
         procurementAgentCode: Yup.string()
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
@@ -183,7 +183,7 @@ class AddProcurementAgentComponent extends Component {
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.procurementagent.procurementagentadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}

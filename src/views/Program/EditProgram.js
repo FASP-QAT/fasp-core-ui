@@ -42,7 +42,7 @@ const validationSchema = function (values) {
         programName: Yup.string()
             .required(i18n.t('static.program.validprogramtext')),
         realmId: Yup.string()
-            .required(i18n.t('static.program.validrealmtext')),
+            .required(i18n.t('static.common.realmtext')),
         realmCountryId: Yup.string()
             .required(i18n.t('static.program.validcountrytext')),
         organisationId: Yup.string()
@@ -478,7 +478,7 @@ export default class EditProgram extends Component {
 
                                             <Form onSubmit={handleSubmit} noValidate name='programForm'>
                                                 <CardHeader>
-                                                    <strong>{i18n.t('static.program.programlist')}</strong>
+                                                    <strong>{i18n.t('static.common.editEntity',{entityname})}</strong>
                                                 </CardHeader>
                                                 <CardBody>
                                                     <FormGroup>

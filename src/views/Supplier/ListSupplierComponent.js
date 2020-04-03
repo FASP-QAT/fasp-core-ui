@@ -199,7 +199,7 @@ class SupplierListComponent extends Component {
                     <CardBody>
                     <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realmMaster')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input

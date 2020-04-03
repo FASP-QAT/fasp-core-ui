@@ -16,7 +16,7 @@ const entityname=i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-      .required(i18n.t('static.fundingsource.realmtext')),
+      .required(i18n.t('static.common.realmtext')),
     fundingSource: Yup.string()
       .required(i18n.t('static.fundingsource.fundingsourcetext'))
   })

@@ -12,7 +12,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
-const entityname = i18n.t('static.realm.realmMaster');
+const entityname = i18n.t('static.realm.realm');
 export default class ReactListComponent extends Component {
 
 

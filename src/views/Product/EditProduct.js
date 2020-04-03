@@ -20,6 +20,7 @@ let initialValues = {
     productCategoryId: '',
     unitId: ''
 }
+const entityname=i18n.t('static.product.product')
 const validationSchema = function (values) {
     return Yup.object().shape({
         productName: Yup.string()
@@ -27,7 +28,7 @@ const validationSchema = function (values) {
         genericName: Yup.string()
             .required(i18n.t('static.product.generictext')),
         realmId: Yup.string()
-            .required(i18n.t('static.product.realmtext')),
+            .required(i18n.t('static.common.realmtext')),
         productCategoryId: Yup.string()
             .required(i18n.t('static.product.productcategorytext')),
         unitId: Yup.string()
@@ -356,7 +357,7 @@ export default class EditProduct extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.product.productedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
