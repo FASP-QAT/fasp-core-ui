@@ -385,6 +385,7 @@
     "static.programproduct.programproduct":"Program Product",
     "static.unit.dimensiontext":"Please select dimension",
     "static.supplyplan.supplyplan":"Supply plan / Supply plan" ,
-    "static.dashboard.masterdatasync":"Master Data Sync"  
+    "static.dashboard.masterdatasync":"Master Data Sync" ,
+    "static.language.languageCodemax3digittext":"Maximum two characters are allowed."
 }
 

@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, InputGroupAddon, InputGroupText, Label, Row,FormFeedback } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, InputGroupAddon, InputGroupText, Label, Row, FormFeedback } from 'reactstrap';
 import * as Yup from 'yup';
 // import * as myConst from '../../Labels.js';
 import LanguageService from '../../api/LanguageService.js';
@@ -10,7 +10,7 @@ import '../Forms/ValidationForms/ValidationForms.css';
 
 let initialValues = {
     language: "",
-    languageCode:''
+    languageCode: ''
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
@@ -18,7 +18,7 @@ const validationSchema = function (values) {
 
         language: Yup.string()
             .required(i18n.t('static.language.languagetext')),
-        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2,i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -111,6 +111,8 @@ export default class EditLanguageComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <h6>{i18n.t(this.state.message)}</h6>
+                <h6>{i18n.t(this.props.match.params.message)}</h6>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -197,7 +199,7 @@ export default class EditLanguageComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageCode}
                                                             required />
-                                                            <FormFeedback className="red">{errors.languageCode}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -248,10 +250,7 @@ export default class EditLanguageComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+               
             </div>
         );
     }

@@ -22,7 +22,7 @@ const validationSchema = function (values) {
 
         languageName: Yup.string()
             .required(i18n.t('static.language.languagetext')),
-        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext'))
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2,i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -53,7 +53,9 @@ class AddLanguageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            language: {},
+            language: {
+                languageName: ''
+            },
             message: ''
         }
 
@@ -79,11 +81,14 @@ class AddLanguageComponent extends Component {
     };
 
     Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
+        // if (str != null && str != "") {
+        //     return str.charAt(0).toUpperCase() + str.slice(1);
+        // } else {
+        //     return "";
+        // }
+
+        let { language } = this.state
+        language.languageName = str.charAt(0).toUpperCase() + str.slice(1)
     }
     touchAll(setTouched, errors) {
         setTouched({
@@ -124,6 +129,8 @@ class AddLanguageComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h6>{i18n.t(this.state.message)}</h6>
+                <h6>{i18n.t(this.props.match.params.message)}</h6>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -185,10 +192,10 @@ class AddLanguageComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
                                                             invalid={touched.languageName && !!errors.languageName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.langaugeName}
-                                                      required />
+                                                            value={this.state.language.languageName}
+                                                            required />
                                                         <FormFeedback className="red">{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -219,10 +226,7 @@ class AddLanguageComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-                <div>
-                    <h6>{i18n.t(this.state.message)}</h6>
-                    <h6>{i18n.t(this.props.match.params.message)}</h6>
-                </div>
+
             </div>
         );
     }
