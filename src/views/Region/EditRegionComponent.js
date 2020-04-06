@@ -185,7 +185,7 @@ class EditRegionComponent extends Component {
                                                         <FormText className="red">{errors.region}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
