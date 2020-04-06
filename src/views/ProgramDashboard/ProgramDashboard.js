@@ -166,7 +166,7 @@ class ProgramDashboard extends Component {
                     <td>
                       <div className="clearfix">
                         <div className="float-left">
-                          <strong>50%</strong>
+                          <strong>90%</strong>
                         </div>
                         <div className="float-right">
                           <small className="text-muted">Inventory At Threshold</small>
@@ -186,7 +186,7 @@ class ProgramDashboard extends Component {
                  <td>
                    <div className="clearfix">
                      <div className="float-left">
-                       <strong>30%</strong>
+                       <strong>60%</strong>
                      </div>
                      <div className="float-right">
                        <small className="text-muted">Inventory Below Threshold</small>
@@ -206,7 +206,7 @@ class ProgramDashboard extends Component {
                  <td>
                    <div className="clearfix">
                      <div className="float-left">
-                       <strong>80%</strong>
+                       <strong>25%</strong>
                      </div>
                      <div className="float-right">
                        <small className="text-muted">Inventory Above Threshold</small>
@@ -219,14 +219,14 @@ class ProgramDashboard extends Component {
                <tr>
                  
                     <td>
-                      <div>Program 1</div>
+                      <div>Program 4</div>
                      
                     </td>
                     
                     <td>
                       <div className="clearfix">
                         <div className="float-left">
-                          <strong>50%</strong>
+                          <strong>35%</strong>
                         </div>
                         <div className="float-right">
                           <small className="text-muted">Inventory At Threshold</small>

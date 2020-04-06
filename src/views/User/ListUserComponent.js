@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {
-    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, FormText, Label, Button, Col
+    Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
 } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
@@ -232,7 +232,9 @@ class ListUserComponent extends Component {
             }
         }, {
             dataField: 'userId',
-            text: 'ACTION',
+            text: 'Action',
+            align: 'center',
+            headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (<Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>
                 )
@@ -262,7 +264,6 @@ class ListUserComponent extends Component {
                 text: '50', value: 50
             },
             {
-
                 text: 'All', value: this.state.selUserList.length
             }]
         }

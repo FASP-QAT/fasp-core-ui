@@ -102,7 +102,7 @@ class EditRegionComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.region.regionedit')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',entityname)}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}

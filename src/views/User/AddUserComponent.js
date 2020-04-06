@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, FormText,Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, FormFeedback,Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -325,10 +325,10 @@ class AddUserComponent extends Component {
                                                                 required
                                                                 value={this.state.user.realm.realmId}
                                                             >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                                <option value=" ">{i18n.t('static.common.select')}</option>
                                                                 {realmList}
                                                             </Input>
-                                                        <FormText className="red">{errors.realmId}</FormText>
+                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
@@ -342,7 +342,7 @@ class AddUserComponent extends Component {
                                                                 onBlur={handleBlur}
                                                                 required
                                                                 value={this.state.user.username}
-                                                            /><FormText className="red">{errors.username}</FormText>
+                                                            /><FormFeedback className="red">{errors.username}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
@@ -357,7 +357,7 @@ class AddUserComponent extends Component {
                                                             required
                                                             value={this.state.user.emailId}
                                                         />
-                                                        <FormText className="red">{errors.emailId}</FormText>
+                                                        <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
@@ -371,7 +371,7 @@ class AddUserComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.user.phoneNumber}
-                                                        /><FormText className="red">{errors.phoneNumber}</FormText>
+                                                        /><FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
@@ -388,7 +388,7 @@ class AddUserComponent extends Component {
                                                             value={this.state.user.roles}
                                                             multiple={true}
                                                         >
-                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
+                                                            <option value="" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
                                                         </Input>
                                                         <FormFeedback>{errors.roleId}</FormFeedback>
@@ -407,7 +407,7 @@ class AddUserComponent extends Component {
                                                             required
                                                             value={this.state.user.language.languageId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageList}
                                                         </Input>
                                                          <FormFeedback>{errors.languageId}</FormFeedback>

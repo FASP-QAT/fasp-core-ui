@@ -81,7 +81,8 @@
     "reactstrap": "^8.0.0",
     "simple-line-icons": "^2.4.1",
     "spinkit": "1.2.5",
-    "yup": "^0.27.0"
+    "yup": "^0.27.0",
+    "react-sortable-tree": "^2.7.1"
   },
   "devDependencies": {
     "mutationobserver-shim": "^0.3.3",

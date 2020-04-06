@@ -22,7 +22,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required(i18n.t('static.tracercategory.realmtext')),
+            .required(i18n.t('static.common.realmtext')),
        tracerCategoryName: Yup.string()
             .required(i18n.t('static.tracerCategory.tracercategorytext'))
     })

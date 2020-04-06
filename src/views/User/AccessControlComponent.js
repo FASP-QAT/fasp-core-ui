@@ -484,7 +484,6 @@ class AccessControlComponent extends Component {
                                             <th className="text-left"> {i18n.t('static.organisation.organisation')} </th>
                                             <th className="text-left">{i18n.t('static.program.program')}</th>
                                             <th className="text-left">{i18n.t('static.common.remove')}</th>
-
                                         </tr>
                                     </thead>
                                     <tbody>

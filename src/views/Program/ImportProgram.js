@@ -19,6 +19,7 @@ import CryptoJS from 'crypto-js';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
+import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 const initialValues = {
     programId: ''
 }
@@ -81,6 +82,7 @@ export default class ImportProgram extends Component {
                 var file = document.querySelector('input[type=file]').files[0];
                 var selectedPrgArr = this.state.programId;
                 var db1;
+                getDatabase();
                 var openRequest = indexedDB.open('fasp', 1);
                 openRequest.onsuccess = function (e) {
                     console.log("in success");

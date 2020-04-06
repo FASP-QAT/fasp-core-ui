@@ -258,7 +258,7 @@ class AddBudgetComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.budget.budgetadd')}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -342,7 +342,7 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.programId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {programList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
@@ -364,7 +364,7 @@ class AddBudgetComponent extends Component {
                                                             required
                                                             value={this.state.subFundingSourceId}
                                                         >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
                                                             {subFundingSourceList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
