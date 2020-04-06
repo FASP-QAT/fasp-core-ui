@@ -48,6 +48,7 @@ class ListBudgetComponent extends Component {
     this.addBudget = this.addBudget.bind(this);
     this.filterData = this.filterData.bind(this);
     this.formatDate = this.formatDate.bind(this);
+    this.formatLabel = this.formatLabel.bind(this);
   }
 
 
@@ -76,7 +77,7 @@ class ListBudgetComponent extends Component {
   editBudget(budget) {
     // var budgetId = budget.budgetId
     this.props.history.push({
-      pathname: "/budget/editBudget", 
+      pathname: "/budget/editBudget",
       state: { budget }
     });
   }
@@ -157,12 +158,6 @@ class ListBudgetComponent extends Component {
       );
 
   }
-
-
-  // showBudgetLabel(cell, row) {
-  //   return getLabelText(cell, this.state.lang);
-  // }
-
   // showSubFundingSourceLabel(cell, row) {
   //   return getLabelText(cell.label, this.state.lang);
   // }
@@ -178,6 +173,11 @@ class ListBudgetComponent extends Component {
   //     return "Disabled";
   //   }
   // }
+
+  formatLabel(cell, row) {
+    return getLabelText(cell, this.state.lang);
+  }
+
   render() {
 
     const { SearchBar, ClearSearchButton } = Search;
@@ -199,25 +199,29 @@ class ListBudgetComponent extends Component {
 
     const columns = [
       {
-        dataField: 'label.label_en',
+        dataField: 'label',
         text: i18n.t('static.budget.budget'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatLabel
+
       },
       {
-        dataField: 'program.label.label_en',
+        dataField: 'program.label',
         text: i18n.t('static.budget.program'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatLabel
       },
       {
-        dataField: 'subFundingSource.label.label_en',
+        dataField: 'subFundingSource.label',
         text: i18n.t('static.budget.subfundingsource'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatLabel
       },
       {
         dataField: 'budgetAmt',
@@ -286,10 +290,10 @@ class ListBudgetComponent extends Component {
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i>{i18n.t('static.common.listEntity',{entityname})}{' '}
+            <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
+                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addBudget}><i className="fa fa-plus-square"></i></a>
               </div>
             </div>
           </CardHeader>
