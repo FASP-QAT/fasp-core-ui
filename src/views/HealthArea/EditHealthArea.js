@@ -17,13 +17,13 @@ let initialValues = {
     realmId: '',
     healthAreaName: ''
 }
-const entityname = i18n.t('static.datasourcetype.datasourcetype');
+const entityname = i18n.t('static.healtharea.healtharea');
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
-            .required('select realm'),
+            .required(i18n.t('static.common.realmtext')),
         healthAreaName: Yup.string()
-            .required('enter health area name')
+            .required(i18n.t('static.healtharea.healthareatext'))
     })
 }
 
@@ -139,8 +139,7 @@ export default class EditHealthAreaComponent extends Component {
         }
 
         AuthenticationService.setupAxiosInterceptors();
-        // var realmId = parseInt(this.state.healthArea.realm.realmId);
-        // this.getCountryListByRealmId(realmId);
+        
         UserService.getRealmList()
             .then(response => {
                 console.log("realm list---", response.data);
@@ -203,25 +202,6 @@ export default class EditHealthAreaComponent extends Component {
                 }
             );
 
-
-        // $("#healthAreaForm").validate({
-        //     ignore: [],
-        //     rules: {
-        //         'healthArea.label.label_en': {
-        //             required: true
-        //         },
-        //         'healthArea.realmCountryArray': {
-        //             required: true
-        //         },
-        //         'healthArea.realm.realmId': {
-        //             required: true
-        //         }
-        //     },
-        //     errorPlacement: function (error, element) {
-        //         error.insertAfter(element);
-        //     }
-        // });
-
     }
 
     updateFieldData(value) {
@@ -236,152 +216,9 @@ export default class EditHealthAreaComponent extends Component {
         this.setState({ healthArea: healthArea });
     }
 
-    // getRealmCountryList(e) {
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     HealthAreaService.getRealmCountryList(e.target.value)
-    //         .then(response => {
-    //             console.log("Realm Country List list---", response.data);
-    //             if (response.status == 200) {
-    //                 var json = response.data;
-    //                 var regList = [];
-    //                 for (var i = 0; i < json.length; i++) {
-    //                     regList[i] = { value: json[i].realmCountryId, label: getLabelText(json[i].country.label, this.state.lang) }
-    //                 }
-    //                 this.setState({
-    //                     realmCountryId: '',
-    //                     realmCountryList: regList
-    //                 })
-    //             } else {
-    //                 this.setState({
-    //                     message: response.data.messageCode
-    //                 })
-    //             }
-    //         }).catch(
-    //             error => {
-    //                 if (error.message === "Network Error") {
-    //                     this.setState({ message: error.message });
-    //                 } else {
-    //                     switch (error.response.status) {
-    //                         case 500:
-    //                         case 401:
-    //                         case 404:
-    //                         case 406:
-    //                         case 412:
-    //                             this.setState({ message: error.response.data.messageCode });
-    //                             break;
-    //                         default:
-    //                             this.setState({ message: 'static.unkownError' });
-    //                             console.log("Error code unkown");
-    //                             break;
-    //                     }
-    //                 }
-    //             }
-    //         );
-
-    // }
-
     Capitalize(str) {
-        // let { dataSourceType } = this.state
-        // dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        this.state.healthArea.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
-
-    // render() {
-    //     const { countries } = this.state;
-    //     const { realms } = this.state;
-
-    //     let realmList = realms.length > 0
-    //         && realms.map((item, i) => {
-    //             return (
-    //                 <option key={i} value={item.realmId}>
-    //                     {(() => {
-    //                         switch (this.state.languageId) {
-    //                             case 2: return (item.label.label_pr !== null && item.label.label_pr !== "" ? item.label.label_pr : item.label.label_en);
-    //                             case 3: return (item.label.label_fr !== null && item.label.label_fr !== "" ? item.label.label_fr : item.label.label_en);
-    //                             case 4: return (item.label.label_sp !== null && item.label.label_sp !== "" ? item.label.label_sp : item.label.label_en);
-    //                             default: return item.label.label_en;
-    //                         }
-    //                     })()}
-    //                 </option>
-    //             )
-    //         }, this);
-
-    //     let countryList = countries.length > 0
-    //         && countries.map((item, i) => {
-    //             return (
-    //                 <option key={i} value={item.realmCountryId}>
-    //                     {item.country.label.label_en}
-    //                 </option>
-    //             )
-    //         }, this);
-    //     return (
-    //         <div class="page-container page-navigation-toggled page-container-wide">
-    //             <div class="page-content">
-    //                 <ul class="breadcrumb">
-    //                     <li><a href="#">Home</a></li>
-    //                     <li><a href="#">Admin</a></li>
-    //                     <li><a href="#">Health Area</a></li>
-    //                     <li><a href="#">Update Health Area</a></li>
-    //                 </ul>
-    //                 <div class="page-content-wrap">
-    //                     <div><h5>{this.state.message}</h5></div>
-    //                     <div class="row">
-    //                         <div class="col-md-12">
-
-    //                             <form name="healthAreaForm" id="healthAreaForm" class="form-horizontal">
-    //                                 <div class="panel panel-default">
-    //                                     <div class="panel-heading">
-    //                                         <h3 class="panel-title">Edit Health Area</h3>
-    //                                     </div>
-    //                                     <div class="panel-body">
-    //                                         <div class="form-group">
-    //                                             <label class="req col-md-2 col-xs-12 control-label">Realm</label>
-    //                                             <div class="col-md-6 col-xs-12">
-    //                                                 <select id="healthArea.realm.realmId" class="form-control select" data-live-search="true" name="healthArea.realm.realmId" onChange={this.dataChange} value={this.state.healthArea.realm.realmId} disabled={true}>
-    //                                                     <option value="">-Nothing Selected-</option>
-    //                                                     {realmList}
-    //                                                 </select>
-
-    //                                             </div>
-    //                                         </div>
-    //                                         <div class="form-group">
-    //                                             <label class="req col-md-2 col-xs-12 control-label">Country</label>
-    //                                             <div class="col-md-6 col-xs-12">
-    //                                                 <select id="healthArea.realmCountryArray" class="form-control select" data-live-search="true" name="healthArea.realmCountryArray" onChange={this.dataChange} multiple={true} value={this.state.healthArea.realmCountryArray}>
-    //                                                     <option value="">-Nothing Selected-</option>
-    //                                                     {countryList}
-    //                                                 </select>
-
-    //                                             </div>
-    //                                         </div>
-    //                                         <div class="form-group">
-    //                                             <label class="req col-md-2 col-xs-12 control-label">HealthAreaName</label>
-    //                                             <div class="col-md-6 col-xs-12">
-    //                                                 <input type="text" id="healthArea.label.label_en" class="form-control" name="healthArea.label.label_en" onChange={this.dataChange} value={this.state.healthArea.label.label_en} readOnly={true} />
-    //                                             </div>
-    //                                         </div>
-    //                                         <div className="form-group">
-    //                                             <label class="req col-md-2 col-xs-12 control-label">Active</label>
-    //                                             <div class="col-md-1 col-xs-12">
-    //                                                 <input type="radio" id="healthArea.active1" name="healthArea.active" value={true} checked={this.state.healthArea.active === true} onChange={this.dataChange} /> Active
-    //                                                 <input type="radio" id="healthArea.active2" name="healthArea.active" value={false} checked={this.state.healthArea.active === false} onChange={this.dataChange} /> Disabled
-    //                                         </div>
-    //                                         </div>
-    //                                     </div>
-    //                                     <div class="panel-footer">
-    //                                         <div class="pull-right">
-    //                                             <button type="button" className="btn btn-success" onClick={this.updateClicked}>Update</button>
-    //                                             <button type="button" className="btn btn-danger" onClick={this.cancelClicked}>Cancel</button><br></br><br></br>
-    //                                         </div>
-    //                                     </div>
-    //                                 </div>
-    //                             </form>
-    //                         </div>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     )
-    // }
 
     render() {
         const { countries } = this.state;
@@ -403,22 +240,13 @@ export default class EditHealthAreaComponent extends Component {
                 )
             }, this);
 
-        // let countryList = countries.length > 0
-        //     && countries.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.realmCountryId}>
-        //                 {item.country.label.label_en}
-        //             </option>
-        //         )
-        //     }, this);
-
         return (
             <div className="animated fadeIn">
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Edit Health Area</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -471,11 +299,11 @@ export default class EditHealthAreaComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="healthAreaName">Label(English) </Label>
+                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')} </Label>
                                                         <Input
                                                             type="text" name="healthAreaName" valid={!errors.healthAreaName}
                                                             invalid={touched.healthAreaName && !!errors.healthAreaName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.healthArea.label.label_en}
                                                             id="healthAreaName" placeholder="Health Area Text" />
@@ -483,7 +311,7 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
                                                         <Input
                                                             value={this.state.healthArea.realm.realmId}
                                                             valid={!errors.realmId}
@@ -499,7 +327,7 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}</Label>
                                                         <Select
                                                             valid={!errors.realmCountryId}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
@@ -553,7 +381,7 @@ export default class EditHealthAreaComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
                                                       </FormGroup>
@@ -568,72 +396,6 @@ export default class EditHealthAreaComponent extends Component {
             </div>
         );
     }
-
-    // getCountryListByRealmId(realmId) {
-    //     console.log("realmId---" + realmId);
-    //     CountryService.getRealmCountryListByRealmId(realmId !== "" ? realmId : 0)
-    //         .then(response => {
-    //             console.log("response---", response.data);
-    //             this.setState({
-    //                 countries: response.data
-    //             })
-    //         }).catch(
-    //             error => {
-    //                 switch (error.message) {
-    //                     case "Network Error":
-    //                         this.setState({
-    //                             message: error.message
-    //                         })
-    //                         break
-    //                     default:
-    //                         this.setState({
-    //                             message: error.response.data.message
-    //                         })
-    //                         break
-    //                 }
-    //             }
-    //         );
-
-    // }
-    // updateClicked() {
-    //     if (navigator.onLine) {
-    //         if (AuthenticationService.checkTypeOfSession()) {
-    //             if ($("#healthAreaForm").valid()) {
-    //                 HealthAreaService.editHealthArea(this.state.healthArea)
-    //                     .then(response => {
-    //                         console.log("response edit---", response);
-    //                         if (response.data.message != "Failed") {
-    //                             this.props.history.push(`/healthAreaList/${response.data.message}`)
-    //                         } else {
-    //                             this.setState({
-    //                                 message: response.data.message
-    //                             })
-    //                         }
-    //                     })
-    //                     .catch(
-    //                         error => {
-    //                             switch (error.message) {
-    //                                 case "Network Error":
-    //                                     this.setState({
-    //                                         message: error.message
-    //                                     })
-    //                                     break
-    //                                 default:
-    //                                     this.setState({
-    //                                         message: error.response.data.message
-    //                                     })
-    //                                     break
-    //                             }
-    //                         }
-    //                     );
-    //             }
-    //         } else {
-    //             alert("You can't change your session from online to offline or vice versa.");
-    //         }
-    //     } else {
-    //         alert("You must be Online.")
-    //     }
-    // }
 
     cancelClicked() {
         this.props.history.push(`/healthArea/listHealthArea/` + i18n.t('static.message.cancelled', { entityname }))

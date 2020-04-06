@@ -12,7 +12,7 @@ import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 
-const entityname = i18n.t('static.datasourcetype.datasourcetype');
+const entityname = i18n.t('static.healtharea.healtharea');
 
 const initialValues = {
   realmId: '',
@@ -22,9 +22,9 @@ const initialValues = {
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
-      .required('select realm'),
+      .required(i18n.t('static.common.realmtext')),
     healthAreaName: Yup.string()
-      .required('enter health area name')
+      .required(i18n.t('static.healtharea.healthareatext'))
   })
 }
 
@@ -232,100 +232,8 @@ export default class AddHealthAreaComponent extends Component {
 
   }
 
-
-  // render() {
-  //     const { selCountries } = this.state;
-  //     const { realms } = this.state;
-
-  //     let realmList = realms.length > 0
-  //         && realms.map((item, i) => {
-  //             return (
-  //                 <option key={i} value={item.realmId}>
-  //                     {(() => {
-  //                         switch (this.state.languageId) {
-  //                             case 2: return (item.label.label_pr !== null && item.label.label_pr !== "" ? item.label.label_pr : item.label.label_en);
-  //                             case 3: return (item.label.label_fr !== null && item.label.label_fr !== "" ? item.label.label_fr : item.label.label_en);
-  //                             case 4: return (item.label.label_sp !== null && item.label.label_sp !== "" ? item.label.label_sp : item.label.label_en);
-  //                             default: return item.label.label_en;
-  //                         }
-  //                     })()}
-  //                 </option>
-  //             )
-  //         }, this);
-
-  //     let countryList = selCountries.length > 0
-  //         && selCountries.map((item, i) => {
-  //             return (
-  //                 <option key={i} value={item.realmCountryId}>
-  //                     {item.country.label.label_en}
-  //                 </option>
-  //             )
-  //         }, this);
-  //     return (
-  //         <div className="page-container page-navigation-toggled page-container-wide">
-  //             <div className="page-content">
-  //                 <ul className="breadcrumb">
-  //                     <li><a href="#">Home</a></li>
-  //                     <li><a href="#">Admin</a></li>
-  //                     <li><a href="#">Health Area</a></li>
-  //                     <li><a href="#">Add Health Area</a></li>
-  //                 </ul>
-  //                 <div className="page-content-wrap">
-  //                     <div><h5>{this.state.message}</h5></div>
-  //                     <div className="row">
-  //                         <div className="col-md-12">
-
-  //                             <form name="healthAreaForm" id="healthAreaForm" class="form-horizontal">
-  //                                 <div className="panel panel-default">
-  //                                     <div class="panel-heading">
-  //                                         <h3 class="panel-title">Add Health Area</h3>
-  //                                     </div>
-  //                                     <div class="panel-body">
-  //                                         <div class="form-group">
-  //                                             <label class="req col-md-2 col-xs-12 control-label">Realm</label>
-  //                                             <div class="col-md-6 col-xs-12">
-  //                                                 <select id="healthArea.realm.realmId" class="form-control select" data-live-search="true" name="healthArea.realm.realmId" onChange={this.dataChange}>
-  //                                                     <option value="">-Nothing Selected-</option>
-  //                                                     {realmList}
-  //                                                 </select>
-
-  //                                             </div>
-  //                                         </div>
-  //                                         <div class="form-group">
-  //                                             <label class="req col-md-2 col-xs-12 control-label">Country</label>
-  //                                             <div class="col-md-6 col-xs-12">
-  //                                                 <select id="healthArea.realmCountryArray" class="form-control select" data-live-search="true" name="healthArea.realmCountryArray" onChange={this.dataChange} multiple={true}>
-  //                                                     <option value="">-Nothing Selected-</option>
-  //                                                     {countryList}
-  //                                                 </select>
-
-  //                                             </div>
-  //                                         </div>
-  //                                         <div class="form-group">
-  //                                             <label class="req col-md-2 col-xs-12 control-label">Health area name (English)</label>
-  //                                             <div class="col-md-6 col-xs-12">
-  //                                                 <input type="text" id="healthArea.label.label_en" class="form-control" name="healthArea.label.label_en" onChange={this.dataChange} />
-  //                                             </div>
-  //                                         </div>
-  //                                     </div>
-  //                                     <div class="panel-footer">
-  //                                         <div class="pull-right">
-  //                                             <button type="button" className="btn btn-success" onClick={this.submitClicked}>Submit</button>
-  //                                             <button type="button" className="btn btn-danger" onClick={this.cancelClicked}>Cancel</button><br></br><br></br>
-  //                                         </div>
-  //                                     </div>
-  //                                 </div>
-  //                             </form>
-  //                         </div>
-  //                     </div>
-  //                 </div>
-  //             </div>
-  //         </div>
-  //     )
-  // }
-
   Capitalize(str) {
-
+    this.state.healthArea.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
   }
 
   render() {
@@ -348,22 +256,13 @@ export default class AddHealthAreaComponent extends Component {
         )
       }, this);
 
-    // let countryList = countries.length > 0
-    //   && countries.map((item, i) => {
-    //     return (
-    //       <option key={i} value={item.realmCountryId}>
-    //         {item.country.label.label_en}
-    //       </option>
-    //     )
-    //   }, this);
-
     return (
       <div className="animated fadeIn">
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>Edit Health Area</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -416,18 +315,18 @@ export default class AddHealthAreaComponent extends Component {
                         <CardBody>
 
                           <FormGroup>
-                            <Label htmlFor="company">Label(English) </Label>
+                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')} </Label>
                             <Input
                               type="text" name="healthAreaName" valid={!errors.healthAreaName}
                               invalid={touched.healthAreaName && !!errors.healthAreaName}
-                              onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                              onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                               onBlur={handleBlur}
                               id="healthAreaName" placeholder="Health Area Text" />
                             <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
                           </FormGroup>
 
                           <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                            <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
                             <Input
                               value={this.state.healthArea.realm.realmId}
                               valid={!errors.realmId}
@@ -442,7 +341,7 @@ export default class AddHealthAreaComponent extends Component {
                           </FormGroup>
 
                           <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                            <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}</Label>
                             <Select
                               valid={!errors.realmCountryId}
                               invalid={touched.realmCountryId && !!errors.realmCountryId}

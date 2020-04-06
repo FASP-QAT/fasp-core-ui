@@ -196,12 +196,12 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-pie-chart'
                           },
                           {
-                            name: 'List HealthArea',
+                            name: i18n.t('static.healtharea.healtharea'),
                             url: '/healthArea/listHealthArea',
                             icon: 'fa fa-pie-chart'
                           },
                           {
-                            name: 'List Organisation',
+                            name: i18n.t('static.organisation.organisation'),
                             url: '/organisation/listOrganisation',
                             icon: 'fa fa-pie-chart'
                           }

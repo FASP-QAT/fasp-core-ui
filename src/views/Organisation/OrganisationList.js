@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import UserService from "../../api/UserService.js";
 import OrganisationService from "../../api/OrganisationService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
-
+import RealmService from '../../api/RealmService';
+import getLabelText from '../../CommonComponent/getLabelText';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import 'react-bootstrap-table/dist//react-bootstrap-table-all.min.css';
@@ -13,7 +14,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
-const entityname = i18n.t('static.subfundingsource.subfundingsource');
+const entityname = i18n.t('static.organisation.organisation');
 
 
 export default class OrganisationListComponent extends Component {
@@ -21,22 +22,68 @@ export default class OrganisationListComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            realms: [],
             organisations: [],
             message: "",
             selSource: []
         }
         this.editOrganisation = this.editOrganisation.bind(this);
         this.addOrganisation = this.addOrganisation.bind(this);
+        this.filterData = this.filterData.bind(this);
     }
-
+    filterData() {
+        let realmId = document.getElementById("realmId").value;
+        if (realmId != 0) {
+            const selSource = this.state.organisations.filter(c => c.realm.realmId == realmId)
+            this.setState({
+                selSource
+            });
+        } else {
+            this.setState({
+                selSource: this.state.organisations
+            });
+        }
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        RealmService.getRealmListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
+
         OrganisationService.getOrganisationList()
             .then(response => {
                 console.log("response---", response);
 
                 this.setState({
-                    organisations: response.data.data,
+                    organisations: response.data,
                     selSource: response.data
                 })
 
@@ -105,21 +152,31 @@ export default class OrganisationListComponent extends Component {
             </span>
         );
 
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         const columns = [{
             dataField: 'organisationCode',
-            text: 'Organisation Code',
+            text: i18n.t('static.organisation.organisationcode'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
             dataField: 'label.label_en',
-            text: 'Organisation Name',
+            text: i18n.t('static.realm.realm'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
             dataField: 'realm.label.label_en',
-            text: 'realm',
+            text: i18n.t('static.organisation.organisationname'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
@@ -176,8 +233,29 @@ export default class OrganisationListComponent extends Component {
 
                     </CardHeader>
                     <CardBody>
+                        <Col md="3 pl-0">
+                            <FormGroup>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                <div className="controls SelectGo">
+                                    <InputGroup>
+                                        <Input
+                                            type="select"
+                                            name="realmId"
+                                            id="realmId"
+                                            bsSize="sm"
+                                        >
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {realmList}
+                                        </Input>
+                                        <InputGroupAddon addonType="append">
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                        </InputGroupAddon>
+                                    </InputGroup>
+                                </div>
+                            </FormGroup>
+                        </Col>
                         <ToolkitProvider
-                            keyField="dataSourceTypeId"
+                            keyField="organisationId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
