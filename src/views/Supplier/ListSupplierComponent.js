@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import { Card, CardHeader, CardBody , FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col} from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';

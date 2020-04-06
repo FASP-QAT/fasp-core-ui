@@ -127,7 +127,7 @@ export default class EditUnitComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ unit: this.state.unit }}
+                                initialValues={{ unit: this.state.unit,unitName:this.state.unit.unitName,unitCode:this.state.unit.unitCode }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
