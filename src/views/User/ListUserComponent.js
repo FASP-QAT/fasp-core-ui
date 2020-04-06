@@ -232,7 +232,9 @@ class ListUserComponent extends Component {
             }
         }, {
             dataField: 'userId',
-            text: 'ACTION',
+            text: 'Action',
+            align: 'center',
+            headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (<Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>
                 )
