@@ -223,7 +223,7 @@ class ListUserComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.lastLoginDate ? moment(row.lastLoginDate).format('MM-DD-YYYY hh:mm A') : "")
+                    (row.lastLoginDate ? moment(row.lastLoginDate).format('MM-DD-YYYY hh:mm A') : null)
                 );
             }
         }, {
@@ -329,7 +329,7 @@ class ListUserComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
+                                                   // row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
                                                     this.editUser(row);
                                                 }
                                             }}

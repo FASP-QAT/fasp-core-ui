@@ -382,10 +382,16 @@
     "static.dashboard.changepassword": "Change Password",
     "static.dashboard.useraccessctrl": "User / Access Control",
     "static.productcategory.productcategory": "Product Category",
-    "static.programproduct.programproduct": "Program Product",
-    "static.unit.dimensiontext": "Please select dimension",
-    "static.supplyplan.supplyplan": "Supply plan / Supply plan",
-    "static.dashboard.masterdatasync": "Master Data Sync",
+    "static.programproduct.programproduct":"Program Product",
+    "static.unit.dimensiontext":"Please select dimension",
+    "static.supplyplan.supplyplan":"Supply plan / Supply plan" ,
+    "static.dashboard.masterdatasync":"Master Data Sync" ,
+    "static.language.languageCodemax3digittext":"Maximum two characters are allowed.",
+    "static.dashboard.forecastingunit":"Forcasting Unit",
+    "static.forecastingunit.forecastingunit":"Forecasting Unit",
+    "static.tracercategory.tracercategoryText":"Please select tracer category",
+    "static.productcategory.productcategorytext":"Please select product category",
+    "static.forecastingunit.forecastingunittext":"Please enter forecasting unit",
     "static.language.languageCodemax3digittext": "Maximum two characters are allowed.",
     "static.healtharea.realm": "Realm",
     "static.healtharea.realmcountry": "Country",
@@ -398,3 +404,4 @@
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
     "static.currency.numbernotallowedtext": "Numbers are not allowed"
 }
+

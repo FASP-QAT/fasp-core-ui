@@ -11,6 +11,7 @@ import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
+import i18n from '../../../i18n'
 
 
 
@@ -116,7 +117,7 @@ class ChangePasswordComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>Change Password</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.dashboard.changepassword')}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={{
