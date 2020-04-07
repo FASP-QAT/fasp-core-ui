@@ -375,7 +375,7 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input
-
+                                                            
                                                             type="number"
                                                             min="0"
                                                             name="budgetAmt"
@@ -414,7 +414,7 @@ class AddBudgetComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupAddon addonType="prepend"> 
                                                         {/* <InputGroupText><i className="fa fa-calendar-minus-o"></i></InputGroupText> */}
                                                         <Input
 
@@ -431,7 +431,7 @@ class AddBudgetComponent extends Component {
                                                             min={this.state.budget.startDate}
                                                             placeholder={i18n.t('static.budget.budgetstopdate')}
                                                             required />
-                                                        {/* </InputGroupAddon> */}
+                                                             {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>

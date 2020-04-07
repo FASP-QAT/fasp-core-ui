@@ -52,7 +52,7 @@
     "static.currency.currencysymboltext": "Please enter currency symbol",
     "static.common.clear": "Clear",
     "static.datasourcetype.datasourcetypetext": "Please enter datasource type",
-    "static.country.countrycodemax3digittext": "Please enter 3 characters",
+    "static.country.countrycodemax3digittext": "Maximum 3 characters only",
     "static.currency.currencytext": "Please enter currency name",
     "static.supplier.realm": "Realm",
     "static.program.validprogramtext": "Please enter programName",
@@ -394,5 +394,7 @@
     "static.organisation.realm": "Realm",
     "static.organisation.realmcountry": "Country",
     "static.organisation.organisationname": "Organisation Name",
-    "static.organisation.organisationcode": "Organisation Code"
+    "static.organisation.organisationcode": "Organisation Code",
+    "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
+    "static.currency.numbernotallowedtext": "Numbers are not allowed"
 }
