@@ -68,8 +68,8 @@ const LoadingButtons = React.lazy(() => import('./views/Buttons/LoadingButtons')
 
 const Breadcrumbs = React.lazy(() => import('./views/Base/Breadcrumbs'));
 const Cards = React.lazy(() => import('./views/Base/Cards'));
-const Carousels = React.lazy(() => import('./views/Base/Carousels'));
 const Collapses = React.lazy(() => import('./views/Base/Collapses'));
+const Carousels = React.lazy(() => import('./views/Base/Carousels'));
 const Dropdowns = React.lazy(() => import('./views/Base/Dropdowns'));
 
 const Jumbotrons = React.lazy(() => import('./views/Base/Jumbotrons'));
@@ -172,17 +172,20 @@ const routes = [
   { path: '/product/listProduct', exact: true, name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/listProduct/:message', name: i18n.t('static.product.productlist'), component: ListProdct },
   { path: '/product/addProduct', name: 'Add Product', component: AddProduct },
-  { path: '/program/addProgram', name: 'Add Program', component: AddProgram },
-  { path: '/program/listProgram', exact: true, name: 'Program ', component: Programs },
-  { path: '/program/listProgram/:message', name: 'Program ', component: Programs },
-  { path: '/program/editProgram/:programId', name: 'Edit Program', component: EditProgram },
+  
+  { path: '/program/addProgram', name: 'Program / Add Program', component: AddProgram },
+  { path: '/program/listProgram', exact: true, name: 'Program / Program List ', component: Programs },
+  { path: '/program/listProgram/:message', component: Programs },
+  { path: '/program/editProgram/:programId', name: 'Program / Update Program', component: EditProgram },
+  
   { path: '/productCategory/addProductCategory', name: 'Add Product Category', component: AddProductCategory },
   { path: '/programProduct/addProgramProduct', name: 'Add Program Product', component: AddProgramProduct },
-  { path: '/budget/addBudget', name: 'Add Budget', component: AddBudgetComponent },
-
-  { path: '/budget/listBudget', exact: true, name: 'Budget List', component: ListBudgetComponent },
+  
+  { path: '/budget/addBudget', name: 'Budget / Add Budget', component: AddBudgetComponent },
+  { path: '/budget/listBudget', exact: true, name: 'Budget / Budget List', component: ListBudgetComponent },
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
-  { path: '/budget/editBudget/', name: 'Update Budget', component: EditBudgetComponent },
+  { path: '/budget/editBudget/', name: 'Budget / Update Budget', component: EditBudgetComponent },
+  
   { path: '/', exact: true, name: 'Home' },
 
   { path: '/healthArea/addHealthArea', name: 'Health Area / Add Health Area', component: AddHealthArea },
