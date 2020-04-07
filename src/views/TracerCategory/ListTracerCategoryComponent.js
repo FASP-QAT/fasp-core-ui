@@ -27,6 +27,7 @@ class ListTracerCategoryComponent extends Component {
         this.editTracerCategory = this.editTracerCategory.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewTracerCategory = this.addNewTracerCategory.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
 
     }
     addNewTracerCategory() {
@@ -113,6 +114,10 @@ class ListTracerCategoryComponent extends Component {
                 }
             );
     }
+
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -134,21 +139,23 @@ class ListTracerCategoryComponent extends Component {
 
         const columns = [
             {
-                dataField: 'realm.label.label_en',
+                dataField: 'realm.label',
                 text: i18n.t('static.realm.realm'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
-                dataField: 'label.label_en',
+                dataField: 'label',
                 text: i18n.t('static.tracercategory.tracercategory'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
-           
-          
+
+
             {
                 dataField: 'active',
                 text: i18n.t('static.common.status'),
@@ -189,14 +196,14 @@ class ListTracerCategoryComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

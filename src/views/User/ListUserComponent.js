@@ -8,7 +8,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import i18n from '../../i18n'
-
+import getLabelText from '../../CommonComponent/getLabelText'
 import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -21,7 +21,8 @@ class ListUserComponent extends Component {
             realms: [],
             userList: [],
             message: '',
-            selUserList: []
+            selUserList: [],
+            lang: localStorage.getItem('lang')
         }
         this.editUser = this.editUser.bind(this);
         this.filterData = this.filterData.bind(this);
@@ -29,15 +30,16 @@ class ListUserComponent extends Component {
         this.buttonFormatter = this.buttonFormatter.bind(this);
         this.addAccessControls = this.addAccessControls.bind(this);
         this.formatDate = this.formatDate.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     formatDate(cell, row) {
         if (cell != null && cell != "") {
-          var modifiedDate = moment(cell).format('MM-DD-YYYY');
-          return modifiedDate;
+            var modifiedDate = moment(cell).format('MM-DD-YYYY');
+            return modifiedDate;
         } else {
-          return "";
+            return "";
         }
-      }
+    }
 
     buttonFormatter(cell, row) {
         return <Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>;
@@ -153,6 +155,10 @@ class ListUserComponent extends Component {
             return "Disabled";
         }
     }
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
+
     formatDate(cell, row) {
         if (cell != null && cell != "") {
             return moment(cell).format('MM-DD-YYYY hh:mm A');
@@ -178,11 +184,12 @@ class ListUserComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'realm.label.label_en',
+            dataField: 'realm.label',
             text: i18n.t('static.realm.realm'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
             dataField: 'username',
             text: i18n.t('static.user.username'),
