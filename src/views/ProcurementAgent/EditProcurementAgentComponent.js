@@ -251,7 +251,7 @@ class EditProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

@@ -280,7 +280,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.realm.default')}</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
