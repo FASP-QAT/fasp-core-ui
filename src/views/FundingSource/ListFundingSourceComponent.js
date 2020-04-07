@@ -12,7 +12,7 @@ import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
-const entityname=i18n.t('static.fundingsource.fundingsource');
+const entityname = i18n.t('static.fundingsource.fundingsource');
 class FundingSourceListComponent extends Component {
     constructor(props) {
         super(props);
@@ -25,6 +25,7 @@ class FundingSourceListComponent extends Component {
         this.editFundingSource = this.editFundingSource.bind(this);
         this.addFundingSource = this.addFundingSource.bind(this);
         this.filterData = this.filterData.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
@@ -55,42 +56,43 @@ class FundingSourceListComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
-        .then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    realms: response.data
-                })
-            } else {
-                this.setState({ message: response.data.messageCode })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data
+                    })
                 } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
+                    this.setState({ message: response.data.messageCode })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
 
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 if (response.status == 200) {
-                this.setState({
-                    fundingSourceList: response.data,
-                    selSource: response.data
-                })} else {
+                    this.setState({
+                        fundingSourceList: response.data,
+                        selSource: response.data
+                    })
+                } else {
                     this.setState({ message: response.data.messageCode })
                 }
             }).catch(
@@ -116,8 +118,10 @@ class FundingSourceListComponent extends Component {
             );
 
     }
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
 
-    
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -132,22 +136,24 @@ class FundingSourceListComponent extends Component {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
-               {i18n.t('static.common.result',{from,to,size}) }
+                {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
 
         const columns = [{
-            dataField: 'realm.label.label_en',
+            dataField: 'realm.label',
             text: i18n.t('static.realm.realm'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
-        },{
-            dataField: 'label.label_en',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
+            dataField: 'label',
             text: i18n.t('static.fundingsource.fundingsource'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -156,7 +162,7 @@ class FundingSourceListComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.active ? i18n.t('static.common.active') :i18n.t('static.common.disabled'))
+                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
             }
         }];
@@ -166,10 +172,10 @@ class FundingSourceListComponent extends Component {
             prePageText: i18n.t('static.common.back'),
             nextPageText: i18n.t('static.common.next'),
             lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage') ,
-            prePageTitle: i18n.t('static.common.prevPage') ,
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
             firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage') ,
+            lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
@@ -188,19 +194,19 @@ class FundingSourceListComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
-         <Card>
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addFundingSource}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
                     <CardBody>
-                    <Col md="3 pl-0">
+                        <Col md="3 pl-0">
                             <FormGroup>
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
@@ -221,7 +227,7 @@ class FundingSourceListComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                    <ToolkitProvider
+                        <ToolkitProvider
                             keyField="fundingSourceId"
                             data={this.state.selSource}
                             columns={columns}
@@ -232,8 +238,8 @@ class FundingSourceListComponent extends Component {
                             {
                                 props => (
                                     <div className="TableCust">
-                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left"><SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} /></div>
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left"><SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} /></div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
@@ -250,7 +256,7 @@ class FundingSourceListComponent extends Component {
 
                     </CardBody>
                 </Card>
-              
+
             </div>
         );
     }

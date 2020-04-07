@@ -13,7 +13,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 
-const entityname=i18n.t('static.procurementagent.procurementagent')
+const entityname = i18n.t('static.procurementagent.procurementagent')
 class ListProcurementAgentComponent extends Component {
     constructor(props) {
         super(props);
@@ -27,6 +27,7 @@ class ListProcurementAgentComponent extends Component {
         this.editProcurementAgent = this.editProcurementAgent.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewProcurementAgent = this.addNewProcurementAgent.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
 
     }
     addNewProcurementAgent() {
@@ -111,6 +112,11 @@ class ListProcurementAgentComponent extends Component {
                 }
             );
     }
+
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
+
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -132,18 +138,20 @@ class ListProcurementAgentComponent extends Component {
 
         const columns = [
             {
-                dataField: 'realm.label.label_en',
+                dataField: 'realm.label',
                 text: i18n.t('static.realm.realm'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
-                dataField: 'label.label_en',
+                dataField: 'label',
                 text: i18n.t('static.procurementagent.procurementagentname'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
                 dataField: 'procurementAgentCode',
@@ -200,13 +208,13 @@ class ListProcurementAgentComponent extends Component {
         return (
             <div className="animated">
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementAgent}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>

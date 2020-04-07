@@ -30,6 +30,7 @@ export default class OrganisationListComponent extends Component {
         this.editOrganisation = this.editOrganisation.bind(this);
         this.addOrganisation = this.addOrganisation.bind(this);
         this.filterData = this.filterData.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
@@ -143,6 +144,9 @@ export default class OrganisationListComponent extends Component {
     //         </div>
     //     );
     // }
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
 
     render() {
         const { SearchBar, ClearSearchButton } = Search;
@@ -169,17 +173,19 @@ export default class OrganisationListComponent extends Component {
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'label.label_en',
+            dataField: 'label',
             text: i18n.t('static.realm.realm'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
-            dataField: 'realm.label.label_en',
+            dataField: 'realm.label',
             text: i18n.t('static.organisation.organisationname'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),

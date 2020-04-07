@@ -29,6 +29,7 @@ class RegionListComponent extends Component {
         this.editRegion = this.editRegion.bind(this);
         this.addRegion = this.addRegion.bind(this);
         this.filterData = this.filterData.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     filterData() {
         let countryId = document.getElementById("realmCountryId").value;
@@ -123,6 +124,10 @@ class RegionListComponent extends Component {
             );
     }
 
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
+
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -144,18 +149,20 @@ class RegionListComponent extends Component {
 
         const columns = [
             {
-                dataField: 'realmCountry.country.label.label_en',
+                dataField: 'realmCountry.country.label',
                 text: i18n.t('static.region.country'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
-                dataField: 'label.label_en',
+                dataField: 'label',
                 text: i18n.t('static.region.region'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
                 dataField: 'active',
