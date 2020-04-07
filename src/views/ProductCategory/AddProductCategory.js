@@ -43,7 +43,7 @@ export default class AddProductCategory extends React.Component {
         this.disableNode = this.disableNode.bind(this);
         this.enableNode = this.enableNode.bind(this);
         this.setTreeData = this.setTreeData.bind(this);
-        console.log("initial data to be passed to this tree ---->",initialData);
+        console.log("initial data to be passed to this tree ---->", initialData);
     }
 
 
@@ -127,8 +127,9 @@ export default class AddProductCategory extends React.Component {
     }
 
     setTreeData(treeData) {
-        let treeDataChanged=treeData.treeData;
-        // console.log("tree data----------->", treeData)
+        // console.log("in cahnges function------->");
+        let treeDataChanged = treeData.treeData;
+        console.log("tree data----------->", treeData)
         let updatedTreeData = getFlatDataFromTree({
             treeData: treeDataChanged,
             getNodeKey: ({ node }) => node.id,
@@ -138,8 +139,9 @@ export default class AddProductCategory extends React.Component {
         // console.log("update------->",updatedTreeData);
         updatedTreeData.map(update => {
             initialData.map(node => {
-                if (node.id == update.node.id && update.parentNode !=null && update.parentNode.active == true) {
+                if (node.id == update.node.id && update.parentNode != null && update.parentNode.active == true) {
                     node.parentId = update.parentNode.id;
+                    node.expanded = update.node.expanded;//update expanded info of parent and child node on tree change
                 }
             });
         })
@@ -213,7 +215,7 @@ export default class AddProductCategory extends React.Component {
                                             }
 
                                             onChange={treeData => this.setTreeData({ treeData })}
-                                        // treeData => this.setState({ treeData })
+                                        // onChange={treeData => this.setState({ treeData })}
                                         />
 
                                     </div>
