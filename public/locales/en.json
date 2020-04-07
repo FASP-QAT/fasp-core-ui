@@ -386,7 +386,7 @@
     "static.unit.dimensiontext": "Please select dimension",
     "static.supplyplan.supplyplan": "Supply plan / Supply plan",
     "static.dashboard.masterdatasync": "Master Data Sync",
-    "static.language.languageCodemax3digittext": "Maximum two characters are allowed.",
+    "static.language.languageCodemax3digittext":"Maximum two characters are allowed.",
     "static.healtharea.realm": "Realm",
     "static.healtharea.realmcountry": "Country",
     "static.organisation.organisationtext": "Please enter organisation",
@@ -396,7 +396,6 @@
     "static.organisation.organisationname": "Organisation Name",
     "static.organisation.organisationcode": "Organisation Code",
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
-    "static.currency.numbernotallowedtext": "Numbers are not allowed",
     "static.dashboard.forecastingunit":"Forecasting Unit",
     "static.forecastingunit.forecastingunit":"Forecasting Unit",
     "static.tracercategory.tracercategoryText":"Please select tracer category",
@@ -408,8 +407,7 @@
     "static.planningunit.forcastingunittext":"Please select forecasting unit",
     "static.planningunit.unittext":"Please select unit",
     "static.planningunit.planningunittext":"Please enter planning unit",
-    "static.planningunit.multipliertext":"Please enter multiplier"
-    
-
+    "static.planningunit.multipliertext":"Please enter multiplier",
+    "static.currency.numbernotallowedtext": "Numbers are not allowed"
 }
 
