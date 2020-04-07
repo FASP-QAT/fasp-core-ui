@@ -39,7 +39,7 @@ export default class ForecastingUnitListComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
-        alert(realmId+" "+productCategoryId+" "+tracerCategoryId)
+        //alert(realmId+" "+productCategoryId+" "+tracerCategoryId)
         if (realmId != 0 && productCategoryId != 0 && tracerCategoryId != 0){
                     const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId &&  c.tracerCategory.tracerCategoryId == tracerCategoryId && c.productCategory.productCategoryId == productCategoryId  )
                     this.setState({
