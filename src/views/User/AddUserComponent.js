@@ -16,6 +16,7 @@ const initialValues = {
     phoneNumber: "",
     roles: [],
     languageId: []
+   
 }
 const entityname=i18n.t('static.user.user')
 const validationSchema = function (values) {
@@ -70,13 +71,12 @@ class AddUserComponent extends Component {
             languages: [],
             roles: [],
             user: {
-                realm: {
-realmId:-1
-                },
+                realm: {},
                 language: {
 
                 },
-                roles: []
+                roles: [],
+                userAcls:[]
             },
             message: ''
         }
