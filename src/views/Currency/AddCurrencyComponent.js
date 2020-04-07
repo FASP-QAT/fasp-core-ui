@@ -23,7 +23,8 @@ const validationSchema = function (values) {
         currencySymbol: Yup.string()
             .required(i18n.t('static.currency.currencysymboltext')).
             max(3, i18n.t('static.country.countrycodemax3digittext')).
-            matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+            // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+            matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.number()
