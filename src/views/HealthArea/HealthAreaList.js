@@ -28,6 +28,7 @@ export default class HealthAreaListComponent extends Component {
         this.editHealthArea = this.editHealthArea.bind(this);
         this.addHealthArea = this.addHealthArea.bind(this);
         this.filterData = this.filterData.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
@@ -137,7 +138,9 @@ export default class HealthAreaListComponent extends Component {
     //         </div>
     //     );
     // }
-
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
     render() {
 
         const { realms } = this.state;
@@ -158,17 +161,19 @@ export default class HealthAreaListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'label.label_en',
+            dataField: 'label',
             text: i18n.t('static.healthArea.healthAreaName'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
-            dataField: 'realm.label.label_en',
+            dataField: 'realm.label',
             text: i18n.t('static.healtharea.realm'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),

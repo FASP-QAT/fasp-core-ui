@@ -29,6 +29,11 @@ class ProductService {
         );
 
     }
+    getProductCategoryList() {
+        // /productCategory/realmId/{realmId}/list/{productCategoryId}/{includeCurrentLevel}/{includeAllChildren}
+        return axios.get(`${API_URL}/api/productCategory/`, {}
+        );
+    }
 
 
 }

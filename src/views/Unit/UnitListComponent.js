@@ -3,7 +3,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import { Card, CardBody, CardHeader,FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
+import { Card, CardBody, CardHeader, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import UnitService from '../../api/UnitService.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -36,12 +36,14 @@ export default class UnitListComponent extends Component {
             unitList: [],
             message: '',
             selSource: [],
-            dimensions:[]
+            dimensions: [],
+            lang: localStorage.getItem('lang')
         }
         this.editUnit = this.editUnit.bind(this);
         this.addUnit = this.addUnit.bind(this);
         this.filterData = this.filterData.bind(this);
-       
+        this.formatLabel = this.formatLabel.bind(this);
+
     }
 
     editUnit(unit) {
@@ -75,36 +77,36 @@ export default class UnitListComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-         DimensionService.getDimensionListAll()
-        .then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    dimensions: response.data
-                })
-            } else {
-                this.setState({ message: response.data.messageCode })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+        DimensionService.getDimensionListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        dimensions: response.data
+                    })
                 } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
+                    this.setState({ message: response.data.messageCode })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
 
         UnitService.getUnitListAll()
             .then(response => {
@@ -121,7 +123,7 @@ export default class UnitListComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -139,7 +141,10 @@ export default class UnitListComponent extends Component {
 
     }
 
-
+    formatLabel(cell, row) {
+        console.log("----------jjjjjjj",cell);
+        return getLabelText(cell, this.state.lang);
+    }
     render() {
         const { dimensions } = this.state;
         let dimensionList = dimensions.length > 0
@@ -159,11 +164,12 @@ export default class UnitListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'label.label_en',
+            dataField: 'label',
             text: i18n.t('static.unit.unit'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
             dataField: 'unitCode',
             text: i18n.t('static.unit.unitCode'),
@@ -171,11 +177,12 @@ export default class UnitListComponent extends Component {
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'dimension.label.label_en',
+            dataField: 'dimension.label',
             text: i18n.t('static.dimension.dimension'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -227,28 +234,29 @@ export default class UnitListComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>   <Col md="3 pl-0">
-                            <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.dimension.dimension')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="dimensionId"
-                                            id="dimensionId"
-                                            bsSize="sm"
-                                        >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                            {dimensionList}
-                                        </Input>
-                                        <InputGroupAddon addonType="append">
-                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
-                        </Col>
-                     
+                    <CardBody>   
+                        <Col md="3 pl-0">
+                        <FormGroup>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.dimension.dimension')}</Label>
+                            <div className="controls SelectGo">
+                                <InputGroup>
+                                    <Input
+                                        type="select"
+                                        name="dimensionId"
+                                        id="dimensionId"
+                                        bsSize="sm"
+                                    >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {dimensionList}
+                                    </Input>
+                                    <InputGroupAddon addonType="append">
+                                        <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                    </InputGroupAddon>
+                                </InputGroup>
+                            </div>
+                        </FormGroup>
+                    </Col>
+
                         <ToolkitProvider
                             keyField="unitId"
                             data={this.state.selSource}

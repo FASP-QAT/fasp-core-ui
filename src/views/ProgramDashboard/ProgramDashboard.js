@@ -45,9 +45,9 @@ const options = {
 
 
 const chartColors = {
-  color1: "red",
-  color2: 'orange',
-  color3: 'green'
+  color1: "#ed5626",
+  color2: '#f48521',
+  color3: '#118b70'
 };
 
 const bar = {

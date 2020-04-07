@@ -79,7 +79,7 @@ const bar = {
   datasets: [
     {
       label: 'Active Program',
-      backgroundColor: '#248f48',
+      backgroundColor: '#118B70',
       borderColor: 'rgba(179,181,198,1)',
       pointBackgroundColor: 'rgba(179,181,198,1)',
       pointBorderColor: '#fff',
@@ -89,7 +89,7 @@ const bar = {
     },
     {
       label: 'Inactive Program',
-      backgroundColor: '#b2b8c1',
+      backgroundColor: '#cfcdc9',
       borderColor: 'rgba(255,99,132,1)',
       pointBackgroundColor: 'rgba(255,99,132,1)',
       pointBorderColor: '#fff',
