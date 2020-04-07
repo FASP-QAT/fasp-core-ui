@@ -14,7 +14,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 
 
 const entityname=i18n.t('static.datasourcetype.datasourcetype');
-export default class DataSourceListComponent extends Component {
+export default class DataSourceTypeListComponent extends Component {
 
     constructor(props) {
         super(props);

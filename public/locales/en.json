@@ -386,6 +386,13 @@
     "static.unit.dimensiontext":"Please select dimension",
     "static.supplyplan.supplyplan":"Supply plan / Supply plan" ,
     "static.dashboard.masterdatasync":"Master Data Sync" ,
-    "static.language.languageCodemax3digittext":"Maximum two characters are allowed."
+    "static.language.languageCodemax3digittext":"Maximum two characters are allowed.",
+    "static.dashboard.forecastingunit":"Forcasting Unit",
+    "static.forecastingunit.forecastingunit":"Forecasting Unit",
+    "static.tracercategory.tracercategoryText":"Please select tracer category",
+    "static.productcategory.productcategorytext":"Please select product category",
+    "static.forecastingunit.forecastingunittext":"Please enter forecasting unit"
+    
+
 }
 

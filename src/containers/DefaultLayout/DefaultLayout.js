@@ -229,6 +229,11 @@ class DefaultLayout extends Component {
                             icon: 'icon-graph'
                           },
                           {
+                            name: i18n.t('static.dashboard.forecastingunit'),
+                            url: '/forecastingUnit/listforecastingUnit',
+                            icon: 'icon-graph'
+                          },
+                          {
                             name: i18n.t('static.dashboard.product'),
                             url: '/product/listProduct',
                             icon: 'icon-graph',
