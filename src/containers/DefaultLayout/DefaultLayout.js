@@ -111,7 +111,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.role'),
                             url: '/role/listRole',
-                            icon: 'fa fa-list-alt'
+                            icon: 'fa fa-dot-circle-o'
                           },
                           {
                             name: i18n.t('static.dashboard.user'),
@@ -141,7 +141,7 @@ class DefaultLayout extends Component {
                           , {
                             name: i18n.t('static.dashboard.unit'),
                             url: '/unit/listUnit',
-                            icon: 'fa fa-map'
+                            icon: 'fa fa-th'
                           }
                           ,
                           {
@@ -193,6 +193,16 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.region'),
                             url: '/region/listRegion',
+                            icon: 'fa fa-pie-chart'
+                          },
+                          {
+                            name: i18n.t('static.healtharea.healtharea'),
+                            url: '/healthArea/listHealthArea',
+                            icon: 'fa fa-pie-chart'
+                          },
+                          {
+                            name: i18n.t('static.organisation.organisation'),
+                            url: '/organisation/listOrganisation',
                             icon: 'fa fa-pie-chart'
                           }
                         ]

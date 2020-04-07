@@ -16,7 +16,7 @@ class UserService {
         });
     }
     getRealmList() {
-        return axios.get(`${API_URL}/api/getRealmList`, {
+        return axios.get(`${API_URL}/api/realm`, {
         });
     }
     addNewUser(json) {

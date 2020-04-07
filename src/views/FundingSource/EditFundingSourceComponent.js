@@ -172,7 +172,7 @@ class EditFundingSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

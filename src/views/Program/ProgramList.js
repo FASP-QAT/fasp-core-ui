@@ -31,6 +31,7 @@ export default class ProgramList extends Component {
     this.buttonFormatter = this.buttonFormatter.bind(this);
     this.addProductMapping = this.addProductMapping.bind(this);
     this.filterData = this.filterData.bind(this);
+    this.formatLabel = this.formatLabel.bind(this);
   }
 
   filterData() {
@@ -194,6 +195,10 @@ export default class ProgramList extends Component {
         }
       );
   }
+
+  formatLabel(cell, row) {
+    return getLabelText(cell, this.state.lang);
+  }
   render() {
 
     const { SearchBar, ClearSearchButton } = Search;
@@ -214,32 +219,36 @@ export default class ProgramList extends Component {
 
     const columns = [
       {
-        dataField: 'label.label_en',
+        dataField: 'label',
         text: i18n.t('static.program.program'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatLabel
       },
       {
-        dataField: 'realmCountry.realm.label.label_en',
+        dataField: 'realmCountry.realm.label',
         text: i18n.t('static.program.realm'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatLabel
       },
       {
-        dataField: 'realmCountry.country.label.label_en',
+        dataField: 'realmCountry.country.label',
         text: i18n.t('static.program.realmcountry'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatLabel
       },
       {
-        dataField: 'organisation.label.label_en',
+        dataField: 'organisation.label',
         text: i18n.t('static.program.organisation'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.formatLabel
       },
       {
         dataField: 'programId',
@@ -282,10 +291,10 @@ export default class ProgramList extends Component {
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
+            <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
               </div>
             </div>
           </CardHeader>

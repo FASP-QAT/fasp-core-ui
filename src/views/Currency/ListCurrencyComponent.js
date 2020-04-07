@@ -7,7 +7,7 @@ import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAdd
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
-
+import getLabelText from '../../CommonComponent/getLabelText'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
@@ -41,6 +41,7 @@ export default class CurrencyListComponent extends Component {
         }
         this.editCurrency = this.editCurrency.bind(this);
         this.addNewCurrency = this.addNewCurrency.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
 
     componentDidMount() {
@@ -100,6 +101,10 @@ export default class CurrencyListComponent extends Component {
     // showCurrencyLabel(cell, row) {
     //     return cell.label_en;
     // }
+
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -124,11 +129,12 @@ export default class CurrencyListComponent extends Component {
                 headerAlign: 'center'
             },
             {
-                dataField: 'label.label_en',
+                dataField: 'label',
                 text: i18n.t('static.currency.currency'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
                 dataField: 'conversionRateToUsd',

@@ -348,7 +348,7 @@ class EditBudgetComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
 
                                                         <FormGroup check inline>
                                                             <Input

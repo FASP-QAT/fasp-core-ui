@@ -28,6 +28,7 @@ export default class CountryListComponent extends Component {
         this.addNewCountry = this.addNewCountry.bind(this);
         this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     filterData() {
         var selStatus = document.getElementById("active").value;
@@ -105,6 +106,10 @@ export default class CountryListComponent extends Component {
 
     }
 
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
+
     render() {
 
         const { SearchBar, ClearSearchButton } = Search;
@@ -116,11 +121,12 @@ export default class CountryListComponent extends Component {
 
         const columns = [
             {
-                dataField: 'label.label_en',
+                dataField: 'label',
                 text: i18n.t('static.country.countryMaster'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
                 dataField: 'countryCode',
