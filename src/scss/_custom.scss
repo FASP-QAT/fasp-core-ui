@@ -613,8 +613,13 @@ h5,
 .footerlink {
   color: #20a8d8;
 }
+
+// icon-input-table
 .Fa-right::before{position: absolute;
   right: 43px;font-size:10px;margin-right: 2px;}
   .form-control-sm:hover{
   padding-right: calc(1.5em + 0.75rem);}
   .form-control:focus{padding-right: calc(1.5em + 0.75rem);}
+
+  .dropdown-menu .dropdown-item a{padding: 10px 50px 10px 50px;}
+  .dropdown-menu .dropdown-item{padding: 2px;}

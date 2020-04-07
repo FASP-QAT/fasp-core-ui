@@ -139,7 +139,7 @@ export default class EditHealthAreaComponent extends Component {
         }
 
         AuthenticationService.setupAxiosInterceptors();
-        
+
         UserService.getRealmList()
             .then(response => {
                 console.log("realm list---", response.data);
@@ -306,7 +306,7 @@ export default class EditHealthAreaComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.healthArea.label.label_en}
-                                                            id="healthAreaName" placeholder="Health Area Text" />
+                                                            id="healthAreaName" />
                                                         <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
                                                     </FormGroup>
 
