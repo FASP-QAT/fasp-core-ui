@@ -134,6 +134,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                     localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                                     localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                     localStorage.setItem('typeOfSession', "Online");
+                                                    localStorage.setItem('lastActionTaken', new Date());
                                                     localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                                     localStorage.setItem('lang', decoded.user.language.languageCode);
                                                     this.props.history.push(`/dashboard/${response.statusText}`)

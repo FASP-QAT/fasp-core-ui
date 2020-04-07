@@ -42,6 +42,7 @@
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
     "formik": "^1.5.1",
+    "history": "^4.10.1",
     "i18next": "^19.3.3",
     "i18next-browser-languagedetector": "^4.0.2",
     "i18next-localstorage-cache": "^1.1.1",

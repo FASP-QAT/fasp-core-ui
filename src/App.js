@@ -24,6 +24,7 @@ class App extends Component {
 
   render() {
     return (
+      
       <HashRouter>
           <React.Suspense fallback={loading()}>
             <Switch>

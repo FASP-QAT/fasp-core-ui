@@ -7,6 +7,7 @@ import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const initialValues = {
   fundingSourceId: [],
@@ -109,32 +110,33 @@ class AddSubFundingSourceComponent extends Component {
   }
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
+    // AuthenticationService.setupAxiosInterceptors();
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
         this.setState({
           fundingSources: response.data
         })
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
+      })
+      // .catch(
+      //   error => {
+      //     if (error.message === "Network Error") {
+      //       this.setState({ message: error.message });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 500:
+      //         case 401:
+      //         case 404:
+      //         case 406:
+      //         case 412:
+      //           this.setState({ message: error.response.data.messageCode });
+      //           break;
+      //         default:
+      //           this.setState({ message: 'static.unkownError' });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
   }
 
   render() {
@@ -149,6 +151,7 @@ class AddSubFundingSourceComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
+        <AuthenticationServiceComponent history={this.props.history}/>
         <h5>{i18n.t(this.state.message,{entityname})}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -170,26 +173,26 @@ class AddSubFundingSourceComponent extends Component {
                         })
                       }
                     })
-                    .catch(
-                      error => {
-                        if (error.message === "Network Error") {
-                          this.setState({ message: error.message });
-                        } else {
-                          switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                              this.setState({ message: error.response.data.messageCode });
-                              break;
-                            default:
-                              this.setState({ message: 'static.unkownError' });
-                              break;
-                          }
-                        }
-                      }
-                    );
+                    // .catch(
+                    //   error => {
+                    //     if (error.message === "Network Error") {
+                    //       this.setState({ message: error.message });
+                    //     } else {
+                    //       switch (error.response ? error.response.status : "") {
+                    //         case 500:
+                    //         case 401:
+                    //         case 404:
+                    //         case 406:
+                    //         case 412:
+                    //           this.setState({ message: error.response.data.messageCode });
+                    //           break;
+                    //         default:
+                    //           this.setState({ message: 'static.unkownError' });
+                    //           break;
+                    //       }
+                    //     }
+                    //   }
+                    // );
                 }}
                 render={
                   ({

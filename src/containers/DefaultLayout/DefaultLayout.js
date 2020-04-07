@@ -33,8 +33,8 @@ class DefaultLayout extends Component {
     AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
-  signOut(e) {
-    e.preventDefault();
+  signOut() {
+    // e.preventDefault();
     let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng"];
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
@@ -42,7 +42,6 @@ class DefaultLayout extends Component {
         .then(response => {
           if (response.status == 200) {
             keysToRemove.forEach(k => localStorage.removeItem(k))
-            this.props.history.push(`/login/static.logoutSuccess`)
           }
         }).catch(
           error => {
@@ -50,8 +49,8 @@ class DefaultLayout extends Component {
         );
     } else {
       keysToRemove.forEach(k => localStorage.removeItem(k))
-      this.props.history.push(`/login/static.logoutSuccess`)
     }
+    this.props.history.push(`/login/static.logoutSuccess`)
   }
 
   render() {
@@ -59,7 +58,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} />
+            <DefaultHeader onLogout={e => this.signOut()} onChangePassword={e => this.changePassword(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">

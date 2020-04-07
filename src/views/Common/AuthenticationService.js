@@ -1,10 +1,14 @@
+import history from '../../history';
 import axios from 'axios'
-import { Online } from "react-detect-offline";
+import { Online, Offline } from "react-detect-offline";
 import jwt_decode from 'jwt-decode'
 import { API_URL } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
+import React, { Component } from 'react';
+import { HashRouter, Route, Switch, useHistory } from 'react-router-dom';
+import moment from 'moment';
 
 let myDt;
 class AuthenticationService {
@@ -52,7 +56,7 @@ class AuthenticationService {
 
     checkTypeOfSession() {
         let typeOfSession = localStorage.getItem('typeOfSession');
-        if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && !navigator.onLine)) {
+        if ((typeOfSession === 'Online' && navigator.onLine) || (typeOfSession === 'Offline' && navigator.Offline)) {
             return true;
         } else {
             return false;
@@ -99,26 +103,62 @@ class AuthenticationService {
         return decryptedUser.sessionExpiresOn;
     }
 
-    // refreshToken() {
-    //     let token = localStorage.getItem('token');
-    //     this.setupAxiosInterceptors();
-    //     return axios.get(`${API_URL}/refresh`, {}).then(response => {
-    //     }).catch(
-    //         error => {
-    //         })
-    // }
+    refreshToken() {
+        // let token = localStorage.getItem('token');
+        localStorage.setItem('refreshFlag', 1);
+        this.setupAxiosInterceptors();
+        return axios.get(`${API_URL}/refresh`, {}).then(response => {
+            console.log("refresh response---", response);
+        }).catch(
+            error => {
+                console.log("refresh error---", error);
+            })
+    }
+
+    checkLastActionTaken() {
+        var lastActionTaken = moment(localStorage.getItem('lastActionTaken'));
+        var curDate = moment(new Date());
+        const diff = curDate.diff(lastActionTaken);
+        const diffDuration = moment.duration(diff);
+        console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+        console.log("Days:", diffDuration.days());
+        console.log("Hours:", diffDuration.hours());
+        console.log("Minutes:", diffDuration.minutes());
+        console.log("Seconds:", diffDuration.seconds());
+        if (diffDuration.minutes() < 30) {
+            return true;
+        }
+        return false;
+
+    }
 
     setupAxiosInterceptors() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        let basicAuthHeader = 'Bearer ' + decryptedToken
-        axios.interceptors.request.use(
-            (config) => {
-                config.headers.authorization = basicAuthHeader
-                return config;
-            }
-        )
 
+        if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+            if (this.checkLastActionTaken()) {
+                localStorage.setItem('lastActionTaken', new Date());
+                let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
+
+                let basicAuthHeader = 'Bearer ' + decryptedToken
+
+                axios.interceptors.request.use(function (config) {
+                    console.log("goint to call interceptor request---", config)
+                    config.headers.authorization = basicAuthHeader
+                    return config;
+                }, function (error) {
+                    // Do something with request error
+                    return Promise.reject(error);
+                }
+                )
+            } else {
+                // history.push(`/fundingSource/listFundingSource`);
+                // window.location.reload();
+            }
+        } else {
+            // history.push(`/fundingSource/listFundingSource`);
+            // window.location.reload();
+        }
     }
     storeTokenInIndexedDb(token, decodedObj) {
         let userObj = {

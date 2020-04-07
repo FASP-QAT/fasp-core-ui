@@ -13,7 +13,8 @@ import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-const entityname=i18n.t('static.subfundingsource.subfundingsource');
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+const entityname = i18n.t('static.subfundingsource.subfundingsource');
 class ListSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
@@ -57,32 +58,34 @@ class ListSubFundingSourceComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
+        console.log("parent component did mount");
+        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
                     fundingSources: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+            // .catch(
+            //     error => {
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response.status) {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: error.response.data.messageCode });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
@@ -90,33 +93,34 @@ class ListSubFundingSourceComponent extends Component {
                     subFundingSourceList: response.data,
                     selSubFundingSource: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+            // .catch(
+            //     error => {
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: error.response.data.messageCode });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
     }
 
     render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
-               {i18n.t('static.common.result',{from,to,size}) }
+                {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
 
@@ -150,7 +154,7 @@ class ListSubFundingSourceComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.active ? i18n.t('static.common.active') :i18n.t('static.common.disabled'))
+                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
             }
         }];
@@ -160,10 +164,10 @@ class ListSubFundingSourceComponent extends Component {
             prePageText: i18n.t('static.common.back'),
             nextPageText: i18n.t('static.common.next'),
             lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage') ,
-            prePageTitle: i18n.t('static.common.prevPage') ,
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
             firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage') ,
+            lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
@@ -184,8 +188,9 @@ class ListSubFundingSourceComponent extends Component {
 
         return (
             <div className="animated">
-                <h6 className="mt-success">{i18n.t(this.props.match.params.message,{entityname})}</h6>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history}/>
+                <h6 className="mt-success">{i18n.t(this.props.match.params.message, { entityname })}</h6>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
@@ -217,7 +222,7 @@ class ListSubFundingSourceComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        
+
                         <ToolkitProvider
                             keyField="subFundingSourceId"
                             data={this.state.selSubFundingSource}
@@ -231,9 +236,9 @@ class ListSubFundingSourceComponent extends Component {
                                     <div className="TableCust">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
