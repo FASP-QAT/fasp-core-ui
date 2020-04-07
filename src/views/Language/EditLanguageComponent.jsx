@@ -9,14 +9,14 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
 
 let initialValues = {
-    language: "",
+    languageName: '',
     languageCode: ''
 }
 const entityname = i18n.t('static.language.language');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
-        language: Yup.string()
+        languageName: Yup.string()
             .required(i18n.t('static.language.languagetext')),
         languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2,i18n.t('static.language.languageCodemax3digittext'))
 
@@ -121,7 +121,7 @@ export default class EditLanguageComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ language: this.state.language }}
+                                initialValues={{ languageName: this.state.language.languageName,languageCode:this.state.language.languageCode }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -174,7 +174,7 @@ export default class EditLanguageComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='languageForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="language">{i18n.t('static.language.language')}</Label>
+                                                        <Label for="languageName">{i18n.t('static.language.language')}</Label>
                                                         <Input type="text"
                                                             name="languageName"
                                                             id="languageName"
@@ -202,7 +202,7 @@ export default class EditLanguageComponent extends Component {
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

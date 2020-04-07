@@ -171,7 +171,7 @@ class EditBudgetComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -348,7 +348,7 @@ class EditBudgetComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label>{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}&nbsp;&nbsp;</Label>
 
                                                         <FormGroup check inline>
                                                             <Input

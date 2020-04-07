@@ -396,6 +396,15 @@ label.arrow_label:after {
 .red {
   color: #f86c6b !important;
 }
+.table-hover tbody tr:hover {
+   background-color: #cfcdc9;
+}
+.Select--multi .Select-value {color: #5c6873 !important;}
+.form-check-inline .form-check-input {margin-left: 2rem;}
+.P-absltRadio{position: absolute;}
+#active2{margin-left: 0rem !important;}
+
+
 
 // Login Css//
 .Login-component {

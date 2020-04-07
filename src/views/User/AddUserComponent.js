@@ -16,6 +16,7 @@ const initialValues = {
     phoneNumber: "",
     roles: [],
     languageId: []
+   
 }
 const entityname=i18n.t('static.user.user')
 const validationSchema = function (values) {
@@ -70,13 +71,12 @@ class AddUserComponent extends Component {
             languages: [],
             roles: [],
             user: {
-                realm: {
-
-                },
+                realm: {},
                 language: {
 
                 },
-                roles: []
+                roles: [],
+                userAcls:[]
             },
             message: ''
         }
@@ -252,7 +252,7 @@ class AddUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -263,6 +263,7 @@ class AddUserComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    console.log(JSON.stringify(this.state.user))
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -325,7 +326,7 @@ class AddUserComponent extends Component {
                                                                 required
                                                                 value={this.state.user.realm.realmId}
                                                             >
-                                                                <option value=" ">{i18n.t('static.common.select')}</option>
+                                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                                 {realmList}
                                                             </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>

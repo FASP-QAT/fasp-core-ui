@@ -3,7 +3,7 @@ import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
 import { Card, CardHeader, CardBody } from 'reactstrap';
-
+import getLabelText from '../../CommonComponent/getLabelText'
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import i18n from '../../i18n';
 
@@ -25,6 +25,7 @@ export default class ReactListComponent extends Component {
         }
         this.addNewRealm = this.addNewRealm.bind(this);
         this.editRealm = this.editRealm.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -76,7 +77,9 @@ export default class ReactListComponent extends Component {
         }
 
     }
-
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
     render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -94,11 +97,12 @@ export default class ReactListComponent extends Component {
                 headerAlign: 'center'
             },
             {
-                dataField: 'label.label_en',
+                dataField: 'label',
                 text: i18n.t('static.realm.realmName'),
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: this.formatLabel
             },
             {
                 dataField: 'monthInPastForAmc',
@@ -165,11 +169,11 @@ export default class ReactListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity',{entityname})}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity',{entityname})} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
+                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewRealm}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
@@ -185,9 +189,9 @@ export default class ReactListComponent extends Component {
                             {
                                 props => (
                                     <div className="TableCust">
-                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                        <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
+                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                            <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
                                         </div>
                                         <BootstrapTable striped hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}

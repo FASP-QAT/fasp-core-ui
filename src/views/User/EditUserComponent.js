@@ -98,6 +98,7 @@ class EditUserComponent extends Component {
         if (event.target.name == "active") {
             user.active = event.target.id === "active2" ? false : true;
         }
+        
         this.setState({
             user
         },
@@ -250,7 +251,7 @@ class EditUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message)}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -264,10 +265,12 @@ class EditUserComponent extends Component {
                                     emailId: this.state.user.emailId,
                                     phoneNumber: this.state.user.phoneNumber,
                                     roles: this.state.user.roles,
-                                    languageId: this.state.user.language.languageId
+                                    languageId: this.state.user.language.languageId,
+                                    roleId:this.state.user.roles
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    console.log(JSON.stringify(this.state.user))
                                     UserService.editUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -415,7 +418,7 @@ class EditUserComponent extends Component {
                                                         </Input> <FormFeedback className="red">{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}</Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

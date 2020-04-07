@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col
 } from 'reactstrap';
-
+import getLabelText from '../../CommonComponent/getLabelText'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
@@ -13,7 +13,7 @@ import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-const entityname=i18n.t('static.subfundingsource.subfundingsource');
+const entityname = i18n.t('static.subfundingsource.subfundingsource');
 class ListSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
@@ -26,6 +26,7 @@ class ListSubFundingSourceComponent extends Component {
         this.editSubFundingSource = this.editSubFundingSource.bind(this);
         this.filterData = this.filterData.bind(this);
         this.addNewSubFundingSource = this.addNewSubFundingSource.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
     addNewSubFundingSource() {
         this.props.history.push("/subFundingSource/addSubFundingSource");
@@ -112,11 +113,15 @@ class ListSubFundingSourceComponent extends Component {
             );
     }
 
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
+
     render() {
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
-               {i18n.t('static.common.result',{from,to,size}) }
+                {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
 
@@ -131,17 +136,19 @@ class ListSubFundingSourceComponent extends Component {
             }, this);
 
         const columns = [{
-            dataField: 'fundingSource.label.label_en',
+            dataField: 'fundingSource.label',
             text: i18n.t('static.subfundingsource.fundingsource'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
-            dataField: 'label.label_en',
+            dataField: 'label',
             text: i18n.t('static.subfundingsource.subfundingsource'),
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -150,7 +157,7 @@ class ListSubFundingSourceComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (
-                    (row.active ? i18n.t('static.common.active') :i18n.t('static.common.disabled'))
+                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
             }
         }];
@@ -160,10 +167,10 @@ class ListSubFundingSourceComponent extends Component {
             prePageText: i18n.t('static.common.back'),
             nextPageText: i18n.t('static.common.next'),
             lastPageText: i18n.t('static.common.last'),
-            nextPageTitle: i18n.t('static.common.firstPage') ,
-            prePageTitle: i18n.t('static.common.prevPage') ,
+            nextPageTitle: i18n.t('static.common.firstPage'),
+            prePageTitle: i18n.t('static.common.prevPage'),
             firstPageTitle: i18n.t('static.common.nextPage'),
-            lastPageTitle: i18n.t('static.common.lastPage') ,
+            lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
@@ -184,8 +191,8 @@ class ListSubFundingSourceComponent extends Component {
 
         return (
             <div className="animated">
-                <h6 className="mt-success">{i18n.t(this.props.match.params.message,{entityname})}</h6>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h6 className="mt-success">{i18n.t(this.props.match.params.message, { entityname })}</h6>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
@@ -217,7 +224,7 @@ class ListSubFundingSourceComponent extends Component {
                                 </div>
                             </FormGroup>
                         </Col>
-                        
+
                         <ToolkitProvider
                             keyField="subFundingSourceId"
                             data={this.state.selSubFundingSource}
@@ -231,9 +238,9 @@ class ListSubFundingSourceComponent extends Component {
                                     <div className="TableCust">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
-                                        <ClearSearchButton {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {

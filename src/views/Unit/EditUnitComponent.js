@@ -1,13 +1,13 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, FormFeedback,InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
 // import * as myConst from '../../Labels.js';
 import UnitService from '../../api/UnitService.js';
+import getLabelText from '../../CommonComponent/getLabelText.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
-import getLabelText from '../../CommonComponent/getLabelText.js';
 
 let initialValues = {
     unit: ""
@@ -127,7 +127,7 @@ export default class EditUnitComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ unit: this.state.unit }}
+                                initialValues={{ unit: this.state.unit,unitName:this.state.unit.unitName,unitCode:this.state.unit.unitCode }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -231,7 +231,7 @@ export default class EditUnitComponent extends Component {
                                                               <FormFeedback className="red">{errors.unitCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
