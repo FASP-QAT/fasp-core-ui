@@ -95,12 +95,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.label.labelTranslations'),
                             url: '/translations/labelTranslations',
-                            icon: 'fa fa-list-alt'
+                            icon: 'fa fa-exchange'
                           },
                           {
                             name: i18n.t('static.label.databaseTranslations'),
                             url: '/translations/databaseTranslations',
-                            icon: 'fa fa-list-alt'
+                            icon: 'fa fa-exchange'
                           }
                         ]
                       },
@@ -198,12 +198,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.healtharea.healtharea'),
                             url: '/healthArea/listHealthArea',
-                            icon: 'fa fa-pie-chart'
+                            icon: 'fa fa-medkit'
                           },
                           {
                             name: i18n.t('static.organisation.organisation'),
                             url: '/organisation/listOrganisation',
-                            icon: 'fa fa-pie-chart'
+                            icon: 'fa fa-building'
                           }
                         ]
                       },
