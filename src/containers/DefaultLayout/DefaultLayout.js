@@ -242,6 +242,10 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
                             icon: 'icon-graph'
+                          },{
+                            name: i18n.t('static.dashboard.planningunit'),
+                            url: '/planningUnit/listPlanningUnit',
+                            icon: 'icon-graph'
                           },
                           // {
                           //   name: i18n.t('static.dashboard.product'),
@@ -262,50 +266,50 @@ class DefaultLayout extends Component {
                           // },
 
 
-                          {
-                            name: i18n.t('static.dashboard.program'),
-                            icon: 'fa fa-list',
-                            children: [
-                              {
-                                name: i18n.t('static.dashboard.downloadprogram'),
-                                url: '/program/downloadProgram',
-                                icon: 'fa fa-download',
-                              },
-                              {
-                                name: i18n.t('static.dashboard.exportprogram'),
-                                url: '/program/exportProgram',
-                                icon: 'fa fa-upload',
-                              },
-                              {
-                                name: i18n.t('static.dashboard.importprogram'),
-                                url: '/program/importProgram',
-                                icon: 'fa fa-long-arrow-down',
-                              }
-                            ]
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.program'),
+                          //   icon: 'fa fa-list',
+                          //   children: [
+                          //     {
+                          //       name: i18n.t('static.dashboard.downloadprogram'),
+                          //       url: '/program/downloadProgram',
+                          //       icon: 'fa fa-download',
+                          //     },
+                          //     {
+                          //       name: i18n.t('static.dashboard.exportprogram'),
+                          //       url: '/program/exportProgram',
+                          //       icon: 'fa fa-upload',
+                          //     },
+                          //     {
+                          //       name: i18n.t('static.dashboard.importprogram'),
+                          //       url: '/program/importProgram',
+                          //       icon: 'fa fa-long-arrow-down',
+                          //     }
+                          //   ]
+                          // },
                           {
                             name: i18n.t('static.dashboard.datasync'),
                             url: '/masterDataSync',
                             icon: 'fa fa-list',
                           },
-                          {
-                            name: i18n.t('static.dashboard.consumptiondetails'),
-                            url: '/consumptionDetails',
-                            icon: 'fa fa-list',
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.consumptiondetails'),
+                          //   url: '/consumptionDetails',
+                          //   icon: 'fa fa-list',
+                          // },
                         ]
                       },
-                      {
-                        name: "Supply plan",
-                        icon: 'fa fa-list',
-                        children: [
-                          {
-                            name: "Supply Plan",
-                            url: '/supplyPlan',
-                            icon: 'fa fa-list-alt'
-                          }
-                        ]
-                      },
+                      // {
+                      //   name: "Supply plan",
+                      //   icon: 'fa fa-list',
+                      //   children: [
+                      //     {
+                      //       name: "Supply Plan",
+                      //       url: '/supplyPlan',
+                      //       icon: 'fa fa-list-alt'
+                      //     }
+                      //   ]
+                      // },
                     ]
 
                 }} {...this.props} />

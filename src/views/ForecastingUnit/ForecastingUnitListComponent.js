@@ -34,7 +34,7 @@ export default class ForecastingUnitListComponent extends Component {
         this.editForecastingUnit = this.editForecastingUnit.bind(this);
         this.addNewForecastingUnit = this.addNewForecastingUnit.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.formatLabel=this.formatLabel.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
     }
 
 
@@ -46,7 +46,7 @@ export default class ForecastingUnitListComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
-        console.log(realmId + " " + productCategoryId + " " + tracerCategoryId)
+        //alert(realmId+" "+productCategoryId+" "+tracerCategoryId)
         if (realmId != 0 && productCategoryId != 0 && tracerCategoryId != 0) {
             const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId && c.tracerCategory.tracerCategoryId == tracerCategoryId && c.productCategory.productCategoryId == productCategoryId)
             this.setState({
@@ -176,7 +176,7 @@ export default class ForecastingUnitListComponent extends Component {
 
 
         ForecastingUnitService.getForecastingUnitList().then(response => {
-            console.log("response------->"+response);
+            console.log("response------->" + response);
             this.setState({
                 forecastingUnitList: response.data,
                 selSource: response.data
@@ -262,35 +262,35 @@ export default class ForecastingUnitListComponent extends Component {
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter:this.formatLabel
+            formatter: this.formatLabel
         }, {
             dataField: 'productCategory.label',
             text: i18n.t('static.productcategory.productcategory'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter:this.formatLabel
+            formatter: this.formatLabel
         }, {
             dataField: 'tracerCategory.label',
             text: i18n.t('static.tracercategory.tracercategory'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter:this.formatLabel
+            formatter: this.formatLabel
         }, {
             dataField: 'genericLabel',
             text: i18n.t('static.product.productgenericname'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter:this.formatLabel
+            formatter: this.formatLabel
         }, {
             dataField: 'label',
             text: i18n.t('static.forecastingunit.forecastingunit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter:this.formatLabel
+            formatter: this.formatLabel
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -345,64 +345,62 @@ export default class ForecastingUnitListComponent extends Component {
                     </CardHeader>
                     <CardBody>
                         <Form >
-                            <Col md="3 pl-0">
-                                <FormGroup>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="realmId"
-                                                id="realmId"
-                                                bsSize="sm"
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {realmList}
-                                            </Input>
+                            <Col md="9 pl-0">
+                                <div className="d-md-flex">
+                                    <FormGroup>
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                        <div className="controls SelectGo">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="realmId"
+                                                    id="realmId"
+                                                    bsSize="sm"
+                                                >
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {realmList}
+                                                </Input>
 
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-                            </Col>
-                            <Col md="3 pl-0">
-                                <FormGroup>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="productCategoryId"
-                                                id="productCategoryId"
-                                                bsSize="sm"
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {productCategoryList}
-                                            </Input>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                    <FormGroup className="tab-ml-1">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                        <div className="controls SelectGo">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="productCategoryId"
+                                                    id="productCategoryId"
+                                                    bsSize="sm"
+                                                >
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {productCategoryList}
+                                                </Input>
 
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-                            </Col>
-                            <Col md="3 pl-0">
-                                <FormGroup>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="tracerCategoryId"
-                                                id="tracerCategoryId"
-                                                bsSize="sm"
-                                            >
-                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                {tracercategoryList}
-                                            </Input>
-                                            <InputGroupAddon addonType="append">
-                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                    <FormGroup className="tab-ml-1">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                        <div className="controls SelectGo">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="tracerCategoryId"
+                                                    id="tracerCategoryId"
+                                                    bsSize="sm"
+                                                >
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {tracercategoryList}
+                                                </Input>
+                                                <InputGroupAddon addonType="append">
+                                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                                </InputGroupAddon>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                </div>
                             </Col>
                         </Form>
                         <ToolkitProvider
