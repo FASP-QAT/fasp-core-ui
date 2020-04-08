@@ -342,18 +342,20 @@ export default class EditHealthAreaComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')} </Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             type="text" name="healthAreaName" valid={!errors.healthAreaName}
                                                             invalid={touched.healthAreaName && !!errors.healthAreaName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.healthArea.label.label_en}
-                                                            id="healthAreaName" placeholder="Health Area Text" />
+                                                            id="healthAreaName" />
                                                         <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             value={this.state.healthArea.realm.realmId}
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
@@ -370,6 +372,7 @@ export default class EditHealthAreaComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}</Label>
                                                         <Select
+                                                        bsSize="sm"
                                                             valid={!errors.realmCountryId}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -382,9 +385,10 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
+                                                            
                                                                 className="form-check-input"
                                                                 type="radio"
                                                                 id="active1"

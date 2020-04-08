@@ -6,15 +6,16 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import getLabelText from '../../CommonComponent/getLabelText'
 
 let initialValues = {
     fundingSource: ""
 }
-const entityname=i18n.t('static.fundingsource.fundingsource');
+const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         fundingSource: Yup.string()
-      .required(i18n.t('static.fundingsource.fundingsourcetext'))
+            .required(i18n.t('static.fundingsource.fundingsourcetext'))
     })
 }
 
@@ -45,7 +46,8 @@ class EditFundingSourceComponent extends Component {
         super(props);
         this.state = {
             fundingSource: this.props.location.state.fundingSource,
-            message: ''
+            message: '',
+            lang: localStorage.getItem('lang')
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -94,7 +96,7 @@ class EditFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -105,7 +107,7 @@ class EditFundingSourceComponent extends Component {
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/fundingSource/listFundingSource/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({ message: response.data.messageCode })
                                             }
@@ -153,7 +155,7 @@ class EditFundingSourceComponent extends Component {
                                                             id="realmId"
                                                             bsSize="sm"
                                                             readOnly
-                                                            value={this.state.fundingSource.realm.label.label_en}
+                                                            value={getLabelText(this.state.fundingSource.realm.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                     </FormGroup>
@@ -186,8 +188,8 @@ class EditFundingSourceComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active1">
-                                                               {i18n.t('static.common.active')}
-                                                                </Label>
+                                                                {i18n.t('static.common.active')}
+                                                            </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
                                                             <Input
@@ -203,7 +205,7 @@ class EditFundingSourceComponent extends Component {
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-active2">
                                                                 {i18n.t('static.common.disabled')}
-                                                                </Label>
+                                                            </Label>
                                                         </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
@@ -222,14 +224,14 @@ class EditFundingSourceComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-        <h6>{i18n.t(this.state.message)}</h6>
-       <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/fundingSource/listFundingSource/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

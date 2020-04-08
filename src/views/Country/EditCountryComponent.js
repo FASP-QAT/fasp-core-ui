@@ -70,11 +70,11 @@ export default class UpdateCountryComponent extends Component {
             message: ''
         }
 
-        // this.Capitalize = this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         initialValues = {
-            label:getLabelText(this.state.country.label,this.state.lang),
+            label: getLabelText(this.state.country.label, this.state.lang),
             countryCode: this.state.country.countryCode,
             languageId: this.state.country.language.languageId,
             currencyId: this.state.country.currency.currencyId
@@ -198,10 +198,10 @@ export default class UpdateCountryComponent extends Component {
                 });
 
     }
-    // Capitalize(event) {
-    //     let { country } = this.state
-    //     country.label.label_en = event.target.value.charAt(0).toUpperCase() + event.target.value.slice(1)
-    // }
+    Capitalize(event) {
+        let { country } = this.state
+        country.label.label_en = event.target.value.charAt(0).toUpperCase() + event.target.value.slice(1)
+    }
 
     render() {
         const { languageList } = this.state;
@@ -221,12 +221,12 @@ export default class UpdateCountryComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -290,9 +290,9 @@ export default class UpdateCountryComponent extends Component {
                                                             valid={!errors.label}
                                                             bsSize="sm"
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e)}}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.country.label,this.state.lang)}
+                                                            value={this.state.country.label.label_en}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>

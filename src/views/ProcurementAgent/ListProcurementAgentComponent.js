@@ -208,7 +208,7 @@ class ListProcurementAgentComponent extends Component {
         return (
             <div className="animated">
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}

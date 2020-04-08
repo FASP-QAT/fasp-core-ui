@@ -345,6 +345,7 @@ export default class EditOrganisationComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             value={this.state.organisation.realm.realmId}
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
@@ -361,6 +362,7 @@ export default class EditOrganisationComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
                                                         <Select
+                                                        bsSize="sm"
                                                             valid={!errors.realmCountryId}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -375,29 +377,31 @@ export default class EditOrganisationComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} </Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             type="text" name="organisationCode" valid={!errors.organisationCode}
                                                             invalid={touched.organisationCode && !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.organisationCode}
-                                                            id="organisationCode" placeholder="organisation Code" />
+                                                            id="organisationCode" />
                                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
                                                         <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')} </Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             type="text" name="organisationName" valid={!errors.organisationName}
                                                             invalid={touched.organisationName && !!errors.organisationName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.label.label_en}
-                                                            id="organisationName" placeholder="Organisation Name" />
+                                                            id="organisationName" />
                                                         <FormFeedback className="red">{errors.organisationName}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

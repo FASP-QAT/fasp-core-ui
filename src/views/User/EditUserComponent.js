@@ -8,6 +8,7 @@ import UserService from "../../api/UserService";
 import RealmService from "../../api/RealmService";
 import LanguageService from "../../api/LanguageService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     username: "",
@@ -65,6 +66,7 @@ class EditUserComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
             roles: [],
@@ -226,7 +228,7 @@ class EditUserComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -234,7 +236,7 @@ class EditUserComponent extends Component {
             && roles.map((item, i) => {
                 return (
                     <option key={i} value={item.roleId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

@@ -9,16 +9,16 @@ export function getDatabase() {
     openRequest.onupgradeneeded = function (e) {
         db1 = e.target.result;
         if (!db1.objectStoreNames.contains('programData')) {
-            storeOS = db1.createObjectStore('programData', { keyPath: 'id'});
+            storeOS = db1.createObjectStore('programData', { keyPath: 'id' });
         }
         if (!db1.objectStoreNames.contains('program')) {
-            storeOS = db1.createObjectStore('program', { keyPath: 'programId',autoIncrement:true});
+            storeOS = db1.createObjectStore('program', { keyPath: 'programId', autoIncrement: true });
         }
         if (!db1.objectStoreNames.contains('realmCountry')) {
-            storeOS = db1.createObjectStore('realmCountry', { keyPath: 'realmCountryId',autoIncrement:true});
+            storeOS = db1.createObjectStore('realmCountry', { keyPath: 'realmCountryId', autoIncrement: true });
         }
         if (!db1.objectStoreNames.contains('realm')) {
-            storeOS = db1.createObjectStore('realm', { keyPath: 'realmId',autoIncrement:true});
+            storeOS = db1.createObjectStore('realm', { keyPath: 'realmId', autoIncrement: true });
         }
         if (!db1.objectStoreNames.contains('lastSyncDate')) {
             storeOS = db1.createObjectStore('lastSyncDate', { keyPath: 'id', autoIncrement: true });
@@ -93,4 +93,18 @@ export function getDatabase() {
             storeOS = db1.createObjectStore('planningUnit', { keyPath: 'planningUnitId', autoIncrement: true });
         }
     };
+}
+
+export function getEnLabel() {
+    var json = {
+        "static.procurementagent.realmtext": "Please select realm",
+        "static.healtharea.realmtext": "Please select realm",
+        "static.datasource.datasourceedit": "Update Data Source",
+        "static.program.programwithsameversion": "Program with same version already exists in the local machine you want to overwirte that program with the new data?",
+        "static.dashboard.subfundingsource": "Sub Funding Source",
+        "static.region.regionedit": "Update Region",
+        "static.common.select": "Please Select",
+        "static.procurementagent.procurementagentlist": "Procurement Agent List"
+    }
+    return json;
 }

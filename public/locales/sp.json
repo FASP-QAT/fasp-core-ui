@@ -64,5 +64,6 @@
     "static.realm.monthInFutureForAmcText": "Ingrese el mes en el futuro para amc",
     "static.realm.orderFrequencyText": "Por favor ingrese la frecuencia de la orden",
     "static.realm.realmCodeLength": "Ingrese la longitud menos entonces o igual a 6",
-    "static.realm.realmName":"Nombre del reino"
+    "static.realm.realmName":"Nombre del reino",
+    "static.dimension.dimension": "Dimensión"
 }

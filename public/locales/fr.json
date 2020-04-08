@@ -24,5 +24,8 @@
     "static.realm.monthInFutureForAmcText": "Veuillez entrer le mois à venir pour amc",
     "static.realm.orderFrequencyText": "Veuillez entrer la fréquence des commandes",
     "static.realm.realmCodeLength": "Veuillez saisir une longueur inférieure à ou égale à 6",
-    "static.realm.realmName":"Nom du domaine" 
+    "static.realm.realmName": "Nom du domaine",
+    "static.budget.budgetamount": "Montant budgétaire",
+    "static.country.countryName": "Nom du pays",
+    "static.program.program": "Programme"
 }

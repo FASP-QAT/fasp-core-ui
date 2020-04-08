@@ -8,6 +8,7 @@ import UserService from "../../api/UserService";
 import RealmService from "../../api/RealmService";
 import LanguageService from "../../api/LanguageService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     username: "",
@@ -16,6 +17,7 @@ const initialValues = {
     phoneNumber: "",
     roles: [],
     languageId: []
+   
 }
 const entityname=i18n.t('static.user.user')
 const validationSchema = function (values) {
@@ -66,17 +68,17 @@ class AddUserComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
             roles: [],
             user: {
-                realm: {
-realmId:-1
-                },
+                realm: {},
                 language: {
 
                 },
-                roles: []
+                roles: [],
+                userAcls:[]
             },
             message: ''
         }
@@ -227,7 +229,7 @@ realmId:-1
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -235,7 +237,7 @@ realmId:-1
             && roles.map((item, i) => {
                 return (
                     <option key={i} value={item.roleId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);

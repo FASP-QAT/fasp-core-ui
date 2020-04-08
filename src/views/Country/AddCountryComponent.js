@@ -302,7 +302,7 @@ export default class AddCountryComponent extends Component {
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.country.label, this.state.lang)}
+                                                            value={this.state.country.label.label_en}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>

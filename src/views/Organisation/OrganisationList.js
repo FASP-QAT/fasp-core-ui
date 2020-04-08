@@ -174,7 +174,7 @@ export default class OrganisationListComponent extends Component {
             headerAlign: 'center'
         }, {
             dataField: 'label',
-            text: i18n.t('static.realm.realm'),
+            text: i18n.t('static.organisation.organisationName'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
