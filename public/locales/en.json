@@ -397,6 +397,7 @@
     "static.organisation.organisationcode": "Organisation Code",
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
     "static.currency.numbernotallowedtext": "Numbers are not allowed",
+    "static.organisation.organisationcodemax4digittext": "Maximum 4 characters only",
     "static.dashboard.forecastingunit":"Forecasting Unit",
     "static.forecastingunit.forecastingunit":"Forecasting Unit",
     "static.tracercategory.tracercategoryText":"Please select tracer category",

@@ -22,5 +22,10 @@ class OrganisationService {
         );
     }
 
+    getOrganisationById(json) {
+        return axios.get(`${API_URL}/api/organisation/${json}`, {}
+        );
+    }
+
 }
 export default new OrganisationService();

@@ -43,6 +43,7 @@ export default class HealthAreaListComponent extends Component {
             });
         }
     }
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
 
@@ -285,8 +286,9 @@ export default class HealthAreaListComponent extends Component {
 
     editHealthArea(healthArea) {
         this.props.history.push({
-            pathname: "/healthArea/editHealthArea/",
-            state: { healthArea: healthArea }
+            // pathname: "/healthArea/editHealthArea/",
+            // state: { healthArea: healthArea }
+            pathname: `/healthArea/editHealthArea/${healthArea.healthAreaId}`,
         });
     }
     addHealthArea() {
