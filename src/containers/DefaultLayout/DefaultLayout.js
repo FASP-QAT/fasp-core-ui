@@ -1,7 +1,6 @@
 import React, { Component, Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
-import i18n from '../../i18n'
 import { Online, Offline } from "react-detect-offline";
 import {
   AppAside,
@@ -21,6 +20,7 @@ import navigation from '../../_nav';
 import routes from '../../routes';
 import LogoutService from "../../api/LogoutService";
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
+import i18n from '../../i18n'
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
