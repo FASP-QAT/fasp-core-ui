@@ -39,7 +39,7 @@ export default class ForecastingUnitListComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
-        alert(realmId+" "+productCategoryId+" "+tracerCategoryId)
+        //alert(realmId+" "+productCategoryId+" "+tracerCategoryId)
         if (realmId != 0 && productCategoryId != 0 && tracerCategoryId != 0){
                     const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId &&  c.tracerCategory.tracerCategoryId == tracerCategoryId && c.productCategory.productCategoryId == productCategoryId  )
                     this.setState({
@@ -332,7 +332,8 @@ export default class ForecastingUnitListComponent extends Component {
                     </CardHeader>
                     <CardBody>
                     <Form >
-                    <Col md="3 pl-0">
+                    <Col md="9 pl-0">
+                        <div className="d-md-flex">
                             <FormGroup>
                             <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
@@ -350,9 +351,7 @@ export default class ForecastingUnitListComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
-                        </Col>
-                        <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="tab-ml-1">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -369,9 +368,7 @@ export default class ForecastingUnitListComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
-                        </Col>
-                        <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="tab-ml-1">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -390,6 +387,7 @@ export default class ForecastingUnitListComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
+                            </div>
                         </Col>
                         </Form>
                     <ToolkitProvider

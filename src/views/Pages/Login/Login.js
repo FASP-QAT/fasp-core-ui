@@ -278,17 +278,17 @@ class Login extends Component {
                 <Row className="text-center Login-bttom-logo">
                 <Col md="4">
                   <CardBody>
-                    <img src={'assets/img/wordmark.png'} className="img-fluid" width="420" />
+                    <img src={'assets/img/wordmark.png'} className="img-fluid bottom-logo-img" />
                   </CardBody>
                 </Col>
                 <Col md="4">
                   <CardBody>
-                    <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid" width="420" />
+                    <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
                   </CardBody>
                 </Col>
                 <Col md="4">
                   <CardBody>
-                    <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid" width="420" />
+                    <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
                   </CardBody>
                 </Col>
               </Row>
