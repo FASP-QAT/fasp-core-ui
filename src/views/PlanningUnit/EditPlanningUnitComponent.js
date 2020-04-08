@@ -1,22 +1,27 @@
 import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-import '../Forms/ValidationForms/ValidationForms.css'
-import ForecastingUnitService from '../../api/ForecastingUnitService.js';
+import ForecastingUnitService from '../../api/ForecastingUnitService';
+import PlanningUnitService from '../../api/PlanningUnitService';
+import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import getLabelText from '../../CommonComponent/getLabelText'
 
+const entityname = i18n.t('static.planningunit.planningunit');
 let initialValues = {
-    label: ''
-
+    label: '',
+    forecastingUnitId: '',
+    forecastingUnitList: [],
+    multiplier:''
 }
-const entityname = i18n.t('static.forecastingunit.forecastingunit');
+
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
-            .required(i18n.t('static.forecastingunit.forecastingunittext'))
+            .required(i18n.t('static.planningunit.planningunittext')),
+            multiplier: Yup.string()
+            .required(i18n.t('static.planningunit.multipliertext'))
+            .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
 
@@ -41,115 +46,84 @@ const getErrorsFromValidationError = (validationError) => {
         }
     }, {})
 }
-
-
-export default class EditForecastingUnitComponent extends Component {
-
+export default class EditPlanningUnitComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            message: '',
-            forecastingUnit:
-            {
-                active: '',
 
+            planningUnit: {
+                message: '',
+                active: '',
+                planningUnitId: '',
                 label: {
                     label_en: '',
-                    label_sp: '',
-                    label_pr: '',
-                    label_fr: '',
-                    labelId: ''
-                }, genericLabel: {
-                    label_en: '',
+                    // spaLabel: '',
+                    // freLabel: '',
+                    // porLabel: '',
                     labelId: '',
-                    label_sp: '',
-                    label_pr: '',
-                    label_fr: ''
                 },
-                realm: {
-                    realmId: '',
+                foreacastingUnit: {
+                    forecastingUnitId: '',
                     label: {
-                        label_en: '',
-                        label_sp: '',
-                        label_pr: '',
-                        label_fr: ''
+                        label_en: ''
                     }
-                },
-                productCategory: {
-                    productCategoryId: '',
+                }, unit: {
+                    unitId: '',
                     label: {
-                        label_en: '',
-                        label_sp: '',
-                        label_pr: '',
-                        label_fr: ''
-                    }
-                },
-                tracerCategory: {
-                    tracerCategoryId: '',
-                    label: {
-                        label_en: '',
-                        label_sp: '',
-                        label_pr: '',
-                        label_fr: ''
+                        label_en: ''
                     }
                 }
             },
-            lang: localStorage.getItem('lang')
+
         }
 
-        this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.dataChange = this.dataChange.bind(this);
         initialValues = {
-            message: '',
-            label: this.props.location.state.forecastingUnit.label.label_en,
-            genericLabel: this.props.location.state.forecastingUnit.genericLabel.label_en
+            label: this.props.location.state.planningUnit.label.label_en,
+            forecastingUnitId: this.props.location.state.planningUnit.foreacastingUnit.forecastingUnitId,
+            multiplier:this.props.location.state.planningUnit.multiplier
         }
     }
 
     dataChange(event) {
-        let { forecastingUnit } = this.state
+        let { planningUnit } = this.state
 
         if (event.target.name === "label") {
-            forecastingUnit.label.label_en = event.target.value
+            planningUnit.label.label_en = event.target.value
         }
-        if (event.target.name == "realmId") {
-            forecastingUnit.realm.realmId = event.target.value;
+        else if (event.target.name === "forecastingUnitId") {
+            planningUnit.foreacastingUnit.forecastingUnitId = event.target.value
         }
-        if (event.target.name == "tracerCategoryId") {
-            forecastingUnit.tracerCategory.tracerCategoryId = event.target.value;
+        if (event.target.name === "unitId") {
+            planningUnit.unit.unitId = event.target.value;
         }
-        if (event.target.name == "productCategoryId") {
-            forecastingUnit.productCategory.productCategoryId = event.target.value;
+        if (event.target.name === "multiplier") {
+            planningUnit.multiplier = event.target.value;
+        } if (event.target.name === "active") {
+            planningUnit.active = event.target.id === "active2" ? false : true
         }
-        if (event.target.name == "genericLabel") {
-            forecastingUnit.genericLabel.label_en = event.target.value;
-        }
-
-
-        else if (event.target.name === "active") {
-            forecastingUnit.active = event.target.id === "active2" ? false : true
-        }
-
 
         this.setState(
             {
-                forecastingUnit
+                planningUnit
             }
         )
-
     };
 
     touchAll(setTouched, errors) {
         setTouched({
-            'label': true
+            'label': true,
+            'forecastingUnitId': true,
+            'multiplier':true
         }
         )
         this.validateForm(errors)
     }
     validateForm(errors) {
-        this.findFirstError('forecastingUnitForm', (fieldName) => {
+        this.findFirstError('planningUnitForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
@@ -164,19 +138,19 @@ export default class EditForecastingUnitComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
-
         this.setState({
-            forecastingUnit: this.props.location.state.forecastingUnit
+            planningUnit: this.props.location.state.planningUnit
         });
+
+
     }
 
+
     Capitalize(str) {
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
+        this.state.planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    }
+    cancelClicked() {
+        this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
     render() {
@@ -190,13 +164,16 @@ export default class EditForecastingUnitComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    ForecastingUnitService.editForecastingUnit(this.state.forecastingUnit)
+                                    console.log(JSON.stringify(this.state.planningUnit))            
+                                    AuthenticationService.setupAxiosInterceptors();
+                                    PlanningUnitService.editPlanningUnit(this.state.planningUnit)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -225,8 +202,6 @@ export default class EditForecastingUnitComponent extends Component {
                                             }
                                         );
                                 }}
-
-
                                 render={
                                     ({
                                         values,
@@ -239,75 +214,66 @@ export default class EditForecastingUnitComponent extends Component {
                                         isValid,
                                         setTouched
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='forecastingUnitForm'>
+                                            <Form onSubmit={handleSubmit} noValidate name='planningUnitForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                <FormGroup>
+                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.planningunit.forecastingunit')}</Label>
                                                         <Input
                                                             type="text"
-                                                            name="realmId"
-                                                            id="realmId"
+                                                            name="forecastingUnitId"
+                                                            id="forecastingUnitId"
                                                             bsSize="sm"
                                                             readOnly
-                                                            value={getLabelText(this.state.forecastingUnit.realm.label, this.state.lang)}
+                                                            value={this.state.planningUnit.foreacastingUnit.label.label_en}
                                                         >
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
                                                         <Input
                                                             type="text"
-                                                            name="tracerCategoryId"
-                                                            id="tracerCategoryId"
+                                                            name="unitId"
+                                                            id="unitId"
                                                             bsSize="sm"
                                                             readOnly
-                                                            value={getLabelText(this.state.forecastingUnit.tracerCategory.label, this.state.lang)}
+                                                            value={this.state.planningUnit.unit.label.label_en}
                                                         >
                                                         </Input>
                                                     </FormGroup>
+                                                   
                                                     <FormGroup>
-                                                        <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}</Label>
-                                                        <Input
+                                                        <Label htmlFor="label">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                         <Input
                                                             type="text"
-                                                            name="productCategoryId"
-                                                            id="productCategoryId"
-                                                            bsSize="sm"
-                                                            readOnly
-                                                            value={getLabelText(this.state.forecastingUnit.productCategory.label, this.state.lang)}
-                                                        >
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                                        <Input type="text"
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }} //this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.forecastingUnit.label.label_en)}
-                                                            required />
+                                                            value={this.state.planningUnit.label.label_en}
+                                                            required
+                                                        >
+                                                        </Input>
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
-                                                        <Input type="text"
-                                                            name="genericLabel"
-                                                            id="genericLabel"
+                                                        <Label for="multiplier">{i18n.t('static.planningunit.multiplier')}</Label>
+                                                        <Input type="number"
+                                                            name="multiplier"
+                                                            id="multiplier"
                                                             bsSize="sm"
-                                                            valid={!errors.genericLabel}
-                                                            invalid={touched.genericLabel && !!errors.genericLabel}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            valid={!errors.multiplier}
+                                                            invalid={touched.multiplier && !!errors.multiplier}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.forecastingUnit.genericLabel.label_en}
+                                                            value={this.state.planningUnit.multiplier}
                                                             required />
-                                                        <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
-
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -315,7 +281,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                                 id="active1"
                                                                 name="active"
                                                                 value={true}
-                                                                checked={this.state.forecastingUnit.active === true}
+                                                                checked={this.state.planningUnit.active === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -331,7 +297,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                                 id="active2"
                                                                 name="active"
                                                                 value={false}
-                                                                checked={this.state.forecastingUnit.active === false}
+                                                                checked={this.state.planningUnit.active === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -344,12 +310,9 @@ export default class EditForecastingUnitComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.update')}</Button>
-
-
-                                                        &nbsp;
-
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                      &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>
@@ -360,15 +323,11 @@ export default class EditForecastingUnitComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{i18n.t(this.state.message, { entityname })}</h6>
-                    <h6>{i18n.t(this.props.match.params.message, { entityname })}</h6>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
                 </div>
             </div>
         );
     }
-    cancelClicked() {
-        this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t('static.message.cancelled', { entityname }))
-    }
 
 }
-

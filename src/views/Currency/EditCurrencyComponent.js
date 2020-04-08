@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, FormText, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -25,7 +25,8 @@ const validationSchema = function (values) {
         currencySymbol: Yup.string()
             .required(i18n.t('static.currency.currencysymboltext')).
             max(3, i18n.t('static.country.countrycodemax3digittext')).
-            matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+            // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+            matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.number()
@@ -86,7 +87,7 @@ export default class UpdateCurrencyComponent extends Component {
             this.state.currency.currencySymbol = event.target.value;
         }
         if (event.target.name === "label") {
-            this.state.currency.label.engLabel = event.target.value
+            this.state.currency.label.label_en = event.target.value
         }
 
         else if (event.target.name === "conversionRate") {
@@ -146,7 +147,7 @@ export default class UpdateCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -161,6 +162,7 @@ export default class UpdateCurrencyComponent extends Component {
                                     CurrencyService.editCurrency(this.state.currency)
                                         .then(response => {
                                             if (response.status == 200) {
+                                                // console.log("after update--",response.data);
                                                 this.props.history.push(`/currency/listCurrency/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
@@ -220,7 +222,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             value={this.state.currency.currencyCode}
                                                             required />
                                                         {/* </InputGroupAddon> */}
-                                                        <FormText className="red">{errors.currencyCode}</FormText>
+                                                        <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
@@ -237,7 +239,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             value={this.state.currency.currencySymbol}
                                                             required />
                                                         {/* </InputGroupAddon> */}
-                                                        <FormText className="red">{errors.currencySymbol}</FormText>
+                                                        <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.currency.currency')}</Label>
@@ -251,10 +253,10 @@ export default class UpdateCurrencyComponent extends Component {
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.currency.label, this.state.lang)}
+                                                            value={this.state.currency.label.label_en}
                                                             required />
                                                         {/* </InputGroupAddon> */}
-                                                        <FormText className="red">{errors.label}</FormText>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}</Label>
@@ -271,7 +273,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             value={this.state.currency.conversionRateToUsd}
                                                             required />
                                                         {/* </InputGroupAddon> */}
-                                                        <FormText className="red">{errors.conversionRate}</FormText>
+                                                        <FormFeedback className="red">{errors.conversionRate}</FormFeedback>
                                                     </FormGroup>
 
                                                 </CardBody>
