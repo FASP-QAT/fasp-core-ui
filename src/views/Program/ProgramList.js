@@ -312,7 +312,7 @@ export default class ProgramList extends Component {
                       id="countryId"
                       bsSize="sm"
                     >
-                      <option value="0">{i18n.t('static.common.select')}</option>
+                      <option value="0">{i18n.t('static.common.all')}</option>
                       {countries}
                     </Input>
                     <InputGroupAddon addonType="append">
