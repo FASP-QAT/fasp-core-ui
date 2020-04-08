@@ -201,7 +201,7 @@ export default class CountryListComponent extends Component {
                                             id="active"
                                             bsSize="sm"
                                         >
-                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            <option value="">{i18n.t('static.common.all')}</option>
                                             <option value="true">{i18n.t('static.common.active')}</option>
                                             <option value="false">{i18n.t('static.common.disabled')}</option>
 

@@ -227,7 +227,7 @@ class RegionListComponent extends Component {
                                             id="realmCountryId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmCountries}
                                         </Input>
                                         <InputGroupAddon addonType="append">
