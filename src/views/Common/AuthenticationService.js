@@ -143,7 +143,6 @@ class AuthenticationService {
         let basicAuthHeader = 'Bearer ' + decryptedToken
 
         axios.interceptors.request.use(function (config) {
-            console.log("goint to call interceptor request---", config)
             config.headers.authorization = basicAuthHeader
             return config;
         }, function (error) {
