@@ -332,7 +332,8 @@ export default class ForecastingUnitListComponent extends Component {
                     </CardHeader>
                     <CardBody>
                     <Form >
-                    <Col md="3 pl-0">
+                    <Col md="9">
+                        <div className="d-md-flex">
                             <FormGroup>
                             <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
@@ -350,9 +351,7 @@ export default class ForecastingUnitListComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
-                        </Col>
-                        <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="tab-ml-1">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -369,9 +368,7 @@ export default class ForecastingUnitListComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
-                        </Col>
-                        <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="tab-ml-1">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -390,6 +387,7 @@ export default class ForecastingUnitListComponent extends Component {
                                     </InputGroup>
                                 </div>
                             </FormGroup>
+                            </div>
                         </Col>
                         </Form>
                     <ToolkitProvider
