@@ -14,12 +14,14 @@ import UserService from "../../api/UserService"
 import RealmCountryService from "../../api/RealmCountryService"
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n'
+import getLabelText from '../../CommonComponent/getLabelText';
 
 class AccessControlComponent extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            lang: localStorage.getItem('lang'),
             user: this.props.location.state.user,
             countries: [],
             organisations: [],
@@ -401,28 +403,28 @@ class AccessControlComponent extends Component {
         let programList = selProgram.length > 0 && selProgram.map((item, i) => {
             return (
                 <option key={i} value={item.programId}>
-                    {item.label.label_en}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);
         let countryList = selRealmCountry.length > 0 && selRealmCountry.map((item, i) => {
             return (
                 <option key={i} value={item.realmCountryId}>
-                    {item.country.label.label_en}
+                    {getLabelText(item.country.label, this.state.lang)}
                 </option>
             )
         }, this);
         let organisationList = selOrganisation.length > 0 && selOrganisation.map((item, i) => {
             return (
                 <option key={i} value={item.organisationId}>
-                    {item.label.label_en}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);
         let healthAreaList = selHealthArea.length > 0 && selHealthArea.map((item, i) => {
             return (
                 <option key={i} value={item.healthAreaId}>
-                    {item.label.label_en}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);
