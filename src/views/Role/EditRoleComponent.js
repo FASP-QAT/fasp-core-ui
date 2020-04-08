@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     roleName: "",
     businessFunctions: [],
     canCreateRole: []
 }
-const entityname=i18n.t('static.role.role');
+const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
@@ -49,6 +50,7 @@ class EditRoleComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lang: localStorage.getItem('lang'),
             businessFunctions: [],
             roles: [],
             role: this.props.location.state.role,
@@ -172,7 +174,7 @@ class EditRoleComponent extends Component {
                 return (
                     <>
                         <option key={i} value={item.businessFunctionId}>
-                            {item.label.label_en}
+                            {getLabelText(item.label, this.state.lang)}
                         </option>
                     </>
                 )
@@ -181,19 +183,19 @@ class EditRoleComponent extends Component {
             && roles.map((item, i) => {
                 return (
                     <option key={i} value={item.roleId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={{
@@ -206,7 +208,7 @@ class EditRoleComponent extends Component {
                                     UserService.editRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/role/listRole/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/role/listRole/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -264,7 +266,7 @@ class EditRoleComponent extends Component {
                                                             required
                                                             value={this.Capitalize(this.state.role.label.label_en)}
                                                         />
-                                                          <FormFeedback className="red">{errors.roleName}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label><Input
@@ -282,7 +284,7 @@ class EditRoleComponent extends Component {
                                                         >
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {businessFunctionsList}
-                                                            
+
                                                         </Input>
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
@@ -323,7 +325,7 @@ class EditRoleComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/role/listRole/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/role/listRole/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

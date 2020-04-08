@@ -6,6 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     roleName: "",
@@ -49,6 +50,7 @@ class AddRoleComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lang: localStorage.getItem('lang'),
             businessFunctions: [],
             roles: [],
             role: {
@@ -178,7 +180,7 @@ class AddRoleComponent extends Component {
                 return (
                     <>
                         <option key={i} value={item.businessFunctionId}>
-                            {item.label.label_en}
+                            {getLabelText(item.label, this.state.lang)}
                         </option>
                     </>
                 )
@@ -187,7 +189,7 @@ class AddRoleComponent extends Component {
             && roles.map((item, i) => {
                 return (
                     <option key={i} value={item.roleId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
