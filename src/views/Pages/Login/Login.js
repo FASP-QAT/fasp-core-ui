@@ -17,6 +17,7 @@ import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import LoginService from '../../../api/LoginService'
 import i18n from '../../../i18n'
+import moment from 'moment';
 
 
 const initialValues = {
@@ -116,13 +117,13 @@ class Login extends Component {
                             LoginService.authenticate(username, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng","lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
-                                localStorage.setItem('lastActionTaken', new Date());
+                                localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 AuthenticationService.setupAxiosInterceptors();

@@ -116,49 +116,42 @@ class AuthenticationService {
     }
 
     checkLastActionTaken() {
-        var lastActionTaken = moment(localStorage.getItem('lastActionTaken'));
-        var curDate = moment(new Date());
-        const diff = curDate.diff(lastActionTaken);
-        const diffDuration = moment.duration(diff);
-        console.log("Total Duration in millis:", diffDuration.asMilliseconds());
-        console.log("Days:", diffDuration.days());
-        console.log("Hours:", diffDuration.hours());
-        console.log("Minutes:", diffDuration.minutes());
-        console.log("Seconds:", diffDuration.seconds());
-        if (diffDuration.minutes() < 30) {
-            return true;
+        if (localStorage.getItem('lastActionTaken') != null && localStorage.getItem('lastActionTaken') != "") {
+            var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            var lastActionTaken = moment(lastActionTakenStorage);
+            console.log("lastActionTakenStorage---", lastActionTakenStorage);
+            var curDate = moment(new Date());
+            const diff = curDate.diff(lastActionTaken);
+            const diffDuration = moment.duration(diff);
+            console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            console.log("Days:", diffDuration.days());
+            console.log("Hours:", diffDuration.hours());
+            console.log("Minutes:", diffDuration.minutes());
+            console.log("Seconds:", diffDuration.seconds());
+            if (diffDuration.minutes() < 30) {
+                return true;
+            }
+            return false;
         }
         return false;
-
     }
 
     setupAxiosInterceptors() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
 
-        if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
-            if (this.checkLastActionTaken()) {
-                localStorage.setItem('lastActionTaken', new Date());
-                let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
+        let basicAuthHeader = 'Bearer ' + decryptedToken
 
-                let basicAuthHeader = 'Bearer ' + decryptedToken
-
-                axios.interceptors.request.use(function (config) {
-                    console.log("goint to call interceptor request---", config)
-                    config.headers.authorization = basicAuthHeader
-                    return config;
-                }, function (error) {
-                    // Do something with request error
-                    return Promise.reject(error);
-                }
-                )
-            } else {
-                // history.push(`/fundingSource/listFundingSource`);
-                // window.location.reload();
-            }
-        } else {
-            // history.push(`/fundingSource/listFundingSource`);
-            // window.location.reload();
+        axios.interceptors.request.use(function (config) {
+            console.log("goint to call interceptor request---", config)
+            config.headers.authorization = basicAuthHeader
+            return config;
+        }, function (error) {
+            // Do something with request error
+            return Promise.reject(error);
         }
+        )
+
     }
     storeTokenInIndexedDb(token, decodedObj) {
         let userObj = {

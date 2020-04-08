@@ -33,9 +33,9 @@ class DefaultLayout extends Component {
     AuthenticationService.setupAxiosInterceptors();
     this.props.history.push(`/changePassword`);
   }
-  signOut() {
-    // e.preventDefault();
-    let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng"];
+  signOut(e) {
+    e.preventDefault();
+    let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       LogoutService.logout()
@@ -58,7 +58,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut()} onChangePassword={e => this.changePassword(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} />
           </Suspense>
         </AppHeader>
         <div className="app-body">

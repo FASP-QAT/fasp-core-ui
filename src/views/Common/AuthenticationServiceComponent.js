@@ -4,14 +4,15 @@ import { SECRET_KEY } from '../../Constants.js'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import axios from 'axios'
 import LogoutService from "../../api/LogoutService";
+import moment from 'moment';
 
 export default class AuthenticationServiceComponent extends Component {
     constructor(props) {
         super(props);
         this.logout = this.logout.bind(this);
     }
-    logout() {
-        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng"];
+    logout(message) {
+        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
         if (navigator.onLine) {
             AuthenticationService.setupAxiosInterceptors();
             LogoutService.logout()
@@ -26,18 +27,18 @@ export default class AuthenticationServiceComponent extends Component {
         } else {
             keysToRemove.forEach(k => localStorage.removeItem(k))
         }
-        this.props.history.push(`/login/static.logoutSuccess`)
+        this.props.history.push(`/login/${message != "" ? message : "static.logoutSuccess"}`)
     }
-    componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
-        console.log("component did mount called on service component---")
+    componentDidMount = () => {
+        console.log("component did mount called on service component---", this.props)
 
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         console.log("decryptedCurUser---" + decryptedCurUser);
         if (AuthenticationService.checkTypeOfSession()) {
             if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                 if (AuthenticationService.checkLastActionTaken()) {
-                    localStorage.setItem('lastActionTaken', new Date());
+                    localStorage.removeItem('lastActionTaken');
+                    localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                     let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
 
                     let basicAuthHeader = 'Bearer ' + decryptedToken
@@ -54,42 +55,43 @@ export default class AuthenticationServiceComponent extends Component {
                     axios.interceptors.response.use(function (response) {
                         console.log("inside interceptors response---", response);
                         return response;
-                    }, function (error) {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.logout();
-                                break;
-                            case 500:
-                                console.log("Internal server error");
-                                break;
-                            case 404:
-                            case 406:
-                            case 412:
-                                // this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                // this.setState({ message: 'static.unkownError' });
-                                break;
+                    }, (error) => {
+                        if (error.message === "Network Error") {
+                            this.props.message(error.message)
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.logout("static.message.sessionExpired");
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.props.message(error.response.data.messageCode);
+                                    break;
+                                default:
+                                    this.props.message('static.unkownError');
+                                    break;
+                            }
+                            console.log("inside interceptors response---", error);
+                            return Promise.reject(error);
                         }
-                        console.log("inside interceptors response---", error);
-                        return Promise.reject(error);
                     });
 
                 } else {
-                    this.logout();
+                    this.logout("static.message.sessionExpired");
                 }
             } else {
-                this.logout();
+                this.logout("static.message.tokenError");
             }
         } else {
-            this.logout();
+            this.logout("static.message.sessionChange");
         }
     }
     render() {
-        console.log("render#########");
         return (
             <div className="animated fadeIn">
-                <h1>helloooo</h1>
+
             </div>
         )
     }

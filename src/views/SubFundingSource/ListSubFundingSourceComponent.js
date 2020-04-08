@@ -28,6 +28,10 @@ class ListSubFundingSourceComponent extends Component {
         this.filterData = this.filterData.bind(this);
         this.addNewSubFundingSource = this.addNewSubFundingSource.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
     addNewSubFundingSource() {
         this.props.history.push("/subFundingSource/addSubFundingSource");
@@ -60,33 +64,12 @@ class ListSubFundingSourceComponent extends Component {
 
     componentDidMount() {
         console.log("parent component did mount");
-        // AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
                     fundingSources: response.data
                 })
             })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response.status) {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
@@ -95,26 +78,6 @@ class ListSubFundingSourceComponent extends Component {
                     selSubFundingSource: response.data
                 })
             })
-        // .catch(
-        //     error => {
-        //         if (error.message === "Network Error") {
-        //             this.setState({ message: error.message });
-        //         } else {
-        //             switch (error.response ? error.response.status : "") {
-        //                 case 500:
-        //                 case 401:
-        //                 case 404:
-        //                 case 406:
-        //                 case 412:
-        //                     this.setState({ message: error.response.data.messageCode });
-        //                     break;
-        //                 default:
-        //                     this.setState({ message: 'static.unkownError' });
-        //                     break;
-        //             }
-        //         }
-        //     }
-        // );
     }
 
     formatLabel(cell, row) {
@@ -195,7 +158,7 @@ class ListSubFundingSourceComponent extends Component {
 
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} />
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage}/>
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message, { entityname })}</h6>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
