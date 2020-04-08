@@ -332,7 +332,7 @@ export default class ForecastingUnitListComponent extends Component {
                     </CardHeader>
                     <CardBody>
                     <Form >
-                    <Col md="9">
+                    <Col md="9 pl-0">
                         <div className="d-md-flex">
                             <FormGroup>
                             <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
