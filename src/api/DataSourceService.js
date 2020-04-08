@@ -18,9 +18,14 @@ class DataSourceService {
     }
 
     editDataSource(json) {
-        return axios.put(`${API_URL}/api/dataSource/`,json,{}
-            );
-        }
-    
+        return axios.put(`${API_URL}/api/dataSource/`, json, {}
+        );
+    }
+
+    getDataSourceById(json) {
+        return axios.get(`${API_URL}/api/dataSource/${json}`, {}
+        );
+    }
+
 }
 export default new DataSourceService();

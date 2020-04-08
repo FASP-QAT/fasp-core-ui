@@ -49,7 +49,6 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-
 export default class EditHealthAreaComponent extends Component {
 
     constructor(props) {
@@ -57,17 +56,26 @@ export default class EditHealthAreaComponent extends Component {
         this.state = {
             countries: [],
             realms: [],
-            // healthArea: {
-            //     label: {
-            //         label_en: ''
-            //     },
-            //     realm: {
-            //         realmId: ''
-            //     },
-            //     realmCountryArray: []
+            healthArea: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                realmCountryArray: []
 
-            // },
-            healthArea: this.props.location.state.healthArea,
+            },
+            // healthArea: this.props.location.state.healthArea,
             message: '',
             lang: localStorage.getItem('lang'),
             realmCountryId: '',
@@ -79,11 +87,11 @@ export default class EditHealthAreaComponent extends Component {
         this.updateFieldData = this.updateFieldData.bind(this);
         // this.getRealmCountryList = this.getRealmCountryList.bind(this);
 
-        initialValues = {
-            // label: this.props.location.state.healthArea.label.label_en,
-            healthAreaName: getLabelText(this.state.healthArea.label, lang),
-            realmId: this.state.healthArea.realm.realmId
-        }
+        // initialValues = {
+        //     // label: this.props.location.state.healthArea.label.label_en,
+        //     healthAreaName: getLabelText(this.state.healthArea.label, lang),
+        //     realmId: this.state.healthArea.realm.realmId
+        // }
 
         console.log("state---", this.state);
     }
@@ -132,75 +140,101 @@ export default class EditHealthAreaComponent extends Component {
 
     componentDidMount() {
 
-        console.log("check---", this.state.healthArea);
-        if (!AuthenticationService.checkTypeOfSession()) {
-            alert("You can't change your session from online to offline or vice versa.");
-            this.props.history.push(`/`)
-        }
-
         AuthenticationService.setupAxiosInterceptors();
-        
-        UserService.getRealmList()
-            .then(response => {
-                console.log("realm list---", response.data);
-                this.setState({
-                    realms: response.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
+        HealthAreaService.getHealthAreaById(this.props.match.params.healthAreaId).then(response => {
+            this.setState({
+                healthArea: response.data
+            })
 
-        HealthAreaService.getRealmCountryList(this.props.location.state.healthArea.realm.realmId)
-            .then(response => {
-                console.log("Realm Country List -------list---", response.data);
-                if (response.status == 200) {
-                    var json = response.data;
-                    var regList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        regList[i] = { value: json[i].realmCountryId, label: getLabelText(json[i].country.label, this.state.lang) }
-                    }
+            initialValues = {
+                healthAreaName: this.state.healthArea.label.label_en,
+                realmId: this.state.healthArea.realm.realmId
+            }
+
+            UserService.getRealmList()
+                .then(response => {
+                    console.log("realm list---", response.data);
                     this.setState({
-                        realmCountryList: regList
+                        realms: response.data
                     })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
+                }).catch(
+                    error => {
+                        switch (error.message) {
+                            case "Network Error":
+                                this.setState({
+                                    message: error.message
+                                })
+                                break
                             default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                                this.setState({
+                                    message: error.response.data.message
+                                })
+                                break
                         }
                     }
+                );
+
+            HealthAreaService.getRealmCountryList(this.state.healthArea.realm.realmId)
+                .then(response => {
+                    console.log("Realm Country List -------list---", response.data);
+                    if (response.status == 200) {
+                        var json = response.data;
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                        }
+                        this.setState({
+                            realmCountryList: regList
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response.status) {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
+                        }
+                    }
+                );
+
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
                 }
-            );
+            }
+        );
 
     }
 
@@ -242,6 +276,7 @@ export default class EditHealthAreaComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -249,33 +284,39 @@ export default class EditHealthAreaComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     console.log("-------------------->" + this.state.healthArea);
                                     HealthAreaService.editHealthArea(this.state.healthArea)
                                         .then(response => {
-                                            if (response.data.message != "Failed") {
+                                            if (response.status == 200) {
                                                 this.props.history.push(`/healthArea/listHealthArea/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );

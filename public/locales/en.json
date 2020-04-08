@@ -396,5 +396,6 @@
     "static.organisation.organisationname": "Organisation Name",
     "static.organisation.organisationcode": "Organisation Code",
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
-    "static.currency.numbernotallowedtext": "Numbers are not allowed"
+    "static.currency.numbernotallowedtext": "Numbers are not allowed",
+    "static.organisation.organisationcodemax4digittext": "Maximum 4 characters only"
 }

@@ -29,6 +29,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
             .required(i18n.t('static.organisation.organisationcodetext'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
     })
 }
 
@@ -109,7 +110,7 @@ export default class AddOrganisationComponent extends Component {
         setTouched({
             realmId: true,
             organisationName: true,
-            organisationCode:true
+            organisationCode: true
         }
         )
         this.validateForm(errors)
@@ -201,7 +202,7 @@ export default class AddOrganisationComponent extends Component {
                     var json = response.data;
                     var regList = [];
                     for (var i = 0; i < json.length; i++) {
-                        regList[i] = { value: json[i].realmCountryId, label: getLabelText(json[i].country.label, this.state.lang) }
+                        regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
                     }
                     this.setState({
                         realmCountryId: '',
@@ -271,11 +272,12 @@ export default class AddOrganisationComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                            <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -284,27 +286,32 @@ export default class AddOrganisationComponent extends Component {
                                     // console.log("-------------------->" + this.state.healthArea);
                                     OrganisationService.addOrganisation(this.state.organisation)
                                         .then(response => {
-                                            if (response.data.message != "Failed") {
+                                            if (response.status == 200) {
                                                 this.props.history.push(`/organisation/listOrganisation/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -400,6 +407,6 @@ export default class AddOrganisationComponent extends Component {
 
     cancelClicked() {
         this.props.history.push(`/organisation/listOrganisation/` + i18n.t('static.message.cancelled', { entityname }))
-      }
+    }
 
 }
