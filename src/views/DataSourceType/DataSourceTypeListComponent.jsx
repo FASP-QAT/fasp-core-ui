@@ -13,8 +13,8 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
 
-const entityname = i18n.t('static.datasourcetype.datasourcetype');
-export default class DataSourceListComponent extends Component {
+const entityname=i18n.t('static.datasourcetype.datasourcetype');
+export default class DataSourceTypeListComponent extends Component {
 
     constructor(props) {
         super(props);

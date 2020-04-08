@@ -142,7 +142,7 @@
     "static.supplier.suppliertext": "Please enter Supplier",
     "static.datasource.datasourcetext": "Please enter datasource name",
     "static.country.countryadd": "Add Country",
-    "static.message.user.forgotPasswordTokenExpired": "Token expired",
+    "static.message.user.TokenExpired": "Token expired",
     "static.dashboard.realmcountry": "Realm-Country",
     "static.product.unit1": "Forcasting Unit",
     "static.dashboard.role": "Role",
@@ -399,5 +399,17 @@
     "static.currency.numbernotallowedtext": "Numbers are not allowed",
     "static.message.sessionExpired": "Your session has been expired",
     "static.message.sessionChange": "You can't change your session from online to offline or vice versa",
-    "static.message.tokenError": "Token Error"
+    "static.message.tokenError": "Token Error",
+    "static.dashboard.forecastingunit": "Forecasting Unit",
+    "static.forecastingunit.forecastingunit": "Forecasting Unit",
+    "static.tracercategory.tracercategoryText": "Please select tracer category",
+    "static.productcategory.productcategorytext": "Please select product category",
+    "static.forecastingunit.forecastingunittext": "Please enter forecasting unit",
+    "static.planningunit.planningunit": "Planning Unit",
+    "static.dashboard.planningunit": "Planning Unit",
+    "static.unit.multiplier": "Multiplier",
+    "static.planningunit.forcastingunittext": "Please select forecasting unit",
+    "static.planningunit.unittext": "Please select unit",
+    "static.planningunit.planningunittext": "Please enter planning unit",
+    "static.planningunit.multipliertext": "Please enter multiplier"
 }
