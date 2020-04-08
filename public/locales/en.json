@@ -398,6 +398,7 @@
     "static.currency.currencycodemax4digittext": "Maximum 4 characters only",
     "static.currency.numbernotallowedtext": "Numbers are not allowed",
     "static.message.sessionExpired": "Your session has been expired",
+    "static.message.tokenExpired": "Your token has been expired",
     "static.message.sessionChange": "You can't change your session from online to offline or vice versa",
     "static.message.tokenError": "Token Error",
     "static.dashboard.forecastingunit": "Forecasting Unit",

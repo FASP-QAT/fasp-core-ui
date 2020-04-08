@@ -56,7 +56,7 @@ export default class AuthenticationServiceComponent extends Component {
                         } else {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
-                                    this.logout("static.message.sessionExpired");
+                                    this.logout("static.message.tokenExpired");
                                     break;
                                 case 500:
                                 case 404:
