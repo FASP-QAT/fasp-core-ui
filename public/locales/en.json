@@ -392,7 +392,7 @@
     "static.tracercategory.tracercategoryText":"Please select tracer category",
     "static.productcategory.productcategorytext":"Please select product category",
     "static.forecastingunit.forecastingunittext":"Please enter forecasting unit",
-    "static.language.languageCodemax3digittext": "Maximum two characters are allowed.",
+    
     "static.healtharea.realm": "Realm",
     "static.healtharea.realmcountry": "Country",
     "static.organisation.organisationtext": "Please enter organisation",

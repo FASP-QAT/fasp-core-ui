@@ -249,15 +249,16 @@ export default class ProgramList extends Component {
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
-      },
-      {
-        dataField: 'programId',
-        text: 'Map Product To Program',
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.buttonFormatter
       }
+      // ,
+      // {
+      //   dataField: 'programId',
+      //   text: 'Map Product To Program',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: this.buttonFormatter
+      // }
     ];
     const options = {
       hidePageListOnlyOnePage: true,

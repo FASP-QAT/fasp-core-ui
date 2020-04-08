@@ -5,11 +5,12 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import ForecastingUnitService from '../../api/ForecastingUnitService.js';
-import i18n from '../../i18n'
+import i18n from '../../i18n';
+import getLabelText from '../../CommonComponent/getLabelText'
 
 let initialValues = {
     label: ''
-   
+
 }
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
 const validationSchema = function (values) {
@@ -47,43 +48,54 @@ export default class EditForecastingUnitComponent extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {message: '',
+        this.state = {
+            message: '',
             forecastingUnit:
             {
                 active: '',
 
                 label: {
                     label_en: '',
-                    // spaLabel: '',
-                    // freLabel: '',
-                    // porLabel: '',
-                    labelId: '',
-                },genericLabel: {
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                    labelId: ''
+                }, genericLabel: {
                     label_en: '',
-                    // spaLabel: '',
-                    // freLabel: '',
-                    // porLabel: '',
                     labelId: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
                 },
                 realm: {
                     realmId: '',
                     label: {
-                        label_en: ''
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
                     }
                 },
                 productCategory: {
                     productCategoryId: '',
                     label: {
-                        label_en: ''
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
                     }
                 },
                 tracerCategory: {
                     tracerCategoryId: '',
                     label: {
-                        label_en: ''
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
                     }
                 }
-            }
+            },
+            lang: localStorage.getItem('lang')
         }
 
         this.dataChange = this.dataChange.bind(this);
@@ -92,7 +104,7 @@ export default class EditForecastingUnitComponent extends Component {
         initialValues = {
             message: '',
             label: this.props.location.state.forecastingUnit.label.label_en,
-            genericLabel:this.props.location.state.forecastingUnit.genericLabel.label_en
+            genericLabel: this.props.location.state.forecastingUnit.genericLabel.label_en
         }
     }
 
@@ -237,7 +249,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                             id="realmId"
                                                             bsSize="sm"
                                                             readOnly
-                                                            value={this.state.forecastingUnit.realm.label.label_en}
+                                                            value={getLabelText(this.state.forecastingUnit.realm.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                     </FormGroup>
@@ -249,7 +261,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                             id="tracerCategoryId"
                                                             bsSize="sm"
                                                             readOnly
-                                                            value={this.state.forecastingUnit.tracerCategory.label.label_en}
+                                                            value={getLabelText(this.state.forecastingUnit.tracerCategory.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                     </FormGroup>
@@ -261,7 +273,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                             id="productCategoryId"
                                                             bsSize="sm"
                                                             readOnly
-                                                            value={this.state.forecastingUnit.productCategory.label.label_en}
+                                                            value={getLabelText(this.state.forecastingUnit.productCategory.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                     </FormGroup>
@@ -273,7 +285,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);}} //this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }} //this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.Capitalize(this.state.forecastingUnit.label.label_en)}
                                                             required />

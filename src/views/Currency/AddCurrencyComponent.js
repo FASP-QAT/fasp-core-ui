@@ -145,7 +145,7 @@ export default class AddCurrencyComponent extends Component {
                                     CurrencyService.addCurrency(this.state)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                console.log("----------after add", response.data);
+                                                // console.log("----------after add", response.data.messageCode);
                                                 this.props.history.push(`/currency/listCurrency/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({

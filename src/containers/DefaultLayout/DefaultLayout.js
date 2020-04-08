@@ -233,20 +233,20 @@ class DefaultLayout extends Component {
                             url: '/tracerCategory/listTracerCategory',
                             icon: 'icon-graph'
                           },
-                          {
-                            name: 'Product Category',
-                            url: '/ProductCategory/AddProductCategory',
-                            icon: 'icon-graph'
-                          },
+                          // {
+                          //   name: 'Product Category',
+                          //   url: '/ProductCategory/AddProductCategory',
+                          //   icon: 'icon-graph'
+                          // },
                           {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
                             icon: 'icon-graph'
                           },
-                          {
-                            name: i18n.t('static.dashboard.product'),
-                            url: '/product/listProduct',
-                            icon: 'icon-graph',
+                          // {
+                          //   name: i18n.t('static.dashboard.product'),
+                          //   url: '/product/listProduct',
+                          //   icon: 'icon-graph',
                             // children: [
                             //   // {
                             //   //   name: i18n.t('static.dashboard.addproduct'),
@@ -259,7 +259,7 @@ class DefaultLayout extends Component {
                             //     icon: 'fa fa-th-large',
                             //   }
                             // ]
-                          },
+                          // },
 
 
                           {
