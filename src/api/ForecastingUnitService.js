@@ -12,6 +12,10 @@ getForecastingUnitList() {
     return axios.get(`${API_URL}/api/forecastingUnit/`, {
     });
 }
+getForecastingUnitListAll() {
+    return axios.get(`${API_URL}/api/forecastingUnit/all/`, {
+    });
+}
 
 editForecastingUnit(json) {
     return axios.put(`${API_URL}/api/forecastingUnit/`, json, {

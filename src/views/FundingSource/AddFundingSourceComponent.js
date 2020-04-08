@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
-
+import getLabelText from '../../CommonComponent/getLabelText'
 import FundingSourceService from "../../api/FundingSourceService";
 import RealmService from "../../api/RealmService";
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -12,7 +12,7 @@ const initialValues = {
   fundingSourceId: [],
   subFundingSource: ""
 }
-const entityname=i18n.t('static.fundingsource.fundingsource');
+const entityname = i18n.t('static.fundingsource.fundingsource');
 const validationSchema = function (values) {
   return Yup.object().shape({
     realmId: Yup.string()
@@ -54,7 +54,8 @@ class AddFundingSourceComponent extends Component {
         label: {
         }
       },
-      message: ''
+      message: '',
+      lang: localStorage.getItem('lang')
     }
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -141,7 +142,7 @@ class AddFundingSourceComponent extends Component {
       && realms.map((item, i) => {
         return (
           <option key={i} value={item.realmId}>
-            {item.label.label_en}
+            {getLabelText(item.label,this.state.lang)}
           </option>
         )
       }, this);
@@ -151,7 +152,7 @@ class AddFundingSourceComponent extends Component {
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -162,7 +163,7 @@ class AddFundingSourceComponent extends Component {
                     .then(response => {
                       console.log("Response->", response);
                       if (response.status == 200) {
-                        this.props.history.push(`/fundingSource/listFundingSource/`+i18n.t(response.data.messageCode,{entityname}))
+                        this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
                       } else {
                         this.setState({ message: response.data.messageCode })
                       }
@@ -218,7 +219,7 @@ class AddFundingSourceComponent extends Component {
                               <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}
                             </Input>
-                          <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
                             <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
@@ -232,17 +233,17 @@ class AddFundingSourceComponent extends Component {
                               onBlur={handleBlur}
                               value={this.Capitalize(this.state.fundingSource.label.label_en)}
                               required />
-                              <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
+                            <FormFeedback className="red">{errors.fundingSource}</FormFeedback>
                           </FormGroup>
                         </CardBody>
                         <CardFooter>
                           <FormGroup>
 
-                            
+
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
-                            
-                                                        &nbsp;
+
+                            &nbsp;
                           </FormGroup>
                         </CardFooter>
                       </Form>
@@ -253,14 +254,14 @@ class AddFundingSourceComponent extends Component {
           </Col>
         </Row>
         <div>
-        <h6>{i18n.t(this.state.message)}</h6>
-       <h6>{i18n.t(this.props.match.params.message)}</h6>
+          <h6>{i18n.t(this.state.message)}</h6>
+          <h6>{i18n.t(this.props.match.params.message)}</h6>
         </div>
       </div>
     );
   }
   cancelClicked() {
-    this.props.history.push(`/fundingSource/listFundingSource/` +i18n.t('static.message.cancelled',{entityname}))
+    this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
   }
 }
 

@@ -87,7 +87,7 @@ export default class UpdateCurrencyComponent extends Component {
             this.state.currency.currencySymbol = event.target.value;
         }
         if (event.target.name === "label") {
-            this.state.currency.label.engLabel = event.target.value
+            this.state.currency.label.label_en = event.target.value
         }
 
         else if (event.target.name === "conversionRate") {
@@ -162,6 +162,7 @@ export default class UpdateCurrencyComponent extends Component {
                                     CurrencyService.editCurrency(this.state.currency)
                                         .then(response => {
                                             if (response.status == 200) {
+                                                // console.log("after update--",response.data);
                                                 this.props.history.push(`/currency/listCurrency/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
@@ -252,7 +253,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={getLabelText(this.state.currency.label, this.state.lang)}
+                                                            value={this.state.currency.label.label_en}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>

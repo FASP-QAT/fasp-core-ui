@@ -172,7 +172,7 @@ class ListUserComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -299,7 +299,7 @@ class ListUserComponent extends Component {
                                             id="realmId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
                                         <InputGroupAddon addonType="append">

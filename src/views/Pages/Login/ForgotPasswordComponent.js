@@ -1,11 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, Suspense } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, Container } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
-import '../../Forms/ValidationForms/ValidationForms.css'
+import '../../Forms/ValidationForms/ValidationForms.css';
+import {
+    AppFooter,
+    AppSidebarFooter,
+} from '@coreui/react';
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
+const DefaultFooter = React.lazy(() => import('../../../containers/DefaultLayout/DefaultFooter'));
 
 const initialValues = {
     username: ""
@@ -40,6 +45,7 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 class ForgotPasswordComponent extends Component {
+    loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
     constructor(props) {
         super(props);
         this.state = {
@@ -77,14 +83,18 @@ class ForgotPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                
-                <Container>
+                <div className="Login-component">
+                <Container className="container-login">
                     <Row className="justify-content-center ">
-                    
-                        <Col md="9" lg="7" xl="6">
-                        <h5 className="mx-4">{this.state.message}</h5>
+                    <Col md="12">
+                        <div className="upper-logo mt-1">
+                         <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                      </div>
+                    </Col>
+                        <Col md="9" lg="7" xl="6" className="mt-4">
+                            <h5 className="mx-4">{this.state.message}</h5>
                             <Card className="mx-4 ">
-                                
+
                                 <CardHeader>
                                     <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Forgot Password</strong>{' '}
                                 </CardHeader>
@@ -166,8 +176,15 @@ class ForgotPasswordComponent extends Component {
                             </Card>
                         </Col>
                     </Row>
+                    <AppFooter className="footer-fwp">
+                    <Suspense fallback={this.loading()}>
+                        <DefaultFooter />
+                    </Suspense>
+                </AppFooter>
                 </Container>
+               </div>
             </div>
+            
         );
     }
 }

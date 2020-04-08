@@ -174,14 +174,14 @@ export default class OrganisationListComponent extends Component {
             headerAlign: 'center'
         }, {
             dataField: 'label',
-            text: i18n.t('static.realm.realm'),
+            text: i18n.t('static.organisation.organisationName'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
         }, {
             dataField: 'realm.label',
-            text: i18n.t('static.organisation.organisationname'),
+            text: i18n.t('static.realm.realm'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
@@ -250,7 +250,7 @@ export default class OrganisationListComponent extends Component {
                                             id="realmId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
@@ -297,8 +297,8 @@ export default class OrganisationListComponent extends Component {
 
     editOrganisation(organisation) {
         this.props.history.push({
-            pathname: "/organisation/editOrganisation",
-            state: { organisation: organisation }
+            pathname: `/organisation/editOrganisation/${organisation.organisationId}`,
+            // state: { organisation: organisation }
         });
     }
     addOrganisation() {

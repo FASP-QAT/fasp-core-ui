@@ -99,7 +99,7 @@ class Login extends Component {
             <Row className="justify-content-center">
             <Col md="12">
               <div className="upper-logo mt-1">
-               <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+               <img src={'assets/img/QAT-login-logo.png'} className="img-fluid " />
              </div>
              </Col>
             <Col lg="5" md="7" xl="4">
@@ -281,14 +281,15 @@ class Login extends Component {
                     <img src={'assets/img/wordmark.png'} className="img-fluid bottom-logo-img" />
                   </CardBody>
                 </Col>
+                
                 <Col md="4">
                   <CardBody>
-                    <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
+                    <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
                   </CardBody>
                 </Col>
                 <Col md="4">
                   <CardBody>
-                    <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
+                    <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
                   </CardBody>
                 </Col>
               </Row>

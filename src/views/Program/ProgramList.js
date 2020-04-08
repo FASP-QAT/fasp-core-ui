@@ -249,15 +249,16 @@ export default class ProgramList extends Component {
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
-      },
-      {
-        dataField: 'programId',
-        text: 'Map Product To Program',
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.buttonFormatter
       }
+      // ,
+      // {
+      //   dataField: 'programId',
+      //   text: 'Map Product To Program',
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: this.buttonFormatter
+      // }
     ];
     const options = {
       hidePageListOnlyOnePage: true,
@@ -311,7 +312,7 @@ export default class ProgramList extends Component {
                       id="countryId"
                       bsSize="sm"
                     >
-                      <option value="0">{i18n.t('static.common.select')}</option>
+                      <option value="0">{i18n.t('static.common.all')}</option>
                       {countries}
                     </Input>
                     <InputGroupAddon addonType="append">

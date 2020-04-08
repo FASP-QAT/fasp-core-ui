@@ -21,5 +21,10 @@ class HealthAreaService {
         return axios.put(`${API_URL}/api/healthArea/`, json, {
         });
     }
+
+    getHealthAreaById(json) {
+        return axios.get(`${API_URL}/api/healthArea/${json}`, {}
+        );
+    }
 }
 export default new HealthAreaService()
