@@ -30,10 +30,7 @@ export default class AuthenticationServiceComponent extends Component {
         this.props.history.push(`/login/${message != "" ? message : "static.logoutSuccess"}`)
     }
     componentDidMount = () => {
-        console.log("component did mount called on service component---", this.props)
-
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---" + decryptedCurUser);
         if (AuthenticationService.checkTypeOfSession()) {
             if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
                 if (AuthenticationService.checkLastActionTaken()) {
@@ -44,7 +41,6 @@ export default class AuthenticationServiceComponent extends Component {
                     let basicAuthHeader = 'Bearer ' + decryptedToken
 
                     axios.interceptors.request.use(function (config) {
-                        console.log("goint to call interceptor request---", config)
                         config.headers.authorization = basicAuthHeader
                         return config;
                     }, function (error) {
@@ -53,7 +49,6 @@ export default class AuthenticationServiceComponent extends Component {
                     )
 
                     axios.interceptors.response.use(function (response) {
-                        console.log("inside interceptors response---", response);
                         return response;
                     }, (error) => {
                         if (error.message === "Network Error") {
@@ -73,7 +68,6 @@ export default class AuthenticationServiceComponent extends Component {
                                     this.props.message('static.unkownError');
                                     break;
                             }
-                            console.log("inside interceptors response---", error);
                             return Promise.reject(error);
                         }
                     });
