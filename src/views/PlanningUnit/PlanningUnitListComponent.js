@@ -73,7 +73,7 @@ export default class PlanningUnitListComponent extends Component {
                 }
             );
 
-        PlanningUnitService.getActivePlanningUnitList().then(response => {
+        PlanningUnitService.getAllPlanningUnitList().then(response => {
             console.log(response.data)
             this.setState({
                 planningUnitList: response.data,
@@ -234,7 +234,7 @@ export default class PlanningUnitListComponent extends Component {
                                             id="forecastingUnitId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            <option value="0">{i18n.t('static.common.all')}</option>
                                             {forecastingUnitList}
                                         </Input>
                                         <InputGroupAddon addonType="append">

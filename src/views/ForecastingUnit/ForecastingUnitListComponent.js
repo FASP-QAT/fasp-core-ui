@@ -175,7 +175,7 @@ export default class ForecastingUnitListComponent extends Component {
 
 
 
-        ForecastingUnitService.getForecastingUnitList().then(response => {
+        ForecastingUnitService.getForecastingUnitListAll().then(response => {
             console.log("response------->" + response);
             this.setState({
                 forecastingUnitList: response.data,
@@ -357,7 +357,7 @@ export default class ForecastingUnitListComponent extends Component {
                                                     id="realmId"
                                                     bsSize="sm"
                                                 >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    <option value="0">{i18n.t('static.common.all')}</option>
                                                     {realmList}
                                                 </Input>
 
@@ -374,7 +374,7 @@ export default class ForecastingUnitListComponent extends Component {
                                                     id="productCategoryId"
                                                     bsSize="sm"
                                                 >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    <option value="0">{i18n.t('static.common.all')}</option>
                                                     {productCategoryList}
                                                 </Input>
 
@@ -391,7 +391,7 @@ export default class ForecastingUnitListComponent extends Component {
                                                     id="tracerCategoryId"
                                                     bsSize="sm"
                                                 >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    <option value="0">{i18n.t('static.common.all')}</option>
                                                     {tracercategoryList}
                                                 </Input>
                                                 <InputGroupAddon addonType="append">
