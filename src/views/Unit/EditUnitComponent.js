@@ -1,13 +1,13 @@
 import { Formik } from 'formik';
 import React, { Component } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, FormFeedback,InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
 // import * as myConst from '../../Labels.js';
 import UnitService from '../../api/UnitService.js';
+import getLabelText from '../../CommonComponent/getLabelText.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import '../Forms/ValidationForms/ValidationForms.css';
-import getLabelText from '../../CommonComponent/getLabelText.js';
 
 let initialValues = {
     unit: ""

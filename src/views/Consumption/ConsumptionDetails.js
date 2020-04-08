@@ -503,7 +503,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         <Col md="1">
                                                             <br /><br />
                                                             <FormGroup>
-                                                                <Button type="button" size="sm" color="primary" className="float-right mr-1" onClick={() => this.formSubmit()}> Go</Button>
+                                                                <Button type="button" size="sm" color="primary" className="float-right btn btn-secondary Gobtn btn-sm mt-2" onClick={() => this.formSubmit()}> Go</Button>
                                                                 &nbsp;
                                                             </FormGroup>
                                                             {/* <Button type="button" onClick={() => this.formSubmit()} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Go</Button> */}

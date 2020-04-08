@@ -23,7 +23,8 @@ const validationSchema = function (values) {
         currencySymbol: Yup.string()
             .required(i18n.t('static.currency.currencysymboltext')).
             max(3, i18n.t('static.country.countrycodemax3digittext')).
-            matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+            // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+            matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.number()
@@ -129,7 +130,7 @@ export default class AddCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message,{entityname})}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>

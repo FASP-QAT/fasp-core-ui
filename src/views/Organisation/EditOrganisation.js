@@ -130,7 +130,7 @@ export default class EditOrganisationComponent extends Component {
             this.props.history.push(`/`)
         }
         AuthenticationService.setupAxiosInterceptors();
-       
+
         UserService.getRealmList()
             .then(response => {
                 console.log("realm list---", response.data);
