@@ -27,8 +27,6 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     componentDidMount() {
-        document.getElementById("shipmentArtmisCard").style.display = "none";
-        document.getElementById("actualQATOrdersCard").style.display = "none";
     };
 
     saveData = function () {
@@ -36,178 +34,35 @@ export default class SupplyPlanComponent extends React.Component {
 
     toggleLarge(supplyPlanType, month, quantity) {
         var supplyPlanType = supplyPlanType;
-        this.el = jexcel(document.getElementById("actualQATOrdersDiv"), '');
-        console.log("this.el===================", this.el)
-        this.el.destroy();
-        this.el = jexcel(document.getElementById("shipmentsARTMIS"), '');
-        console.log("this.el===================", this.el)
-        this.el.destroy();
-        document.getElementById("shipmentArtmisCard").style.display = "none";
-        document.getElementById("actualQATOrdersCard").style.display = "none";
         if (supplyPlanType == 'Consumption') {
             this.setState({
                 consumption: !this.state.consumption,
             });
         } else if (supplyPlanType == 'Actual QAT Orders') {
-            document.getElementById("actualQATOrdersCard").style.display = "block";
-            var json = [];
-            var data = [];
-            data[0] = month;
-            data[1] = "";
-            data[2] = "";
-            data[3] = "";
-            data[4] = "";
-            data[5] = "";
-            data[6] = "";
-            data[7] = "";
-            data[8] = "";
-            data[9] = "";
-            data[10] = "";
-            data[11] = "";
-            data[12] = "";
-            data[13] = "";
-            data[14] = quantity;
-            data[15] = "";
-            data[16] = "";
-            data[17] = "";
-            data[18] = "";
-            data[19] = "";
-            data[20] = "";
-            data[21] = "";
-            data[22] = "";
-            data[23] = "";
-            data[24] = "";
-            data[25] = "";
-            json[0] = data;
-            var options = {
-                data: json,
-                colHeaders: [
-                    "Month",
-                    "QAT Order No",
-                    "Delivery date",
-                    "Order Status",
-                    "RO No",
-                    "Procurement Agent",
-                    "Planning Unit",
-                    "Suggested Order Qty",
-                    "MOQ",
-                    "Adjusted Order Qty",
-                    "Manual Price per Planning Unit",
-                    "Procurement Unit",
-                    "Supplier",
-                    "Multiplier",
-                    "Qty",
-                    "Final Planning Unit Qty",
-                    "Price per Planning Unit",
-                    "Amt",
-                    "Funding Source",
-                    "Sub-Funding Source",
-                    "Budget",
-                    "Notes",
-                    "Create date",
-                    "Created By",
-                    "Last Modified date",
-                    "Last Modified by"
-                ],
-                colWidths: [80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80],
-                columns: [
-                    { type: 'text', readOnly: true },
-                ],
-                pagination: false,
-                search: false,
-                columnSorting: true,
-                tableOverflow: true,
-                wordWrap: true,
-                allowInsertColumn: false,
-                allowManualInsertColumn: false,
-                allowDeleteRow: false,
-            };
-
-            // this.el=jexcel(document.getElementById("actualQATOrdersDiv"),"");
-            console.log("this.el================", this.el)
-            this.el = jexcel(document.getElementById("actualQATOrdersDiv"), options);
+            this.setState({
+                actualQATOrders: !this.state.actualQATOrders,
+                qty: quantity
+            });
         } else if (supplyPlanType == 'Shipments ARTMIS') {
-            document.getElementById("shipmentArtmisCard").style.display = "block";
-            var json = [];
-            var data = [];
-            data[0] = month;
-            data[1] = "";
-            data[2] = "";
-            data[3] = "";
-            data[4] = "";
-            data[5] = "";
-            data[6] = "";
-            data[7] = "";
-            data[8] = "";
-            data[9] = "";
-            data[10] = "";
-            data[11] = quantity;
-            data[12] = "";
-            data[13] = "";
-            data[14] = "";
-            data[15] = "";
-            data[16] = "";
-            data[17] = "";
-            data[18] = "";
-            data[19] = "";
-            data[20] = "";
-            data[21] = "";
-            json[0] = data;
-            var options = {
-                data: json,
-                colHeaders: [
-                    "Month",
-                    "QAT Order No",
-                    "RO",
-                    "Procurement Agent",
-                    "Funding Source",
-                    "Sub-Funding Source",
-                    "Budget",
-                    "Planning Unit",
-                    "Procurement Unit",
-                    "Conversion Units",
-                    "Qty",
-                    "Planning Unit Qty",
-                    "Manufacturer",
-                    "Price",
-                    "Amt",
-                    "Delivery date",
-                    "Order Status",
-                    "Notes",
-                    "Create date",
-                    "Created By",
-                    "Last Modified date",
-                    "Last Modified by"
-                ],
-                colWidths: [80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80],
-                columns: [
-                    { type: 'text', readOnly: true },
-                ],
-                pagination: false,
-                search: false,
-                columnSorting: true,
-                tableOverflow: true,
-                wordWrap: true,
-                allowInsertColumn: false,
-                allowManualInsertColumn: false,
-                allowDeleteRow: false,
-            };
-
-            // this.el=jexcel(document.getElementById("actualQATOrdersDiv"),"");
-            console.log("this.el================", this.el)
-            this.el = jexcel(document.getElementById("shipmentsARTMIS"), options);
+            this.setState({
+                shipmentsArtmis: !this.state.shipmentsArtmis,
+                qty: quantity
+            });
         } else if (supplyPlanType == 'Adjustments') {
             this.setState({
                 adjustments: !this.state.adjustments,
+            });
+        } else if (supplyPlanType == 'QAT Recommended Order Qty') {
+            this.setState({
+                QATRecommendedOrderQty: !this.state.QATRecommendedOrderQty,
+                qty: quantity
             });
         }
 
     }
 
     consumptionDetailsClicked(month, region, quantity) {
-        // console.log("This=====================>",this.children[0])
-        this.el = jexcel(document.getElementById("jexcelTable"), '');
-        console.log("this.el===================", this.el)
+        this.el = jexcel(document.getElementById("consumptionDetailsTable"), '');
         this.el.destroy();
         var json = [];
         var data = [];
@@ -258,7 +113,7 @@ export default class SupplyPlanComponent extends React.Component {
             allowManualInsertColumn: false,
             allowDeleteRow: false
         };
-        this.el = jexcel(document.getElementById("jexcelTable"), options);
+        this.el = jexcel(document.getElementById("consumptionDetailsTable"), options);
     }
 
     adjustmentsDetailsClicked(month, region, quantity) {
@@ -374,6 +229,12 @@ export default class SupplyPlanComponent extends React.Component {
         this.el = jexcel(document.getElementById("adjustmentsTable"), options);
     }
 
+    contextMenu(event) {
+        event.preventDefault();
+        console.log("in right click")
+        // addMenu.popup(e.clientX, e.clientY);
+    }
+
     render() {
         return (
             <>
@@ -433,76 +294,16 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
                                         <td>QAT Recommended Order Qty</td>
                                         <td></td>
-                                        <td>167</td>
+                                        <td onContextMenu={this.contextMenu} className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Mar 20', '167')}>167</td>
                                         <td></td>
                                         <td></td>
-                                        <td>44,773</td>
+                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Jun 20', '44773')}>44,773</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td>68,000</td>
+                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Oct 20', '68000')}>68,000</td>
                                         <td></td>
-                                        <td>50,000</td>
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
-                                        <td>To be accounted</td>
-                                        <td>
-                                            <select name="toBeAccounted">
-                                                <option value=""></option>
-                                                <option value="0">No-skip</option>
-                                                <option value="1">Yes-Account</option>
-                                            </select>
-                                        </td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
+                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Oct 20', '50000')}>50,000</td>
                                     </tr>
                                     <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
                                         <td>Actual QAT Orders</td>
@@ -518,66 +319,6 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td></td>
                                         <td></td>
                                     </tr>
-                                    <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
-                                        <td>To be accounted</td>
-                                        <td>
-                                            <select name="toBeAccounted">
-                                                <option value=""></option>
-                                                <option value="0">No-skip</option>
-                                                <option value="1">Yes-Account</option>
-                                            </select>
-                                        </td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                    </tr>
                                     <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
                                         <td>Shipments ARTMIS</td>
                                         <td></td>
@@ -591,66 +332,6 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Oct 20', '68359')}>68,359</td>
                                         <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Nov 20', '59567')}>59,567</td>
                                         <td></td>
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
-                                        <td>To be accounted</td>
-                                        <td>
-                                            <select name="toBeAccounted">
-                                                <option value=""></option>
-                                                <option value="0">No-skip</option>
-                                                <option value="1">Yes-Account</option>
-                                            </select>
-                                        </td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
-                                        <td><select name="toBeAccounted">
-                                            <option value=""></option>
-                                            <option value="0">No-skip</option>
-                                            <option value="1">Yes-Account</option>
-                                        </select></td>
                                     </tr>
                                     <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Adjustments', '', '')}>
                                         <td>Adjustments</td>
@@ -710,9 +391,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </tbody>
                             </Table>
-                            {/* <div className="table-responsive" id="actualQATOrdersDiv" /> */}
-                            <Card id="actualQATOrdersCard"><CardHeader><strong>Actual QAT Orders</strong></CardHeader><CardBody><div className="table-responsive" id="actualQATOrdersDiv" /></CardBody></Card>
-                            <Card id="shipmentArtmisCard"><CardHeader><strong>Shipment ARTMIS Details</strong></CardHeader><CardBody><div className="table-responsive" id="shipmentsARTMIS" /></CardBody></Card>
                         </CardBody>
                     </Card>
                     <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
@@ -790,7 +468,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </tfoot>
                             </Table>
-                            <div className="table-responsive" id="jexcelTable" />
+                            <div className="table-responsive" id="consumptionDetailsTable" />
                         </ModalBody>
                         <ModalFooter>
                             <Button color="primary" onClick={() => this.toggleLarge('Consumption')}>Do Something</Button>{' '}
@@ -877,6 +555,189 @@ export default class SupplyPlanComponent extends React.Component {
                         <ModalFooter>
                             <Button color="primary" onClick={() => this.toggleLarge('Adjustments')}>Do Something</Button>{' '}
                             <Button color="secondary" onClick={() => this.toggleLarge('Adjustments')}>Cancel</Button>
+                        </ModalFooter>
+                    </Modal>
+                    <Modal isOpen={this.state.QATRecommendedOrderQty} toggle={() => this.toggleLarge('QAT Recommended Order Qty')}
+                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        <ModalHeader toggle={() => this.toggleLarge('QAT Recommended Order Qty')}>QAT Recommended Order</ModalHeader>
+                        <ModalBody>
+                            <Table bordered responsive size="sm" options={this.options}>
+                                <thead>
+                                    <tr>
+                                        <th>QAT Order No</th>
+                                        <th>Expected Delivery date</th>
+                                        <th>Shipment Status</th>
+                                        <th>Planning Unit</th>
+                                        <th>Suggested Order Qty</th>
+                                        <th>Adjusted Order Qty</th>
+                                        <th>Notes</th>
+                                        <th>Create date</th>
+                                        <th>Created By</th>
+                                        <th>Last Modified date</th>
+                                        <th>Last Modified by</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>102129</td>
+                                        <td>18 Jun 2020</td>
+                                        <td>01-SUGGESTED</td>
+                                        <td>Ceftriaxone 250 mg Powder Vial - 10 Vials</td>
+                                        <td>{this.state.qty}</td>
+                                        <td>{this.state.qty}</td>
+                                        <td><input type="textarea" name="notes" id="notes" /></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="primary" onClick={() => this.toggleLarge('QAT Recommended Order Qty')}>Do Something</Button>{' '}
+                            <Button color="secondary" onClick={() => this.toggleLarge('QAT Recommended Order Qty')}>Cancel</Button>
+                        </ModalFooter>
+                    </Modal>
+                    <Modal isOpen={this.state.actualQATOrders} toggle={() => this.toggleLarge('Actual QAT Orders')}
+                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        <ModalHeader toggle={() => this.toggleLarge('Actual QAT Orders')}>Actual QAT Orders</ModalHeader>
+                        <ModalBody>
+                            <Table bordered responsive size="sm" options={this.options}>
+                                <thead>
+                                    <tr>
+                                        <th colspan="10"></th>
+                                        <th colspan="5">Only for strategic products</th>
+                                        <th colspan="11"></th>
+                                    </tr>
+                                    <tr>
+                                        <th>QAT Order No</th>
+                                        <th>Expected Delivery date</th>
+                                        <th>Shipment Status</th>
+                                        <th>Procurement Agent</th>
+                                        <th>Funding Source</th>
+                                        <th>Sub-Funding Source</th>
+                                        <th>Budget</th>
+                                        <th>Planning Unit</th>
+                                        <th>Suggested Order Qty</th>
+                                        <th>MoQ</th>
+                                        <th>No of Pallets</th>
+                                        <th>No of Containers</th>
+                                        <th>Order based on</th>
+                                        <th>Rounding option</th>
+                                        <th>User Qty</th>
+                                        <th>Adjusted Order Qty</th>
+                                        <th>Adjusted Pallets</th>
+                                        <th>Adjusted Containers</th>
+                                        <th>Manual Price per Planning Unit</th>
+                                        <th>Price per Planning Unit</th>
+                                        <th>Amt</th>
+                                        <th>Notes</th>
+                                        <th>Create date</th>
+                                        <th>Created By</th>
+                                        <th>Last Modified date</th>
+                                        <th>Last Modified by</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{this.state.qty}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="primary" onClick={() => this.toggleLarge('Actual QAT Orders')}>Do Something</Button>{' '}
+                            <Button color="secondary" onClick={() => this.toggleLarge('Actual QAT Orders')}>Cancel</Button>
+                        </ModalFooter>
+                    </Modal>
+                    <Modal isOpen={this.state.shipmentsArtmis} toggle={() => this.toggleLarge('Shipments ARTMIS')}
+                        className={'modal-lg ' + this.props.className, "modalWidth"}>
+                        <ModalHeader toggle={() => this.toggleLarge('Shipments ARTMIS')}>Shipments ARTMIS</ModalHeader>
+                        <ModalBody>
+                            <Table bordered responsive size="sm" options={this.options}>
+                                <thead>
+                                    <tr>
+                                        <th>QAT Order No</th>
+                                        <th>Order date</th>
+                                        <th>Order Status</th>
+                                        <th>RO</th>
+                                        <th>Procurement Agent</th>
+                                        <th>Funding Source</th>
+                                        <th>Sub-Funding Source</th>
+                                        <th>Budget</th>
+                                        <th>Planning Unit</th>
+                                        <th>Procurement Unit</th>
+                                        <th>Conversion Units</th>
+                                        <th>Qty</th>
+                                        <th>Planning Unit Qty</th>
+                                        <th>Supplier</th>
+                                        <th>Price</th>
+                                        <th>Amt</th>
+                                        <th>Delivery date</th>
+                                        <th>Notes</th>
+                                        <th>Create date</th>
+                                        <th>Created By</th>
+                                        <th>Last Modified date</th>
+                                        <th>Last Modified by</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{this.state.qty}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="primary" onClick={() => this.toggleLarge('Shipments ARTMIS')}>Do Something</Button>{' '}
+                            <Button color="secondary" onClick={() => this.toggleLarge('Shipments ARTMIS')}>Cancel</Button>
                         </ModalFooter>
                     </Modal>
                     {/* <Modal isOpen={this.state.actualQATOrders} toggle={() => this.toggleLarge('Actual QAT Orders','','')}

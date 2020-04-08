@@ -27,6 +27,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.organisation.organisationtext')),
         organisationCode: Yup.string()
             .required(i18n.t('static.organisation.organisationcodetext'))
+            .max(4, i18n.t('static.organisation.organisationcodemax4digittext'))
     })
 }
 
@@ -60,7 +61,26 @@ export default class EditOrganisationComponent extends Component {
         this.state = {
             countries: [],
             realms: [],
-            organisation: this.props.location.state.organisation,
+            // organisation: this.props.location.state.organisation,
+            organisation: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                realmCountryArray: [],
+                organisationCode: ''
+            },
             message: '',
             lang: localStorage.getItem('lang'),
             realmCountryId: '',
@@ -71,12 +91,12 @@ export default class EditOrganisationComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
 
-        initialValues = {
-            // label: this.props.location.state.healthArea.label.label_en,
-            organisationName: getLabelText(this.state.organisation.label, lang),
-            organisationCode: this.state.organisation.organisationCode,
-            realmId: this.state.organisation.realm.realmId
-        }
+        // initialValues = {
+        //     // label: this.props.location.state.healthArea.label.label_en,
+        //     organisationName: getLabelText(this.state.organisation.label, lang),
+        //     organisationCode: this.state.organisation.organisationCode,
+        //     realmId: this.state.organisation.realm.realmId
+        // }
     }
     dataChange(event) {
         let { organisation } = this.state
@@ -124,74 +144,100 @@ export default class EditOrganisationComponent extends Component {
     }
 
     componentDidMount() {
-        console.log("check---", this.state.organisation);
-        if (!AuthenticationService.checkTypeOfSession()) {
-            alert("You can't change your session from online to offline or vice versa.");
-            this.props.history.push(`/`)
-        }
+
         AuthenticationService.setupAxiosInterceptors();
-
-        UserService.getRealmList()
-            .then(response => {
-                console.log("realm list---", response.data);
-                this.setState({
-                    realms: response.data
-                })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
-        OrganisationService.getRealmCountryList(this.props.location.state.organisation.realm.realmId)
-            .then(response => {
-                console.log("Realm Country List list---", response.data);
-                if (response.status == 200) {
-                    var json = response.data;
-                    var regList = [];
-                    for (var i = 0; i < json.length; i++) {
-                        regList[i] = { value: json[i].realmCountryId, label: getLabelText(json[i].country.label, this.state.lang) }
-                    }
+        OrganisationService.getOrganisationById(this.props.match.params.organisationId).then(response => {
+            this.setState({
+                organisation: response.data
+            })
+            initialValues = {
+                // label: this.props.location.state.healthArea.label.label_en,
+                organisationName: this.state.organisation.label.label_en,
+                organisationCode: this.state.organisation.organisationCode,
+                realmId: this.state.organisation.realm.realmId
+            }
+            UserService.getRealmList()
+                .then(response => {
+                    console.log("realm list---", response.data);
                     this.setState({
-                        realmCountryList: regList
+                        realms: response.data
                     })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
+                }).catch(
+                    error => {
+                        switch (error.message) {
+                            case "Network Error":
+                                this.setState({
+                                    message: error.message
+                                })
+                                break
                             default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                                this.setState({
+                                    message: error.response.data.message
+                                })
+                                break
                         }
                     }
+                );
+
+            OrganisationService.getRealmCountryList(this.state.organisation.realm.realmId)
+                .then(response => {
+                    console.log("Realm Country List list---", response.data);
+                    if (response.status == 200) {
+                        var json = response.data;
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].realmCountryId, label: json[i].country.label.label_en }
+                        }
+                        this.setState({
+                            realmCountryList: regList
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response.status) {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
                 }
-            );
+            }
+        );
 
     }
 
@@ -234,40 +280,47 @@ export default class EditOrganisationComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                            <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     // console.log("-------------------->" + this.state.healthArea);
                                     OrganisationService.editOrganisation(this.state.organisation)
                                         .then(response => {
-                                            if (response.data.message != "Failed") {
+                                            if (response.status == 200) {
                                                 this.props.history.push(`/organisation/listOrganisation/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.message
+                                                    message: response.data.messageCode
                                                 })
                                             }
                                         })
                                         .catch(
                                             error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.message
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
+                                                if (error.message === "Network Error") {
+                                                    this.setState({ message: error.message });
+                                                } else {
+                                                    switch (error.response ? error.response.status : "") {
+                                                        case 500:
+                                                        case 401:
+                                                        case 404:
+                                                        case 406:
+                                                        case 412:
+                                                            this.setState({ message: error.response.data.messageCode });
+                                                            break;
+                                                        default:
+                                                            this.setState({ message: 'static.unkownError' });
+                                                            console.log("Error code unkown");
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         );
@@ -290,8 +343,9 @@ export default class EditOrganisationComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                    <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             value={this.state.organisation.realm.realmId}
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
@@ -306,8 +360,9 @@ export default class EditOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                    <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
+                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
                                                         <Select
+                                                        bsSize="sm"
                                                             valid={!errors.realmCountryId}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -320,31 +375,33 @@ export default class EditOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                    <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} </Label>
+                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} </Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             type="text" name="organisationCode" valid={!errors.organisationCode}
                                                             invalid={touched.organisationCode && !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.organisationCode}
-                                                            id="organisationCode" placeholder="organisation Code" />
+                                                            id="organisationCode" />
                                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                    <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')} </Label>
+                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')} </Label>
                                                         <Input
+                                                        bsSize="sm"
                                                             type="text" name="organisationName" valid={!errors.organisationName}
                                                             invalid={touched.organisationName && !!errors.organisationName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.label.label_en}
-                                                            id="organisationName" placeholder="Organisation Name" />
+                                                            id="organisationName" />
                                                         <FormFeedback className="red">{errors.organisationName}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label>{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

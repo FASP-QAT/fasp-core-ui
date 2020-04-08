@@ -74,7 +74,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
             label: this.props.location.state.dataSourceType.label.label_en
         }
     }
-
+    
     dataChange(event) {
         let { dataSourceType } = this.state
 

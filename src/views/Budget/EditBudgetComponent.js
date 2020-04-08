@@ -280,8 +280,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly
-
-                                                            value={this.state.budget.subFundingSource.label.label_en}
+                                                            value={getLabelText(this.state.budget.subFundingSource.label,this.state.lang)}
                                                         >
                                                         </Input>
                                                         {/* </InputGroupAddon> */}

@@ -199,12 +199,12 @@ const routes = [
   { path: '/healthArea/addHealthArea', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healtharea') }), component: AddHealthArea },
   { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },
   { path: '/healthArea/listHealthArea', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.healtharea') }), component: HealthAreaList },
-  { path: '/healthArea/editHealthArea/', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healtharea') }), component: EditHealthArea },
+  { path: '/healthArea/editHealthArea/:healthAreaId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.healtharea') }), component: EditHealthArea },
 
   { path: '/organisation/addOrganisation', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.organisation.organisation') }), component: AddOrganisation },
   { path: '/organisation/listOrganisation/:message', component: OrganisationList },
   { path: '/organisation/listOrganisation', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.organisation.organisation') }), component: OrganisationList },
-  { path: '/organisation/editOrganisation/', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.organisation.organisation') }), component: EditOrganisation },
+  { path: '/organisation/editOrganisation/:organisationId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.organisation.organisation') }), component: EditOrganisation },
 
   { path: '/fundingSource/addFundingSource', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.fundingsource') }), component: AddFundingSource },
   { path: '/fundingSource/listFundingSource', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.fundingsource') }), component: ListFundingSource },

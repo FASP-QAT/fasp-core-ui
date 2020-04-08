@@ -172,7 +172,7 @@ class ListUserComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
