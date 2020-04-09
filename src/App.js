@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 // import { renderRoutes } from 'react-router-config';
 import './App.scss';
-import  './i18n'
+//import  './i18n'
 import ResetPasswordComponent from './views/Pages/Login/ResetPasswordComponent';
 import UpdateExpiredPasswordComponent from './views/Pages/Login/UpdateExpiredPasswordComponent';
 
