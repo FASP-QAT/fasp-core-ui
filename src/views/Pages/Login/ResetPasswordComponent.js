@@ -144,14 +144,20 @@ class ResetPasswordComponent extends Component {
                                         if (navigator.onLine) {
                                             UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
                                                 .then(response => {
-                                                    this.props.history.push(`/login`)
+                                                    if (response.status == 200) {
+                                                        this.props.history.push(`/login/static.message.user.passwordSuccess`)
+                                                    } else {
+                                                        this.setState({
+                                                            message: response.data.message
+                                                        })
+                                                    }
                                                 })
                                                 .catch(
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({ message: error.message });
                                                         } else {
-                                                            switch (error.response.status) {
+                                                            switch (error.response ? error.response.status : "") {
                                                                 case 500:
                                                                 case 401:
                                                                 case 404:

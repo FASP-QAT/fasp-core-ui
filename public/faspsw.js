@@ -1,4 +1,4 @@
-var cacheName = 'fasp-v6';
+var cacheName = 'fasp-v1';
 var assets = [
   '/',
   '/index.html',
@@ -47,10 +47,10 @@ self.addEventListener('message', (event) => {
   // console.log('[Service Worker] Message Event: ', event.data)
 });
 
-// This will work!
-workbox.routing.registerRoute(
-  new RegExp('\\.(?:js|css|scss|html|gif|svg|jpg|png|map)'),
-  new workbox.strategies.CacheFirst()
-);
+// // This will work!
+// workbox.routing.registerRoute(
+//   new RegExp('\\.(?:js|css|scss|html|gif|svg|jpg|png|map)'),
+//   new workbox.strategies.CacheFirst()
+// );
 
 

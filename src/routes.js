@@ -37,6 +37,7 @@ const EditRegion = React.lazy(() => import('./views/Region/EditRegionComponent')
 const ListRealmCountry = React.lazy(() => import('./views/RealmCountry/ListRealmCountryComponent'));
 const AddRealmCountry = React.lazy(() => import('./views/RealmCountry/AddRealmCountryComponent'));
 const ChangePassword = React.lazy(() => import('./views/Pages/Login/ChangePasswordComponent'));
+const Logout = React.lazy(() => import('./views/Pages/Login/LogoutComponent'));
 const AddRole = React.lazy(() => import('./views/Role/AddRoleComponent'));
 const ListRole = React.lazy(() => import('./views/Role/ListRoleComponent'));
 const EditRole = React.lazy(() => import('./views/Role/EditRoleComponent'));
@@ -216,7 +217,8 @@ const routes = [
   { path: '/subFundingSource/editSubFundingSource', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.subfundingsource') }), component: EditSubFundingSource },
   { path: '/subFundingSource/subFundingSourceList/:message', component: SubFundingSourceList },
 
-  { path: '/ApplicationDashboard', name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+  { path: '/ApplicationDashboard', exact: true, name: i18n.t('static.dashboard.applicationdashboard'), component: ApplicationDashboard },
+  { path: '/ApplicationDashboard/:message', component: ApplicationDashboard },
   { path: '/RealmDashboard', name: i18n.t('static.dashboard.realmdashboard'), component: RealmDashboard },
   { path: '/ProgramDashboard', name: i18n.t('static.dashboard.programdashboard'), component: ProgramDashboard },
   { path: '/dashboard', exact: true, name: i18n.t('static.common.dashboard'), component: Dashboard },
@@ -249,6 +251,7 @@ const routes = [
   { path: '/realmCountry/addRealmCountry', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realmcountry') }), component: AddRealmCountry },
 
   { path: '/changePassword', exact: true, name: i18n.t('static.dashboard.changepassword'), component: ChangePassword },
+  { path: '/logout', exact: true, component: Logout },
 
   { path: '/role/listRole/:message', component: ListRole },
   { path: '/role/listRole', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.role') }), component: ListRole },
@@ -307,16 +310,16 @@ const routes = [
 
   { path: '/supplyPlan', name: i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
 
-  { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.dashboard.forecastingunit')}), component: AddForecastingUnit },
-  { path: '/forecastingUnit/listForecastingUnit', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.dashboard.forecastingunit')}), component: ForecastingUnitList },
+  { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: AddForecastingUnit },
+  { path: '/forecastingUnit/listForecastingUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: ForecastingUnitList },
   { path: '/forecastingUnit/listForecastingUnit/:message', component: ForecastingUnitList },
-  { path: '/forecastingUnit/editForecastingUnit', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.dashboard.forecastingunit')}), component: EditForecastingUnit },
+  { path: '/forecastingUnit/editForecastingUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: EditForecastingUnit },
 
-  { path: '/planningUnit/addPlanningUnit', name: i18n.t('static.breadcrum.add',{entityname:i18n.t('static.dashboard.planningunit')}), component: AddPlanningUnit },
-  { path: '/planningUnit/listPlanningUnit', exact: true, name: i18n.t('static.breadcrum.list',{entityname:i18n.t('static.dashboard.planningunit')}), component: PlanningUnitList },
+  { path: '/planningUnit/addPlanningUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.planningunit') }), component: AddPlanningUnit },
+  { path: '/planningUnit/listPlanningUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.planningunit') }), component: PlanningUnitList },
   { path: '/planningUnit/listPlanningUnit/:message', component: PlanningUnitList },
-  { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit',{entityname:i18n.t('static.dashboard.planningunit')}), component: EditPlanningUnit },
-  
+  { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
+
 
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

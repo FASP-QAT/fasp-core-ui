@@ -35,23 +35,7 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng"];
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      LogoutService.logout()
-        .then(response => {
-          if (response.status == 200) {
-            keysToRemove.forEach(k => localStorage.removeItem(k))
-            this.props.history.push(`/login/static.logoutSuccess`)
-          }
-        }).catch(
-          error => {
-          }
-        );
-    } else {
-      keysToRemove.forEach(k => localStorage.removeItem(k))
-      this.props.history.push(`/login/static.logoutSuccess`)
-    }
+    this.props.history.push(`/logout`)
   }
 
   render() {
@@ -242,7 +226,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
                             icon: 'icon-graph'
-                          },{
+                          }, {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'icon-graph'
@@ -251,18 +235,18 @@ class DefaultLayout extends Component {
                           //   name: i18n.t('static.dashboard.product'),
                           //   url: '/product/listProduct',
                           //   icon: 'icon-graph',
-                            // children: [
-                            //   // {
-                            //   //   name: i18n.t('static.dashboard.addproduct'),
-                            //   //   url: '/product/addProduct',
-                            //   //   icon: 'icon-pencil',
-                            //   // },
-                            //   {
-                            //     name: i18n.t('static.dashboard.listproduct'),
-                            //     url: '/product/listProduct',
-                            //     icon: 'fa fa-th-large',
-                            //   }
-                            // ]
+                          // children: [
+                          //   // {
+                          //   //   name: i18n.t('static.dashboard.addproduct'),
+                          //   //   url: '/product/addProduct',
+                          //   //   icon: 'icon-pencil',
+                          //   // },
+                          //   {
+                          //     name: i18n.t('static.dashboard.listproduct'),
+                          //     url: '/product/listProduct',
+                          //     icon: 'fa fa-th-large',
+                          //   }
+                          // ]
                           // },
 
 
