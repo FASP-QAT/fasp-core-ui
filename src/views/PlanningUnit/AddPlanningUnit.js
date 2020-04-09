@@ -327,7 +327,7 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="multiplier">{i18n.t('static.planningunit.multiplier')}</Label>
+                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}</Label>
                                                         <Input type="number"
                                                             name="multiplier"
                                                             id="multiplier"

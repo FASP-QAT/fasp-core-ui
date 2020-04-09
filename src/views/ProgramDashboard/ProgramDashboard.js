@@ -126,7 +126,7 @@ class ProgramDashboard extends Component {
           <Card>
             <CardHeader className="text-center">
            
-            <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels : <span className="count-clr">89</span></b>
+            <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels <span className="count-clr"></span></b>
               <div className="card-header-actions">
                
               </div>
@@ -143,7 +143,7 @@ class ProgramDashboard extends Component {
         <Col md="6">
             <Card>
               <CardHeader className="text-center">
-              <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels : <span className="count-clr">89</span></b>
+              <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels  <span className="count-clr"></span></b>
               </CardHeader>
               <CardBody>
                 <Row>

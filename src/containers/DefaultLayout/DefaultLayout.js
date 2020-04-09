@@ -1,7 +1,6 @@
 import React, { Component, Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'reactstrap';
-import i18n from '../../i18n'
 import { Online, Offline } from "react-detect-offline";
 import {
   AppAside,
@@ -21,6 +20,7 @@ import navigation from '../../_nav';
 import routes from '../../routes';
 import LogoutService from "../../api/LogoutService";
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
+import i18n from '../../i18n'
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -35,23 +35,7 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng"];
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      LogoutService.logout()
-        .then(response => {
-          if (response.status == 200) {
-            keysToRemove.forEach(k => localStorage.removeItem(k))
-            this.props.history.push(`/login/static.logoutSuccess`)
-          }
-        }).catch(
-          error => {
-          }
-        );
-    } else {
-      keysToRemove.forEach(k => localStorage.removeItem(k))
-      this.props.history.push(`/login/static.logoutSuccess`)
-    }
+    this.props.history.push(`/logout`)
   }
 
   render() {
@@ -242,7 +226,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
                             icon: 'icon-graph'
-                          },{
+                          }, {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'icon-graph'
@@ -251,18 +235,18 @@ class DefaultLayout extends Component {
                           //   name: i18n.t('static.dashboard.product'),
                           //   url: '/product/listProduct',
                           //   icon: 'icon-graph',
-                            // children: [
-                            //   // {
-                            //   //   name: i18n.t('static.dashboard.addproduct'),
-                            //   //   url: '/product/addProduct',
-                            //   //   icon: 'icon-pencil',
-                            //   // },
-                            //   {
-                            //     name: i18n.t('static.dashboard.listproduct'),
-                            //     url: '/product/listProduct',
-                            //     icon: 'fa fa-th-large',
-                            //   }
-                            // ]
+                          // children: [
+                          //   // {
+                          //   //   name: i18n.t('static.dashboard.addproduct'),
+                          //   //   url: '/product/addProduct',
+                          //   //   icon: 'icon-pencil',
+                          //   // },
+                          //   {
+                          //     name: i18n.t('static.dashboard.listproduct'),
+                          //     url: '/product/listProduct',
+                          //     icon: 'fa fa-th-large',
+                          //   }
+                          // ]
                           // },
 
 

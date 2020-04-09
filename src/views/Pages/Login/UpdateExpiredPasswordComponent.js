@@ -1,4 +1,4 @@
-import React, { Component} from 'react';
+import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, Container, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -108,146 +108,146 @@ class UpdateExpiredPasswordComponent extends Component {
         return (
             <div className="app flex-row align-items-center">
                 <div className="Login-component">
-                <Container className="container-login">
-                    <Row className="justify-content-center">
-                    <Col md="12">
-                        <div className="upper-logo mt-1">
-                         <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
-                      </div>
-                    </Col>
-                        <Col md="9" lg="7" xl="6 " className="mt-4">
-                            <h5 className="mx-4">{this.state.message}</h5>
-                            <Card className="mx-4">
-                                <CardHeader>
-                                    <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Update Expired Password</strong>{' '}
-                                </CardHeader>
-                                <Formik
-                                    initialValues={{
-                                        oldPassword: "",
-                                        newPassword: "",
-                                        confirmNewPassword: "",
-                                        username: this.state.username
-                                    }}
-                                    validate={validate(validationSchema)}
-                                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        if (navigator.onLine) {
-                                            UserService.updateExpiredPassword(values.username, values.oldPassword, values.newPassword)
-                                                .then(response => {
-                                                    var decoded = jwt_decode(response.data.token);
-                                                    let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
-                                                    keysToRemove.forEach(k => localStorage.removeItem(k))
+                    <Container className="container-login">
+                        <Row className="justify-content-center">
+                            <Col md="12">
+                                <div className="upper-logo mt-1">
+                                    <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                                </div>
+                            </Col>
+                            <Col md="9" lg="7" xl="6 " className="mt-4">
+                                <h5 className="mx-4">{this.state.message}</h5>
+                                <Card className="mx-4">
+                                    <CardHeader>
+                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Update Expired Password</strong>{' '}
+                                    </CardHeader>
+                                    <Formik
+                                        initialValues={{
+                                            oldPassword: "",
+                                            newPassword: "",
+                                            confirmNewPassword: "",
+                                            username: this.state.username
+                                        }}
+                                        validate={validate(validationSchema)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            if (navigator.onLine) {
+                                                UserService.updateExpiredPassword(values.username, values.oldPassword, values.newPassword)
+                                                    .then(response => {
+                                                        var decoded = jwt_decode(response.data.token);
+                                                        let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
+                                                        keysToRemove.forEach(k => localStorage.removeItem(k))
 
-                                                    localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
-                                                    localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
-                                                    localStorage.setItem('typeOfSession', "Online");
-                                                    localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
-                                                    localStorage.setItem('lang', decoded.user.language.languageCode);
-                                                    this.props.history.push(`/dashboard/${response.statusText}`)
-                                                })
-                                                .catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({ message: error.message });
-                                                        } else {
-                                                            switch (error.response.status) {
-                                                                case 500:
-                                                                case 401:
-                                                                case 404:
-                                                                case 406:
-                                                                case 412:
-                                                                    this.setState({ message: error.response.data.messageCode });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({ message: 'static.unkownError' });
-                                                                    break;
+                                                        localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
+                                                        localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
+                                                        localStorage.setItem('typeOfSession', "Online");
+                                                        localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
+                                                        localStorage.setItem('lang', decoded.user.language.languageCode);
+                                                        this.props.history.push(`/ApplicationDashboard/static.message.user.passwordSuccess`)
+                                                    })
+                                                    .catch(
+                                                        error => {
+                                                            if (error.message === "Network Error") {
+                                                                this.setState({ message: error.message });
+                                                            } else {
+                                                                switch (error.response ? error.response.status : "") {
+                                                                    case 500:
+                                                                    case 401:
+                                                                    case 404:
+                                                                    case 406:
+                                                                    case 412:
+                                                                        this.setState({ message: error.response.data.messageCode });
+                                                                        break;
+                                                                    default:
+                                                                        this.setState({ message: 'static.unkownError' });
+                                                                        break;
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                );
+                                                    );
 
-                                        } else {
-                                            this.setState({
-                                                message: "You must be online to update the password."
-                                            });
-                                        }
-                                    }}
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched
-                                        }) => (
-                                                <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
-                                                    <CardBody>
-                                                        <Input type="text"
-                                                            name="username"
-                                                            id="username"
-                                                            onChange={handleChange}
-                                                            hidden
-                                                        />
-                                                        <FormGroup>
-                                                            <Label for="oldPassword">Old Password</Label>
-                                                            <Input type="password"
-                                                                name="oldPassword"
-                                                                id="oldPassword"
-                                                                bsSize="sm"
-                                                                valid={!errors.oldPassword}
-                                                                invalid={touched.oldPassword && !!errors.oldPassword}
+                                            } else {
+                                                this.setState({
+                                                    message: "You must be online to update the password."
+                                                });
+                                            }
+                                        }}
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched
+                                            }) => (
+                                                    <Form onSubmit={handleSubmit} noValidate name='updatePasswordForm'>
+                                                        <CardBody>
+                                                            <Input type="text"
+                                                                name="username"
+                                                                id="username"
                                                                 onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                required
+                                                                hidden
                                                             />
-                                                            <FormFeedback>{errors.oldPassword}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup>
-                                                            <Label for="newPassword">New Password</Label>
-                                                            <Input type="password"
-                                                                name="newPassword"
-                                                                id="newPassword"
-                                                                bsSize="sm"
-                                                                valid={!errors.newPassword}
-                                                                invalid={touched.newPassword && !!errors.newPassword}
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            />
-                                                            <FormFeedback>{errors.newPassword}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup>
-                                                            <Label for="confirmNewPassword">Confirm New Password</Label>
-                                                            <Input type="password"
-                                                                name="confirmNewPassword"
-                                                                id="confirmNewPassword"
-                                                                bsSize="sm"
-                                                                valid={!errors.confirmNewPassword}
-                                                                invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            />
-                                                            <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
-                                                        </FormGroup>
-                                                    </CardBody>
-                                                    <CardFooter>
-                                                        <FormGroup>
-                                                            <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i> Logout</Button>
-                                                            <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
-                                                            &nbsp;
+                                                            <FormGroup>
+                                                                <Label for="oldPassword">Old Password</Label>
+                                                                <Input type="password"
+                                                                    name="oldPassword"
+                                                                    id="oldPassword"
+                                                                    bsSize="sm"
+                                                                    valid={!errors.oldPassword}
+                                                                    invalid={touched.oldPassword && !!errors.oldPassword}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                />
+                                                                <FormFeedback>{errors.oldPassword}</FormFeedback>
+                                                            </FormGroup>
+                                                            <FormGroup>
+                                                                <Label for="newPassword">New Password</Label>
+                                                                <Input type="password"
+                                                                    name="newPassword"
+                                                                    id="newPassword"
+                                                                    bsSize="sm"
+                                                                    valid={!errors.newPassword}
+                                                                    invalid={touched.newPassword && !!errors.newPassword}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                />
+                                                                <FormFeedback>{errors.newPassword}</FormFeedback>
+                                                            </FormGroup>
+                                                            <FormGroup>
+                                                                <Label for="confirmNewPassword">Confirm New Password</Label>
+                                                                <Input type="password"
+                                                                    name="confirmNewPassword"
+                                                                    id="confirmNewPassword"
+                                                                    bsSize="sm"
+                                                                    valid={!errors.confirmNewPassword}
+                                                                    invalid={touched.confirmNewPassword && !!errors.confirmNewPassword}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                />
+                                                                <FormFeedback>{errors.confirmNewPassword}</FormFeedback>
+                                                            </FormGroup>
+                                                        </CardBody>
+                                                        <CardFooter>
+                                                            <FormGroup>
+                                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i> Logout</Button>
+                                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                                &nbsp;
                           </FormGroup>
-                                                    </CardFooter>
-                                                </Form>
-                                            )} />
-                            </Card>
-                        </Col>
-                    </Row>
-                
-                </Container>
+                                                        </CardFooter>
+                                                    </Form>
+                                                )} />
+                                </Card>
+                            </Col>
+                        </Row>
+
+                    </Container>
                 </div>
             </div>
         );
