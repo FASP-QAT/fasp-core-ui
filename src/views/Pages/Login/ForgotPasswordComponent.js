@@ -1,16 +1,11 @@
-import React, { Component, Suspense } from 'react';
+import React, { Component} from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, Container } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css';
-import {
-    AppFooter,
-    AppSidebarFooter,
-} from '@coreui/react';
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
-const DefaultFooter = React.lazy(() => import('../../../containers/DefaultLayout/DefaultFooter'));
 
 const initialValues = {
     username: ""
@@ -176,11 +171,7 @@ class ForgotPasswordComponent extends Component {
                             </Card>
                         </Col>
                     </Row>
-                    <AppFooter className="footer-fwp">
-                    <Suspense fallback={this.loading()}>
-                        <DefaultFooter />
-                    </Suspense>
-                </AppFooter>
+                    
                 </Container>
                </div>
             </div>

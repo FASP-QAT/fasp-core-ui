@@ -125,9 +125,15 @@ class ResetPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <Container>
+                <div className="Login-component">
+                <Container  className="container-login">
                     <Row className="justify-content-center">
-                        <Col md="9" lg="7" xl="6">
+                    <Col md="12">
+                        <div className="upper-logo mt-1">
+                         <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                      </div>
+                    </Col>
+                        <Col md="9" lg="7" xl="6" className="mt-4">
                             <h5 className="mx-4">{this.state.message}</h5>
                             <Card className="mx-4">
                                 <CardHeader>
@@ -236,6 +242,7 @@ class ResetPasswordComponent extends Component {
                             </Col>
                     </Row>
                 </Container>
+                </div>
             </div>
         );
     }

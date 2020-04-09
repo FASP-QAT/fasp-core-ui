@@ -1,14 +1,9 @@
-import React, { Component ,Suspense} from 'react';
+import React, { Component} from 'react';
 import { Row, Col, Card, CardHeader, Container, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../../Forms/ValidationForms/ValidationForms.css'
-import {
-  
-    AppFooter,
-    AppSidebarFooter,
 
-} from '@coreui/react';
 import CryptoJS from 'crypto-js'
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import { Online } from "react-detect-offline";
@@ -16,7 +11,7 @@ import bcrypt from 'bcryptjs';
 import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
-const DefaultFooter = React.lazy(() => import('../../../containers/DefaultLayout/DefaultFooter'));
+
 
 
 const validationSchema = function (values) {
@@ -251,11 +246,7 @@ class UpdateExpiredPasswordComponent extends Component {
                             </Card>
                         </Col>
                     </Row>
-                    <AppFooter className="footer-fwp">
-                    <Suspense fallback={this.loading()}>
-                        <DefaultFooter />
-                    </Suspense>
-                </AppFooter>
+                
                 </Container>
                 </div>
             </div>
