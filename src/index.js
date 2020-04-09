@@ -6,6 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import  './i18n';
 import registerServiceWorker from './serviceWorkerDev.js';
 import { getDatabase } from "../src/CommonComponent/IndexedDbFunctions";
 import { saveProgram } from '../src/CommonComponent/IndexedDbFunctions';
