@@ -1,16 +1,12 @@
-import React, { Component, Suspense } from 'react';
+import React, { Component } from 'react';
 import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, Container } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
+import i18n from '../../../i18n'
 import '../../Forms/ValidationForms/ValidationForms.css';
-import {
-    AppFooter,
-    AppSidebarFooter,
-} from '@coreui/react';
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
-const DefaultFooter = React.lazy(() => import('../../../containers/DefaultLayout/DefaultFooter'));
 
 const initialValues = {
     username: ""
@@ -83,108 +79,111 @@ class ForgotPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
+                <h5>{i18n.t(this.state.message)}</h5>
                 <div className="Login-component">
-                <Container className="container-login">
-                    <Row className="justify-content-center ">
-                    <Col md="12">
-                        <div className="upper-logo mt-1">
-                         <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
-                      </div>
-                    </Col>
-                        <Col md="9" lg="7" xl="6" className="mt-4">
-                            <h5 className="mx-4">{this.state.message}</h5>
-                            <Card className="mx-4 ">
+                    <Container className="container-login">
+                        <Row className="justify-content-center ">
+                            <Col md="12">
+                                <div className="upper-logo mt-1">
+                                    <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                                </div>
+                            </Col>
+                            <Col md="9" lg="7" xl="6" className="mt-4">
+                                <h5 className="mx-4">{this.state.message}</h5>
+                                <Card className="mx-4 ">
 
-                                <CardHeader>
-                                    <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Forgot Password</strong>{' '}
-                                </CardHeader>
-                                <Formik
-                                    initialValues={initialValues}
-                                    validate={validate(validationSchema)}
-                                    onSubmit={(values, { setSubmitting, setErrors }) => {
-                                        if (navigator.onLine) {
-                                            UserService.forgotPassword(values.username)
-                                                .then(response => {
-                                                    this.props.history.push(`/login/${response.statusText}`)
-                                                })
-                                                .catch(
-                                                    error => {
-                                                        if (error.message === "Network Error") {
-                                                            this.setState({ message: error.message });
+                                    <CardHeader>
+                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Forgot Password</strong>{' '}
+                                    </CardHeader>
+                                    <Formik
+                                        initialValues={initialValues}
+                                        validate={validate(validationSchema)}
+                                        onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            if (navigator.onLine) {
+                                                UserService.forgotPassword(values.username)
+                                                    .then(response => {
+                                                        if (response.status == 200) {
+                                                            this.props.history.push(`/login/static.message.user.forgotPasswordSuccess`)
                                                         } else {
-                                                            switch (error.response.status) {
-                                                                case 500:
-                                                                case 401:
-                                                                case 404:
-                                                                case 406:
-                                                                case 412:
-                                                                    this.setState({ message: error.response.data.messageCode });
-                                                                    break;
-                                                                default:
-                                                                    this.setState({ message: 'static.unkownError' });
-                                                                    break;
+                                                            this.setState({
+                                                                message: response.data.message
+                                                            })
+                                                        }
+                                                    })
+                                                    .catch(
+                                                        error => {
+                                                            if (error.message === "Network Error") {
+                                                                this.setState({ message: error.message });
+                                                            } else {
+                                                                switch (error.response ? error.response.status : "") {
+                                                                    case 500:
+                                                                    case 401:
+                                                                    case 404:
+                                                                    case 406:
+                                                                    case 412:
+                                                                        this.setState({ message: error.response.data.messageCode });
+                                                                        break;
+                                                                    default:
+                                                                        this.setState({ message: 'static.unkownError' });
+                                                                        break;
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                );
+                                                    );
 
-                                        } else {
-                                            this.setState({
-                                                message: "You must be online to update the password."
-                                            });
-                                        }
-                                    }}
-                                    render={
-                                        ({
-                                            values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            handleSubmit,
-                                            isSubmitting,
-                                            isValid,
-                                            setTouched
-                                        }) => (
-                                                <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
-                                                    <CardBody className="p-4">
+                                            } else {
+                                                this.setState({
+                                                    message: "You must be online to update the password."
+                                                });
+                                            }
+                                        }}
+                                        render={
+                                            ({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isSubmitting,
+                                                isValid,
+                                                setTouched
+                                            }) => (
+                                                    <Form onSubmit={handleSubmit} noValidate name='forgotPasswordForm'>
+                                                        <CardBody className="p-4">
 
-                                                        <FormGroup>
-                                                            <Label for="username">Username</Label>
-                                                            <Input type="text"
-                                                                name="username"
-                                                                id="username"
-                                                                bsSize="sm"
-                                                                valid={!errors.username}
-                                                                invalid={touched.username && !!errors.username}
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            />
-                                                            <FormFeedback>{errors.username}</FormFeedback>
-                                                        </FormGroup>
-                                                    </CardBody>
-                                                    <CardFooter>
-                                                        <FormGroup>
-                                                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
-                                                            &nbsp;
+                                                            <FormGroup>
+                                                                <Label for="username">Username</Label>
+                                                                <Input type="text"
+                                                                    name="username"
+                                                                    id="username"
+                                                                    bsSize="sm"
+                                                                    valid={!errors.username}
+                                                                    invalid={touched.username && !!errors.username}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    required
+                                                                />
+                                                                <FormFeedback>{errors.username}</FormFeedback>
+                                                            </FormGroup>
+                                                        </CardBody>
+                                                        <CardFooter>
+                                                            <FormGroup>
+                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
+                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                                &nbsp;
                           </FormGroup>
-                                                    </CardFooter>
-                                                </Form>
-                                            )} />
-                            </Card>
-                        </Col>
-                    </Row>
-                    <AppFooter className="footer-fwp">
-                    <Suspense fallback={this.loading()}>
-                        <DefaultFooter />
-                    </Suspense>
-                </AppFooter>
-                </Container>
-               </div>
+                                                        </CardFooter>
+                                                    </Form>
+                                                )} />
+                                </Card>
+                            </Col>
+                        </Row>
+
+                    </Container>
+                </div>
             </div>
-            
+
         );
     }
 }

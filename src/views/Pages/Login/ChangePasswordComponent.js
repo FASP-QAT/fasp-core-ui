@@ -133,7 +133,7 @@ class ChangePasswordComponent extends Component {
                                         UserService.changePassword(AuthenticationService.getLoggedInUserId(), values.oldPassword, values.newPassword)
                                             .then(response => {
                                                 localStorage.setItem('password', CryptoJS.AES.encrypt((response.data.hashPass).toString(), `${SECRET_KEY}`));
-                                                this.props.history.push(`/dashboard`)
+                                                this.props.history.push(`/ApplicationDashboard/static.message.user.passwordSuccess`)
                                             })
                                             .catch(
                                                 error => {
