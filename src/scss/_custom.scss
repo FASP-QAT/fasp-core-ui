@@ -317,9 +317,9 @@ label.arrow_label:after {
   width: 180px;
 }
 .TableCust .btn-default {
-  color: #212721 !important;
-  background-color: #cfcdc9 !important;
-  border-color: #cfcdc9 !important;
+  color: #fff !important;
+  background-color: #20a8d8 !important;
+  border-color: #20a8d8 !important;
   margin-left: 5px;
   margin-top: -2px;
   height: calc(1.5em + 0.5rem + 2px);
@@ -875,4 +875,12 @@ h5,
 
   color: #212721;
   
+}
+
+.dropdown-item {
+  color: #212721;
+}
+
+.Select--single>.Select-control .Select-value, .Select-placeholder {
+  color: #212721!important;
 }
