@@ -30,6 +30,7 @@ class LogoutComponent extends Component {
                         // localStorage.removeItem("lang");
                         // localStorage.removeItem("typeOfSession");
                         // localStorage.removeItem("i18nextLng");
+                        this.$axios.setHeader('Authorization', null)
                         this.props.history.push(`/login/static.logoutSuccess`)
                     }
                     console.log("inside if out---");
