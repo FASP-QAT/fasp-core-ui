@@ -309,6 +309,7 @@ label.arrow_label:after {
 .Gobtn {
   margin-left: 5px;
   border-radius: 0.2rem !important;
+  
 }
 .SelectGo select {
   border-radius: 0.2rem !important;
@@ -317,8 +318,8 @@ label.arrow_label:after {
   width: 180px;
 }
 .TableCust .btn-default {
-  color: #212721 !important;
-  background-color: #cfcdc9 !important;
+  background: #20a8d8 !important;
+    color: #fff !important;
   border-color: #cfcdc9 !important;
   margin-left: 5px;
   margin-top: -2px;
@@ -373,21 +374,16 @@ label.arrow_label:after {
 .react-bootstrap-table {
   overflow-x: auto;
 }
-// search button
+//table search button
 
 .table th,
 .table td {
   padding: 0.55rem;
 }
 
-// add button
+//table add button
 .card-header-action a i {
   font-size: 25px;
-}
-
-// radio button
-.form-check {
-  padding-left: 1.25rem !important;
 }
 
 .breadcrumb {
@@ -396,44 +392,41 @@ label.arrow_label:after {
 .red {
   color: #f86c6b !important;
 }
-.table-hover tbody tr:hover {
-   background-color: #cfcdc9;
-}
+
+
+// table multiselect color
 .Select--multi .Select-value {color: #5c6873 !important;}
 .form-check-inline .form-check-input {margin-left: 2rem;}
+// table radio button
 .P-absltRadio{position: absolute;}
 #active2{margin-left: 0rem !important;}
 @media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}}
-
+// radio button
+.form-check {
+  padding-left: 1.25rem !important;
+}// table dropdown footer
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a{padding: 8px 30px 8px 30px;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item{padding: 2px;}
+
+// table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
-  
-   max-height: 220px;
+  max-height: 320px;
 }
+
 .react-bootstrap-table-pagination{margin-top: 10px;}
 
-.react-bootstrap-table::-webkit-scrollbar {
-  width: 10px;
-}
+// .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 
-
-.react-bootstrap-table.react-bootstrap-table::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey; 
-  border-radius: 10px;
-}
- 
-
-.react-bootstrap-table::-webkit-scrollbar-thumb {
-  background: #002f6c; 
-  border-radius: 2px;
-}
-
-
-.react-bootstrap-table::-webkit-scrollbar-thumb:hover {
-  background: #002f6c; 
-}
+// .react-bootstrap-table.react-bootstrap-table::-webkit-scrollbar-track {
+//   box-shadow: inset 0 0 5px grey; 
+//   border-radius: 10px;
+// }.react-bootstrap-table::-webkit-scrollbar-thumb {
+//   background: #002f6c; 
+//   border-radius: 2px;
+// }.react-bootstrap-table::-webkit-scrollbar-thumb:hover {
+//   background: #002f6c; 
+// }
 
 
 
@@ -705,6 +698,7 @@ h5,
 // icon-input-table
 .Fa-right::before{position: absolute;
   right: 43px;font-size:10px;margin-right: 2px;}
+  
   .form-control-sm:hover{
   padding-right: calc(1.5em + 0.75rem);}
   .form-control:focus{padding-right: calc(1.5em + 0.75rem);}
@@ -817,8 +811,8 @@ h5,
 }
 
 .btn-secondary {
-  color: #212721!important;
-  background-color: #cfcdc9!important;
+  background: #20a8d8 !important;
+    color: #fff !important;
   border-color: #cfcdc9!important;
 }
 .text-muted {
