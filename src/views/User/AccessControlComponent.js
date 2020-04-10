@@ -477,15 +477,15 @@ class AccessControlComponent extends Component {
                                     &nbsp;
 
                         </FormGroup>
-                                <Table responsive>
+                                <Table responsive className="table-striped table-hover table-bordered text-center">
 
                                     <thead>
                                         <tr>
-                                            <th className="text-left"> {i18n.t('static.program.realmcountry')} </th>
-                                            <th className="text-left"> {i18n.t('static.healtharea.healtharea')}</th>
-                                            <th className="text-left"> {i18n.t('static.organisation.organisation')} </th>
-                                            <th className="text-left">{i18n.t('static.program.program')}</th>
-                                            <th className="text-left">{i18n.t('static.common.remove')}</th>
+                                            <th className="text-center"> {i18n.t('static.program.realmcountry')} </th>
+                                            <th className="text-center"> {i18n.t('static.healtharea.healtharea')}</th>
+                                            <th className="text-center"> {i18n.t('static.organisation.organisation')} </th>
+                                            <th className="text-center">{i18n.t('static.program.program')}</th>
+                                            <th className="text-center">{i18n.t('static.common.remove')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
