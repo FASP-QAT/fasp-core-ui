@@ -163,6 +163,9 @@ const EditForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/Edi
 const AddPlanningUnit = React.lazy(() => import('./views/PlanningUnit/AddPlanningUnit'));
 const PlanningUnitList = React.lazy(() => import('./views/PlanningUnit/PlanningUnitListComponent'));
 const EditPlanningUnit = React.lazy(() => import('./views/PlanningUnit/EditPlanningUnitComponent'));
+const ListProcurementUnit=React.lazy(()=>import('./views/ProcurementUnit/ListProcurementUnit'))
+const AddProcurementUnit=React.lazy(()=>import('./views/ProcurementUnit/AddProcurementUnit'))
+const EditProcurementUnit=React.lazy(()=>import('./views/ProcurementUnit/EditProcurementUnit'))
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -320,7 +323,11 @@ const routes = [
   { path: '/planningUnit/listPlanningUnit/:message', component: PlanningUnitList },
   { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
 
-
+  { path: '/procurementUnit/addProcurementUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: AddProcurementUnit },
+  { path: '/procurementUnit/listProcurementUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: ListProcurementUnit },
+  { path: '/procurementUnit/listProcurementUnit/:message', component: ListProcurementUnit },
+  { path: '/procurementUnit/editProcurementUnit',exact:true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: EditProcurementUnit },
+  { path: '/procurementUnit/editProcurementUnit/:procurementUnitId',  component: EditProcurementUnit },
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
