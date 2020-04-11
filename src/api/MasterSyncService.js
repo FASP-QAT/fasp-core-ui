@@ -2,205 +2,102 @@ import axios from "axios"
 import { API_URL } from '../Constants.js'
 
 class MasterSyncService {
+    
     getLanguageListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getLanguageListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/language/${lastSyncDate}`, {
         });
     }
 
     getCountryListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getCountryListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/country/${lastSyncDate}`, {
+        });
+    }
+
+    getBudgetListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/budget/${lastSyncDate}`, {
         });
     }
 
     getCurrencyListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getCurrencyListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/currency/${lastSyncDate}`, {
         });
     }
 
     getUnitListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getUnitListForSync?lastSyncDate=${lastSyncDate}`, {
-        });
-    }
-
-    getUnitTypeList() {
-        return axios.get(`${API_URL}/api/getUnitTypeListForSync`, {
+        return axios.get(`${API_URL}/api/sync/unit/${lastSyncDate}`, {
         });
     }
 
     getOrganisationListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getOrganisationListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/organisation/${lastSyncDate}`, {
         });
     }
 
+    getProcurementAgentListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/procurementAgent/${lastSyncDate}`, {
+        });
+    }
     getHealthAreaListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getHealthAreaListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/healthArea/${lastSyncDate}`, {
         });
     }
 
     getRegionListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getRegionListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/region/${lastSyncDate}`, {
         });
     }
 
     getFundingSourceListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getFundingSourceListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/fundingSource/${lastSyncDate}`, {
         });
     }
     getSubFundingSourceListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getSubFundingSourceListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/subFundingSource/${lastSyncDate}`, {
         });
     }
 
-    getProductListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getProductListForSync?lastSyncDate=${lastSyncDate}`, {
+    getSupplierListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/supplier/${lastSyncDate}`, {
+        });
+    }
+
+    getTracerCategoryListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/tracerCategory/${lastSyncDate}`, {
         });
     }
 
     getProductCategoryListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getProductCategoryListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/productCategory/${lastSyncDate}`, {
+        });
+    }
+
+    getProgramListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/program/${lastSyncDate}`, {
+        });
+    }
+
+    getRealmCountryListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/realmCountry/${lastSyncDate}`, {
+        });
+    }
+
+    getRealmListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/realm/${lastSyncDate}`, {
         });
     }
 
     getDataSourceListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getDataSourceListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/dataSource/${lastSyncDate}`, {
+        });
+    }
+
+    getDimensionListForSync(lastSyncDate) {
+        return axios.get(`${API_URL}/api/sync/dimension/${lastSyncDate}`, {
         });
     }
 
     getDataSourceTypeListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getDataSourceTypeListForSync?lastSyncDate=${lastSyncDate}`, {
-        });
-    }
-
-    getShipmentStatusListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getShipmentStatusListForSync?lastSyncDate=${lastSyncDate}`, {
-        });
-    }
-
-    getShipmentStatusAllowedListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getShipmentStatusAllowedListForSync?lastSyncDate=${lastSyncDate}`, {
-        });
-    }
-
-    getPlanningUnitListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getPlanningUnitListForSync?lastSyncDate=${lastSyncDate}`, {
-        });
-    }
-
-    getLogisticsUnitListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getLogisticsUnitListForSync?lastSyncDate=${lastSyncDate}`, {
-        });
-    }
-
-    getManufacturerListForSync(lastSyncDate) {
-        var lastSyncDate;
-        if (lastSyncDate == null) {
-            lastSyncDate = null
-        } else {
-            lastSyncDate = lastSyncDate.lastSyncDate
-        }
-        return axios.get(`${API_URL}/api/getManufacturerListForSync?lastSyncDate=${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/dataSourceType/${lastSyncDate}`, {
         });
     }
 

@@ -1,26 +1,31 @@
 import axios from "axios";
-import {API_URL} from '../Constants.js';
+import { API_URL } from '../Constants.js';
 
-class DataSourceTypeService{
+class DataSourceTypeService {
 
-addDataSourceType(json){
-return axios.put(`${API_URL}/api/addDataSourceType/`,json,{}
-);
-}
+    addDataSourceType(json) {
+        return axios.post(`${API_URL}/api/dataSourceType/`, json, {}
+        );
+    }
 
-getDataSourceTypeList() {
-    return axios.get(`${API_URL}/api/getDataSourceTypeList/`, {
-    });
-}
+    getDataSourceTypeList() {
+        return axios.get(`${API_URL}/api/dataSourceType/all/`, {
+        });
+    }
 
-getDataSourceTypeListActive() {
-    return axios.get(`${API_URL}/api/getDataSourceTypeListActive/`, {
-    });
-}
+    getDataSourceTypeListActive() {
+        return axios.get(`${API_URL}/api/dataSourceType/`, {
+        });
+    }
 
-editDataSourceType(json) {
-    return axios.put(`${API_URL}/api/editDataSourceType/`, json, {
-    });
-}
+    editDataSourceType(json) {
+        return axios.put(`${API_URL}/api/dataSourceType/`, json, {
+        });
+    }
+
+    getDataSourceTypeById(json) {
+        return axios.get(`${API_URL}/api/dataSourceType/${json}`, {}
+        );
+    }
 }
 export default new DataSourceTypeService();

@@ -8,34 +8,28 @@ class UserService {
         });
     }
     getRoleList() {
-        return axios.get(`${API_URL}/api/getRoleList`, {
+        return axios.get(`${API_URL}/api/role`, {
         });
     }
     getBusinessFunctionList() {
-        return axios.get(`${API_URL}/api/getBusinessFunctionList`, {
+        return axios.get(`${API_URL}/api/businessFunction`, {
         });
     }
     getRealmList() {
-        return axios.get(`${API_URL}/api/getRealmList`, {
+        return axios.get(`${API_URL}/api/realm`, {
         });
     }
     addNewUser(json) {
-        console.log(json);
-        // var jsonString=JSON.stringify(json);
-
-        return axios.put(`${API_URL}/api/addNewUser/`, json, {
+        return axios.post(`${API_URL}/api/user/`, json, {
         });
     }
     addNewRole(json) {
-        console.log(json);
-        // var jsonString=JSON.stringify(json);
-
-        return axios.put(`${API_URL}/api/addNewRole/`, json, {
+        return axios.post(`${API_URL}/api/role/`, json, {
         });
     }
 
     getUserList() {
-        return axios.get(`${API_URL}/api/getUserList`, {
+        return axios.get(`${API_URL}/api/user`, {
         });
     }
     getUserByUserId(userId) {
@@ -43,15 +37,12 @@ class UserService {
         });
     }
     editUser(json) {
-        return axios.put(`${API_URL}/api/editUser/`, json, {
+        return axios.put(`${API_URL}/api/user/`, json, {
         });
     }
 
     editRole(json) {
-        console.log(json);
-        // var jsonString=JSON.stringify(json);
-
-        return axios.put(`${API_URL}/api/editRole/`, json, {
+        return axios.put(`${API_URL}/api/role/`, json, {
         });
     }
     unlockAccount(userId, emailId) {
@@ -59,12 +50,10 @@ class UserService {
         });
     }
     updateExpiredPassword(username, oldPassword, newPassword) {
-        console.log("api username---" + username);
         return axios.post(`${API_URL}/api/updateExpiredPassword/`, { username, oldPassword, newPassword }, {});
     }
 
     changePassword(userId, oldPassword, newPassword) {
-        console.log("api username---" + userId);
         return axios.post(`${API_URL}/api/changePassword/`, { userId, oldPassword, newPassword }, {});
     }
     forgotPassword(username) {
@@ -75,6 +64,10 @@ class UserService {
     }
     updatePassword(username, token, password) {
         return axios.post(`${API_URL}/api/updatePassword/`, { username, token, password }, {});
+    }
+    accessControls(json) {
+        return axios.put(`${API_URL}/api/accessControls/`, json, {
+        });
     }
 }
 

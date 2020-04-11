@@ -4,7 +4,6 @@ import { API_URL } from '../Constants.js';
 class OrganisationService {
 
     addOrganisation(json) {
-        console.log(json);
         return axios.post(`${API_URL}/api/organisation/`, json, {}
         );
     }
@@ -15,6 +14,16 @@ class OrganisationService {
     }
     editOrganisation(json) {
         return axios.put(`${API_URL}/api/organisation/`, json, {}
+        );
+    }
+
+    getRealmCountryList(json) {
+        return axios.get(`${API_URL}/api/realmCountry/realmId/${json}`, {}
+        );
+    }
+
+    getOrganisationById(json) {
+        return axios.get(`${API_URL}/api/organisation/${json}`, {}
         );
     }
 
