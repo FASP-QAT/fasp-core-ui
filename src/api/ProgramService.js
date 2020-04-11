@@ -49,12 +49,18 @@ class ProgramService {
         return axios.get(`${API_URL}/api/programProduct/${json}`, {}
         );
     }
-
+    getProgramPlaningUnitListByProgramId(json) {
+        return axios.get(`${API_URL}/api/program/${json}/planningUnit`, {}
+        );
+    }
     addProgramProductMapping(json) {
         return axios.put(`${API_URL}/api/programProduct/`, json, {}
         );
     }
-
+    addprogramPlanningUnitMapping(json) {
+        return axios.put(`${API_URL}/api/program/planningUnit/`, json, {}
+        );
+    }
     getProgramById(json) {
         return axios.get(`${API_URL}/api/program/${json}`, {}
         );

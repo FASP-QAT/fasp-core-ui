@@ -28,7 +28,55 @@ class ListProcurementAgentComponent extends Component {
         this.filterData = this.filterData.bind(this);
         this.addNewProcurementAgent = this.addNewProcurementAgent.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.buttonFormatter = this.buttonFormatter.bind(this);
+        this.addPlanningUnitMapping=this.addPlanningUnitMapping.bind(this);
 
+    }
+
+    addPlanningUnitMapping(event, cell) {
+        // console.log(cell);
+        event.stopPropagation();
+        AuthenticationService.setupAxiosInterceptors();
+        console.log("cell------", cell);
+        ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
+            .then(response => {
+                console.log("response------->", response)
+                if (response.status == 200) {
+                    let myReasponse = response.data;
+                    console.log("myResponce=========", response.data);
+                    this.props.history.push({
+                        pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
+                        state: {
+                            procurementAgentPlanningUnit: myReasponse
+                        }
+
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
     }
     addNewProcurementAgent() {
         this.props.history.push("/procurementAgent/addProcurementAgent");
@@ -52,7 +100,10 @@ class ListProcurementAgentComponent extends Component {
             state: { procurementAgent }
         });
     }
-
+    buttonFormatter(cell, row) {
+        console.log("button formater cell-----------", cell);
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
@@ -178,7 +229,16 @@ class ListProcurementAgentComponent extends Component {
                         (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                     );
                 }
-            }];
+            },
+            {
+                dataField: 'procurementAgentId',
+                text: 'Map Planning Unit',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.buttonFormatter
+            }
+        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -208,7 +268,7 @@ class ListProcurementAgentComponent extends Component {
         return (
             <div className="animated">
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}

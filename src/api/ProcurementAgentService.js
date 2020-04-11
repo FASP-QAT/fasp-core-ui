@@ -16,7 +16,15 @@ class ProcurementAgentService {
         return axios.put(`${API_URL}/api/procurementAgent/`, json, {
         });
     }
+    getProcurementAgentPlaningUnitList(json) {
+        return axios.get(`${API_URL}/api/procurementAgent/${json}/planningUnit`, {}
+        );
+    }
 
+    addprocurementAgentPlanningUnitMapping(json) {
+        return axios.put(`${API_URL}/api/procurementAgent/planningingUnit/`, json, {}
+        );
+    }
 }
 
 export default new ProcurementAgentService();
