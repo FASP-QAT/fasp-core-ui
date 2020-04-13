@@ -108,6 +108,10 @@ class AuthenticationService {
     //         })
     // }
 
+    clearAxiosInterceptors() {
+        axios.interceptors.request.use = null;
+    }
+
     setupAxiosInterceptors() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         console.log("decryptedCurUser---", decryptedCurUser);
@@ -134,31 +138,6 @@ class AuthenticationService {
 
     }
 
-    ejectAxiosInterceptors() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---", decryptedCurUser);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        console.log("decryptedToken---", decryptedToken);
-        let basicAuthHeader = 'Bearer ' + decryptedToken
-        console.log("basicAuthHeader---", basicAuthHeader);
-        const myInterceptor = axios.interceptors.request.use(
-            (config) => {
-                config.headers.authorization = basicAuthHeader
-                return config;
-            }
-        )
-
-
-        // Add a response interceptor
-        axios.interceptors.response.use(function (response) {
-            console.log("interceptor response---", response);
-            return response;
-        }, function (error) {
-            console.log("interceptor error---", error);
-            return Promise.reject(error);
-        });
-        axios.interceptors.request.eject(myInterceptor);
-    }
     storeTokenInIndexedDb(token, decodedObj) {
         let userObj = {
             token: token,
