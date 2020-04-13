@@ -12,14 +12,14 @@ let initialValues = {
     label: '',
     forecastingUnitId: '',
     forecastingUnitList: [],
-    multiplier:''
+    multiplier: ''
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         label: Yup.string()
             .required(i18n.t('static.planningunit.planningunittext')),
-            multiplier: Yup.string()
+        multiplier: Yup.string()
             .required(i18n.t('static.planningunit.multipliertext'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
@@ -58,9 +58,9 @@ export default class EditPlanningUnitComponent extends Component {
                 planningUnitId: '',
                 label: {
                     label_en: '',
-                    // spaLabel: '',
-                    // freLabel: '',
-                    // porLabel: '',
+                    label_fr: '',
+                    label_sp: '',
+                    label_pr: '',
                     labelId: '',
                 },
                 foreacastingUnit: {
@@ -81,11 +81,7 @@ export default class EditPlanningUnitComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        initialValues = {
-            label: this.props.location.state.planningUnit.label.label_en,
-            forecastingUnitId: this.props.location.state.planningUnit.foreacastingUnit.forecastingUnitId,
-            multiplier:this.props.location.state.planningUnit.multiplier
-        }
+
     }
 
     dataChange(event) {
@@ -117,7 +113,7 @@ export default class EditPlanningUnitComponent extends Component {
         setTouched({
             'label': true,
             'forecastingUnitId': true,
-            'multiplier':true
+            'multiplier': true
         }
         )
         this.validateForm(errors)
@@ -137,22 +133,45 @@ export default class EditPlanningUnitComponent extends Component {
         }
     }
 
-    componentDidMount() {
-        this.setState({
-            planningUnit: this.props.location.state.planningUnit
-        });
-
-
-    }
-
-
     Capitalize(str) {
-        this.state.planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        if (str != null && str != "") {
+            let { planningUnit } = this.state
+            planningUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
+
     }
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
     }
+    componentWillMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
+            this.setState({
+                planningUnit: response.data
+            });
 
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+    }
     render() {
 
         return (
@@ -165,10 +184,14 @@ export default class EditPlanningUnitComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    label: this.state.planningUnit.label.label_en,
+                                    forecastingUnitId: this.state.planningUnit.foreacastingUnit.forecastingUnitId,
+                                    multiplier: this.state.planningUnit.multiplier
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log(JSON.stringify(this.state.planningUnit))            
+                                    console.log(JSON.stringify(this.state.planningUnit))
                                     AuthenticationService.setupAxiosInterceptors();
                                     PlanningUnitService.editPlanningUnit(this.state.planningUnit)
                                         .then(response => {
@@ -216,7 +239,7 @@ export default class EditPlanningUnitComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='planningUnitForm'>
                                                 <CardBody>
-                                                <FormGroup>
+                                                    <FormGroup>
                                                         <Label htmlFor="forecastingUnitId">{i18n.t('static.planningunit.forecastingunit')}</Label>
                                                         <Input
                                                             type="text"
@@ -240,10 +263,10 @@ export default class EditPlanningUnitComponent extends Component {
                                                         >
                                                         </Input>
                                                     </FormGroup>
-                                                   
+
                                                     <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                         <Input
+                                                        <Input
                                                             type="text"
                                                             name="label"
                                                             id="label"
@@ -266,7 +289,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.multiplier}
                                                             invalid={touched.multiplier && !!errors.multiplier}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.multiplier}
                                                             required />
@@ -312,7 +335,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                      &nbsp;
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

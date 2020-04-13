@@ -42,8 +42,8 @@ class FundingSourceListComponent extends Component {
     }
     editFundingSource(fundingSource) {
         this.props.history.push({
-            pathname: "/fundingSource/editFundingSource",
-            state: { fundingSource }
+            pathname: `/fundingSource/editFundingSource/${fundingSource.fundingSourceId}`,
+            // state: { fundingSource }
         });
     }
 

@@ -46,8 +46,8 @@ class RegionListComponent extends Component {
     }
     editRegion(region) {
         this.props.history.push({
-            pathname: "/region/editRegion",
-            state: { region }
+            pathname: `/region/editRegion/${region.regionId}`,
+            // state: { region }
         });
     }
     addRegion(region) {

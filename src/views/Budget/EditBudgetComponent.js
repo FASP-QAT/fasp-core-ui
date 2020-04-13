@@ -57,15 +57,36 @@ class EditBudgetComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            budget: this.props.location.state.budget,
+            // budget: this.props.location.state.budget,
+            budget: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                program: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                subFundingSource: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                startDate: '',
+                stopDate: ''
+
+            },
             message: '',
             lang: localStorage.getItem('lang'),
-        }
-        initialValues = {
-            budgetName: getLabelText(this.state.budget.label, this.state.lang),
-            budgetAmt: this.state.budget.budgetAmt,
-            startDate: this.state.budget.startDate,
-            stopDate: this.state.budget.stopDate
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -75,43 +96,39 @@ class EditBudgetComponent extends Component {
         // console.log(this.state);
     }
 
-    // componentDidMount() {
-    //     console.log("in componentdidmount---------------");
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     BudgetService.getBudgetDataById(this.props.match.params.budgetId)
-    //         .then(response => {
-    //             this.setState({
-    //                 budget: response.data
-    //             });
-    //             initialValues = {
-    //                 budgetName: getLabelText(this.state.budget.label, this.state.lang),
-    //                 budgetAmt: this.state.budget.budgetAmt,
-    //                 startDate: this.state.budget.startDate,
-    //                 stopDate: this.state.budget.stopDate
-    //             }
-    //         })
-    //         .catch(
-    //             error => {
-    //                 switch (error.message) {
-    //                     case "Network Error":
-    //                         this.setState({
-    //                             message: error.message
-    //                         })
-    //                         break
-    //                     default:
-    //                         this.setState({
-    //                             message: error.message
-    //                         })
-    //                         break
-    //                 }
-    //             }
-    //         );
+    componentDidMount() {
 
+        AuthenticationService.setupAxiosInterceptors();
+        BudgetService.getBudgetDataById(this.props.match.params.budgetId)
+            .then(response => {
+                this.setState({
+                    budget: response.data
+                });
 
-    // }
+            })
+            .catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                    }
+                }
+            );
+    }
+
     Capitalize(str) {
-        let { budget } = this.state
-        budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        if (str != null && str != "") {
+            let { budget } = this.state
+            budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
     }
     currentDate() {
         var todaysDate = new Date();
@@ -171,16 +188,21 @@ class EditBudgetComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    budgetName: getLabelText(this.state.budget.label, this.state.lang),
+                                    budgetAmt: this.state.budget.budgetAmt,
+                                    startDate: this.state.budget.startDate,
+                                    stopDate: this.state.budget.stopDate
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -280,7 +302,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly
-                                                            value={getLabelText(this.state.budget.subFundingSource.label,this.state.lang)}
+                                                            value={getLabelText(this.state.budget.subFundingSource.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                         {/* </InputGroupAddon> */}

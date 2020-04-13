@@ -11,11 +11,15 @@ class UnitService {
     getUnitListAll() {
         return axios.get(`${API_URL}/api/unit/`, {
         });
-    } 
+    }
 
     updateUnit(json) {
         return axios.put(`${API_URL}/api/unit/`, json, {
         });
+    }
+    getUnitById(json) {
+        return axios.get(`${API_URL}/api/unit/${json}`, {}
+        );
     }
 }
 

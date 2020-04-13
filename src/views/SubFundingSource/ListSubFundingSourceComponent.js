@@ -46,8 +46,8 @@ class ListSubFundingSourceComponent extends Component {
     }
     editSubFundingSource(subFundingSource) {
         this.props.history.push({
-            pathname: "/subFundingSource/editSubFundingSource",
-            state: { subFundingSource }
+            pathname: `/subFundingSource/editSubFundingSource/${subFundingSource.subFundingSourceId}`,
+            // state: { subFundingSource }
         });
     }
 

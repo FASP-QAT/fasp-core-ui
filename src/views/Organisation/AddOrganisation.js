@@ -384,6 +384,7 @@ export default class AddOrganisationComponent extends Component {
                                                             invalid={touched.organisationName && !!errors.organisationName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.organisation.label.label_en}
                                                             id="organisationName" />
                                                         <FormFeedback className="red">{errors.organisationName}</FormFeedback>
                                                     </FormGroup>

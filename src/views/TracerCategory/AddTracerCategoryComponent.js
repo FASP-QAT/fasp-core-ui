@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormFeedback, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormFeedback, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -23,7 +23,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         realmId: Yup.string()
             .required(i18n.t('static.common.realmtext')),
-       tracerCategoryName: Yup.string()
+        tracerCategoryName: Yup.string()
             .required(i18n.t('static.tracerCategory.tracercategorytext'))
     })
 }
@@ -56,9 +56,18 @@ class AddTracerCategoryComponent extends Component {
             realms: [],
             tracerCategory: {
                 realm: {
+                    label: {
+                        label_en: '',
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    }
                 },
                 label: {
-
+                    label_en: '',
+                    label_fr: '',
+                    label_sp: '',
+                    label_pr: ''
                 }
             },
             message: '',
@@ -83,11 +92,11 @@ class AddTracerCategoryComponent extends Component {
         if (event.target.name == "realmId") {
             tracerCategory.realm.realmId = event.target.value;
         }
-       
+
         if (event.target.name == "tracerCategoryName") {
             tracerCategory.label.label_en = event.target.value;
         }
-       
+
 
 
         this.setState({
@@ -169,13 +178,13 @@ class AddTracerCategoryComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -185,7 +194,7 @@ class AddTracerCategoryComponent extends Component {
                                     TracerCategoryService.addTracerCategory(this.state.tracerCategory)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/tracerCategory/listTracerCategory/`+ i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/tracerCategory/listTracerCategory/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -231,44 +240,44 @@ class AddTracerCategoryComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
-                                                            {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                            <Input
-                                                                type="select"
-                                                                bsSize="sm"
-                                                                name="realmId"
-                                                                id="realmId"
-                                                                valid={!errors.realmId}
-                                                                invalid={touched.realmId && !!errors.realmId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {realmList}
-                                                            </Input>
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                        <Input
+                                                            type="select"
+                                                            bsSize="sm"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            valid={!errors.realmId}
+                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {realmList}
+                                                        </Input>
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
-                                                            {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
-                                                            <Input type="text"
-                                                                bsSize="sm"
-                                                                name="tracerCategoryName"
-                                                                id="tracerCategoryName"
-                                                                valid={!errors.tracerCategoryName}
-                                                                invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.Capitalize(this.state.tracerCategory.label.label_en)}
-                                                            />
+                                                        {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            bsSize="sm"
+                                                            name="tracerCategoryName"
+                                                            id="tracerCategoryName"
+                                                            valid={!errors.tracerCategoryName}
+                                                            invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.Capitalize(this.state.tracerCategory.label.label_en)}
+                                                        />
                                                         {/* </InputGroupAddon> */}
-                                                         <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.tracerCategoryName}</FormFeedback>
                                                     </FormGroup>
-                                                   
-                                                    </CardBody>
+
+                                                </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
@@ -288,7 +297,7 @@ class AddTracerCategoryComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/tracerCategory/listTracerCategory/`+ i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/tracerCategory/listTracerCategory/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

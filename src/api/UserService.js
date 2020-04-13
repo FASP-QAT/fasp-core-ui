@@ -69,6 +69,10 @@ class UserService {
         return axios.put(`${API_URL}/api/accessControls/`, json, {
         });
     }
+    getRoleById(json) {
+        return axios.get(`${API_URL}/api/role/${json}`, {}
+        );
+    }
 }
 
 export default new UserService()

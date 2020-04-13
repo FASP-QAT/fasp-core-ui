@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -17,12 +17,12 @@ const initialValues = {
     phoneNumber: "",
     languageId: []
 }
-const entityname=i18n.t('static.user.user')
+const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
         username: Yup.string()
             .min(6, i18n.t('static.user.valid6char'))
-            .max(30,i18n.t('static.user.validpasswordlength'))
+            .max(30, i18n.t('static.user.validpasswordlength'))
             .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
@@ -253,12 +253,12 @@ class EditUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={{
@@ -472,7 +472,7 @@ class EditUserComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/` + i18n.t("static.message.cancelled",{entityname}))
+        this.props.history.push(`/user/listUser/` + i18n.t("static.message.cancelled", { entityname }))
     }
 }
 

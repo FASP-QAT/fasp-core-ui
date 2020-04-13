@@ -64,8 +64,8 @@ export default class CountryListComponent extends Component {
     editCountry(country) {
         console.log(country);
         this.props.history.push({
-            pathname: "/country/editCountry",
-            state: { country: country }
+            pathname: `/country/editCountry/${country.countryId}`,
+            // state: { country: country }
         });
 
     }
