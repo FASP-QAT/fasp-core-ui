@@ -477,5 +477,8 @@
     "static.procurementAgentPlanningUnit.unitPerContainer": "Unit per container",
     "static.procurementAgentPlanningUnit.unitPerContainerText": "Enter unit per container",
     "static.planningunit.forecastingunit": "Forecasting Unit",
-    "static.dataSource.program": "Program"
+    "static.dataSource.program": "Program",
+    "static.dashboad.planningunitcapacity":"Planning Unit Capacity",
+    "static.planningunit.capacity":"Capacity"
 }
+
