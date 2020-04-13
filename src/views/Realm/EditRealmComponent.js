@@ -22,9 +22,9 @@ let initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         realmCode: Yup.string()
-            .required(i18n.t('static.realm.realmCodeText')).max(6, i18n.t('static.realm.realmCodeLength')),
+            .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
-            .required(i18n.t('static.realm.realmNameText')),
+            .required(i18n.t('static.realm.realmCodeText')),
         monthInPastForAmc: Yup.number()
             .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
         monthInFutureForAmc: Yup.number()
@@ -61,26 +61,21 @@ export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // realm: this.props.location.state.realm,
-            realm: {
-                realmCode: '',
-                label: {
-                    label_en: '',
-                    label_sp: '',
-                    label_pr: '',
-                    label_fr: ''
-                },
-                monthInPastForAmc: '',
-                monthInFutureForAmc: '',
-                orderFrequency: '',
-                defaultRealm: ''
-            },
+            realm: this.props.location.state.realm,
             lang: localStorage.getItem('lang'),
             message: ''
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        initialValues = {
+            realmCode: this.state.realm.realmCode,
+            label: getLabelText(this.state.realm.label, this.state.lang),
+            monthInPastForAmc: this.state.realm.monthInPastForAmc,
+            monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
+            orderFrequency: this.state.realm.orderFrequency,
+            defaultRealm: this.state.realm.defaultRealm,
+        }
 
     }
 
@@ -139,33 +134,6 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount(str) {
-        AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmById(this.props.match.params.realmId).then(response => {
-            this.setState({
-                realm: response.data
-            });
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
 
     }
 
@@ -190,14 +158,7 @@ export default class UpdateDataSourceComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{
-                                    realmCode: this.state.realm.realmCode,
-                                    label: getLabelText(this.state.realm.label, this.state.lang),
-                                    monthInPastForAmc: this.state.realm.monthInPastForAmc,
-                                    monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
-                                    orderFrequency: this.state.realm.orderFrequency,
-                                    defaultRealm: this.state.realm.defaultRealm,
-                                }}
+                                initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();

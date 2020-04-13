@@ -100,7 +100,7 @@ class EditUserComponent extends Component {
         if (event.target.name == "active") {
             user.active = event.target.id === "active2" ? false : true;
         }
-        
+
         this.setState({
             user
         },
@@ -165,12 +165,14 @@ class EditUserComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                this.setState({
-                    realms: response.data
-                }) } else {
+                    this.setState({
+                        realms: response.data
+                    })
+                } else {
                     this.setState({
                         message: response.data.messageCode
-                    })}
+                    })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -268,7 +270,7 @@ class EditUserComponent extends Component {
                                     phoneNumber: this.state.user.phoneNumber,
                                     roles: this.state.user.roles,
                                     languageId: this.state.user.language.languageId,
-                                    roleId:this.state.user.roles
+                                    roleId: this.state.user.roles
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -276,7 +278,7 @@ class EditUserComponent extends Component {
                                     UserService.editUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode

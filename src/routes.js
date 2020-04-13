@@ -173,7 +173,7 @@ const routes = [
 
   { path: '/realm/addrealm', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realm') }), component: AddRealm },
   { path: '/realm/realmlist', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.realm') }), component: RealmList },
-  { path: '/realm/updaterealm/:realmId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.realm') }), component: EditRealm },
+  { path: '/realm/updaterealm', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.realm') }), component: EditRealm },
   { path: '/realm/realmlist/:message', component: RealmList },
 
   { path: '/product/editProduct/:productId', name: i18n.t('static.product.productedit'), component: EditProdct },
@@ -192,7 +192,7 @@ const routes = [
   { path: '/budget/addBudget', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.budget') }), component: AddBudgetComponent },
   { path: '/budget/listBudget', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.budget') }), component: ListBudgetComponent },
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
-  { path: '/budget/editBudget/:budgetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.budget') }), component: EditBudgetComponent },
+  { path: '/budget/editBudget', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.budget') }), component: EditBudgetComponent },
 
   { path: '/', exact: true, name: 'Home' },
 
