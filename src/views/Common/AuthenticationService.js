@@ -108,33 +108,29 @@ class AuthenticationService {
     //         })
     // }
 
-    clearAxiosInterceptors() {
-        axios.interceptors.request.use = null;
-    }
+    
 
     setupAxiosInterceptors() {
+        // axios.defaults.headers.common['Authorization'] = '';
+        // delete axios.defaults.headers.common['Authorization'];
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---", decryptedCurUser);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        console.log("decryptedToken---", decryptedToken);
+        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let basicAuthHeader = 'Bearer ' + decryptedToken
-        console.log("basicAuthHeader---", basicAuthHeader);
-        axios.interceptors.request.use(
-            (config) => {
-                config.headers.authorization = basicAuthHeader
-                return config;
-            }
-        )
+        axios.defaults.headers.common['Authorization'] = basicAuthHeader;
+        // axios.interceptors.request.use(
+        //     (config) => {
+        //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
+        //         return config;
+        //     }
+        // )
 
 
-        // Add a response interceptor
-        axios.interceptors.response.use(function (response) {
-            console.log("interceptor response---", response);
-            return response;
-        }, function (error) {
-            console.log("interceptor error---", error);
-            return Promise.reject(error);
-        });
+        // // Add a response interceptor
+        // axios.interceptors.response.use(function (response) {
+        //     return response;
+        // }, function (error) {
+        //     return Promise.reject(error);
+        // });
 
     }
 
