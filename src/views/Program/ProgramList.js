@@ -155,16 +155,16 @@ export default class ProgramList extends Component {
     event.stopPropagation();
     AuthenticationService.setupAxiosInterceptors();
     console.log("cell------", cell);
-    ProgramService.getProgramProductListByProgramId(cell)
+    ProgramService.getProgramPlaningUnitListByProgramId(cell)
       .then(response => {
-
+        console.log("response------->", response)
         if (response.status == 200) {
           let myReasponse = response.data;
           console.log("myResponce=========", response.data);
           this.props.history.push({
             pathname: "/programProduct/addProgramProduct",
             state: {
-              programProduct: myReasponse
+              programPlanningUnit: myReasponse
             }
 
           })
@@ -250,15 +250,15 @@ export default class ProgramList extends Component {
         headerAlign: 'center',
         formatter: this.formatLabel
       }
-      // ,
-      // {
-      //   dataField: 'programId',
-      //   text: 'Map Product To Program',
-      //   sort: true,
-      //   align: 'center',
-      //   headerAlign: 'center',
-      //   formatter: this.buttonFormatter
-      // }
+      ,
+      {
+        dataField: 'programId',
+        text: 'Map Product To Program',
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.buttonFormatter
+      }
     ];
     const options = {
       hidePageListOnlyOnePage: true,

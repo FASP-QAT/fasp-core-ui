@@ -8,6 +8,11 @@ class ProcurementUnitService {
         });
     }
 
+    getProcurementUnitListActive() {
+        return axios.get(`${API_URL}/api/procurementUnit/`, {
+        });
+    }
+
     addProcurementUnit(json) {
         return axios.post(`${API_URL}/api/procurementUnit/`, json, {}
         );
