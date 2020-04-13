@@ -16,6 +16,10 @@ class ProcurementAgentService {
         return axios.put(`${API_URL}/api/procurementAgent/`, json, {
         });
     }
+    getProcurementAgentById(json) {
+        return axios.get(`${API_URL}/api/procurementAgent/${json}`, {}
+        );
+    }
 
 }
 

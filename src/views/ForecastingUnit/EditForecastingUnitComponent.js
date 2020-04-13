@@ -53,7 +53,6 @@ export default class EditForecastingUnitComponent extends Component {
             forecastingUnit:
             {
                 active: '',
-
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -101,11 +100,7 @@ export default class EditForecastingUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        initialValues = {
-            message: '',
-            label: this.props.location.state.forecastingUnit.label.label_en,
-            genericLabel: this.props.location.state.forecastingUnit.genericLabel.label_en
-        }
+
     }
 
     dataChange(event) {
@@ -165,15 +160,38 @@ export default class EditForecastingUnitComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+            this.setState({
+                forecastingUnit: response.data
+            });
 
-        this.setState({
-            forecastingUnit: this.props.location.state.forecastingUnit
-        });
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
     }
 
     Capitalize(str) {
         if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+            let { forecastingUnit } = this.state
+            forecastingUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
         } else {
             return "";
         }
@@ -190,7 +208,12 @@ export default class EditForecastingUnitComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    message: '',
+                                    label: this.state.forecastingUnit.label.label_en,
+                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     ForecastingUnitService.editForecastingUnit(this.state.forecastingUnit)
@@ -285,9 +308,9 @@ export default class EditForecastingUnitComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }} //this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.forecastingUnit.label.label_en)}
+                                                            value={this.state.forecastingUnit.label.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>

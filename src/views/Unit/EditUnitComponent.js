@@ -12,11 +12,11 @@ import '../Forms/ValidationForms/ValidationForms.css';
 let initialValues = {
     unit: ""
 }
-const entityname=i18n.t('static.unit.unit');
+const entityname = i18n.t('static.unit.unit');
 const validationSchema = function (values) {
     return Yup.object().shape({
 
-        unit: Yup.string()
+        unitName: Yup.string()
             .required(i18n.t('static.unit.unittext')),
         unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
 
@@ -49,31 +49,40 @@ export default class EditUnitComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            unit: this.props.location.state.unit,
+            // unit: this.props.location.state.unit,
+            unit: {
+                dimension: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    },
+                },
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                },
+                // unitName: '',
+                unitCode: ''
+            },
             message: ''
         }
 
-        // this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
-    Capitalize(str) {
-        console.log("capitalize");
-        if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
-        }
-    }
 
     dataChange(event) {
         let { unit } = this.state
-        if (event.target.name === "unitName") {
-            unit.unitName = event.target.value
-        } else if (event.target.name === "unitCode") {
+        if (event.target.name == "unitName") {
+            unit.label.label_en = event.target.value
+        } if (event.target.name == "unitCode") {
             unit.unitCode = event.target.value
-        } else if (event.target.name === "active") {
+        } else if (event.target.name == "active") {
             unit.active = event.target.id === "active2" ? false : true
         }
 
@@ -108,13 +117,42 @@ export default class EditUnitComponent extends Component {
         }
     }
     componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        UnitService.getUnitById(this.props.match.params.unitId).then(response => {
+            this.setState({
+                unit: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
 
     }
 
-    // Capitalize(str) {
-    //     let { unit } = this.state
-    //     unit.unitName = str.charAt(0).toUpperCase() + str.slice(1)
-    // }
+    Capitalize(str) {
+        if (str != null && str != "") {
+            let { unit } = this.state
+            unit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
+        }
+    }
 
     render() {
         return (
@@ -123,18 +161,22 @@ export default class EditUnitComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ unit: this.state.unit,unitName:this.state.unit.unitName,unitCode:this.state.unit.unitCode }}
+                                initialValues={{
+                                    // unit: this.state.unit,
+                                    unitName: this.state.unit.label.label_en,
+                                    unitCode: this.state.unit.unitCode
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
                                     UnitService.updateUnit(this.state.unit).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {
-                                            this.props.history.push(`/unit/listUnit/`+i18n.t(response.data.messageCode,{entityname}))
+                                            this.props.history.push(`/unit/listUnit/` + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
@@ -179,28 +221,28 @@ export default class EditUnitComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='unitForm'>
                                                 <CardBody>
-                                                <FormGroup>
+                                                    <FormGroup>
                                                         <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
-                                                            {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                            <Input
-                                                                type="text"
-                                                                bsSize="sm"
-                                                                name="dimensionId"
-                                                                id="dimensionId"
-                                                                valid={!errors.dimensionId}
-                                                                invalid={touched.dimensionId && !!errors.dimensionId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                readOnly={true}
-                                                                value={getLabelText(this.state.unit.dimension.label,this.state.lang)}
-                                                                >
-                                                               
-                                                            </Input>
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                        <Input
+                                                            type="text"
+                                                            bsSize="sm"
+                                                            name="dimensionId"
+                                                            id="dimensionId"
+                                                            valid={!errors.dimensionId}
+                                                            invalid={touched.dimensionId && !!errors.dimensionId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            readOnly={true}
+                                                            value={getLabelText(this.state.unit.dimension.label, this.state.lang)}
+                                                        >
+
+                                                        </Input>
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
                                                     </FormGroup>
-                                                  
+
                                                     <FormGroup>
                                                         <Label for="unitName">{i18n.t('static.unit.unit')}</Label>
                                                         <Input type="text"
@@ -209,15 +251,15 @@ export default class EditUnitComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.unitName}
                                                             invalid={touched.unitName && !!errors.unitName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(getLabelText(this.state.unit.label,this.state.lang))}
+                                                            value={this.state.unit.label.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.unitName}</FormFeedback>
                                                     </FormGroup>
-                                                <FormGroup>
+                                                    <FormGroup>
                                                         <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
-                                                         <Input type="text"
+                                                        <Input type="text"
                                                             name="unitCode"
                                                             id="unitCode"
                                                             bsSize="sm"
@@ -227,8 +269,8 @@ export default class EditUnitComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.unit.unitCode}
-                                                             />
-                                                              <FormFeedback className="red">{errors.unitCode}</FormFeedback>
+                                                        />
+                                                        <FormFeedback className="red">{errors.unitCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
@@ -268,7 +310,7 @@ export default class EditUnitComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -280,14 +322,14 @@ export default class EditUnitComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-        <h6>{i18n.t(this.state.message)}</h6>
-       <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/unit/listUnit/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/unit/listUnit/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }

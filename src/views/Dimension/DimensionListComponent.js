@@ -74,8 +74,8 @@ export default class DimensionListComponent extends Component {
 
     editDimension(dimension) {
         this.props.history.push({
-            pathname: "/diamension/editDiamension",
-            state: { dimension: dimension }
+            pathname: `/diamension/editDiamension/${dimension.dimensionId}`,
+            // state: { dimension: dimension }
         });
     }
 

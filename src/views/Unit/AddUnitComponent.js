@@ -15,13 +15,13 @@ import '../Forms/ValidationForms/ValidationForms.css';
 const initialValues = {
     unitName: "",
     unitCode: "",
-    dimensionId:[]
+    dimensionId: []
 }
 const entityname = i18n.t('static.unit.unit');
 const validationSchema = function (values) {
     return Yup.object().shape({
         dimensionId: Yup.string()
-        .required(i18n.t('static.unit.dimensiontext')),
+            .required(i18n.t('static.unit.dimensiontext')),
         unitName: Yup.string()
             .required(i18n.t('static.unit.unittext')),
         unitCode: Yup.string().required(i18n.t('static.unit.unitcodetext'))
@@ -55,16 +55,18 @@ class AddUnitComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            unit: { dimension: {
-            },
-            label: {
+            unit: {
+                dimension: {
+                },
+                label: {
 
-            }},
+                }
+            },
             message: '',
-            dimensions:[]
+            dimensions: []
         }
 
-         this.Capitalize = this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -122,35 +124,35 @@ class AddUnitComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll()
-        .then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    dimensions: response.data
-                })
-            } else {
-                this.setState({ message: response.data.messageCode })
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        dimensions: response.data
+                    })
                 } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
+                    this.setState({ message: response.data.messageCode })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
                     }
                 }
-            }
-        );
+            );
 
 
     }
@@ -227,28 +229,28 @@ class AddUnitComponent extends Component {
                                     }) => (
                                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
                                                 <CardBody>
-                                                <FormGroup>
+                                                    <FormGroup>
                                                         <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}</Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
-                                                            {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                            <Input
-                                                                type="select"
-                                                                bsSize="sm"
-                                                                name="dimensionId"
-                                                                id="dimensionId"
-                                                                valid={!errors.dimensionId}
-                                                                invalid={touched.dimensionId && !!errors.dimensionId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                            >
-                                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                                {dimensionList}
-                                                            </Input>
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                        <Input
+                                                            type="select"
+                                                            bsSize="sm"
+                                                            name="dimensionId"
+                                                            id="dimensionId"
+                                                            valid={!errors.dimensionId}
+                                                            invalid={touched.dimensionId && !!errors.dimensionId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                        >
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {dimensionList}
+                                                        </Input>
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.dimensionId}</FormFeedback>
                                                     </FormGroup>
-                                                  
+
                                                     <FormGroup>
                                                         <Label for="unitName">{i18n.t('static.unit.unit')}</Label>
                                                         <Input type="text"
@@ -260,7 +262,7 @@ class AddUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.Capitalize(this.state.unit.label.label_en)}
-                                                      
+
                                                             required />
                                                         <FormFeedback className="red">{errors.unitName}</FormFeedback>
                                                     </FormGroup>
@@ -293,8 +295,8 @@ class AddUnitComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-                    <h6>{i18n.t(this.state.message,{entityname})}</h6>
-                    <h6>{i18n.t(this.props.match.params.message,{entityname})}</h6>
+                    <h6>{i18n.t(this.state.message, { entityname })}</h6>
+                    <h6>{i18n.t(this.props.match.params.message, { entityname })}</h6>
                 </div>
             </div>
         );

@@ -110,8 +110,8 @@ export default class DataSourceTypeListComponent extends Component {
     editDataSourceType(dataSourceType) {
         console.log(dataSourceType)
         this.props.history.push({
-            pathname: "/dataSourceType/editDataSourceType",
-            state: { dataSourceType: dataSourceType }
+            pathname: `/dataSourceType/editDataSourceType/${dataSourceType.dataSourceTypeId}`,
+            // state: { dataSourceType: dataSourceType }
         });
 
     }

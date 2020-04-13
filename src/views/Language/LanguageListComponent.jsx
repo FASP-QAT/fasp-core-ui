@@ -44,8 +44,8 @@ export default class LanguageListComponent extends Component {
 
     editLanguage(language) {
         this.props.history.push({
-            pathname: "/language/editLanguage",
-            state: { language }
+            pathname: `/language/editLanguage/${language.languageId}`,
+            // state: { language }
         });
     }
 
