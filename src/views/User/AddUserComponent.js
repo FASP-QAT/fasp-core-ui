@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, FormFeedback,Input, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, FormFeedback, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -9,27 +9,28 @@ import RealmService from "../../api/RealmService";
 import LanguageService from "../../api/LanguageService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 const initialValues = {
     username: "",
     realmId: [],
     emailId: "",
     phoneNumber: "",
-    roles: [],
     languageId: []
-   
+
 }
-const entityname=i18n.t('static.user.user')
+const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
         username: Yup.string()
             .min(6, i18n.t('static.user.valid6char'))
-            .max(30,i18n.t('static.user.validpasswordlength'))
+            .max(30, i18n.t('static.user.validpasswordlength'))
             .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
-        roleId: Yup.string()
-            .required(i18n.t('static.user.validrole')),
+        // roleId: Yup.string()
+        //     .required(i18n.t('static.user.validrole')),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
@@ -71,19 +72,20 @@ class AddUserComponent extends Component {
             lang: localStorage.getItem('lang'),
             realms: [],
             languages: [],
-            roles: [],
             user: {
                 realm: {},
                 language: {
 
                 },
-                roles: [],
-                userAcls:[]
+                roleList: [],
+                roles: []
             },
+            roleId: '',
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.roleChange = this.roleChange.bind(this);
     }
 
     dataChange(event) {
@@ -97,9 +99,7 @@ class AddUserComponent extends Component {
         if (event.target.name == "phoneNumber") {
             user.phoneNumber = event.target.value;
         }
-        if (event.target.name == "roleId") {
-            user.roles = Array.from(event.target.selectedOptions, (item) => item.value);
-        }
+
         if (event.target.name == "realmId") {
             user.realm.realmId = event.target.value;
         }
@@ -112,13 +112,26 @@ class AddUserComponent extends Component {
             () => { });
     };
 
+    roleChange(roleId) {
+        let { user } = this.state;
+        this.setState({ roleId});
+        var roleIdArray = [];
+        for (var i = 0; i < roleId.length; i++) {
+            roleIdArray[i] = roleId[i].value;
+        }
+        user.roles = roleIdArray;
+        this.setState({
+            user
+        },
+            () => { });
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             username: true,
             realmId: true,
             emailId: true,
             phoneNumber: true,
-            roles: true,
             languageId: true
         }
         )
@@ -195,8 +208,12 @@ class AddUserComponent extends Component {
 
         UserService.getRoleList()
             .then(response => {
+                var roleList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
-                    roles: response.data
+                    roleList
                 })
             }).catch(
                 error => {
@@ -233,14 +250,14 @@ class AddUserComponent extends Component {
                     </option>
                 )
             }, this);
-        let roleList = roles.length > 0
-            && roles.map((item, i) => {
-                return (
-                    <option key={i} value={item.roleId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+        // let roleList = roles.length > 0
+        //     && roles.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.roleId}>
+        //                 {getLabelText(item.label, this.state.lang)}
+        //             </option>
+        //         )
+        //     }, this);
 
         let languageList = languages.length > 0
             && languages.map((item, i) => {
@@ -254,12 +271,12 @@ class AddUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -269,7 +286,7 @@ class AddUserComponent extends Component {
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -317,39 +334,39 @@ class AddUserComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         <Input
-                                                                type="select"
-                                                                name="realmId"
-                                                                id="realmId"
-                                                                bsSize="sm"
-                                                                valid={!errors.realmId}
-                                                                invalid={touched.realmId && !!errors.realmId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.state.user.realm.realmId}
-                                                            >
-                                                                <option value="0">{i18n.t('static.common.select')}</option>
-                                                                {realmList}
-                                                            </Input>
+                                                            type="select"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            valid={!errors.realmId}
+                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.user.realm.realmId}
+                                                        >
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {realmList}
+                                                        </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
-                                                         <Input type="text"
-                                                                name="username"
-                                                                id="username"
-                                                                bsSize="sm"
-                                                                valid={!errors.username}
-                                                                invalid={touched.username && !!errors.username}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                required
-                                                                value={this.state.user.username}
-                                                            /><FormFeedback className="red">{errors.username}</FormFeedback>
+                                                        <Input type="text"
+                                                            name="username"
+                                                            id="username"
+                                                            bsSize="sm"
+                                                            valid={!errors.username}
+                                                            invalid={touched.username && !!errors.username}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                            value={this.state.user.username}
+                                                        /><FormFeedback className="red">{errors.username}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
-                                                         <Input type="text"
+                                                        <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"
@@ -378,7 +395,19 @@ class AddUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
-                                                        <Input
+                                                        <Select
+                                                            valid={!errors.roleId}
+                                                            bsSize="sm"
+                                                            invalid={touched.roleId && !!errors.roleId}
+                                                            onChange={(e) => { handleChange(e); this.roleChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            name="roleId"
+                                                            id="roleId"
+                                                            multi
+                                                            options={this.state.roleList}
+                                                            value={this.state.roleId}
+                                                        />
+                                                        {/* <Input
                                                             type="select"
                                                             name="roleId"
                                                             id="roleId"
@@ -393,12 +422,12 @@ class AddUserComponent extends Component {
                                                         >
                                                             <option value="" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
-                                                        </Input>
+                                                        </Input> */}
                                                         <FormFeedback>{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
-                                                     <Input
+                                                        <Input
                                                             type="select"
                                                             name="languageId"
                                                             id="languageId"
@@ -413,7 +442,7 @@ class AddUserComponent extends Component {
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageList}
                                                         </Input>
-                                                         <FormFeedback>{errors.languageId}</FormFeedback>
+                                                        <FormFeedback>{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
@@ -433,8 +462,8 @@ class AddUserComponent extends Component {
         );
     }
     cancelClicked() {
-        
-        this.props.history.push(`/user/listUser/` + i18n.t('static.message.cancelled',{entityname}))
+
+        this.props.history.push(`/user/listUser/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 
