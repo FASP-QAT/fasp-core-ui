@@ -53,14 +53,7 @@ class EditRoleComponent extends Component {
             lang: localStorage.getItem('lang'),
             businessFunctions: [],
             roles: [],
-            // role: this.props.location.state.role,
-            role: {
-                businessFunctions: [],
-                canCreateRole: [],
-                label: {
-
-                }
-            },
+            role: this.props.location.state.role,
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -120,39 +113,6 @@ class EditRoleComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        UserService.getRoleById(this.props.match.params.roleId).then(response => {
-            this.setState({
-                role: response.data
-            });
-            initialValues = {
-                roleName: this.state.role.label.label_en,
-                businessFunctions: this.state.role.businessFunctions,
-                canCreateRole: this.state.role.canCreateRole
-            }
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
-
-
-
         UserService.getBusinessFunctionList()
             .then(response => {
                 this.setState({
@@ -238,13 +198,11 @@ class EditRoleComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                // initialValues={{
-                                //     roleName: this.state.role.label.label_en,
-                                //     businessFunctions: this.state.role.businessFunctions,
-                                //     canCreateRole: this.state.role.canCreateRole
-                                // }}
-                                enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    roleName: this.state.role.label.label_en,
+                                    businessFunctions: this.state.role.businessFunctions,
+                                    canCreateRole: this.state.role.canCreateRole
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     UserService.editRole(this.state.role)
