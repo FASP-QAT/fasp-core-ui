@@ -340,7 +340,6 @@ const routes = [
   { path: '/procurementUnit/editProcurementUnit/:procurementUnitId',  component: EditProcurementUnit },
   { path: '/planningUnit/editPlanningUnit/:planningUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
   { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
-
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') +" / "+i18n.t('static.dashboad.planningunitcapacity') , component: PlanningUnitCapacity },
 
 
