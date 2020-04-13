@@ -18,9 +18,22 @@ class PlanningUnitService {
     }
 
     editPlanningUnit(json) {
-        return axios.put(`${API_URL}/api/planningUnit/`,json,{}
-            );
-        }
-    
+        return axios.put(`${API_URL}/api/planningUnit/`, json, {}
+        );
+    }
+    getPlanningUnitCapacityForId(planningUnitId) {
+        return axios.get(`${API_URL}/api/planningUnit/${planningUnitId}/capacity/`, {}
+        );
+
+    }
+
+    getPlanningUnitForId(planningUnitId) {
+        return axios.get(`${API_URL}/api/planningUnit/${planningUnitId}`, {
+        });
+    }
+    editPlanningUnitCapacity(json){
+        return axios.put(`${API_URL}/api/planningUnit/capacity`, json, {}
+        );
+    }
 }
 export default new PlanningUnitService();

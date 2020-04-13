@@ -149,7 +149,7 @@ export default class DimensionListComponent extends Component {
                     </CardHeader>
                     <CardBody>
                         <ToolkitProvider
-                            keyField="dataSourceTypeId"
+                            keyField="dimensionId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}

@@ -163,6 +163,7 @@ const EditForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/Edi
 const AddPlanningUnit = React.lazy(() => import('./views/PlanningUnit/AddPlanningUnit'));
 const PlanningUnitList = React.lazy(() => import('./views/PlanningUnit/PlanningUnitListComponent'));
 const EditPlanningUnit = React.lazy(() => import('./views/PlanningUnit/EditPlanningUnitComponent'));
+const PlanningUnitCapacity = React.lazy(() => import('./views/PlanningUnitCapacity/PlanningUnitCapacity'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -320,6 +321,7 @@ const routes = [
   { path: '/planningUnit/listPlanningUnit/:message', component: PlanningUnitList },
   { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
 
+  { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') +" / "+i18n.t('static.dashboad.planningunitcapacity') , component: PlanningUnitCapacity },
 
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

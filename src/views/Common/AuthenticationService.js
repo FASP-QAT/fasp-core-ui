@@ -112,9 +112,9 @@ class AuthenticationService {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         console.log("decryptedCurUser---", decryptedCurUser);
         let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        console.log("decryptedToken---", decryptedToken);
+        //console.log("decryptedToken---", decryptedToken);
         let basicAuthHeader = 'Bearer ' + decryptedToken
-        console.log("basicAuthHeader---", basicAuthHeader);
+       // console.log("basicAuthHeader---", basicAuthHeader);
         // axios.interceptors.request.use(
         //     (config) => {
         //         config.headers.authorization = basicAuthHeader
@@ -123,12 +123,10 @@ class AuthenticationService {
         // )
 
         axios.interceptors.request.use(function (config) {
-            console.log("response config---", config);
             config.headers.authorization = basicAuthHeader
             return config;
         }, function (error) {
             // Do something with request error
-            console.log("response config error---",error);
             return Promise.reject(error);
         });
 
@@ -136,12 +134,12 @@ class AuthenticationService {
         axios.interceptors.response.use(function (response) {
             // Any status code that lie within the range of 2xx cause this function to trigger
             // Do something with response data
-            console.log("interceptor response---", response);
+           // console.log("interceptor response---", response);
             return response;
         }, function (error) {
             // Any status codes that falls outside the range of 2xx cause this function to trigger
             // Do something with response error
-            console.log("interceptor error---", error);
+            //console.log("interceptor error---", error);
             return Promise.reject(error);
         });
 

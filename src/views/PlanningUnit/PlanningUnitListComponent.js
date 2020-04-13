@@ -4,8 +4,8 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
-import PlanningUnitService from '../../api/PlanningUnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import PlanningUnitService from '../../api/PlanningUnitService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -42,7 +42,17 @@ export default class PlanningUnitListComponent extends Component {
             });
         }
     }
+   
+    PlanningUnitCapacity(event, row) {
+        event.stopPropagation();
+        console.log(JSON.stringify(row))
+        this.props.history.push({
+            pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
+            state: { planningUnit: row }
+           
 
+        })
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ForecastingUnitService.getForecastingUnitList().then(response => {
@@ -180,6 +190,15 @@ export default class PlanningUnitListComponent extends Component {
                 return (
                     (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
+            }
+        }, {
+            dataField: 'planningUnitId',
+            text: 'Action',
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
+                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>Planning unit capacity</Button>
+                )
             }
         }];
         const options = {
