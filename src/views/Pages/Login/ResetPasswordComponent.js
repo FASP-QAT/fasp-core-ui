@@ -125,9 +125,15 @@ class ResetPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <Container>
+                <div className="Login-component">
+                <Container  className="container-login">
                     <Row className="justify-content-center">
-                        <Col md="9" lg="7" xl="6">
+                    <Col md="12">
+                        <div className="upper-logo mt-1">
+                         <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                      </div>
+                    </Col>
+                        <Col md="9" lg="7" xl="6" className="mt-4">
                             <h5 className="mx-4">{this.state.message}</h5>
                             <Card className="mx-4">
                                 <CardHeader>
@@ -144,14 +150,20 @@ class ResetPasswordComponent extends Component {
                                         if (navigator.onLine) {
                                             UserService.updatePassword(this.state.username, this.state.token, values.newPassword)
                                                 .then(response => {
-                                                    this.props.history.push(`/login`)
+                                                    if (response.status == 200) {
+                                                        this.props.history.push(`/login/static.message.user.passwordSuccess`)
+                                                    } else {
+                                                        this.setState({
+                                                            message: response.data.message
+                                                        })
+                                                    }
                                                 })
                                                 .catch(
                                                     error => {
                                                         if (error.message === "Network Error") {
                                                             this.setState({ message: error.message });
                                                         } else {
-                                                            switch (error.response.status) {
+                                                            switch (error.response ? error.response.status : "") {
                                                                 case 500:
                                                                 case 401:
                                                                 case 404:
@@ -236,6 +248,7 @@ class ResetPasswordComponent extends Component {
                             </Col>
                     </Row>
                 </Container>
+                </div>
             </div>
         );
     }

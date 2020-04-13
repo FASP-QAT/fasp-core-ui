@@ -253,12 +253,12 @@ class AddBudgetComponent extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -375,7 +375,6 @@ class AddBudgetComponent extends Component {
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input
-                                                            
                                                             type="number"
                                                             min="0"
                                                             name="budgetAmt"
@@ -431,7 +430,7 @@ class AddBudgetComponent extends Component {
                                                             min={this.state.budget.startDate}
                                                             placeholder={i18n.t('static.budget.budgetstopdate')}
                                                             required />
-                                                             {/* </InputGroupAddon> */}
+                                                        {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.stopDate}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>

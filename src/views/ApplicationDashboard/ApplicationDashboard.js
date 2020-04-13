@@ -28,6 +28,7 @@ import {
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
+import i18n from '../../i18n'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -182,11 +183,12 @@ class ApplicationDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
+        <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <Row>
           <Col md="9">
           <Card>
             <CardHeader className="text-center">
-              <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">98</span></b>
+              <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
               <div className="card-header-actions">
               <a className="card-header-action">
                   {/* <small className="text-muted">98</small> */}

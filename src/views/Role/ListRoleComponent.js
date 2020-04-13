@@ -30,8 +30,8 @@ class ListRoleComponent extends Component {
     }
     editRole(role) {
         this.props.history.push({
-            pathname: `/role/editRole/${role.roleId}`,
-            // state: { role }
+            pathname: "/role/editRole",
+            state: { role }
         });
     }
 

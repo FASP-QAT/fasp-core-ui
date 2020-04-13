@@ -224,7 +224,7 @@ export default class DataSourceTypeListComponent extends Component {
                                             id="realmId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
                                         <InputGroupAddon addonType="append">

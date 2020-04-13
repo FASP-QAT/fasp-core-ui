@@ -8,8 +8,14 @@ class ForecastingUnitService {
         );
     }
 
+
     getForecastingUnitList() {
         return axios.get(`${API_URL}/api/forecastingUnit/`, {
+        });
+    }
+
+    getForecastingUnitListAll() {
+        return axios.get(`${API_URL}/api/forecastingUnit/all/`, {
         });
     }
 
