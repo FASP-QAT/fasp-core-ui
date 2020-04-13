@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 let initialValues = {
     supplier: ""
 }
-const entityname=i18n.t('static.supplier.supplier');
+const entityname = i18n.t('static.supplier.supplier');
 const validationSchema = function (values) {
     return Yup.object().shape({
         supplier: Yup.string()
@@ -44,7 +44,23 @@ class EditSupplierComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            supplier: this.props.location.state.supplier,
+            // supplier: this.props.location.state.supplier,
+            supplier: {
+                realm: {
+                    label: {
+                        label_en: '',
+                        label_fr: '',
+                        label_sp: '',
+                        label_pr: ''
+                    }
+                },
+                label: {
+                    label_en: '',
+                    label_fr: '',
+                    label_sp: '',
+                    label_pr: ''
+                }
+            },
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -53,7 +69,8 @@ class EditSupplierComponent extends Component {
     }
     Capitalize(str) {
         if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+            let { supplier } = this.state;
+            supplier.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
         } else {
             return "";
         }
@@ -93,7 +110,35 @@ class EditSupplierComponent extends Component {
             }
         }
     }
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
+            this.setState({
+                supplier: response.data
+            });
 
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+    }
     render() {
         return (
             <div className="animated fadeIn">
@@ -101,7 +146,7 @@ class EditSupplierComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -112,7 +157,7 @@ class EditSupplierComponent extends Component {
                                     SupplierService.updateSupplier(this.state.supplier)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/supplier/listSupplier/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/supplier/listSupplier/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -156,29 +201,29 @@ class EditSupplierComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
-                                                         <Input
-                                                                type="text"
-                                                                name="realmId"
-                                                                id="realmId"
-                                                                bsSize="sm"
-                                                                readOnly
-                                                                value={this.state.supplier.realm.label.label_en}
-                                                            >
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                        <Input
+                                                            type="text"
+                                                            name="realmId"
+                                                            id="realmId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.supplier.realm.label.label_en}
+                                                        >
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
-                                                            <Input type="text"
-                                                                name="supplier"
-                                                                id="supplier"
-                                                                bsSize="sm"
-                                                                valid={!errors.supplier}
-                                                                invalid={touched.supplier && !!errors.supplier}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.Capitalize(this.state.supplier.label.label_en)}
-                                                                required />
+                                                        <Input type="text"
+                                                            name="supplier"
+                                                            id="supplier"
+                                                            bsSize="sm"
+                                                            valid={!errors.supplier}
+                                                            invalid={touched.supplier && !!errors.supplier}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.supplier.label.label_en}
+                                                            required />
                                                         <FormFeedback className="red">{errors.supplier}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -232,14 +277,14 @@ class EditSupplierComponent extends Component {
                     </Col>
                 </Row>
                 <div>
-        <h6>{i18n.t(this.state.message)}</h6>
-       <h6>{i18n.t(this.props.match.params.message)}</h6>
-        </div>
+                    <h6>{i18n.t(this.state.message)}</h6>
+                    <h6>{i18n.t(this.props.match.params.message)}</h6>
+                </div>
             </div>
         );
     }
     cancelClicked() {
-        this.props.history.push(`/supplier/listSupplier/` +i18n.t('static.message.cancelled',{entityname}))
+        this.props.history.push(`/supplier/listSupplier/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

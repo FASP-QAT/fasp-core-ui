@@ -48,8 +48,8 @@ export default class UnitListComponent extends Component {
 
     editUnit(unit) {
         this.props.history.push({
-            pathname: "/unit/editUnit",
-            state: { unit }
+            pathname: `/unit/editUnit/${unit.unitId}`,
+            // state: { unit }
         });
     }
 
