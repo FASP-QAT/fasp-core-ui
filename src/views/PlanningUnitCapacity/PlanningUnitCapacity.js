@@ -88,6 +88,7 @@ class PlanningUnitCapacity extends Component {
         this.submitForm = this.submitForm.bind(this);
         this.handleEnableSpecificRow = this.handleEnableSpecificRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
     }
     currentDate() {
         var todaysDate = new Date();
@@ -183,6 +184,9 @@ class PlanningUnitCapacity extends Component {
      /*  rows[this.state.rows.length - 1].active=false
        var row=   rows.slice(-1).pop();
        rows.push(row);*/
+       rows[this.state.rows.length - 1].active=false
+       var row=   rows.slice(-1).pop();
+       rows.push(row);
         this.setState({
             rows
         });
@@ -245,7 +249,7 @@ class PlanningUnitCapacity extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
+        PlanningUnitService.getPlanningUnitForId(this.props.match.params.planningUnitId).then(response => {
             console.log(response.data);
             this.setState({
                 planningUnit: response.data,
@@ -486,6 +490,7 @@ class PlanningUnitCapacity extends Component {
                                         <th className="text-left">{i18n.t('static.planningunit.capacity')}</th>
                                         <th className="text-left">{i18n.t('static.common.status')}</th>
                                         <th className="text-left">{i18n.t('static.common.action')}</th>
+                                        <th className="text-left">{i18n.t('static.common.remove')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -515,7 +520,6 @@ class PlanningUnitCapacity extends Component {
                                                {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={()=>{this.handleEnableSpecificRow(idx)}}><i className="fa fa-check"></i>Activate</Button>}
                                                 </td>
                                             </tr>)
-                                        
                                     }
                                 </tbody>
 
@@ -538,7 +542,6 @@ class PlanningUnitCapacity extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
- 
     }
 }
 

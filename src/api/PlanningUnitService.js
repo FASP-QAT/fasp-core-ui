@@ -29,6 +29,10 @@ class PlanningUnitService {
     getPlanningUnitCapacityForId(planningUnitId) {
         return axios.get(`${API_URL}/api/planningUnit/${planningUnitId}/capacity/`, {}
         );
+<<<<<<< HEAD
+=======
+
+>>>>>>> planning unit capacity
     }
 
     editPlanningUnitCapacity(json){

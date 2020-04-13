@@ -478,6 +478,16 @@
     "static.procurementAgentPlanningUnit.unitPerContainerText": "Enter unit per container",
     "static.planningunit.forecastingunit": "Forecasting Unit",
     "static.dataSource.program": "Program",
+    "static.procurementAgentProcurementUnit.mapProcurementUnit":"Map procurement unit",
+    "static.procurementAgentProcurementUnit.skuCode":"SKU code",
+    "static.procurementAgentProcurementUnit.skuCodeText":"Enter SKU code",
+    "static.procurementAgentProcurementUnit.vendorPrice":"Vendor price",
+    "static.procurementAgentProcurementUnit.vendorPriceText":"Enter vendor price",
+    "static.procurementAgentProcurementUnit.approvedToShippedLeadTime":"Approved to shipped lead time",
+    "static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText":"Enter approved to shipped lead time",
+    "static.procurementAgentProcurementUnit.gtin":"GTIN",
+    "static.procurementAgentProcurementUnit.gtinText":"Enter GTIN",
+    "static.dashboard.procurementAgentProcurementUnit":"Procurement agent procurement unit",
     "static.dashboad.planningunitcapacity":"Planning Unit Capacity",
     "static.planningunit.capacity":"Capacity"
 }
