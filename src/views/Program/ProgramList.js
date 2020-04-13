@@ -152,6 +152,7 @@ export default class ProgramList extends Component {
   }
   addProductMapping(event, cell) {
     // console.log(cell);
+
     event.stopPropagation();
     AuthenticationService.setupAxiosInterceptors();
     console.log("cell------", cell);
@@ -164,7 +165,8 @@ export default class ProgramList extends Component {
           this.props.history.push({
             pathname: "/programProduct/addProgramProduct",
             state: {
-              programPlanningUnit: myReasponse
+              programPlanningUnit: myReasponse,
+              programId: cell
             }
 
           })

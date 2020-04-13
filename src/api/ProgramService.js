@@ -50,7 +50,7 @@ class ProgramService {
         );
     }
     getProgramPlaningUnitListByProgramId(json) {
-        return axios.get(`${API_URL}/api/program/${json}/planningUnit`, {}
+        return axios.get(`${API_URL}/api/program/${json}/planningUnit/all/`, {}
         );
     }
     addProgramProductMapping(json) {

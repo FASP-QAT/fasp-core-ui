@@ -12,70 +12,111 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitList from '../../api/PlanningUnitService'
 import PlanningUnitService from "../../api/PlanningUnitService";
 import { boolean } from "yup";
+import StatusUpdateButtonFeature from '../../CommonComponent/StatusUpdateButtonFeature';
+import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
 
 class AddprogramPlanningUnit extends Component {
 
     constructor(props) {
         super(props);
+        let rows = [];
+        if (this.props.location.state.programPlanningUnit.length > 0) {
+            rows = this.props.location.state.programPlanningUnit;
+        }
         this.state = {
             programPlanningUnit: this.props.location.state.programPlanningUnit,
             planningUnitId: '',
             planningUnitName: '',
             reorderFrequencyInMonths: '',
-            //maxMonth: '',
-            rows: this.props.location.state.programPlanningUnit.planningUnitList,
+            rows: rows,
             programList: [],
             planningUnitList: [],
-            addRowMessage: ''
+            addRowMessage: '',
+            programPlanningUnitId: 0,
+            isNew: true,
+            programId: this.props.location.state.programId
         }
         this.addRow = this.addRow.bind(this);
-        this.deleteLastRow = this.deleteLastRow.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.enableRow = this.enableRow.bind(this);
+        this.disableRow = this.disableRow.bind(this);
+        this.updateRow = this.updateRow.bind(this);
 
     }
     addRow() {
         let addRow = true;
         if (addRow) {
             this.state.rows.map(item => {
-                if (item.planningUnitId == this.state.planningUnitId) {
+                if (item.planningUnit.id == this.state.planningUnitId) {
                     addRow = false;
                 }
             }
             )
         }
         if (addRow == true) {
+            var programName = document.getElementById("programId");
+            var value = programName.selectedIndex;
+            var selectedProgramName = programName.options[value].text;
             this.state.rows.push(
                 {
-                    planningUnitId: this.state.planningUnitId,
-                    label:
-                    {
-                        label_en: this.state.planningUnitName
-                    },
 
+                    planningUnit: {
+                        id: this.state.planningUnitId,
+                        label: {
+                            label_en: this.state.planningUnitName
+                        }
+                    },
+                    program: {
+                        id: this.state.programId,
+                        label: {
+                            label_en: selectedProgramName
+                        }
+                    },
                     reorderFrequencyInMonths: this.state.reorderFrequencyInMonths,
-                    //maxMonth: this.state.maxMonth
+                    active: true,
+                    isNew: this.state.isNew,
+                    programPlanningUnitId: this.state.programPlanningUnitId
+
                 })
 
             this.setState({ rows: this.state.rows, addRowMessage: '' })
         } else {
-            // console.log("sorry----------->");
             this.state.addRowMessage = 'Planning Unit Already Exist In List.'
         }
         this.setState({
             planningUnitId: '',
             reorderFrequencyInMonths: '',
-            //maxMonth: '',
-            planningUnitName: ''
+            planningUnitName: '',
+            programPlanningUnitId: 0,
+            isNew: true
         });
 
     }
-    deleteLastRow() {
+
+    updateRow(idx) {
+        const rows = [...this.state.rows]
         this.setState({
-            rows: this.state.rows.slice(0, -1)
-        });
+            planningUnitId: this.state.rows[idx].planningUnit.id,
+            planningUnitName: this.state.rows[idx].planningUnit.label.label_en,
+            reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
+            programPlanningUnitId: this.state.rows[idx].programPlanningUnitId,
+            isNew: false
+        })
+        rows.splice(idx, 1);
+        this.setState({ rows });
+    }
+
+    enableRow(idx) {
+        this.state.rows[idx].active = true;
+        this.setState({ rows: this.state.rows })
+    }
+
+    disableRow(idx) {
+        this.state.rows[idx].active = false;
+        this.setState({ rows: this.state.rows })
     }
 
     handleRemoveSpecificRow(idx) {
@@ -89,23 +130,15 @@ class AddprogramPlanningUnit extends Component {
         if (event.target.name === 'reorderFrequencyInMonths') {
             this.setState({ reorderFrequencyInMonths: event.target.value });
         }
-        // if (event.target.name === 'maxMonth') {
-        //     this.setState({ maxMonth: event.target.value });
-        // } 
         else if (event.target.name === 'planningUnitId') {
             this.setState({ planningUnitName: event.target[event.target.selectedIndex].text });
             this.setState({ planningUnitId: event.target.value })
         }
     };
     submitForm() {
-        var programPlanningUnit = {
-            programId: this.state.programPlanningUnit.programId,
-            planningUnits: this.state.rows
-        }
-
         AuthenticationService.setupAxiosInterceptors();
-        // console.log("------------------programProdcut", programPlanningUnit);
-        ProgramService.addprogramPlanningUnitMapping(programPlanningUnit)
+        
+        ProgramService.addprogramPlanningUnitMapping(this.state.rows)
             .then(response => {
                 console.log(response.data);
                 if (response.status == "200") {
@@ -178,7 +211,6 @@ class AddprogramPlanningUnit extends Component {
             }
         );
         PlanningUnitService.getActivePlanningUnitList().then(response => {
-            // console.log(response.data.data);
             if (response.status == 200) {
                 this.setState({
                     planningUnitList: response.data
@@ -262,7 +294,7 @@ class AddprogramPlanningUnit extends Component {
                                     <Input type="number" min="0" name="maxMonth" id="maxMonth" value={this.state.maxMonth} placeholder="Enter max month stock" onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup> */}
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button>
+                                    {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
                                     <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>Add</Button>
                                     &nbsp;
 
@@ -277,7 +309,9 @@ class AddprogramPlanningUnit extends Component {
                                             <th className="text-left"> Planing Unit</th>
                                             <th className="text-left"> Reorder frequency in month </th>
                                             {/* <th className="text-left">Max Month Stock</th> */}
-                                            <th className="text-left">Delete Row</th>
+                                            {/* <th className="text-left">Delete Row</th> */}
+                                            <th className="text-left">Status</th>
+                                            <th className="text-left">Update</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -285,10 +319,12 @@ class AddprogramPlanningUnit extends Component {
                                             this.state.rows.map((item, idx) => (
                                                 <tr id="addr0" key={idx}>
                                                     <td>
-                                                        {this.state.programPlanningUnit.label.label_en}
+                                                        {this.state.rows[idx].program.label.label_en}
+                                                        {/* {this.state.programPlanningUnit.label.label_en} */}
                                                     </td>
                                                     <td>
-                                                        {this.state.rows[idx].label.label_en}
+                                                        {/* {this.state.rows[idx].label.label_en} */}
+                                                        {this.state.rows[idx].planningUnit.label.label_en}
                                                     </td>
                                                     <td>
 
@@ -298,7 +334,11 @@ class AddprogramPlanningUnit extends Component {
                                                         {this.state.rows[idx].maxMonth}
                                                     </td> */}
                                                     <td>
-                                                        <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} />
+                                                        {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
+                                                    </td>
+                                                    <td>
+                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                     </td>
                                                 </tr>
                                             ))
