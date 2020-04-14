@@ -515,7 +515,6 @@ class PlanningUnitCapacity extends Component {
                                                {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={()=>{this.handleEnableSpecificRow(idx)}}><i className="fa fa-check"></i>Activate</Button>}
                                                 </td>
                                             </tr>)
-                                        
                                     }
                                 </tbody>
 
@@ -538,7 +537,6 @@ class PlanningUnitCapacity extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
- 
     }
 }
 

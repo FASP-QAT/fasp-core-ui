@@ -114,9 +114,11 @@ class AuthenticationService {
         // axios.defaults.headers.common['Authorization'] = '';
         // delete axios.defaults.headers.common['Authorization'];
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("decryptedCurUser---", decryptedCurUser);
+        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
+        //console.log("decryptedToken---", decryptedToken);
         let basicAuthHeader = 'Bearer ' + decryptedToken
-        axios.defaults.headers.common['Authorization'] = basicAuthHeader;
+       // console.log("basicAuthHeader---", basicAuthHeader);
         // axios.interceptors.request.use(
         //     (config) => {
         //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
@@ -124,13 +126,26 @@ class AuthenticationService {
         //     }
         // )
 
+        axios.interceptors.request.use(function (config) {
+            config.headers.authorization = basicAuthHeader
+            return config;
+        }, function (error) {
+            // Do something with request error
+            return Promise.reject(error);
+        });
 
-        // // Add a response interceptor
-        // axios.interceptors.response.use(function (response) {
-        //     return response;
-        // }, function (error) {
-        //     return Promise.reject(error);
-        // });
+        // Add a response interceptor
+        axios.interceptors.response.use(function (response) {
+            // Any status code that lie within the range of 2xx cause this function to trigger
+            // Do something with response data
+           // console.log("interceptor response---", response);
+            return response;
+        }, function (error) {
+            // Any status codes that falls outside the range of 2xx cause this function to trigger
+            // Do something with response error
+            //console.log("interceptor error---", error);
+            return Promise.reject(error);
+        });
 
     }
 
