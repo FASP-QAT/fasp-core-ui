@@ -63,8 +63,8 @@ export default class ReactListComponent extends Component {
     }
     editRealm(realm) {
         this.props.history.push({
-            pathname: "/realm/updateRealm",
-            state: { realm: realm }
+            pathname: `/realm/updateRealm/${realm.realmId}`,
+            // state: { realm: realm }
         });
 
     }

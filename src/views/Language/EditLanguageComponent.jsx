@@ -18,7 +18,7 @@ const validationSchema = function (values) {
 
         languageName: Yup.string()
             .required(i18n.t('static.language.languagetext')),
-        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2,i18n.t('static.language.languageCodemax3digittext'))
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2, i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -49,11 +49,14 @@ export default class EditLanguageComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            language: this.props.location.state.language,
+            // language: this.props.location.state.language,
+            language: {
+                languageName: ''
+            },
             message: ''
         }
 
-        // this.Capitalize = this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
 
@@ -100,13 +103,41 @@ export default class EditLanguageComponent extends Component {
         }
     }
     componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        LanguageService.getLanguageById(this.props.match.params.languageId).then(response => {
+            this.setState({
+                language: response.data
+            });
 
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
     }
 
-    // Capitalize(str) {
-    //     let { language } = this.state
-    //     language.languageName = str.charAt(0).toUpperCase() + str.slice(1)
-    // }
+    Capitalize(str) {
+        if (str != null && str != "") {
+            let { language } = this.state
+            language.languageName = str.charAt(0).toUpperCase() + str.slice(1)
+        }
+    }
 
     render() {
         return (
@@ -121,7 +152,10 @@ export default class EditLanguageComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ languageName: this.state.language.languageName,languageCode:this.state.language.languageCode }}
+                                initialValues={{
+                                    languageName: this.state.language.languageName,
+                                    languageCode: this.state.language.languageCode
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -181,7 +215,7 @@ export default class EditLanguageComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.languageName}
                                                             invalid={touched.languageName && !!errors.languageName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.language.languageName}
                                                             required />
@@ -250,7 +284,7 @@ export default class EditLanguageComponent extends Component {
                         </Card>
                     </Col>
                 </Row>
-               
+
             </div>
         );
     }

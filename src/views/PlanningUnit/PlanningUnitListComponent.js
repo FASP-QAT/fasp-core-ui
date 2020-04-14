@@ -104,8 +104,8 @@ export default class PlanningUnitListComponent extends Component {
 
     editPlanningUnit(planningUnit) {
         this.props.history.push({
-            pathname: "/planningUnit/editPlanningUnit",
-            state: { planningUnit: planningUnit }
+            pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
+            // state: { planningUnit: planningUnit }
         });
 
     }

@@ -56,20 +56,26 @@ export default class UpdateDataSourceComponent extends Component {
                 dataSourceId: '',
                 label: {
                     label_en: '',
-                    // spaLabel: '',
-                    // freLabel: '',
-                    // porLabel: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
                     labelId: '',
                 },
                 dataSourceType: {
                     dataSourceTypeId: '',
                     label: {
-                        label_en: ''
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
                     }
                 }, realm: {
                     realmId: '',
                     label: {
-                        label_en: ''
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
                     }
                 }
             },
@@ -79,10 +85,10 @@ export default class UpdateDataSourceComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        initialValues = {
-            label: this.props.location.state.dataSource.label.label_en,
-            dataSourceTypeId: this.props.location.state.dataSource.dataSourceType.dataSourceTypeId
-        }
+        // initialValues = {
+        //     label: this.props.location.state.dataSource.label.label_en,
+        //     dataSourceTypeId: this.props.location.state.dataSource.dataSourceType.dataSourceTypeId
+        // }
     }
 
     dataChange(event) {
@@ -129,16 +135,42 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount() {
-        this.setState({
-            dataSource: this.props.location.state.dataSource
-        });
 
+        AuthenticationService.setupAxiosInterceptors();
+        DataSourceService.getDataSourceById(this.props.match.params.dataSourceId).then(response => {
+            this.setState({
+                dataSource: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
 
     }
 
 
     Capitalize(str) {
-        this.state.dataSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        if (str != null && str != "") {
+            this.state.dataSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
     }
     cancelClicked() {
         this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled', { entityname }))
@@ -156,7 +188,10 @@ export default class UpdateDataSourceComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    label: this.state.dataSource.label.label_en,
+                                    dataSourceTypeId: this.state.dataSource.dataSourceType.dataSourceTypeId
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -232,7 +267,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="label">{i18n.t('static.datasource.datasource')}</Label>
-                                                         <Input
+                                                        <Input
                                                             type="text"
                                                             name="label"
                                                             id="label"
@@ -287,7 +322,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
-                                                      &nbsp;
+                                                        &nbsp;
                                                     </FormGroup>
                                                 </CardFooter>
                                             </Form>

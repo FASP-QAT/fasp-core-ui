@@ -235,7 +235,6 @@ export default class EditHealthAreaComponent extends Component {
                 }
             }
         );
-
     }
 
     updateFieldData(value) {
