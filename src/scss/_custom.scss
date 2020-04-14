@@ -677,6 +677,8 @@ a:hover {
   color: #212721;
 }
 
+.btn-sm .fa-times{    margin-right: 0.100rem;}
+
 @media (min-width: 992px) {
   .sidebar .nav {
     font-size: 12px !important;
@@ -870,10 +872,7 @@ h5,
 
 
 .dropdown-header {
-
-  color: #212721;
-  
-}
+  color: #212721;}
 
 .dropdown-item {
   color: #212721;

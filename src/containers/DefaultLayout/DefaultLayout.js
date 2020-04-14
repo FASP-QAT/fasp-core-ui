@@ -231,6 +231,11 @@ class DefaultLayout extends Component {
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'icon-graph'
                           },
+                          {
+                            name: i18n.t('static.procurementUnit.procurementUnit'),
+                            url: '/procurementUnit/listProcurementUnit',
+                            icon: 'fa fa-building'
+                          },
                           // {
                           //   name: i18n.t('static.dashboard.product'),
                           //   url: '/product/listProduct',

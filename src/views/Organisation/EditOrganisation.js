@@ -105,7 +105,7 @@ export default class EditOrganisationComponent extends Component {
         if (event.target.name === "organisationName") {
             organisation.label.label_en = event.target.value
         } else if (event.target.name === "organisationCode") {
-            organisation.organisationCode = event.target.value
+            organisation.organisationCode = event.target.value.toUpperCase();
         } else if (event.target.name === "realmId") {
             organisation.realm.realmId = event.target.value
         } else if (event.target.name === "active") {

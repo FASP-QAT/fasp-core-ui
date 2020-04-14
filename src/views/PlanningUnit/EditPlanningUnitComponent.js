@@ -63,7 +63,7 @@ export default class EditPlanningUnitComponent extends Component {
                     label_pr: '',
                     labelId: '',
                 },
-                foreacastingUnit: {
+                forecastingUnit: {
                     forecastingUnitId: '',
                     label: {
                         label_en: ''
@@ -91,7 +91,7 @@ export default class EditPlanningUnitComponent extends Component {
             planningUnit.label.label_en = event.target.value
         }
         else if (event.target.name === "forecastingUnitId") {
-            planningUnit.foreacastingUnit.forecastingUnitId = event.target.value
+            planningUnit.forecastingUnit.forecastingUnitId = event.target.value
         }
         if (event.target.name === "unitId") {
             planningUnit.unit.unitId = event.target.value;
@@ -186,7 +186,7 @@ export default class EditPlanningUnitComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.planningUnit.label.label_en,
-                                    forecastingUnitId: this.state.planningUnit.foreacastingUnit.forecastingUnitId,
+                                    forecastingUnitId: this.state.planningUnit.forecastingUnit.forecastingUnitId,
                                     multiplier: this.state.planningUnit.multiplier
                                 }}
                                 validate={validate(validationSchema)}
@@ -248,7 +248,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                             id="forecastingUnitId"
                                                             bsSize="sm"
                                                             readOnly
-                                                            value={this.state.planningUnit.foreacastingUnit.label.label_en}
+                                                            value={this.state.planningUnit.forecastingUnit.label.label_en}
                                                         >
                                                         </Input>
                                                     </FormGroup>

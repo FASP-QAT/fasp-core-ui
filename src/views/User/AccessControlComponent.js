@@ -440,33 +440,33 @@ class AccessControlComponent extends Component {
                             <CardBody>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.user.username')}</Label>
-                                    <Input type="text" value={this.state.user.username} name="username" id="username" disabled>
+                                    <Input bsSize="sm" type="text" value={this.state.user.username} name="username" id="username" disabled>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
-                                    <Input type="select" name="realmCountryId" id="select" value={this.state.realmCountryId} onChange={event => this.setTextAndValue(event)}>
+                                    <Label  htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                                    <Input bsSize="sm" type="select" name="realmCountryId" id="select" value={this.state.realmCountryId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {countryList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.healtharea.healtharea')}</Label>
-                                    <Input type="select" name="healthAreaId" id="select" value={this.state.healthAreaId} onChange={event => this.setTextAndValue(event)}>
+                                    <Input bsSize="sm" type="select" name="healthAreaId" id="select" value={this.state.healthAreaId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {healthAreaList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.organisation.organisation')}</Label>
-                                    <Input type="select" name="organisationId" id="select" value={this.state.organisationId} onChange={event => this.setTextAndValue(event)}>
+                                    <Input bsSize="sm" type="select" name="organisationId" id="select" value={this.state.organisationId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {organisationList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                    <Input type="select" name="programId" id="select" value={this.state.programId} onChange={event => this.setTextAndValue(event)}>
+                                    <Input bsSize="sm" type="select" name="programId" id="select" value={this.state.programId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {programList}
                                     </Input>
@@ -477,7 +477,7 @@ class AccessControlComponent extends Component {
                                     &nbsp;
 
                         </FormGroup>
-                                <Table responsive className="table-striped table-hover table-bordered text-center">
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                     <thead>
                                         <tr>

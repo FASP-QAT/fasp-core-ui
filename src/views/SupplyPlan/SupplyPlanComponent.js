@@ -8,6 +8,9 @@ import ReactDOM from 'react-dom';
 import jexcel from 'jexcel';
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import i18n from '../../i18n';
+import { Menu, Item, Separator, Submenu, MenuProvider } from 'react-contexify';
+import 'react-contexify/dist/ReactContexify.min.css';
+import { contextMenu } from 'react-contexify';
 
 export default class SupplyPlanComponent extends React.Component {
 
@@ -60,6 +63,8 @@ export default class SupplyPlanComponent extends React.Component {
         }
 
     }
+
+
 
     consumptionDetailsClicked(month, region, quantity) {
         this.el = jexcel(document.getElementById("consumptionDetailsTable"), '');
@@ -229,13 +234,42 @@ export default class SupplyPlanComponent extends React.Component {
         this.el = jexcel(document.getElementById("adjustmentsTable"), options);
     }
 
-    contextMenu(event) {
-        event.preventDefault();
-        console.log("in right click")
-        // addMenu.popup(e.clientX, e.clientY);
+
+    handleEvent(e, toBeAccounted) {
+        e.preventDefault();
+        if (toBeAccounted == true) {
+            contextMenu.show({
+                id: 'menu_id',
+                event: e,
+                props: {
+                    toBeAccounted: true
+                }
+            });
+        } else {
+            contextMenu.show({
+                id: 'no_skip',
+                event: e,
+                props: {
+                    toBeAccounted: true
+                }
+            });
+        }
     }
 
     render() {
+        const MyMenu = () => (
+            <Menu id='menu_id'>
+                <Item disabled>Yes-Account</Item>
+                <Item>No-Skip</Item>
+            </Menu>
+        );
+
+        const NoSkip = () => (
+            <Menu id='no_skip'>
+                <Item>Yes-Account</Item>
+                <Item disabled>No-Skip</Item>
+            </Menu>
+        );
         return (
             <>
                 <Col xs="12" sm="12">
@@ -263,6 +297,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <MyMenu />
+                                    <NoSkip />
                                     <tr>
                                         <td>Opening Balance</td>
                                         <td>5,260</td>
@@ -292,18 +328,19 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td>18,359</td>
                                     </tr>
                                     <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
+
                                         <td>QAT Recommended Order Qty</td>
                                         <td></td>
-                                        <td onContextMenu={this.contextMenu} className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Mar 20', '167')}>167</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Mar 20', '167')}>167</td>
                                         <td></td>
                                         <td></td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Jun 20', '44773')}>44,773</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Jun 20', '44773')}>44,773</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Oct 20', '68000')}>68,000</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, true)} className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Oct 20', '68000')}>68,000</td>
                                         <td></td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Oct 20', '50000')}>50,000</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, true)} className="hoverTd" onDoubleClick={() => this.toggleLarge('QAT Recommended Order Qty', 'Oct 20', '50000')}>50,000</td>
                                     </tr>
                                     <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
                                         <td>Actual QAT Orders</td>
@@ -311,7 +348,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Actual QAT Orders', 'July 20', '44,773')}>44,773</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Actual QAT Orders', 'July 20', '44,773')}>44,773</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -322,15 +359,15 @@ export default class SupplyPlanComponent extends React.Component {
                                     <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
                                         <td>Shipments ARTMIS</td>
                                         <td></td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Mar 20', '82200')}>82,200</td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Apr 20', '167')}>167</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, true)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Mar 20', '82200')}>82,200</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Apr 20', '167')}>167</td>
                                         <td></td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Jun 20', '19466')}>19,466</td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'July 20', '18667')}>18,667</td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'August 20', '6640')}>6,640</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, true)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Jun 20', '19466')}>19,466</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'July 20', '18667')}>18,667</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'August 20', '6640')}>6,640</td>
                                         <td></td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Oct 20', '68359')}>68,359</td>
-                                        <td className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Nov 20', '59567')}>59,567</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Oct 20', '68359')}>68,359</td>
+                                        <td onContextMenu={(e) => this.handleEvent(e, false)} className="hoverTd" onDoubleClick={() => this.toggleLarge('Shipments ARTMIS', 'Nov 20', '59567')}>59,567</td>
                                         <td></td>
                                     </tr>
                                     <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Adjustments', '', '')}>
@@ -397,7 +434,7 @@ export default class SupplyPlanComponent extends React.Component {
                         className={'modal-lg ' + this.props.className, "modalWidth"}>
                         <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
                         <ModalBody>
-                            <Table bordered responsive size="sm" options={this.options}>
+                            <Table bordered responsive size="sm" options={this.options}> 
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -641,10 +678,12 @@ export default class SupplyPlanComponent extends React.Component {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>102129</td>
+                                        <td><input type="text" id="expectedDeliveryDate" value="18 Jun 2020" /></td>
+                                        <td>02-PLANNED</td>
+                                        <td><select>
+                                            <option selected id="1">PSM</option>
+                                        </select></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -811,5 +850,3 @@ export default class SupplyPlanComponent extends React.Component {
     //     console("on load function")
     // }
 }
-
-
