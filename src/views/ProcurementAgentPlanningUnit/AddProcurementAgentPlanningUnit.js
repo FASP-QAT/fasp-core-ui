@@ -12,7 +12,9 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from "../../api/PlanningUnitService";
 import StatusUpdateButtonFeature from '../../CommonComponent/StatusUpdateButtonFeature';
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+import i18n from '../../i18n';
 
+const entityname = i18n.t('static.dashboard.procurementAgentPlanningUnit')
 export default class AddProcurementAgentPlanningUnit extends Component {
     constructor(props) {
         super(props);
@@ -99,15 +101,15 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             this.state.rows.push(
                 {
                     planningUnit: {
-                        id:this.state.planningUnitId,
-                        label:{
-                            label_en:this.state.planningUnitName
+                        id: this.state.planningUnitId,
+                        label: {
+                            label_en: this.state.planningUnitName
                         }
                     },
                     procurementAgent: {
                         id: this.state.procurementAgentId,
-                        label:{
-                            label_en:selectedProcurementAgentName
+                        label: {
+                            label_en: selectedProcurementAgentName
                         }
                     },
                     skuCode: this.state.skuCode,
@@ -141,7 +143,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         });
 
     }
-    
+
     // deleteLastRow() {
     //     this.setState({
     //         rows: this.state.rows.slice(0, -1)
@@ -184,7 +186,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     };
 
     submitForm() {
-console.log("In submit form",this.state.rows)
+        console.log("In submit form", this.state.rows)
         AuthenticationService.setupAxiosInterceptors();
         // console.log("------------------programProdcut", programPlanningUnit);
         ProcurementAgentService.addprocurementAgentPlanningUnitMapping(this.state.rows)
@@ -192,7 +194,7 @@ console.log("In submit form",this.state.rows)
                 console.log(response.data);
                 if (response.status == "200") {
                     console.log(response);
-                    this.props.history.push(`/procurementAgent/listProcurementAgent/${response.data.message}`)
+                    this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
                         message: response.data.message
@@ -311,54 +313,55 @@ console.log("In submit form",this.state.rows)
         }, this);
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
-                                <strong>Map Planning Unit</strong>
+                                <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader>
                             <CardBody>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Procurement Agent</Label>
+                                    <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                     <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
                                         {programs}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Planning Unit</Label>
+                                    <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                     <Input type="select" name="planningUnitId" id="select" value={this.state.planningUnitId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="">Please select</option>
                                         {products}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">SKU Code</Label>
-                                    <Input type="text" name="skuCode" id="skuCode" value={this.state.skuCode} placeholder="Enter SKU code" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
+                                    <Input type="text" name="skuCode" id="skuCode" value={this.state.skuCode} placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">Catlog Price</Label>
-                                    <Input type="number" min="0" name="catalogPrice" id="catalogPrice" value={this.state.catalogPrice} placeholder="Enter catlog price" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.catalogPrice')}</Label>
+                                    <Input type="number" min="0" name="catalogPrice" id="catalogPrice" value={this.state.catalogPrice} placeholder={i18n.t('static.procurementAgentPlanningUnit.catalogPriceText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">MOQ</Label>
-                                    <Input type="number" min="0" name="moq" id="moq" value={this.state.moq} placeholder="Enter moq" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}</Label>
+                                    <Input type="number" min="0" name="moq" id="moq" value={this.state.moq} placeholder={i18n.t('static.procurementAgentPlanningUnit.moqText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">Unit Per Pallet</Label>
-                                    <Input type="number" min="0" name="unitsPerPallet" id="unitsPerPallet" value={this.state.unitsPerPallet} placeholder="Enter unit per pallet" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}</Label>
+                                    <Input type="number" min="0" name="unitsPerPallet" id="unitsPerPallet" value={this.state.unitsPerPallet} placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerPalletText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">Unit Per Container</Label>
-                                    <Input type="number" min="0" name="unitsPerContainer" id="unitsPerContainer" value={this.state.unitsPerContainer} placeholder="Enter unitsPerContainer" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}</Label>
+                                    <Input type="number" min="0" name="unitsPerContainer" id="unitsPerContainer" value={this.state.unitsPerContainer} placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerContainerText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">Volume</Label>
-                                    <Input type="number" min="0" name="volume" id="volume" value={this.state.volume} placeholder="Enter volume" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}</Label>
+                                    <Input type="number" min="0" name="volume" id="volume" value={this.state.volume} placeholder={i18n.t('static.procurementAgentPlanningUnit.volumeText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">Weight</Label>
-                                    <Input type="number" min="0" name="weight" id="weight" value={this.state.weight} placeholder="Enter weight" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}</Label>
+                                    <Input type="number" min="0" name="weight" id="weight" value={this.state.weight} placeholder={i18n.t('static.procurementAgentPlanningUnit.weightText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
                                 <FormGroup>
                                     {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
@@ -433,8 +436,8 @@ console.log("In submit form",this.state.rows)
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>Submit</Button>
+                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
                                 </FormGroup>
 
@@ -447,6 +450,6 @@ console.log("In submit form",this.state.rows)
         );
     }
     cancelClicked() {
-        this.props.history.push(`/procurementAgent/listProcurementAgent/` + "Action Canceled")
+        this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }

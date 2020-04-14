@@ -13,8 +13,10 @@ import PlanningUnitList from '../../api/PlanningUnitService'
 import PlanningUnitService from "../../api/PlanningUnitService";
 import { boolean } from "yup";
 import StatusUpdateButtonFeature from '../../CommonComponent/StatusUpdateButtonFeature';
-import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature';
+import i18n from '../../i18n';
 
+const entityname = i18n.t('static.dashboard.programPlanningUnit')
 class AddprogramPlanningUnit extends Component {
 
     constructor(props) {
@@ -137,13 +139,13 @@ class AddprogramPlanningUnit extends Component {
     };
     submitForm() {
         AuthenticationService.setupAxiosInterceptors();
-        
+
         ProgramService.addprogramPlanningUnitMapping(this.state.rows)
             .then(response => {
                 console.log(response.data);
                 if (response.status == "200") {
                     console.log(response);
-                    this.props.history.push(`/program/listProgram/${response.data.message}`)
+                    this.props.history.push(`/program/listProgram/` + i18n.t(response.data.messageCode, { entityname }))
                 } else {
                     this.setState({
                         message: response.data.message
@@ -264,38 +266,35 @@ class AddprogramPlanningUnit extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
-                                <strong>Add Program Product</strong>
+                                <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader>
                             <CardBody>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Program</Label>
+                                    <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                     <Input type="select" value={this.state.programPlanningUnit.programId} name="programId" id="programId" disabled>
                                         {programs}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">Select Planning Unit</Label>
+                                    <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                     <Input type="select" name="planningUnitId" id="select" value={this.state.planningUnitId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="">Please select</option>
                                         {products}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="company">Reorder Frequency In Months</Label>
-                                    <Input type="number" min='0' name="reorderFrequencyInMonths" id="reorderFrequencyInMonths" value={this.state.reorderFrequencyInMonths} placeholder="Enter min month stock" onChange={event => this.setTextAndValue(event)} />
+                                    <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}</Label>
+                                    <Input type="number" min='0' name="reorderFrequencyInMonths" id="reorderFrequencyInMonths" value={this.state.reorderFrequencyInMonths} placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')} onChange={event => this.setTextAndValue(event)} />
                                 </FormGroup>
-                                {/* <FormGroup>
-                                    <Label htmlFor="company">Max Month Stock</Label>
-                                    <Input type="number" min="0" name="maxMonth" id="maxMonth" value={this.state.maxMonth} placeholder="Enter max month stock" onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup> */}
                                 <FormGroup>
                                     {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                    <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>Add</Button>
+                                    <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                     &nbsp;
 
                         </FormGroup>
@@ -305,13 +304,11 @@ class AddprogramPlanningUnit extends Component {
                                     <thead>
                                         <tr>
 
-                                            <th className="text-left"> Program </th>
-                                            <th className="text-left"> Planing Unit</th>
-                                            <th className="text-left"> Reorder frequency in month </th>
-                                            {/* <th className="text-left">Max Month Stock</th> */}
-                                            {/* <th className="text-left">Delete Row</th> */}
-                                            <th className="text-left">Status</th>
-                                            <th className="text-left">Update</th>
+                                            <th className="text-left"> {i18n.t('static.program.program')} </th>
+                                            <th className="text-left"> {i18n.t('static.planningunit.planningunit')}</th>
+                                            <th className="text-left"> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
+                                            <th className="text-left">{i18n.t('static.common.status')}</th>
+                                            <th className="text-left">{i18n.t('static.common.update')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -349,8 +346,8 @@ class AddprogramPlanningUnit extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>Submit</Button>
+                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
                                 </FormGroup>
 
@@ -363,7 +360,7 @@ class AddprogramPlanningUnit extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/program/listProgram/` + "Action Canceled")
+        this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }
