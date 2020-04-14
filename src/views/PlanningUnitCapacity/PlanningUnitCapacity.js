@@ -21,6 +21,7 @@ const initialValues = {
     capacity: ''
 
 }
+const entityname=i18n.t('static.dashboad.planningunitcapacity')
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         supplier: Yup.string()
@@ -83,8 +84,10 @@ class PlanningUnitCapacity extends Component {
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.addRow = this.addRow.bind(this);
         this.deleteLastRow = this.deleteLastRow.bind(this);
-        this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
+        this.handleDisableSpecificRow = this.handleDisableSpecificRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
+        this.handleEnableSpecificRow = this.handleEnableSpecificRow.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
     currentDate() {
         var todaysDate = new Date();
@@ -177,16 +180,23 @@ class PlanningUnitCapacity extends Component {
     }
     deleteLastRow() {
         const rows = [...this.state.rows]
-       rows[this.state.rows.length - 1].active=false
+     /*  rows[this.state.rows.length - 1].active=false
        var row=   rows.slice(-1).pop();
-       rows.push(row);
+       rows.push(row);*/
         this.setState({
             rows
         });
     }
-    handleRemoveSpecificRow(idx) {
+    handleDisableSpecificRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = false
+    
+        // rows.splice(idx, 1);
+        this.setState({ rows })
+    }
+    handleEnableSpecificRow(idx) {
+        const rows = [...this.state.rows]
+        rows[idx].active = true
     
         // rows.splice(idx, 1);
         this.setState({ rows })
@@ -235,7 +245,7 @@ class PlanningUnitCapacity extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.getPlanningUnitForId(this.props.match.params.planningUnitId).then(response => {
+        PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             console.log(response.data);
             this.setState({
                 planningUnit: response.data,
@@ -474,15 +484,16 @@ class PlanningUnitCapacity extends Component {
                                         <th className="text-left"> {i18n.t('static.common.startdate')}</th>
                                         <th className="text-left"> {i18n.t('static.common.stopdate')} </th>
                                         <th className="text-left">{i18n.t('static.planningunit.capacity')}</th>
-                                        <th className="text-left">{i18n.t('static.common.remove')}</th>
+                                        <th className="text-left">{i18n.t('static.common.status')}</th>
+                                        <th className="text-left">{i18n.t('static.common.action')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {
                                         this.state.rows.length > 0
                                         &&
-                                        this.state.rows.map((item, idx) => (this.state.rows[idx].active == true && (
-                                            <tr id="addr0" key={idx}>
+                                        this.state.rows.map((item, idx) => 
+                                            <tr id="addr0" key={idx} >
                                                 <td>
                                                     {this.state.rows[idx].supplier.label.label_en}
                                                 </td>
@@ -497,10 +508,14 @@ class PlanningUnitCapacity extends Component {
                                                     {this.state.rows[idx].capacity}
                                                 </td>
                                                 <td>
-                                                    <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} />
+                                                    {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
+                                                </td>
+                                                <td>
+                                               { this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={()=>{this.handleDisableSpecificRow(idx)}} ><i className="fa fa-times"></i>Disable</Button>}
+                                               {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={()=>{this.handleEnableSpecificRow(idx)}}><i className="fa fa-check"></i>Activate</Button>}
                                                 </td>
                                             </tr>)
-                                        ))
+                                        
                                     }
                                 </tbody>
 
@@ -522,7 +537,8 @@ class PlanningUnitCapacity extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/` + i18n.t('static.actionCancelled'))
+        this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
+ 
     }
 }
 
