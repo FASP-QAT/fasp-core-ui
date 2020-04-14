@@ -80,7 +80,6 @@ class ForgotPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <h5>{i18n.t(this.state.message)}</h5>
                 <div className="Login-component">
                     <Container className="container-login">
                         <Row className="justify-content-center ">
@@ -90,7 +89,7 @@ class ForgotPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
-                                <h5 className="mx-4">{this.state.message}</h5>
+                                <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4 ">
 
                                     <CardHeader>
@@ -100,7 +99,6 @@ class ForgotPasswordComponent extends Component {
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                                            console.log(values.emailId);
                                             if (navigator.onLine) {
                                                 UserService.forgotPassword(values.emailId)
                                                     .then(response => {
@@ -114,8 +112,6 @@ class ForgotPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
-                                                            console.log("error---", error);
-                                                            console.log("message code---", error.message)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
                                                             } else {
@@ -126,7 +122,6 @@ class ForgotPasswordComponent extends Component {
                                                                     case 404:
                                                                     case 406:
                                                                     case 412:
-                                                                        console.log("inside default---", error.response.data);
                                                                         this.setState({ message: error.response.data.messageCode });
                                                                         break;
                                                                     default:
