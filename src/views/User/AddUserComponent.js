@@ -17,8 +17,8 @@ const initialValues = {
     realmId: [],
     emailId: "",
     phoneNumber: "",
-    languageId: []
-
+    languageId: [],
+    roleId: []
 }
 const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
@@ -29,8 +29,14 @@ const validationSchema = function (values) {
             .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
-        // roleId: Yup.string()
-        //     .required(i18n.t('static.user.validrole')),
+        roleId: Yup.array()
+            .min(3, 'Pick at least 3 tags')
+            .of(
+                Yup.object().shape({
+                    label: Yup.string().required(),
+                    value: Yup.string().required(),
+                })
+            ),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
@@ -77,10 +83,10 @@ class AddUserComponent extends Component {
                 language: {
 
                 },
-                roleList: [],
                 roles: []
             },
             roleId: '',
+            roleList: [],
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -114,7 +120,7 @@ class AddUserComponent extends Component {
 
     roleChange(roleId) {
         let { user } = this.state;
-        this.setState({ roleId});
+        this.setState({ roleId });
         var roleIdArray = [];
         for (var i = 0; i < roleId.length; i++) {
             roleIdArray[i] = roleId[i].value;
@@ -132,7 +138,8 @@ class AddUserComponent extends Component {
             realmId: true,
             emailId: true,
             phoneNumber: true,
-            languageId: true
+            languageId: true,
+            roleId: true
         }
         )
         this.validateForm(errors)
@@ -238,7 +245,6 @@ class AddUserComponent extends Component {
     }
 
     render() {
-        const { roles } = this.state;
         const { realms } = this.state;
         const { languages } = this.state;
 
@@ -250,14 +256,6 @@ class AddUserComponent extends Component {
                     </option>
                 )
             }, this);
-        // let roleList = roles.length > 0
-        //     && roles.map((item, i) => {
-        //         return (
-        //             <option key={i} value={item.roleId}>
-        //                 {getLabelText(item.label, this.state.lang)}
-        //             </option>
-        //         )
-        //     }, this);
 
         let languageList = languages.length > 0
             && languages.map((item, i) => {
@@ -404,9 +402,17 @@ class AddUserComponent extends Component {
                                                             name="roleId"
                                                             id="roleId"
                                                             multi
+                                                            required
+                                                            min={1}
                                                             options={this.state.roleList}
                                                             value={this.state.roleId}
+                                                            error={errors.roleId}
+                                                            touched={touched.roleId}
                                                         />
+                                                        {!!this.props.error &&
+                                                            this.props.touched && (
+                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                            )}
                                                         {/* <Input
                                                             type="select"
                                                             name="roleId"
@@ -423,7 +429,7 @@ class AddUserComponent extends Component {
                                                             <option value="" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
                                                         </Input> */}
-                                                        <FormFeedback>{errors.roleId}</FormFeedback>
+                                                        {/* <FormFeedback>{errors.roleId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>

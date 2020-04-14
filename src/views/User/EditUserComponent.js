@@ -9,6 +9,8 @@ import RealmService from "../../api/RealmService";
 import LanguageService from "../../api/LanguageService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 const initialValues = {
     username: "",
@@ -26,8 +28,6 @@ const validationSchema = function (values) {
             .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
-        roleId: Yup.string()
-            .required(i18n.t('static.user.validrole')),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
@@ -71,10 +71,13 @@ class EditUserComponent extends Component {
             languages: [],
             roles: [],
             user: this.props.location.state.user,
-            message: ''
+            message: '',
+            roleId: '',
+            roleList: []
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.roleChange = this.roleChange.bind(this);
     }
 
     dataChange(event) {
@@ -107,13 +110,26 @@ class EditUserComponent extends Component {
             () => { });
     };
 
+    roleChange(roleId) {
+        let { user } = this.state;
+        this.setState({ roleId });
+        var roleIdArray = [];
+        for (var i = 0; i < roleId.length; i++) {
+            roleIdArray[i] = roleId[i].value;
+        }
+        user.roles = roleIdArray;
+        this.setState({
+            user
+        },
+            () => { });
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
             username: true,
             realmId: true,
             emailId: true,
             phoneNumber: true,
-            roles: true,
             languageId: true
         }
         )
@@ -196,8 +212,12 @@ class EditUserComponent extends Component {
 
         UserService.getRoleList()
             .then(response => {
+                var roleList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    roleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
-                    roles: response.data
+                    roleList
                 })
             }).catch(
                 error => {
@@ -222,7 +242,6 @@ class EditUserComponent extends Component {
     }
 
     render() {
-        const { roles } = this.state;
         const { realms } = this.state;
         const { languages } = this.state;
 
@@ -230,14 +249,6 @@ class EditUserComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-        let roleList = roles.length > 0
-            && roles.map((item, i) => {
-                return (
-                    <option key={i} value={item.roleId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -386,7 +397,19 @@ class EditUserComponent extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
-                                                        <Input
+                                                        <Select
+                                                            valid={!errors.roleId}
+                                                            bsSize="sm"
+                                                            invalid={touched.roleId && !!errors.roleId}
+                                                            onChange={(e) => { handleChange(e); this.roleChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            name="roleId"
+                                                            id="roleId"
+                                                            multi
+                                                            options={this.state.roleList}
+                                                            value={this.state.user.roles}
+                                                        />
+                                                        {/* <Input
                                                             type="select"
                                                             name="roleId"
                                                             id="roleId"
@@ -401,7 +424,8 @@ class EditUserComponent extends Component {
                                                         >
                                                             <option value="0" disabled>{i18n.t('static.common.select')}</option>
                                                             {roleList}
-                                                        </Input><FormFeedback className="red">{errors.roleId}</FormFeedback>
+                                                        </Input> */}
+                                                        <FormFeedback className="red">{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>

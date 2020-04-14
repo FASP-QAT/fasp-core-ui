@@ -9,13 +9,14 @@ import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 
 const initialValues = {
-    username: ""
+    emailId: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        username: Yup.string()
-            .required('Please enter username')
+        emailId: Yup.string()
+            .email(i18n.t('static.user.invalidemail'))
+            .required(i18n.t('static.user.validemail')),
     })
 }
 
@@ -56,7 +57,7 @@ class ForgotPasswordComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            username: true
+            emailId: true
         }
         )
         this.validateForm(errors)
@@ -99,8 +100,9 @@ class ForgotPasswordComponent extends Component {
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
+                                            console.log(values.emailId);
                                             if (navigator.onLine) {
-                                                UserService.forgotPassword(values.username)
+                                                UserService.forgotPassword(values.emailId)
                                                     .then(response => {
                                                         if (response.status == 200) {
                                                             this.props.history.push(`/login/static.message.user.forgotPasswordSuccess`)
@@ -112,15 +114,19 @@ class ForgotPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
+                                                            console.log("error---", error);
+                                                            console.log("message code---", error.message)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
                                                                     case 500:
                                                                     case 401:
+                                                                    case 403:
                                                                     case 404:
                                                                     case 406:
                                                                     case 412:
+                                                                        console.log("inside default---", error.response.data);
                                                                         this.setState({ message: error.response.data.messageCode });
                                                                         break;
                                                                     default:
@@ -153,18 +159,18 @@ class ForgotPasswordComponent extends Component {
                                                         <CardBody className="p-4">
 
                                                             <FormGroup>
-                                                                <Label for="username">Username</Label>
+                                                                <Label for="emailId">Email Id</Label>
                                                                 <Input type="text"
-                                                                    name="username"
-                                                                    id="username"
+                                                                    name="emailId"
+                                                                    id="emailId"
                                                                     bsSize="sm"
-                                                                    valid={!errors.username}
-                                                                    invalid={touched.username && !!errors.username}
+                                                                    valid={!errors.emailId}
+                                                                    invalid={touched.emailId && !!errors.emailId}
                                                                     onChange={handleChange}
                                                                     onBlur={handleBlur}
                                                                     required
                                                                 />
-                                                                <FormFeedback>{errors.username}</FormFeedback>
+                                                                <FormFeedback>{errors.emailId}</FormFeedback>
                                                             </FormGroup>
                                                         </CardBody>
                                                         <CardFooter>
