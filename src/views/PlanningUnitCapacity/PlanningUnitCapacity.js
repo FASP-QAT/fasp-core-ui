@@ -186,7 +186,7 @@ class PlanningUnitCapacity extends Component {
        rows.push(row);*/
        rows[this.state.rows.length - 1].active=false
        var row=   rows.slice(-1).pop();
-       rows.push(row);
+       rows.push(row);*/
         this.setState({
             rows
         });
@@ -194,14 +194,12 @@ class PlanningUnitCapacity extends Component {
     handleDisableSpecificRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = false
-    
         // rows.splice(idx, 1);
         this.setState({ rows })
     }
     handleEnableSpecificRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = true
-    
         // rows.splice(idx, 1);
         this.setState({ rows })
     }
@@ -249,7 +247,7 @@ class PlanningUnitCapacity extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        PlanningUnitService.getPlanningUnitForId(this.props.match.params.planningUnitId).then(response => {
+        PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             console.log(response.data);
             this.setState({
                 planningUnit: response.data,
@@ -490,7 +488,6 @@ class PlanningUnitCapacity extends Component {
                                         <th className="text-left">{i18n.t('static.planningunit.capacity')}</th>
                                         <th className="text-left">{i18n.t('static.common.status')}</th>
                                         <th className="text-left">{i18n.t('static.common.action')}</th>
-                                        <th className="text-left">{i18n.t('static.common.remove')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
