@@ -52,7 +52,25 @@ class EditProcurementAgentComponent extends Component {
         super(props);
         this.state = {
             realms: [],
-            procurementAgent: this.props.location.state.procurementAgent,
+            // procurementAgent: this.props.location.state.procurementAgent,
+            procurementAgent: {
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    }
+                },
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                },
+                procurementAgentCode: ''
+            },
             message: '',
             lang: localStorage.getItem('lang')
         }
@@ -63,7 +81,8 @@ class EditProcurementAgentComponent extends Component {
 
     Capitalize(str) {
         if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+            let { procurementAgent } = this.state;
+            procurementAgent.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         } else {
             return "";
         }
@@ -118,6 +137,35 @@ class EditProcurementAgentComponent extends Component {
         }
     }
 
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
+            this.setState({
+                procurementAgent: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+    }
     render() {
         return (
             <div className="animated fadeIn">
@@ -127,9 +175,10 @@ class EditProcurementAgentComponent extends Component {
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
@@ -208,7 +257,7 @@ class EditProcurementAgentComponent extends Component {
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
                                                             readOnly={true}
-                                                            value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
+                                                            value={this.state.procurementAgent.procurementAgentCode}
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
@@ -223,10 +272,10 @@ class EditProcurementAgentComponent extends Component {
                                                             id="procurementAgentName"
                                                             valid={!errors.procurementAgentName}
                                                             invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.Capitalize(getLabelText(this.state.procurementAgent.label, this.state.lang))}
+                                                            value={getLabelText(this.state.procurementAgent.label, this.state.lang)}
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>

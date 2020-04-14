@@ -21,5 +21,9 @@ class CountryService {
         return axios.put(`${API_URL}/api/country/`, json, {}
         );
     }
+    getCountryById(json) {
+        return axios.get(`${API_URL}/api/country/${json}`, {}
+        );
+    }
 }
 export default new CountryService();

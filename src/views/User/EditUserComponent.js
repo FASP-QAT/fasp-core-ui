@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,InputGroupAddon,InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -17,12 +17,12 @@ const initialValues = {
     phoneNumber: "",
     languageId: []
 }
-const entityname=i18n.t('static.user.user')
+const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
         username: Yup.string()
             .min(6, i18n.t('static.user.valid6char'))
-            .max(30,i18n.t('static.user.validpasswordlength'))
+            .max(30, i18n.t('static.user.validpasswordlength'))
             .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
@@ -100,7 +100,7 @@ class EditUserComponent extends Component {
         if (event.target.name == "active") {
             user.active = event.target.id === "active2" ? false : true;
         }
-        
+
         this.setState({
             user
         },
@@ -165,12 +165,14 @@ class EditUserComponent extends Component {
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                this.setState({
-                    realms: response.data
-                }) } else {
+                    this.setState({
+                        realms: response.data
+                    })
+                } else {
                     this.setState({
                         message: response.data.messageCode
-                    })}
+                    })
+                }
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -253,12 +255,12 @@ class EditUserComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={{
@@ -268,7 +270,7 @@ class EditUserComponent extends Component {
                                     phoneNumber: this.state.user.phoneNumber,
                                     roles: this.state.user.roles,
                                     languageId: this.state.user.language.languageId,
-                                    roleId:this.state.user.roles
+                                    roleId: this.state.user.roles
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -276,7 +278,7 @@ class EditUserComponent extends Component {
                                     UserService.editUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/user/listUser/`+i18n.t(response.data.messageCode,{entityname}))
+                                                this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
@@ -472,7 +474,7 @@ class EditUserComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/user/listUser/` + i18n.t("static.message.cancelled",{entityname}))
+        this.props.history.push(`/user/listUser/` + i18n.t("static.message.cancelled", { entityname }))
     }
 }
 

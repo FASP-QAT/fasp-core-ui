@@ -25,6 +25,11 @@ class ProcurementAgentService {
         return axios.put(`${API_URL}/api/procurementAgent/planningingUnit/`, json, {}
         );
     }
+    
+    getProcurementAgentById(json) {
+        return axios.get(`${API_URL}/api/procurementAgent/${json}`, {}
+        );
+    }
 
     addprocurementAgentProcurementUnitMapping(json) {
         console.log("Json",json);

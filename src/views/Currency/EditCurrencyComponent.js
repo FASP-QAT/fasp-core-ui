@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -62,19 +62,25 @@ export default class UpdateCurrencyComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currency: this.props.location.state.currency,
+            // currency: this.props.location.state.currency,
+            currency: {
+                currencyCode: '',
+                currencySymbol: '',
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                conversionRateToUsd: ''
+            },
             message: '',
             lang: localStorage.getItem('lang')
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        initialValues = {
-            currencyCode: this.props.location.state.currency.currencyCode,
-            currencySymbol: this.props.location.state.currency.currencySymbol,
-            label: getLabelText(this.props.location.state.currency.label, this.state.lang),
-            conversionRate: this.props.location.state.currency.conversionRateToUsd
-        }
+
     }
 
     dataChange(event) {
@@ -129,14 +135,20 @@ export default class UpdateCurrencyComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        // this.setState({
-        //     currency: this.props.location.state.currency
-        // });
+        CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
+            this.setState({
+                currency: response.data
+            });
+        })
+
     }
 
     Capitalize(str) {
-        let { currency } = this.state
-        currency.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        if (str != null && str != "") {
+            let { currency } = this.state
+            currency.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
+
     }
 
     cancelClicked() {
@@ -147,7 +159,7 @@ export default class UpdateCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -155,7 +167,13 @@ export default class UpdateCurrencyComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    currencyCode: this.state.currency.currencyCode,
+                                    currencySymbol: this.state.currency.currencySymbol,
+                                    label: getLabelText(this.state.currency.label, this.state.lang),
+                                    conversionRate: this.state.currency.conversionRateToUsd
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 

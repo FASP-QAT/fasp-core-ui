@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -10,11 +10,11 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 let initialValues = {
     subFundingSource: ""
 }
-const entityname=i18n.t('static.subfundingsource.subfundingsource');
+const entityname = i18n.t('static.subfundingsource.subfundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         subFundingSource: Yup.string()
-        .required( i18n.t('static.fundingsource.validsubfundingsource'))
+            .required(i18n.t('static.fundingsource.validsubfundingsource'))
     })
 }
 
@@ -44,18 +44,44 @@ class EditSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subFundingSource: this.props.location.state.subFundingSource,
+            // subFundingSource: this.props.location.state.subFundingSource,
+            subFundingSource: {
+                fundingSource: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    }
+                },
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                }
+            },
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
     }
+
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        SubFundingSourceService.getSubFundingSourceServiceById(this.props.match.params.subFundingSourceId).then(response => {
+            this.setState({
+                subFundingSource: response.data
+            });
+
+        })
+    }
+
     Capitalize(str) {
         if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
+            let { subFundingSource } = this.state;
+            subFundingSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
 
@@ -103,19 +129,21 @@ class EditSubFundingSourceComponent extends Component {
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.commo.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.commo.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ subFundingSource: this.state.subFundingSource.label.label_en }}
+                                initialValues={{
+                                    subFundingSource: this.state.subFundingSource.label.label_en
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
-                                                } else {
+                                                this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
+                                            } else {
                                                 this.setState({
                                                     message: response.data.messageCode
                                                 })
@@ -176,9 +204,9 @@ class EditSubFundingSourceComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.subFundingSource}
                                                             invalid={touched.subFundingSource && !!errors.subFundingSource}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.subFundingSource.label.label_en)}
+                                                            value={this.state.subFundingSource.label.label_en}
                                                             required />
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
@@ -236,7 +264,7 @@ class EditSubFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}));
+        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled', { entityname }));
     }
 }
 

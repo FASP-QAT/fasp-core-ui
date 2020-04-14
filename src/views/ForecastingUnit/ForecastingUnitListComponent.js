@@ -206,8 +206,8 @@ export default class ForecastingUnitListComponent extends Component {
 
     editForecastingUnit(forecastingUnit) {
         this.props.history.push({
-            pathname: "/forecastingUnit/editForecastingUnit",
-            state: { forecastingUnit: forecastingUnit }
+            pathname: `/forecastingUnit/editForecastingUnit/${forecastingUnit.forecastingUnitId}`,
+            // state: { forecastingUnit: forecastingUnit }
         });
 
     }

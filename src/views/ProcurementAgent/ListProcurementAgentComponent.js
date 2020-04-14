@@ -142,8 +142,8 @@ class ListProcurementAgentComponent extends Component {
     }
     editProcurementAgent(procurementAgent) {
         this.props.history.push({
-            pathname: "/procurementAgent/editProcurementAgent",
-            state: { procurementAgent }
+            pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
+            // state: { procurementAgent }
         });
     }
     buttonFormatter(cell, row) {

@@ -16,6 +16,10 @@ class SubFundingSourceService {
         return axios.put(`${API_URL}/api/subFundingSource/`, json, {
         });
     }
+    getSubFundingSourceServiceById(json) {
+        return axios.get(`${API_URL}/api/subFundingSource/${json}`, {}
+        );
+    }
 
 }
 

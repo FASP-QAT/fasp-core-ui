@@ -12,9 +12,13 @@ class RegionService {
         return axios.get(`${API_URL}/api/region/`, {
         });
     }
-    
+
     updateRegion(json) {
         return axios.put(`${API_URL}/api/region/`, json, {}
+        );
+    }
+    getRegionById(json) {
+        return axios.get(`${API_URL}/api/region/${json}`, {}
         );
     }
 

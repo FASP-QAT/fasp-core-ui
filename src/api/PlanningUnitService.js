@@ -18,9 +18,13 @@ class PlanningUnitService {
     }
 
     editPlanningUnit(json) {
-        return axios.put(`${API_URL}/api/planningUnit/`,json,{}
-            );
-        }
-    
+        return axios.put(`${API_URL}/api/planningUnit/`, json, {}
+        );
+    }
+    getPlanningUnitById(json) {
+        return axios.get(`${API_URL}/api/planningUnit/${json}`, {}
+        );
+    }
+
 }
 export default new PlanningUnitService();

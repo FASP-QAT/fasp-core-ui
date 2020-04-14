@@ -17,6 +17,7 @@ import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import LoginService from '../../../api/LoginService'
 import i18n from '../../../i18n'
+import axios from 'axios';
 
 const initialValues = {
   username: "",
@@ -94,14 +95,14 @@ class Login extends Component {
 
         <div className="Login-component">
           <Container className="container-login">
-        
+
             <Row className="justify-content-center">
-            <Col md="12">
-              <div className="upper-logo mt-1">
-               <img src={'assets/img/QAT-login-logo.png'} className="img-fluid " />
-             </div>
-             </Col>
-            <Col lg="5" md="7" xl="4">
+              <Col md="12">
+                <div className="upper-logo mt-1">
+                  <img src={'assets/img/QAT-login-logo.png'} className="img-fluid " />
+                </div>
+              </Col>
+              <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <Card className="p-4 Login-card mt-2">
                     <CardBody>
@@ -118,11 +119,22 @@ class Login extends Component {
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
+
+                                // localStorage.removeItem("token-" + decoded.userId);
+                                // localStorage.removeItem("user-" + decoded.userId);
+                                // localStorage.removeItem("curUser");
+                                // localStorage.removeItem("lang");
+                                // localStorage.removeItem("typeOfSession");
+                                // localStorage.removeItem("i18nextLng");
+
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
+                                // AuthenticationService.setupAxiosInterceptors();
+                                let basicAuthHeader = 'Bearer ' + response.data.token
+                                console.log("basicAuthHeader---", basicAuthHeader);
                                 AuthenticationService.setupAxiosInterceptors();
                                 this.props.history.push(`/ApplicationDashboard`)
                               })
@@ -131,7 +143,7 @@ class Login extends Component {
                                   if (error.message === "Network Error") {
                                     this.setState({ message: error.message });
                                   } else {
-                                    switch (error.response.status) {
+                                    switch (error.response ? error.response.status : "") {
                                       case 500:
                                       case 401:
                                       case 404:
@@ -197,7 +209,7 @@ class Login extends Component {
                               <Form onSubmit={handleSubmit} noValidate name="loginForm">
                                 <h5 >{i18n.t(this.props.match.params.message)}</h5>
                                 <h5 >{i18n.t(this.state.message)}</h5>
-                              
+
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
                                 <p className="text-muted">{i18n.t('static.login.signintext')}</p>
@@ -256,9 +268,9 @@ class Login extends Component {
 
                 </CardGroup>
               </Col>
-           
 
-            <Col xs="12"className="Login-bttom ">
+
+              <Col xs="12" className="Login-bttom ">
                 <CardBody>
 
                   <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
@@ -275,27 +287,27 @@ class Login extends Component {
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
-                <Col md="4">
-                  <CardBody>
-                    <img src={'assets/img/wordmark.png'} className="img-fluid bottom-logo-img" />
-                  </CardBody>
-                </Col>
-                
-                <Col md="4">
-                  <CardBody>
-                    <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
-                  </CardBody>
-                </Col>
-                <Col md="4">
-                  <CardBody>
-                    <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
-                  </CardBody>
-                </Col>
-              </Row>
+                  <Col md="4">
+                    <CardBody>
+                      <img src={'assets/img/wordmark.png'} className="img-fluid bottom-logo-img" />
+                    </CardBody>
+                  </Col>
+
+                  <Col md="4">
+                    <CardBody>
+                      <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
+                    </CardBody>
+                  </Col>
+                  <Col md="4">
+                    <CardBody>
+                      <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
+                    </CardBody>
+                  </Col>
+                </Row>
 
               </Col>
-             
-              </Row>
+
+            </Row>
           </Container>
         </div>
       </div>

@@ -82,8 +82,8 @@ export default class CurrencyListComponent extends Component {
 
     editCurrency(currency) {
         this.props.history.push({
-            pathname: "/currency/editCurrency",
-            state: { currency: currency }
+            pathname: `/currency/editCurrency/${currency.currencyId}`,
+            // state: { currency: currency }
         });
 
     }

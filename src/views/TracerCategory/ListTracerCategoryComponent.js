@@ -48,8 +48,8 @@ class ListTracerCategoryComponent extends Component {
     }
     editTracerCategory(tracerCategory) {
         this.props.history.push({
-            pathname: "/tracerCategory/editTracerCategory",
-            state: { tracerCategory }
+            pathname: `/tracerCategory/editTracerCategory/${tracerCategory.tracerCategoryId}`,
+            // state: { tracerCategory }
         });
     }
 
