@@ -164,7 +164,9 @@ class ForgotPasswordComponent extends Component {
                                                                     onBlur={handleBlur}
                                                                     required
                                                                 />
+                                                               
                                                                 <FormFeedback>{errors.username}</FormFeedback>
+                                                                
                                                             </FormGroup>
                                                         </CardBody>
                                                         <CardFooter>
