@@ -13,6 +13,8 @@
     "static.program.realmcountry": "Country",
     "static.program.program": "Program",
     "static.message.user.usernameExists": "Username already exists",
+    "static.message.user.emailIdExists": "Email Id already exists",
+    "static.message.user.usernameemailIdExists": "Username and Email Id already exists",
     "static.budget.budgetstartdate": "Start Date of Budget",
     "static.dashboard.product": "Product",
     "static.procurementagent.procurementagentname": "Procurement Agent Name",
@@ -411,6 +413,8 @@
     "static.planningunit.planningunittext": "Please enter planning unit",
     "static.planningunit.multipliertext": "Please enter multiplier",
     "static.common.all": "All",
+    "static.user.forgotpassword": "Forgot Password",
+    "static.message.user.duplicateacl": "Duplicate access controls found",
     "static.dashboard.procurementUnit": "Procurement Unit",
     "static.procurementUnit.validProcurementUnitText": "Please enter procurement unit name.",
     "static.procurementUnit.procurementUnitText": "Enter procurement unit name",
@@ -470,5 +474,6 @@
     "static.procurementAgentPlanningUnit.weightText": "Enter weight",
 
     "static.procurementAgentPlanningUnit.unitPerContainer": "Unit per container",
-    "static.procurementAgentPlanningUnit.unitPerContainerText": "Enter unit per container"
+    "static.procurementAgentPlanningUnit.unitPerContainerText": "Enter unit per container",
+    "static.planningunit.forecastingunit":"Forecasting Unit"
 }

@@ -32,7 +32,7 @@ export default class PlanningUnitListComponent extends Component {
     filterData() {
         let forecastingUnitId = document.getElementById("forecastingUnitId").value;
         if (forecastingUnitId != 0) {
-            const selSource = this.state.planningUnitList.filter(c => c.foreacastingUnit.forecastingUnitId == forecastingUnitId)
+            const selSource = this.state.planningUnitList.filter(c => c.forecastingUnit.forecastingUnitId == forecastingUnitId)
             this.setState({
                 selSource
             });
@@ -57,7 +57,7 @@ export default class PlanningUnitListComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -85,7 +85,7 @@ export default class PlanningUnitListComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -142,35 +142,35 @@ export default class PlanningUnitListComponent extends Component {
             </span>
         );
 
-        const columns = [ {
+        const columns = [{
             dataField: 'label',
             text: i18n.t('static.planningunit.planningunit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },  {
-            dataField: 'foreacastingUnit.label',
+        }, {
+            dataField: 'forecastingUnit.label',
             text: i18n.t('static.forecastingunit.forecastingunit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'unit.label',
             text: i18n.t('static.unit.unit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'multiplier',
             text: i18n.t('static.unit.multiplier'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             //formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
             sort: true,
