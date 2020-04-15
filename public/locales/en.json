@@ -89,6 +89,7 @@
     "static.dashboard.programmaster": "Program Masters",
     "static.login.forgotpassword": "Forgot Password",
     "static.message.user.forgotPasswordTokenUsed": "Token already used",
+    "static.message.user.invalidToken": "Invalid Token",
     "static.program.downloadsuccess": "Program downloaded successfully",
     "static.language.english": "English",
     "static.message.user.couldNotBeUnlocked": "User could not be unlocked",
@@ -124,6 +125,7 @@
     "static.program.seafreightperc": "Sea Freight Percentage",
     "static.currency.currency": "Currency (English)",
     "static.message.user.passwordSame": "New password cannot be the same as current password",
+    "static.message.user.previousPasswordSame": "This password is already been used previously",
     "static.region.region": "Region",
     "static.message.user.passwordSuccess": "Password updated successfully",
     "static.product.product": "Product",
@@ -472,8 +474,7 @@
     "static.procurementAgentPlanningUnit.volumeText": "Enter volume",
     "static.procurementAgentPlanningUnit.weight": "Weight",
     "static.procurementAgentPlanningUnit.weightText": "Enter weight",
-
     "static.procurementAgentPlanningUnit.unitPerContainer": "Unit per container",
     "static.procurementAgentPlanningUnit.unitPerContainerText": "Enter unit per container",
-    "static.planningunit.forecastingunit":"Forecasting Unit"
+    "static.planningunit.forecastingunit": "Forecasting Unit"
 }
