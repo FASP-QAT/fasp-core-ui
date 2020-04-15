@@ -23,12 +23,23 @@ const initialValues = {
 const entityname = i18n.t('static.user.user')
 const validationSchema = function (values) {
     return Yup.object().shape({
+
         username: Yup.string()
             .min(6, i18n.t('static.user.valid6char'))
             .max(30, i18n.t('static.user.validpasswordlength'))
             .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
+        showRealm: Yup.boolean(),
+        realmId: Yup.string()
+            .when("showRealm", (showRealm, schema) => {
+                if (document.getElementById("showRealm").value == "true") {
+                    return schema.required(i18n.t('static.user.validusername'))
+                } else {
+                    return schema;
+                }
+                return schema;
+            }),
         // roleId: Yup.array()
         //     .min(3, 'Pick at least 3 tags')
         //     .of(
@@ -87,7 +98,8 @@ class AddUserComponent extends Component {
             },
             roleId: '',
             roleList: [],
-            message: ''
+            message: '',
+            validateRealm: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
@@ -120,14 +132,30 @@ class AddUserComponent extends Component {
 
     roleChange(roleId) {
         let { user } = this.state;
+        let count = 0;
         this.setState({ roleId });
         var roleIdArray = [];
         for (var i = 0; i < roleId.length; i++) {
             roleIdArray[i] = roleId[i].value;
+            if (roleId[i].value != 'ROLE_APPL_ADMIN') {
+                count++;
+                // showRealm
+
+            }
         }
+        console.log("count---" + count);
+        if (count > 0) {
+            console.log("if");
+            document.getElementById("showRealm").value = true;
+        } else {
+            console.log("else");
+            document.getElementById("showRealm").value = false;
+        }
+        console.log("value---" + document.getElementById("showRealm").value);
         user.roles = roleIdArray;
         this.setState({
-            user
+            user,
+            validateRealm: (count > 0 ? true : false)
         },
             () => { });
     }
@@ -329,6 +357,11 @@ class AddUserComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='userForm'>
                                                 <CardBody>
+                                                    <Input
+                                                        type="hidden"
+                                                        name="showRealm"
+                                                        id="showRealm"
+                                                    />
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         <Input
