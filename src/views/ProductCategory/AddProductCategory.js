@@ -224,7 +224,7 @@ export default class AddProductCategory extends React.Component {
             if (data.parentNode != null && data.parentNode.sortOrder != 0) {
                 data.node.sortOrder = ("" + data.parentNode.sortOrder).concat(".").concat(data.node.sortOrder);
             } else {
-                data.node.sortOrder = nullParentNodeCount;
+                data.node.sortOrder =""+nullParentNodeCount;
                 nullParentNodeCount++;
             }
         })
