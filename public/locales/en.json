@@ -13,6 +13,8 @@
     "static.program.realmcountry": "Country",
     "static.program.program": "Program",
     "static.message.user.usernameExists": "Username already exists",
+    "static.message.user.emailIdExists": "Email Id already exists",
+    "static.message.user.usernameemailIdExists": "Username and Email Id already exists",
     "static.budget.budgetstartdate": "Start Date of Budget",
     "static.dashboard.product": "Product",
     "static.procurementagent.procurementagentname": "Procurement Agent Name",

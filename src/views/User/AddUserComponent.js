@@ -29,14 +29,14 @@ const validationSchema = function (values) {
             .matches(/^(?=.*[a-zA-Z]).*$/, i18n.t('static.user.alleast1alpha'))
             .matches(/^\S*$/, i18n.t('static.user.nospace'))
             .required(i18n.t('static.user.validusername')),
-        roleId: Yup.array()
-            .min(3, 'Pick at least 3 tags')
-            .of(
-                Yup.object().shape({
-                    label: Yup.string().required(),
-                    value: Yup.string().required(),
-                })
-            ),
+        // roleId: Yup.array()
+        //     .min(3, 'Pick at least 3 tags')
+        //     .of(
+        //         Yup.object().shape({
+        //             label: Yup.string().required(),
+        //             value: Yup.string().required(),
+        //         })
+        //     ),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()

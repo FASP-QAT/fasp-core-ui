@@ -336,20 +336,13 @@ class EditUserComponent extends Component {
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label><Input
-                                                            type="select"
+                                                            type="text"
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
-                                                            invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.user.realm.realmId}
-                                                        >
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {realmList}
-                                                        </Input> <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                            readOnly={true}
+                                                            value={this.state.user.realm.label.label_en}
+                                                        ></Input>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="username">{i18n.t('static.user.username')}</Label>
