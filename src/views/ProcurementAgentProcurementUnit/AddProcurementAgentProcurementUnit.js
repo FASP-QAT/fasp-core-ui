@@ -33,7 +33,9 @@ const validationSchema = function (values, t) {
         skuCode: Yup.string()
             .required(i18n.t('static.mapProcurementUnit.validSKUCodeText')),
         gtin: Yup.string()
-            .required(i18n.t('static.mapProcurementUnit.validGtinText')),
+            .required(i18n.t('static.mapProcurementUnit.validGtinText'))
+            .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
+            .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
         approvedToShippedLeadTime: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.mapProcurementUnit.validApprovedToShippedLeadTimeText'))
@@ -208,12 +210,21 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.setState({ rows })
     }
 
-    capitalize(str) {
-        let { skuCode } = this.state
-        skuCode = str.toUpperCase()
-        this.setState({
-            skuCode: skuCode
-        })
+    capitalize(event) {
+        if (event.target.name === "skuCode") {
+            let { skuCode } = this.state
+            skuCode = event.target.value.toUpperCase()
+            this.setState({
+                skuCode: skuCode
+            })
+        } else if (event.target.name === "gtin") {
+            let { gtin } = this.state
+            gtin = event.target.value.toUpperCase()
+            this.setState({
+                gtin: gtin
+            })
+
+        }
     }
 
     setTextAndValue = (event) => {
@@ -489,7 +500,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             invalid={touched.skuCode && !!errors.skuCode}
                                                             placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                             onBlur={handleBlur}
-                                                            onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event.target.value) }} />
+                                                            onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                         <FormFeedback className="red">{errors.skuCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -535,7 +546,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             invalid={touched.gtin && !!errors.gtin}
                                                             value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                                             onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                         <FormFeedback className="red">{errors.gtin}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>

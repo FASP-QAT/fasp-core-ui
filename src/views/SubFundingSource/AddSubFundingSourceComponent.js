@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -7,18 +7,19 @@ import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const initialValues = {
   fundingSourceId: [],
   subFundingSource: ""
 }
-const entityname=i18n.t('static.subfundingsource.subfundingsource');
+const entityname = i18n.t('static.subfundingsource.subfundingsource');
 const validationSchema = function (values) {
   return Yup.object().shape({
     fundingSourceId: Yup.string()
-    .required( i18n.t('static.fundingsource.validfundingsource')),
+      .required(i18n.t('static.fundingsource.validfundingsource')),
     subFundingSource: Yup.string()
-    .required( i18n.t('static.fundingsource.validsubfundingsource'))
+      .required(i18n.t('static.fundingsource.validsubfundingsource'))
   })
 }
 
@@ -109,32 +110,34 @@ class AddSubFundingSourceComponent extends Component {
   }
 
   componentDidMount() {
-    AuthenticationService.setupAxiosInterceptors();
     FundingSourceService.getFundingSourceListAll()
       .then(response => {
-        this.setState({
-          fundingSources: response.data
-        })
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
+        if (response.status == 200) {
+          this.setState({
+            fundingSources: response.data
+          })
         }
-      );
+      })
+    // .catch(
+    //   error => {
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message });
+    //     } else {
+    //       switch (error.response ? error.response.status : "") {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ message: error.response.data.messageCode });
+    //           break;
+    //         default:
+    //           this.setState({ message: 'static.unkownError' });
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
   }
 
   render() {
@@ -149,12 +152,15 @@ class AddSubFundingSourceComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
-        <h5>{i18n.t(this.state.message,{entityname})}</h5>
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
+        <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
+                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
               </CardHeader>
               <Formik
                 initialValues={initialValues}
@@ -163,33 +169,29 @@ class AddSubFundingSourceComponent extends Component {
                   SubFundingSourceService.addSubFundingSource(this.state.subFundingSource)
                     .then(response => {
                       if (response.status == 200) {
-                        this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
-                      } else {
-                        this.setState({
-                          message: response.data.message
-                        })
+                        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
                       }
                     })
-                    .catch(
-                      error => {
-                        if (error.message === "Network Error") {
-                          this.setState({ message: error.message });
-                        } else {
-                          switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                              this.setState({ message: error.response.data.messageCode });
-                              break;
-                            default:
-                              this.setState({ message: 'static.unkownError' });
-                              break;
-                          }
-                        }
-                      }
-                    );
+                  // .catch(
+                  //   error => {
+                  //     if (error.message === "Network Error") {
+                  //       this.setState({ message: error.message });
+                  //     } else {
+                  //       switch (error.response ? error.response.status : "") {
+                  //         case 500:
+                  //         case 401:
+                  //         case 404:
+                  //         case 406:
+                  //         case 412:
+                  //           this.setState({ message: error.response.data.messageCode });
+                  //           break;
+                  //         default:
+                  //           this.setState({ message: 'static.unkownError' });
+                  //           break;
+                  //       }
+                  //     }
+                  //   }
+                  // );
                 }}
                 render={
                   ({
@@ -257,7 +259,7 @@ class AddSubFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}))
+    this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
   }
 }
 

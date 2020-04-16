@@ -46,6 +46,7 @@ const AddUser = React.lazy(() => import('./views/User/AddUserComponent'));
 const ListUser = React.lazy(() => import('./views/User/ListUserComponent'));
 const EditUser = React.lazy(() => import('./views/User/EditUserComponent'));
 const AccessControl = React.lazy(() => import('./views/User/AccessControlComponent'));
+const AccessDenied = React.lazy(() => import('./views/Common/AccessDeniedComponent'));
 
 
 const CodeEditors = React.lazy(() => import('./views/Editors/CodeEditors'));
@@ -266,6 +267,7 @@ const routes = [
 
   { path: '/changePassword', exact: true, name: i18n.t('static.dashboard.changepassword'), component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
+  { path: '/logout/:message', exact: true, component: Logout },
 
   { path: '/role/listRole/:message', component: ListRole },
   { path: '/role/listRole', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.role') }), component: ListRole },
@@ -277,6 +279,7 @@ const routes = [
   { path: '/user/addUser', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.user') }), component: AddUser },
   { path: '/user/editUser', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.user') }), component: EditUser },
   { path: '/user/accessControl', exact: true, name: i18n.t('static.dashboard.useraccessctrl'), component: AccessControl },
+  { path: '/accessDenied', exact: true, component: AccessDenied },
 
   { path: '/dashboard/:message', component: Dashboard },
 
