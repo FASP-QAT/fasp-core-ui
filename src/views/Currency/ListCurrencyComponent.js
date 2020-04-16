@@ -189,7 +189,7 @@ export default class CurrencyListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.currencylist')}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">

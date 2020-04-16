@@ -490,7 +490,7 @@
     "static.planningunit.capacityupdate": "Map Capacity",
     "static.planningunit.planningunitupdate": "Map Planning Unit",
     "static.planningunit.countrysku": "Country SKU",
-    "static.dashboad.planningunitcountry": "Planning Unit Country",
+    "static.dashboad.planningunitcountry": "Realm Country Planning Unit",
     "static.planningunit.Countrytext": "Please enter Country SKU ",
     "static.realmcountry.airFreightPercentage": "Air Freight Percentage",
     "static.realmcountry.seaFreightPercentage": "Sea Freight Percentage",
@@ -514,4 +514,16 @@
     "static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate":"One Of the mapped row is already in update.",
     "static.procurementUnit.validMaxValueText":"Maximum 14 characters are allowed.",
     "static.procurementUnit.onlyalphaNumericText":"Only alpha numeric values are allowed."
+    "static.dashboard.countrylist":"Countries",
+    "static.dashboard.realmcountrylist":"Realm Countries",
+    "static.dashboard.tracercategorylist":"Tracer Categories",
+    "static.dashboard.currencylist":"Currencies",
+    "static.dashboard.capacitylist":"Planning Unit Capacities",
+    "static.realmcountry.regionupdate":"Map Region",
+    "static.region.capacitycbm":"Capacity CBM",
+    "static.region.capacitycbmtext":"Enter Capacity CBM",
+    "static.region.gln":"GLN",
+    "static.region.glntext":"Enter GLN",
+    "static.dashboad.regioncountry":"Realm Country Region"
+
 }

@@ -34,7 +34,11 @@ class RealmCountryService {
         return axios.put(`${API_URL}/api/realmCountry/planningUnit`, json, {}
         );
     }
-
+    getRealmCountryPlanningUnitAllByrealmCountryId(realmCountryId) {
+        return axios.get(`${API_URL}/api/realmCountry/${realmCountryId}/planningUnit/all`, {}
+        );
+    }
+    
 
 }
 export default new RealmCountryService();
