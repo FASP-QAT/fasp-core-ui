@@ -17,6 +17,10 @@ class TracerCategoryService {
         return axios.put(`${API_URL}/api/tracerCategory/`, json, {
         });
     }
+    getTracerCategoryById(json) {
+        return axios.get(`${API_URL}/api/tracerCategory/${json}`, {}
+        );
+    }
 
 }
 

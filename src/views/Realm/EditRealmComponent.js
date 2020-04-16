@@ -61,21 +61,26 @@ export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            realm: this.props.location.state.realm,
+            // realm: this.props.location.state.realm,
+            realm: {
+                realmCode: '',
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                monthInPastForAmc: '',
+                monthInFutureForAmc: '',
+                orderFrequency: '',
+                defaultRealm: ''
+            },
             lang: localStorage.getItem('lang'),
             message: ''
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        initialValues = {
-            realmCode: this.state.realm.realmCode,
-            label: getLabelText(this.state.realm.label, this.state.lang),
-            monthInPastForAmc: this.state.realm.monthInPastForAmc,
-            monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
-            orderFrequency: this.state.realm.orderFrequency,
-            defaultRealm: this.state.realm.defaultRealm,
-        }
 
     }
 
@@ -134,7 +139,33 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount(str) {
-      
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmById(this.props.match.params.realmId).then(response => {
+            this.setState({
+                realm: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
     }
 
     Capitalize(str) {
@@ -149,16 +180,24 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    realmCode: this.state.realm.realmCode,
+                                    label: getLabelText(this.state.realm.label, this.state.lang),
+                                    monthInPastForAmc: this.state.realm.monthInPastForAmc,
+                                    monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
+                                    orderFrequency: this.state.realm.orderFrequency,
+                                    defaultRealm: this.state.realm.defaultRealm,
+                                }}
+
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -209,20 +248,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='realmForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
-                                                        <Input type="text"
-                                                            name="realmCode"
-                                                            id="realmCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.realmCode}
-                                                            invalid={touched.realmCode && !!errors.realmCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.realmCode}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
-                                                    </FormGroup>
+                                        
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.realm.realmName')}</Label>
                                                         <Input type="text"
@@ -236,6 +262,20 @@ export default class UpdateDataSourceComponent extends Component {
                                                             value={this.state.realm.label.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
+                                                        <Input type="text"
+                                                            name="realmCode"
+                                                            id="realmCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.realmCode}
+                                                            invalid={touched.realmCode && !!errors.realmCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.realmCode}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>

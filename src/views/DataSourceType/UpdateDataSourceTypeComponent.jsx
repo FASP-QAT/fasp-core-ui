@@ -53,15 +53,18 @@ export default class UpdateDataSourceTypeComponent extends Component {
 
                 label: {
                     label_en: '',
-                    // spaLabel: '',
-                    // freLabel: '',
-                    // porLabel: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
                     labelId: '',
                 },
                 realm: {
                     realmId: '',
                     label: {
-                        label_en: ''
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
                     }
                 }
             }
@@ -70,11 +73,9 @@ export default class UpdateDataSourceTypeComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        initialValues = {
-            label: this.props.location.state.dataSourceType.label.label_en
-        }
+
     }
-    
+
     dataChange(event) {
         let { dataSourceType } = this.state
 
@@ -119,15 +120,41 @@ export default class UpdateDataSourceTypeComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        DataSourceTypeService.getDataSourceTypeById(this.props.match.params.dataSourceTypeId).then(response => {
+            this.setState({
+                dataSourceType: response.data
+            });
 
-        this.setState({
-            dataSourceType: this.props.location.state.dataSourceType
-        });
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+
+
     }
 
     Capitalize(str) {
-        let { dataSourceType } = this.state
-        dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        if (str != null && str != "") {
+            let { dataSourceType } = this.state
+            dataSourceType.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
     }
 
     render() {
@@ -141,7 +168,10 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    label: this.state.dataSourceType.label.label_en
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     DataSourceTypeService.editDataSourceType(this.state.dataSourceType)

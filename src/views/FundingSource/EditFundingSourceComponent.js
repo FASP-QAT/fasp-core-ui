@@ -45,12 +45,59 @@ class EditFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            fundingSource: this.props.location.state.fundingSource,
+            // fundingSource: this.props.location.state.fundingSource,
+            fundingSource: {
+                realm: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    }
+                },
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                }
+            },
             message: '',
             lang: localStorage.getItem('lang')
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
+    }
+
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
+            this.setState({
+                fundingSource: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
     }
 
     dataChange(event) {
@@ -88,6 +135,12 @@ class EditFundingSourceComponent extends Component {
             }
         }
     }
+    Capitalize(str) {
+        if (str != null && str != "") {
+            let { fundingSource } = this.state
+            fundingSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
+    }
 
     render() {
         return (
@@ -100,7 +153,9 @@ class EditFundingSourceComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ fundingSource: this.state.fundingSource.label.label_en }}
+                                initialValues={{
+                                    fundingSource: this.state.fundingSource.label.label_en
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -167,7 +222,7 @@ class EditFundingSourceComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.fundingSource}
                                                             invalid={touched.fundingSource && !!errors.fundingSource}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
                                                             required />

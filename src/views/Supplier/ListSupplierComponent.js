@@ -28,8 +28,8 @@ class SupplierListComponent extends Component {
     }
     editSupplier(supplier) {
         this.props.history.push({
-            pathname: "/supplier/editSupplier",
-            state: { supplier }
+            pathname: `/supplier/editSupplier/${supplier.supplierId}`,
+            // state: { supplier }
         });
     }
     addSupplier(supplier) {

@@ -217,11 +217,11 @@ class DefaultLayout extends Component {
                             url: '/tracerCategory/listTracerCategory',
                             icon: 'icon-graph'
                           },
-                          // {
-                          //   name: 'Product Category',
-                          //   url: '/ProductCategory/AddProductCategory',
-                          //   icon: 'icon-graph'
-                          // },
+                          {
+                            name: 'Product Category',
+                            url: '/ProductCategory/AddProductCategory',
+                            icon: 'icon-graph'
+                          },
                           {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
@@ -230,6 +230,11 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'icon-graph'
+                          },
+                          {
+                            name: i18n.t('static.procurementUnit.procurementUnit'),
+                            url: '/procurementUnit/listProcurementUnit',
+                            icon: 'fa fa-building'
                           },
                           // {
                           //   name: i18n.t('static.dashboard.product'),

@@ -204,20 +204,7 @@ export default class AddRealmComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='realmForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
-                                                        <Input type="text"
-                                                            name="realmCode"
-                                                            id="realmCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.realmCode}
-                                                            invalid={touched.realmCode && !!errors.realmCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.realmCode}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
-                                                    </FormGroup>
+                                            
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.realm.realmName')}</Label>
                                                         <Input type="text"
@@ -231,6 +218,20 @@ export default class AddRealmComponent extends Component {
                                                             value={this.state.realm.label.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
+                                                        <Input type="text"
+                                                            name="realmCode"
+                                                            id="realmCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.realmCode}
+                                                            invalid={touched.realmCode && !!errors.realmCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.realmCode}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>

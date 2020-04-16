@@ -4,6 +4,9 @@ body {
   color: #212721!important;
 }
 
+::placeholder {
+  color:#212721!important;
+}
 /* ————————————————————–
   Tree core styles
 */
@@ -677,6 +680,8 @@ a:hover {
   color: #212721;
 }
 
+.btn-sm .fa-times{    margin-right: 0.100rem;}
+
 @media (min-width: 992px) {
   .sidebar .nav {
     font-size: 12px !important;
@@ -871,9 +876,8 @@ h5,
 
 
 .dropdown-header {
-
   color: #212721;
-  
+  font-size:15px;
 }
 
 .dropdown-item {
@@ -884,41 +888,7 @@ h5,
   color: #212721!important;
 }
 
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black;
+.sidebar .nav-dropdown-toggle::before {
+   transform: scaleX(-1);
 }
 
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: #555;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
-  bottom: 125%;
-  left: 50%;
-  margin-left: -60px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #555 transparent transparent transparent;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
-}

@@ -359,41 +359,11 @@ class AccessControlComponent extends Component {
                 }
             }
         );
-        ProductService.getProductList().then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    productList: response.data
-                });
-            } else {
-                this.setState({
-                    message: response.data.messageCode
-                })
-            }
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
-                    }
-                }
-            }
-        );
+       
         this.filterData();
         this.filterOrganisation();
         this.filterHealthArea();
-
+        this.filterProgram();
     }
     render() {
         const { selProgram } = this.state;
@@ -440,44 +410,44 @@ class AccessControlComponent extends Component {
                             <CardBody>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.user.username')}</Label>
-                                    <Input type="text" value={this.state.user.username} name="username" id="username" disabled>
+                                    <Input bsSize="sm" type="text" value={this.state.user.username} name="username" id="username" disabled>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
-                                    <Input type="select" name="realmCountryId" id="select" value={this.state.realmCountryId} onChange={event => this.setTextAndValue(event)}>
+                                    <Label  htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                                    <Input bsSize="sm" type="select" name="realmCountryId" id="select" value={this.state.realmCountryId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {countryList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.healtharea.healtharea')}</Label>
-                                    <Input type="select" name="healthAreaId" id="select" value={this.state.healthAreaId} onChange={event => this.setTextAndValue(event)}>
+                                    <Input bsSize="sm" type="select" name="healthAreaId" id="select" value={this.state.healthAreaId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {healthAreaList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.organisation.organisation')}</Label>
-                                    <Input type="select" name="organisationId" id="select" value={this.state.organisationId} onChange={event => this.setTextAndValue(event)}>
+                                    <Input bsSize="sm" type="select" name="organisationId" id="select" value={this.state.organisationId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {organisationList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                    <Input type="select" name="programId" id="select" value={this.state.programId} onChange={event => this.setTextAndValue(event)}>
+                                    <Input bsSize="sm" type="select" name="programId" id="select" value={this.state.programId} onChange={event => this.setTextAndValue(event)}>
                                         <option value="-1">All</option>
                                         {programList}
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                    <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>
+                                    <Button type="submit" size="md" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                     &nbsp;
 
                         </FormGroup>
-                                <Table responsive className="table-striped table-hover table-bordered text-center">
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                     <thead>
                                         <tr>

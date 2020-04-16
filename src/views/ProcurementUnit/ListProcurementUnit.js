@@ -3,64 +3,61 @@ import { NavLink } from 'react-router-dom';
 import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import getLabelText from '../../CommonComponent/getLabelText';
-import programDate from './ProgramData';
-import ProgramService from "../../api/ProgramService";
+import ProcurementUnitService from "../../api/ProcurementUnitService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
-import CountryService from '../../api/CountryService.js';
+import PlanningUnitService from '../../api/PlanningUnitService'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
-const entityname = i18n.t('static.program.programMaster');
-export default class ProgramList extends Component {
+const entityname = i18n.t('static.procurementUnit.procurementUnit');
+export default class ListProcurementUnit extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      programlist: [],
+      procurementUnitList: [],
       lang: 'en',
       message: '',
-      selProgram: [],
-      countryList: [],
+      selProcurementUnit: [],
+      planningUnitList: [],
       lang: localStorage.getItem('lang')
     }
-    this.editProgram = this.editProgram.bind(this);
-    this.addNewProgram = this.addNewProgram.bind(this);
-    this.buttonFormatter = this.buttonFormatter.bind(this);
-    this.addProductMapping = this.addProductMapping.bind(this);
+    this.editProcurementUnit = this.editProcurementUnit.bind(this);
+    this.addNewProcurementUnit = this.addNewProcurementUnit.bind(this);
     this.filterData = this.filterData.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
   }
 
   filterData() {
-    let countryId = document.getElementById("countryId").value;
-    if (countryId != 0) {
-      const selProgram = this.state.programList.filter(c => c.realmCountry.country.countryId == countryId)
+    let planningUnitId = document.getElementById("planningUnitId").value;
+    if (planningUnitId != 0) {
+      const selProcurementUnit = this.state.procurementUnitList.filter(c => c.planningUnit.planningUnitId == planningUnitId)
       this.setState({
-        selProgram: selProgram
+        selProcurementUnit: selProcurementUnit
       });
     } else {
       this.setState({
-        selProgram: this.state.programList
+        selProcurementUnit: this.state.procurementUnitList
       });
     }
   }
 
-  editProgram(program) {
+  editProcurementUnit(procurementUnit) {
+    console.log(procurementUnit.procurementUnitId)
     this.props.history.push({
-      pathname: `/program/editProgram/${program.programId}`,
-      // state: { program }
+      pathname: `/procurementUnit/editProcurementUnit/${procurementUnit.procurementUnitId}`,
     });
   }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
-    ProgramService.getProgramList().then(response => {
+    ProcurementUnitService.getProcurementUnitList().then(response => {
       if (response.status == 200) {
         this.setState({
-          programList: response.data,
-          selProgram: response.data
+          procurementUnitList: response.data,
+          selProcurementUnit: response.data
         })
       } else {
         this.setState({ message: response.data.messageCode })
@@ -86,11 +83,11 @@ export default class ProgramList extends Component {
           }
         }
       );
-    CountryService.getCountryListActive().then(response => {
+    PlanningUnitService.getActivePlanningUnitList().then(response => {
       if (response.status == 200) {
         console.log("response--->", response.data);
         this.setState({
-          countryList: response.data,
+          planningUnitList: response.data,
         })
       } else {
         this.setState({ message: response.data.messageCode })
@@ -121,99 +118,28 @@ export default class ProgramList extends Component {
 
   }
 
-  // showProgramLabel(cell, row) {
-  //   // console.log("========", cell);
-  //   return getLabelText(cell, this.state.lang);
-
-  // }
-  // showRealmLabel(cell, row) {
-  //   // console.log("========>",cell);
-  //   return getLabelText(cell.realm.label, this.state.lang);
-
-  // }
-  // showCountryLabel(cell, row) {
-  //   // console.log("========>",cell);
-  //   return getLabelText(cell.country.label, this.state.lang);
-
-  // }
-  // showOrganisationLabel(cell, row) {
-  //   // console.log("========>",cell);
-  //   return getLabelText(cell.label, this.state.lang);
-
-  // }
-  addNewProgram() {
+  addNewProcurementUnit() {
     this.props.history.push({
-      pathname: "/program/addProgram"
+      pathname: "/procurementUnit/addProcurementUnit"
     });
-  }
-  buttonFormatter(cell, row) {
-    // console.log("-----------", cell);
-    return <Button type="button" size="md" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
-  }
-  addProductMapping(event, cell) {
-    // console.log(cell);
-
-    event.stopPropagation();
-    AuthenticationService.setupAxiosInterceptors();
-    console.log("cell------", cell);
-    ProgramService.getProgramPlaningUnitListByProgramId(cell)
-      .then(response => {
-        console.log("response------->", response)
-        if (response.status == 200) {
-          let myReasponse = response.data;
-          console.log("myResponce=========", response.data);
-          this.props.history.push({
-            pathname: "/programProduct/addProgramProduct",
-            state: {
-              programPlanningUnit: myReasponse,
-              programId: cell
-            }
-
-          })
-        } else {
-          this.setState({
-            message: response.data.messageCode
-          })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                console.log("Error code unkown");
-                break;
-            }
-          }
-        }
-      );
   }
 
   formatLabel(cell, row) {
     return getLabelText(cell, this.state.lang);
   }
-  render() {
 
+  render() {
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
-    const { countryList } = this.state;
-    let countries = countryList.length > 0
-      && countryList.map((item, i) => {
+    const { planningUnitList } = this.state;
+    let planningUnits = planningUnitList.length > 0
+      && planningUnitList.map((item, i) => {
         return (
-          <option key={i} value={item.countryId}>
+          <option key={i} value={item.planningUnitId}>
             {getLabelText(item.label, this.state.lang)}
           </option>
         )
@@ -221,32 +147,31 @@ export default class ProgramList extends Component {
 
     const columns = [
       {
+        dataField: 'planningUnit.label',
+        text: i18n.t('static.procurementUnit.planningUnit'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      },
+      {
         dataField: 'label',
-        text: i18n.t('static.program.program'),
+        text: i18n.t('static.procurementUnit.procurementUnit'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
       },
       {
-        dataField: 'realmCountry.realm.label',
-        text: i18n.t('static.program.realm'),
+        dataField: 'multiplier',
+        text: i18n.t('static.procurementUnit.multiplier'),
         sort: true,
         align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
+        headerAlign: 'center'
       },
       {
-        dataField: 'realmCountry.country.label',
-        text: i18n.t('static.program.realmcountry'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
-      },
-      {
-        dataField: 'organisation.label',
-        text: i18n.t('static.program.organisation'),
+        dataField: 'unit.label',
+        text: i18n.t('static.procurementUnit.unit'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
@@ -254,12 +179,32 @@ export default class ProgramList extends Component {
       }
       ,
       {
-        dataField: 'programId',
-        text: 'Map Product To Program',
+        dataField: 'supplier.label',
+        text: i18n.t('static.procurementUnit.supplier'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: this.buttonFormatter
+        formatter: this.formatLabel
+      },
+      {
+        dataField: 'labeling',
+        text: i18n.t('static.procurementUnit.labeling'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center'
+      },
+      ,
+      {
+        dataField: 'active',
+        text: i18n.t('static.common.status'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cellContent, row) => {
+          return (
+            (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+          );
+        }
       }
     ];
     const options = {
@@ -285,7 +230,7 @@ export default class ProgramList extends Component {
         text: '50', value: 50
       },
       {
-        text: 'All', value: this.state.selProgram.length
+        text: 'All', value: this.state.selProcurementUnit.length
       }]
     }
     return (
@@ -297,25 +242,25 @@ export default class ProgramList extends Component {
             <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
-                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProgram}><i className="fa fa-plus-square"></i></a>
+                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewProcurementUnit}><i className="fa fa-plus-square"></i></a>
               </div>
             </div>
           </CardHeader>
           <CardBody>
             <Col md="3 pl-0" >
               <FormGroup>
-                <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
+                <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}</Label>
 
                 <div className="controls SelectGo">
                   <InputGroup>
                     <Input
                       type="select"
-                      name="countryId"
-                      id="countryId"
+                      name="planningUnitId"
+                      id="planningUnitId"
                       bsSize="sm"
                     >
                       <option value="0">{i18n.t('static.common.all')}</option>
-                      {countries}
+                      {planningUnits}
                     </Input>
                     <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -324,22 +269,9 @@ export default class ProgramList extends Component {
                 </div>
               </FormGroup>
             </Col>
-            {/* <BootstrapTable data={this.state.table} version="4" hover pagination search options={this.options}>
-              <TableHeaderColumn isKey dataField="programId" hidden >Program Id</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="label" dataSort dataFormat={this.showProgramLabel} >{i18n.t('static.program.program')}</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showRealmLabel} >{i18n.t('static.program.realm')}</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="realmCountry" dataSort dataFormat={this.showCountryLabel} >{i18n.t('static.program.realmcountry')}</TableHeaderColumn>
-              <TableHeaderColumn filterFormatted dataField="organisation" dataSort dataFormat={this.showOrganisationLabel} >{i18n.t('static.program.organisation')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="airFreightPerc" dataSort >{i18n.t('static.program.airfreightperc')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="seaFreightPerc" dataSort>{i18n.t('static.program.seafreightperc')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="plannedToDraftLeadTime" dataSort>{i18n.t('static.program.draftleadtime')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="draftToSubmittedLeadTime" dataSort>{i18n.t('static.program.drafttosubmitleadtime')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="submittedToApprovedLeadTime" dataSort>{i18n.t('static.program.submittoapproveleadtime')}</TableHeaderColumn>
-              <TableHeaderColumn dataField="programId" dataFormat={this.buttonFormatter}>Map Product To Program</TableHeaderColumn>
-            </BootstrapTable> */}
             <ToolkitProvider
-              keyField="programId"
-              data={this.state.selProgram}
+              keyField="procurementUnitId"
+              data={this.state.selProcurementUnit}
               columns={columns}
               search={{ searchFormatted: true }}
               hover
@@ -356,7 +288,7 @@ export default class ProgramList extends Component {
                       pagination={paginationFactory(options)}
                       rowEvents={{
                         onClick: (e, row, rowIndex) => {
-                          this.editProgram(row);
+                          this.editProcurementUnit(row);
                         }
                       }}
                       {...props.baseProps}

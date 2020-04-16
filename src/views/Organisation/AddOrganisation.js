@@ -94,7 +94,7 @@ export default class AddOrganisationComponent extends Component {
         if (event.target.name === "organisationName") {
             organisation.label.label_en = event.target.value
         } else if (event.target.name === "organisationCode") {
-            organisation.organisationCode = event.target.value
+            organisation.organisationCode = event.target.value.toUpperCase();
         } else if (event.target.name === "realmId") {
             organisation.realm.realmId = event.target.value
         }
@@ -372,6 +372,7 @@ export default class AddOrganisationComponent extends Component {
                                                             invalid={touched.organisationCode && !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.organisation.organisationCode}
                                                             id="organisationCode"  />
                                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                                     </FormGroup>
@@ -384,6 +385,7 @@ export default class AddOrganisationComponent extends Component {
                                                             invalid={touched.organisationName && !!errors.organisationName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.organisation.label.label_en}
                                                             id="organisationName" />
                                                         <FormFeedback className="red">{errors.organisationName}</FormFeedback>
                                                     </FormGroup>

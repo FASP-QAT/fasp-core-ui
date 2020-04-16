@@ -50,7 +50,10 @@ export default class UpdateDimensionComponent extends Component {
                 dimensionId: '',
                 label: {
                     labelId: '',
-                    label_en: ''
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
                 }
             }
         }
@@ -95,9 +98,32 @@ export default class UpdateDimensionComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        this.setState({
-            dimension: this.props.location.state.dimension
-        });
+        DimensionService.getDiamensionById(this.props.match.params.dimensionId).then(response => {
+            this.setState({
+                dimension: response.data
+            });
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+
 
     }
 
@@ -118,7 +144,7 @@ export default class UpdateDimensionComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ language: this.state.language }}
+                                initialValues={{ label: this.state.dimension.label.label_en }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     DimensionService.updateDimension(this.state.dimension).then(response => {
@@ -176,16 +202,16 @@ export default class UpdateDimensionComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.dimension.label.label_en}
                                                             required />
-                                                            <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                <CardFooter>
+                                                    <FormGroup>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
-                                            </CardFooter>
+                                                </CardFooter>
                                             </Form>
 
                                         )} />
