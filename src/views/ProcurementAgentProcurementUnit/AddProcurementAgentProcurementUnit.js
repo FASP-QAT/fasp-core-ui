@@ -535,7 +535,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             invalid={touched.gtin && !!errors.gtin}
                                                             value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                                             onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event.target.value) }} />
                                                         <FormFeedback className="red">{errors.gtin}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
