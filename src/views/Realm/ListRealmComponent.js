@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
-import { Card, CardHeader, CardBody } from 'reactstrap';
+import { Card, CardHeader, CardBody,Button } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import i18n from '../../i18n';
@@ -77,6 +77,16 @@ export default class ReactListComponent extends Component {
         }
 
     }
+    RealmCountry(event, row) {
+        event.stopPropagation();
+        console.log(JSON.stringify(row))
+        this.props.history.push({
+            pathname: `/realmCountry/RealmCountry/${row.realmId}`,
+            state: { realm: row }
+           
+
+        })
+    }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
@@ -124,6 +134,15 @@ export default class ReactListComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
+            }, {
+                dataField: 'realmId',
+                text: 'Action',
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (<div><Button type="button" size="sm" color="success" onClick={(event) => this.RealmCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realm.mapcountry')}</Button>
+                   </div> )
+                }
             }
             // {
             //     dataField: 'defaultRealm',

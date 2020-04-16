@@ -113,6 +113,7 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     editPlanningUnit(planningUnit) {
+        console.log('**'+JSON.stringify(planningUnit))
         this.props.history.push({
             pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
             // state: { planningUnit: planningUnit }
@@ -159,7 +160,7 @@ export default class PlanningUnitListComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        }, {
+        },  {
             dataField: 'forecastingUnit.label',
             text: i18n.t('static.forecastingunit.forecastingunit'),
             sort: true,
@@ -193,12 +194,12 @@ export default class PlanningUnitListComponent extends Component {
             }
         }, {
             dataField: 'planningUnitId',
-            text: 'Action',
+            text: i18n.t('static.common.action'),
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>Planning unit capacity</Button>
-                )
+                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.capacityupdate')}</Button>
+                 )
             }
         }];
         const options = {

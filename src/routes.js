@@ -36,6 +36,7 @@ const ListRegion = React.lazy(() => import('./views/Region/ListRegionComponent')
 const EditRegion = React.lazy(() => import('./views/Region/EditRegionComponent'));
 const ListRealmCountry = React.lazy(() => import('./views/RealmCountry/ListRealmCountryComponent'));
 const AddRealmCountry = React.lazy(() => import('./views/RealmCountry/AddRealmCountryComponent'));
+const RealmCountry = React.lazy(() => import('./views/RealmCountry/RealmCountry'));
 const ChangePassword = React.lazy(() => import('./views/Pages/Login/ChangePasswordComponent'));
 const Logout = React.lazy(() => import('./views/Pages/Login/LogoutComponent'));
 const AddRole = React.lazy(() => import('./views/Role/AddRoleComponent'));
@@ -163,12 +164,14 @@ const EditForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/Edi
 const AddPlanningUnit = React.lazy(() => import('./views/PlanningUnit/AddPlanningUnit'));
 const PlanningUnitList = React.lazy(() => import('./views/PlanningUnit/PlanningUnitListComponent'));
 const EditPlanningUnit = React.lazy(() => import('./views/PlanningUnit/EditPlanningUnitComponent'));
-const ListProcurementUnit = React.lazy(() => import('./views/ProcurementUnit/ListProcurementUnit'))
-const AddProcurementUnit = React.lazy(() => import('./views/ProcurementUnit/AddProcurementUnit'))
-const EditProcurementUnit = React.lazy(() => import('./views/ProcurementUnit/EditProcurementUnit'))
+
+const ListProcurementUnit=React.lazy(()=>import('./views/ProcurementUnit/ListProcurementUnit'))
+const AddProcurementUnit=React.lazy(()=>import('./views/ProcurementUnit/AddProcurementUnit'))
+const EditProcurementUnit=React.lazy(()=>import('./views/ProcurementUnit/EditProcurementUnit'))
 const AddProcurementAgentPlanningUnit = React.lazy(() => import('./views/ProcurementAgentPlanningUnit/AddProcurementAgentPlanningUnit'));
 const AddProcurementAgentProcurementUnit = React.lazy(() => import('./views/ProcurementAgentProcurementUnit/AddProcurementAgentProcurementUnit'));
 const PlanningUnitCapacity = React.lazy(() => import('./views/PlanningUnitCapacity/PlanningUnitCapacity'));
+const PlanningUnitCountry = React.lazy(() => import('./views/RealmCountry/RealmCountryPlanningUnit'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -259,6 +262,7 @@ const routes = [
   { path: '/realmCountry/listRealmCountry/:message', component: ListRealmCountry },
   { path: '/realmCountry/listRealmCountry', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.realmcountry') }), component: ListRealmCountry },
   { path: '/realmCountry/addRealmCountry', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.realmcountry') }), component: AddRealmCountry },
+  { path: '/realmCountry/realmCountry/:realmId', exact: true, name:  i18n.t('static.dashboard.realm') +" / "+ i18n.t('static.dashboard.realmcountry') , component: RealmCountry },
 
   { path: '/changePassword', exact: true, name: i18n.t('static.dashboard.changepassword'), component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
@@ -341,6 +345,7 @@ const routes = [
   { path: '/planningUnit/editPlanningUnit/:planningUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
   { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') +" / "+i18n.t('static.dashboad.planningunitcapacity') , component: PlanningUnitCapacity },
+  { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: i18n.t('static.dashboard.planningunit') +" / "+i18n.t('static.dashboad.planningunitcountry') , component: PlanningUnitCountry },
 
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

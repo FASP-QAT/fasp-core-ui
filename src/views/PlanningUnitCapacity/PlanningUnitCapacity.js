@@ -27,7 +27,7 @@ const validationSchema = function (values, t) {
         supplier: Yup.string()
             .required(i18n.t('static.planningunit.suppliertext')),
         capacity: Yup.number()
-            .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
+            .required(i18n.t('static.planningunit.capacitytext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
         stopDate: Yup.string()
@@ -184,9 +184,6 @@ class PlanningUnitCapacity extends Component {
      /*  rows[this.state.rows.length - 1].active=false
        var row=   rows.slice(-1).pop();
        rows.push(row);*/
-       rows[this.state.rows.length - 1].active=false
-       var row=   rows.slice(-1).pop();
-       rows.push(row);*/
         this.setState({
             rows
         });
@@ -195,6 +192,11 @@ class PlanningUnitCapacity extends Component {
         const rows = [...this.state.rows]
         rows[idx].active = false
         // rows.splice(idx, 1);
+        this.setState({ rows })
+    }
+    handleRemoveSpecificRow(idx) {
+        const rows = [...this.state.rows]
+         rows.splice(idx, 1);
         this.setState({ rows })
     }
     handleEnableSpecificRow(idx) {
@@ -339,12 +341,12 @@ class PlanningUnitCapacity extends Component {
                 </option>
             )
         }, this);
-        return (<div className="animated fadeIn">
-            <h5>{i18n.t(this.state.message)}</h5>
-            <Row>
-                <Col style={{ flexBasis: 'auto' }}>
-                    <Card sm={6} md={5}>
-                        <CardHeader>
+        return ( <div className="animated fadeIn">
+        <h5>{i18n.t(this.state.message)}</h5>
+        <Row>
+            <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                <Card>
+                    <CardHeader>
                             <strong>{i18n.t('static.dashboad.planningunitcapacity')}</strong>
                         </CardHeader>
                         <CardBody>
@@ -467,27 +469,27 @@ class PlanningUnitCapacity extends Component {
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                 type="number"
-                                                placeholder={i18n.t('static.budget.budgetamountdesc')}
+                                                placeholder={i18n.t('static.planningunit.capacitytext')}
                                                 required />
                                             <FormFeedback className="red">{errors.capacity}</FormFeedback>
                                         </FormGroup>
 
                                         <FormGroup>
-                                            <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>
+                                           {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
                 </FormGroup></Form>)} />
-                            <Table responsive>
+                            <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>
                                     <tr>
-                                        <th className="text-left"> {i18n.t('static.supplier.supplier')} </th>
-                                        <th className="text-left"> {i18n.t('static.common.startdate')}</th>
-                                        <th className="text-left"> {i18n.t('static.common.stopdate')} </th>
-                                        <th className="text-left">{i18n.t('static.planningunit.capacity')}</th>
-                                        <th className="text-left">{i18n.t('static.common.status')}</th>
-                                        <th className="text-left">{i18n.t('static.common.action')}</th>
+                                        <th className="text-center"> {i18n.t('static.supplier.supplier')} </th>
+                                        <th className="text-center"> {i18n.t('static.common.startdate')}</th>
+                                        <th className="text-center"> {i18n.t('static.common.stopdate')} </th>
+                                        <th className="text-center">{i18n.t('static.planningunit.capacity')}</th>
+                                        <th className="text-center">{i18n.t('static.common.status')}</th>
+                                        <th className="text-center">{i18n.t('static.common.action')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -515,8 +517,10 @@ class PlanningUnitCapacity extends Component {
                                                 <td>
                                                { this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={()=>{this.handleDisableSpecificRow(idx)}} ><i className="fa fa-times"></i>Disable</Button>}
                                                {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={()=>{this.handleEnableSpecificRow(idx)}}><i className="fa fa-check"></i>Activate</Button>}
-                                                </td>
+                                               {!this.state.rows[idx].planningUnitCapacityId &&<DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} />}
+                                                    </td>
                                             </tr>)
+
                                     }
                                 </tbody>
 
