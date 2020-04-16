@@ -59,7 +59,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     labelId: '',
                 },
                 realm: {
-                    realmId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',

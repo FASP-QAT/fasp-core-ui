@@ -130,26 +130,35 @@ class AddRealmCountryComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
-            .then(response => {
+        .then(response => {
+            if (response.status == 200) {
                 this.setState({
-                    realms: response.data.data
+                    realms: response.data
                 })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
+            } else {
+                this.setState({ message: response.data.messageCode })
+            }
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
                         default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
+                            this.setState({ message: 'static.unkownError' });
+                            break;
                     }
                 }
-            );
+            }
+        );
+
         CountryService.getCountryListAll()
             .then(response => {
                 this.setState({

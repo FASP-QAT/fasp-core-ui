@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,  } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
+import Select from 'react-select';
 import '../Forms/ValidationForms/ValidationForms.css'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceService from '../../api/DataSourceService';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
 import i18n from '../../i18n';
 import RealmService from "../../api/RealmService";
+import ProgramService from "../../api/ProgramService";
+import getLabelText from '../../CommonComponent/getLabelText'
 
 const initialValues = {
     realmId: [],
@@ -66,12 +69,27 @@ export default class AddDataSource extends Component {
             dataSourceType: {
                 dataSourceTypeId: ''
             },
-            dataSourceTypeList: []
+            program: {
+                id: '',
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                }
+            },
+            dataSourceTypeList: [],
+            dataSourceTypeId: '',
+            programs: [],
+            programId: '',
         }
         this.Capitalize = this.Capitalize.bind(this);
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+
+        this.getDataSourceTypeByRealmId = this.getDataSourceTypeByRealmId.bind(this);
+        this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
 
     dataChange(event) {
@@ -79,10 +97,13 @@ export default class AddDataSource extends Component {
             this.state.label.label_en = event.target.value
         }
         else if (event.target.name === "dataSourceTypeId") {
-            this.state.dataSourceType.dataSourceTypeId = event.target.value
+            this.state.dataSourceType.id = event.target.value
         }
         if (event.target.name === "realmId") {
-            this.state.realm.realmId = event.target.value;
+            this.state.realm.id = event.target.value;
+        }
+        if (event.target.name === "programId") {
+            this.state.program.id = event.target.value;
         }
         let { dataSource } = this.state
         this.setState(
@@ -118,6 +139,7 @@ export default class AddDataSource extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
@@ -143,18 +165,25 @@ export default class AddDataSource extends Component {
                     }
                 }
             );
+
+    }
+
+    getDataSourceTypeByRealmId(e) {
+        
         AuthenticationService.setupAxiosInterceptors();
-        DataSourceTypeService.getDataSourceTypeListActive().then(response => {
-            this.setState({
-                dataSourceTypeList: response.data
-            })
-        })
-            .catch(
+        DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
+            .then(response => {
+                console.log("getDataSourceTypeByRealmId---", response.data);
+                this.setState({
+                    dataSourceTypeList: response.data
+                })
+
+            }).catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        switch (error.response.status) {
                             case 500:
                             case 401:
                             case 404:
@@ -164,6 +193,7 @@ export default class AddDataSource extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
                                 break;
                         }
                     }
@@ -172,12 +202,54 @@ export default class AddDataSource extends Component {
 
     }
 
+    getProgramByRealmId(e) {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getProgramByRealmId(e.target.value)
+            .then(response => {
+                console.log("getProgramByRealmId---", response.data);
+                this.setState({
+                    programs: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
 
     Capitalize(str) {
         this.state.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
     render() {
         const { realms } = this.state;
+
+        const { programs } = this.state;
+        let programList = programs.length > 0
+            && programs.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         let realmList = realms.length > 0
             && realms.map((item, i) => {
                 return (
@@ -264,7 +336,7 @@ export default class AddDataSource extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.realmId}
@@ -274,6 +346,7 @@ export default class AddDataSource extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
+
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasource.datasource')}</Label>
                                                         <Input type="text"
@@ -288,6 +361,26 @@ export default class AddDataSource extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="programId"
+                                                            id="programId"
+                                                            bsSize="sm"
+                                                            valid={!errors.programId}
+                                                            invalid={touched.programId && !!errors.programId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required
+                                                        >
+                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                            {programList}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.realmId}</FormFeedback>
+                                                    </FormGroup>
+
                                                     <FormGroup>
                                                         <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
                                                         <Input
@@ -299,7 +392,8 @@ export default class AddDataSource extends Component {
                                                             invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            required>
+                                                            required
+                                                        >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {dataSourceTypes}
                                                         </Input>

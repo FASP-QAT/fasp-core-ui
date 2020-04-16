@@ -62,7 +62,7 @@ export default class UpdateDataSourceComponent extends Component {
                     labelId: '',
                 },
                 dataSourceType: {
-                    dataSourceTypeId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -77,7 +77,16 @@ export default class UpdateDataSourceComponent extends Component {
                         label_pr: '',
                         label_fr: ''
                     }
-                }
+                },
+                program: {
+                    id: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
             },
 
         }
@@ -99,7 +108,7 @@ export default class UpdateDataSourceComponent extends Component {
         }
 
         if (event.target.name === "dataSourceTypeId") {
-            this.state.dataSource.dataSourceType.dataSourceTypeId = event.target.value
+            this.state.dataSource.dataSourceType.id = event.target.value
         } else if (event.target.name === "active") {
             dataSource.active = event.target.id === "active2" ? false : true
         }
@@ -190,7 +199,7 @@ export default class UpdateDataSourceComponent extends Component {
                                 enableReinitialize={true}
                                 initialValues={{
                                     label: this.state.dataSource.label.label_en,
-                                    dataSourceTypeId: this.state.dataSource.dataSourceType.dataSourceTypeId
+                                    dataSourceTypeId: this.state.dataSource.dataSourceType.id
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -262,6 +271,18 @@ export default class UpdateDataSourceComponent extends Component {
                                                             bsSize="sm"
                                                             readOnly
                                                             value={this.state.dataSource.dataSourceType.label.label_en}
+                                                        >
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="programId"
+                                                            id="programId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={this.state.dataSource.program.label.label_en}
                                                         >
                                                         </Input>
                                                     </FormGroup>

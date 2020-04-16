@@ -255,7 +255,7 @@ export default class ProgramList extends Component {
       ,
       {
         dataField: 'programId',
-        text: 'Map Product To Program',
+        text: i18n.t('static.program.mapPlanningUnit'),
         sort: true,
         align: 'center',
         headerAlign: 'center',

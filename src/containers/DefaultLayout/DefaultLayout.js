@@ -130,8 +130,15 @@ class DefaultLayout extends Component {
                           ,
                           {
                             name: i18n.t('static.dashboard.realm'),
-                            url: '/realm/realmlist',
-                            icon: 'fa fa-th-large'
+                            icon: 'fa fa-list',
+                            children:[ {
+                              name: i18n.t('static.dashboard.realm'),
+                              url: '/realm/realmlist',
+                              icon: 'fa fa-th-large'},{
+                              name: i18n.t('static.dashboard.realmcountry'),
+                              url: '/realmCountry/listRealmCountry',
+                              icon: 'fa fa-globe'
+                            }]
                           },
                         ]
                       },

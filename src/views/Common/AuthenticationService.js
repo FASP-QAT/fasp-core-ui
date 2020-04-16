@@ -108,7 +108,6 @@ class AuthenticationService {
     //         })
     // }
 
-    
 
     setupAxiosInterceptors() {
         // axios.defaults.headers.common['Authorization'] = '';

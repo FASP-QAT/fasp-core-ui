@@ -282,7 +282,7 @@ class ListProcurementAgentComponent extends Component {
             },
             {
                 dataField: 'procurementAgentId',
-                text: 'Map Planning Unit',
+                text: i18n.t('static.program.mapPlanningUnit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
