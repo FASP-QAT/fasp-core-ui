@@ -476,5 +476,9 @@
     "static.procurementAgentPlanningUnit.weightText": "Enter weight",
     "static.procurementAgentPlanningUnit.unitPerContainer": "Unit per container",
     "static.procurementAgentPlanningUnit.unitPerContainerText": "Enter unit per container",
-    "static.planningunit.forecastingunit": "Forecasting Unit"
+    "static.planningunit.forecastingunit": "Forecasting Unit",
+    "static.message.sessionExpired": "Your session has been expired",
+    "static.message.tokenExpired": "Your token has been expired",
+    "static.message.sessionChange": "You can't change your session from online to offline or vice versa",
+    "static.message.tokenError": "Token Error"
 }

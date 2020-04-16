@@ -5,6 +5,7 @@ import { API_URL } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
+import moment from 'moment';
 
 let myDt;
 class AuthenticationService {
@@ -108,7 +109,7 @@ class AuthenticationService {
     //         })
     // }
 
-    
+
 
     setupAxiosInterceptors() {
         // axios.defaults.headers.common['Authorization'] = '';
@@ -253,6 +254,27 @@ class AuthenticationService {
             }.bind(this);
 
         }
+    }
+    checkLastActionTaken() {
+        if (localStorage.getItem('lastActionTaken') != null && localStorage.getItem('lastActionTaken') != "") {
+            var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            var lastActionTaken = moment(lastActionTakenStorage);
+            console.log("lastActionTakenStorage---", lastActionTakenStorage);
+            var curDate = moment(new Date());
+            const diff = curDate.diff(lastActionTaken);
+            const diffDuration = moment.duration(diff);
+            console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            console.log("Days:", diffDuration.days());
+            console.log("Hours:", diffDuration.hours());
+            console.log("Minutes:", diffDuration.minutes());
+            console.log("Seconds:", diffDuration.seconds());
+            // if (diffDuration.minutes() < 30) {
+            if (diffDuration.minutes() < 5) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
     getLoggedInUserDetails() {
         if (!('indexedDB' in window)) {

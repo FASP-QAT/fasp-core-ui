@@ -34,7 +34,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .when("showRealm", (showRealm, schema) => {
                 if (document.getElementById("showRealm").value == "true") {
-                    return schema.required(i18n.t('static.user.validusername'))
+                    return schema.required(i18n.t('static.common.realmtext'))
                 } else {
                     return schema;
                 }

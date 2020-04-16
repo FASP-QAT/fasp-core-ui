@@ -13,6 +13,8 @@ import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+
 const entityname = i18n.t('static.subfundingsource.subfundingsource');
 class ListSubFundingSourceComponent extends Component {
     constructor(props) {
@@ -58,59 +60,64 @@ class ListSubFundingSourceComponent extends Component {
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
-                this.setState({
-                    fundingSources: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
+                if (response.status == 200) {
+                    this.setState({
+                        fundingSources: response.data
+                    })
                 }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response.status) {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
-                this.setState({
-                    subFundingSourceList: response.data,
-                    selSubFundingSource: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
+                if (response.status == 200) {
+                    this.setState({
+                        subFundingSourceList: response.data,
+                        selSubFundingSource: response.data
+                    })
                 }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     formatLabel(cell, row) {
@@ -184,13 +191,16 @@ class ListSubFundingSourceComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selSubFundingSource.length
+                text: 'All', value: (this.state.selSubFundingSource ? this.state.selSubFundingSource.length : 0)
             }]
         }
 
 
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message, { entityname })}</h6>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
