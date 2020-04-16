@@ -49,6 +49,9 @@ class DefaultHeader extends Component {
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>
+        <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> <span><b>New user registered</b></span>
+        <br></br><span><small>Application Level Admin</small></span></div>
+
         <UncontrolledDropdown nav direction="down" className="lang-btn">
         <DropdownToggle nav className="nav-link-lng">
           

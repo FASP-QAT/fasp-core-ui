@@ -79,13 +79,20 @@ class DefaultHeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+          {/* <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" /> */}
+          {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
+            <i class="icon-settings icon-anim-pulse text-primary"></i>
+        </button> */}
+        <span class="icon-wrapper icon-wrapper-alt rounded-circle ">
+                                <span class="icon-wrapper-bg setting-icon"></span>
+                                <i class="icon-settings icon-anim-pulse text-primary"></i>
+                            </span>
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
           <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> {i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
           {/* <DropdownItem><i className="fa fa-shield"></i> Language</DropdownItem> */}
-          <DropdownItem onClick={this.props.onLogout}><i className="fa fa-lock"></i> Logout</DropdownItem>
+          <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i> Logout</DropdownItem>
           {/*<DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>*/}
         </DropdownMenu>
       </Dropdown>
