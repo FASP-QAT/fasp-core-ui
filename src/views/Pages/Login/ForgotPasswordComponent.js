@@ -112,14 +112,17 @@ class ForgotPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
+                                                            console.log(error)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
+                                                                    case 404:
+                                                                        this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                                                        break;
                                                                     case 500:
                                                                     case 401:
                                                                     case 403:
-                                                                    case 404:
                                                                     case 406:
                                                                     case 412:
                                                                         this.setState({ message: error.response.data.messageCode });
