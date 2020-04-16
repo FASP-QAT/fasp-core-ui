@@ -75,7 +75,16 @@ class ListRealmCountryComponent extends Component {
 
         })
     }
+    RealmCountryRegion(event, row) {
+        event.stopPropagation();
+        console.log(JSON.stringify(row))
+        this.props.history.push({
+            pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
+            state: { realmCountry: row }
+           
 
+        })
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
@@ -257,7 +266,8 @@ class ListRealmCountryComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<div><Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.planningunitupdate')}</Button>
+                return (<div><Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.planningunitupdate')}</Button><br/><br/>
+                <Button type="button" size="sm" color="success" onClick={(event) => this.RealmCountryRegion(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realmcountry.regionupdate')}</Button>
                </div> )
             }
         }];
@@ -294,7 +304,7 @@ class ListRealmCountryComponent extends Component {
                 <Card>
                     <CardHeader>
 
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.realmcountrylist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>
@@ -340,11 +350,11 @@ class ListRealmCountryComponent extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            rowEvents={{
+                                          /*  rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
                                                     this.editSupplier(row);
                                                 }
-                                            }}
+                                            }}*/
                                             {...props.baseProps}
                                         />
                                     </div>

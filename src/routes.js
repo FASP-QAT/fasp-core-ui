@@ -172,6 +172,10 @@ const AddProcurementAgentPlanningUnit = React.lazy(() => import('./views/Procure
 const AddProcurementAgentProcurementUnit = React.lazy(() => import('./views/ProcurementAgentProcurementUnit/AddProcurementAgentProcurementUnit'));
 const PlanningUnitCapacity = React.lazy(() => import('./views/PlanningUnitCapacity/PlanningUnitCapacity'));
 const PlanningUnitCountry = React.lazy(() => import('./views/RealmCountry/RealmCountryPlanningUnit'));
+const PlanningUnitCountryList = React.lazy(() => import('./views/RealmCountry/RealmCountryPlanningUnitList'));
+const PlanningUnitCapacityList = React.lazy(() => import('./views/PlanningUnitCapacity/PlanningUnitCapacityList'));
+const RealmCountryRegion = React.lazy(() => import('./views/RealmCountry/RealmCountryRegion'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -332,8 +336,6 @@ const routes = [
   { path: '/planningUnit/addPlanningUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.planningunit') }), component: AddPlanningUnit },
   { path: '/planningUnit/listPlanningUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.planningunit') }), component: PlanningUnitList },
   { path: '/planningUnit/listPlanningUnit/:message', component: PlanningUnitList },
-  { path: '/planningUnit/editPlanningUnit/:planningUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
-  { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacity },
 
 
@@ -342,11 +344,13 @@ const routes = [
   { path: '/procurementUnit/listProcurementUnit/:message', component: ListProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: EditProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit/:procurementUnitId', component: EditProcurementUnit },
-  { path: '/planningUnit/editPlanningUnit/:planningUnitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
-  { path: '/planningUnit/editPlanningUnit', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
+  { path: '/planningUnit/editPlanningUnit/:planningUnitId',exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
+  { path: '/realmCountry/listRealmCountryPlanningUnit', name: i18n.t('static.dashboard.planningunit')+" / "+ i18n.t('static.dashboad.planningunitcountry' ), component: PlanningUnitCountryList },
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacity },
   { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountry },
-
+  { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCapacityList },
+  { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: RealmCountryRegion },
+  
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
