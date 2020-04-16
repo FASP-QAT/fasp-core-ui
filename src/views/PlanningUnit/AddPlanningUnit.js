@@ -72,7 +72,7 @@ export default class AddPlanningUnit extends Component {
             label: {
                 label_en: ''
             },
-            foreacastingUnit: {
+            forecastingUnit: {
                 forecastingUnitId: ''
             },
             }
@@ -90,7 +90,7 @@ export default class AddPlanningUnit extends Component {
             planningUnit.label.label_en = event.target.value
         }
         else if (event.target.name === "forecastingUnitId") {
-            planningUnit.foreacastingUnit.forecastingUnitId = event.target.value
+            planningUnit.forecastingUnit.forecastingUnitId = event.target.value
         }
         if (event.target.name === "unitId") {
             planningUnit.unit.unitId = event.target.value;
