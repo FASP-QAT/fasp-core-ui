@@ -70,5 +70,10 @@ class ProgramService {
         return axios.get(`${API_URL}/api/user/realmId/${json}`, {}
         );
     }
+
+    getProgramByRealmId(json) {
+        return axios.get(`${API_URL}/api/program/realmId/${json}`, {}
+        );
+    }
 }
 export default new ProgramService()

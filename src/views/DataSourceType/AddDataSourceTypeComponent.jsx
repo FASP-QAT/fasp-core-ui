@@ -75,7 +75,7 @@ export default class AddDataSourceTypeComponent extends Component {
             dataSourceType.label.label_en = event.target.value
         }
         if (event.target.name == "realmId") {
-            dataSourceType.realm.realmId = event.target.value;
+            dataSourceType.realm.id = event.target.value;
         }
 
         this.setState(

@@ -36,92 +36,94 @@ class ListProcurementAgentComponent extends Component {
     }
 
     addPlanningUnitMapping(event, cell) {
-        // console.log(cell);
         event.stopPropagation();
-        AuthenticationService.setupAxiosInterceptors();
-        console.log("cell------", cell);
-        ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
-            .then(response => {
-                console.log("response------->", response)
-                if (response.status == 200) {
-                    let myReasponse = response.data;
-                    console.log("myResponce=========", response.data);
-                    this.props.history.push({
-                        pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
-                        state: {
-                            procurementAgentPlanningUnit: myReasponse,
-                            procurementAgentId:cell
-                        }
+        this.props.history.push({
+            pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
+        });
+        // AuthenticationService.setupAxiosInterceptors();
+        // ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             let myReasponse = response.data;
+        //             this.props.history.push({
+        //                 pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
+        //                 state: {
+        //                     procurementAgentPlanningUnit: myReasponse,
+        //                     procurementAgentId:cell
+        //                 }
 
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+        //             })
+        //         } else {
+        //             this.setState({
+        //                 message: response.data.messageCode
+        //             })
+        //         }
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({ message: error.message });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
+        //                     case 500:
+        //                     case 401:
+        //                     case 404:
+        //                     case 406:
+        //                     case 412:
+        //                         this.setState({ message: error.response.data.messageCode });
+        //                         break;
+        //                     default:
+        //                         this.setState({ message: 'static.unkownError' });
+        //                         console.log("Error code unkown");
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
     }
 
     addProcurementUnitMapping(event, cell) {
         event.stopPropagation();
-        AuthenticationService.setupAxiosInterceptors();
-        ProcurementAgentService.getProcurementAgentProcurementUnitList(cell)
-            .then(response => {
-                if (response.status == 200) {
-                    let myResponse = response.data;
-                    this.props.history.push({
-                        pathname: "/procurementAgent/addProcurementAgentProcurementUnit",
-                        state: {
-                            procurementAgentProcurementUnit: myResponse,
-                            procurementAgentId:cell
-                        }
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+        this.props.history.push({
+            pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
+        });
+        // AuthenticationService.setupAxiosInterceptors();
+        // ProcurementAgentService.getProcurementAgentProcurementUnitList(cell)
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             let myResponse = response.data;
+        //             this.props.history.push({
+        //                 pathname: "/procurementAgent/addProcurementAgentProcurementUnit",
+        //                 state: {
+        //                     procurementAgentProcurementUnit: myResponse,
+        //                     procurementAgentId:cell
+        //                 }
+        //             })
+        //         } else {
+        //             this.setState({
+        //                 message: response.data.messageCode
+        //             })
+        //         }
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({ message: error.message });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
+        //                     case 500:
+        //                     case 401:
+        //                     case 404:
+        //                     case 406:
+        //                     case 412:
+        //                         this.setState({ message: error.response.data.messageCode });
+        //                         break;
+        //                     default:
+        //                         this.setState({ message: 'static.unkownError' });
+        //                         console.log("Error code unkown");
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
     }
 
     addNewProcurementAgent() {
@@ -148,11 +150,11 @@ class ListProcurementAgentComponent extends Component {
     }
     buttonFormatter(cell, row) {
         console.log("button formater cell-----------", cell);
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
+        return <Button type="button" size="md" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
     }
 
     buttonFormatterForProcurementUnit(cell, row) {
-        return <Button type="button" size="sm" color="success" onClick={(event) => this.addProcurementUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
+        return <Button type="button" size="md" color="success" onClick={(event) => this.addProcurementUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -282,7 +284,7 @@ class ListProcurementAgentComponent extends Component {
             },
             {
                 dataField: 'procurementAgentId',
-                text: 'Map Planning Unit',
+                text: i18n.t('static.program.mapPlanningUnit'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',

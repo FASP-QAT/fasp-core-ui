@@ -33,6 +33,23 @@ class AuthenticationService {
         return decryptedUser.username;
     }
 
+    getLoggedInUserRole() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        let roles = "";
+        for (let i = 0; i <= decryptedUser.roles.length; i++) {
+            let role = decryptedUser.roles[i];
+            if (role != null && role != "") {
+                if (i > 0) {
+                    roles += "," + role.label.label_en;
+                } else {
+                    roles += role.label.label_en;
+                }
+            }
+        }
+        return roles;
+    }
+
     getLoggedInUserId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         return decryptedCurUser;
@@ -47,7 +64,7 @@ class AuthenticationService {
     getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log(decryptedUser);
+        // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
 
@@ -108,7 +125,6 @@ class AuthenticationService {
     //         error => {
     //         })
     // }
-
 
 
     setupAxiosInterceptors() {
@@ -259,17 +275,17 @@ class AuthenticationService {
         if (localStorage.getItem('lastActionTaken') != null && localStorage.getItem('lastActionTaken') != "") {
             var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             var lastActionTaken = moment(lastActionTakenStorage);
-            console.log("lastActionTakenStorage---", lastActionTakenStorage);
+            // console.log("lastActionTakenStorage---", lastActionTakenStorage);
             var curDate = moment(new Date());
             const diff = curDate.diff(lastActionTaken);
             const diffDuration = moment.duration(diff);
-            console.log("Total Duration in millis:", diffDuration.asMilliseconds());
-            console.log("Days:", diffDuration.days());
-            console.log("Hours:", diffDuration.hours());
-            console.log("Minutes:", diffDuration.minutes());
-            console.log("Seconds:", diffDuration.seconds());
-            // if (diffDuration.minutes() < 30) {
-            if (diffDuration.minutes() < 5) {
+            // console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            // console.log("Days:", diffDuration.days());
+            // console.log("Hours:", diffDuration.hours());
+            // console.log("Minutes:", diffDuration.minutes());
+            // console.log("Seconds:", diffDuration.seconds());
+            if (diffDuration.minutes() < 30) {
+                // if (diffDuration.minutes() < 10) {
                 return true;
             }
             return false;

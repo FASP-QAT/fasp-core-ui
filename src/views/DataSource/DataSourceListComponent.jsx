@@ -6,6 +6,8 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
 import DataSourceService from '../../api/DataSourceService';
 import DataSourceTypeService from '../../api/DataSourceTypeService';
+import RealmService from '../../api/RealmService';
+import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -17,6 +19,8 @@ export default class DataSourceListComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            realms: [],
+            programs: [],
             dataSourceTypes: [],
             dataSourceList: [],
             message: '',
@@ -31,8 +35,53 @@ export default class DataSourceListComponent extends Component {
 
     filterData() {
         let dataSourceTypeId = document.getElementById("dataSourceTypeId").value;
-        if (dataSourceTypeId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.dataSourceTypeId == dataSourceTypeId)
+        let realmId = document.getElementById("realmId").value;
+        let programId = document.getElementById("programId").value;
+
+        // if (dataSourceTypeId != 0) {
+        //     const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.id == dataSourceTypeId)
+        //     this.setState({
+        //         selSource
+        //     });
+        // } else {
+        //     this.setState({
+        //         selSource: this.state.dataSourceList
+        //     });
+        // }
+
+        if (realmId != 0 && dataSourceTypeId != 0 && programId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && c.program.id == programId)
+            this.setState({
+                selSource
+            });
+        } else if (realmId != 0 && dataSourceTypeId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId)
+            this.setState({
+                selSource
+            });
+        } else if (realmId != 0 && programId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.program.id == programId)
+
+            this.setState({
+                selSource
+            });
+        } else if (dataSourceTypeId != 0 && programId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.program.id == programId && c.dataSourceType.id == dataSourceTypeId)
+            this.setState({
+                selSource
+            });
+        } else if (realmId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId)
+            this.setState({
+                selSource
+            });
+        } else if (dataSourceTypeId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.dataSourceType.id == dataSourceTypeId)
+            this.setState({
+                selSource
+            });
+        } else if (programId != 0) {
+            const selSource = this.state.dataSourceList.filter(c => c.program.id == programId)
             this.setState({
                 selSource
             });
@@ -41,10 +90,68 @@ export default class DataSourceListComponent extends Component {
                 selSource: this.state.dataSourceList
             });
         }
+
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        ProgramService.getProgramList()
+            .then(response => {
+                this.setState({
+                    programs: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        RealmService.getRealmListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data
+                    })
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
         DataSourceTypeService.getDataSourceTypeList().then(response => {
             console.log(response.data)
             this.setState({
@@ -124,11 +231,32 @@ export default class DataSourceListComponent extends Component {
     }
 
     render() {
+
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         const { dataSourceTypes } = this.state;
         let dataSourceTypeList = dataSourceTypes.length > 0
             && dataSourceTypes.map((item, i) => {
                 return (
                     <option key={i} value={item.dataSourceTypeId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        const { programs } = this.state;
+        let programList = programs.length > 0
+            && programs.map((item, i) => {
+                return (
+                    <option key={i} value={item.programId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -158,6 +286,13 @@ export default class DataSourceListComponent extends Component {
         }, {
             dataField: 'label',
             text: i18n.t('static.datasource.datasource'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
+            dataField: 'program.label',
+            text: i18n.t('static.dataSource.program'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
@@ -215,26 +350,62 @@ export default class DataSourceListComponent extends Component {
 
                     </CardHeader>
                     <CardBody>
-                        <Col md="3 pl-0">
-                            <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="dataSourceTypeId"
-                                            id="dataSourceTypeId"
-                                            bsSize="sm"
-                                        >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {dataSourceTypeList}
-                                        </Input>
-                                        <InputGroupAddon addonType="append">
-                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
+                        <Col md="9 pl-0">
+                            <div className="d-md-flex">
+                                <FormGroup>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="realmId"
+                                                id="realmId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {realmList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dataSource.program')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="programId"
+                                                id="programId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {programList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="dataSourceTypeId"
+                                                id="dataSourceTypeId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {dataSourceTypeList}
+                                            </Input>
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
                         </Col>
                         <ToolkitProvider
                             keyField="dataSourceId"
