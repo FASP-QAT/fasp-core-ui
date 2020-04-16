@@ -74,11 +74,11 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     constructor(props) {
         super(props);
         let rows = [];
-        if (this.props.location.state.procurementAgentProcurementUnit.length > 0) {
-            rows = this.props.location.state.procurementAgentProcurementUnit;
-        }
+        // if (this.props.location.state.procurementAgentProcurementUnit.length > 0) {
+        //     rows = this.props.location.state.procurementAgentProcurementUnit;
+        // }
         this.state = {
-            procurementAgentProcurementUnit: this.props.location.state.procurementAgentProcurementUnit,
+            // procurementAgentProcurementUnit: this.props.location.state.procurementAgentProcurementUnit,
             procurementUnitId: '',
             procurementUnitName: '',
             skuCode: '',
@@ -92,7 +92,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             procurementUnitList: [],
             rowErrorMessage: '',
             lang: localStorage.getItem('lang'),
-            procurementAgentId: this.props.location.state.procurementAgentId,
+            procurementAgentId: this.props.match.params.procurementAgentId,
             updateRowStatus: 0,
         }
         this.addRow = this.addRow.bind(this);
@@ -287,6 +287,42 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        ProcurementAgentService.getProcurementAgentProcurementUnitList(this.state.procurementAgentId)
+            .then(response => {
+                if (response.status == 200) {
+                    let myResponse = response.data;
+                    if (myResponse.length > 0) {
+                        this.setState({ rows: myResponse });
+                    }
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+
+
         ProcurementAgentService.getProcurementAgentListAll().then(response => {
             console.log(response.data);
             if (response.status == "200") {

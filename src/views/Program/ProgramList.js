@@ -151,51 +151,11 @@ export default class ProgramList extends Component {
     return <Button type="button" size="md" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
   }
   addProductMapping(event, cell) {
-    // console.log(cell);
-
     event.stopPropagation();
-    AuthenticationService.setupAxiosInterceptors();
-    console.log("cell------", cell);
-    ProgramService.getProgramPlaningUnitListByProgramId(cell)
-      .then(response => {
-        console.log("response------->", response)
-        if (response.status == 200) {
-          let myReasponse = response.data;
-          console.log("myResponce=========", response.data);
-          this.props.history.push({
-            pathname: "/programProduct/addProgramProduct",
-            state: {
-              programPlanningUnit: myReasponse,
-              programId: cell
-            }
+    this.props.history.push({
+      pathname: `/programProduct/addProgramProduct/${cell}`,
+    });
 
-          })
-        } else {
-          this.setState({
-            message: response.data.messageCode
-          })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                console.log("Error code unkown");
-                break;
-            }
-          }
-        }
-      );
   }
 
   formatLabel(cell, row) {
