@@ -527,4 +527,5 @@
     "static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate":"One Of the mapped row is already in update.",
     "static.procurementUnit.validMaxValueText":"Maximum 14 characters are allowed.",
     "static.procurementUnit.onlyalphaNumericText":"Only alpha numeric values are allowed."
+
 }
