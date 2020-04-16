@@ -56,8 +56,8 @@ class UserService {
     changePassword(userId, oldPassword, newPassword) {
         return axios.post(`${API_URL}/api/changePassword/`, { userId, oldPassword, newPassword }, {});
     }
-    forgotPassword(username) {
-        return axios.get(`${API_URL}/api/forgotPassword/${username}`, {});
+    forgotPassword(emailId) {
+        return axios.post(`${API_URL}/api/forgotPassword/`, { emailId });
     }
     confirmForgotPasswordToken(username, token) {
         return axios.post(`${API_URL}/api/confirmForgotPasswordToken/`, { username, token }, {});

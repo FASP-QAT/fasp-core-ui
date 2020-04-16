@@ -217,11 +217,11 @@ class DefaultLayout extends Component {
                             url: '/tracerCategory/listTracerCategory',
                             icon: 'icon-graph'
                           },
-                          // {
-                          //   name: 'Product Category',
-                          //   url: '/ProductCategory/AddProductCategory',
-                          //   icon: 'icon-graph'
-                          // },
+                          {
+                            name: 'Product Category',
+                            url: '/ProductCategory/AddProductCategory',
+                            icon: 'icon-graph'
+                          },
                           {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
