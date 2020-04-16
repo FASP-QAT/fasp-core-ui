@@ -206,7 +206,7 @@ class AddSubFundingSourceComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='subFundingSourceForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}</Label>
+                            <Label htmlFor="fundingSourceId">{i18n.t('static.subfundingsource.fundingsource')}<span className="red Reqasterisk">*</span></Label>
                             <Input
                               type="select"
                               name="fundingSourceId"
@@ -225,7 +225,7 @@ class AddSubFundingSourceComponent extends Component {
                             <FormFeedback>{errors.fundingSourceId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
+                            <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}<span className="red Reqasterisk">*</span></Label>
                             <Input type="text"
                               name="subFundingSource"
                               id="subFundingSource"

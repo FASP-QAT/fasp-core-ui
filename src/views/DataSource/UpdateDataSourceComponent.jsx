@@ -287,7 +287,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="label">{i18n.t('static.datasource.datasource')}</Label>
+                                                        <Label htmlFor="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="label"

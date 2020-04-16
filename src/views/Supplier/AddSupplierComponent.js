@@ -205,7 +205,7 @@ class AddSupplierComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='supplierForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}<span className="red Reqasterisk">*</span></Label>
                               <Input
                                 type="select"
                                 name="realmId"
@@ -224,7 +224,7 @@ class AddSupplierComponent extends Component {
                                <FormText className="red">{errors.realmId}</FormText>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
+                            <Label for="supplier">{i18n.t('static.supplier.supplier')}<span className="red Reqasterisk">*</span></Label>
                               <Input type="text"
                                 name="supplier"
                                 id="supplier"

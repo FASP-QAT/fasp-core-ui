@@ -212,7 +212,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceType'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -231,7 +231,8 @@ export default class AddDataSourceTypeComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label> <Input type="text"
+                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label> 
+                                                        <Input type="text"
                                                                 name="label"
                                                                 id="label"
                                                                 bsSize="sm"

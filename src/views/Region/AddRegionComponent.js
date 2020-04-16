@@ -218,7 +218,7 @@ class AddRegionComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='regionForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
+                            <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}<span className="red Reqasterisk">*</span></Label>
                             {/* <InputGroupAddon addonType="prepend"> */}
                             {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
                             <Input
@@ -242,7 +242,7 @@ class AddRegionComponent extends Component {
 
                           <FormGroup>
 
-                            <Label for="region">{i18n.t('static.region.region')}</Label>
+                            <Label for="region">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
                             {/* <InputGroupAddon addonType="prepend"> */}
                             {/* <InputGroupText><i className="fa fa-pie-chart"></i></InputGroupText> */}
                             <Input type="text"

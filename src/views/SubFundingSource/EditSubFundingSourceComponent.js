@@ -197,7 +197,7 @@ class EditSubFundingSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
+                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"
