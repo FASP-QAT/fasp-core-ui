@@ -208,12 +208,21 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.setState({ rows })
     }
 
-    capitalize(str) {
-        let { skuCode } = this.state
-        skuCode = str.toUpperCase()
-        this.setState({
-            skuCode: skuCode
-        })
+    capitalize(event) {
+        if (event.target.name === "skuCode") {
+            let { skuCode } = this.state
+            skuCode = event.target.value.toUpperCase()
+            this.setState({
+                skuCode: skuCode
+            })
+        } else if (event.target.name === "gtin") {
+            let { gtin } = this.state
+            gtin = event.target.value.toUpperCase()
+            this.setState({
+                gtin: gtin
+            })
+
+        }
     }
 
     setTextAndValue = (event) => {
@@ -489,7 +498,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             invalid={touched.skuCode && !!errors.skuCode}
                                                             placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                             onBlur={handleBlur}
-                                                            onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event.target.value) }} />
+                                                            onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                         <FormFeedback className="red">{errors.skuCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -535,7 +544,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             invalid={touched.gtin && !!errors.gtin}
                                                             value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                                             onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event.target.value) }} />
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                         <FormFeedback className="red">{errors.gtin}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
