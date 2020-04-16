@@ -499,5 +499,13 @@
     "static.procurementAgentPlanningUnit.validUnitsPerPallet": "Please enter units per pallet",
     "static.procurementAgentPlanningUnit.validUnitsPerContainer": "Please enter units per container",
     "static.procurementAgentPlanningUnit.validVolume": "Please enter volume",
-    "static.procurementAgentPlanningUnit.validWeight": "Please enter weight"
+    "static.procurementAgentPlanningUnit.validWeight": "Please enter weight",
+    "static.masterDataSync.confirmSyncMessage": "Are you sure you want to continue?",
+    "static.masterDataSync.confirmRetrySyncMessage": "Are you sure you want to retry?",
+    "static.mapProcurementUnit.validGtinText": "Please enter valid GTIN.",
+    "static.mapProcurementUnit.validSKUCodeText": "Please enter SKU code.",
+    "static.mapProcurementUnit.validProcurementUnitText": "Please select procurement unit.",
+    "static.mapProcurementUnit.validApprovedToShippedLeadTimeText": "Please enter approved to shipped lead time.",
+    "static.mapProcurementUnit.validVendorPriceText": "Please enter vendor price.",
+    "static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate":"One Of the mapped row is already in update."
 }

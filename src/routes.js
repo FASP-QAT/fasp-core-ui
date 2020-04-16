@@ -200,8 +200,8 @@ const routes = [
   { path: '/programProduct/addProgramProduct/:programId', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.programPlanningUnit') }), component: AddProgramProduct },
 
 
-  { path: '/procurementAgent/addProcurementAgentPlanningUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementAgentPlanningUnit') }), component: AddProcurementAgentPlanningUnit },
-  { path: '/procurementAgent/addProcurementAgentProcurementUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementAgentProcurementUnit') }), component: AddProcurementAgentProcurementUnit },
+  { path: '/procurementAgent/addProcurementAgentPlanningUnit/:procurementAgentId', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementAgentPlanningUnit') }), component: AddProcurementAgentPlanningUnit },
+  { path: '/procurementAgent/addProcurementAgentProcurementUnit/:procurementAgentId', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.procurementAgentProcurementUnit') }), component: AddProcurementAgentProcurementUnit },
 
   { path: '/budget/addBudget', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.budget') }), component: AddBudgetComponent },
   { path: '/budget/listBudget', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.budget') }), component: ListBudgetComponent },

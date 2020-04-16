@@ -1,10 +1,9 @@
-
 import React, { Component } from 'react';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
-    CardFooter, Button, Table, Badge, Col, Row
+    CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
 
 } from 'reactstrap';
 import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
@@ -14,16 +13,70 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import ProcurementUnitService from "../../api/ProcurementUnitService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import i18n from '../../i18n';
+import * as Yup from 'yup';
+import { Formik } from "formik";
 const entityname = i18n.t('static.dashboard.procurementAgentProcurementUnit')
+
+let initialValues = {
+    procurementUnitId: '',
+    skuCode: '',
+    vendorPrice: '',
+    approvedToShippedLeadTime: '',
+    gtin: '',
+}
+
+const validationSchema = function (values, t) {
+    console.log("made by us schema--->", values)
+    return Yup.object().shape({
+        procurementUnitId: Yup.string()
+            .required(i18n.t('static.mapProcurementUnit.validProcurementUnitText')),
+        skuCode: Yup.string()
+            .required(i18n.t('static.mapProcurementUnit.validSKUCodeText')),
+        gtin: Yup.string()
+            .required(i18n.t('static.mapProcurementUnit.validGtinText')),
+        approvedToShippedLeadTime: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.mapProcurementUnit.validApprovedToShippedLeadTimeText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText')),
+        vendorPrice: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.mapProcurementUnit.validVendorPriceText'))
+            .min(0, i18n.t('static.procurementUnit.validValueText'))
+    })
+}
+
+const validate = (getValidationSchema) => {
+
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
 export default class AddProcurementAgentProcurementUnit extends Component {
     constructor(props) {
         super(props);
         let rows = [];
-        if (this.props.location.state.procurementAgentProcurementUnit.length > 0) {
-            rows = this.props.location.state.procurementAgentProcurementUnit;
-        }
+        // if (this.props.location.state.procurementAgentProcurementUnit.length > 0) {
+        //     rows = this.props.location.state.procurementAgentProcurementUnit;
+        // }
         this.state = {
-            procurementAgentProcurementUnit: this.props.location.state.procurementAgentProcurementUnit,
+            // procurementAgentProcurementUnit: this.props.location.state.procurementAgentProcurementUnit,
             procurementUnitId: '',
             procurementUnitName: '',
             skuCode: '',
@@ -35,9 +88,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             rows: rows,
             procurementAgentList: [],
             procurementUnitList: [],
-            addRowMessage: '',
+            rowErrorMessage: '',
             lang: localStorage.getItem('lang'),
-            procurementAgentId: this.props.location.state.procurementAgentId
+            procurementAgentId: this.props.match.params.procurementAgentId,
+            updateRowStatus: 0,
         }
         this.addRow = this.addRow.bind(this);
         // this.deleteLastRow = this.deleteLastRow.bind(this);
@@ -52,19 +106,32 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     }
 
     updateRow(idx) {
-        const rows = [...this.state.rows]
-        this.setState({
-            procurementUnitId: this.state.rows[idx].procurementUnit.id,
-            procurementUnitName: this.state.rows[idx].procurementUnit.label.label_en,
-            skuCode: this.state.rows[idx].skuCode,
-            vendorPrice: this.state.rows[idx].vendorPrice,
-            approvedToShippedLeadTime: this.state.rows[idx].approvedToShippedLeadTime,
-            gtin: this.state.rows[idx].gtin,
-            procurementAgentProcurementUnitId: this.state.rows[idx].procurementAgentProcurementUnitId,
-            isNew: false
-        })
-        rows.splice(idx, 1);
-        this.setState({ rows });
+        if (this.state.updateRowStatus == 1) {
+            this.setState({ rowErrorMessage: i18n.t('static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate') })
+        } else {
+            document.getElementById('procurementUnitId').disabled = true;
+            initialValues = {
+                procurementUnitId: this.state.rows[idx].procurementUnit.id,
+                skuCode: this.state.rows[idx].skuCode,
+                vendorPrice: this.state.rows[idx].vendorPrice,
+                approvedToShippedLeadTime: this.state.rows[idx].approvedToShippedLeadTime,
+                gtin: this.state.rows[idx].gtin,
+            }
+            const rows = [...this.state.rows]
+            this.setState({
+                procurementUnitId: this.state.rows[idx].procurementUnit.id,
+                procurementUnitName: this.state.rows[idx].procurementUnit.label.label_en,
+                skuCode: this.state.rows[idx].skuCode,
+                vendorPrice: this.state.rows[idx].vendorPrice,
+                approvedToShippedLeadTime: this.state.rows[idx].approvedToShippedLeadTime,
+                gtin: this.state.rows[idx].gtin,
+                procurementAgentProcurementUnitId: this.state.rows[idx].procurementAgentProcurementUnitId,
+                isNew: false,
+                updateRowStatus: 1
+            })
+            rows.splice(idx, 1);
+            this.setState({ rows });
+        }
     }
 
     enableRow(idx) {
@@ -100,8 +167,8 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     },
                     procurementAgent: {
                         id: this.state.procurementAgentId,
-                        label:{
-                            label_en:selectedProcurementAgentName
+                        label: {
+                            label_en: selectedProcurementAgentName
                         }
                     },
                     skuCode: this.state.skuCode,
@@ -112,9 +179,9 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                     isNew: this.state.isNew,
                     procurementAgentProcurementUnitId: this.state.procurementAgentProcurementUnitId
                 })
-            this.setState({ rows: this.state.rows, addRowMessage: '' })
+            this.setState({ rows: this.state.rows, rowErrorMessage: '' })
         } else {
-            this.state.addRowMessage = i18n.t('static.procurementAgentProcurementUnit.procurementUnitAlreadyExists')
+            this.state.rowErrorMessage = i18n.t('static.procurementAgentProcurementUnit.procurementUnitAlreadyExists')
         }
         this.setState({
             procurementUnitId: '',
@@ -124,9 +191,10 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             approvedToShippedLeadTime: '',
             gtin: '',
             procurementAgentProcurementUnitId: 0,
-            isNew: true
+            isNew: true,
+            updateRowStatus: 0
         });
-
+        document.getElementById('procurementUnitId').disabled = false;
     }
     // deleteLastRow() {
     //     this.setState({
@@ -138,6 +206,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         const rows = [...this.state.rows]
         rows.splice(idx, 1);
         this.setState({ rows })
+    }
+
+    capitalize(str) {
+        let { skuCode } = this.state
+        skuCode = str.toUpperCase()
+        this.setState({
+            skuCode: skuCode
+        })
     }
 
     setTextAndValue = (event) => {
@@ -200,6 +276,42 @@ export default class AddProcurementAgentProcurementUnit extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        ProcurementAgentService.getProcurementAgentProcurementUnitList(this.state.procurementAgentId)
+            .then(response => {
+                if (response.status == 200) {
+                    let myResponse = response.data;
+                    if (myResponse.length > 0) {
+                        this.setState({ rows: myResponse });
+                    }
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+
+
         ProcurementAgentService.getProcurementAgentListAll().then(response => {
             console.log(response.data);
             if (response.status == "200") {
@@ -268,6 +380,24 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             }
         );
     }
+
+    touchAll(errors) {
+        this.validateForm(errors);
+    }
+    validateForm(errors) {
+        this.findFirstError('procurementAgentPlanningUnitForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
     render() {
         const { procurementUnitList } = this.state;
         let procurementUnits = procurementUnitList.length > 0 && procurementUnitList.map((item, i) => {
@@ -297,42 +427,126 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 <strong>{i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit')}</strong>
                             </CardHeader>
                             <CardBody>
-                                <FormGroup>
-                                    <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
-                                    <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
-                                        {procurementAgents}
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="select">{i18n.t('static.procurementUnit.procurementUnit')}</Label>
-                                    <Input type="select" name="procurementUnitId" id="select" value={this.state.procurementUnitId} onChange={event => this.setTextAndValue(event)}>
-                                        <option value="">{i18n.t('static.common.select')}</option>
-                                        {procurementUnits}
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
-                                    <Input type="text" name="skuCode" id="skuCode" value={this.state.skuCode} placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="vendorPrice">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}</Label>
-                                    <Input type="number" min="0" name="vendorPrice" id="vendorPrice" value={this.state.vendorPrice} placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="leadTime">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}</Label>
-                                    <Input type="number" min="0" name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" value={this.state.approvedToShippedLeadTime} placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
-                                    <Input type="text" name="gtin" id="gtin" value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    {/* <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button> */}
-                                    <Button type="submit" size="md" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>
-                                    &nbsp;
+                                <Formik
+                                    enableReinitialize={true}
+                                    initialValues={initialValues}
+                                    validate={validate(validationSchema)}
+                                    onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+                                        this.addRow();
+                                        resetForm({
+                                            procurementUnitId: '',
+                                            skuCode: '',
+                                            vendorPrice: '',
+                                            approvedToShippedLeadTime: '',
+                                            gtin: '',
+                                        });
+                                    }}
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched
+                                        }) => (
+                                                <Form onSubmit={handleSubmit} noValidate name='procurementAgentPlanningUnitForm'>
+                                                    <FormGroup>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
+                                                        <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
+                                                            {procurementAgents}
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.procurementUnit')}</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="procurementUnitId"
+                                                            id="procurementUnitId"
+                                                            bsSize="sm"
+                                                            valid={!errors.procurementUnitId}
+                                                            invalid={touched.procurementUnitId && !!errors.procurementUnitId}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.procurementUnitId}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {procurementUnits}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.procurementUnitId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="skuCode"
+                                                            id="skuCode"
+                                                            value={this.state.skuCode}
+                                                            bsSize="sm"
+                                                            valid={!errors.skuCode}
+                                                            invalid={touched.skuCode && !!errors.skuCode}
+                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                            onBlur={handleBlur}
+                                                            onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event.target.value) }} />
+                                                        <FormFeedback className="red">{errors.skuCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="vendorPrice">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="vendorPrice"
+                                                            id="vendorPrice"
+                                                            bsSize="sm"
+                                                            valid={!errors.vendorPrice}
+                                                            invalid={touched.vendorPrice && !!errors.vendorPrice}
+                                                            value={this.state.vendorPrice}
+                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.vendorPrice}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="leadTime">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="approvedToShippedLeadTime"
+                                                            id="approvedToShippedLeadTime"
+                                                            bsSize="sm"
+                                                            valid={!errors.approvedToShippedLeadTime}
+                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
+                                                            value={this.state.approvedToShippedLeadTime}
+                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="gtin"
+                                                            id="gtin"
+                                                            bsSize="sm"
+                                                            valid={!errors.gtin}
+                                                            invalid={touched.gtin && !!errors.gtin}
+                                                            value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.gtin}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        {/* <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button> */}
+                                                        <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                        &nbsp;
 
                         </FormGroup>
-                                <h5 className="red">{this.state.addRowMessage}</h5>
+                                                </Form>
+                                            )} />
+                                <h5 className="red">{this.state.rowErrorMessage}</h5>
                                 <Table responsive>
                                     <thead>
                                         <tr>

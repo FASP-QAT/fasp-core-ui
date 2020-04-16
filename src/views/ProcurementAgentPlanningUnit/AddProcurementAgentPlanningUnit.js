@@ -85,11 +85,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     constructor(props) {
         super(props);
         let rows = [];
-        if (this.props.location.state.procurementAgentPlanningUnit.length > 0) {
-            rows = this.props.location.state.procurementAgentPlanningUnit;
-        }
+        // if (this.props.location.state.procurementAgentPlanningUnit.length > 0) {
+        //     rows = this.props.location.state.procurementAgentPlanningUnit;
+        // }
         this.state = {
-            procurementAgentPlanningUnit: this.props.location.state.procurementAgentPlanningUnit,
+            // procurementAgentPlanningUnit: this.props.location.state.procurementAgentPlanningUnit,
             planningUnitId: '',
             planningUnitName: '',
             skuCode: '',
@@ -107,7 +107,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
             procurementAgentPlanningUnitId: 0,
             isNew: true,
-            procurementAgentId: this.props.location.state.procurementAgentId,
+            procurementAgentId: this.props.match.params.procurementAgentId,
             updateRowStatus: 0,
             lang: localStorage.getItem('lang')
         }
@@ -311,6 +311,42 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        ProcurementAgentService.getProcurementAgentPlaningUnitList(this.state.procurementAgentId)
+            .then(response => {
+                if (response.status == 200) {
+                    let myResponse = response.data;
+                    if (myResponse.length > 0) {
+                        this.setState({ rows: myResponse });
+                    }
+
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+
         ProcurementAgentService.getProcurementAgentListAll().then(response => {
             console.log(response.data);
             if (response.status == "200") {
@@ -666,8 +702,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
                                 </FormGroup>
 
