@@ -337,6 +337,13 @@ label.arrow_label:after {
   border-radius: 0.2rem;
   width: 130px;
 }
+
+.table th, .table td {
+  padding: 0.35rem !important;
+}
+
+
+
 .page-link {
   line-height: 1;
 }
@@ -412,10 +419,14 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
-  max-height: 320px;
+  max-height: 420px;
 }
 
 .react-bootstrap-table-pagination{margin-top: 10px;}
+
+.sidebar .nav-link .nav-dropdown-toggle::before {
+  transform: rotate(-180deg !important);
+}
 
 // .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 
@@ -866,9 +877,9 @@ h5,
   // background-color: #e5edf5;
   background-color: #d1e3f5;
 }
-.table thead tr th{position: sticky;
-  background: #fff;
-  top: 0px;}
+// .table thead tr th{position: sticky;
+//   background: #fff;
+//   top: 0px;}
 
 
 .dropdown-header {
