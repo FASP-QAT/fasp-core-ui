@@ -21,6 +21,13 @@ class RegionService {
         return axios.get(`${API_URL}/api/region/${json}`, {}
         );
     }
+    getRegionForCountryId(realmCountryId) {
+        return axios.get(`${API_URL}/api/region/realmCountry/${realmCountryId}`, {}
+        );
+    }
+    editRegionsForcountry(json){
+        return axios.put(`${API_URL}/api/realmCountry/region`, json, {});
+    }
 
 }
 export default new RegionService();

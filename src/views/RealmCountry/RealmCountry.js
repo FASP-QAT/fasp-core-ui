@@ -16,6 +16,7 @@ import RealmService from "../../api/RealmService";
 import RealmCountryService from "../../api/RealmCountryService";
 import CurrencyService from "../../api/CurrencyService";
 import UnitService from "../../api/UnitService";
+import DeleteSpecificRow from "../ProgramProduct/TableFeatureTwo";
 const initialValues = {
     country: [],
     currency: [],
@@ -101,6 +102,8 @@ class RealmCountry extends Component {
         this.submitForm = this.submitForm.bind(this);
         this.handleEnableSpecificRow = this.handleEnableSpecificRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
+        
     }
     currentDate() {
         var todaysDate = new Date();
@@ -194,6 +197,12 @@ class RealmCountry extends Component {
         rows[idx].active = true
 
         // rows.splice(idx, 1);
+        this.setState({ rows })
+    }
+
+    handleRemoveSpecificRow(idx) {
+        const rows = [...this.state.rows]
+        rows.splice(idx, 1);
         this.setState({ rows })
     }
 
@@ -672,6 +681,8 @@ class RealmCountry extends Component {
                                                 <td>
                                                     {this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={() => { this.handleDisableSpecificRow(idx) }} ><i className="fa fa-times"></i>Disable</Button>}
                                                     {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={() => { this.handleEnableSpecificRow(idx) }}><i className="fa fa-check"></i>Activate</Button>}
+                                                    {!this.state.rows[idx].realmCountryId && (<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
+
                                                 </td>
                                             </tr>))
 
