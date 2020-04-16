@@ -32,7 +32,7 @@ export default class PlanningUnitListComponent extends Component {
     filterData() {
         let forecastingUnitId = document.getElementById("forecastingUnitId").value;
         if (forecastingUnitId != 0) {
-            const selSource = this.state.planningUnitList.filter(c => c.foreacastingUnit.forecastingUnitId == forecastingUnitId)
+            const selSource = this.state.planningUnitList.filter(c => c.forecastingUnit.forecastingUnitId == forecastingUnitId)
             this.setState({
                 selSource
             });
@@ -53,6 +53,7 @@ export default class PlanningUnitListComponent extends Component {
 
         })
     }
+   
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ForecastingUnitService.getForecastingUnitList().then(response => {
@@ -113,6 +114,7 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     editPlanningUnit(planningUnit) {
+        console.log('**'+JSON.stringify(planningUnit))
         this.props.history.push({
             pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
             // state: { planningUnit: planningUnit }
@@ -160,7 +162,7 @@ export default class PlanningUnitListComponent extends Component {
             headerAlign: 'center',
             formatter: this.formatLabel
         },  {
-            dataField: 'foreacastingUnit.label',
+            dataField: 'forecastingUnit.label',
             text: i18n.t('static.forecastingunit.forecastingunit'),
             sort: true,
             align: 'center',
@@ -193,12 +195,12 @@ export default class PlanningUnitListComponent extends Component {
             }
         }, {
             dataField: 'planningUnitId',
-            text: 'Action',
+            text: i18n.t('static.common.action'),
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>Planning unit capacity</Button>
-                )
+                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.capacityupdate')}</Button>
+                 )
             }
         }];
         const options = {
