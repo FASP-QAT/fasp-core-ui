@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     Card, CardBody, CardHeader,
-    CardFooter, Button, Col, Progress, FormGroup,Row
+    CardFooter, Button, Col, Progress, FormGroup, Row
 } from 'reactstrap';
 import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
@@ -11,6 +11,9 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
 import i18next from 'i18next';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 export default class SyncMasterData extends Component {
 
     constructor() {
@@ -26,7 +29,27 @@ export default class SyncMasterData extends Component {
 
     componentDidMount() {
         document.getElementById("retryButtonDiv").style.display = "none";
-        this.syncMasters();
+        confirmAlert({
+            // title: i18n.t('static.masterDataSync.masterDataSync'),
+            message: i18n.t('static.masterDataSync.confirmSyncMessage'),
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
+                        this.syncMasters();
+                    }
+                },
+                {
+                    label: i18n.t('static.program.no'),
+                    onClick: () => {
+                        document.getElementById("retryButtonDiv").style.display = "block";
+                        this.setState({
+                            message: i18n.t('static.actionCancelled')
+                        })
+                    }
+                }
+            ]
+        });
     }
 
     render() {
@@ -1057,13 +1080,36 @@ export default class SyncMasterData extends Component {
 
 
     retryClicked() {
-        this.setState({
-            totalMasters: 20,
-            syncedMasters: 0,
-            syncedPercentage: 0,
-            errorMessage: "",
-            successMessage: ""
-        })
-        this.syncMasters();
+        confirmAlert({
+            // title: i18n.t('static.masterDataSync.masterDataSync'),
+            message: i18n.t('static.masterDataSync.confirmRetrySyncMessage'),
+            buttons: [
+                {
+                    label: i18n.t('static.program.yes'),
+                    onClick: () => {
+                        this.setState({
+                            totalMasters: 20,
+                            syncedMasters: 0,
+                            syncedPercentage: 0,
+                            errorMessage: "",
+                            successMessage: ""
+                        })
+                        this.syncMasters();
+                    }
+                },
+                {
+                    label: i18n.t('static.program.no'),
+                    onClick: () => {
+                        // document.getElementById("retryButtonDiv").style.display = "block";
+                        this.setState({
+                            message: i18n.t('static.actionCancelled')
+                        })
+                    }
+                }
+            ]
+        });
+
+
+
     }
 }
