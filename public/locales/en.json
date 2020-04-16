@@ -475,5 +475,6 @@
 
     "static.procurementAgentPlanningUnit.unitPerContainer": "Unit per container",
     "static.procurementAgentPlanningUnit.unitPerContainerText": "Enter unit per container",
-    "static.planningunit.forecastingunit":"Forecasting Unit"
+    "static.planningunit.forecastingunit":"Forecasting Unit",
+    "static.programPlanningUnit.validReorderFrequencyText":"Please enter reorder frequency in months"
 }
