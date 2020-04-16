@@ -6,6 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 let initialValues = {
     subFundingSource: ""
@@ -66,10 +67,13 @@ class EditSubFundingSourceComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
         SubFundingSourceService.getSubFundingSourceServiceById(this.props.match.params.subFundingSourceId).then(response => {
             this.setState({
                 subFundingSource: response.data
@@ -124,6 +128,7 @@ class EditSubFundingSourceComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <h5>{this.state.message}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -138,37 +143,33 @@ class EditSubFundingSourceComponent extends Component {
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
+                                            console.log("my response---", response);
                                             if (response.status == 200) {
                                                 this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
-                                            } else {
-                                                this.setState({
-                                                    message: response.data.messageCode
-                                                })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+                                    // .catch(
+                                    //     error => {
+                                    //         if (error.message === "Network Error") {
+                                    //             this.setState({ message: error.message });
+                                    //         } else {
+                                    //             switch (error.response ? error.response.status : "") {
+                                    //                 case 500:
+                                    //                 case 401:
+                                    //                 case 404:
+                                    //                 case 406:
+                                    //                 case 412:
+                                    //                     this.setState({ message: error.response.data.messageCode });
+                                    //                     break;
+                                    //                 default:
+                                    //                     this.setState({ message: 'static.unkownError' });
+                                    //                     break;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // );
                                 }}
                                 render={
                                     ({
@@ -197,7 +198,7 @@ class EditSubFundingSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
+                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"

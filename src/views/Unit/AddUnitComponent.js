@@ -230,7 +230,7 @@ class AddUnitComponent extends Component {
                                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}</Label>
+                                                        <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input
@@ -252,7 +252,7 @@ class AddUnitComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="unitName">{i18n.t('static.unit.unit')}</Label>
+                                                        <Label for="unitName">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="unitName"
                                                             id="unitName"
@@ -267,7 +267,7 @@ class AddUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.unitName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}</Label>
+                                                        <Label for="unitCode">{i18n.t('static.unit.unitCode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="unitCode"
                                                             id="unitCode"

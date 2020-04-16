@@ -35,7 +35,7 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    this.props.history.push(`/logout`)
+    this.props.history.push(`/logout/static.logoutSuccess`)
   }
 
   render() {
