@@ -62,11 +62,12 @@ class AddprogramPlanningUnit extends Component {
     constructor(props) {
         super(props);
         let rows = [];
-        if (this.props.location.state.programPlanningUnit.length > 0) {
-            rows = this.props.location.state.programPlanningUnit;
-        }
+        // if (this.props.location.state.programPlanningUnit.length > 0) {
+        //     rows = this.props.location.state.programPlanningUnit;
+        // }
         this.state = {
-            programPlanningUnit: this.props.location.state.programPlanningUnit,
+            // programPlanningUnit: this.props.location.state.programPlanningUnit,
+            programPlanningUnit: [],
             planningUnitId: '',
             planningUnitName: '',
             reorderFrequencyInMonths: '',
@@ -76,7 +77,7 @@ class AddprogramPlanningUnit extends Component {
             rowErrorMessage: '',
             programPlanningUnitId: 0,
             isNew: true,
-            programId: this.props.location.state.programId,
+            programId: this.props.match.params.programId,
             updateRowStatus: 0,
             lang: localStorage.getItem('lang')
 
@@ -232,6 +233,42 @@ class AddprogramPlanningUnit extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        ProgramService.getProgramPlaningUnitListByProgramId(this.state.programId)
+            .then(response => {
+                if (response.status == 200) {
+                    let myReasponse = response.data;
+                    if (myReasponse.length > 0) {
+                        this.setState({ rows: myReasponse });
+                    }
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+
+
         ProgramService.getProgramList().then(response => {
             if (response.status == "200") {
                 this.setState({
@@ -369,7 +406,7 @@ class AddprogramPlanningUnit extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                         <Input
                                                             type="select"
-                                                            value={this.state.programPlanningUnit.programId}
+                                                            value={this.state.programId}
                                                             name="programId"
                                                             id="programId"
                                                             disabled>
@@ -458,8 +495,8 @@ class AddprogramPlanningUnit extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
                                 </FormGroup>
                             </CardFooter>
