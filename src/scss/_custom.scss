@@ -4,6 +4,9 @@ body {
   color: #212721!important;
 }
 
+::placeholder {
+  color:#212721!important;
+}
 /* ————————————————————–
   Tree core styles
 */
@@ -337,6 +340,18 @@ label.arrow_label:after {
   border-radius: 0.2rem;
   width: 130px;
 }
+
+.table th, .table td {
+  padding: 0.35rem !important;
+}
+// input asterisk
+.Reqasterisk{    font-size: 15px;
+  position: absolute;
+  margin-left: 3px;
+ }
+
+
+
 .page-link {
   line-height: 1;
 }
@@ -412,10 +427,14 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
-  max-height: 320px;
+  max-height: 420px;
 }
 
 .react-bootstrap-table-pagination{margin-top: 10px;}
+
+.sidebar .nav-link .nav-dropdown-toggle::before {
+  transform: rotate(-180deg !important);
+}
 
 // .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 
@@ -811,6 +830,7 @@ h5,
 .table {
 
   color: #212721!important;
+  cursor: pointer!important;
 }
 
 .btn-secondary {
@@ -866,13 +886,15 @@ h5,
   // background-color: #e5edf5;
   background-color: #d1e3f5;
 }
-.table thead tr th{position: sticky;
-  background: #fff;
-  top: 0px;}
+// .table thead tr th{position: sticky;
+//   background: #fff;
+//   top: 0px;}
 
 
 .dropdown-header {
-  color: #212721;}
+  color: #212721;
+  font-size:15px;
+}
 
 .dropdown-item {
   color: #212721;
@@ -881,3 +903,8 @@ h5,
 .Select--single>.Select-control .Select-value, .Select-placeholder {
   color: #212721!important;
 }
+
+.sidebar .nav-dropdown-toggle::before {
+   transform: scaleX(-1);
+}
+
