@@ -94,7 +94,7 @@ export default class AddOrganisationComponent extends Component {
         if (event.target.name === "organisationName") {
             organisation.label.label_en = event.target.value
         } else if (event.target.name === "organisationCode") {
-            organisation.organisationCode = event.target.value
+            organisation.organisationCode = event.target.value.toUpperCase();
         } else if (event.target.name === "realmId") {
             organisation.realm.realmId = event.target.value
         }
@@ -372,6 +372,7 @@ export default class AddOrganisationComponent extends Component {
                                                             invalid={touched.organisationCode && !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.organisation.organisationCode}
                                                             id="organisationCode"  />
                                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                                     </FormGroup>
@@ -393,7 +394,7 @@ export default class AddOrganisationComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;

@@ -130,8 +130,15 @@ class DefaultLayout extends Component {
                           ,
                           {
                             name: i18n.t('static.dashboard.realm'),
-                            url: '/realm/realmlist',
-                            icon: 'fa fa-th-large'
+                            icon: 'fa fa-list',
+                            children:[ {
+                              name: i18n.t('static.dashboard.realm'),
+                              url: '/realm/realmlist',
+                              icon: 'fa fa-th-large'},{
+                              name: i18n.t('static.dashboard.realmcountry'),
+                              url: '/realmCountry/listRealmCountry',
+                              icon: 'fa fa-globe'
+                            }]
                           },
                         ]
                       },
@@ -217,11 +224,11 @@ class DefaultLayout extends Component {
                             url: '/tracerCategory/listTracerCategory',
                             icon: 'icon-graph'
                           },
-                          // {
-                          //   name: 'Product Category',
-                          //   url: '/ProductCategory/AddProductCategory',
-                          //   icon: 'icon-graph'
-                          // },
+                          {
+                            name: 'Product Category',
+                            url: '/ProductCategory/AddProductCategory',
+                            icon: 'icon-graph'
+                          },
                           {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
@@ -230,6 +237,11 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'icon-graph'
+                          },
+                          {
+                            name: i18n.t('static.procurementUnit.procurementUnit'),
+                            url: '/procurementUnit/listProcurementUnit',
+                            icon: 'fa fa-building'
                           },
                           // {
                           //   name: i18n.t('static.dashboard.product'),

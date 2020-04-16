@@ -4,6 +4,9 @@ body {
   color: #212721!important;
 }
 
+::placeholder {
+  color:#212721!important;
+}
 /* ————————————————————–
   Tree core styles
 */
@@ -827,6 +830,7 @@ h5,
 .table {
 
   color: #212721!important;
+  cursor: pointer!important;
 }
 
 .btn-secondary {
@@ -888,7 +892,9 @@ h5,
 
 
 .dropdown-header {
-  color: #212721;}
+  color: #212721;
+  font-size:15px;
+}
 
 .dropdown-item {
   color: #212721;
@@ -897,3 +903,8 @@ h5,
 .Select--single>.Select-control .Select-value, .Select-placeholder {
   color: #212721!important;
 }
+
+.sidebar .nav-dropdown-toggle::before {
+   transform: scaleX(-1);
+}
+

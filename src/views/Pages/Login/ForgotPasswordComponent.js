@@ -9,13 +9,14 @@ import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 
 const initialValues = {
-    username: ""
+    emailId: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        username: Yup.string()
-            .required('Please enter username')
+        emailId: Yup.string()
+            .email(i18n.t('static.user.invalidemail'))
+            .required(i18n.t('static.user.validemail')),
     })
 }
 
@@ -56,7 +57,7 @@ class ForgotPasswordComponent extends Component {
 
     touchAll(setTouched, errors) {
         setTouched({
-            username: true
+            emailId: true
         }
         )
         this.validateForm(errors)
@@ -79,7 +80,6 @@ class ForgotPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <h5>{i18n.t(this.state.message)}</h5>
                 <div className="Login-component">
                     <Container className="container-login">
                         <Row className="justify-content-center ">
@@ -89,7 +89,7 @@ class ForgotPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
-                                <h5 className="mx-4">{this.state.message}</h5>
+                                <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4 ">
 
                                     <CardHeader>
@@ -100,7 +100,7 @@ class ForgotPasswordComponent extends Component {
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (navigator.onLine) {
-                                                UserService.forgotPassword(values.username)
+                                                UserService.forgotPassword(values.emailId)
                                                     .then(response => {
                                                         if (response.status == 200) {
                                                             this.props.history.push(`/login/static.message.user.forgotPasswordSuccess`)
@@ -112,13 +112,17 @@ class ForgotPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
+                                                            console.log(error)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
+                                                                    case 404:
+                                                                        this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                                                        break;
                                                                     case 500:
                                                                     case 401:
-                                                                    case 404:
+                                                                    case 403:
                                                                     case 406:
                                                                     case 412:
                                                                         this.setState({ message: error.response.data.messageCode });
@@ -153,18 +157,18 @@ class ForgotPasswordComponent extends Component {
                                                         <CardBody className="p-4">
 
                                                             <FormGroup>
-                                                                <Label for="username">Username</Label>
+                                                                <Label for="emailId">Email Id</Label>
                                                                 <Input type="text"
-                                                                    name="username"
-                                                                    id="username"
+                                                                    name="emailId"
+                                                                    id="emailId"
                                                                     bsSize="sm"
-                                                                    valid={!errors.username}
-                                                                    invalid={touched.username && !!errors.username}
+                                                                    valid={!errors.emailId}
+                                                                    invalid={touched.emailId && !!errors.emailId}
                                                                     onChange={handleChange}
                                                                     onBlur={handleBlur}
                                                                     required
                                                                 />
-                                                                <FormFeedback>{errors.username}</FormFeedback>
+                                                                <FormFeedback>{errors.emailId}</FormFeedback>
                                                             </FormGroup>
                                                         </CardBody>
                                                         <CardFooter>

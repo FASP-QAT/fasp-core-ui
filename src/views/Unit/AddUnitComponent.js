@@ -75,7 +75,7 @@ class AddUnitComponent extends Component {
     dataChange(event) {
         let { unit } = this.state;
         if (event.target.name == "dimensionId") {
-            unit.dimension.dimensionId = event.target.value;
+            unit.dimension.id = event.target.value;
         }
         if (event.target.name == "unitName") {
             unit.label.label_en = event.target.value;

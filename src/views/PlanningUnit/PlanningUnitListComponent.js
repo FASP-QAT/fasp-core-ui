@@ -4,8 +4,8 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
-import PlanningUnitService from '../../api/PlanningUnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
+import PlanningUnitService from '../../api/PlanningUnitService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -32,7 +32,7 @@ export default class PlanningUnitListComponent extends Component {
     filterData() {
         let forecastingUnitId = document.getElementById("forecastingUnitId").value;
         if (forecastingUnitId != 0) {
-            const selSource = this.state.planningUnitList.filter(c => c.foreacastingUnit.forecastingUnitId == forecastingUnitId)
+            const selSource = this.state.planningUnitList.filter(c => c.forecastingUnit.forecastingUnitId == forecastingUnitId)
             this.setState({
                 selSource
             });
@@ -42,7 +42,17 @@ export default class PlanningUnitListComponent extends Component {
             });
         }
     }
+   
+    PlanningUnitCapacity(event, row) {
+        event.stopPropagation();
+        console.log(JSON.stringify(row))
+        this.props.history.push({
+            pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
+            state: { planningUnit: row }
+           
 
+        })
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         ForecastingUnitService.getForecastingUnitList().then(response => {
@@ -57,7 +67,7 @@ export default class PlanningUnitListComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -85,7 +95,7 @@ export default class PlanningUnitListComponent extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -103,6 +113,7 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     editPlanningUnit(planningUnit) {
+        console.log('**'+JSON.stringify(planningUnit))
         this.props.history.push({
             pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
             // state: { planningUnit: planningUnit }
@@ -142,7 +153,7 @@ export default class PlanningUnitListComponent extends Component {
             </span>
         );
 
-        const columns = [ {
+        const columns = [{
             dataField: 'label',
             text: i18n.t('static.planningunit.planningunit'),
             sort: true,
@@ -150,27 +161,27 @@ export default class PlanningUnitListComponent extends Component {
             headerAlign: 'center',
             formatter: this.formatLabel
         },  {
-            dataField: 'foreacastingUnit.label',
+            dataField: 'forecastingUnit.label',
             text: i18n.t('static.forecastingunit.forecastingunit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'unit.label',
             text: i18n.t('static.unit.unit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'multiplier',
             text: i18n.t('static.unit.multiplier'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             //formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
             sort: true,
@@ -180,6 +191,15 @@ export default class PlanningUnitListComponent extends Component {
                 return (
                     (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
+            }
+        }, {
+            dataField: 'planningUnitId',
+            text: i18n.t('static.common.action'),
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
+                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.capacityupdate')}</Button>
+                 )
             }
         }];
         const options = {

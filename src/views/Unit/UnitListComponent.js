@@ -64,7 +64,7 @@ export default class UnitListComponent extends Component {
     filterData() {
         let dimensionId = document.getElementById("dimensionId").value;
         if (dimensionId != 0) {
-            const selSource = this.state.unitList.filter(c => c.dimension.dimensionId == dimensionId)
+            const selSource = this.state.unitList.filter(c => c.dimension.id == dimensionId)
             this.setState({
                 selSource
             });

@@ -59,7 +59,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                     labelId: '',
                 },
                 realm: {
-                    realmId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -287,8 +287,8 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
 
                                                         &nbsp;

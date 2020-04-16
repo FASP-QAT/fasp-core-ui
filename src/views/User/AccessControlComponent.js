@@ -359,41 +359,11 @@ class AccessControlComponent extends Component {
                 }
             }
         );
-        ProductService.getProductList().then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    productList: response.data
-                });
-            } else {
-                this.setState({
-                    message: response.data.messageCode
-                })
-            }
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
-                    }
-                }
-            }
-        );
+       
         this.filterData();
         this.filterOrganisation();
         this.filterHealthArea();
-
+        this.filterProgram();
     }
     render() {
         const { selProgram } = this.state;
@@ -472,8 +442,8 @@ class AccessControlComponent extends Component {
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                    <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>
+                                    <Button type="submit" size="md" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                     &nbsp;
 
                         </FormGroup>
