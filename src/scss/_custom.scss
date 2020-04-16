@@ -309,6 +309,7 @@ label.arrow_label:after {
 .react-bootstrap-table-pagination-total {
   font-size: 12px;
 }
+
 .Gobtn {
   margin-left: 5px;
   border-radius: 0.2rem !important;
@@ -416,7 +417,7 @@ label.arrow_label:after {
 // table radio button
 .P-absltRadio{position: absolute;}
 #active2{margin-left: 0rem !important;}
-@media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}}
+@media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}.Selectdiv{position: absolute;top:-25px;margin-bottom: 0.5rem;}}
 // radio button
 .form-check {
   padding-left: 1.25rem !important;
@@ -427,7 +428,7 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
-  max-height: 420px;
+  max-height: 440px;
 }
 
 .react-bootstrap-table-pagination{margin-top: 10px;}
