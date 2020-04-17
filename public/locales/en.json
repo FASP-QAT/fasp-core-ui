@@ -524,6 +524,8 @@
     "static.region.capacitycbmtext":"Enter Capacity CBM",
     "static.region.gln":"GLN",
     "static.region.glntext":"Enter GLN",
-    "static.dashboad.regioncountry":"Realm Country Region"
-
+    "static.dashboad.regioncountry":"Realm Country Region",
+    "static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate":"One Of the mapped row is already in update.",
+    "static.procurementUnit.validMaxValueText":"Maximum 14 characters are allowed.",
+    "static.procurementUnit.onlyalphaNumericText":"Only alpha numeric values are allowed."
 }
