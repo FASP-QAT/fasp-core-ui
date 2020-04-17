@@ -13,7 +13,7 @@ import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
-import PlanningUnitService from "../../api/PlanningUnitService";
+import RegionService from "../../api/RegionService";
 import UnitService from "../../api/UnitService";
 const initialValues = {
     startDate: '',
@@ -22,19 +22,14 @@ const initialValues = {
     country: ''
 
 }
-const entityname = i18n.t('static.dashboad.planningunitcountry')
+const entityname = i18n.t('static.dashboad.regioncountry')
 const validationSchema = function (values, t) {
     return Yup.object().shape({
-        planningUnit: Yup.string()
-            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         label: Yup.string()
-            .required(i18n.t('static.planningunit.Countrytext')),
-        skuCode: Yup.string()
-            .required(i18n.t('static.procurementAgentProcurementUnit.skuCodeText')),
-        multiplier: Yup.number()
-            .required(i18n.t('static.planningunit.multipliertext')).min(0, i18n.t('static.program.validvaluetext')),
-        unitId: Yup.string()
-            .required(i18n.t('static.product.productunittext'))
+            .required(i18n.t('static.region.validregion')),
+        capacityCBM: Yup.number()
+            .min(0, i18n.t('static.program.validvaluetext')),
+       
     })
 }
 
@@ -60,14 +55,14 @@ const getErrorsFromValidationError = (validationError) => {
     }, {})
 }
 
-class PlanningUnitCountry extends Component {
+class RealmCountryRegion extends Component {
     constructor(props) {
         super(props);
         this.state = {
             units: [],
             lang: localStorage.getItem('lang'),
-            planningUnitCountry: {},
-            planningUnits: [],
+            regionCountry: {},
+            regions: [],
             realmCountry: {
                 realmCountryId: '',
                 country: {
@@ -82,23 +77,13 @@ class PlanningUnitCountry extends Component {
                         label_en: ''
                     }
                 }
-            }, realmCountryName: '',
-            label: {
+            }, label: {
                 label_en: ''
             },
-            rows: [],
-            planningUnit: {
-                planningUnitId: '',
-                label: {
-                    label_en: ''
-                }
-            },
-            unit: {
-                unitId: '',
-                label: {
-                    label_en: ''
-                }
-            }
+            capacityCBM:'',
+            gln:'',
+            rows: []
+           
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.handleDisableSpecificRow = this.handleDisableSpecificRow.bind(this);
@@ -112,11 +97,8 @@ class PlanningUnitCountry extends Component {
   
     touchAll(setTouched, errors) {
         setTouched({
-            planningUnit: true,
-            startDate: true,
-            stopDate: true,
-            country: true,
-
+            label: true,
+           
         }
         )
         this.validateForm(errors)
@@ -139,29 +121,17 @@ class PlanningUnitCountry extends Component {
 
     setTextAndValue = (event) => {
         // let { budget } = this.state;
-        if (event.target.name === "planningUnit") {
-            this.state.planningUnit.planningUnitId = event.target.value;
-            this.state.planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
-            console.log(event.target.value)
-        }
+       
         if (event.target.name === "label") {
             this.state.label.label_en = event.target.value;
         }
-        if (event.target.name === "skuCode") {
-            this.state.skuCode = event.target.value;
+        
+        if (event.target.name === "capacityCBM") {
+            this.state.capacityCBM = event.target.value;
 
         }
-        if (event.target.name === "unitId") {
-            this.state.unit.unitId = event.target.value;
-            this.state.unit.label.label_en = event.target[event.target.selectedIndex].text;
-            console.log(event.target.value)
-        }
-        if (event.target.name === "multiplier") {
-            this.state.multiplier = event.target.value;
-
-        }
-        if (event.target.name === "gtin") {
-            this.state.gtin = event.target.value;
+        if (event.target.name === "gln") {
+            this.state.gln = event.target.value;
 
         }
     }
@@ -203,11 +173,11 @@ class PlanningUnitCountry extends Component {
 
     submitForm() {
         console.log(JSON.stringify(this.state.rows))
-        var planningUnitCountry = this.state.rows
+        var regionCountry = this.state.rows
 
 
         AuthenticationService.setupAxiosInterceptors();
-        RealmCountryService.editPlanningUnitCountry(planningUnitCountry)
+        RegionService.editRegionsForcountry(regionCountry)
             .then(response => {
                 if (response.status == 200) {
                     this.props.history.push(`/realmCountry/listRealmCountry/` + i18n.t(response.data.messageCode, { entityname }))
@@ -244,32 +214,7 @@ class PlanningUnitCountry extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        UnitService.getUnitListAll()
-            .then(response => {
-                this.setState({
-                    units: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-        RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
+            RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
             console.log(JSON.stringify(response.data))
             this.setState({
                 realmCountry: response.data,
@@ -297,10 +242,10 @@ class PlanningUnitCountry extends Component {
                 }
             }
         );
-        RealmCountryService.getPlanningUnitCountryForId(this.props.match.params.realmCountryId).then(response => {
+        RegionService.getRegionForCountryId(this.props.match.params.realmCountryId).then(response => {
             console.log(response.data);
             this.setState({
-                planningUnitCountry: response.data,
+                regionCountry: response.data,
                 rows: response.data
             })
         }).catch(
@@ -324,33 +269,7 @@ class PlanningUnitCountry extends Component {
                 }
             }
         );
-        PlanningUnitService.getAllPlanningUnitList()
-            .then(response => {
-                console.log(response.data)
-                this.setState({
-                    planningUnits: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
+        
     }
     render() {
         const { units } = this.state;
@@ -362,11 +281,11 @@ class PlanningUnitCountry extends Component {
                     </option>
                 )
             }, this);
-        const { planningUnits } = this.state;
-        let planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
+        const { regions } = this.state;
+        let regionList = regions.length > 0
+            && regions.map((item, i) => {
                 return (
-                    <option key={i} value={item.planningUnitId}>
+                    <option key={i} value={item.regionId}>
                         {item.label.label_en}
                     </option>
                 )
@@ -378,38 +297,24 @@ class PlanningUnitCountry extends Component {
                 <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                     <Card>
                         <CardHeader>
-                            <strong>{i18n.t('static.dashboad.planningunitcountry')}</strong>
+                            <strong>{i18n.t('static.dashboad.regioncountry')}</strong>
                         </CardHeader>
                         <CardBody>
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.skuCode + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
-                                    if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != "" && this.state.skuCode != "" && this.state.unit.unitId != "" && this.state.multiplier != "") {
+                                    if ( this.state.label.label_en != "" ) {
                                         var json =
                                         {
                                             realmCountry: {
                                                 id: this.props.match.params.realmCountryId
                                             }
-                                            ,
-                                            planningUnit: {
-                                                id: this.state.planningUnit.planningUnitId,
-                                                label: {
-                                                    label_en: this.state.planningUnit.label.label_en
-                                                }
-                                            }
                                             , label: { label_en: this.state.label.label_en },
-                                            skuCode: this.state.skuCode,
-                                            unit: {
-                                                unitId: this.state.unit.unitId,
-                                                label: {
-                                                    label_en: this.state.unit.label.label_en
-                                                }
-                                            },
-                                            multiplier: this.state.multiplier,
+                                            
+                                            capacityCBM: this.state.capacityCBM,
 
-                                            gtin: this.state.gtin,
+                                            gln: this.state.gln,
                                             active: true
 
                                         }
@@ -447,18 +352,7 @@ class PlanningUnitCountry extends Component {
                                             </Input>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <Input type="select" name="planningUnit" id="planningUnit" bsSize="sm"
-                                                valid={!errors.planningUnit}
-                                                invalid={touched.planningUnit && !!errors.planningUnit}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }} required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {planningUnitList}
-                                            </Input> <FormFeedback className="red">{errors.planningUnit}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="label">{i18n.t('static.planningunit.countrysku')}</Label>
+                                            <Label for="label">{i18n.t('static.region.region')}</Label>
                                             <Input type="text"
                                                 name="label"
                                                 id="label"
@@ -472,67 +366,35 @@ class PlanningUnitCountry extends Component {
                                             <FormFeedback className="red">{errors.label}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
-                                            <Input type="text"
-                                                name="skuCode"
-                                                id="skuCode" bsSize="sm"
-                                                valid={!errors.skuCode}
-                                                invalid={touched.skuCode && !!errors.skuCode}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e);  }}
-                                                onBlur={handleBlur}
-                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
-                                                value={this.CapitalizeFull(this.state.skuCode)}
-                                                required />
-                                            <FormFeedback className="red">{errors.skuCode}</FormFeedback>
-
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
-                                            <Input
-                                                type="select"
-                                                name="unitId"
-                                                id="unitId"
-                                                bsSize="sm"
-                                                valid={!errors.unitId}
-                                                invalid={touched.unitId && !!errors.unitId}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                onBlur={handleBlur}
-                                                required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {unitList}
-                                            </Input>
-                                            <FormFeedback className="red">{errors.unitId}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <Label for="multiplier">{i18n.t('static.unit.multiplier')}</Label>
+                                            <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}</Label>
                                             <Input type="number"
-                                                name="multiplier"
-                                                id="multiplier"
+                                                name="capacityCBM"
+                                                id="capacityCBM"
                                                 bsSize="sm"
-                                                valid={!errors.multiplier}
-                                                invalid={touched.multiplier && !!errors.multiplier}
+                                                valid={!errors.capacityCBM}
+                                                invalid={touched.capacityCBM && !!errors.capacityCBM}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
-                                                required />
-                                            <FormFeedback className="red">{errors.multiplier}</FormFeedback>
+                                                placeholder={i18n.t('static.region.capacitycbmtext')}
+                                                />
+                                            <FormFeedback className="red">{errors.capacityCBM}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
-                                            <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
+                                            <Label for="gln">{i18n.t('static.region.gln')}</Label>
                                             <Input
-
                                                 type="text"
                                                 min="0"
-                                                name="gtin"
-                                                id="gtin"
+                                                name="gln"
+                                                id="gln"
                                                 bsSize="sm"
-                                                valid={!errors.gtin}
-                                                invalid={touched.gtin && !!errors.gtin}
+                                                valid={!errors.gln}
+                                                invalid={touched.gln && !!errors.gln}
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e);  }}
-                                                value={this.CapitalizeFull(this.state.gtin)}
-                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
+                                                value={this.CapitalizeFull(this.state.gln)}
+                                                placeholder={i18n.t('static.region.glntext')}
                                             />
-                                            <FormFeedback className="red">{errors.gtin}</FormFeedback>
+                                            <FormFeedback className="red">{errors.gln}</FormFeedback>
                                         </FormGroup>
 
                                         <FormGroup>
@@ -544,12 +406,9 @@ class PlanningUnitCountry extends Component {
 
                                 <thead>
                                     <tr>
-                                        <th className="text-center"> {i18n.t('static.dashboard.planningunit')} </th>
-                                        <th className="text-center"> {i18n.t('static.planningunit.countrysku')}</th>
-                                        <th className="text-center"> {i18n.t('static.procurementAgentProcurementUnit.skuCode')} </th>
-                                        <th className="text-center">{i18n.t('static.unit.unit')}</th>
-                                        <th className="text-center">{i18n.t('static.unit.multiplier')}</th>
-                                        <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>
+                                        <th className="text-center"> {i18n.t('static.dashboard.region')} </th>
+                                        <th className="text-center">{i18n.t('static.region.capacitycbm')}</th>
+                                        <th className="text-center">{i18n.t('static.region.gln')}</th>
                                         <th className="text-center">{i18n.t('static.common.status')}</th>
                                         <th className="text-center">{i18n.t('static.common.action')}</th>
                                     </tr>
@@ -562,22 +421,14 @@ class PlanningUnitCountry extends Component {
 
                                             <tr id="addr0" key={idx} >
                                                 <td>
-                                                    {this.state.rows[idx].planningUnit.label.label_en}
-                                                </td>
-                                                <td>
 
                                                     {this.state.rows[idx].label.label_en}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].skuCode}
-                                                </td><td>
-                                                    {this.state.rows[idx].unit.label.label_en}
+                                                    {this.state.rows[idx].capacityCBM}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].multiplier}
-                                                </td>
-                                                <td>
-                                                    {this.state.rows[idx].gtin}
+                                                    {this.state.rows[idx].gln}
                                                 </td>
                                                 <td>
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
@@ -585,7 +436,7 @@ class PlanningUnitCountry extends Component {
                                                 <td>
                                                     {this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={() => { this.handleDisableSpecificRow(idx) }} ><i className="fa fa-times"></i>Disable</Button>}
                                                     {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={() => { this.handleEnableSpecificRow(idx) }}><i className="fa fa-check"></i>Activate</Button>}
-                                                    {!this.state.rows[idx].realmCountryPlanningUnitId && (<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
+                                                    {!this.state.rows[idx].realmCountryRegionId && (<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
 
                                                 </td>
                                             </tr>)
@@ -615,5 +466,5 @@ class PlanningUnitCountry extends Component {
     }
 }
 
-export default PlanningUnitCountry
+export default RealmCountryRegion
 

@@ -67,7 +67,7 @@ export default class AddPlanningUnit extends Component {
             {
                 active: '',
              unit: {
-                unitId:''
+                id:''
             },
             label: {
                 label_en: ''
@@ -93,7 +93,7 @@ export default class AddPlanningUnit extends Component {
             planningUnit.forecastingUnit.forecastingUnitId = event.target.value
         }
         if (event.target.name === "unitId") {
-            planningUnit.unit.unitId = event.target.value;
+            planningUnit.unit.id = event.target.value;
         }
         if (event.target.name === "multiplier") {
             planningUnit.multiplier = event.target.value;

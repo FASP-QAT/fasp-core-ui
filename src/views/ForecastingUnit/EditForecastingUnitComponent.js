@@ -67,7 +67,7 @@ export default class EditForecastingUnitComponent extends Component {
                     label_fr: ''
                 },
                 realm: {
-                    realmId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -76,7 +76,7 @@ export default class EditForecastingUnitComponent extends Component {
                     }
                 },
                 productCategory: {
-                    productCategoryId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',

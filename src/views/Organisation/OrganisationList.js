@@ -35,7 +35,7 @@ export default class OrganisationListComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selSource = this.state.organisations.filter(c => c.realm.realmId == realmId)
+            const selSource = this.state.organisations.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
             });

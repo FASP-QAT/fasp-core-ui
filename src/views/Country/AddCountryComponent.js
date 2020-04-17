@@ -72,7 +72,7 @@ export default class AddCountryComponent extends Component {
                     label_pr:''
                 },
                 currency: {
-                    currencyId: ''
+                    id: ''
                 },
                 language: {
                     languageId: ''
@@ -98,7 +98,7 @@ export default class AddCountryComponent extends Component {
             country.countryCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "currencyId") {
-            country.currency.currencyId = event.target.value
+            country.currency.id = event.target.value
         } else if (event.target.name === "languageId") {
             country.language.languageId = event.target.value
         }
@@ -361,7 +361,7 @@ export default class AddCountryComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.country.currency.currencyId}
+                                                            value={this.state.country.currency.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {currencyItems}
