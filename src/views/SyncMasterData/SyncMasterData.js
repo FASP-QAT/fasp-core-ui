@@ -194,7 +194,7 @@ export default class SyncMasterData extends Component {
                                                                                         MasterSyncService.getDataSourceTypeListForSync(lastSyncDateRealm)
                                                                                             .then(response => {
                                                                                                 if (response.status == 200) {
-                                                                                                    console.log("Response", response.data)
+                                                                                                    console.log("Response data source type", response.data)
                                                                                                     var json = response.data;
                                                                                                     var dataSourceTypeTransaction = db1.transaction(['dataSourceType'], 'readwrite');
                                                                                                     var dataSourceTypeObjectStore = dataSourceTypeTransaction.objectStore('dataSourceType');
