@@ -48,38 +48,38 @@ export default class ForecastingUnitListComponent extends Component {
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
         //alert(realmId+" "+productCategoryId+" "+tracerCategoryId)
         if (realmId != 0 && productCategoryId != 0 && tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId && c.tracerCategory.tracerCategoryId == tracerCategoryId && c.productCategory.productCategoryId == productCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId && c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
             this.setState({
                 selSource
             });
         } else if (realmId != 0 && productCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId && c.productCategory.productCategoryId == productCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId && c.productCategory.id == productCategoryId)
             this.setState({
                 selSource
             });
         } else if (realmId != 0 && tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId && c.tracerCategory.tracerCategoryId == tracerCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId && c.tracerCategory.id == tracerCategoryId)
 
             this.setState({
                 selSource
             });
         } else if (productCategoryId != 0 && tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.tracerCategoryId == tracerCategoryId && c.productCategory.productCategoryId == productCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
             this.setState({
                 selSource
             });
         } else if (realmId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
             });
         } else if (productCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.productCategory.productCategoryId == productCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.productCategory.id == productCategoryId)
             this.setState({
                 selSource
             });
         } else if (tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.tracerCategoryId == tracerCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId)
             this.setState({
                 selSource
             });

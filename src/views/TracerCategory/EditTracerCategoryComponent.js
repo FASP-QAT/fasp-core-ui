@@ -87,7 +87,7 @@ class EditTracerCategoryComponent extends Component {
     dataChange(event) {
         let { tracerCategory } = this.state;
         if (event.target.name == "realmId") {
-            tracerCategory.realm.realmId = event.target.value;
+            tracerCategory.realm.id = event.target.value;
         }
         if (event.target.name == "tracerCategoryName") {
             tracerCategory.label.label_en = event.target.value;
@@ -240,7 +240,7 @@ class EditTracerCategoryComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                                        <Label for="tracerCategoryName">{i18n.t('static.tracercategory.tracercategory')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                         <Input type="text"

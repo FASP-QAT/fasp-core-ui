@@ -91,7 +91,7 @@ export default class AddHealthAreaComponent extends Component {
     if (event.target.name === "healthAreaName") {
       healthArea.label.label_en = event.target.value
     } else if (event.target.name === "realmId") {
-      healthArea.realm.realmId = event.target.value
+      healthArea.realm.id = event.target.value
     }
     this.setState({
       healthArea
@@ -322,7 +322,7 @@ export default class AddHealthAreaComponent extends Component {
                         <CardBody>
 
                           <FormGroup>
-                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')} </Label>
+                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                             <Input
                               bsSize="sm"
                               type="text" name="healthAreaName" valid={!errors.healthAreaName}
@@ -335,10 +335,10 @@ export default class AddHealthAreaComponent extends Component {
                           </FormGroup>
 
                           <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
+                            <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
                             <Input
                               bsSize="sm"
-                              value={this.state.healthArea.realm.realmId}
+                              value={this.state.healthArea.realm.id}
                               valid={!errors.realmId}
                               invalid={touched.realmId && !!errors.realmId}
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
@@ -351,7 +351,7 @@ export default class AddHealthAreaComponent extends Component {
                           </FormGroup>
 
                           <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}</Label>
+                            <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                             <Select
                               bsSize="sm"
                               valid={!errors.realmCountryId}

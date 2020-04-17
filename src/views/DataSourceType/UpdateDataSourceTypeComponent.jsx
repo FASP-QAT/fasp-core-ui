@@ -223,7 +223,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceTypeForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
                                                         <Input
                                                             type="text"
                                                             name="realmId"
