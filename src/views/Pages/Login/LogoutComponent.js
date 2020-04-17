@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 import LogoutService from "../../../api/LogoutService";
 import axios from 'axios';
+import CryptoJS from 'crypto-js'
+import { SECRET_KEY } from '../../../Constants.js'
 
 
 
@@ -15,9 +17,11 @@ class LogoutComponent extends Component {
 
 
     componentDidMount() {
-        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng"];
-
-        if (navigator.onLine) {
+        let keysToRemove = ["token-" + AuthenticationService.getLoggedInUserId(), "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
+        console.log("2")
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        console.log("")
+        if (navigator.onLine && localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
             AuthenticationService.setupAxiosInterceptors();
             LogoutService.logout()
                 .then(response => {
@@ -26,12 +30,12 @@ class LogoutComponent extends Component {
                     }
                 }).catch(
                     error => {
-
+                        this.props.history.push(`/login/static.logoutSuccess`)
                     }
                 );
         }
         keysToRemove.forEach(k => localStorage.removeItem(k));
-        this.props.history.push(`/login/static.logoutSuccess`)
+        this.props.history.push(`/login/${this.props.match.params.message}`)
     }
     render() {
         return (

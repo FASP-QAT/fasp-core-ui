@@ -213,7 +213,7 @@ class EditSupplierComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
+                                                        <Label for="supplier">{i18n.t('static.supplier.supplier')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="supplier"
                                                             id="supplier"

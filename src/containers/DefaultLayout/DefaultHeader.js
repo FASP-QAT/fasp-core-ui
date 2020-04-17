@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Nav, NavItem ,UncontrolledDropdown,DropdownToggle,DropdownMenu,DropdownItem} from 'reactstrap';
+import { Nav, NavItem, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
@@ -8,6 +8,8 @@ import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
 // import QAT from '../../assets/img/brand/QAT.svg'
 import i18n from '../../i18n'
+import { Online, Offline } from 'react-detect-offline';
+import AuthenticationService from '../../views/Common/AuthenticationService';
 
 const propTypes = {
   children: PropTypes.node,
@@ -16,14 +18,14 @@ const propTypes = {
 const defaultProps = {};
 
 class DefaultHeader extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
-    this.changeLanguage=this.changeLanguage.bind(this)
+    this.changeLanguage = this.changeLanguage.bind(this)
   }
-  changeLanguage(lang ) {
-  localStorage.setItem('lang',lang);
-  i18n.changeLanguage(lang)
-  window.location.reload();
+  changeLanguage(lang) {
+    localStorage.setItem('lang', lang);
+    i18n.changeLanguage(lang)
+    window.location.reload();
   }
   render() {
 
@@ -35,13 +37,13 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
           full={{ src: logo, width: 150, height: 50, alt: 'QAT Logo' }}
-          // minimized={{ src: QAT, width: 30, height: 30, alt: 'QAT Logo' }}
+        // minimized={{ src: QAT, width: 30, height: 30, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
 
 
-{/*          <NavItem className="px-3">
+          {/*          <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
     </NavItem>*/}
           <NavItem className="px-3">
@@ -49,24 +51,24 @@ class DefaultHeader extends Component {
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>
-        <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> <span><b>New user registered</b></span>
-        <br></br><span><small>Application Level Admin</small></span></div>
+          <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> <span><b>{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : "Unknown"}</b></span>
+            <br></br><span><small>{AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole() : "Unknown"}</small></span></div>
 
-        <UncontrolledDropdown nav direction="down" className="lang-btn">
-        <DropdownToggle nav className="nav-link-lng">
-          
-        {/* <i className="fa fa-language fa-lg "></i> &nbsp; */}
-        { localStorage.getItem('lang').toString()=='undefined'?'en':localStorage.getItem('lang').toString()}
-          &nbsp;<i className="fa fa-caret-down"></i>
-           </DropdownToggle >
+          <UncontrolledDropdown nav direction="down" className="lang-btn">
+            <DropdownToggle nav className="nav-link-lng">
+
+              {/* <i className="fa fa-language fa-lg "></i> &nbsp; */}
+              {localStorage.getItem('lang').toString() == 'undefined' ? 'en' : localStorage.getItem('lang').toString()}
+              &nbsp;<i className="fa fa-caret-down"></i>
+            </DropdownToggle >
             <DropdownMenu right>
-              <DropdownItem  onClick= {this.changeLanguage.bind(this,'en')}> {i18n.t('static.language.english')}</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this,'sp')}> {i18n.t('static.language.spanish')}</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this,'fr')}> {i18n.t('static.language.french')}</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this,'pr')}> {i18n.t('static.language.pourtegese')}</DropdownItem>
-             </DropdownMenu>
+              <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}> {i18n.t('static.language.english')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}> {i18n.t('static.language.spanish')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}> {i18n.t('static.language.french')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.pourtegese')}</DropdownItem>
+            </DropdownMenu>
           </UncontrolledDropdown>
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword}/>
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} />
         </Nav>
       </React.Fragment>
     );

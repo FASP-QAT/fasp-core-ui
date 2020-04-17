@@ -1,70 +1,75 @@
-
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
-// import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-import i18n from '../../i18n'
-import RealmService from "../../api/RealmService";
-import TracerCategoryService from "../../api/TracerCategoryService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText';
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
+import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
+import getLabelText from '../../CommonComponent/getLabelText';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import RealmCountryService from '../../api/RealmCountryService';
 
-const entityname = i18n.t('static.tracercategory.tracercategory');
-class ListTracerCategoryComponent extends Component {
+
+const entityname = i18n.t('static.dashboad.planningunitcountry');
+export default class RealmCountryPlanningUnitList extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
-            realms: [],
-            tracerCategoryList: [],
+            realmCountrys: [],
+            realmCountryPlanningUnitList: [],
             message: '',
-            selTracerCategory: [],
-            lang: localStorage.getItem('lang')
+            selSource: []
+
         }
-        this.editTracerCategory = this.editTracerCategory.bind(this);
         this.filterData = this.filterData.bind(this);
-        this.addNewTracerCategory = this.addNewTracerCategory.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+    }
 
-    }
-    addNewTracerCategory() {
-        this.props.history.push("/tracerCategory/addTracerCategory");
-    }
     filterData() {
-        let realmId = document.getElementById("realmId").value;
-        if (realmId != 0) {
-            const selTracerCategory = this.state.tracerCategoryList.filter(c => c.realm.realmId == realmId)
+        let realmCountryId = document.getElementById("realmCountryId").value;
+        AuthenticationService.setupAxiosInterceptors();
+        RealmCountryService.getRealmCountryPlanningUnitAllByrealmCountryId(realmCountryId).then(response => {
+            console.log(response.data)
             this.setState({
-                selTracerCategory
-            });
-        } else {
-            this.setState({
-                selTracerCategory: this.state.tracerCategoryList
-            });
-        }
-    }
-    editTracerCategory(tracerCategory) {
-        this.props.history.push({
-            pathname: `/tracerCategory/editTracerCategory/${tracerCategory.tracerCategoryId}`,
-            // state: { tracerCategory }
-        });
-    }
+                realmCountryPlanningUnitList: response.data,
+                selSource: response.data
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
 
+    }
+   
+  
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realms: response.data
-                    })
-                } else {
-                    this.setState({ message: response.data.messageCode })
-                }
-            }).catch(
+        RealmCountryService.getRealmCountryListAll().then(response => {
+            console.log(response.data)
+            this.setState({
+                realmCountrys: response.data,
+
+            })
+        })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
@@ -79,46 +84,30 @@ class ListTracerCategoryComponent extends Component {
                                 break;
                             default:
                                 this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
                                 break;
                         }
                     }
                 }
             );
 
-        TracerCategoryService.getTracerCategoryListAll()
-            .then(response => {
-                this.setState({
-                    tracerCategoryList: response.data,
-                    selTracerCategory: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-    }
+         }
+
+    
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
+
     render() {
+        const { realmCountrys } = this.state;
+        let realmCountryList = realmCountrys.length > 0
+            && realmCountrys.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmCountryId}>
+                        {getLabelText(item.realm.label, this.state.lang)+" - "+ getLabelText(item.country.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
 
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
@@ -127,47 +116,65 @@ class ListTracerCategoryComponent extends Component {
             </span>
         );
 
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
+        const columns = [{
+            dataField: 'label',
+            text: i18n.t('static.dashboad.planningunitcountry'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        },{
+            dataField: 'realmCountry.label',
+            text: i18n.t('static.dashboard.realmcountry'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        },{
+            dataField: 'planningUnit.label',
+            text: i18n.t('static.dashboard.planningunit'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
+            dataField: 'unit.label',
+            text: i18n.t('static.unit.unit'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
+            dataField: 'skuCode',
+            text: i18n.t('static.procurementAgentProcurementUnit.skuCode'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'multiplier',
+            text: i18n.t('static.unit.multiplier'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            //formatter: this.formatLabel
+        }, {
+            dataField: 'gtin',
+            text: i18n.t('static.procurementAgentProcurementUnit.gtin'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'active',
+            text: i18n.t('static.common.status'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: (cellContent, row) => {
                 return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
-        const columns = [
-            {
-                dataField: 'realm.label',
-                text: i18n.t('static.realm.realm'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.tracercategory.tracercategory'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
-            },
-
-
-            {
-                dataField: 'active',
-                text: i18n.t('static.common.status'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: (cellContent, row) => {
-                    return (
-                        (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                    );
-                }
-            }];
+                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
+                );
+            }
+        }];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -191,36 +198,35 @@ class ListTracerCategoryComponent extends Component {
                 text: '50', value: 50
             },
             {
-                text: 'All', value: this.state.selTracerCategory.length
+                text: 'All', value: this.state.selSource.length
             }]
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.tracercategorylist')}</strong>{' '}
+                        <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
-                            <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>
-                            </div>
+                           
                         </div>
+
                     </CardHeader>
                     <CardBody>
                         <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.realmcountry')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="realmId"
-                                            id="realmId"
+                                            name="realmCountryId"
+                                            id="realmCountryId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {realmList}
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {realmCountryList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -230,8 +236,8 @@ class ListTracerCategoryComponent extends Component {
                             </FormGroup>
                         </Col>
                         <ToolkitProvider
-                            keyField="tracerCategoryId"
-                            data={this.state.selTracerCategory}
+                            keyField="realmCountryPlanningUnitId"
+                            data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
                             hover
@@ -246,21 +252,22 @@ class ListTracerCategoryComponent extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            rowEvents={{
+                                           /* rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editTracerCategory(row);
+                                                    this.editRealmCountryPlanningUnit(row);
                                                 }
-                                            }}
+                                            }}*/
                                             {...props.baseProps}
                                         />
                                     </div>
                                 )
                             }
                         </ToolkitProvider>
+
                     </CardBody>
                 </Card>
             </div>
         );
     }
+
 }
-export default ListTracerCategoryComponent;

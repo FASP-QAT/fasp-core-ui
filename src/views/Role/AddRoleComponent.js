@@ -256,7 +256,7 @@ class AddRoleComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="roleName">{i18n.t('static.role.role')}</Label>
+                                                        <Label for="roleName">{i18n.t('static.role.role')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                                 name="roleName"
                                                                 id="roleName"
@@ -270,7 +270,7 @@ class AddRoleComponent extends Component {
                                                             /><FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label> <Input
+                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label> <Input
                                                                 type="select"
                                                                 name="businessFunctions"
                                                                 id="businessFunctions"
@@ -288,7 +288,7 @@ class AddRoleComponent extends Component {
                                                             </Input><FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
+                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
                                                             <Input
                                                                 type="select"
                                                                 name="canCreateRole"

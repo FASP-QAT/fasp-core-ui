@@ -345,7 +345,7 @@ class EditUserComponent extends Component {
                                                         ></Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="username">{i18n.t('static.user.username')}</Label>
+                                                        <Label for="username">{i18n.t('static.user.username')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="username"
                                                             id="username"
@@ -359,7 +359,7 @@ class EditUserComponent extends Component {
                                                         /> <FormFeedback className="red">{errors.username}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
+                                                        <Label for="emailId">{i18n.t('static.user.emailid')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
@@ -374,7 +374,7 @@ class EditUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
+                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -421,7 +421,7 @@ class EditUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.roleId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
+                                                        <Label htmlFor="languageId">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="languageId"

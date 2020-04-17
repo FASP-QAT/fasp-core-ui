@@ -180,7 +180,7 @@ export default class CountryListComponent extends Component {
                 <Card>
                     <CardHeader>
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
