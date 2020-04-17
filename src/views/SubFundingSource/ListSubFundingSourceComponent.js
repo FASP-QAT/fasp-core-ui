@@ -204,7 +204,8 @@ class ListSubFundingSourceComponent extends Component {
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message, { entityname })}</h6>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader className="mb-md-3">
+                    <CardHeader>
+                        {/* needed  className="mb-md-3" in card header for inline search select  */}
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -214,7 +215,8 @@ class ListSubFundingSourceComponent extends Component {
                     </CardHeader>
                     <CardBody>
                         <Col md="3 pl-0">
-                            <FormGroup className="Selectdiv">
+                            <FormGroup>
+                            {/* className="Selectdiv" in form group for inline search and select */}
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.subfundingsource.fundingsource')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>

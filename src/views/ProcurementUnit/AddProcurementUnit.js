@@ -427,7 +427,7 @@ export default class AddProcurementUnit extends Component {
                                                 </CardHeader>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}</Label>
+                                                        <Label htmlFor="procurementUnit">{i18n.t('static.procurementUnit.procurementUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text" name="procurementUnitName" valid={!errors.procurementUnitName}
                                                             bsSize="sm"
@@ -453,7 +453,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.planningUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="multiplier">{i18n.t('static.procurementUnit.multiplier')}</Label>
+                                                        <Label htmlFor="multiplier">{i18n.t('static.procurementUnit.multiplier')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number" name="multiplier" valid={!errors.multiplier}
                                                             bsSize="sm"
@@ -465,7 +465,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.unit')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.unit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.unitId}
@@ -479,7 +479,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.unitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.supplier')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.supplier')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.supplierId}
@@ -493,7 +493,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.supplierId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.heightUnit')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.heightUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.heightUnitId}
@@ -507,7 +507,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.heightUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="heightQty">{i18n.t('static.procurementUnit.heightQty')}</Label>
+                                                        <Label htmlFor="heightQty">{i18n.t('static.procurementUnit.heightQty')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number" name="heightQty" valid={!errors.heightQty}
                                                             bsSize="sm"
@@ -519,7 +519,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.heightQty}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.lengthUnit')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.lengthUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.lengthUnitId}
@@ -533,7 +533,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.lengthUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="lengthQty">{i18n.t('static.procurementUnit.lengthQty')}</Label>
+                                                        <Label htmlFor="lengthQty">{i18n.t('static.procurementUnit.lengthQty')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number" name="lengthQty" valid={!errors.lengthQty}
                                                             bsSize="sm"
@@ -545,7 +545,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.lengthQty}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.widthUnit')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.widthUnit')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             valid={!errors.widthUnitId}
@@ -559,7 +559,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.widthUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="widthQty">{i18n.t('static.procurementUnit.widthQty')}</Label>
+                                                        <Label htmlFor="widthQty">{i18n.t('static.procurementUnit.widthQty')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number" name="widthQty" valid={!errors.widthQty}
                                                             bsSize="sm"
@@ -585,7 +585,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback>{errors.weightUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="weightQty">{i18n.t('static.procurementUnit.weightQty')}</Label>
+                                                        <Label htmlFor="weightQty">{i18n.t('static.procurementUnit.weightQty')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number" name="weightQty" valid={!errors.weightQty}
                                                             bsSize="sm"
@@ -597,7 +597,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.weightQty}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="labeling">{i18n.t('static.procurementUnit.labeling')}</Label>
+                                                        <Label htmlFor="labeling">{i18n.t('static.procurementUnit.labeling')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text" name="labeling" valid={!errors.labeling}
                                                             bsSize="sm"
@@ -609,7 +609,7 @@ export default class AddProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.labeling}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitsPerContainer">{i18n.t('static.procurementUnit.unitsPerContainer')}</Label>
+                                                        <Label htmlFor="unitsPerContainer">{i18n.t('static.procurementUnit.unitsPerContainer')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number" name="unitsPerContainer" valid={!errors.unitsPerContainer}
                                                             bsSize="sm"

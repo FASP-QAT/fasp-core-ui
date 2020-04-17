@@ -596,7 +596,7 @@ export default class AddProgram extends Component {
                                                 </CardHeader>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             type="text" name="programName" valid={!errors.programName}
@@ -609,7 +609,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.realm.realmId}
@@ -627,7 +627,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.realmCountry.realmCountryId}
@@ -647,7 +647,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup >
-                                                        <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
 
                                                         <Select
                                                             valid={!errors.regionId}
@@ -664,7 +664,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.regionId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             // value={this.state.program.organisation.organisationId}
                                                             bsSize="sm"
@@ -682,7 +682,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.organisationId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             // value={this.state.program.healthArea.healthAreaId}
                                                             bsSize="sm"
@@ -700,7 +700,7 @@ export default class AddProgram extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             // value={this.state.program.programManager.userId}
                                                             bsSize="sm"
@@ -718,7 +718,7 @@ export default class AddProgram extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             // value={this.state.program.programNotes}
                                                             bsSize="sm"
@@ -730,7 +730,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             // value={this.state.program.airFreightPerc}
                                                             bsSize="sm"
@@ -744,7 +744,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             // value={this.state.program.seaFreightPerc}
                                                             bsSize="sm"
@@ -758,7 +758,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.plannedToDraftLeadTime}
@@ -775,7 +775,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.draftToSubmittedLeadTime}
@@ -793,7 +793,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.submittedToApprovedLeadTime}
@@ -810,7 +810,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.approvedToShippedLeadTime}
@@ -827,7 +827,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.deliveredToReceivedLeadTime}
@@ -844,7 +844,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.monthsInPastForAmc}
@@ -861,7 +861,7 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.monthsInFutureForAmc}

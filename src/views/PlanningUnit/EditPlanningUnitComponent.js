@@ -267,7 +267,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="label">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                        <Label htmlFor="label">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="label"
@@ -284,7 +284,7 @@ export default class EditPlanningUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}</Label>
+                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             name="multiplier"
                                                             id="multiplier"

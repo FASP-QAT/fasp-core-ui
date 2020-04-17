@@ -418,6 +418,9 @@ label.arrow_label:after {
 .P-absltRadio{position: absolute;}
 #active2{margin-left: 0rem !important;}
 @media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}.Selectdiv{position: absolute;top:-25px;margin-bottom: 0.5rem;}}
+
+// inline search and select
+@media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}.Selectdiv{position: absolute;top:-25px;margin-bottom: 0.5rem;}}
 // radio button
 .form-check {
   padding-left: 1.25rem !important;
