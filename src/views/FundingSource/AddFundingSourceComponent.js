@@ -204,7 +204,7 @@ class AddFundingSourceComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label><Input
+                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}<span className="red Reqasterisk">*</span></Label><Input
                               type="select"
                               name="realmId"
                               id="realmId"
@@ -222,7 +222,7 @@ class AddFundingSourceComponent extends Component {
                             <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
+                            <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}<span className="red Reqasterisk">*</span> </Label>
                             <Input type="text"
                               name="fundingSource"
                               id="fundingSource"

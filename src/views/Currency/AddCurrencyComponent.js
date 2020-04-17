@@ -191,7 +191,7 @@ export default class AddCurrencyComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
+                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -208,7 +208,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
+                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -224,7 +224,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.currency.currency')}</Label>
+                                                        <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -241,7 +241,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}</Label>
+                                                        <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-exchange"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -261,7 +261,7 @@ export default class AddCurrencyComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;

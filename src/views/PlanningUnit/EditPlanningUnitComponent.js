@@ -145,6 +145,7 @@ export default class EditPlanningUnitComponent extends Component {
     }
     componentWillMount() {
         AuthenticationService.setupAxiosInterceptors();
+        console.log(this.props.match.params.planningUnitId)
         PlanningUnitService.getPlanningUnitById(this.props.match.params.planningUnitId).then(response => {
             this.setState({
                 planningUnit: response.data

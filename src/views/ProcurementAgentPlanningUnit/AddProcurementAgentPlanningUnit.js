@@ -4,7 +4,7 @@ import ProcurementAgentService from "../../api/ProcurementAgentService";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
-    CardFooter, Button, Table, Badge, Col, Row
+    CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
 
 } from 'reactstrap';
 import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
@@ -13,17 +13,83 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import StatusUpdateButtonFeature from '../../CommonComponent/StatusUpdateButtonFeature';
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
 import i18n from '../../i18n';
+import * as Yup from 'yup';
+import { Formik } from "formik";
+import getLabelText from '../../CommonComponent/getLabelText'
+
 
 const entityname = i18n.t('static.dashboard.procurementAgentPlanningUnit')
+
+let initialValues = {
+    planningUnitId: '',
+    skuCode: '',
+    catalogPrice: '',
+    moq: '',
+    unitsPerPallet: '',
+    unitsPerContainer: '',
+    volume: '',
+    weight: ''
+}
+
+const validationSchema = function (values, t) {
+    return Yup.object().shape({
+        planningUnitId: Yup.string()
+            .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
+        skuCode: Yup.string()
+            .required(i18n.t('static.procurementAgentPlanningUnit.validSKUCode')),
+        catalogPrice: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.procurementAgentPlanningUnit.validCatalogPrice')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        moq: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.procurementAgentPlanningUnit.validMoq')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerPallet: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.procurementAgentPlanningUnit.validUnitsPerPallet')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        unitsPerContainer: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.procurementAgentPlanningUnit.validUnitsPerContainer')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        volume: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.procurementAgentPlanningUnit.validVolume')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        weight: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required(i18n.t('static.procurementAgentPlanningUnit.validWeight')).min(0, i18n.t('static.procurementUnit.validValueText'))
+    })
+}
+
+const validate = (getValidationSchema) => {
+    return (values) => {
+        const validationSchema = getValidationSchema(values)
+        try {
+            validationSchema.validateSync(values, { abortEarly: false })
+            return {}
+        } catch (error) {
+            return getErrorsFromValidationError(error)
+        }
+    }
+}
+
+const getErrorsFromValidationError = (validationError) => {
+    const FIRST_ERROR = 0
+    return validationError.inner.reduce((errors, error) => {
+        return {
+            ...errors,
+            [error.path]: error.errors[FIRST_ERROR],
+        }
+    }, {})
+}
+
+
 export default class AddProcurementAgentPlanningUnit extends Component {
     constructor(props) {
         super(props);
         let rows = [];
-        if (this.props.location.state.procurementAgentPlanningUnit.length > 0) {
-            rows = this.props.location.state.procurementAgentPlanningUnit;
-        }
+        // if (this.props.location.state.procurementAgentPlanningUnit.length > 0) {
+        //     rows = this.props.location.state.procurementAgentPlanningUnit;
+        // }
         this.state = {
-            procurementAgentPlanningUnit: this.props.location.state.procurementAgentPlanningUnit,
+            // procurementAgentPlanningUnit: this.props.location.state.procurementAgentPlanningUnit,
             planningUnitId: '',
             planningUnitName: '',
             skuCode: '',
@@ -37,11 +103,13 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             rows: rows,
             procurementAgentList: [],
             planningUnitList: [],
-            addRowMessage: '',
+            rowErrorMessage: '',
 
             procurementAgentPlanningUnitId: 0,
             isNew: true,
-            procurementAgentId: this.props.location.state.procurementAgentId
+            procurementAgentId: this.props.match.params.procurementAgentId,
+            updateRowStatus: 0,
+            lang: localStorage.getItem('lang')
         }
         this.addRow = this.addRow.bind(this);
         // this.deleteLastRow = this.deleteLastRow.bind(this);
@@ -56,22 +124,39 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
 
     updateRow(idx) {
-        const rows = [...this.state.rows]
-        this.setState({
-            planningUnitId: this.state.rows[idx].planningUnit.id,
-            planningUnitName: this.state.rows[idx].planningUnit.label.label_en,
-            skuCode: this.state.rows[idx].skuCode,
-            catalogPrice: this.state.rows[idx].catalogPrice,
-            moq: this.state.rows[idx].moq,
-            unitsPerPallet: this.state.rows[idx].unitsPerPallet,
-            unitsPerContainer: this.state.rows[idx].unitsPerContainer,
-            volume: this.state.rows[idx].volume,
-            weight: this.state.rows[idx].weight,
-            procurementAgentPlanningUnitId: this.state.rows[idx].procurementAgentPlanningUnitId,
-            isNew: false
-        })
-        rows.splice(idx, 1);
-        this.setState({ rows });
+        if (this.state.updateRowStatus == 1) {
+            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
+        } else {
+            document.getElementById('select').disabled = true;
+            initialValues = {
+                planningUnitId: this.state.rows[idx].planningUnit.id,
+                skuCode: this.state.rows[idx].skuCode,
+                catalogPrice: this.state.rows[idx].catalogPrice,
+                moq: this.state.rows[idx].moq,
+                unitsPerPallet: this.state.rows[idx].unitsPerPallet,
+                unitsPerContainer: this.state.rows[idx].unitsPerContainer,
+                volume: this.state.rows[idx].volume,
+                weight: this.state.rows[idx].weight
+
+            }
+            const rows = [...this.state.rows]
+            this.setState({
+                planningUnitId: this.state.rows[idx].planningUnit.id,
+                planningUnitName: this.state.rows[idx].planningUnit.label.label_en,
+                skuCode: this.state.rows[idx].skuCode,
+                catalogPrice: this.state.rows[idx].catalogPrice,
+                moq: this.state.rows[idx].moq,
+                unitsPerPallet: this.state.rows[idx].unitsPerPallet,
+                unitsPerContainer: this.state.rows[idx].unitsPerContainer,
+                volume: this.state.rows[idx].volume,
+                weight: this.state.rows[idx].weight,
+                procurementAgentPlanningUnitId: this.state.rows[idx].procurementAgentPlanningUnitId,
+                isNew: false,
+                updateRowStatus: 1
+            })
+            rows.splice(idx, 1);
+            this.setState({ rows });
+        }
     }
 
     enableRow(idx) {
@@ -124,9 +209,9 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                     procurementAgentPlanningUnitId: this.state.procurementAgentPlanningUnitId
                 })
 
-            this.setState({ rows: this.state.rows, addRowMessage: '' })
+            this.setState({ rows: this.state.rows, rowErrorMessage: '' })
         } else {
-            this.state.addRowMessage = 'Planning Unit Already Exist In List.'
+            this.state.rowErrorMessage = 'Planning Unit Already Exist In List.'
         }
         this.setState({
             planningUnitId: '',
@@ -139,9 +224,10 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             volume: '',
             weight: '',
             procurementAgentPlanningUnitId: 0,
-            isNew: true
+            isNew: true,
+            updateRowStatus: 0
         });
-
+        document.getElementById('select').disabled = false;
     }
 
     // deleteLastRow() {
@@ -225,6 +311,42 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+
+        ProcurementAgentService.getProcurementAgentPlaningUnitList(this.state.procurementAgentId)
+            .then(response => {
+                if (response.status == 200) {
+                    let myResponse = response.data;
+                    if (myResponse.length > 0) {
+                        this.setState({ rows: myResponse });
+                    }
+
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+
         ProcurementAgentService.getProcurementAgentListAll().then(response => {
             console.log(response.data);
             if (response.status == "200") {
@@ -294,20 +416,37 @@ export default class AddProcurementAgentPlanningUnit extends Component {
 
 
     }
+    touchAll(errors) {
+        this.validateForm(errors);
+    }
+    validateForm(errors) {
+        this.findFirstError('procurementAgentPlanningUnitForm', (fieldName) => {
+            return Boolean(errors[fieldName])
+        })
+    }
+    findFirstError(formName, hasError) {
+        const form = document.forms[formName]
+        for (let i = 0; i < form.length; i++) {
+            if (hasError(form[i].name)) {
+                form[i].focus()
+                break
+            }
+        }
+    }
     render() {
         const { procurementAgentList } = this.state;
         const { planningUnitList } = this.state;
         let programs = procurementAgentList.length > 0 && procurementAgentList.map((item, i) => {
             return (
                 <option key={i} value={item.procurementAgentId}>
-                    {item.label.label_en}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);
         let products = planningUnitList.length > 0 && planningUnitList.map((item, i) => {
             return (
                 <option key={i} value={item.planningUnitId}>
-                    {item.label.label_en}
+                    {getLabelText(item.label, this.state.lang)}
                 </option>
             )
         }, this);
@@ -322,54 +461,181 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
                             </CardHeader>
                             <CardBody>
-                                <FormGroup>
-                                    <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
-                                    <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
-                                        {programs}
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
-                                    <Input type="select" name="planningUnitId" id="select" value={this.state.planningUnitId} onChange={event => this.setTextAndValue(event)}>
-                                        <option value="">Please select</option>
-                                        {products}
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
-                                    <Input type="text" name="skuCode" id="skuCode" value={this.state.skuCode} placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.catalogPrice')}</Label>
-                                    <Input type="number" min="0" name="catalogPrice" id="catalogPrice" value={this.state.catalogPrice} placeholder={i18n.t('static.procurementAgentPlanningUnit.catalogPriceText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}</Label>
-                                    <Input type="number" min="0" name="moq" id="moq" value={this.state.moq} placeholder={i18n.t('static.procurementAgentPlanningUnit.moqText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}</Label>
-                                    <Input type="number" min="0" name="unitsPerPallet" id="unitsPerPallet" value={this.state.unitsPerPallet} placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerPalletText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}</Label>
-                                    <Input type="number" min="0" name="unitsPerContainer" id="unitsPerContainer" value={this.state.unitsPerContainer} placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerContainerText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}</Label>
-                                    <Input type="number" min="0" name="volume" id="volume" value={this.state.volume} placeholder={i18n.t('static.procurementAgentPlanningUnit.volumeText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}</Label>
-                                    <Input type="number" min="0" name="weight" id="weight" value={this.state.weight} placeholder={i18n.t('static.procurementAgentPlanningUnit.weightText')} onChange={event => this.setTextAndValue(event)} />
-                                </FormGroup>
-                                <FormGroup>
-                                    {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                    <Button type="submit" size="sm" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>Add</Button>
-                                    &nbsp;
+                                <Formik
+                                    enableReinitialize={true}
+                                    initialValues={initialValues}
+                                    validate={validate(validationSchema)}
+                                    onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+                                        this.addRow();
+                                        resetForm({
+                                            planningUnitId: "",
+                                            skuCode: "",
+                                            catalogPrice: "",
+                                            moq: "",
+                                            unitsPerPallet: "",
+                                            unitsPerContainer: "",
+                                            volume: "",
+                                            weight: ""
+                                        });
+                                    }}
+                                    render={
+                                        ({
+                                            values,
+                                            errors,
+                                            touched,
+                                            handleChange,
+                                            handleBlur,
+                                            handleSubmit,
+                                            isSubmitting,
+                                            isValid,
+                                            setTouched
+                                        }) => (
+                                                <Form onSubmit={handleSubmit} noValidate name='procurementAgentPlanningUnitForm'>
+                                                    <FormGroup>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
+                                                        <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
+                                                            {programs}
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="planningUnitId"
+                                                            id="select"
+                                                            bsSize="sm"
+                                                            valid={!errors.planningUnitId}
+                                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                            value={this.state.planningUnitId}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            required
+                                                        >
+                                                            <option value="">Please select</option>
+                                                            {products}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="skuCode"
+                                                            id="skuCode"
+                                                            value={this.state.skuCode}
+                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.skuCode}
+                                                            invalid={touched.skuCode && !!errors.skuCode}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.skuCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.catalogPrice')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="catalogPrice"
+                                                            id="catalogPrice"
+                                                            value={this.state.catalogPrice}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.catalogPriceText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.catalogPrice}
+                                                            invalid={touched.catalogPrice && !!errors.catalogPrice}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.catalogPrice}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="moq"
+                                                            id="moq"
+                                                            value={this.state.moq}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.moqText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.moq}
+                                                            invalid={touched.moq && !!errors.moq}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.moq}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="unitsPerPallet"
+                                                            id="unitsPerPallet"
+                                                            value={this.state.unitsPerPallet}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerPalletText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.unitsPerPallet}
+                                                            invalid={touched.unitsPerPallet && !!errors.unitsPerPallet}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.unitsPerPallet}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="unitsPerContainer"
+                                                            id="unitsPerContainer"
+                                                            value={this.state.unitsPerContainer}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerContainerText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.unitsPerContainer}
+                                                            invalid={touched.unitsPerContainer && !!errors.unitsPerContainer}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="volume"
+                                                            id="volume"
+                                                            value={this.state.volume}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.volumeText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.volume}
+                                                            invalid={touched.volume && !!errors.volume}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.volume}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="weight"
+                                                            id="weight"
+                                                            value={this.state.weight}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.weightText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.weight}
+                                                            invalid={touched.weight && !!errors.weight}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.weight}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
+                                                        <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                        &nbsp;
 
                         </FormGroup>
-                                <h5>{this.state.addRowMessage}</h5>
+                                                </Form>
+                                            )} />
+                                <h5 className="red">{this.state.rowErrorMessage}</h5>
                                 <Table responsive>
 
                                     <thead>
@@ -436,8 +702,8 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                    <Button type="submit" size="sm" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                     &nbsp;
                                 </FormGroup>
 

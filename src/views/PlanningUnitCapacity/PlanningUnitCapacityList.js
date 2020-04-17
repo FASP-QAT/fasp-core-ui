@@ -4,89 +4,35 @@ import filterFactory from 'react-bootstrap-table2-filter';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
-import ForecastingUnitService from '../../api/ForecastingUnitService';
-import PlanningUnitService from '../../api/PlanningUnitService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
+import PlanningUnitService from '../../api/PlanningUnitService';
 
 
-const entityname = i18n.t('static.planningunit.planningunit');
-export default class PlanningUnitListComponent extends Component {
+const entityname = i18n.t('static.dashboad.planningunitcapacity');
+export default class PlanningUnitCapacityList extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            forecastingUnits: [],
-            planningUnitList: [],
+            planningUnits: [],
+            planningUnitCapacityList: [],
             message: '',
             selSource: []
 
         }
-        this.editPlanningUnit = this.editPlanningUnit.bind(this);
-        this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
     }
 
     filterData() {
-        let forecastingUnitId = document.getElementById("forecastingUnitId").value;
-        if (forecastingUnitId != 0) {
-            const selSource = this.state.planningUnitList.filter(c => c.forecastingUnit.forecastingUnitId == forecastingUnitId)
-            this.setState({
-                selSource
-            });
-        } else {
-            this.setState({
-                selSource: this.state.planningUnitList
-            });
-        }
-    }
-   
-    PlanningUnitCapacity(event, row) {
-        event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
-            state: { planningUnit: row }
-           
-
-        })
-    }
-    componentDidMount() {
+        let planningUnitId = document.getElementById("planningUnitId").value;
         AuthenticationService.setupAxiosInterceptors();
-        ForecastingUnitService.getForecastingUnitList().then(response => {
+        PlanningUnitService.getPlanningUnitCapacityForId(planningUnitId).then(response => {
             console.log(response.data)
             this.setState({
-                forecastingUnits: response.data,
-
-            })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-        PlanningUnitService.getAllPlanningUnitList().then(response => {
-            console.log(response.data)
-            this.setState({
-                planningUnitList: response.data,
+                planningUnitCapacityList: response.data,
                 selSource: response.data
             })
         })
@@ -110,37 +56,55 @@ export default class PlanningUnitListComponent extends Component {
                     }
                 }
             );
-    }
-
-    editPlanningUnit(planningUnit) {
-        console.log('**'+JSON.stringify(planningUnit))
-        this.props.history.push({
-            pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
-            // state: { planningUnit: planningUnit }
-        });
 
     }
+   
+  
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        PlanningUnitService.getAllPlanningUnitList().then(response => {
+            console.log(response.data)
+            this.setState({
+                planningUnits: response.data,
 
-    addNewPlanningUnit() {
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+            
 
-        if (navigator.onLine) {
-            this.props.history.push(`/planningUnit/addPlanningUnit`)
-        } else {
-            alert(i18n.t('static.common.online'))
-        }
+         }
 
-    }
+    
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
 
     render() {
-        const { forecastingUnits } = this.state;
-        let forecastingUnitList = forecastingUnits.length > 0
-            && forecastingUnits.map((item, i) => {
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
                 return (
-                    <option key={i} value={item.forecastingUnitId}>
+                    <option key={i} value={item.planningUnitId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -154,33 +118,38 @@ export default class PlanningUnitListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'label',
-            text: i18n.t('static.planningunit.planningunit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        },  {
-            dataField: 'forecastingUnit.label',
-            text: i18n.t('static.forecastingunit.forecastingunit'),
+            dataField: 'planningUnit.label',
+            text: i18n.t('static.dashboard.planningunit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
         }, {
-            dataField: 'unit.label',
-            text: i18n.t('static.unit.unit'),
+            dataField: 'supplier.label',
+            text: i18n.t('static.dashboard.supplier'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
         }, {
-            dataField: 'multiplier',
-            text: i18n.t('static.unit.multiplier'),
+            dataField: 'startDate',
+            text: i18n.t('static.common.startdate'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'stopDate',
+            text: i18n.t('static.common.stopdate'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             //formatter: this.formatLabel
+        }, {
+            dataField: 'capacity',
+            text: i18n.t('static.planningunit.capacity'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -191,15 +160,6 @@ export default class PlanningUnitListComponent extends Component {
                 return (
                     (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                 );
-            }
-        }, {
-            dataField: 'planningUnitId',
-            text: i18n.t('static.common.action'),
-            align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.capacityupdate')}</Button>
-                 )
             }
         }];
         const options = {
@@ -234,28 +194,26 @@ export default class PlanningUnitListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-                        <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
+                        <i className="icon-menu"></i>{i18n.t('static.dashboard.capacitylist')}
                         <div className="card-header-actions">
-                            <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>
-                            </div>
+                           
                         </div>
 
                     </CardHeader>
                     <CardBody>
                         <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunit')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="forecastingUnitId"
-                                            id="forecastingUnitId"
+                                            name="planningUnitId"
+                                            id="planningUnitId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {forecastingUnitList}
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {planningUnitList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -265,7 +223,7 @@ export default class PlanningUnitListComponent extends Component {
                             </FormGroup>
                         </Col>
                         <ToolkitProvider
-                            keyField="planningUnitId"
+                            keyField="planningUnitCapacityId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
@@ -281,11 +239,11 @@ export default class PlanningUnitListComponent extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            rowEvents={{
+                                           /* rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editPlanningUnit(row);
+                                                    this.editPlanningUnitCapacity(row);
                                                 }
-                                            }}
+                                            }}*/
                                             {...props.baseProps}
                                         />
                                     </div>

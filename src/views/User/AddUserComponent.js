@@ -34,7 +34,7 @@ const validationSchema = function (values) {
         realmId: Yup.string()
             .when("showRealm", (showRealm, schema) => {
                 if (document.getElementById("showRealm").value == "true") {
-                    return schema.required(i18n.t('static.user.validusername'))
+                    return schema.required(i18n.t('static.common.realmtext'))
                 } else {
                     return schema;
                 }
@@ -363,7 +363,7 @@ class AddUserComponent extends Component {
                                                         id="showRealm"
                                                     />
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -382,7 +382,7 @@ class AddUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="username">{i18n.t('static.user.username')}</Label>
+                                                        <Label for="username">{i18n.t('static.user.username')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="username"
                                                             id="username"
@@ -396,7 +396,7 @@ class AddUserComponent extends Component {
                                                         /><FormFeedback className="red">{errors.username}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
+                                                        <Label for="emailId">{i18n.t('static.user.emailid')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="emailId"
                                                             id="emailId"
@@ -411,7 +411,7 @@ class AddUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.emailId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}</Label>
+                                                        <Label for="phoneNumber">{i18n.t('static.user.phoneNumber')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="phoneNumber"
                                                             id="phoneNumber"
@@ -425,7 +425,7 @@ class AddUserComponent extends Component {
                                                         /><FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
+                                                        <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             valid={!errors.roleId}
                                                             bsSize="sm"
@@ -465,7 +465,7 @@ class AddUserComponent extends Component {
                                                         {/* <FormFeedback>{errors.roleId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="languageId">{i18n.t('static.language.language')}</Label>
+                                                        <Label htmlFor="languageId">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="languageId"
