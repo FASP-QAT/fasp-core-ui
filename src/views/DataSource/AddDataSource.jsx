@@ -328,7 +328,7 @@ export default class AddDataSource extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -348,7 +348,7 @@ export default class AddDataSource extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.datasource.datasource')}</Label>
+                                                        <Label for="label">{i18n.t('static.datasource.datasource')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -363,7 +363,7 @@ export default class AddDataSource extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}</Label>
+                                                        <Label htmlFor="programId">{i18n.t('static.dataSource.program')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="programId"
@@ -382,7 +382,7 @@ export default class AddDataSource extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}</Label>
+                                                        <Label htmlFor="dataSourceTypeId">{i18n.t('static.datasource.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="dataSourceTypeId"

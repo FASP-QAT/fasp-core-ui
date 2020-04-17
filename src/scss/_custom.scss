@@ -418,6 +418,9 @@ label.arrow_label:after {
 .P-absltRadio{position: absolute;}
 #active2{margin-left: 0rem !important;}
 @media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}.Selectdiv{position: absolute;top:-25px;margin-bottom: 0.5rem;}}
+
+// inline search and select
+@media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}.Selectdiv{position: absolute;top:-25px;margin-bottom: 0.5rem;}}
 // radio button
 .form-check {
   padding-left: 1.25rem !important;
@@ -909,3 +912,32 @@ h5,
    transform: scaleX(-1);
 }
 
+.box-role{
+  border-bottom: 0px solid #c0c9d1!important;
+  position: relative;
+  padding: 10px 20px;
+  display: block;
+  width: 100%;
+  // padding: 0.25rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  // color: #555d64;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+}
+.box-role:hover, .box-role:focus {
+
+  background-color:transparent!important;
+}
+
+.box-role i {
+  display: inline-block;
+  font-size: 19px!important;
+  margin-right: 10px!important;
+  margin-left: -30px!important;
+  color: #20a8d8;
+  text-align: center;
+  vertical-align: middle;
+}

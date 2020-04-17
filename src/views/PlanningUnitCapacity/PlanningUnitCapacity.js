@@ -517,7 +517,7 @@ class PlanningUnitCapacity extends Component {
                                                 <td>
                                                { this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={()=>{this.handleDisableSpecificRow(idx)}} ><i className="fa fa-times"></i>Disable</Button>}
                                                {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={()=>{this.handleEnableSpecificRow(idx)}}><i className="fa fa-check"></i>Activate</Button>}
-                                               {!this.state.rows[idx].planningUnitCapacityId &&<DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} />}
+                                               {!this.state.rows[idx].planningUnitCapacityId &&(<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
                                                     </td>
                                             </tr>)
 

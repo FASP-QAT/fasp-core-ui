@@ -64,7 +64,7 @@ export default class EditHealthAreaComponent extends Component {
                     label_fr: ''
                 },
                 realm: {
-                    realmId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -102,7 +102,7 @@ export default class EditHealthAreaComponent extends Component {
         if (event.target.name === "healthAreaName") {
             healthArea.label.label_en = event.target.value
         } else if (event.target.name === "realmId") {
-            healthArea.realm.realmId = event.target.value
+            healthArea.realm.id = event.target.value
         } else if (event.target.name === "active") {
             healthArea.active = event.target.id === "active2" ? false : true
         }
@@ -148,7 +148,7 @@ export default class EditHealthAreaComponent extends Component {
 
             initialValues = {
                 healthAreaName: this.state.healthArea.label.label_en,
-                realmId: this.state.healthArea.realm.realmId
+                realmId: this.state.healthArea.realm.id
             }
 
             UserService.getRealmList()
@@ -174,7 +174,7 @@ export default class EditHealthAreaComponent extends Component {
                     }
                 );
 
-            HealthAreaService.getRealmCountryList(this.state.healthArea.realm.realmId)
+            HealthAreaService.getRealmCountryList(this.state.healthArea.realm.id)
                 .then(response => {
                     console.log("Realm Country List -------list---", response.data);
                     if (response.status == 200) {
@@ -339,7 +339,7 @@ export default class EditHealthAreaComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')} </Label>
+                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                         bsSize="sm"
                                                             type="text" name="healthAreaName" valid={!errors.healthAreaName}
@@ -355,7 +355,7 @@ export default class EditHealthAreaComponent extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
                                                         <Input
                                                         bsSize="sm"
-                                                            value={this.state.healthArea.realm.realmId}
+                                                            value={this.state.healthArea.realm.id}
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
@@ -369,7 +369,7 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                         bsSize="sm"
                                                             valid={!errors.realmCountryId}

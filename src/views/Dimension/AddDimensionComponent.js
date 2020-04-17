@@ -175,7 +175,7 @@ export default class AddDimensionComponent extends Component {
 
 
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
+                                                        <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"

@@ -72,7 +72,7 @@ class AddSupplierComponent extends Component {
   dataChange(event) {
     let { supplier } = this.state;
     if (event.target.name == "realmId") {
-      supplier.realm.realmId = event.target.value;
+      supplier.realm.id = event.target.value;
     }
     if (event.target.name == "supplier") {
       supplier.label.label_en = event.target.value;
@@ -205,7 +205,7 @@ class AddSupplierComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='supplierForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}</Label>
+                            <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}<span className="red Reqasterisk">*</span></Label>
                               <Input
                                 type="select"
                                 name="realmId"
@@ -216,7 +216,7 @@ class AddSupplierComponent extends Component {
                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                 onBlur={handleBlur}
                                 required
-                                value={this.state.realmId}
+                                value={this.state.id}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {realmList}
@@ -224,7 +224,7 @@ class AddSupplierComponent extends Component {
                                <FormText className="red">{errors.realmId}</FormText>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="supplier">{i18n.t('static.supplier.supplier')}</Label>
+                            <Label for="supplier">{i18n.t('static.supplier.supplier')}<span className="red Reqasterisk">*</span></Label>
                               <Input type="text"
                                 name="supplier"
                                 id="supplier"

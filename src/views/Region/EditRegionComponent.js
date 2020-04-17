@@ -222,7 +222,7 @@ class EditRegionComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="region">{i18n.t('static.region.region')}</Label>
+                                                        <Label for="region">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="region"
                                                             id="region"

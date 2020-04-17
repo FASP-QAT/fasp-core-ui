@@ -1,68 +1,42 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, Label, Button, Col } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
-import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import filterFactory from 'react-bootstrap-table2-filter';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
-import i18n from '../../i18n'
-
-import SupplierService from "../../api/SupplierService";
-import AuthenticationService from '../Common/AuthenticationService.js';
-import RealmService from '../../api/RealmService';
+import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-const entityname = i18n.t('static.supplier.supplier');
-class SupplierListComponent extends Component {
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import PlanningUnitService from '../../api/PlanningUnitService';
+
+
+const entityname = i18n.t('static.dashboad.planningunitcapacity');
+export default class PlanningUnitCapacityList extends Component {
+
     constructor(props) {
         super(props);
-
         this.state = {
-            realms: [],
-            supplierList: [],
+            planningUnits: [],
+            planningUnitCapacityList: [],
             message: '',
             selSource: []
+
         }
-        this.editSupplier = this.editSupplier.bind(this);
-        this.addSupplier = this.addSupplier.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
     }
-    editSupplier(supplier) {
-        this.props.history.push({
-            pathname: `/supplier/editSupplier/${supplier.supplierId}`,
-            // state: { supplier }
-        });
-    }
-    addSupplier(supplier) {
-        this.props.history.push({
-            pathname: "/supplier/addSupplier"
-        });
-    }
-    filterData() {
-        let realmId = document.getElementById("realmId").value;
-        if (realmId != 0) {
-            const selSource = this.state.supplierList.filter(c => c.realm.id == realmId)
-            this.setState({
-                selSource
-            });
-        } else {
-            this.setState({
-                selSource: this.state.supplierList
-            });
-        }
-    }
 
-    componentDidMount() {
+    filterData() {
+        let planningUnitId = document.getElementById("planningUnitId").value;
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realms: response.data
-                    })
-                } else {
-                    this.setState({ message: response.data.messageCode })
-                }
-            }).catch(
+        PlanningUnitService.getPlanningUnitCapacityForId(planningUnitId).then(response => {
+            console.log(response.data)
+            this.setState({
+                planningUnitCapacityList: response.data,
+                selSource: response.data
+            })
+        })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
@@ -83,19 +57,24 @@ class SupplierListComponent extends Component {
                 }
             );
 
-        SupplierService.getSupplierListAll()
-            .then(response => {
-                console.log(response.data)
-                this.setState({
-                    supplierList: response.data,
-                    selSource: response.data
-                })
-            }).catch(
+    }
+   
+  
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        PlanningUnitService.getAllPlanningUnitList().then(response => {
+            console.log(response.data)
+            this.setState({
+                planningUnits: response.data,
+
+            })
+        })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -110,18 +89,22 @@ class SupplierListComponent extends Component {
                     }
                 }
             );
+            
 
-    }
+         }
+
+    
+
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
 
     render() {
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0
+            && planningUnits.map((item, i) => {
                 return (
-                    <option key={i} value={item.realmId}>
+                    <option key={i} value={item.planningUnitId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -135,19 +118,38 @@ class SupplierListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'realm.label',
-            text: i18n.t('static.realm.realm'),
+            dataField: 'planningUnit.label',
+            text: i18n.t('static.dashboard.planningunit'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
         }, {
-            dataField: 'label',
-            text: i18n.t('static.supplier.supplier'),
+            dataField: 'supplier.label',
+            text: i18n.t('static.dashboard.supplier'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
+        }, {
+            dataField: 'startDate',
+            text: i18n.t('static.common.startdate'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
+        }, {
+            dataField: 'stopDate',
+            text: i18n.t('static.common.stopdate'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            //formatter: this.formatLabel
+        }, {
+            dataField: 'capacity',
+            text: i18n.t('static.planningunit.capacity'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center'
         }, {
             dataField: 'active',
             text: i18n.t('static.common.status'),
@@ -192,28 +194,26 @@ class SupplierListComponent extends Component {
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
-
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                        <i className="icon-menu"></i>{i18n.t('static.dashboard.capacitylist')}
                         <div className="card-header-actions">
-                            <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>
-                            </div>
+                           
                         </div>
+
                     </CardHeader>
                     <CardBody>
                         <Col md="3 pl-0">
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunit')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
                                         <Input
                                             type="select"
-                                            name="realmId"
-                                            id="realmId"
+                                            name="planningUnitId"
+                                            id="planningUnitId"
                                             bsSize="sm"
                                         >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {realmList}
+                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                            {planningUnitList}
                                         </Input>
                                         <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -223,7 +223,7 @@ class SupplierListComponent extends Component {
                             </FormGroup>
                         </Col>
                         <ToolkitProvider
-                            keyField="supplierId"
+                            keyField="planningUnitCapacityId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
@@ -239,11 +239,11 @@ class SupplierListComponent extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            rowEvents={{
+                                           /* rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editSupplier(row);
+                                                    this.editPlanningUnitCapacity(row);
                                                 }
-                                            }}
+                                            }}*/
                                             {...props.baseProps}
                                         />
                                     </div>
@@ -256,5 +256,5 @@ class SupplierListComponent extends Component {
             </div>
         );
     }
+
 }
-export default SupplierListComponent;

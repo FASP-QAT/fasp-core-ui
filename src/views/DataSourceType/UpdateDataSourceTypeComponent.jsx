@@ -235,7 +235,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
+                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -250,7 +250,7 @@ export default class UpdateDataSourceTypeComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')} </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
