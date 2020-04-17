@@ -389,7 +389,7 @@ class EditUserComponent extends Component {
                                                         <FormFeedback className="red">{errors.phoneNumber}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="roleId">{i18n.t('static.role.role')}</Label>
+                                                        <Label htmlFor="roleId">{i18n.t('static.role.role')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             valid={!errors.roleId}
                                                             bsSize="sm"
