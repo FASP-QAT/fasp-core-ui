@@ -9,23 +9,40 @@ import { Date } from 'core-js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../i18n'
-import DeleteSpecificRow from '../ProgramProduct/TableFeatureTwo';
 import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
 import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
-const initialValues = {
-    startDate: '',
-    stopDate: '',
-    realmCountry: [],
-    country: ''
+import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
+import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+ let initialValues = {
+    
+    planningUnit: {
+        id: '',
+        label: {
+            label_en: ''
+        }
+    }
+    , label: { label_en: '' },
+    skuCode: '',
+    unit: {
+        unitId: '',
+        label: {
+            label_en: ''
+        }
+    },
+    multiplier: '',
+
+    gtin: '',
+    active: true
+
 
 }
 const entityname = i18n.t('static.dashboad.planningunitcountry')
 const validationSchema = function (values, t) {
     return Yup.object().shape({
-        planningUnit: Yup.string()
+        planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         label: Yup.string()
             .required(i18n.t('static.planningunit.Countrytext')),
@@ -68,6 +85,7 @@ class PlanningUnitCountry extends Component {
             lang: localStorage.getItem('lang'),
             planningUnitCountry: {},
             planningUnits: [],
+           
             realmCountry: {
                 realmCountryId: '',
                 country: {
@@ -86,6 +104,8 @@ class PlanningUnitCountry extends Component {
             label: {
                 label_en: ''
             },
+            skuCode:'',
+            multiplier:'',
             rows: [],
             planningUnit: {
                 planningUnitId: '',
@@ -98,7 +118,8 @@ class PlanningUnitCountry extends Component {
                 label: {
                     label_en: ''
                 }
-            }
+            }, isNew: true,
+            updateRowStatus: 0
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.handleDisableSpecificRow = this.handleDisableSpecificRow.bind(this);
@@ -108,14 +129,74 @@ class PlanningUnitCountry extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
         this.CapitalizeFull = this.CapitalizeFull.bind(this);
+        this.updateRow = this.updateRow.bind(this);
     }
-  
+    updateRow(idx) {
+        if (this.state.updateRowStatus == 1) {
+            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
+        } else {
+            document.getElementById('planningUnitId').disabled = true;
+            initialValues = {
+               
+                planningUnit: {
+                    planningUnitId: this.state.rows[idx].planningUnit.planningUnitId,
+                    label: {
+                        label_en: this.state.rows[idx].planningUnit.label.label_en
+                    }
+                }
+                , label: { label_en: this.state.rows[idx].label.label_en },
+                skuCode: this.state.rows[idx].skuCode,
+                unit: {
+                    unitId: this.state.rows[idx].unit.unitId,
+                    label: {
+                        label_en: this.state.rows[idx].unit.label.label_en
+                    }
+                },
+                multiplier: this.state.rows[idx].multiplier,
+
+                gtin: this.state.rows[idx].gtin,
+                active: this.state.rows[idx].active
+
+
+            }
+            const rows = [...this.state.rows]
+            this.setState({
+               
+                planningUnit: {
+                    planningUnitId: this.state.rows[idx].planningUnit.id,
+                    label: {
+                        label_en: this.state.rows[idx].planningUnit.label.label_en
+                    }
+                }
+                , label: { label_en: this.state.rows[idx].label.label_en },
+                skuCode: this.state.rows[idx].skuCode,
+                unit: {
+                    unitId: this.state.rows[idx].unit.unitId,
+                    label: {
+                        label_en: this.state.rows[idx].unit.label.label_en
+                    }
+                },
+                multiplier: this.state.rows[idx].multiplier,
+
+                gtin: this.state.rows[idx].gtin,
+                // active: this.state.rows[idx].active,
+                isNew: false,
+                updateRowStatus: 1
+            }
+            );
+
+            rows.splice(idx, 1);
+            this.setState({ rows });
+        }
+    }
+
     touchAll(setTouched, errors) {
         setTouched({
-            planningUnit: true,
-            startDate: true,
-            stopDate: true,
-            country: true,
+            planningUnitId: true,
+            label: true,
+            skuCode: true,
+            multiplier: true,
+            unitId:true
 
         }
         )
@@ -139,7 +220,7 @@ class PlanningUnitCountry extends Component {
 
     setTextAndValue = (event) => {
         // let { budget } = this.state;
-        if (event.target.name === "planningUnit") {
+        if (event.target.name === "planningUnitId") {
             this.state.planningUnit.planningUnitId = event.target.value;
             this.state.planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
             console.log(event.target.value)
@@ -174,10 +255,10 @@ class PlanningUnitCountry extends Component {
     }
     CapitalizeFull(str) {
         if (str != null && str != "") {
-        return str.toUpperCase() 
-    } else {
-        return "";
-    }
+            return str.toUpperCase()
+        } else {
+            return "";
+        }
     }
 
 
@@ -270,14 +351,12 @@ class PlanningUnitCountry extends Component {
                 }
             );
         RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
-            console.log(JSON.stringify(response.data))
             this.setState({
                 realmCountry: response.data,
                 //  rows:response.data
             })
         }).catch(
             error => {
-                console.log(JSON.stringify(error))
                 if (error.message === "Network Error") {
                     this.setState({ message: error.message });
                 } else {
@@ -291,14 +370,12 @@ class PlanningUnitCountry extends Component {
                             break;
                         default:
                             this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
                             break;
                     }
                 }
             }
         );
         RealmCountryService.getPlanningUnitCountryForId(this.props.match.params.realmCountryId).then(response => {
-            console.log(response.data);
             this.setState({
                 planningUnitCountry: response.data,
                 rows: response.data
@@ -318,7 +395,6 @@ class PlanningUnitCountry extends Component {
                             break;
                         default:
                             this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
                             break;
                     }
                 }
@@ -326,8 +402,7 @@ class PlanningUnitCountry extends Component {
         );
         PlanningUnitService.getAllPlanningUnitList()
             .then(response => {
-                console.log(response.data)
-                this.setState({
+               this.setState({
                     planningUnits: response.data
                 })
             }).catch(
@@ -384,7 +459,7 @@ class PlanningUnitCountry extends Component {
                             <Formik
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                     console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.skuCode + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
                                     if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != "" && this.state.skuCode != "" && this.state.unit.unitId != "" && this.state.multiplier != "") {
                                         var json =
@@ -410,12 +485,38 @@ class PlanningUnitCountry extends Component {
                                             multiplier: this.state.multiplier,
 
                                             gtin: this.state.gtin,
+                                            isNew: this.state.isNew,
                                             active: true
 
                                         }
                                         this.state.rows.push(json)
                                         this.setState({ rows: this.state.rows })
-                                    }
+                                    };
+                                    resetForm({
+                                        realmCountry: {
+                                            id: this.props.match.params.realmCountryId
+                                        }
+                                        ,
+                                        planningUnit: {
+                                            id: '',
+                                            label: {
+                                                label_en: ''
+                                            }
+                                        }
+                                        , label: { label_en: '' },
+                                        skuCode: '',
+                                        unit: {
+                                            unitId: '',
+                                            label: {
+                                                label_en: ''
+                                            }
+                                        },
+                                        multiplier: '',
+
+                                        gtin: '',
+                                        active: true
+
+                                    });
                                 }}
                                 render={
                                     ({
@@ -448,14 +549,15 @@ class PlanningUnitCountry extends Component {
                                         </FormGroup>
                                         <FormGroup>
                                             <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <Input type="select" name="planningUnit" id="planningUnit" bsSize="sm"
-                                                valid={!errors.planningUnit}
-                                                invalid={touched.planningUnit && !!errors.planningUnit}
+                                            <Input type="select" name="planningUnitId" id="planningUnitId" bsSize="sm"
+                                                valid={!errors.planningUnitId}
+                                                invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                 onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }} required>
+                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                value={this.state.planningUnit.planningUnitId} required>
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {planningUnitList}
-                                            </Input> <FormFeedback className="red">{errors.planningUnit}</FormFeedback>
+                                            </Input> <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
                                             <Label for="label">{i18n.t('static.planningunit.countrysku')}</Label>
@@ -467,7 +569,7 @@ class PlanningUnitCountry extends Component {
                                                 invalid={touched.label && !!errors.label}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
-                                                value={ this.Capitalize(this.state.label.label_en)}
+                                                value={this.Capitalize(this.state.label.label_en)}
                                                 required />
                                             <FormFeedback className="red">{errors.label}</FormFeedback>
                                         </FormGroup>
@@ -478,7 +580,7 @@ class PlanningUnitCountry extends Component {
                                                 id="skuCode" bsSize="sm"
                                                 valid={!errors.skuCode}
                                                 invalid={touched.skuCode && !!errors.skuCode}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e);  }}
+                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
                                                 placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
                                                 value={this.CapitalizeFull(this.state.skuCode)}
@@ -493,6 +595,7 @@ class PlanningUnitCountry extends Component {
                                                 name="unitId"
                                                 id="unitId"
                                                 bsSize="sm"
+                                                value={this.state.unit.unitId}
                                                 valid={!errors.unitId}
                                                 invalid={touched.unitId && !!errors.unitId}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
@@ -513,6 +616,7 @@ class PlanningUnitCountry extends Component {
                                                 invalid={touched.multiplier && !!errors.multiplier}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
+                                                value={this.state.multiplier}
                                                 required />
                                             <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                         </FormGroup>
@@ -528,7 +632,7 @@ class PlanningUnitCountry extends Component {
                                                 valid={!errors.gtin}
                                                 invalid={touched.gtin && !!errors.gtin}
                                                 onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e);  }}
+                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 value={this.CapitalizeFull(this.state.gtin)}
                                                 placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
                                             />
@@ -583,11 +687,11 @@ class PlanningUnitCountry extends Component {
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={() => { this.handleDisableSpecificRow(idx) }} ><i className="fa fa-times"></i>Disable</Button>}
-                                                    {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={() => { this.handleEnableSpecificRow(idx) }}><i className="fa fa-check"></i>Activate</Button>}
-                                                    {!this.state.rows[idx].realmCountryPlanningUnitId && (<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
-
-                                                </td>
+                                                        {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
+                                                  
+                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                                    </td>
                                             </tr>)
 
                                     }
@@ -598,7 +702,7 @@ class PlanningUnitCountry extends Component {
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                { <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                {<Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
                         </FormGroup>
 
