@@ -115,7 +115,7 @@ export default class AddProgram extends Component {
                     realmCountryId: ''
                 },
                 organisation: {
-                    organisationId: ''
+                    id: ''
                 },
                 programManager: {
                     userId: '',
@@ -136,7 +136,7 @@ export default class AddProgram extends Component {
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
                 healthArea: {
-                    healthAreaId: ''
+                    id: ''
                 },
                 programNotes: '',
                 regionArray: [],
@@ -411,7 +411,7 @@ export default class AddProgram extends Component {
         } if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
         } if (event.target.name == 'organisationId') {
-            program.organisation.organisationId = event.target.value;
+            program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
@@ -431,7 +431,7 @@ export default class AddProgram extends Component {
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
-            program.healthArea.healthAreaId = event.target.value;
+            program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }

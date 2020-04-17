@@ -86,7 +86,7 @@ class AddProcurementAgentComponent extends Component {
     dataChange(event) {
         let { procurementAgent } = this.state;
         if (event.target.name == "realmId") {
-            procurementAgent.realm.realmId = event.target.value;
+            procurementAgent.realm.id = event.target.value;
         }
         if (event.target.name == "procurementAgentCode") {
             procurementAgent.procurementAgentCode = event.target.value;

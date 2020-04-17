@@ -106,25 +106,25 @@ export default class AddProcurementUnit extends Component {
                 },
                 multiplier: '',
                 unit: {
-                    unitId: ''
+                    id: ''
                 },
                 supplier: {
-                    supplierId: ''
+                    id: ''
                 },
                 heightUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 heightQty: 0,
                 lengthUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 lengthQty: 0,
                 widthUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 widthQty: 0,
                 weightUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 weightQty: 0,
                 labeling: '',
@@ -261,31 +261,31 @@ export default class AddProcurementUnit extends Component {
             procurementUnit.multiplier = event.target.value;
         }
         if (event.target.name == "unitId") {
-            procurementUnit.unit.unitId = event.target.value;
+            procurementUnit.unit.id = event.target.value;
         }
         if (event.target.name == "supplierId") {
-            procurementUnit.supplier.supplierId = event.target.value;
+            procurementUnit.supplier.id = event.target.value;
         }
         if (event.target.name == "heightUnitId") {
-            procurementUnit.heightUnit.unitId = event.target.value;
+            procurementUnit.heightUnit.id = event.target.value;
         }
         if (event.target.name == "heightQty") {
             procurementUnit.heightQty = event.target.value;
         }
         if (event.target.name == "lengthUnitId") {
-            procurementUnit.lengthUnit.unitId = event.target.value;
+            procurementUnit.lengthUnit.id = event.target.value;
         }
         if (event.target.name == "lengthQty") {
             procurementUnit.lengthQty = event.target.value;
         }
         if (event.target.name == "widthUnitId") {
-            procurementUnit.widthUnit.unitId = event.target.value;
+            procurementUnit.widthUnit.id = event.target.value;
         }
         if (event.target.name == "widthQty") {
             procurementUnit.widthQty = event.target.value;
         }
         if (event.target.name == "weightUnitId") {
-            procurementUnit.weightUnit.unitId = event.target.value;
+            procurementUnit.weightUnit.id = event.target.value;
         }
         if (event.target.name == "weightQty") {
             procurementUnit.weightQty = event.target.value;

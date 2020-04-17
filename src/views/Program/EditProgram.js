@@ -132,7 +132,7 @@ export default class EditProgram extends Component {
                     }
                 },
                 organisation: {
-                    organisationId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -160,7 +160,7 @@ export default class EditProgram extends Component {
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
                 healthArea: {
-                    healthAreaId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -208,7 +208,7 @@ export default class EditProgram extends Component {
                 programName: getLabelText(this.state.program.label, lang),
                 realmId: this.state.program.realmCountry.realm.realmId,
                 realmCountryId: this.state.program.realmCountry.realmCountryId,
-                organisationId: this.state.program.organisation.organisationId,
+                organisationId: this.state.program.organisation.id,
                 userId: this.state.program.programManager.userId,
                 airFreightPerc: this.state.program.airFreightPerc,
                 seaFreightPerc: this.state.program.seaFreightPerc,
@@ -219,7 +219,7 @@ export default class EditProgram extends Component {
                 approvedToShippedLeadTime: this.state.program.approvedToShippedLeadTime,
                 monthsInFutureForAmc: this.state.program.monthsInFutureForAmc,
                 monthsInPastForAmc: this.state.program.monthsInPastForAmc,
-                healthAreaId: this.state.program.healthArea.healthAreaId,
+                healthAreaId: this.state.program.healthArea.id,
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray
             }
@@ -338,7 +338,7 @@ export default class EditProgram extends Component {
         } if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
         } if (event.target.name == 'organisationId') {
-            program.organisation.organisationId = event.target.value;
+            program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
@@ -358,7 +358,7 @@ export default class EditProgram extends Component {
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
-            program.healthArea.healthAreaId = event.target.value;
+            program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }

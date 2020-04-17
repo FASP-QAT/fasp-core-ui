@@ -90,7 +90,7 @@ class AddTracerCategoryComponent extends Component {
     dataChange(event) {
         let { tracerCategory } = this.state;
         if (event.target.name == "realmId") {
-            tracerCategory.realm.realmId = event.target.value;
+            tracerCategory.realm.id = event.target.value;
         }
 
         if (event.target.name == "tracerCategoryName") {

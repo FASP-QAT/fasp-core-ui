@@ -72,7 +72,7 @@ class AddSupplierComponent extends Component {
   dataChange(event) {
     let { supplier } = this.state;
     if (event.target.name == "realmId") {
-      supplier.realm.realmId = event.target.value;
+      supplier.realm.id = event.target.value;
     }
     if (event.target.name == "supplier") {
       supplier.label.label_en = event.target.value;
@@ -216,7 +216,7 @@ class AddSupplierComponent extends Component {
                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                 onBlur={handleBlur}
                                 required
-                                value={this.state.realmId}
+                                value={this.state.id}
                               >
                                 <option value="0">{i18n.t('static.common.select')}</option>
                                 {realmList}

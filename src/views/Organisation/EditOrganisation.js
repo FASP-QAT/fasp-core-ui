@@ -70,7 +70,7 @@ export default class EditOrganisationComponent extends Component {
                     label_fr: ''
                 },
                 realm: {
-                    realmId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -107,7 +107,7 @@ export default class EditOrganisationComponent extends Component {
         } else if (event.target.name === "organisationCode") {
             organisation.organisationCode = event.target.value.toUpperCase();
         } else if (event.target.name === "realmId") {
-            organisation.realm.realmId = event.target.value
+            organisation.realm.id = event.target.value
         } else if (event.target.name === "active") {
             organisation.active = event.target.id === "active2" ? false : true
         }
@@ -154,7 +154,7 @@ export default class EditOrganisationComponent extends Component {
                 // label: this.props.location.state.healthArea.label.label_en,
                 organisationName: this.state.organisation.label.label_en,
                 organisationCode: this.state.organisation.organisationCode,
-                realmId: this.state.organisation.realm.realmId
+                realmId: this.state.organisation.realm.id
             }
             UserService.getRealmList()
                 .then(response => {
@@ -179,7 +179,7 @@ export default class EditOrganisationComponent extends Component {
                     }
                 );
 
-            OrganisationService.getRealmCountryList(this.state.organisation.realm.realmId)
+            OrganisationService.getRealmCountryList(this.state.organisation.realm.id)
                 .then(response => {
                     console.log("Realm Country List list---", response.data);
                     if (response.status == 200) {
@@ -346,7 +346,7 @@ export default class EditOrganisationComponent extends Component {
                                                         <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
                                                         <Input
                                                         bsSize="sm"
-                                                            value={this.state.organisation.realm.realmId}
+                                                            value={this.state.organisation.realm.id}
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}

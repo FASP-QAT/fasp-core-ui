@@ -67,7 +67,7 @@ export default class AddOrganisationComponent extends Component {
                     label_en: ''
                 },
                 realm: {
-                    realmId: ""
+                    id: ""
                 },
                 realmCountryArray: [],
                 organisationCode: ''
@@ -96,7 +96,7 @@ export default class AddOrganisationComponent extends Component {
         } else if (event.target.name === "organisationCode") {
             organisation.organisationCode = event.target.value.toUpperCase();
         } else if (event.target.name === "realmId") {
-            organisation.realm.realmId = event.target.value
+            organisation.realm.id = event.target.value
         }
         this.setState({
             organisation
@@ -337,7 +337,7 @@ export default class AddOrganisationComponent extends Component {
                                                         <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            value={this.state.organisation.realm.realmId}
+                                                            value={this.state.organisation.realm.id}
                                                             valid={!errors.realmId}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}

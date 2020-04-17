@@ -111,10 +111,10 @@ export default class EditProcurementUnit extends Component {
                 },
                 multiplier: '',
                 unit: {
-                    unitId: ''
+                    id: ''
                 },
                 supplier: {
-                    supplierId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -123,19 +123,19 @@ export default class EditProcurementUnit extends Component {
                     },
                 },
                 heightUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 heightQty: 0,
                 lengthUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 lengthQty: 0,
                 widthUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 widthQty: 0,
                 weightUnit: {
-                    unitId: '',
+                    id: '',
                 },
                 weightQty: 0,
                 labeling: '',
@@ -169,15 +169,15 @@ export default class EditProcurementUnit extends Component {
                 procurementUnitName: getLabelText(this.state.procurementUnit.label, lang),
                 planningUnitId: this.state.procurementUnit.planningUnit.planningUnitId,
                 multiplier: this.state.procurementUnit.multiplier,
-                unitId: this.state.procurementUnit.unit.unitId,
-                supplierId: this.state.procurementUnit.supplier.supplierId,
-                heightUnitId: this.state.procurementUnit.heightUnit.unitId,
+                unitId: this.state.procurementUnit.unit.id,
+                supplierId: this.state.procurementUnit.supplier.id,
+                heightUnitId: this.state.procurementUnit.heightUnit.id,
                 heightQty: this.state.procurementUnit.heightQty,
-                lengthUnitId: this.state.procurementUnit.lengthUnit.unitId,
+                lengthUnitId: this.state.procurementUnit.lengthUnit.id,
                 lengthQty: this.state.procurementUnit.lengthQty,
-                widthUnitId: this.state.procurementUnit.widthUnit.unitId,
+                widthUnitId: this.state.procurementUnit.widthUnit.id,
                 widthQty: this.state.procurementUnit.widthQty,
-                weightUnitId: this.state.procurementUnit.weightUnit.unitId,
+                weightUnitId: this.state.procurementUnit.weightUnit.id,
                 weightQty: this.state.procurementUnit.weightQty,
                 labeling: this.state.procurementUnit.labeling,
                 unitsPerContainer: this.state.procurementUnit.unitsPerContainer
@@ -250,31 +250,31 @@ export default class EditProcurementUnit extends Component {
             procurementUnit.multiplier = event.target.value;
         }
         if (event.target.name == "unitId") {
-            procurementUnit.unit.unitId = event.target.value;
+            procurementUnit.unit.id = event.target.value;
         }
         if (event.target.name == "supplierId") {
-            procurementUnit.supplier.supplierId = event.target.value;
+            procurementUnit.supplier.id = event.target.value;
         }
         if (event.target.name == "heightUnitId") {
-            procurementUnit.heightUnit.unitId = event.target.value;
+            procurementUnit.heightUnit.id = event.target.value;
         }
         if (event.target.name == "heightQty") {
             procurementUnit.heightQty = event.target.value;
         }
         if (event.target.name == "lengthUnitId") {
-            procurementUnit.lengthUnit.unitId = event.target.value;
+            procurementUnit.lengthUnit.id = event.target.value;
         }
         if (event.target.name == "lengthQty") {
             procurementUnit.lengthQty = event.target.value;
         }
         if (event.target.name == "widthUnitId") {
-            procurementUnit.widthUnit.unitId = event.target.value;
+            procurementUnit.widthUnit.id = event.target.value;
         }
         if (event.target.name == "widthQty") {
             procurementUnit.widthQty = event.target.value;
         }
         if (event.target.name == "weightUnitId") {
-            procurementUnit.weightUnit.unitId = event.target.value;
+            procurementUnit.weightUnit.id = event.target.value;
         }
         if (event.target.name == "weightQty") {
             procurementUnit.weightQty = event.target.value;
@@ -446,7 +446,7 @@ export default class EditProcurementUnit extends Component {
                                                             invalid={touched.unitId && !!errors.unitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.unit.unitId}
+                                                            value={this.state.procurementUnit.unit.id}
                                                             type="select" name="unitId" id="unitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -476,7 +476,7 @@ export default class EditProcurementUnit extends Component {
                                                             invalid={touched.heightUnitId && !!errors.heightUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.heightUnit.unitId}
+                                                            value={this.state.procurementUnit.heightUnit.id}
                                                             type="select" name="heightUnitId" id="heightUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -503,7 +503,7 @@ export default class EditProcurementUnit extends Component {
                                                             invalid={touched.lengthUnitId && !!errors.lengthUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.lengthUnit.unitId}
+                                                            value={this.state.procurementUnit.lengthUnit.id}
                                                             type="select" name="lengthUnitId" id="lengthUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -530,7 +530,7 @@ export default class EditProcurementUnit extends Component {
                                                             invalid={touched.widthUnitId && !!errors.widthUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.widthUnit.unitId}
+                                                            value={this.state.procurementUnit.widthUnit.id}
                                                             type="select" name="widthUnitId" id="widthUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -557,7 +557,7 @@ export default class EditProcurementUnit extends Component {
                                                             invalid={touched.weightUnitId && !!errors.weightUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.weightUnit.unitId}
+                                                            value={this.state.procurementUnit.weightUnit.id}
                                                             type="select" name="weightUnitId" id="weightUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}

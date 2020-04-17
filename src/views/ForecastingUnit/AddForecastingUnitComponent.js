@@ -93,13 +93,13 @@ export default class AddForecastingUnitComponent extends Component {
             forecastingUnit.label.label_en = event.target.value
         }
         if (event.target.name == "realmId") {
-            forecastingUnit.realm.realmId = event.target.value;
+            forecastingUnit.realm.id = event.target.value;
         }
         if (event.target.name == "tracerCategoryId") {
-            forecastingUnit.tracerCategory.tracerCategoryId = event.target.value;
+            forecastingUnit.tracerCategory.id = event.target.value;
         }
         if (event.target.name == "productCategoryId") {
-            forecastingUnit.productCategory.productCategoryId = event.target.value;
+            forecastingUnit.productCategory.id = event.target.value;
         }
         if (event.target.name == "genericLabel") {
             forecastingUnit.genericLabel.label_en = event.target.value;
@@ -323,7 +323,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
@@ -342,7 +342,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {tracerCategoryList}
@@ -361,7 +361,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {productCategoryList}

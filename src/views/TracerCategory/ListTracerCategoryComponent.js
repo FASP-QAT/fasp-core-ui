@@ -36,7 +36,7 @@ class ListTracerCategoryComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selTracerCategory = this.state.tracerCategoryList.filter(c => c.realm.realmId == realmId)
+            const selTracerCategory = this.state.tracerCategoryList.filter(c => c.realm.id == realmId)
             this.setState({
                 selTracerCategory
             });
