@@ -75,30 +75,66 @@ class DefaultHeaderDropdown extends Component {
     );
   }
 
+  // dropAccnt() {
+  //   return (
+  //     <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+  //       <DropdownToggle nav>
+  //                <span class="icon-wrapper icon-wrapper-alt rounded-circle ">
+  //                     <span class="icon-wrapper-bg setting-icon"></span>
+  //                        <i class="icon-settings icon-anim-pulse text-primary"></i>
+  //               </span>
+  //       </DropdownToggle>
+  //       <DropdownMenu right>
+  //         <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
+  //         <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> {i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
+  //         <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i> Logout</DropdownItem>
+  //       </DropdownMenu>
+  //     </Dropdown>
+  //   );
+  // }
+
   dropAccnt() {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-        <DropdownToggle nav>
-          {/* <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" /> */}
-          {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
-            <i class="icon-settings icon-anim-pulse text-primary"></i>
-        </button> */}
-        <span class="icon-wrapper icon-wrapper-alt rounded-circle ">
-                                <span class="icon-wrapper-bg setting-icon"></span>
-                                <i class="icon-settings icon-anim-pulse text-primary"></i>
-                            </span>
-        </DropdownToggle>
-        <DropdownMenu right>
-          <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
-         
-          <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> {i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
-          {/* <DropdownItem><i className="fa fa-shield"></i> Language</DropdownItem> */}
-          <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i> Logout</DropdownItem>
-          {/*<DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>*/}
-        </DropdownMenu>
-      </Dropdown>
+      <DropdownToggle nav float-left>
+        <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+      </DropdownToggle>
+      <DropdownMenu right>
+        <DropdownItem header tag="div" className="text-center"><b>Profile</b></DropdownItem>
+        <DropdownItem><i className="icon-user icons icon-size"></i><span className="tittle-role">Anchal</span> 
+            <div className=" mb-1 mt-2">
+              <small><i className="fa fa-dot-circle-o"></i> Application level Admin</small>
+            </div>
+            <div className="mb-1 mt-2">
+              <small><i className="fa fa-dot-circle-o"></i> Program level Admin</small>
+            </div>
+            <div className=" mb-1 mt-2">
+              <small><i className="fa fa-dot-circle-o"></i> Realm Level Admin</small>
+            </div>
+            <div className=" mb-1 mt-2">
+              <small><i className="fa fa-dot-circle-o"></i> Program User</small>
+            </div>
+        
+        </DropdownItem>
+        <DropdownItem header tag="div" className="text-center"><b>Change Preferred Language</b></DropdownItem>
+        <DropdownItem><i className="flag-icon flag-icon-us"></i> English</DropdownItem>
+        <DropdownItem><i className="flag-icon flag-icon-wf "></i> French</DropdownItem>
+        <DropdownItem><i className="flag-icon flag-icon-es"></i> Spanish</DropdownItem>
+        <DropdownItem><i className="flag-icon flag-icon-pt"></i> Pourtegese</DropdownItem>
+        <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> <b>{i18n.t('static.dashboard.changepassword')}</b></DropdownItem></Online>
+        {/* <DropdownItem><i className="fa fa-shield"></i> Lock Account</DropdownItem>
+        <DropdownItem onClick={this.props.onLogout}><i className="fa fa-lock"></i> Logout</DropdownItem> */}
+        {/*<DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>*/}
+      </DropdownMenu>
+     
+     
+    </Dropdown>
+    
+    
     );
   }
+
+  
 
   dropTasks() {
     const itemsCount = 15;

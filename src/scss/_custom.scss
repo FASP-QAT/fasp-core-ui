@@ -897,7 +897,7 @@ h5,
 
 .dropdown-header {
   color: #212721;
-  font-size:14px;
+  font-size:13px;
 }
 
 .dropdown-item {
@@ -958,11 +958,11 @@ h5,
   z-index: 5;
 }
 
-.app-header .nav-item {
+// .app-header .nav-item {
 
-  margin: 5px;
+//   margin: 5px;
  
-}
+// }
 
 .box-role{
   border-bottom: 0px solid #c0c9d1!important;
@@ -1009,4 +1009,10 @@ h5,
 .react-confirm-alert-overlay {
   background: rgba(25, 24, 24, 0.45)!important;
 }
+///////
+.tittle-role{
+  font-weight: 550;
+  font-size: 15px;
+}
 
+.icon-size{font-size:16px;}
