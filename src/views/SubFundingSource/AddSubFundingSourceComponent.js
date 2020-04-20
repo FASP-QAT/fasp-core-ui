@@ -61,6 +61,7 @@ class AddSubFundingSourceComponent extends Component {
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
     this.Capitalize = this.Capitalize.bind(this);
+    this.resetClicked = this.resetClicked.bind(this);
   }
 
   Capitalize(str) {
@@ -219,7 +220,7 @@ class AddSubFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required
-                              value={this.state.fundingSourceId}
+                              value={this.state.subFundingSource.fundingSource.fundingSourceId}
                             >
                               <option value="">{i18n.t('static.common.select')}</option>
                               {fundingSourceList}
@@ -245,6 +246,7 @@ class AddSubFundingSourceComponent extends Component {
                         <CardFooter>
                           <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
@@ -260,6 +262,17 @@ class AddSubFundingSourceComponent extends Component {
   }
   cancelClicked() {
     this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
+  }
+  resetClicked() {
+    let { subFundingSource } = this.state;
+
+    subFundingSource.fundingSource.fundingSourceId = ''
+    subFundingSource.label.label_en = ''
+
+    this.setState({
+      subFundingSource
+    },
+      () => { });
   }
 }
 

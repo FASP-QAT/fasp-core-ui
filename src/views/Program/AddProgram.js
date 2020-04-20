@@ -33,7 +33,7 @@ const initialValues = {
     monthsInPastForAmc: '',
     healthAreaId: '',
     programNotes: ''
-    
+
 }
 
 const validationSchema = function (values) {
@@ -70,7 +70,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validhealthareatext')),
         programNotes: Yup.string()
             .required(i18n.t('static.program.validnotestext')),
-        
+
     })
 }
 
@@ -162,6 +162,7 @@ export default class AddProgram extends Component {
         this.getRegionList = this.getRegionList.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -460,7 +461,7 @@ export default class AddProgram extends Component {
             monthsInPastForAmc: true,
             healthAreaId: true,
             programNotes: true,
-        
+
         }
         )
         this.validateForm(errors)
@@ -618,6 +619,7 @@ export default class AddProgram extends Component {
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.program.realm.realmId}
                                                             type="select" name="realmId" id="realmId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realms}
@@ -630,7 +632,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.realmCountry.realmCountryId}
+                                                            value={this.state.program.realmCountry.realmCountryId}
                                                             bsSize="sm"
                                                             valid={!errors.realmCountryId}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
@@ -666,7 +668,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
                                                         <Input
-                                                            // value={this.state.program.organisation.organisationId}
+                                                            value={this.state.program.organisation.id}
                                                             bsSize="sm"
                                                             valid={!errors.organisationId}
                                                             invalid={touched.organisationId && !!errors.organisationId}
@@ -684,7 +686,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
                                                         <Input
-                                                            // value={this.state.program.healthArea.healthAreaId}
+                                                            value={this.state.program.healthArea.id}
                                                             bsSize="sm"
                                                             valid={!errors.healthAreaId}
                                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
@@ -702,7 +704,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
                                                         <Input
-                                                            // value={this.state.program.programManager.userId}
+                                                            value={this.state.program.programManager.userId}
                                                             bsSize="sm"
                                                             valid={!errors.userId}
                                                             invalid={touched.userId && !!errors.userId}
@@ -720,7 +722,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                                         <Input
-                                                            // value={this.state.program.programNotes}
+                                                            value={this.state.program.programNotes}
                                                             bsSize="sm"
                                                             valid={!errors.programNotes}
                                                             invalid={touched.programNotes && !!errors.programNotes}
@@ -732,7 +734,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
                                                         <Input
-                                                            // value={this.state.program.airFreightPerc}
+                                                            value={this.state.program.airFreightPerc}
                                                             bsSize="sm"
                                                             valid={!errors.airFreightPerc}
                                                             invalid={touched.airFreightPerc && !!errors.airFreightPerc}
@@ -746,7 +748,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
                                                         <Input
-                                                            // value={this.state.program.seaFreightPerc}
+                                                            value={this.state.program.seaFreightPerc}
                                                             bsSize="sm"
                                                             valid={!errors.seaFreightPerc}
                                                             invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
@@ -761,7 +763,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.plannedToDraftLeadTime}
+                                                            value={this.state.program.plannedToDraftLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.plannedToDraftLeadTime}
                                                             invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
@@ -778,7 +780,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.draftToSubmittedLeadTime}
+                                                            value={this.state.program.draftToSubmittedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.draftToSubmittedLeadTime}
                                                             invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
@@ -796,7 +798,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.submittedToApprovedLeadTime}
+                                                            value={this.state.program.submittedToApprovedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.submittedToApprovedLeadTime}
                                                             invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
@@ -813,7 +815,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.approvedToShippedLeadTime}
+                                                            value={this.state.program.approvedToShippedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.approvedToShippedLeadTime}
                                                             invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
@@ -830,7 +832,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.deliveredToReceivedLeadTime}
+                                                            value={this.state.program.deliveredToReceivedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.deliveredToReceivedLeadTime}
                                                             invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
@@ -847,7 +849,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.monthsInPastForAmc}
+                                                            value={this.state.program.monthsInPastForAmc}
                                                             bsSize="sm"
                                                             valid={!errors.monthsInPastForAmc}
                                                             invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
@@ -864,7 +866,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}</Label>
 
                                                         <Input
-                                                            // value={this.state.program.monthsInFutureForAmc}
+                                                            value={this.state.program.monthsInFutureForAmc}
                                                             bsSize="sm"
                                                             valid={!errors.monthsInFutureForAmc}
                                                             invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
@@ -882,6 +884,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
                                                         &nbsp;
@@ -898,5 +901,29 @@ export default class AddProgram extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+    resetClicked() {
+        let { program } = this.state;
+
+        program.label.label_en = ''
+        program.realm.realmId = ''
+        program.realmCountry.realmCountryId = ''
+        this.state.regionId = ''
+        program.organisation.id = ''
+        program.airFreightPerc = ''
+        program.seaFreightPerc = ''
+        program.deliveredToReceivedLeadTime = ''
+        program.draftToSubmittedLeadTime = ''
+        program.plannedToDraftLeadTime = ''
+        program.submittedToApprovedLeadTime = ''
+        program.approvedToShippedLeadTime = ''
+        program.monthsInFutureForAmc = ''
+        program.monthsInPastForAmc = ''
+        program.healthArea.id = ''
+        program.programManager.userId = ''
+        program.programNotes = ''
+
+        this.setState({ program }, () => { })
+
     }
 }

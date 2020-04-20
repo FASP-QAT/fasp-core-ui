@@ -151,6 +151,7 @@ export default class EditProcurementUnit extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -642,6 +643,7 @@ export default class EditProcurementUnit extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                             </FormGroup>
@@ -658,5 +660,83 @@ export default class EditProcurementUnit extends Component {
     cancelClicked() {
         this.props.history.push(`/procurementUnit/listProcurementUnit/` + i18n.t('static.message.cancelled', { entityname }))
     }
-
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        console.log("this.props.match.params.procurementUnitId", this.props.match.params.procurementUnitId)
+        ProcurementUnitService.getProcurementUnitById(this.props.match.params.procurementUnitId).then(response => {
+            this.setState({
+                procurementUnit: response.data
+            })
+            initialValues = {
+                procurementUnitName: getLabelText(this.state.procurementUnit.label, lang),
+                planningUnitId: this.state.procurementUnit.planningUnit.planningUnitId,
+                multiplier: this.state.procurementUnit.multiplier,
+                unitId: this.state.procurementUnit.unit.id,
+                supplierId: this.state.procurementUnit.supplier.id,
+                heightUnitId: this.state.procurementUnit.heightUnit.id,
+                heightQty: this.state.procurementUnit.heightQty,
+                lengthUnitId: this.state.procurementUnit.lengthUnit.id,
+                lengthQty: this.state.procurementUnit.lengthQty,
+                widthUnitId: this.state.procurementUnit.widthUnit.id,
+                widthQty: this.state.procurementUnit.widthQty,
+                weightUnitId: this.state.procurementUnit.weightUnit.id,
+                weightQty: this.state.procurementUnit.weightQty,
+                labeling: this.state.procurementUnit.labeling,
+                unitsPerContainer: this.state.procurementUnit.unitsPerContainer
+            }
+            AuthenticationService.setupAxiosInterceptors();
+            UnitService.getUnitListAll()
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            unitList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
+                        }
+                    }
+                );
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+    }
 }

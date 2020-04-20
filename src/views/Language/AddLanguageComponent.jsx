@@ -22,7 +22,7 @@ const validationSchema = function (values) {
 
         languageName: Yup.string()
             .required(i18n.t('static.language.languagetext')),
-        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2,i18n.t('static.language.languageCodemax3digittext'))
+        languageCode: Yup.string().required(i18n.t('static.language.languagecodetext')).max(2, i18n.t('static.language.languageCodemax3digittext'))
 
     })
 }
@@ -64,6 +64,7 @@ class AddLanguageComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     dataChange(event) {
@@ -208,7 +209,7 @@ class AddLanguageComponent extends Component {
                                                             invalid={touched.languageCode && !!errors.languageCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.languageCode}
+                                                            value={this.state.language.languageCode}
                                                             required />
                                                         <FormFeedback className="red">{errors.languageCode}</FormFeedback>
                                                     </FormGroup>
@@ -216,6 +217,7 @@ class AddLanguageComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -233,6 +235,17 @@ class AddLanguageComponent extends Component {
 
     cancelClicked() {
         this.props.history.push(`/language/listLanguage/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { language } = this.state;
+        language.languageName = '';
+        language.languageCode = '';
+        this.setState({
+            language
+        },
+            () => { });
+
     }
 
 

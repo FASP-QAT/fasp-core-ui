@@ -82,6 +82,7 @@ export default class AddHealthAreaComponent extends Component {
     this.dataChange = this.dataChange.bind(this);
     this.updateFieldData = this.updateFieldData.bind(this);
     this.getRealmCountryList = this.getRealmCountryList.bind(this);
+    this.resetClicked = this.resetClicked.bind(this);
   }
 
   dataChange(event) {
@@ -370,7 +371,8 @@ export default class AddHealthAreaComponent extends Component {
                         <CardFooter>
                           <FormGroup>
                             <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
                                                   </FormGroup>
@@ -397,6 +399,21 @@ export default class AddHealthAreaComponent extends Component {
 
   cancelClicked() {
     this.props.history.push(`/healthArea/listHealthArea/` + i18n.t('static.message.cancelled', { entityname }))
+  }
+
+  resetClicked() {
+    let { healthArea } = this.state
+
+    healthArea.label.label_en = ''
+    healthArea.realm.id = ''
+    this.state.realmCountryId = ''
+
+    this.setState({
+      healthArea
+    }, (
+    ) => {
+      console.log("state after update---", this.state.healthArea)
+    })
   }
 
 }

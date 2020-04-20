@@ -140,6 +140,7 @@ export default class AddProcurementUnit extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     Capitalize(str) {
@@ -446,6 +447,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.planningUnit.planningUnitId}
                                                             type="select" name="planningUnitId" id="planningUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {planningUnits}
@@ -472,6 +474,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.unitId && !!errors.unitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.unit.id}
                                                             type="select" name="unitId" id="unitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -486,6 +489,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.supplierId && !!errors.supplierId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.supplier.id}
                                                             type="select" name="supplierId" id="supplierId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {suppliers}
@@ -500,6 +504,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.heightUnitId && !!errors.heightUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.heightUnit.id}
                                                             type="select" name="heightUnitId" id="heightUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -526,6 +531,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.lengthUnitId && !!errors.lengthUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.lengthUnit.id}
                                                             type="select" name="lengthUnitId" id="lengthUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -552,6 +558,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.widthUnitId && !!errors.widthUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.weightUnit.id}
                                                             type="select" name="widthUnitId" id="widthUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -578,6 +585,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.weightUnitId && !!errors.weightUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementUnit.weightUnit.id}
                                                             type="select" name="weightUnitId" id="weightUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
@@ -624,6 +632,7 @@ export default class AddProcurementUnit extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         &nbsp;
                                         </FormGroup>
@@ -640,5 +649,28 @@ export default class AddProcurementUnit extends Component {
 
     cancelClicked() {
         this.props.history.push(`/procurementUnit/listProcurementUnit/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { procurementUnit } = this.state;
+
+        procurementUnit.label.label_en = ''
+        procurementUnit.planningUnit.planningUnitId = ''
+        procurementUnit.multiplier = ''
+        procurementUnit.unit.id = ''
+        procurementUnit.supplier.id = ''
+        procurementUnit.heightUnit.id = ''
+        procurementUnit.heightQty = ''
+        procurementUnit.lengthUnit.id = ''
+        procurementUnit.lengthQty = ''
+        procurementUnit.widthUnit.id = ''
+        procurementUnit.widthQty = ''
+        procurementUnit.weightUnit.id = ''
+        procurementUnit.weightQty = ''
+        procurementUnit.labeling = ''
+        procurementUnit.unitsPerContainer = ''
+
+        this.setState({ procurementUnit }, () => { })
+
     }
 }
