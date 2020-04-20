@@ -14,7 +14,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import SupplierService from "../../api/SupplierService";
 import AuthenticationService from "../Common/AuthenticationService";
 import PlanningUnitService from "../../api/PlanningUnitService";
-const initialValues = {
+import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
+import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+let initialValues = {
     startDate: '',
     stopDate: '',
     supplier: [],
@@ -63,6 +65,7 @@ class PlanningUnitCapacity extends Component {
         this.state = {
             lang: localStorage.getItem('lang'),
             planningUnitCapacity: {},
+            planningUnitCapacityId:'',
             suppliers: [],
             supplier: {
                 supplierId: '',
@@ -75,21 +78,71 @@ class PlanningUnitCapacity extends Component {
             stopDate: '',
             rows: [],
             planningUnit: {
+                planningUnitId:'',
                 label: {
                     label_en: ''
                 }
-            }
+            }, isNew: true,
+            updateRowStatus: 0
         }
         this.currentDate = this.currentDate.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
-        this.addRow = this.addRow.bind(this);
         this.deleteLastRow = this.deleteLastRow.bind(this);
-        this.handleDisableSpecificRow = this.handleDisableSpecificRow.bind(this);
+        this.disableRow = this.disableRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
-        this.handleEnableSpecificRow = this.handleEnableSpecificRow.bind(this);
+        this.enableRow = this.enableRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this);
+        this.updateRow = this.updateRow.bind(this);
     }
+
+    updateRow(idx) {
+        if (this.state.updateRowStatus == 1) {
+            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
+        } else {
+        console.log(JSON.stringify(this.state.rows[idx]))
+            initialValues = {
+                planningUnitCapacityId:this.state.rows[idx].planningUnitCapacityId,
+                supplierId: this.state.rows[idx].supplier.id,
+                supplier: {
+                    supplierId: this.state.rows[idx].supplier.id,
+                    label: {
+                        label_en: this.state.rows[idx].supplier.label.label_en
+                    }
+                },
+                startDate: this.state.rows[idx].startDate,
+                 stopDate: this.state.rows[idx].stopDate,
+                gtin: this.state.rows[idx].gtin,
+                capacity: this.state.rows[idx].capacity
+            }
+            const rows = [...this.state.rows]
+            this.setState({
+                planningUnitCapacityId:this.state.rows[idx].planningUnitCapacityId,
+                supplierId: this.state.rows[idx].supplier.id,
+                supplier: {
+                    supplierId: this.state.rows[idx].supplier.id,
+                    label: {
+                        label_en: this.state.rows[idx].supplier.label.label_en
+                    }
+                },
+                startDate: this.state.rows[idx].startDate,
+                 stopDate: this.state.rows[idx].stopDate,
+                gtin: this.state.rows[idx].gtin,
+                capacity: this.state.rows[idx].capacity,
+                isNew: false,
+                updateRowStatus: 1
+            }
+            );
+
+            rows.splice(idx, 1);
+            this.setState({ rows });
+        }
+    }
+
+
+
+
+
     currentDate() {
         var todaysDate = new Date();
         var yyyy = todaysDate.getFullYear().toString();
@@ -149,36 +202,7 @@ class PlanningUnitCapacity extends Component {
 
     }
 
-    addRow() {
-
-        // console.log(JSON.stringify(this.state))
-
-        if (this.state.supplier.supplierId != "" && this.state.startDate != "" && this.state.stopDate != "" && this.state.capacity != "") {
-            var json =
-            {
-                planningUnit: {
-                    id: this.props.match.params.planningUnitId
-                }
-                ,
-                supplier: {
-                    id: this.state.supplier.supplierId,
-                    label: {
-                        label_en: this.state.supplier.label.label_en
-                    }
-                }
-                ,
-                startDate: this.state.startDate,
-
-                stopDate: this.state.stopDate,
-
-                capacity: this.state.capacity,
-                active: true
-
-            }
-            this.state.rows.push(json)
-            this.setState({ rows: this.state.rows })
-        }
-    }
+   
     deleteLastRow() {
         const rows = [...this.state.rows]
      /*  rows[this.state.rows.length - 1].active=false
@@ -188,7 +212,7 @@ class PlanningUnitCapacity extends Component {
             rows
         });
     }
-    handleDisableSpecificRow(idx) {
+    disableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = false
         // rows.splice(idx, 1);
@@ -199,7 +223,7 @@ class PlanningUnitCapacity extends Component {
          rows.splice(idx, 1);
         this.setState({ rows })
     }
-    handleEnableSpecificRow(idx) {
+    enableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = true
         // rows.splice(idx, 1);
@@ -215,7 +239,7 @@ class PlanningUnitCapacity extends Component {
         PlanningUnitService.editPlanningUnitCapacity(planningUnitCapacity)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode))
+                    this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode,{entityname}))
 
                 } else {
                     this.setState({
@@ -351,12 +375,13 @@ class PlanningUnitCapacity extends Component {
                         </CardHeader>
                         <CardBody>
                             <Formik
-                                initialValues={initialValues}
+                                 enableReinitialize={true}
+                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values, { setSubmitting, setErrors,resetForm }) => {
                                     if (this.state.supplier.supplierId != "" && this.state.startDate != "" && this.state.stopDate != "" && this.state.capacity != "") {
                                         var json =
-                                        {
+                                        {planningUnitCapacityId:this.state.planningUnitCapacityId,
                                             planningUnit: {
                                                 id: this.props.match.params.planningUnitId
                                             }
@@ -373,12 +398,55 @@ class PlanningUnitCapacity extends Component {
                                             stopDate: this.state.stopDate,
 
                                             capacity: this.state.capacity,
+                                            isNew: this.state.isNew,
                                             active: true
 
                                         }
                                         this.state.rows.push(json)
-                                        this.setState({ rows: this.state.rows })
+                                        this.setState({ rows: this.state.rows ,updateRowStatus:0 })
+                                        this.setState({
+                                            planningUnitCapacityId:'',
+                                                
+                                                supplier: {
+                                                    id: '',
+                                                    label: {
+                                                        label_en: ''
+                                                    }
+                                                }
+                                                ,
+                                                startDate: '',
+    
+                                                stopDate: '',
+    
+                                                capacity: '',
+                                                active: true
+    
+    
+                                        });
                                     }
+                                    resetForm({
+                                        planningUnitCapacityId:'',
+                                        planningUnit: {
+                                            id: this.props.match.params.planningUnitId
+                                        }
+                                            ,
+                                            supplier: {
+                                                id: '',
+                                                label: {
+                                                    label_en: ''
+                                                }
+                                            }
+                                            ,
+                                            startDate: '',
+
+                                            stopDate: '',
+
+                                            capacity: '',
+                                            active: true
+
+
+                                    });
+                                    
                                 }}
                                 render={
                                     ({
@@ -415,7 +483,8 @@ class PlanningUnitCapacity extends Component {
                                                 valid={!errors.supplier}
                                                 invalid={touched.realmId && !!errors.supplier}
                                                 onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }} required>
+                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }} 
+                                                value={this.state.supplier.supplierId} required>
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {supplierList}
                                             </Input> <FormFeedback className="red">{errors.supplier}</FormFeedback>
@@ -433,6 +502,7 @@ class PlanningUnitCapacity extends Component {
                                                 onBlur={handleBlur}
                                                 min={this.currentDate()}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                value={this.state.startDate}
                                                 placeholder={i18n.t('static.budget.budgetstartdate')}
                                                 required />
                                             <FormFeedback className="red">{errors.startDate}</FormFeedback>
@@ -451,6 +521,7 @@ class PlanningUnitCapacity extends Component {
                                                 onBlur={handleBlur}
                                                 min={this.state.startDate}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                value={this.state.stopDate}
                                                 placeholder={i18n.t('static.budget.budgetstopdate')}
                                                 required /> <FormFeedback className="red">{errors.stopDate}</FormFeedback>
 
@@ -468,6 +539,7 @@ class PlanningUnitCapacity extends Component {
                                                 invalid={touched.capacity && !!errors.capacity}
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                value={this.state.capacity}
                                                 type="number"
                                                 placeholder={i18n.t('static.planningunit.capacitytext')}
                                                 required />
@@ -476,7 +548,7 @@ class PlanningUnitCapacity extends Component {
 
                                         <FormGroup>
                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
                 </FormGroup></Form>)} />
@@ -515,10 +587,11 @@ class PlanningUnitCapacity extends Component {
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
                                                 <td>
-                                               { this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={()=>{this.handleDisableSpecificRow(idx)}} ><i className="fa fa-times"></i>Disable</Button>}
-                                               {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={()=>{this.handleEnableSpecificRow(idx)}}><i className="fa fa-check"></i>Activate</Button>}
-                                               {!this.state.rows[idx].planningUnitCapacityId &&(<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
-                                                    </td>
+                                                    {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                    <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
+
+                                                    <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                                </td>
                                             </tr>)
 
                                     }
