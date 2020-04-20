@@ -344,7 +344,7 @@ class PlanningUnitCapacity extends Component {
         return ( <div className="animated fadeIn">
         <h5>{i18n.t(this.state.message)}</h5>
         <Row>
-            <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                 <Card>
                     <CardHeader>
                             <strong>{i18n.t('static.dashboad.planningunitcapacity')}</strong>
@@ -392,7 +392,8 @@ class PlanningUnitCapacity extends Component {
                                         isValid,
                                         setTouched
                                     }) => (<Form onSubmit={handleSubmit} noValidate name='capacityForm'>
-                                        <FormGroup>
+                                        <Row>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <Input
                                             type="text"
@@ -409,7 +410,7 @@ class PlanningUnitCapacity extends Component {
                                      >
                                             </Input>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.supplier.supplier')}</Label>
                                             <Input type="select" name="supplier" id="supplier" bsSize="sm"
                                                 valid={!errors.supplier}
@@ -420,7 +421,7 @@ class PlanningUnitCapacity extends Component {
                                                 {supplierList}
                                             </Input> <FormFeedback className="red">{errors.supplier}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
                                             <Input
                                                 className="fa fa-calendar Fa-right"
@@ -437,7 +438,7 @@ class PlanningUnitCapacity extends Component {
                                                 required />
                                             <FormFeedback className="red">{errors.startDate}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
                                             <Input
 
@@ -455,7 +456,7 @@ class PlanningUnitCapacity extends Component {
                                                 required /> <FormFeedback className="red">{errors.stopDate}</FormFeedback>
 
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="capacity">{i18n.t('static.planningunit.capacity')}</Label>
                                             <Input
 
@@ -474,12 +475,12 @@ class PlanningUnitCapacity extends Component {
                                             <FormFeedback className="red">{errors.capacity}</FormFeedback>
                                         </FormGroup>
 
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6 mt-md-4" >
                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            <Button  type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
-                </FormGroup></Form>)} />
+                </FormGroup></Row></Form>)} />
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>
