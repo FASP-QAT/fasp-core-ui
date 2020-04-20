@@ -14,12 +14,11 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import RealmCountryService from "../../api/RealmCountryService";
 import AuthenticationService from "../Common/AuthenticationService";
 import RegionService from "../../api/RegionService";
-import UnitService from "../../api/UnitService";
-const initialValues = {
-    startDate: '',
-    stopDate: '',
-    realmCountry: [],
-    country: ''
+import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
+import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+let initialValues = {
+region:'',
+capacityCBM:''
 
 }
 const entityname = i18n.t('static.dashboad.regioncountry')
@@ -63,6 +62,7 @@ class RealmCountryRegion extends Component {
             lang: localStorage.getItem('lang'),
             regionCountry: {},
             regions: [],
+            regionId:'',
             realmCountry: {
                 realmCountryId: '',
                 country: {
@@ -77,27 +77,62 @@ class RealmCountryRegion extends Component {
                         label_en: ''
                     }
                 }
-            }, label: {
+            },
+             label: {
                 label_en: ''
             },
-            capacityCBM:'',
+            capacityCbm:'',
             gln:'',
-            rows: []
+            rows: [], isNew: true,
+            updateRowStatus: 0
            
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
-        this.handleDisableSpecificRow = this.handleDisableSpecificRow.bind(this);
+        this.disableRow = this.disableRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
-        this.handleEnableSpecificRow = this.handleEnableSpecificRow.bind(this);
+        this.enableRow = this.enableRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
         this.CapitalizeFull = this.CapitalizeFull.bind(this);
+        this.updateRow = this.updateRow.bind(this);
     }
   
+    updateRow(idx) {
+        if (this.state.updateRowStatus == 1) {
+            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
+        } else {
+         //   document.getElementById('planningUnitId').disabled = true;
+         console.log(JSON.stringify(this.state.rows[idx]))
+            initialValues = {
+                regionId:this.state.rows[idx].regionId,
+               label: this.state.rows[idx].label.label_en,
+                gln: this.state.rows[idx].gln,
+                capacityCbm: this.state.rows[idx].capacityCbm,
+                active: this.state.rows[idx].active
+            }
+            const rows = [...this.state.rows]
+            this.setState({
+                regionId:this.state.rows[idx].regionId,
+               label: { label_en: this.state.rows[idx].label.label_en },
+                gln: this.state.rows[idx].gln,
+                capacityCbm: this.state.rows[idx].capacityCbm,
+                isNew: false,
+                updateRowStatus: 1
+            }
+            );
+
+            rows.splice(idx, 1);
+            this.setState({ rows });
+        }
+    }
+
+
+
     touchAll(setTouched, errors) {
         setTouched({
             label: true,
+            capacityCBM:true
            
         }
         )
@@ -127,7 +162,7 @@ class RealmCountryRegion extends Component {
         }
         
         if (event.target.name === "capacityCBM") {
-            this.state.capacityCBM = event.target.value;
+            this.state.capacityCbm = event.target.value;
 
         }
         if (event.target.name === "gln") {
@@ -151,14 +186,14 @@ class RealmCountryRegion extends Component {
     }
 
 
-    handleDisableSpecificRow(idx) {
+    disableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = false
 
         // rows.splice(idx, 1);
         this.setState({ rows })
     }
-    handleEnableSpecificRow(idx) {
+    enableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = true
 
@@ -281,15 +316,7 @@ class RealmCountryRegion extends Component {
                     </option>
                 )
             }, this);
-        const { regions } = this.state;
-        let regionList = regions.length > 0
-            && regions.map((item, i) => {
-                return (
-                    <option key={i} value={item.regionId}>
-                        {item.label.label_en}
-                    </option>
-                )
-            }, this);
+        
 
         return (<div className="animated fadeIn">
             <h5>{i18n.t(this.state.message)}</h5>
@@ -301,26 +328,46 @@ class RealmCountryRegion extends Component {
                         </CardHeader>
                         <CardBody>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values, { setSubmitting, setErrors,resetForm }) => {
                                     if ( this.state.label.label_en != "" ) {
                                         var json =
                                         {
+                                            regionId:this.state.regionId,
                                             realmCountry: {
-                                                id: this.props.match.params.realmCountryId
+                                                realmCountryId: this.props.match.params.realmCountryId
                                             }
                                             , label: { label_en: this.state.label.label_en },
                                             
-                                            capacityCBM: this.state.capacityCBM,
+                                            capacityCbm: this.state.capacityCbm,
 
                                             gln: this.state.gln,
+                                            isNew: this.state.isNew,
                                             active: true
 
                                         }
                                         this.state.rows.push(json)
-                                        this.setState({ rows: this.state.rows })
+                                        this.setState({ rows: this.state.rows,updateRowStatus:0  })
+                                        this.setState({ regionId:'',
+                                            label: { label_en: '' },
+                                            
+                                            capacityCbm: '',
+
+                                            gln: '',
+                                            active: true});
                                     }
+                                    resetForm({
+                                        realmCountry: {
+                                            id: this.props.match.params.realmCountryId
+                                        }
+                                        , label: { label_en: '' },
+                                            
+                                        capacityCbm: '',
+
+                                        gln: '',
+                                        active: true});
                                 }}
                                 render={
                                     ({
@@ -346,9 +393,8 @@ class RealmCountryRegion extends Component {
                                                 invalid={touched.realmCountry && !!errors.realmCountry}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                 onBlur={handleBlur}
-
                                                 value={getLabelText(this.state.realmCountry.realm.label, this.state.lang) + "-" + getLabelText(this.state.realmCountry.country.label, this.state.lang)}
-                                            >
+                                                >
                                             </Input>
                                         </FormGroup>
                                         <FormGroup>
@@ -374,6 +420,7 @@ class RealmCountryRegion extends Component {
                                                 valid={!errors.capacityCBM}
                                                 invalid={touched.capacityCBM && !!errors.capacityCBM}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
+                                                value={this.state.capacityCbm}
                                                 onBlur={handleBlur}
                                                 placeholder={i18n.t('static.region.capacitycbmtext')}
                                                 />
@@ -398,7 +445,7 @@ class RealmCountryRegion extends Component {
                                         </FormGroup>
 
                                         <FormGroup>
-                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
                 </FormGroup></Form>)} />
@@ -425,7 +472,7 @@ class RealmCountryRegion extends Component {
                                                     {this.state.rows[idx].label.label_en}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].capacityCBM}
+                                                    {this.state.rows[idx].capacityCbm}
                                                 </td>
                                                 <td>
                                                     {this.state.rows[idx].gln}
@@ -434,11 +481,12 @@ class RealmCountryRegion extends Component {
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={() => { this.handleDisableSpecificRow(idx) }} ><i className="fa fa-times"></i>Disable</Button>}
-                                                    {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={() => { this.handleEnableSpecificRow(idx) }}><i className="fa fa-check"></i>Activate</Button>}
-                                                    {!this.state.rows[idx].realmCountryRegionId && (<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
+                                                    {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                    <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
 
+                                                    <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                 </td>
+                                           
                                             </tr>)
 
                                     }

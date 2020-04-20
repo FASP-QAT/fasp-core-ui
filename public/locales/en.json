@@ -200,7 +200,7 @@
     "static.dashboard.datasync": "Master Data sync",
     "static.supplier.supplier": "Supplier",
     "static.product.productcategory": "Product Category",
-    "static.budget.budget": "Budget",
+    "static.budget.budget": "Budget Name",
     "static.country.country": "Country Name (English)",
     "static.program.validdrafttosubmittext": "Please enter draft to submitted lead time",
     "static.healtharea.healthareatext": "Please enter health area",
@@ -511,9 +511,8 @@
     "static.mapProcurementUnit.validProcurementUnitText": "Please select procurement unit.",
     "static.mapProcurementUnit.validApprovedToShippedLeadTimeText": "Please enter approved to shipped lead time.",
     "static.mapProcurementUnit.validVendorPriceText": "Please enter vendor price.",
-    "static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate":"One Of the mapped row is already in update.",
-    "static.procurementUnit.validMaxValueText":"Maximum 14 characters are allowed.",
-    "static.procurementUnit.onlyalphaNumericText":"Only alpha numeric values are allowed.",
+    "static.productCategory.success": "Product category updated successfully.",
+    "static.productCategory.productCategoryTree": "Product Category Tree",
     "static.dashboard.countrylist":"Countries",
     "static.dashboard.realmcountrylist":"Realm Countries",
     "static.dashboard.tracercategorylist":"Tracer Categories",
@@ -528,4 +527,5 @@
     "static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate":"One Of the mapped row is already in update.",
     "static.procurementUnit.validMaxValueText":"Maximum 14 characters are allowed.",
     "static.procurementUnit.onlyalphaNumericText":"Only alpha numeric values are allowed."
+
 }

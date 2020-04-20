@@ -27,7 +27,8 @@ export default class ConsumptionDetails extends React.Component {
             categoryList: [],
             productList: [],
             consumptionDataList: [],
-            changedFlag: []
+            changedFlag: [],
+            planningUnitList: []
         }
         this.getProductList = this.getProductList.bind(this);
         this.getConsumptionData = this.getConsumptionData.bind(this);
@@ -42,8 +43,8 @@ export default class ConsumptionDetails extends React.Component {
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['program'], 'readwrite');
+            var program = transaction.objectStore('program');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -55,12 +56,14 @@ export default class ConsumptionDetails extends React.Component {
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+
+                    if (myResult[i].programManager.userId == userId) {
+                        // var bytes = CryptoJS.AES.decrypt(myResult[i].label, SECRET_KEY);
+                        var programNameLabel = myResult[i].label;
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                            id: myResult[i].id
+                            // name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            name: getLabelText(programNameLabel, lan),
+                            id: myResult[i].programId
                         }
                         proList[i] = programJson
                     }
@@ -472,7 +475,8 @@ export default class ConsumptionDetails extends React.Component {
                                                             <Input type="select"
                                                                 bsSize="sm"
                                                                 value={this.state.programId}
-                                                                name="programId" id="programId">
+                                                                name="programId" id="programId"
+                                                                onChange={(e) => { this.getPlanningUnitList(e) }}>
                                                                 <option value="0">Please select</option>
                                                                 {programs}
                                                             </Input><br />
@@ -622,6 +626,46 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     productList: proList
                 })
+            }.bind(this);
+        }.bind(this)
+    }
+
+
+    getPlanningUnitList(event) {
+        console.log("in planning list")
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                console.log("myResult", myResult);
+                var programId = document.getElementById("programId").value;
+                console.log(programId)
+                console.log(myResult);
+                // for (var i = 0; i < myResult.length; i++) {
+                //     if (myResult[i].planning.productCategoryId == programId) {
+                //         var productJson = {
+                //             name: getLabelText(myResult[i].label, lan),
+                //             id: myResult[i].productId
+                //         }
+                //         proList[i] = productJson
+                //     }
+                // }
+                // this.setState({
+                //     productList: proList
+                // })
             }.bind(this);
         }.bind(this)
     }

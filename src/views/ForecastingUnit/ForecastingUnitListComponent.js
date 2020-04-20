@@ -35,6 +35,7 @@ export default class ForecastingUnitListComponent extends Component {
         this.addNewForecastingUnit = this.addNewForecastingUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.getProductCategories=this.getProductCategories.bind(this)
     }
 
 
@@ -89,6 +90,36 @@ export default class ForecastingUnitListComponent extends Component {
             });
         }
     }
+    getProductCategories(){
+        AuthenticationService.setupAxiosInterceptors();
+        let realmId = document.getElementById("realmId").value;
+        ProductService.getProductCategoryList(realmId)
+            .then(response => {
+                this.setState({
+                    productCategories: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message:i18n.t( error.response.data.messageCode,{entityname:i18n.t('static.dashboard.productcategory')}) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
@@ -97,6 +128,7 @@ export default class ForecastingUnitListComponent extends Component {
                     this.setState({
                         realms: response.data
                     })
+                    this.getProductCategories();
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
@@ -146,32 +178,7 @@ export default class ForecastingUnitListComponent extends Component {
                     }
                 }
             );
-        ProductService.getProductCategoryList()
-            .then(response => {
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
+         
 
 
         ForecastingUnitService.getForecastingUnitListAll().then(response => {
@@ -201,6 +208,7 @@ export default class ForecastingUnitListComponent extends Component {
                     }
                 }
             );
+            
     }
 
     editForecastingUnit(forecastingUnit) {
@@ -356,7 +364,6 @@ export default class ForecastingUnitListComponent extends Component {
                                                     id="realmId"
                                                     bsSize="sm"
                                                 >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
                                                     {realmList}
                                                 </Input>
 
