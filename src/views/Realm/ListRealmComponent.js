@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
-import { Card, CardHeader, CardBody,Button } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import i18n from '../../i18n';
@@ -83,7 +83,7 @@ export default class ReactListComponent extends Component {
         this.props.history.push({
             pathname: `/realmCountry/RealmCountry/${row.realmId}`,
             state: { realm: row }
-           
+
 
         })
     }
@@ -100,19 +100,19 @@ export default class ReactListComponent extends Component {
 
         const columns = [
             {
-                dataField: 'realmCode',
-                text: i18n.t('static.realm.realmCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
                 dataField: 'label',
                 text: i18n.t('static.realm.realmName'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
                 formatter: this.formatLabel
+            },
+            {
+                dataField: 'realmCode',
+                text: i18n.t('static.realm.realmCode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
             },
             {
                 dataField: 'monthInPastForAmc',
@@ -141,7 +141,7 @@ export default class ReactListComponent extends Component {
                 headerAlign: 'center',
                 formatter: (cellContent, row) => {
                     return (<div><Button type="button" size="sm" color="success" onClick={(event) => this.RealmCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realm.mapcountry')}</Button>
-                   </div> )
+                    </div>)
                 }
             }
             // {
