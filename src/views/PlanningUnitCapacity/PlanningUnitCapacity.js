@@ -552,7 +552,12 @@ class PlanningUnitCapacity extends Component {
                                             <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
+<<<<<<< HEAD
                 </FormGroup></Row></Form>)} />
+=======
+                </FormGroup></Form>)} />
+                <h5 className="red">{this.state.rowErrorMessage}</h5>
+>>>>>>> dev
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>

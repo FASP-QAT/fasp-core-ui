@@ -210,9 +210,7 @@ class RegionListComponent extends Component {
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
-                            <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addRegion}><i className="fa fa-plus-square"></i></a>
-                            </div>
+                            
                         </div>
                     </CardHeader>
                     <CardBody>
@@ -255,11 +253,11 @@ class RegionListComponent extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                            rowEvents={{
+                                           /* rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
                                                     this.editRegion(row);
                                                 }
-                                            }}
+                                            }}*/
                                             {...props.baseProps}
                                         />
                                     </div>
