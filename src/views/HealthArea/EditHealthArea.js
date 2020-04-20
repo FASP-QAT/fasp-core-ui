@@ -340,7 +340,7 @@ export default class EditHealthAreaComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')} </Label>
+                                                        <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="healthAreaName" valid={!errors.healthAreaName}
@@ -370,7 +370,7 @@ export default class EditHealthAreaComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
                                                             valid={!errors.realmCountryId}

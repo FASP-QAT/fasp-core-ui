@@ -226,7 +226,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
+                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input type="text"

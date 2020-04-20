@@ -75,10 +75,10 @@ class ListBudgetComponent extends Component {
     }
   }
   editBudget(budget) {
-    // var budgetId = budget.budgetId
+    var budgetId = budget.budgetId
     this.props.history.push({
-      pathname: "/budget/editBudget",
-      state: { budget }
+      pathname: `/budget/editBudget/${budgetId}`,
+      // state: { budget }
     });
   }
 

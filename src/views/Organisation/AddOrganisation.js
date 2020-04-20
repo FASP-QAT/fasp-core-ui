@@ -335,7 +335,7 @@ export default class AddOrganisationComponent extends Component {
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             value={this.state.organisation.realm.id}
@@ -351,7 +351,7 @@ export default class AddOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
+                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
                                                             valid={!errors.realmCountryId}
@@ -366,7 +366,7 @@ export default class AddOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} </Label>
+                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="organisationCode" valid={!errors.organisationCode}
@@ -379,7 +379,7 @@ export default class AddOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')} </Label>
+                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
                                                             type="text" name="organisationName" valid={!errors.organisationName}

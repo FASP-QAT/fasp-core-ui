@@ -278,7 +278,7 @@ export default class AddPlanningUnit extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='planningUnitForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
+                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="forecastingUnitId"
@@ -297,7 +297,7 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.forecastingUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="unitId"
@@ -315,7 +315,7 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                        <Label for="label">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -329,7 +329,7 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}</Label>
+                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             name="multiplier"
                                                             id="multiplier"

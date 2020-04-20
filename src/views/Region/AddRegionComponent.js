@@ -53,6 +53,7 @@ class AddRegionComponent extends Component {
       realmCountries: [],
       region: {
         realmCountry: {
+          realmCountryId: ''
         },
         label: {
           label_en: '',
@@ -171,7 +172,7 @@ class AddRegionComponent extends Component {
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                  console.log("Submit clicked");
+                  console.log("Submit clicked-----------",this.state.region);
                   RegionService.addRegion(this.state.region)
                     .then(response => {
                       console.log("Response->", response);

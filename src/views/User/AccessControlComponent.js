@@ -402,17 +402,22 @@ class AccessControlComponent extends Component {
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
-                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <strong>Add Access Control</strong>
                             </CardHeader>
+                            
                             <CardBody>
+                            <Row>
+                            <Col sm={6} md={6}>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.user.username')}</Label>
                                     <Input bsSize="sm" type="text" value={this.state.user.username} name="username" id="username" disabled>
                                     </Input>
                                 </FormGroup>
+                              </Col>   
+                              <Col sm={6} md={6}>
                                 <FormGroup>
                                     <Label  htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
                                     <Input bsSize="sm" type="select" name="realmCountryId" id="select" value={this.state.realmCountryId} onChange={event => this.setTextAndValue(event)}>
@@ -420,6 +425,10 @@ class AccessControlComponent extends Component {
                                         {countryList}
                                     </Input>
                                 </FormGroup>
+                            </Col>
+                            </Row>
+                            <Row>
+                            <Col sm={6} md={6}>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.healtharea.healtharea')}</Label>
                                     <Input bsSize="sm" type="select" name="healthAreaId" id="select" value={this.state.healthAreaId} onChange={event => this.setTextAndValue(event)}>
@@ -427,6 +436,8 @@ class AccessControlComponent extends Component {
                                         {healthAreaList}
                                     </Input>
                                 </FormGroup>
+                                </Col>
+                                <Col sm={6} md={6}>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.organisation.organisation')}</Label>
                                     <Input bsSize="sm" type="select" name="organisationId" id="select" value={this.state.organisationId} onChange={event => this.setTextAndValue(event)}>
@@ -434,6 +445,10 @@ class AccessControlComponent extends Component {
                                         {organisationList}
                                     </Input>
                                 </FormGroup>
+                                </Col>
+                                </Row>
+                                <Row>
+                            <Col sm={6} md={6}>
                                 <FormGroup>
                                     <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                     <Input bsSize="sm" type="select" name="programId" id="select" value={this.state.programId} onChange={event => this.setTextAndValue(event)}>
@@ -441,13 +456,21 @@ class AccessControlComponent extends Component {
                                         {programList}
                                     </Input>
                                 </FormGroup>
-                                <FormGroup>
+                                </Col> 
+                                <Col sm={6} md={6}>
+                               
+                                <FormGroup className="mt-md-4">
                                     <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>
                                     <Button type="submit" size="md" color="success" onClick={this.addRow} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                     &nbsp;
-
-                        </FormGroup>
-                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                </FormGroup>
+                              
+                                </Col>
+                                </Row>
+                        </CardBody>
+                   
+                        <CardBody>
+                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                     <thead>
                                         <tr>

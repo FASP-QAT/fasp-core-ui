@@ -302,7 +302,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
+                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -316,7 +316,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
+                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}<span className="red Reqasterisk">*</span><span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="genericLabel"
                                                             id="genericLabel"
