@@ -29,9 +29,9 @@ class ProductService {
         );
 
     }
-    getProductCategoryList() {
+    getProductCategoryList(realmId) {
         // /productCategory/realmId/{realmId}/list/{productCategoryId}/{includeCurrentLevel}/{includeAllChildren}
-        return axios.get(`${API_URL}/api/productCategory/realmId/-1`, {}
+        return axios.get(`${API_URL}/api/productCategory/realmId/${realmId}`, {}
         );
     }
 

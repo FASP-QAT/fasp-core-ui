@@ -22,11 +22,11 @@ class RegionService {
         );
     }
     getRegionForCountryId(realmCountryId) {
-        return axios.get(`${API_URL}/api/region/realmCountry/${realmCountryId}`, {}
+        return axios.get(`${API_URL}/api/region/realmCountryId/${realmCountryId}`, {}
         );
     }
     editRegionsForcountry(json){
-        return axios.put(`${API_URL}/api/realmCountry/region`, json, {});
+        return axios.put(`${API_URL}/api/region`, json, {});
     }
 
 }
