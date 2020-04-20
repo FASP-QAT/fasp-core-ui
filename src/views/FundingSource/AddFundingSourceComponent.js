@@ -65,7 +65,7 @@ class AddFundingSourceComponent extends Component {
   dataChange(event) {
     let { fundingSource } = this.state;
     if (event.target.name == "realmId") {
-      fundingSource.realm.realmId = event.target.value;
+      fundingSource.realm.id = event.target.value;
     }
     if (event.target.name == "fundingSource") {
       fundingSource.label.label_en = event.target.value;
@@ -204,7 +204,7 @@ class AddFundingSourceComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label><Input
+                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}<span className="red Reqasterisk">*</span></Label><Input
                               type="select"
                               name="realmId"
                               id="realmId"
@@ -214,7 +214,7 @@ class AddFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required
-                              value={this.state.realmId}
+                              value={this.state.id}
                             >
                               <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}

@@ -86,7 +86,7 @@ class AddProcurementAgentComponent extends Component {
     dataChange(event) {
         let { procurementAgent } = this.state;
         if (event.target.name == "realmId") {
-            procurementAgent.realm.realmId = event.target.value;
+            procurementAgent.realm.id = event.target.value;
         }
         if (event.target.name == "procurementAgentCode") {
             procurementAgent.procurementAgentCode = event.target.value;
@@ -235,7 +235,7 @@ class AddProcurementAgentComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input
@@ -256,7 +256,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}</Label>
+                                                        <Label for="procurementAgentCode">{i18n.t('static.procurementagent.procurementagentcode')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -275,7 +275,7 @@ class AddProcurementAgentComponent extends Component {
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -293,7 +293,7 @@ class AddProcurementAgentComponent extends Component {
                                                         {/* <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                         <Input type="number"

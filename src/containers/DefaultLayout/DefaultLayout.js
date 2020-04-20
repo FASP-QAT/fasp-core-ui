@@ -35,7 +35,7 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    this.props.history.push(`/logout`)
+    this.props.history.push(`/logout/static.logoutSuccess`)
   }
 
   render() {
@@ -138,6 +138,10 @@ class DefaultLayout extends Component {
                             }, {
                               name: i18n.t('static.dashboard.realmcountry'),
                               url: '/realmCountry/listRealmCountry',
+                              icon: 'fa fa-globe'
+                            },{
+                              name: i18n.t('static.dashboad.planningunitcountry'),
+                              url: '/realmCountry/listRealmCountryPlanningUnit',
                               icon: 'fa fa-globe'
                             }]
                           },
@@ -243,6 +247,10 @@ class DefaultLayout extends Component {
                           }, {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
+                            icon: 'icon-graph'
+                          }, {
+                            name: i18n.t('static.dashboad.planningunitcapacity'),
+                            url: '/planningUnitCapacity/listPlanningUnitcapacity',
                             icon: 'icon-graph'
                           },
                           {

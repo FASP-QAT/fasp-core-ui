@@ -73,7 +73,7 @@ export default class UpdateCountryComponent extends Component {
                     label_pr: ''
                 },
                 currency: {
-                    currencyId: ''
+                    id: ''
                 },
                 language: {
                     languageId: ''
@@ -100,7 +100,7 @@ export default class UpdateCountryComponent extends Component {
             country.countryCode = event.target.value.toUpperCase();
         }
         if (event.target.name === "currencyId") {
-            country.currency.currencyId = event.target.value
+            country.currency.id = event.target.value
         } if (event.target.name === "languageId") {
             country.language.languageId = event.target.value
         } else if (event.target.name === "active") {
@@ -281,7 +281,7 @@ export default class UpdateCountryComponent extends Component {
                                     label: getLabelText(this.state.country.label, this.state.lang),
                                     countryCode: this.state.country.countryCode,
                                     languageId: this.state.country.language.languageId,
-                                    currencyId: this.state.country.currency.currencyId
+                                    currencyId: this.state.country.currency.id
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -334,7 +334,7 @@ export default class UpdateCountryComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='countryForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.country.countryName')}</Label>
+                                                        <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-globe"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -351,7 +351,7 @@ export default class UpdateCountryComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="countryCode">{i18n.t('static.country.countrycode')}</Label>
+                                                        <Label for="countryCode">{i18n.t('static.country.countrycode')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -368,7 +368,7 @@ export default class UpdateCountryComponent extends Component {
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="languageId">{i18n.t('static.country.language')}</Label>
+                                                        <Label htmlFor="languageId">{i18n.t('static.country.language')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-language"></i></InputGroupText> */}
                                                         <Input
@@ -390,7 +390,7 @@ export default class UpdateCountryComponent extends Component {
                                                         <FormFeedback className="red">{errors.languageId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="currencyId">{i18n.t('static.country.currency')}</Label>
+                                                        <Label htmlFor="currencyId">{i18n.t('static.country.currency')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
                                                         <Input
@@ -403,7 +403,7 @@ export default class UpdateCountryComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.country.currency.currencyId}
+                                                            value={this.state.country.currency.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {currencyItems}

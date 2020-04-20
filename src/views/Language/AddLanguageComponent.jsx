@@ -185,7 +185,7 @@ class AddLanguageComponent extends Component {
                                             <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="languageName">{i18n.t('static.language.language')}</Label>
+                                                        <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="languageName"
                                                             id="languageName"
@@ -199,7 +199,7 @@ class AddLanguageComponent extends Component {
                                                         <FormFeedback className="red">{errors.languageName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="languageCode">{i18n.t('static.language.languageCode')}</Label>
+                                                        <Label for="languageCode">{i18n.t('static.language.languageCode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="languageCode"
                                                             id="languageCode"

@@ -30,7 +30,7 @@ class FundingSourceListComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selSource = this.state.fundingSourceList.filter(c => c.realm.realmId == realmId)
+            const selSource = this.state.fundingSourceList.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
             });
@@ -205,7 +205,7 @@ class FundingSourceListComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody  className="pb-md-0">
                         <Col md="3 pl-0">
                             <FormGroup>
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>

@@ -254,12 +254,13 @@ class EditBudgetComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}</Label>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             type="text"
                                                             name="budgetName"
                                                             id="budget"
+                                                            bsSize="sm"
                                                             valid={!errors.budgetName}
                                                             invalid={touched.budgetName && !!errors.budgetName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
@@ -310,7 +311,8 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.subFundingSourceId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
+                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
+
                                                         <Input type="number"
                                                             min="0"
                                                             name="budgetAmt"
@@ -327,7 +329,8 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}<span class="red Reqasterisk">*</span></Label>
+
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
                                                             name="startDate"
@@ -346,7 +349,7 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.startDate}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
