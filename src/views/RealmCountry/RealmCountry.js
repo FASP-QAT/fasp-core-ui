@@ -16,11 +16,33 @@ import RealmService from "../../api/RealmService";
 import RealmCountryService from "../../api/RealmCountryService";
 import CurrencyService from "../../api/CurrencyService";
 import UnitService from "../../api/UnitService";
-import DeleteSpecificRow from "../ProgramProduct/TableFeatureTwo";
-const initialValues = {
-    country: [],
-    currency: [],
-    unit: []
+import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
+import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
+let initialValues = {
+    palletUnit: {
+        unitId: '',
+        label: {
+            label_en: ''
+        }
+    },
+    defaultCurrency: {
+        currencyId: '',
+        label: {
+            label_en: ''
+        }
+    },
+    country: {
+        countryId: '',
+        label: {
+            label_en: ''
+        }
+    }, countryName: '',
+    airFreightPercentage: '0.0',
+    seaFreightPercentage: '0.0',
+    shippedToArrivedAirLeadTime: '0',
+    shippedToArrivedSeaLeadTime: '0',
+    arrivedToDeliveredLeadTime: '0',
+    
 
 }
 const entityname = i18n.t('static.dashboard.realmcountry')
@@ -93,18 +115,87 @@ class RealmCountry extends Component {
                 label: {
                     label_en: ''
                 }
-            }
+            }, isNew: true,
+            updateRowStatus: 0
         }
         this.currentDate = this.currentDate.bind(this);
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.deleteLastRow = this.deleteLastRow.bind(this);
-        this.handleDisableSpecificRow = this.handleDisableSpecificRow.bind(this);
+        this.disableRow = this.disableRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
-        this.handleEnableSpecificRow = this.handleEnableSpecificRow.bind(this);
+        this.enableRow = this.enableRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
+        this.updateRow = this.updateRow.bind(this);
         
     }
+
+    updateRow(idx) {
+        if (this.state.updateRowStatus == 1) {
+            this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
+        } else {
+        console.log(JSON.stringify(this.state.rows[idx]))
+            initialValues = {
+                realmId:this.state.rows[idx].realmId,
+                countryId: this.state.rows[idx].country.countryId,
+                country: {
+                    countryId: this.state.rows[idx].country.countryId,
+                    label: {
+                        label_en: this.state.rows[idx].country.label.label_en
+                    }
+                }, defaultCurrency: {
+                    currencyId: this.state.rows[idx].defaultCurrency.currencyId,
+                    label: {
+                        label_en: this.state.rows[idx].defaultCurrency.label.label_en
+                    }
+                },    currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
+                    unitId: this.state.rows[idx].palletUnit.unitId,
+                    label: {
+                        label_en: this.state.rows[idx].palletUnit.label.label_en
+                    }
+                },unitId: this.state.rows[idx].palletUnit.unitId,
+                airFreightPercentage: this.state.rows[idx].airFreightPercentage,
+                seaFreightPercentage: this.state.rows[idx].seaFreightPercentage,
+                shippedToArrivedAirLeadTime: this.state.rows[idx].shippedToArrivedAirLeadTime,
+                shippedToArrivedSeaLeadTime: this.state.rows[idx].shippedToArrivedSeaLeadTime,
+                arrivedToDeliveredLeadTime: this.state.rows[idx].arrivedToDeliveredLeadTime
+                
+            }
+            const rows = [...this.state.rows]
+            this.setState({
+                realmId:this.state.rows[idx].realmId,
+                countryId: this.state.rows[idx].country.countryId,
+                country: {
+                    countryId: this.state.rows[idx].country.countryId,
+                    label: {
+                        label_en: this.state.rows[idx].country.label.label_en
+                    }
+                }, defaultCurrency: {
+                    currencyId: this.state.rows[idx].defaultCurrency.currencyId,
+                    label: {
+                        label_en: this.state.rows[idx].defaultCurrency.label.label_en
+                    }
+                },    currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
+                    unitId: this.state.rows[idx].palletUnit.unitId,
+                    label: {
+                        label_en: this.state.rows[idx].palletUnit.label.label_en
+                    }
+                },unitId: this.state.rows[idx].palletUnit.unitId,
+                airFreightPercentage: this.state.rows[idx].airFreightPercentage,
+                seaFreightPercentage: this.state.rows[idx].seaFreightPercentage,
+                shippedToArrivedAirLeadTime: this.state.rows[idx].shippedToArrivedAirLeadTime,
+                shippedToArrivedSeaLeadTime: this.state.rows[idx].shippedToArrivedSeaLeadTime,
+                arrivedToDeliveredLeadTime: this.state.rows[idx].arrivedToDeliveredLeadTime,
+                isNew: false,
+                updateRowStatus: 1
+            }
+            );
+
+            rows.splice(idx, 1);
+            this.setState({ rows });
+        }
+    }
+
     currentDate() {
         var todaysDate = new Date();
         var yyyy = todaysDate.getFullYear().toString();
@@ -185,14 +276,14 @@ class RealmCountry extends Component {
             rows
         });
     }
-    handleDisableSpecificRow(idx) {
+    disableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = false
 
         // rows.splice(idx, 1);
         this.setState({ rows })
     }
-    handleEnableSpecificRow(idx) {
+    enableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = true
 
@@ -215,7 +306,7 @@ class RealmCountry extends Component {
         RealmCountryService.addRealmCountry(realmCountry)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/realm/realmlist/` + i18n.t(response.data.messageCode))
+                    this.props.history.push(`/realm/realmlist/` + i18n.t(response.data.messageCode,{entityname}))
 
                 } else {
                     this.setState({
@@ -425,12 +516,13 @@ class RealmCountry extends Component {
                         </CardHeader>
                         <CardBody>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors }) => {
+                                onSubmit={(values, { setSubmitting, setErrors,resetForm }) => {
                                     if (this.state.country.countryId != "" && this.state.defaultCurrency.currencyId != "" && this.state.palletUnit.unitId != "" ) {
                                         var json =
-                                        {
+                                        { realmCountryId:this.state.realmCountryId,
                                             realm: {
                                                 realmId: this.props.match.params.realmId
                                             }
@@ -459,12 +551,73 @@ class RealmCountry extends Component {
                                             shippedToArrivedAirLeadTime: this.state.shippedToArrivedAirLeadTime,
                                             shippedToArrivedSeaLeadTime: this.state.shippedToArrivedSeaLeadTime,
                                             arrivedToDeliveredLeadTime: this.state.arrivedToDeliveredLeadTime,
+                                            isNew: this.state.isNew,
                                             active: true
 
                                         }
                                         this.state.rows.push(json)
                                         this.setState({ rows: this.state.rows })
+                                        this.setState({realmCountryId:this.state.realmCountryId,
+                                        
+                                        country: {
+                                            countryId: '',
+                                            label: {
+                                                label_en: ''
+                                            }
+                                        }
+                                        , defaultCurrency: {
+                                            currencyId: '',
+                                            label: {
+                                                label_en: ''
+                                            }
+                                        }
+                                        , palletUnit: {
+                                            unitId: '',
+                                            label: {
+                                                label_en:''
+                                            }
+                                        }
+                                        ,
+                                        airFreightPercentage: '0.0',
+                                        seaFreightPercentage: '0.0',
+                                        shippedToArrivedAirLeadTime: '0',
+                                        shippedToArrivedSeaLeadTime: '0',
+                                        arrivedToDeliveredLeadTime: '0',
+                                        active: true
+})
                                     }
+                                    resetForm({
+                                        realmCountryId:this.state.realmCountryId,
+                                        realm: {
+                                            realmId: this.props.match.params.realmId
+                                        }
+                                        ,
+                                        country: {
+                                            countryId: '',
+                                            label: {
+                                                label_en: ''
+                                            }
+                                        }
+                                        , defaultCurrency: {
+                                            currencyId: '',
+                                            label: {
+                                                label_en: ''
+                                            }
+                                        }
+                                        , palletUnit: {
+                                            unitId: '',
+                                            label: {
+                                                label_en:''
+                                            }
+                                        }
+                                        ,
+                                        airFreightPercentage: '0.0',
+                                        seaFreightPercentage: '0.0',
+                                        shippedToArrivedAirLeadTime: '0',
+                                        shippedToArrivedSeaLeadTime: '0',
+                                        arrivedToDeliveredLeadTime: '0',
+                                        active: true
+                                    })
                                 }}
                                 render={
                                     ({
@@ -501,7 +654,8 @@ class RealmCountry extends Component {
                                                 valid={!errors.countryId}
                                                 invalid={touched.countryId && !!errors.countryId}
                                                 onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }} required>
+                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                value={this.state.country.countryId} required>
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {countryList}
                                             </Input> <FormFeedback className="red">{errors.countryId}</FormFeedback>
@@ -512,7 +666,8 @@ class RealmCountry extends Component {
                                                 valid={!errors.currencyId}
                                                 invalid={touched.currencyId && !!errors.currencyId}
                                                 onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }} required>
+                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                value={this.state.defaultCurrency.currencyId} required>
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {currencyList}
                                             </Input> <FormFeedback className="red">{errors.currencyId}</FormFeedback>
@@ -528,6 +683,7 @@ class RealmCountry extends Component {
                                                 invalid={touched.unitId && !!errors.unitId}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                 onBlur={handleBlur}
+                                                value={this.state.palletUnit.unitId}
                                                 >
                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                 {unitList}
@@ -628,10 +784,11 @@ class RealmCountry extends Component {
 
                                         <FormGroup>
                                             {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)}  className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
                 </FormGroup></Form>)} />
+                <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>
@@ -650,7 +807,10 @@ class RealmCountry extends Component {
                                 </thead>
                                 <tbody>
                                     {
-                                        this.state.rows.length > 0  &&  this.state.rows.map((item, idx) =>(
+                                        this.state.rows.length > 0  
+                                        &&  
+                                        this.state.rows.map((item, idx) =>
+
                                             <tr id="addr0" key={idx}>
                                                 <td>
                                                     {this.state.rows[idx].country.label.label_en}
@@ -679,12 +839,12 @@ class RealmCountry extends Component {
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].active == true && <Button type="button" size="sm" color="danger" onClick={() => { this.handleDisableSpecificRow(idx) }} ><i className="fa fa-times"></i>Disable</Button>}
-                                                    {this.state.rows[idx].active == false && <Button type="button" size="sm" color="success" onClick={() => { this.handleEnableSpecificRow(idx) }}><i className="fa fa-check"></i>Activate</Button>}
-                                                    {!this.state.rows[idx].realmCountryId && (<><br/><br/><DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /></>)}
+                                                    {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                    <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
 
+                                                    <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                 </td>
-                                            </tr>))
+                                            </tr>)
 
                                     }
                                 </tbody>
@@ -707,7 +867,7 @@ class RealmCountry extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/realm/listRealm/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realm/realmlist/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
 

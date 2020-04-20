@@ -449,6 +449,7 @@ class RealmCountryRegion extends Component {
                                             &nbsp;
 
                 </FormGroup></Form>)} />
+                 <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>
