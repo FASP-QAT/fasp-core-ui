@@ -31,7 +31,7 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.programtext')),
         subFundingSourceId: Yup.string()
             .required(i18n.t('static.budget.subfundingtext')),
-        budgetAmt: Yup.number()
+        budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
@@ -94,7 +94,8 @@ class AddBudgetComponent extends Component {
                     }
                 },
                 startDate: '',
-                stopDate: ''
+                stopDate: '',
+                budgetAmt: ''
 
             },
 

@@ -5,6 +5,8 @@ const AddDimension = React.lazy(() => import('./views/Dimension/AddDimensionComp
 const DimensionList = React.lazy(() => import('./views/Dimension/DimensionListComponent'));
 const EditDimension = React.lazy(() => import('./views/Dimension/EditDimensionComponent'));
 
+const ProductCategoryTree = React.lazy(() => import('./views/ProductCategory/ProductCategoryTree'));
+
 const AddHealthArea = React.lazy(() => import('./views/HealthArea/AddHealthArea'));
 const HealthAreaList = React.lazy(() => import('./views/HealthArea/HealthAreaList'));
 const EditHealthArea = React.lazy(() => import('./views/HealthArea/EditHealthArea'));
@@ -174,6 +176,9 @@ const PlanningUnitCapacity = React.lazy(() => import('./views/PlanningUnitCapaci
 const PlanningUnitCountry = React.lazy(() => import('./views/RealmCountry/RealmCountryPlanningUnit'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+
+
+  { path: '/productCategory/productCategoryTree', name: 'Product Category Tree', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
   { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.dimension') }), component: AddDimension },
@@ -206,7 +211,7 @@ const routes = [
   { path: '/budget/addBudget', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.budget') }), component: AddBudgetComponent },
   { path: '/budget/listBudget', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.budget') }), component: ListBudgetComponent },
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
-  { path: '/budget/editBudget', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.budget') }), component: EditBudgetComponent },
+  { path: '/budget/editBudget/:budgetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.budget') }), component: EditBudgetComponent },
 
   { path: '/', exact: true, name: 'Home' },
 

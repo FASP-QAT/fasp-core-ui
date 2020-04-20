@@ -131,10 +131,11 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.realm'),
                             icon: 'fa fa-list',
-                            children:[ {
+                            children: [{
                               name: i18n.t('static.dashboard.realm'),
                               url: '/realm/realmlist',
-                              icon: 'fa fa-th-large'},{
+                              icon: 'fa fa-th-large'
+                            }, {
                               name: i18n.t('static.dashboard.realmcountry'),
                               url: '/realmCountry/listRealmCountry',
                               icon: 'fa fa-globe'
@@ -224,9 +225,15 @@ class DefaultLayout extends Component {
                             url: '/tracerCategory/listTracerCategory',
                             icon: 'icon-graph'
                           },
+                          // {
+
+                          //   name: 'Product Category',
+                          //   url: '/ProductCategory/AddProductCategory',
+                          //   icon: 'icon-graph'
+                          // },
                           {
-                            name: 'Product Category',
-                            url: '/ProductCategory/AddProductCategory',
+                            name: 'Product Category Tree',
+                            url: '/productCategory/productCategoryTree',
                             icon: 'icon-graph'
                           },
                           {
@@ -287,7 +294,7 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.datasync'),
                             url: '/masterDataSync',
                             icon: 'fa fa-list',
-                          },
+                          }
                           // {
                           //   name: i18n.t('static.dashboard.consumptiondetails'),
                           //   url: '/consumptionDetails',
