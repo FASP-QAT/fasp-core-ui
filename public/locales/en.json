@@ -537,6 +537,5 @@
     "static.program.errorSelectAtleastOneProgram":"Please select atleast one program for download.",
     "static.program.errorSelectProgramIfYouSelectVersion":"Please select program if you are selecting version.",
     "static.common.download":"Download"
-    
 
 }
