@@ -1130,3 +1130,10 @@ h5,
 }
 
 .icon-size{font-size:16px;}
+
+.form-control:focus {
+  padding-right: calc(1.5em + 1.75rem);
+}
+.form-control-sm:hover {
+  padding-right: calc(1.5em + 1.75rem);
+}
