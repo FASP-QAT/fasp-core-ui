@@ -459,7 +459,7 @@ class AddprogramPlanningUnit extends Component {
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive>
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                     <thead>
                                         <tr>
                                             <th className="text-left"> {i18n.t('static.program.program')} </th>

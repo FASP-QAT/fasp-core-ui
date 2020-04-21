@@ -509,7 +509,7 @@ class RealmCountry extends Component {
         return (<div className="animated fadeIn">
             <h5>{i18n.t(this.state.message)}</h5>
             <Row>
-                <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
                         <CardHeader>
                             <strong>{i18n.t('static.dashboard.realmcountry')}</strong>
@@ -631,7 +631,8 @@ class RealmCountry extends Component {
                                         isValid,
                                         setTouched
                                     }) => (<Form onSubmit={handleSubmit} noValidate name='capacityForm'>
-                                        <FormGroup>
+                                        <Row>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.realm.realm')}</Label>
                                             <Input
                                                 type="text"
@@ -648,7 +649,7 @@ class RealmCountry extends Component {
                                             >
                                             </Input>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.dashboard.country')}</Label>
                                             <Input type="select" name="countryId" id="countryId" bsSize="sm"
                                                 valid={!errors.countryId}
@@ -660,7 +661,7 @@ class RealmCountry extends Component {
                                                 {countryList}
                                             </Input> <FormFeedback className="red">{errors.countryId}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.dashboard.currency')}</Label>
                                             <Input type="select" name="currencyId" id="currencyId" bsSize="sm"
                                                 valid={!errors.currencyId}
@@ -672,7 +673,7 @@ class RealmCountry extends Component {
                                                 {currencyList}
                                             </Input> <FormFeedback className="red">{errors.currencyId}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
                                             <Input
                                                 type="select"
@@ -691,7 +692,7 @@ class RealmCountry extends Component {
                                             <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                         </FormGroup>
 
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="airFreightPercentage">{i18n.t('static.realmcountry.airFreightPercentage')}</Label>
                                             <Input
                                                 type="number"
@@ -709,7 +710,7 @@ class RealmCountry extends Component {
                                                  />
                                             <FormFeedback className="red">{errors.airFreightPercentage}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="seaFreightPercentage">{i18n.t('static.realmcountry.seaFreightPercentage')}</Label>
                                             <Input
                                                 type="number"
@@ -727,7 +728,7 @@ class RealmCountry extends Component {
                                                  />
                                             <FormFeedback className="red">{errors.seaFreightPercentage}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="shippedToArrivedAirLeadTime">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}</Label>
                                             <Input
                                                 type="number"
@@ -745,7 +746,7 @@ class RealmCountry extends Component {
                                                  />
                                             <FormFeedback className="red">{errors.shippedToArrivedAirLeadTime}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="shippedToArrivedSeaLeadTime">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}</Label>
                                             <Input
                                                 type="number"
@@ -763,7 +764,7 @@ class RealmCountry extends Component {
                                                  />
                                             <FormFeedback className="red">{errors.shippedToArrivedSeaLeadTime}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="arrivedToDeliveredLeadTime">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}</Label>
                                             <Input
                                                 type="number"
@@ -782,12 +783,12 @@ class RealmCountry extends Component {
                                             <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                         </FormGroup>
 
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6 mt-md-4">
                                             {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)}  className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)}  className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
-
-                </FormGroup></Form>)} />
+                                        </FormGroup>
+                </Row></Form>)} />
                 <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
@@ -838,7 +839,7 @@ class RealmCountry extends Component {
                                                 <td>
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
-                                                <td>
+                                                <td className="forInlinebtnMapping">
                                                     {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
                                                     <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
 
