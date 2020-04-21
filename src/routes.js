@@ -1,6 +1,7 @@
 import React from 'react';
 import i18n from './i18n';
 
+const AddInventory = React.lazy(() => import('./views/Inventory/AddInventory'));
 const AddDimension = React.lazy(() => import('./views/Dimension/AddDimensionComponent'));
 const DimensionList = React.lazy(() => import('./views/Dimension/DimensionListComponent'));
 const EditDimension = React.lazy(() => import('./views/Dimension/EditDimensionComponent'));
@@ -182,7 +183,7 @@ const RealmCountryRegion = React.lazy(() => import('./views/RealmCountry/RealmCo
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
-
+  { path: '/inventory/addInventory', name: 'Inventory / Add Inventory', component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category Tree', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
@@ -352,13 +353,13 @@ const routes = [
   { path: '/procurementUnit/listProcurementUnit/:message', component: ListProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.procurementUnit') }), component: EditProcurementUnit },
   { path: '/procurementUnit/editProcurementUnit/:procurementUnitId', component: EditProcurementUnit },
-  { path: '/planningUnit/editPlanningUnit/:planningUnitId',exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
-  { path: '/realmCountry/listRealmCountryPlanningUnit', name: i18n.t('static.dashboard.planningunit')+" / "+ i18n.t('static.dashboad.planningunitcountry' ), component: PlanningUnitCountryList },
+  { path: '/planningUnit/editPlanningUnit/:planningUnitId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.planningunit') }), component: EditPlanningUnit },
+  { path: '/realmCountry/listRealmCountryPlanningUnit', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountryList },
   { path: '/planningUnitCapacity/planningUnitCapacity/:planningUnitId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcapacity'), component: PlanningUnitCapacity },
   { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountry },
   { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCapacityList },
   { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: RealmCountryRegion },
-  
+
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },

@@ -139,7 +139,7 @@ class DefaultLayout extends Component {
                               name: i18n.t('static.dashboard.realmcountry'),
                               url: '/realmCountry/listRealmCountry',
                               icon: 'fa fa-globe'
-                            },{
+                            }, {
                               name: i18n.t('static.dashboad.planningunitcountry'),
                               url: '/realmCountry/listRealmCountryPlanningUnit',
                               icon: 'fa fa-globe'
@@ -302,12 +302,17 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.datasync'),
                             url: '/masterDataSync',
                             icon: 'fa fa-list',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.consumptiondetails'),
+                            url: '/consumptionDetails',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: 'Inventory Details',
+                            url: '/inventory/addInventory',
+                            icon: 'fa fa-list',
                           }
-                          // {
-                          //   name: i18n.t('static.dashboard.consumptiondetails'),
-                          //   url: '/consumptionDetails',
-                          //   icon: 'fa fa-list',
-                          // },
                         ]
                       },
                       // {
