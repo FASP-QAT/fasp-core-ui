@@ -9,6 +9,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
+import RealmService from '../../api/RealmService';
 
 
 const entityname = i18n.t('static.planningunit.planningunit');
@@ -20,13 +21,16 @@ export default class PlanningUnitListComponent extends Component {
             forecastingUnits: [],
             planningUnitList: [],
             message: '',
-            selSource: []
+            selSource: [],
+            realmId: '',
+            realms: [],
 
         }
         this.editPlanningUnit = this.editPlanningUnit.bind(this);
         this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.filterDataForRealm = this.filterDataForRealm.bind(this);
     }
 
     filterData() {
@@ -42,48 +46,9 @@ export default class PlanningUnitListComponent extends Component {
             });
         }
     }
-   
-    PlanningUnitCapacity(event, row) {
-        event.stopPropagation();
-        console.log(JSON.stringify(row))
-        this.props.history.push({
-            pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
-            state: { planningUnit: row }
-           
-
-        })
-    }
-    componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
-        ForecastingUnitService.getForecastingUnitList().then(response => {
-            console.log(response.data)
-            this.setState({
-                forecastingUnits: response.data,
-
-            })
-        })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-        PlanningUnitService.getAllPlanningUnitList().then(response => {
+    filterDataForRealm() {
+        let realmId = document.getElementById("realmId").value;
+        PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
             console.log(response.data)
             this.setState({
                 planningUnitList: response.data,
@@ -110,10 +75,118 @@ export default class PlanningUnitListComponent extends Component {
                     }
                 }
             );
+
+    }
+
+    PlanningUnitCapacity(event, row) {
+        event.stopPropagation();
+        // console.log(JSON.stringify(row))
+        this.props.history.push({
+            pathname: `/planningUnitCapacity/planningUnitCapacity/${row.planningUnitId}`,
+            state: { planningUnit: row }
+
+
+        })
+    }
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        ForecastingUnitService.getForecastingUnitList().then(response => {
+            // console.log(response.data)
+            this.setState({
+                forecastingUnits: response.data,
+
+            })
+        })
+            .catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
+
+        RealmService.getRealmListAll()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realms: response.data,
+                        realmId: response.data[0].realmId
+                    })
+
+                    PlanningUnitService.getPlanningUnitByRealmId(this.state.realmId).then(response => {
+                        console.log(response.data)
+                        this.setState({
+                            planningUnitList: response.data,
+                            selSource: response.data
+                        })
+                    })
+                        .catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: error.response.data.messageCode });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
+
+
+
+
+
+                } else {
+                    this.setState({ message: response.data.messageCode })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
     }
 
     editPlanningUnit(planningUnit) {
-        console.log('**'+JSON.stringify(planningUnit))
+        console.log('**' + JSON.stringify(planningUnit))
         this.props.history.push({
             pathname: `/planningUnit/editPlanningUnit/${planningUnit.planningUnitId}`,
             // state: { planningUnit: planningUnit }
@@ -136,6 +209,16 @@ export default class PlanningUnitListComponent extends Component {
     }
 
     render() {
+        const { realms } = this.state;
+        let realmList = realms.length > 0
+            && realms.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         const { forecastingUnits } = this.state;
         let forecastingUnitList = forecastingUnits.length > 0
             && forecastingUnits.map((item, i) => {
@@ -160,7 +243,7 @@ export default class PlanningUnitListComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },  {
+        }, {
             dataField: 'forecastingUnit.label',
             text: i18n.t('static.forecastingunit.forecastingunit'),
             sort: true,
@@ -199,7 +282,7 @@ export default class PlanningUnitListComponent extends Component {
             headerAlign: 'center',
             formatter: (cellContent, row) => {
                 return (<Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCapacity(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.capacityupdate')}</Button>
-                 )
+                )
             }
         }];
         const options = {
@@ -243,26 +326,48 @@ export default class PlanningUnitListComponent extends Component {
 
                     </CardHeader>
                     <CardBody>
-                        <Col md="3 pl-0">
+                        <Col md="9 pl-0">
+                            <div className="d-md-flex">
+                                <FormGroup>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="realmId"
+                                                id="realmId"
+                                                bsSize="sm"
+                                            >
+                                                {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+                                                {realmList}
+                                            </Input>
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                &nbsp;
                             <FormGroup>
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
-                                <div className="controls SelectGo">
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="forecastingUnitId"
-                                            id="forecastingUnitId"
-                                            bsSize="sm"
-                                        >
-                                            <option value="0">{i18n.t('static.common.all')}</option>
-                                            {forecastingUnitList}
-                                        </Input>
-                                        <InputGroupAddon addonType="append">
-                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
-                                    </InputGroup>
-                                </div>
-                            </FormGroup>
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="forecastingUnitId"
+                                                id="forecastingUnitId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {forecastingUnitList}
+                                            </Input>
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
                         </Col>
                         <ToolkitProvider
                             keyField="planningUnitId"

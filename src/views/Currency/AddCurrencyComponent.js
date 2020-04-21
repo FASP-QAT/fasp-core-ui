@@ -71,6 +71,7 @@ export default class AddCurrencyComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     dataChange(event) {
@@ -130,7 +131,7 @@ export default class AddCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -191,6 +192,23 @@ export default class AddCurrencyComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
                                                 <CardBody>
                                                     <FormGroup>
+                                                        <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.label.label_en}
+                                                            required />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
                                                         <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
@@ -219,26 +237,10 @@ export default class AddCurrencyComponent extends Component {
                                                             invalid={touched.currencySymbol && !!errors.currencySymbol}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.currencySymbol}
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.label.label_en}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
@@ -251,6 +253,7 @@ export default class AddCurrencyComponent extends Component {
                                                             invalid={touched.conversionRate && !!errors.conversionRate}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.conversionRateToUsd}
                                                             bsSize="sm"
                                                             required />
                                                         {/* </InputGroupAddon> */}
@@ -262,6 +265,7 @@ export default class AddCurrencyComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -280,5 +284,19 @@ export default class AddCurrencyComponent extends Component {
 
     cancelClicked() {
         this.props.history.push(`/currency/listCurrency/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        this.state.currencyCode = ''
+        this.state.currencySymbol = ''
+        this.state.label.label_en = ''
+        this.state.conversionRateToUsd = ''
+
+        let { currency } = this.state
+        this.setState(
+            {
+                currency
+            }
+        )
     }
 }

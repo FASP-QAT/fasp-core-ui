@@ -387,7 +387,7 @@ class AddprogramPlanningUnit extends Component {
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
@@ -414,76 +414,78 @@ class AddprogramPlanningUnit extends Component {
                                             setTouched
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='programPlanningUnitForm'>
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            value={this.state.programId}
-                                                            name="programId"
-                                                            id="programId"
-                                                            disabled>
-                                                            {programs}
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="planningUnitId"
-                                                            id="select"
-                                                            bsSize="sm"
-                                                            valid={!errors.planningUnitId}
-                                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                            value={this.state.planningUnitId}
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            required
-                                                        >
-                                                            <option value="">Please select</option>
-                                                            {products}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}</Label>
-                                                        <Input
-                                                            type="number"
-                                                            min='0'
-                                                            name="reorderFrequencyInMonths"
-                                                            id="reorderFrequencyInMonths"
-                                                            bsSize="sm"
-                                                            valid={!errors.reorderFrequencyInMonths}
-                                                            invalid={touched.reorderFrequencyInMonths && !!errors.reorderFrequencyInMonths}
-                                                            value={this.state.reorderFrequencyInMonths}
-                                                            placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')}
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                        />
-                                                        <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="company">Minimum Month Of Stock</Label>
-                                                        <Input
-                                                            type="number"
-                                                            min='0'
-                                                            name="minMonthsOfStock"
-                                                            id="minMonthsOfStock"
-                                                            bsSize="sm"
-                                                            valid={!errors.minMonthsOfStock}
-                                                            invalid={touched.minMonthsOfStock && !!errors.minMonthsOfStock}
-                                                            value={this.state.minMonthsOfStock}
-                                                            placeholder='Minimum month of stock'
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                        />
-                                                        <FormFeedback className="red">{errors.minMonthsOfStock}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                                        <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                        &nbsp;
+                                                    <Row>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                                            <Input
+                                                                type="select"
+                                                                value={this.state.programId}
+                                                                name="programId"
+                                                                id="programId"
+                                                                disabled>
+                                                                {programs}
+                                                            </Input>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                            <Input
+                                                                type="select"
+                                                                name="planningUnitId"
+                                                                id="select"
+                                                                bsSize="sm"
+                                                                valid={!errors.planningUnitId}
+                                                                invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                                value={this.state.planningUnitId}
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                                required
+                                                            >
+                                                                <option value="">Please select</option>
+                                                                {products}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}</Label>
+                                                            <Input
+                                                                type="number"
+                                                                min='0'
+                                                                name="reorderFrequencyInMonths"
+                                                                id="reorderFrequencyInMonths"
+                                                                bsSize="sm"
+                                                                valid={!errors.reorderFrequencyInMonths}
+                                                                invalid={touched.reorderFrequencyInMonths && !!errors.reorderFrequencyInMonths}
+                                                                value={this.state.reorderFrequencyInMonths}
+                                                                placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')}
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            />
+                                                            <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup>
+                                                            <Label htmlFor="company">Minimum Month Of Stock</Label>
+                                                            <Input
+                                                                type="number"
+                                                                min='0'
+                                                                name="minMonthsOfStock"
+                                                                id="minMonthsOfStock"
+                                                                bsSize="sm"
+                                                                valid={!errors.minMonthsOfStock}
+                                                                invalid={touched.minMonthsOfStock && !!errors.minMonthsOfStock}
+                                                                value={this.state.minMonthsOfStock}
+                                                                placeholder='Minimum month of stock'
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            />
+                                                            <FormFeedback className="red">{errors.minMonthsOfStock}</FormFeedback>
+                                                        </FormGroup>
 
-                                     </FormGroup>
+                                                        <FormGroup className="col-md-6 mt-md-4">
+                                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
+                                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                            &nbsp;
+
+                                     </FormGroup></Row>
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>

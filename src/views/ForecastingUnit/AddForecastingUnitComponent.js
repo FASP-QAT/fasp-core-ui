@@ -84,6 +84,7 @@ export default class AddForecastingUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -238,7 +239,7 @@ export default class AddForecastingUnitComponent extends Component {
             && tracerCategories.map((item, i) => {
                 return (
                     <option key={i} value={item.tracerCategoryId}>
-                        {getLabelText(item.label,this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -247,7 +248,7 @@ export default class AddForecastingUnitComponent extends Component {
             && productcategories.map((item, i) => {
                 return (
                     <option key={i} value={item.productCategoryId}>
-                        {getLabelText(item.label,this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -323,7 +324,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.id}
+                                                            value={this.state.forecastingUnit.realm.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
@@ -342,7 +343,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.id}
+                                                            value={this.state.forecastingUnit.tracerCategory.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {tracerCategoryList}
@@ -361,7 +362,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.id}
+                                                            value={this.state.forecastingUnit.productCategory.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {productCategoryList}
@@ -391,6 +392,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             invalid={touched.genericLabel && !!errors.genericLabel}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.forecastingUnit.genericLabel.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
 
@@ -401,6 +403,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                     <FormGroup>
 
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -421,5 +424,23 @@ export default class AddForecastingUnitComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { forecastingUnit } = this.state
+
+        forecastingUnit.label.label_en = ''
+        forecastingUnit.realm.id = ''
+        forecastingUnit.tracerCategory.id = ''
+        forecastingUnit.productCategory.id = ''
+        forecastingUnit.genericLabel.label_en = ''
+
+        this.setState(
+            {
+                forecastingUnit
+            }, () => {
+            }
+        )
+
     }
 }

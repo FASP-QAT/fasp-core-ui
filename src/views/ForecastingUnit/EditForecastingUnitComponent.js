@@ -100,6 +100,7 @@ export default class EditForecastingUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -368,6 +369,7 @@ export default class EditForecastingUnitComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.update')}</Button>
 
 
@@ -393,5 +395,34 @@ export default class EditForecastingUnitComponent extends Component {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+            this.setState({
+                forecastingUnit: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
+    }
 }
 

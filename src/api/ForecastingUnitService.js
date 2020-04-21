@@ -27,5 +27,9 @@ class ForecastingUnitService {
         return axios.get(`${API_URL}/api/forecastingUnit/${json}`, {}
         );
     }
+    getForcastingUnitByRealmId(json) {
+        return axios.get(`${API_URL}/api/forecastingUnit/realmId/${json}`, {}
+        );
+    }
 }
 export default new ForecastingUnitService();

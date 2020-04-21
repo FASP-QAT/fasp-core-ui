@@ -66,6 +66,7 @@ export default class AddDataSourceTypeComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -212,6 +213,20 @@ export default class AddDataSourceTypeComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='dataSourceType'>
                                                 <CardBody>
                                                     <FormGroup>
+                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.dataSourceType.label.label_en}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
@@ -223,26 +238,12 @@ export default class AddDataSourceTypeComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.dataSourceType.realm.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label> 
-                                                        <Input type="text"
-                                                                name="label"
-                                                                id="label"
-                                                                bsSize="sm"
-                                                                valid={!errors.label}
-                                                                invalid={touched.label && !!errors.label}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.dataSourceType.label.label_en}
-                                                                required />
-                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
 
@@ -250,6 +251,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                     <FormGroup>
 
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -270,5 +272,19 @@ export default class AddDataSourceTypeComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/dataSourceType/listDataSourceType/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { dataSourceType } = this.state
+
+        dataSourceType.label.label_en = ''
+        dataSourceType.realm.id = ''
+
+        this.setState(
+            {
+                dataSourceType
+            }, () => {
+            }
+        )
     }
 }
