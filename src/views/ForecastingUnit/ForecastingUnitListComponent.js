@@ -37,6 +37,7 @@ export default class ForecastingUnitListComponent extends Component {
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
+        this.getProductCategories = this.getProductCategories.bind(this)
     }
 
 
@@ -80,7 +81,7 @@ export default class ForecastingUnitListComponent extends Component {
         // let realmId = document.getElementById("realmId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
-        
+
         // if (realmId != 0 && productCategoryId != 0 && tracerCategoryId != 0) {
         //     const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId && c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
         //     this.setState({
@@ -105,7 +106,7 @@ export default class ForecastingUnitListComponent extends Component {
             this.setState({
                 selSource
             });
-        } 
+        }
         // else if (realmId != 0) {
         //     const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId)
         //     this.setState({
@@ -128,6 +129,39 @@ export default class ForecastingUnitListComponent extends Component {
             });
         }
     }
+    getProductCategories() {
+        AuthenticationService.setupAxiosInterceptors();
+        let realmId = document.getElementById("realmId").value;
+        ProductService.getProductCategoryList(realmId)
+            .then(response => {
+
+
+
+                this.setState({
+                    productCategories: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
@@ -137,6 +171,7 @@ export default class ForecastingUnitListComponent extends Component {
                         realms: response.data,
                         realmId: response.data[0].realmId
                     })
+                    this.getProductCategories();
                     ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
                         console.log("response------->" + response);
                         this.setState({
@@ -164,9 +199,6 @@ export default class ForecastingUnitListComponent extends Component {
                                 }
                             }
                         );
-
-
-
 
                 } else {
                     this.setState({ message: response.data.messageCode })
@@ -217,17 +249,23 @@ export default class ForecastingUnitListComponent extends Component {
                     }
                 }
             );
-        ProductService.getProductCategoryList()
-            .then(response => {
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
+
+
+
+
+        ForecastingUnitService.getForecastingUnitListAll().then(response => {
+            console.log("response------->" + response);
+            this.setState({
+                forecastingUnitList: response.data,
+                selSource: response.data
+            })
+        })
+            .catch(
                 error => {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response ? error.response.status : "") {
+                        switch (error.response.status) {
                             case 500:
                             case 401:
                             case 404:
@@ -242,7 +280,6 @@ export default class ForecastingUnitListComponent extends Component {
                     }
                 }
             );
-
 
     }
 
@@ -400,6 +437,7 @@ export default class ForecastingUnitListComponent extends Component {
                                                     bsSize="sm"
                                                 >
                                                     {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+
                                                     {realmList}
                                                 </Input>
                                                 <InputGroupAddon addonType="append">

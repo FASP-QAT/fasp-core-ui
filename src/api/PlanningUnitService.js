@@ -31,7 +31,7 @@ class PlanningUnitService {
     }
 
     getPlanningUnitCapacityForId(planningUnitId) {
-        return axios.get(`${API_URL}/api/planningUnit/${planningUnitId}/capacity/`, {}
+        return axios.get(`${API_URL}/api/planningUnit/capacity/${planningUnitId}`, {}
         );
     }
 
