@@ -10,7 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
 
 import getLabelText from '../../CommonComponent/getLabelText';
-const entityname=i18n.t('static.procurementagent.procurementagent')
+const entityname = i18n.t('static.procurementagent.procurementagent')
 
 const initialValues = {
     realmId: [],
@@ -72,6 +72,7 @@ class AddProcurementAgentComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     Capitalize(str) {
@@ -177,13 +178,13 @@ class AddProcurementAgentComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -247,6 +248,7 @@ class AddProcurementAgentComponent extends Component {
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.procurementAgent.realm.id}
                                                             required
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
@@ -305,6 +307,7 @@ class AddProcurementAgentComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
+                                                            value={this.state.procurementAgent.submittedToApprovedLeadTime}
                                                             min={1}
                                                         />
                                                         {/* </InputGroupAddon> */}
@@ -314,6 +317,7 @@ class AddProcurementAgentComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -331,6 +335,19 @@ class AddProcurementAgentComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+    resetClicked() {
+        let { procurementAgent } = this.state;
+
+        procurementAgent.realm.id = ''
+        procurementAgent.procurementAgentCode = ''
+        procurementAgent.label.label_en = ''
+        procurementAgent.submittedToApprovedLeadTime = ''
+
+        this.setState({
+            procurementAgent
+        },
+            () => { });
     }
 }
 

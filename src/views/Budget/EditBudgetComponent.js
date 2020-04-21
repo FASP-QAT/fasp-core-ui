@@ -9,6 +9,7 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import moment from 'moment';
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
@@ -22,7 +23,7 @@ const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
-        budgetAmt: Yup.number()
+        budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
@@ -57,58 +58,77 @@ class EditBudgetComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            budget: this.props.location.state.budget,
+            // budget: this.props.location.state.budget,
+            budget: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                program: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                subFundingSource: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                startDate: '',
+                stopDate: '',
+                budgetAmt: ''
+
+            },
             message: '',
             lang: localStorage.getItem('lang'),
-        }
-        initialValues = {
-            budgetName: getLabelText(this.state.budget.label, this.state.lang),
-            budgetAmt: this.state.budget.budgetAmt,
-            startDate: this.state.budget.startDate,
-            stopDate: this.state.budget.stopDate
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
         // console.log(this.state);
+
     }
 
-    // componentDidMount() {
-    //     console.log("in componentdidmount---------------");
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     BudgetService.getBudgetDataById(this.props.match.params.budgetId)
-    //         .then(response => {
-    //             this.setState({
-    //                 budget: response.data
-    //             });
-    //             initialValues = {
-    //                 budgetName: getLabelText(this.state.budget.label, this.state.lang),
-    //                 budgetAmt: this.state.budget.budgetAmt,
-    //                 startDate: this.state.budget.startDate,
-    //                 stopDate: this.state.budget.stopDate
-    //             }
-    //         })
-    //         .catch(
-    //             error => {
-    //                 switch (error.message) {
-    //                     case "Network Error":
-    //                         this.setState({
-    //                             message: error.message
-    //                         })
-    //                         break
-    //                     default:
-    //                         this.setState({
-    //                             message: error.message
-    //                         })
-    //                         break
-    //                 }
-    //             }
-    //         );
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        BudgetService.getBudgetDataById(this.props.match.params.budgetId)
+            .then(response => {
+                response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                this.setState({
+                    budget: response.data
+                });
+            })
+            .catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                    }
+                }
+            );
 
 
-    // }
+    }
     Capitalize(str) {
         let { budget } = this.state
         budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -180,7 +200,12 @@ class EditBudgetComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    budgetName: getLabelText(this.state.budget.label, this.state.lang),
+                                    budgetAmt: this.state.budget.budgetAmt,
+                                    startDate: this.state.budget.startDate,
+                                    stopDate: this.state.budget.stopDate
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -291,7 +316,6 @@ class EditBudgetComponent extends Component {
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input type="number"
-                                                            
                                                             min="0"
                                                             name="budgetAmt"
                                                             id="budgetAmt"
@@ -304,7 +328,6 @@ class EditBudgetComponent extends Component {
                                                             placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
                                                         />
-
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -389,6 +412,7 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
 
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -409,6 +433,35 @@ class EditBudgetComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        BudgetService.getBudgetDataById(this.props.match.params.budgetId)
+            .then(response => {
+                response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                this.setState({
+                    budget: response.data
+                });
+            })
+            .catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                    }
+                }
+            );
+
     }
 }
 

@@ -9,7 +9,7 @@ class DimensionSerice {
     }
 
     getDimensionListAll() {
-        return axios.get(`${API_URL}/api/dimension/`, {
+        return axios.get(`${API_URL}/api/dimension/all`, {
         });
     }
 

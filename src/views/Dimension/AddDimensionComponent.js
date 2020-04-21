@@ -56,7 +56,7 @@ export default class AddDimensionComponent extends Component {
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
@@ -188,10 +188,11 @@ export default class AddDimensionComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
- 
+
                                                     <FormGroup>
 
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -212,5 +213,15 @@ export default class AddDimensionComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/diamension/diamensionlist/` + "Action Canceled")
+    }
+
+    resetClicked() {
+        let { dimension } = this.state
+        dimension.label.label_en = ''
+        this.setState(
+            {
+                dimension
+            }
+        )
     }
 } 

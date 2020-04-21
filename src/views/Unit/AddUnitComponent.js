@@ -67,7 +67,7 @@ class AddUnitComponent extends Component {
         }
 
         this.Capitalize = this.Capitalize.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
@@ -242,6 +242,7 @@ class AddUnitComponent extends Component {
                                                             invalid={touched.dimensionId && !!errors.dimensionId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.unit.dimension.id}
                                                             required
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
@@ -276,7 +277,7 @@ class AddUnitComponent extends Component {
                                                             invalid={touched.unitCode && !!errors.unitCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.unitCode}
+                                                            value={this.state.unit.unitCode}
                                                             required />
                                                         <FormFeedback className="red">{errors.unitCode}</FormFeedback>
                                                     </FormGroup>
@@ -284,6 +285,7 @@ class AddUnitComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -304,6 +306,19 @@ class AddUnitComponent extends Component {
 
     cancelClicked() {
         this.props.history.push(`/unit/listUnit/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { unit } = this.state;
+
+        unit.dimension.id = ''
+        unit.label.label_en = ''
+        unit.unitCode = ''
+
+        this.setState({
+            unit
+        },
+            () => { });
     }
 
 

@@ -31,7 +31,7 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.programtext')),
         subFundingSourceId: Yup.string()
             .required(i18n.t('static.budget.subfundingtext')),
-        budgetAmt: Yup.number()
+        budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
             .required(i18n.t('static.budget.startdatetext')),
@@ -94,7 +94,8 @@ class AddBudgetComponent extends Component {
                     }
                 },
                 startDate: '',
-                stopDate: ''
+                stopDate: '',
+                budgetAmt: ''
 
             },
 
@@ -103,6 +104,7 @@ class AddBudgetComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     Capitalize(str) {
@@ -339,7 +341,7 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.programId}
+                                                            value={this.state.budget.program.programId}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -361,7 +363,7 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.subFundingSourceId}
+                                                            value={this.state.budget.subFundingSource.subFundingSourceId}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {subFundingSourceList}
@@ -384,6 +386,7 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="number"
+                                                            value={this.state.budget.budgetAmt}
                                                             placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             required />
                                                         {/* </InputGroupAddon> */}
@@ -405,6 +408,7 @@ class AddBudgetComponent extends Component {
                                                             onBlur={handleBlur}
                                                             type="date"
                                                             min={this.currentDate()}
+                                                            value={this.state.budget.startDate}
                                                             placeholder={i18n.t('static.budget.budgetstartdate')}
                                                             required />
                                                         {/* </InputGroupAddon> */}
@@ -426,6 +430,7 @@ class AddBudgetComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="date"
+                                                            value={this.state.budget.stopDate}
                                                             min={this.state.budget.startDate}
                                                             placeholder={i18n.t('static.budget.budgetstopdate')}
                                                             required />
@@ -438,6 +443,7 @@ class AddBudgetComponent extends Component {
 
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -457,6 +463,23 @@ class AddBudgetComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked(){
+        let { budget } = this.state;
+        
+            budget.label.label_en = ''
+            budget.program.programId = ''
+            budget.subFundingSource.subFundingSourceId = ''
+            budget.budgetAmt = ''
+            budget.startDate = ''
+            budget.stopDate = ''
+            budget.stopDate = ''
+        
+        this.setState({
+            budget
+        },
+            () => { });
     }
 }
 

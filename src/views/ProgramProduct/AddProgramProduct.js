@@ -375,7 +375,7 @@ class AddprogramPlanningUnit extends Component {
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <strong>{i18n.t('static.program.mapPlanningUnit')}</strong>
@@ -402,7 +402,8 @@ class AddprogramPlanningUnit extends Component {
                                             setTouched
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='programPlanningUnitForm'>
-                                                    <FormGroup>
+                                                    <Row>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                         <Input
                                                             type="select"
@@ -413,7 +414,7 @@ class AddprogramPlanningUnit extends Component {
                                                             {programs}
                                                         </Input>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                                         <Input
                                                             type="select"
@@ -432,7 +433,7 @@ class AddprogramPlanningUnit extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}</Label>
                                                         <Input
                                                             type="number"
@@ -448,13 +449,13 @@ class AddprogramPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }}
                                                         />
                                                         <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
+                                                    </FormGroup >
+                                                    <FormGroup className="col-md-6 mt-md-4">
                                                         {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                                        <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                        <Button  type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                         &nbsp;
 
-                                     </FormGroup>
+                                     </FormGroup></Row>
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>

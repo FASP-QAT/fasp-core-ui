@@ -13,7 +13,7 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 
 
-const entityname=i18n.t('static.datasourcetype.datasourcetype');
+const entityname = i18n.t('static.datasourcetype.datasourcetype');
 export default class DataSourceTypeListComponent extends Component {
 
     constructor(props) {
@@ -45,7 +45,7 @@ export default class DataSourceTypeListComponent extends Component {
             });
         }
     }
-    
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
@@ -148,15 +148,15 @@ export default class DataSourceTypeListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'realm.label',
-            text: i18n.t('static.realm.realm'),
+            dataField: 'label',
+            text: i18n.t('static.datasourcetype.datasourcetype'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
         }, {
-            dataField: 'label',
-            text: i18n.t('static.datasourcetype.datasourcetype'),
+            dataField: 'realm.label',
+            text: i18n.t('static.realm.realm'),
             sort: true,
             align: 'center',
             headerAlign: 'center',

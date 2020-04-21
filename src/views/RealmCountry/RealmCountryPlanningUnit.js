@@ -16,8 +16,8 @@ import PlanningUnitService from "../../api/PlanningUnitService";
 import UnitService from "../../api/UnitService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
- let initialValues = {
-    
+let initialValues = {
+
     planningUnit: {
         id: '',
         label: {
@@ -85,7 +85,7 @@ class PlanningUnitCountry extends Component {
             lang: localStorage.getItem('lang'),
             planningUnitCountry: {},
             planningUnits: [],
-           
+realmCountryPlanningUnitId:'',
             realmCountry: {
                 realmCountryId: '',
                 country: {
@@ -104,8 +104,8 @@ class PlanningUnitCountry extends Component {
             label: {
                 label_en: ''
             },
-            skuCode:'',
-            multiplier:'',
+            skuCode: '',
+            multiplier: '',
             rows: [],
             planningUnit: {
                 planningUnitId: '',
@@ -122,9 +122,9 @@ class PlanningUnitCountry extends Component {
             updateRowStatus: 0
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
-        this.handleDisableSpecificRow = this.handleDisableSpecificRow.bind(this);
+        this.disableRow = this.disableRow.bind(this);
         this.submitForm = this.submitForm.bind(this);
-        this.handleEnableSpecificRow = this.handleEnableSpecificRow.bind(this);
+        this.enableRow = this.enableRow.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
@@ -135,16 +135,18 @@ class PlanningUnitCountry extends Component {
         if (this.state.updateRowStatus == 1) {
             this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
         } else {
-            document.getElementById('planningUnitId').disabled = true;
+         //   document.getElementById('planningUnitId').disabled = true;
+         console.log(JSON.stringify(this.state.rows[idx]))
             initialValues = {
-                planningUnitId:this.state.rows[idx].planningUnit.id,
-                planningUnit:{
+                realmCountryPlanningUnitId:this.state.rows[idx].realmCountryPlanningUnitId,
+                planningUnitId: this.state.rows[idx].planningUnit.id,
+                planningUnit: {
                     id: this.state.rows[idx].planningUnit.id,
                     label: {
                         label_en: this.state.rows[idx].planningUnit.label.label_en
                     }
                 },
-                label:this.state.rows[idx].label.label_en ,
+                label: this.state.rows[idx].label.label_en,
                 // , label: { label_en: this.state.rows[idx].label.label_en },
                 skuCode: this.state.rows[idx].skuCode,
                 unit: {
@@ -153,14 +155,14 @@ class PlanningUnitCountry extends Component {
                         label_en: this.state.rows[idx].unit.label.label_en
                     }
                 },
-                unitId:this.state.rows[idx].unit.unitId,
+                unitId: this.state.rows[idx].unit.unitId,
                 multiplier: this.state.rows[idx].multiplier,
                 gtin: this.state.rows[idx].gtin,
                 active: this.state.rows[idx].active
             }
             const rows = [...this.state.rows]
             this.setState({
-
+                realmCountryPlanningUnitId:this.state.rows[idx].realmCountryPlanningUnitId,
                 planningUnit: {
                     planningUnitId: this.state.rows[idx].planningUnit.id,
                     label: {
@@ -195,7 +197,7 @@ class PlanningUnitCountry extends Component {
             label: true,
             skuCode: true,
             multiplier: true,
-            unitId:true
+            unitId: true
 
         }
         )
@@ -219,10 +221,11 @@ class PlanningUnitCountry extends Component {
 
     setTextAndValue = (event) => {
         // let { budget } = this.state;
+        console.log(event.target.name)
         if (event.target.name === "planningUnitId") {
             this.state.planningUnit.planningUnitId = event.target.value;
             this.state.planningUnit.label.label_en = event.target[event.target.selectedIndex].text;
-            console.log(event.target.value)
+           
         }
         if (event.target.name === "label") {
             this.state.label.label_en = event.target.value;
@@ -261,14 +264,14 @@ class PlanningUnitCountry extends Component {
     }
 
 
-    handleDisableSpecificRow(idx) {
+    disableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = false
 
         // rows.splice(idx, 1);
         this.setState({ rows })
     }
-    handleEnableSpecificRow(idx) {
+    enableRow(idx) {
         const rows = [...this.state.rows]
         rows[idx].active = true
 
@@ -352,7 +355,7 @@ class PlanningUnitCountry extends Component {
         RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
             this.setState({
                 realmCountry: response.data,
-                //  rows:response.data
+                // rows:response.data
             })
         }).catch(
             error => {
@@ -401,7 +404,7 @@ class PlanningUnitCountry extends Component {
         );
         PlanningUnitService.getAllPlanningUnitList()
             .then(response => {
-               this.setState({
+                this.setState({
                     planningUnits: response.data
                 })
             }).catch(
@@ -460,11 +463,11 @@ class PlanningUnitCountry extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
-                                    console.log("values",values)
+                                    console.log("values", values)
                                     console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.skuCode + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
                                     if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != "" && this.state.skuCode != "" && this.state.unit.unitId != "" && this.state.multiplier != "") {
                                         var json =
-                                        {
+                                        {realmCountryPlanningUnitId:this.state.realmCountryPlanningUnitId,
                                             realmCountry: {
                                                 id: this.props.match.params.realmCountryId
                                             }
@@ -491,7 +494,31 @@ class PlanningUnitCountry extends Component {
 
                                         }
                                         this.state.rows.push(json)
-                                        this.setState({ rows: this.state.rows })
+                                        this.setState({ rows: this.state.rows,updateRowStatus:0 })
+                                        
+                                        this.setState({
+                                            realmCountryPlanningUnitId:'',
+                                            planningUnit: {
+                                                planningUnitId: '',
+                                                label: {
+                                                    label_en: ''
+                                                }
+                                            }
+                                            , label: { label_en: '' },
+                                            skuCode: '',
+                                            unit: {
+                                                unitId: '',
+                                                label: {
+                                                    label_en: ''
+                                                }
+                                            },
+                                            multiplier: '',
+    
+                                            gtin: '',
+                                            active: true
+    
+                                        });
+                                        
                                     };
                                     resetForm({
                                         realmCountry: {
@@ -547,8 +574,9 @@ class PlanningUnitCountry extends Component {
                                                 value={getLabelText(this.state.realmCountry.realm.label, this.state.lang) + "-" + getLabelText(this.state.realmCountry.country.label, this.state.lang)}
                                             >
                                             </Input>
-                                        </FormGroup>
-                                        <FormGroup>
+                                        </FormGroup><FormGroup>
+                                        <Input type="hidden" name="realmCountryPlanningUnitId" id="realmCountryPlanningUnitId" value={this.state.realmCountryPlanningUnitId}>
+                                       </Input></FormGroup> <FormGroup>
                                             <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <Input type="select" name="planningUnitId" id="planningUnitId" bsSize="sm"
                                                 valid={!errors.planningUnitId}
@@ -643,8 +671,9 @@ class PlanningUnitCountry extends Component {
                                         <FormGroup>
                                             <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
-
-                </FormGroup></Form>)} />
+                                           
+ </FormGroup></Form>)} />
+ <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>
@@ -688,11 +717,11 @@ class PlanningUnitCountry extends Component {
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
                                                 <td>
-                                                        {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
-                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
-                                                  
-                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
-                                                    </td>
+                                                    {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                    <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
+
+                                                    <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                                </td>
                                             </tr>)
 
                                     }
@@ -705,7 +734,7 @@ class PlanningUnitCountry extends Component {
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {<Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
-                        </FormGroup>
+ </FormGroup>
 
                         </CardFooter>
                     </Card>
@@ -721,4 +750,3 @@ class PlanningUnitCountry extends Component {
 }
 
 export default PlanningUnitCountry
-

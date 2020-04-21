@@ -163,6 +163,7 @@ export default class DatabaseTranslations extends React.Component {
                             <strong>{i18n.t('static.label.databaseTranslations')}</strong>
                         </CardHeader>
                         <CardBody className="table-responsive">
+                        <div id="loader" class="center"></div>
                         <div id="databaseTranslationTable"></div>
                         </CardBody>
                         <CardFooter>
@@ -229,5 +230,17 @@ export default class DatabaseTranslations extends React.Component {
         })
     }.bind(this)
 }
-
+document.onreadystatechange = function() { 
+    if (document.readyState !== "complete") { 
+        document.querySelector( 
+          "table").style.visibility = "hidden"; 
+        document.querySelector( 
+          "#loader").style.visibility = "visible"; 
+    } else { 
+        document.querySelector( 
+          "#loader").style.display = "none"; 
+        document.querySelector( 
+          "table").style.visibility = "visible"; 
+    } 
+};
 

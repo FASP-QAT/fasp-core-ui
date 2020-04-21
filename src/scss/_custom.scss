@@ -420,7 +420,8 @@ label.arrow_label:after {
 @media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}.Selectdiv{position: absolute;top:-25px;margin-bottom: 0.5rem;}}
 
 // inline search and select
-@media (min-width: 768px) {.tab-ml-1{margin-left: 5px;}.Selectdiv{position: absolute;top:-25px;margin-bottom: 0.5rem;}}
+// Selectdiv to put in formgroup of select
+
 // radio button
 .form-check {
   padding-left: 1.25rem !important;
@@ -439,6 +440,119 @@ label.arrow_label:after {
 .sidebar .nav-link .nav-dropdown-toggle::before {
   transform: rotate(-180deg !important);
 }
+
+// jxcel table leble translation
+.draggable tr:nth-of-type(odd) {
+  background-color: #e5edf5;
+}
+
+.jexcel_selectall{background: #fff !important;}
+.jexcel > thead > tr > td {background: #fff !important;}
+
+.jexcel > tbody > tr > td:first-child {background-color: #fff !important;}
+.jexcel > tbody > tr > td{    padding: 6px !important }
+.jexcel > thead > tr > td {padding: 6px!important}
+
+.jexcel_page{z-index: 1;
+  color: 002f6c !important;
+  }
+
+
+  :first-child.jexcel_page{
+    margin-left: 0;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+   
+}
+.jexcel_page_selected{ color: #fff;
+  background-color: #002f6c !important;
+  border-color: #002f6c !important;}
+.jexcel_pagination > div > div {
+  text-align: center;
+  width: 30px !important;
+  height: 22px!important;
+  line-height: 22px!important;
+  border: 1px solid #ccc!important;
+  box-sizing: border-box!important;
+   margin-left: 0px !important ;
+  cursor: pointer!important;
+}
+
+.jexcel_pagination_dropdown{color: #fff !important;
+  background-color: #20a8d8 !important;
+  border-color: #20a8d8 !important;
+  margin-left: 5px;
+  margin-top: -2px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;}
+
+  .jexcel_search{height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+    width: 130px;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #e4e7ea;
+  }
+  // :first-child.jexcel_filter{position: absolute; bottom: 0px;}
+  .jexcel_pagination_dropdown option{    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    
+    float: left;
+    min-width: 10rem;
+    padding: 0 0;
+    margin: 0.125rem 0 0;
+    font-size: 0.875rem;
+    color: #23282c;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #c8ced3 !important;
+    border-radius: 0.25rem;}
+
+  
+// table loader
+    #loader { 
+      border: 12px solid #f3f3f3; 
+      border-radius: 50%; 
+      border-top: 12px solid #444444; 
+      width: 45px; 
+      height: 45px; 
+      animation: spin 1s linear infinite; 
+     
+  } 
+    
+  @keyframes spin { 
+      100% { 
+          transform: rotate(360deg); 
+      } 
+  } 
+    
+  .center { 
+      position: absolute; 
+      top: 0; 
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      margin: auto; 
+  }
+
+
+
+
+
+
+
+
+
 
 // .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 
