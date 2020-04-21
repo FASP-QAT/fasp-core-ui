@@ -20,7 +20,8 @@ const entityname = i18n.t('static.dashboard.programPlanningUnit');
 
 let initialValues = {
     planningUnitId: '',
-    reorderFrequencyInMonths: ''
+    reorderFrequencyInMonths: '',
+    minMonthsOfStock: ''
 }
 
 const validationSchema = function (values, t) {
@@ -30,7 +31,10 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
         reorderFrequencyInMonths: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText'))
+            .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText')),
+        minMonthsOfStock: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText'))
     })
 }
 
@@ -71,6 +75,7 @@ class AddprogramPlanningUnit extends Component {
             planningUnitId: '',
             planningUnitName: '',
             reorderFrequencyInMonths: '',
+            minMonthsOfStock: '',
             rows: rows,
             programList: [],
             planningUnitList: [],
@@ -121,6 +126,7 @@ class AddprogramPlanningUnit extends Component {
                         }
                     },
                     reorderFrequencyInMonths: this.state.reorderFrequencyInMonths,
+                    minMonthsOfStock: this.state.minMonthsOfStock,
                     active: true,
                     isNew: this.state.isNew,
                     programPlanningUnitId: this.state.programPlanningUnitId
@@ -135,6 +141,7 @@ class AddprogramPlanningUnit extends Component {
         this.setState({
             planningUnitId: '',
             reorderFrequencyInMonths: '',
+            minMonthsOfStock: '',
             planningUnitName: '',
             programPlanningUnitId: 0,
             isNew: true,
@@ -151,7 +158,8 @@ class AddprogramPlanningUnit extends Component {
             document.getElementById('select').disabled = true;
             initialValues = {
                 planningUnitId: this.state.rows[idx].planningUnit.id,
-                reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths
+                reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
+                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock
             }
 
             const rows = [...this.state.rows]
@@ -159,6 +167,7 @@ class AddprogramPlanningUnit extends Component {
                 planningUnitId: this.state.rows[idx].planningUnit.id,
                 planningUnitName: this.state.rows[idx].planningUnit.label.label_en,
                 reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
+                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock,
                 programPlanningUnitId: this.state.rows[idx].programPlanningUnitId,
                 isNew: false,
                 updateRowStatus: 1
@@ -187,6 +196,9 @@ class AddprogramPlanningUnit extends Component {
     setTextAndValue = (event) => {
         if (event.target.name === 'reorderFrequencyInMonths') {
             this.setState({ reorderFrequencyInMonths: event.target.value });
+        }
+        if (event.target.name === 'minMonthsOfStock') {
+            this.setState({ minMonthsOfStock: event.target.value });
         }
         else if (event.target.name === 'planningUnitId') {
             this.setState({ planningUnitName: event.target[event.target.selectedIndex].text });
@@ -387,7 +399,7 @@ class AddprogramPlanningUnit extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                         this.addRow();
-                                        resetForm({ planningUnitId: "", reorderFrequencyInMonths: "" });
+                                        resetForm({ planningUnitId: "", reorderFrequencyInMonths: "", minMonthsOfStock: "" });
                                     }}
                                     render={
                                         ({
@@ -403,57 +415,75 @@ class AddprogramPlanningUnit extends Component {
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='programPlanningUnitForm'>
                                                     <Row>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            value={this.state.programId}
-                                                            name="programId"
-                                                            id="programId"
-                                                            disabled>
-                                                            {programs}
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="planningUnitId"
-                                                            id="select"
-                                                            bsSize="sm"
-                                                            valid={!errors.planningUnitId}
-                                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                            value={this.state.planningUnitId}
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                            required
-                                                        >
-                                                            <option value="">Please select</option>
-                                                            {products}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}</Label>
-                                                        <Input
-                                                            type="number"
-                                                            min='0'
-                                                            name="reorderFrequencyInMonths"
-                                                            id="reorderFrequencyInMonths"
-                                                            bsSize="sm"
-                                                            valid={!errors.reorderFrequencyInMonths}
-                                                            invalid={touched.reorderFrequencyInMonths && !!errors.reorderFrequencyInMonths}
-                                                            value={this.state.reorderFrequencyInMonths}
-                                                            placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')}
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                        />
-                                                        <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
-                                                    </FormGroup >
-                                                    <FormGroup className="col-md-6 mt-md-4">
-                                                        {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                                        <Button  type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                        &nbsp;
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                                            <Input
+                                                                type="select"
+                                                                value={this.state.programId}
+                                                                name="programId"
+                                                                id="programId"
+                                                                disabled>
+                                                                {programs}
+                                                            </Input>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                            <Input
+                                                                type="select"
+                                                                name="planningUnitId"
+                                                                id="select"
+                                                                bsSize="sm"
+                                                                valid={!errors.planningUnitId}
+                                                                invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                                value={this.state.planningUnitId}
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                                required
+                                                            >
+                                                                <option value="">Please select</option>
+                                                                {products}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}</Label>
+                                                            <Input
+                                                                type="number"
+                                                                min='0'
+                                                                name="reorderFrequencyInMonths"
+                                                                id="reorderFrequencyInMonths"
+                                                                bsSize="sm"
+                                                                valid={!errors.reorderFrequencyInMonths}
+                                                                invalid={touched.reorderFrequencyInMonths && !!errors.reorderFrequencyInMonths}
+                                                                value={this.state.reorderFrequencyInMonths}
+                                                                placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')}
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            />
+                                                            <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup>
+                                                            <Label htmlFor="company">Minimum Month Of Stock</Label>
+                                                            <Input
+                                                                type="number"
+                                                                min='0'
+                                                                name="minMonthsOfStock"
+                                                                id="minMonthsOfStock"
+                                                                bsSize="sm"
+                                                                valid={!errors.minMonthsOfStock}
+                                                                invalid={touched.minMonthsOfStock && !!errors.minMonthsOfStock}
+                                                                value={this.state.minMonthsOfStock}
+                                                                placeholder='Minimum month of stock'
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            />
+                                                            <FormFeedback className="red">{errors.minMonthsOfStock}</FormFeedback>
+                                                        </FormGroup>
+
+                                                        <FormGroup className="col-md-6 mt-md-4">
+                                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
+                                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                            &nbsp;
 
                                      </FormGroup></Row>
                                                 </Form>
@@ -465,8 +495,10 @@ class AddprogramPlanningUnit extends Component {
                                             <th className="text-left"> {i18n.t('static.program.program')} </th>
                                             <th className="text-left"> {i18n.t('static.planningunit.planningunit')}</th>
                                             <th className="text-left"> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
+                                            <th className="text-left">Minimum month of stock</th>
                                             <th className="text-left">{i18n.t('static.common.status')}</th>
                                             <th className="text-left">{i18n.t('static.common.update')}</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -481,6 +513,9 @@ class AddprogramPlanningUnit extends Component {
                                                     </td>
                                                     <td>
                                                         {this.state.rows[idx].reorderFrequencyInMonths}
+                                                    </td>
+                                                    <td>
+                                                        {this.state.rows[idx].minMonthsOfStock}
                                                     </td>
                                                     <td>
                                                         <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
