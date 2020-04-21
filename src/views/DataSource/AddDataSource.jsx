@@ -87,7 +87,7 @@ export default class AddDataSource extends Component {
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
         this.getDataSourceTypeByRealmId = this.getDataSourceTypeByRealmId.bind(this);
         this.getProgramByRealmId = this.getProgramByRealmId.bind(this);
     }
@@ -169,7 +169,7 @@ export default class AddDataSource extends Component {
     }
 
     getDataSourceTypeByRealmId(e) {
-        
+
         AuthenticationService.setupAxiosInterceptors();
         DataSourceTypeService.getDataSourceTypeByRealmId(e.target.value)
             .then(response => {
@@ -339,7 +339,7 @@ export default class AddDataSource extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.realm.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
@@ -374,6 +374,7 @@ export default class AddDataSource extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
+                                                            value={this.state.program.id}
                                                         >
                                                             <option value="0">{i18n.t('static.common.select')}</option>
                                                             {programList}
@@ -392,6 +393,7 @@ export default class AddDataSource extends Component {
                                                             invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.dataSourceType.id}
                                                             required
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
@@ -404,6 +406,7 @@ export default class AddDataSource extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 
@@ -426,6 +429,22 @@ export default class AddDataSource extends Component {
 
     cancelClicked() {
         this.props.history.push(`/dataSource/listDataSource/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+
+        this.state.label.label_en = ''
+        this.state.dataSourceType.id = ''
+        this.state.realm.id = ''
+        this.state.program.id = ''
+
+        let { dataSource } = this.state
+        this.setState(
+            {
+                dataSource
+            }
+        )
+
     }
 
 }

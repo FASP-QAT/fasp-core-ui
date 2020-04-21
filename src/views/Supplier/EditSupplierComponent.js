@@ -66,6 +66,7 @@ class EditSupplierComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
     Capitalize(str) {
         if (str != null && str != "") {
@@ -265,6 +266,7 @@ class EditSupplierComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -285,6 +287,36 @@ class EditSupplierComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/supplier/listSupplier/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        SupplierService.getSupplierById(this.props.match.params.supplierId).then(response => {
+            this.setState({
+                supplier: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
+        );
     }
 }
 

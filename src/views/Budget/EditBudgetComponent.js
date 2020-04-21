@@ -95,6 +95,8 @@ class EditBudgetComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        // console.log(this.state);
 
     }
 
@@ -410,6 +412,7 @@ class EditBudgetComponent extends Component {
                                                     <FormGroup>
 
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -430,6 +433,35 @@ class EditBudgetComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        BudgetService.getBudgetDataById(this.props.match.params.budgetId)
+            .then(response => {
+                response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                this.setState({
+                    budget: response.data
+                });
+            })
+            .catch(
+                error => {
+                    switch (error.message) {
+                        case "Network Error":
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                        default:
+                            this.setState({
+                                message: error.message
+                            })
+                            break
+                    }
+                }
+            );
+
     }
 }
 

@@ -839,11 +839,13 @@ class RealmCountry extends Component {
                                                 <td>
                                                     {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
-                                                <td className="forInlinebtnMapping">
+                                                <td>
                                                     {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                    <div  className="forInlinebtnMapping">
                                                     <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
 
                                                     <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                                    </div>
                                                 </td>
                                             </tr>)
 

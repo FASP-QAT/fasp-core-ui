@@ -81,7 +81,7 @@ export default class UpdateDataSourceComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     dataChange(event) {
@@ -248,7 +248,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='realmForm'>
                                                 <CardBody>
-                                        
+
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.realm.realmName')}</Label>
                                                         <Input type="text"
@@ -359,6 +359,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -371,6 +372,36 @@ export default class UpdateDataSourceComponent extends Component {
                     </Col>
                 </Row>
             </div>
+        );
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmById(this.props.match.params.realmId).then(response => {
+            this.setState({
+                realm: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
         );
     }
 

@@ -16,6 +16,10 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/all`, {
         });
     }
+    getPlanningUnitByRealmId(json) {
+        return axios.get(`${API_URL}/api/planningUnit/realmId/${json}`, {}
+        );
+    }
 
     editPlanningUnit(json) {
         return axios.put(`${API_URL}/api/planningUnit/`, json, {}

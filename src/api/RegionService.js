@@ -4,7 +4,7 @@ import { API_URL } from '../Constants.js';
 class RegionService {
 
     addRegion(json) {
-        return axios.post(`${API_URL}/api/region/`, json, {}
+        return axios.put(`${API_URL}/api/region/`, json, {}
         );
     }
 

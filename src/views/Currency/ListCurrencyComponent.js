@@ -115,6 +115,14 @@ export default class CurrencyListComponent extends Component {
         );
         const columns = [
             {
+                dataField: 'label',
+                text: i18n.t('static.currency.currency'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.formatLabel
+            },
+            {
                 dataField: 'currencyCode',
                 text: i18n.t('static.currency.currencycode'),
                 sort: true,
@@ -127,14 +135,6 @@ export default class CurrencyListComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
-            },
-            {
-                dataField: 'label',
-                text: i18n.t('static.currency.currency'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center',
-                formatter: this.formatLabel
             },
             {
                 dataField: 'conversionRateToUsd',

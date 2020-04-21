@@ -546,10 +546,18 @@ label.arrow_label:after {
   }
 
 
-  // .forInlinebtnMapping{justify-content: space-between;
-  //   padding-top: 10px !important; display: flex;}
+  // .forInlinebtnMapping{ display: flex;}
+  .forInlinebtnMapping .btn-info{color: #fff !important;margin-left: .2rem;}
+  .forInlinebtnMapping{display: flex;  justify-content: center;
+  }
+  .forInlinebtnMappinglistRealm{display: flex; justify-content: center;    width: 235px;
+  }
+  .updateTextwhitebtn .btn-info{color: #fff!important;}
 
+  // .forbtnMapping .mapUnitbtn{width: 140px !important;}
+  // .forbtnMapping .mapRegionbtn{width: 110px !important;}
 
+ 
 
 
 
