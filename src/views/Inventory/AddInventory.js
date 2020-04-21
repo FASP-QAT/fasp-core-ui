@@ -23,10 +23,46 @@ export default class AddInventory extends Component {
         this.addRow = this.addRow.bind(this);
     }
     componentDidMount() {
+        var db1;
+        var openRequest = indexedDB.open('fasp', 1);
+        var dataSourceList = []
+        var regionList = []
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+            var dataSourceRequest = dataSourceOs.getAll();
+            dataSourceRequest.onsuccess = function (event) {
+                var dataSourceResult = [];
+                dataSourceResult = dataSourceRequest.result;
+                for (var k = 0; k < dataSourceResult.length; k++) {
+                    var dataSourceJson = {
+                        name: dataSourceResult[k].label.label_en,
+                        id: dataSourceResult[k].dataSourceId
+                    }
+                    dataSourceList[k] = dataSourceJson
+                }
+            }
+            var regionTransaction = db1.transaction(['region'], 'readwrite');
+            var regionOs = regionTransaction.objectStore('region');
+            var regionRequest = regionOs.getAll();
+            regionRequest.onsuccess = function (event) {
+                var regionResult = [];
+                regionResult = regionRequest.result;
+                for (var k = 0; k < regionResult.length; k++) {
+                    var regionJson = {
+                        name: regionResult[k].label.label_en,
+                        id: regionResult[k].regionId
+                    }
+                    regionList[k] = regionJson
+                }
+            }
+        }
         this.el = jexcel(document.getElementById("inventorytableDiv"), '');
         this.el.destroy();
         var json = [];
         var data = [[], [], [], [], [], [], [], [], [], []];
+        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
         // json[0] = data;
         var options = {
             data: data,
@@ -79,18 +115,19 @@ export default class AddInventory extends Component {
                 ],
             ],
             columnDrag: true,
-            colWidths: [100, 100, 100, 100, 100, 180, 180, 180, 180, 180, 180, 180, 180, 100],
+            colWidths: [110, 110, 100, 100, 100, 180, 180, 180, 180, 180, 180, 180, 180, 100],
             columns: [
                 // { title: 'Month', type: 'text', readOnly: true },
                 {
                     title: 'Data source',
                     type: 'dropdown',
-                    source: ['Data source1', 'Data source2', 'Data source3']
+                    source: dataSourceList
                 },
                 {
                     title: 'Region',
-                    type: 'text',
-                    readOnly: true
+                    type: 'dropdown',
+                    source: regionList
+                    // readOnly: true
                 },
                 {
                     title: 'Country SKU',
