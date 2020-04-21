@@ -137,14 +137,15 @@ class PlanningUnitCountry extends Component {
         } else {
             document.getElementById('planningUnitId').disabled = true;
             initialValues = {
-               
-                planningUnit: {
-                    planningUnitId: this.state.rows[idx].planningUnit.planningUnitId,
+                planningUnitId:this.state.rows[idx].planningUnit.id,
+                planningUnit:{
+                    id: this.state.rows[idx].planningUnit.id,
                     label: {
                         label_en: this.state.rows[idx].planningUnit.label.label_en
                     }
-                }
-                , label: { label_en: this.state.rows[idx].label.label_en },
+                },
+                label:this.state.rows[idx].label.label_en ,
+                // , label: { label_en: this.state.rows[idx].label.label_en },
                 skuCode: this.state.rows[idx].skuCode,
                 unit: {
                     unitId: this.state.rows[idx].unit.unitId,
@@ -152,16 +153,14 @@ class PlanningUnitCountry extends Component {
                         label_en: this.state.rows[idx].unit.label.label_en
                     }
                 },
+                unitId:this.state.rows[idx].unit.unitId,
                 multiplier: this.state.rows[idx].multiplier,
-
                 gtin: this.state.rows[idx].gtin,
                 active: this.state.rows[idx].active
-
-
             }
             const rows = [...this.state.rows]
             this.setState({
-               
+
                 planningUnit: {
                     planningUnitId: this.state.rows[idx].planningUnit.id,
                     label: {
@@ -457,9 +456,11 @@ class PlanningUnitCountry extends Component {
                         </CardHeader>
                         <CardBody>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+                                    console.log("values",values)
                                     console.log(this.state.planningUnit.planningUnitId + " " + this.state.label.label_en + " " + this.state.skuCode + " " + this.state.unit.unitId + " " + this.state.multiplier + " ")
                                     if (this.state.realmCountry.realmCountryId != "" && this.state.label.label_en != "" && this.state.skuCode != "" && this.state.unit.unitId != "" && this.state.multiplier != "") {
                                         var json =
@@ -640,7 +641,7 @@ class PlanningUnitCountry extends Component {
                                         </FormGroup>
 
                                         <FormGroup>
-                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
                 </FormGroup></Form>)} />

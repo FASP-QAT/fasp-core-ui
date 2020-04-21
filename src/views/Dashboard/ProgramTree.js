@@ -37,6 +37,7 @@ class Program extends Component {
         CountryService.getCountryListActive()
             .then(response => {
                 if (response.status == 200) {
+                    console.loading("RealmCountry",response.data)
                     this.setState({
                         countryList: response.data
                     })
@@ -179,7 +180,7 @@ class Program extends Component {
                                                                             <label htmlFor={"c1-".concat(item.countryId).concat(item1.healthAreaId)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
                                                                             <ul>
                                                                                 {
-                                                                                    this.state.prgList.filter(c => c.realmCountry.country.countryId == item.countryId).filter(c => c.healthArea.healthAreaId == item1.healthAreaId).map(item2 => (
+                                                                                    this.state.prgList.filter(c => c.realmCountry.country.countryId == item.countryId).filter(c => c.healthArea.id == item1.healthAreaId).map(item2 => (
                                                                                         <li>
                                                                                             <span className="tree_label">
                                                                                                 <span className="">
@@ -193,19 +194,21 @@ class Program extends Component {
                                                                                             <label className="arrow_label" htmlFor={"fpm".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId)}></label>
                                                                                             <ul>
                                                                                                 {
-                                                                                                    this.state.versionList.filter(c => c.programId == item2.programId).map(item3 => (
+                                                                                                    this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
+                                                                                                        (item3.versionList).map(item4=>(
 
                                                                                                         <li><span className="tree_label">
                                                                                                             <span className="">
                                                                                                                 <div className="checkbox m-0">
-                                                                                                                    <input type="checkbox" value={item3.id} name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item3.id)} />
-                                                                                                                    <label htmlFor={"kf-v".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item3.id)}>{item3.name}</label>
+                                                                                                                    <input type="checkbox" value={item4.versionId} name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)} />
+                                                                                                                    <label htmlFor={"kf-v".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)}>{"V~".concat(item4.versionId)}</label>
                                                                                                                 </div>
                                                                                                             </span>
                                                                                                         </span>
                                                                                                         </li>
 
-                                                                                                    ))}
+                                                                                                        ))                                                                                                    
+))}
                                                                                             </ul>
                                                                                         </li>
 
