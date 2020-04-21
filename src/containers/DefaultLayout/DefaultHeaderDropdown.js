@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Progress } from 'reactstrap';
+import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownToggle,ListGroup,ListGroupItem, Progress } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Online } from "react-detect-offline";
 import i18n from '../../i18n';
@@ -79,18 +79,22 @@ class DefaultHeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+                 <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+          {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
+            <i class="icon-settings icon-anim-pulse text-primary"></i>
+        </button> */}
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>Settings</strong></DropdownItem>
           <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> {i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
-          {/* <DropdownItem><i className="fa fa-shield"></i> Language</DropdownItem> */}
-          <DropdownItem onClick={this.props.onLogout}><i className="fa fa-lock"></i> Logout</DropdownItem>
-          {/*<DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>*/}
+          <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i> Logout</DropdownItem>
         </DropdownMenu>
       </Dropdown>
     );
   }
+
+
+  
 
   dropTasks() {
     const itemsCount = 15;

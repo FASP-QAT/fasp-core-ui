@@ -670,8 +670,13 @@ realmCountryPlanningUnitId:'',
                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>
                                         </FormGroup>
 
+<<<<<<< HEAD
                                         <FormGroup className="col-md-6 mt-md-4">
                                             <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+=======
+                                        <FormGroup>
+                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+>>>>>>> dev
                                             &nbsp;
                                            
  </FormGroup></Row></Form>)} />
