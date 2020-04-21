@@ -526,5 +526,13 @@
     "static.dashboad.regioncountry":"Realm Country Region",
     "static.mapProcurementUnit.mappedRowAlreadyExistsInUpdate":"One Of the mapped row is already in update.",
     "static.procurementUnit.validMaxValueText":"Maximum 14 characters are allowed.",
-    "static.procurementUnit.onlyalphaNumericText":"Only alpha numeric values are allowed."
+    "static.procurementUnit.onlyalphaNumericText":"Only alpha numeric values are allowed.",
+    "static.realmcountry.airFreightPercentagetext": "Enter Air Freight Percentage",
+    "static.realmcountry.seaFreightPercentagetext": "Enter Sea Freight Percentage",
+    "static.realmcountry.shippedToArrivedAirLeadTimetext": "Enter Shipped To Arrived Air LeadTime",
+    "static.realmcountry.shippedToArrivedSeaLeadTimetext": "Enter Shipped To Arrived Sea LeadTime",
+    "static.realmcountry.arrivedToDeliveredLeadTimetext": "Enter Arrived To Delivered Lead Time",
+    "static.realm.mapcountry":"Map Country"
+    
+
 }

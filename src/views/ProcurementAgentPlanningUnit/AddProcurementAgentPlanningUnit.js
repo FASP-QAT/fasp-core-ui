@@ -245,7 +245,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     setTextAndValue = (event) => {
 
         if (event.target.name === 'skuCode') {
-            this.setState({ skuCode: event.target.value });
+            this.setState({ skuCode: event.target.value.toUpperCase() });
         }
         if (event.target.name === 'catalogPrice') {
             this.setState({ catalogPrice: event.target.value });

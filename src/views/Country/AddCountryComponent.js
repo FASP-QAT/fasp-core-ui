@@ -67,9 +67,9 @@ export default class AddCountryComponent extends Component {
                 countryCode: '',
                 label: {
                     label_en: '',
-                    label_fr:'',
-                    label_sp:'',
-                    label_pr:''
+                    label_fr: '',
+                    label_sp: '',
+                    label_pr: ''
                 },
                 currency: {
                     id: ''
@@ -87,6 +87,7 @@ export default class AddCountryComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     dataChange(event) {
@@ -228,7 +229,7 @@ export default class AddCountryComponent extends Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -375,6 +376,7 @@ export default class AddCountryComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -393,6 +395,22 @@ export default class AddCountryComponent extends Component {
 
     cancelClicked() {
         this.props.history.push(`/country/listCountry/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { country } = this.state
+        country.label.label_en = ''
+        country.countryCode = ''
+        country.currency.id = ''
+        country.language.languageId = ''
+
+        this.setState(
+            {
+                country
+            }, () => {
+
+            }
+        )
     }
 
 }

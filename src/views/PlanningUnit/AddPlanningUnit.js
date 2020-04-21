@@ -78,7 +78,7 @@ export default class AddPlanningUnit extends Component {
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
@@ -289,6 +289,7 @@ export default class AddPlanningUnit extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
+                                                            value={this.state.planningUnit.forecastingUnit.forecastingUnitId}
                                                              >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {forecastingUnitList}
@@ -306,6 +307,7 @@ export default class AddPlanningUnit extends Component {
                                                             invalid={touched.unitId && !!errors.unitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.planningUnit.unit.id}
                                                             required>
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {unitList}
@@ -336,7 +338,7 @@ export default class AddPlanningUnit extends Component {
                                                             invalid={touched.multiplier && !!errors.multiplier}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e);  }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.multiplier}
+                                                            value={this.state.planningUnit.multiplier}
                                                             required />
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
@@ -346,6 +348,7 @@ export default class AddPlanningUnit extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 
@@ -368,6 +371,21 @@ export default class AddPlanningUnit extends Component {
 
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked(){
+        let { planningUnit } = this.state
+        
+            planningUnit.label.label_en = ''       
+            planningUnit.forecastingUnit.forecastingUnitId = ''
+            planningUnit.unit.id = ''
+            planningUnit.multiplier = ''
+      
+        this.setState(
+            {
+                planningUnit
+            }
+        )
     }
 
 }
