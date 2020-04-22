@@ -536,7 +536,7 @@
     "static.program.version":"V~",
     "static.program.errorSelectAtleastOneProgram":"Please select atleast one program for download.",
     "static.program.errorSelectProgramIfYouSelectVersion":"Please select program if you are selecting version.",
-    "static.common.download":"Download"
+    "static.common.download":"Download",
     "static.dashboard.report":"Reports",
     "static.dashboard.productcatalog":"Product Catalog",
     "static.common.issync":"Sync online coversion rate"
