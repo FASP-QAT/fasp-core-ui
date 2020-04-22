@@ -54,7 +54,7 @@ class DefaultLayout extends Component {
             <Suspense>
 
               <Online>
-                <AppSidebarNav navConfig={{
+                <AppSidebarNav  navConfig={{
                   items:
                     [
                       {
