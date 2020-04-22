@@ -553,6 +553,12 @@ label.arrow_label:after {
   .forInlinebtnMappinglistRealm{display: flex; justify-content: center;    width: 235px;
   }
   .updateTextwhitebtn .btn-info{color: #fff!important;}
+  // .select_sorting{position: absolute;bottom: 79px;}
+  // .bottom_entries{margin-left: 4rem;}
+  .jexcel_filter div{margin-left: auto;}
+  .f-End{padding-right: 18px !important;}
+ 
+ 
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}
@@ -641,6 +647,7 @@ label.arrow_label:after {
     margin: 0 auto;
     // margin-left: 2%;
   }
+ 
 }
 
 @media (max-width: 489px) {
@@ -835,6 +842,7 @@ a:hover {
   .sidebar .nav-link {
     padding: 0.75rem 0.2rem !important;
   }
+  .f-End{    justify-content: flex-end !important}
 }
 /////
 h5,
