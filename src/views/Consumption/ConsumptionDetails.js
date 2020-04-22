@@ -34,6 +34,7 @@ export default class ConsumptionDetails extends React.Component {
         this.getConsumptionData = this.getConsumptionData.bind(this);
         this.saveData = this.saveData.bind(this)
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
+        this.formSubmit = this.formSubmit.bind(this);
     }
 
     componentDidMount = function () {
@@ -44,8 +45,8 @@ export default class ConsumptionDetails extends React.Component {
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['program'], 'readwrite');
-            var program = transaction.objectStore('program');
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -57,14 +58,12 @@ export default class ConsumptionDetails extends React.Component {
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-
-                    if (myResult[i].programManager.userId == userId) {
-                        // var bytes = CryptoJS.AES.decrypt(myResult[i].label, SECRET_KEY);
-                        var programNameLabel = myResult[i].label;
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
-                            // name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                            name: getLabelText(programNameLabel, lan),
-                            id: myResult[i].programId
+                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            id: myResult[i].id
                         }
                         proList[i] = programJson
                     }
@@ -72,7 +71,10 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     programList: proList
                 })
+
             }.bind(this);
+
+
 
             var categoryTransaction = db1.transaction(['productCategory'], 'readwrite');
             var categoryOs = categoryTransaction.objectStore('productCategory');
@@ -95,122 +97,294 @@ export default class ConsumptionDetails extends React.Component {
                     categoryList: catList
                 })
             }.bind(this);
+
+
+
         }.bind(this)
 
 
-        this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
-        this.el.destroy();
-        var json = [];
-        var data = [[], [], [], [], [], [], [], [], [], []];
-        // var data = [[]];
-        // json[0] = data;
-        var options = {
-            data: data,
-            // colHeaders: [
-            //     "Month",
-            //     "Region",
-            //     "Data source",
-            //     "Country SKU",
-            //     "SKU Code",
-            //     "Conversion units",
-            //     "Quantity",
-            //     "Planning Unit Qty",
-            //     "Quantity",
-            //     "Planning Unit Qty",
-            //     "Quantity",
-            //     "Planning Unit Qty",
-            //     "Quantity",
-            //     "Planning Unit Qty",
-            //     "Notes",
-            //     "Create date",
-            //     "Created By",
-            //     "Last Modified date",
-            //     "Last Modified by"
-            // ],
-            // nestedHeaders: [
-            //     [
-            //         {
-            //             title: '',
-            //             colspan: '5',
-            //         },
-            //         {
-            //             title: 'Expected Stock',
-            //             colspan: '2'
-            //         },
-            //         {
-            //             title: 'Manual Adjustment',
-            //             colspan: '2'
-            //         }, {
-            //             title: 'Actual Stock count',
-            //             colspan: '2'
-            //         },
-            //         {
-            //             title: 'Final Adjustment',
-            //             colspan: '2'
-            //         },
-            //         {
-            //             title: '',
-            //             colspan: '1',
-            //         }
-            //     ],
-            // ],
-            columnDrag: true,
-            colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
-            columns: [
-                // { title: 'Month', type: 'text', readOnly: true },
-                {
-                    title: 'Data source',
-                    type: 'dropdown',
-                    source: ['Data source1', 'Data source2', 'Data source3']
-                },
-                {
-                    title: 'Region',
-                    type: 'text',
-                    readOnly: true
-                },
-                {
-                    title: 'Quantity',
-                    type: 'text'
-                },
-                {
-                    title: 'Days of Stock out',
-                    type: 'text'
-                },
-                {
-                    title: 'StartDate',
-                    type: 'text'
-                },
-                {
-                    title: 'StopDate',
-                    type: 'text'
-                },
-                {
-                    title: 'Consumption Quantity',
-                    type: 'text'
-                },
-                {
-                    title: 'Notes',
-                    type: 'text'
-                },
-                
-                
-                // { title: 'Create date', type: 'text', readOnly: true },
-                // { title: 'Created By', type: 'text', readOnly: true },
-                // { title: 'Last Modified date', type: 'text', readOnly: true },
-                // { title: 'Last Modified by', type: 'text', readOnly: true }
-            ],
-            pagination: false,
-            search: true,
-            columnSorting: true,
-            tableOverflow: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false
-        };
-
-        this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
     };
+
+    // formSubmit() {
+    //     var programId = document.getElementById('programId').value;
+    //     this.setState({ programId: programId });
+
+    //     const lan = 'en';
+    //     var db1;
+    //     getDatabase();
+    //     var openRequest = indexedDB.open('fasp', 1);
+
+    //     this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
+    //     this.el.destroy();
+    //     var json = [];
+    //     var data = [[], [], [], [], [], [], [], [], [], []];
+    //     // var data = [[]];
+    //     // json[0] = data;
+    //     var options = {
+    //         data: data,
+    //         // colHeaders: [
+    //         //     "Month",
+    //         //     "Region",
+    //         //     "Data source",
+    //         //     "Country SKU",
+    //         //     "SKU Code",
+    //         //     "Conversion units",
+    //         //     "Quantity",
+    //         //     "Planning Unit Qty",
+    //         //     "Quantity",
+    //         //     "Planning Unit Qty",
+    //         //     "Quantity",
+    //         //     "Planning Unit Qty",
+    //         //     "Quantity",
+    //         //     "Planning Unit Qty",
+    //         //     "Notes",
+    //         //     "Create date",
+    //         //     "Created By",
+    //         //     "Last Modified date",
+    //         //     "Last Modified by"
+    //         // ],
+    //         // nestedHeaders: [
+    //         //     [
+    //         //         {
+    //         //             title: '',
+    //         //             colspan: '5',
+    //         //         },
+    //         //         {
+    //         //             title: 'Expected Stock',
+    //         //             colspan: '2'
+    //         //         },
+    //         //         {
+    //         //             title: 'Manual Adjustment',
+    //         //             colspan: '2'
+    //         //         }, {
+    //         //             title: 'Actual Stock count',
+    //         //             colspan: '2'
+    //         //         },
+    //         //         {
+    //         //             title: 'Final Adjustment',
+    //         //             colspan: '2'
+    //         //         },
+    //         //         {
+    //         //             title: '',
+    //         //             colspan: '1',
+    //         //         }
+    //         //     ],
+    //         // ],
+    //         columnDrag: true,
+    //         colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
+    //         columns: [
+    //             // { title: 'Month', type: 'text', readOnly: true },
+    //             {
+    //                 title: 'Data source',
+    //                 type: 'dropdown',
+    //                 source: ['Data source1', 'Data source2', 'Data source3']
+    //             },
+    //             {
+    //                 title: 'Region',
+    //                 type: 'dropdown',
+    //                 source: ['Data source1', 'Data source2', 'Data source3']
+    //             },
+    //             {
+    //                 title: 'Quantity',
+    //                 type: 'text'
+    //             },
+    //             {
+    //                 title: 'Days of Stock out',
+    //                 type: 'text'
+    //             },
+    //             {
+    //                 title: 'StartDate',
+    //                 type: 'calendar'
+    //             },
+    //             {
+    //                 title: 'StopDate',
+    //                 type: 'calendar'
+    //             },
+    //             {
+    //                 title: 'Consumption Quantity',
+    //                 type: 'text'
+    //             },
+    //             {
+    //                 title: 'Active',
+    //                 type: 'checkbox'
+    //             },
+
+
+    //             // { title: 'Create date', type: 'text', readOnly: true },
+    //             // { title: 'Created By', type: 'text', readOnly: true },
+    //             // { title: 'Last Modified date', type: 'text', readOnly: true },
+    //             // { title: 'Last Modified by', type: 'text', readOnly: true }
+    //         ],
+    //         pagination: false,
+    //         search: true,
+    //         columnSorting: true,
+    //         tableOverflow: true,
+    //         wordWrap: true,
+    //         allowInsertColumn: false,
+    //         allowManualInsertColumn: false,
+    //         allowDeleteRow: false
+    //     };
+
+    //     this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
+    // }
+
+
+    //2
+    formSubmit() {
+        var programId = document.getElementById('programId').value;
+        this.setState({ programId: programId });
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+
+        var dataSourceList = []
+        var regionList = []
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+            var dataSourceRequest = dataSourceOs.getAll();
+            dataSourceRequest.onsuccess = function (event) {
+                var dataSourceResult = [];
+                dataSourceResult = dataSourceRequest.result;
+                for (var k = 0; k < dataSourceResult.length; k++) {
+                    var dataSourceJson = {
+                        name: dataSourceResult[k].label.label_en,
+                        id: dataSourceResult[k].dataSourceId
+                    }
+                    dataSourceList[k] = dataSourceJson
+                }
+            }
+
+            var regionTransaction = db1.transaction(['region'], 'readwrite');
+            var regionOs = regionTransaction.objectStore('region');
+            var regionRequest = regionOs.getAll();
+            regionRequest.onsuccess = function (event) {
+                var regionResult = [];
+                regionResult = regionRequest.result;
+                for (var k = 0; k < regionResult.length; k++) {
+                    var regionJson = {
+                        name: regionResult[k].label.label_en,
+                        id: regionResult[k].regionId
+                    }
+                    regionList[k] = regionJson
+                }
+            }
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                // Get inventory data from program
+                var consumptionList = programJson.consumptionList;
+                // var consumptionDataList = [];
+                // var consumptionDataArr = [];
+                // for (var i = 0; i < programProductList.length; i++) {
+                //     if (programProductList[i].product.productId == this.state.productId) {
+                //         consumptionDataList = programProductList[i].product.consumptionData;
+                //     }
+                // }
+                this.setState({
+                    consumptionList: consumptionList
+                });
+
+                var data = [];
+                var consumptionDataArr = []
+                if (consumptionList.length == 0) {
+                    data = [];
+                    consumptionDataArr[0] = data;
+                }
+                for (var j = 0; j < consumptionList.length; j++) {
+                    data = [];
+                    data[0] = consumptionList[j].dataSource.id;
+                    data[1] = consumptionList[j].region.id;
+                    data[2] = consumptionList[j].consumptionQty;
+                    data[3] = consumptionList[j].dayOfStockOut;
+                    data[4] = consumptionList[j].startDate;
+                    data[5] = consumptionList[j].stopDate;
+                    data[7] = consumptionList[j].active;
+
+                    consumptionDataArr[j] = data;
+                }
+
+                this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
+                this.el.destroy();
+                var json = [];
+                var data = consumptionDataArr;
+                // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                // json[0] = data;
+                var options = {
+                    data: data,
+                    columnDrag: true,
+                    colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
+                    columns: [
+                        // { title: 'Month', type: 'text', readOnly: true },
+                        {
+                            title: 'Data source',
+                            type: 'dropdown',
+                            source: dataSourceList
+                        },
+                        {
+                            title: 'Region',
+                            type: 'dropdown',
+                            source: regionList
+                        },
+                        {
+                            title: 'Consumption Quantity',
+                            type: 'text'
+                        },
+                        {
+                            title: 'Days of Stock out',
+                            type: 'text'
+                        },
+                        {
+                            title: 'StartDate',
+                            type: 'calendar'
+                        },
+                        {
+                            title: 'StopDate',
+                            type: 'calendar'
+                        },
+                        {
+                            title: 'Active',
+                            type: 'checkbox'
+                        },
+
+
+                        // { title: 'Create date', type: 'text', readOnly: true },
+                        // { title: 'Created By', type: 'text', readOnly: true },
+                        // { title: 'Last Modified date', type: 'text', readOnly: true },
+                        // { title: 'Last Modified by', type: 'text', readOnly: true }
+                    ],
+                    pagination: 10,
+                    search: true,
+                    columnSorting: true,
+                    tableOverflow: true,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    onchange: this.changed
+                };
+
+                this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
+            }.bind(this)
+        }.bind(this)
+    }
+
+
+
+
+
+
+
+
 
     addRow = function () {
         // document.getElementById("saveButtonDiv").style.display = "block";
@@ -591,7 +765,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 bsSize="sm"
                                                                 value={this.state.programId}
                                                                 name="programId" id="programId"
-                                                            // onChange={(e) => { this.getPlanningUnitList(e) }}
+                                                                onChange={(e) => { this.getPlanningUnitList(e) }}
                                                             >
                                                                 <option value="0">Please select</option>
                                                                 {programs}
@@ -795,7 +969,7 @@ export default class ConsumptionDetails extends React.Component {
                 myResult = planningunitRequest.result;
                 console.log("myResult", myResult);
                 var programId = document.getElementById("programId").value;
-                console.log(programId)
+                console.log('programId----->>>',programId)
                 console.log(myResult);
                 // for (var i = 0; i < myResult.length; i++) {
                 //     if (myResult[i].planning.productCategoryId == programId) {
