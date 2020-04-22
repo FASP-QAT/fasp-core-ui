@@ -452,7 +452,7 @@ realmCountryPlanningUnitId:'',
         return (<div className="animated fadeIn">
             <h5>{i18n.t(this.state.message)}</h5>
             <Row>
-                <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
                         <CardHeader>
                             <strong>{i18n.t('static.dashboad.planningunitcountry')}</strong>
@@ -558,7 +558,8 @@ realmCountryPlanningUnitId:'',
                                         isValid,
                                         setTouched
                                     }) => (<Form onSubmit={handleSubmit} noValidate name='countryForm'>
-                                        <FormGroup>
+                                        <Row>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.dashboard.realmcountry')}</Label>
                                             <Input
                                                 type="text"
@@ -576,7 +577,8 @@ realmCountryPlanningUnitId:'',
                                             </Input>
                                         </FormGroup><FormGroup>
                                         <Input type="hidden" name="realmCountryPlanningUnitId" id="realmCountryPlanningUnitId" value={this.state.realmCountryPlanningUnitId}>
-                                       </Input></FormGroup> <FormGroup>
+                                       </Input></FormGroup> 
+                                       <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <Input type="select" name="planningUnitId" id="planningUnitId" bsSize="sm"
                                                 valid={!errors.planningUnitId}
@@ -588,7 +590,7 @@ realmCountryPlanningUnitId:'',
                                                 {planningUnitList}
                                             </Input> <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="label">{i18n.t('static.planningunit.countrysku')}</Label>
                                             <Input type="text"
                                                 name="label"
@@ -602,7 +604,7 @@ realmCountryPlanningUnitId:'',
                                                 required />
                                             <FormFeedback className="red">{errors.label}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
                                             <Input type="text"
                                                 name="skuCode"
@@ -617,7 +619,7 @@ realmCountryPlanningUnitId:'',
                                             <FormFeedback className="red">{errors.skuCode}</FormFeedback>
 
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
                                             <Input
                                                 type="select"
@@ -635,7 +637,7 @@ realmCountryPlanningUnitId:'',
                                             </Input>
                                             <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="multiplier">{i18n.t('static.unit.multiplier')}</Label>
                                             <Input type="number"
                                                 name="multiplier"
@@ -649,7 +651,7 @@ realmCountryPlanningUnitId:'',
                                                 required />
                                             <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
                                             <Input
 
@@ -668,11 +670,11 @@ realmCountryPlanningUnitId:'',
                                             <FormFeedback className="red">{errors.gtin}</FormFeedback>
                                         </FormGroup>
 
-                                        <FormGroup>
-                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                        <FormGroup className="col-md-6 mt-md-4">
+                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
                                            
- </FormGroup></Form>)} />
+ </FormGroup></Row></Form>)} />
  <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 

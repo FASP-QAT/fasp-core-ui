@@ -92,6 +92,15 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('planningUnit')) {
             storeOS = db1.createObjectStore('planningUnit', { keyPath: 'planningUnitId', autoIncrement: true });
         }
+        if (!db1.objectStoreNames.contains('forecastingUnit')) {
+            storeOS = db1.createObjectStore('forecastingUnit', { keyPath: 'forecastingUnitId', autoIncrement: true });
+        }
+        if (!db1.objectStoreNames.contains('procurementUnit')) {
+            storeOS = db1.createObjectStore('procurementUnit', { keyPath: 'procurementUnitId', autoIncrement: true });
+        }
+        if (!db1.objectStoreNames.contains('realmCountryPlanningUnit')) {
+            storeOS = db1.createObjectStore('realmCountryPlanningUnit', { keyPath: 'realmCountryPlanningUnitId', autoIncrement: true });
+        }
     };
 }
 

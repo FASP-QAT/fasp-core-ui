@@ -150,11 +150,11 @@ class ListProcurementAgentComponent extends Component {
     }
     buttonFormatter(cell, row) {
         console.log("button formater cell-----------", cell);
-        return <Button type="button" size="md" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
     }
 
     buttonFormatterForProcurementUnit(cell, row) {
-        return <Button type="button" size="md" color="success" onClick={(event) => this.addProcurementUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addProcurementUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
