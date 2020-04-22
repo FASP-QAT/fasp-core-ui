@@ -107,6 +107,7 @@ export default class ExportProgram extends Component {
     formSubmit() {
         var zip = new JSZip();
         var programId = this.state.programId;
+        console.log("ProgramId",programId)
         var db1;
         var storeOS;
         getDatabase();
@@ -126,7 +127,8 @@ export default class ExportProgram extends Component {
                     for (var j = 0; j < programId.length; j++) {
                         if (myResult[i].id == programId[j].value) {
                             var txt = JSON.stringify(myResult[i]);
-                            zip.file(programId[i].label + "_" + parseInt(i + 1) + ".txt", txt);
+                            var labelName=(programId[j].label).replace("/","-")
+                            zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
                         }
                     }
                     if (i == myResult.length - 1) {

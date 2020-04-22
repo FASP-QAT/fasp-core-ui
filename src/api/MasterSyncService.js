@@ -101,6 +101,25 @@ class MasterSyncService {
         });
     }
 
+    getProcurementUnitForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/procurementUnit/${lastSyncDate}`, {
+        });
+    }
+
+    getPlanningUnitForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/planningUnit/${lastSyncDate}`, {
+        });
+    }
+
+    getForecastingUnitForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/forecastingUnit/${lastSyncDate}`, {
+        });
+    }
+
+    getRealmCountryPlanningUnitForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/realmCountry/1/planningUnit/all`, {}
+        );
+    }
 
 }
 export default new MasterSyncService()

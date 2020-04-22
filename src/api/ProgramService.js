@@ -2,8 +2,9 @@ import axios from "axios"
 import { API_URL } from '../Constants.js'
 
 class ProgramService {
-    getProgramData(programId) {
-        return axios.get(`${API_URL}/api/getProgramData?programId=${programId}`, {
+    getProgramData(json) {
+        console.log("Json",json)
+        return axios.get(`${API_URL}/api/programData/programId/${json.programId}/versionId/${json.versionId}`, {
         });
     }
 
