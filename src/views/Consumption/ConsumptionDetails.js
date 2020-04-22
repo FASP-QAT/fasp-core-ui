@@ -33,6 +33,7 @@ export default class ConsumptionDetails extends React.Component {
         this.getProductList = this.getProductList.bind(this);
         this.getConsumptionData = this.getConsumptionData.bind(this);
         this.saveData = this.saveData.bind(this)
+        this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
     }
 
     componentDidMount = function () {
@@ -95,11 +96,125 @@ export default class ConsumptionDetails extends React.Component {
                 })
             }.bind(this);
         }.bind(this)
+
+
+        this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
+        this.el.destroy();
+        var json = [];
+        var data = [[], [], [], [], [], [], [], [], [], []];
+        // var data = [[]];
+        // json[0] = data;
+        var options = {
+            data: data,
+            // colHeaders: [
+            //     "Month",
+            //     "Region",
+            //     "Data source",
+            //     "Country SKU",
+            //     "SKU Code",
+            //     "Conversion units",
+            //     "Quantity",
+            //     "Planning Unit Qty",
+            //     "Quantity",
+            //     "Planning Unit Qty",
+            //     "Quantity",
+            //     "Planning Unit Qty",
+            //     "Quantity",
+            //     "Planning Unit Qty",
+            //     "Notes",
+            //     "Create date",
+            //     "Created By",
+            //     "Last Modified date",
+            //     "Last Modified by"
+            // ],
+            // nestedHeaders: [
+            //     [
+            //         {
+            //             title: '',
+            //             colspan: '5',
+            //         },
+            //         {
+            //             title: 'Expected Stock',
+            //             colspan: '2'
+            //         },
+            //         {
+            //             title: 'Manual Adjustment',
+            //             colspan: '2'
+            //         }, {
+            //             title: 'Actual Stock count',
+            //             colspan: '2'
+            //         },
+            //         {
+            //             title: 'Final Adjustment',
+            //             colspan: '2'
+            //         },
+            //         {
+            //             title: '',
+            //             colspan: '1',
+            //         }
+            //     ],
+            // ],
+            columnDrag: true,
+            colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
+            columns: [
+                // { title: 'Month', type: 'text', readOnly: true },
+                {
+                    title: 'Data source',
+                    type: 'dropdown',
+                    source: ['Data source1', 'Data source2', 'Data source3']
+                },
+                {
+                    title: 'Region',
+                    type: 'text',
+                    readOnly: true
+                },
+                {
+                    title: 'Quantity',
+                    type: 'text'
+                },
+                {
+                    title: 'Days of Stock out',
+                    type: 'text'
+                },
+                {
+                    title: 'StartDate',
+                    type: 'text'
+                },
+                {
+                    title: 'StopDate',
+                    type: 'text'
+                },
+                {
+                    title: 'Consumption Quantity',
+                    type: 'text'
+                },
+                {
+                    title: 'Notes',
+                    type: 'text'
+                },
+                
+                
+                // { title: 'Create date', type: 'text', readOnly: true },
+                // { title: 'Created By', type: 'text', readOnly: true },
+                // { title: 'Last Modified date', type: 'text', readOnly: true },
+                // { title: 'Last Modified by', type: 'text', readOnly: true }
+            ],
+            pagination: false,
+            search: true,
+            columnSorting: true,
+            tableOverflow: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false
+        };
+
+        this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
     };
 
     addRow = function () {
         // document.getElementById("saveButtonDiv").style.display = "block";
-        // this.el.insertRow();
+        this.el.insertRow();
     };
 
     checkValidation() {
@@ -438,20 +553,20 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
 
-        const { categoryList } = this.state;
-        let categories = categoryList.length > 0
-            && categoryList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-        const { productList } = this.state;
-        let products = productList.length > 0
-            && productList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
+        // const { categoryList } = this.state;
+        // let categories = categoryList.length > 0
+        //     && categoryList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
+        // const { productList } = this.state;
+        // let products = productList.length > 0
+        //     && productList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.id}>{item.name}</option>
+        //         )
+        //     }, this);
         return (
             <>
                 <Col xs="12" sm="12">
@@ -476,12 +591,26 @@ export default class ConsumptionDetails extends React.Component {
                                                                 bsSize="sm"
                                                                 value={this.state.programId}
                                                                 name="programId" id="programId"
-                                                                onChange={(e) => { this.getPlanningUnitList(e) }}>
+                                                            // onChange={(e) => { this.getPlanningUnitList(e) }}
+                                                            >
                                                                 <option value="0">Please select</option>
                                                                 {programs}
                                                             </Input><br />
                                                         </Col>
                                                         <Col md="3">
+                                                            <br />
+                                                            <Label htmlFor="select">Planning Unit</Label><br />
+                                                            <Input type="select"
+                                                                bsSize="sm"
+                                                                value={this.state.planningUnitId}
+                                                                name="planningUnitId" id="planningUnitId"
+                                                            // onChange={(e) => { this.getProductList(e) }}
+                                                            >
+                                                                <option value="0">Please select</option>
+                                                                {/* {categories} */}
+                                                            </Input><br />
+                                                        </Col>
+                                                        {/* <Col md="3">
                                                             <br />
                                                             <Label htmlFor="select">Product category</Label><br />
                                                             <Input type="select"
@@ -503,7 +632,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 <option value="0">Please select</option>
                                                                 {products}
                                                             </Input><br />
-                                                        </Col>
+                                                        </Col> */}
                                                         <Col md="1">
                                                             <br /><br />
                                                             <FormGroup>
@@ -518,6 +647,20 @@ export default class ConsumptionDetails extends React.Component {
                                             </CardBody>
                                         </Form>
                                     )} />
+                    </Card>
+                </Col>
+                <Col xs="12" sm="12">
+                    <Card>
+                        <CardHeader>
+                            <strong>Consumption details</strong>
+                        </CardHeader>
+                        <CardBody>
+                            <div id="consumptiontableDiv" className="table-responsive">
+                            </div>
+                        </CardBody>
+                        <CardFooter>
+                            <input type='button' value='Add new row' onClick={() => this.addRow()}></input>
+                        </CardFooter>
                     </Card>
                 </Col>
             </>
