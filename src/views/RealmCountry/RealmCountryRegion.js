@@ -321,7 +321,7 @@ class RealmCountryRegion extends Component {
         return (<div className="animated fadeIn">
             <h5>{i18n.t(this.state.message)}</h5>
             <Row>
-                <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                     <Card>
                         <CardHeader>
                             <strong>{i18n.t('static.dashboad.regioncountry')}</strong>
@@ -381,7 +381,8 @@ class RealmCountryRegion extends Component {
                                         isValid,
                                         setTouched
                                     }) => (<Form onSubmit={handleSubmit} noValidate name='countryForm'>
-                                        <FormGroup>
+                                        <Row>
+                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.dashboard.realmcountry')}</Label>
                                             <Input
                                                 type="text"
@@ -397,7 +398,7 @@ class RealmCountryRegion extends Component {
                                                 >
                                             </Input>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="label">{i18n.t('static.region.region')}</Label>
                                             <Input type="text"
                                                 name="label"
@@ -411,7 +412,7 @@ class RealmCountryRegion extends Component {
                                                 required />
                                             <FormFeedback className="red">{errors.label}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}</Label>
                                             <Input type="number"
                                                 name="capacityCBM"
@@ -426,7 +427,7 @@ class RealmCountryRegion extends Component {
                                                 />
                                             <FormFeedback className="red">{errors.capacityCBM}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup>
+                                        <FormGroup className="col-md-6">
                                             <Label for="gln">{i18n.t('static.region.gln')}</Label>
                                             <Input
                                                 type="text"
@@ -444,11 +445,11 @@ class RealmCountryRegion extends Component {
                                             <FormFeedback className="red">{errors.gln}</FormFeedback>
                                         </FormGroup>
 
-                                        <FormGroup>
+                                        <FormGroup className="col-md-12">
                                             <Button type="submit" size="md" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
 
-                </FormGroup></Form>)} />
+                </FormGroup></Row></Form>)} />
                  <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
@@ -483,9 +484,11 @@ class RealmCountryRegion extends Component {
                                                 </td>
                                                 <td>
                                                     {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
+                                                    <div className="forInlinebtnMapping">
                                                     <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
-
-                                                    <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                            
+                                                    <UpdateButtonFeature  updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                                    </div>
                                                 </td>
                                            
                                             </tr>)
@@ -498,7 +501,7 @@ class RealmCountryRegion extends Component {
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                { <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                { <Button  type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
                         </FormGroup>
 

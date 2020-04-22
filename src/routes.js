@@ -122,7 +122,7 @@ const SubFundingSourceList = React.lazy(() => import('./views/SubFundingSource/L
 const AddProduct = React.lazy(() => import('./views/Product/AddProduct'));
 const ListProdct = React.lazy(() => import('./views/Product/ProductList'));
 const EditProdct = React.lazy(() => import('./views/Product/EditProduct'));
-const DownloadProgram = React.lazy(() => import('./views/Program/DownloadProgram'));
+const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
 const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
@@ -153,7 +153,7 @@ const ListCurrency = React.lazy(() => import('./views/Currency/ListCurrencyCompo
 const EditCurrency = React.lazy(() => import('./views/Currency/EditCurrencyComponent'));
 const DatabaseTranslation = React.lazy(() => import('./views/Translations/DatabaseTranslations'));
 const LabelTranslation = React.lazy(() => import('./views/Translations/LabelTranslations'))
-const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
+// const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 
 
 const AddRealm = React.lazy(() => import('./views/Realm/AddRealmComponent'));
@@ -179,6 +179,7 @@ const PlanningUnitCountry = React.lazy(() => import('./views/RealmCountry/RealmC
 const PlanningUnitCountryList = React.lazy(() => import('./views/RealmCountry/RealmCountryPlanningUnitList'));
 const PlanningUnitCapacityList = React.lazy(() => import('./views/PlanningUnitCapacity/PlanningUnitCapacityList'));
 const RealmCountryRegion = React.lazy(() => import('./views/RealmCountry/RealmCountryRegion'));
+const syncPage = React.lazy(() => import('./views/Synchronisation/syncPage'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -293,8 +294,9 @@ const routes = [
 
   { path: '/dashboard/:message', component: Dashboard },
 
-  { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: DownloadProgram },
-  { path: '/program/downloadProgram/:message', component: DownloadProgram },
+  { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: ProgramTree },
+  { path: '/program/syncPage', name: i18n.t('static.dashboard.downloadprogram'), component: syncPage },
+  { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: i18n.t('static.dashboard.exportprogram'), component: ExportProgram },
   { path: '/program/importProgram', name: i18n.t('static.dashboard.importprogram'), component: ImportProgram },
 

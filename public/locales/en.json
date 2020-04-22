@@ -532,7 +532,11 @@
     "static.realmcountry.shippedToArrivedAirLeadTimetext": "Enter Shipped To Arrived Air LeadTime",
     "static.realmcountry.shippedToArrivedSeaLeadTimetext": "Enter Shipped To Arrived Sea LeadTime",
     "static.realmcountry.arrivedToDeliveredLeadTimetext": "Enter Arrived To Delivered Lead Time",
-    "static.realm.mapcountry":"Map Country"
+    "static.realm.mapcountry":"Map Country",
+    "static.program.version":"V~",
+    "static.program.errorSelectAtleastOneProgram":"Please select atleast one program for download.",
+    "static.program.errorSelectProgramIfYouSelectVersion":"Please select program if you are selecting version.",
+    "static.common.download":"Download"
     
 
 }
