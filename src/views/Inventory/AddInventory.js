@@ -14,14 +14,13 @@ import { SECRET_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText'
 
-
 export default class AddInventory extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
             programList: [],
-            programId: ''
+            programId: '',
+            changedFlag: 0
         }
         this.options = props.options;
         // this.addRow = this.addRow.bind(this);
@@ -71,226 +70,250 @@ export default class AddInventory extends Component {
     // };
 
     formSubmit() {
-        var programId = document.getElementById('programId').value;
-        this.setState({ programId: programId });
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        var dataSourceList = []
-        var regionList = []
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-            var dataSourceRequest = dataSourceOs.getAll();
-            dataSourceRequest.onsuccess = function (event) {
-                var dataSourceResult = [];
-                dataSourceResult = dataSourceRequest.result;
-                for (var k = 0; k < dataSourceResult.length; k++) {
-                    var dataSourceJson = {
-                        name: dataSourceResult[k].label.label_en,
-                        id: dataSourceResult[k].dataSourceId
-                    }
-                    dataSourceList[k] = dataSourceJson
-                }
-            }
+        if (this.state.changedFlag == 1) {
+            alert("Click save to continue !")
+        } else {
+            var programId = document.getElementById('programId').value;
+            this.setState({ programId: programId });
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            var dataSourceList = []
+            var regionList = []
+            var countrySKUList = []
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
 
-            var regionTransaction = db1.transaction(['region'], 'readwrite');
-            var regionOs = regionTransaction.objectStore('region');
-            var regionRequest = regionOs.getAll();
-            regionRequest.onsuccess = function (event) {
-                var regionResult = [];
-                regionResult = regionRequest.result;
-                for (var k = 0; k < regionResult.length; k++) {
-                    var regionJson = {
-                        name: regionResult[k].label.label_en,
-                        id: regionResult[k].regionId
-                    }
-                    regionList[k] = regionJson
-                }
-            }
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
 
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
 
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-
-                // Get inventory data from program
-                var inventoryList = programJson.inventoryList;
-                // var consumptionDataList = [];
-                // var consumptionDataArr = [];
-                // for (var i = 0; i < programProductList.length; i++) {
-                //     if (programProductList[i].product.productId == this.state.productId) {
-                //         consumptionDataList = programProductList[i].product.consumptionData;
-                //     }
-                // }
-                this.setState({
-                    inventoryList: inventoryList
-                });
-
-                var data = [];
-                var inventoryDataArr = []
-                if (inventoryList.length == 0) {
-                    data = [];
-                    inventoryDataArr[0] = data;
-                }
-                for (var j = 0; j < inventoryList.length; j++) {
-                    data = [];
-                    data[0] = inventoryList[j].dataSource.id;
-                    data[1] = inventoryList[j].region.id;
-                    data[2] = inventoryList[j].inventoryDate;
-                    data[3] = inventoryList[j].realmCountryPlanningUnit.id;
-                    data[4] = inventoryList[j].multiplier;
-                    data[5] = inventoryList[j].adjustmentQty;
-                    // data[5] = inventoryList[j].multiplier * inventoryList[j].adjustmentQty;
-                    data[6] = `=E${j + 1} * F${j + 1} `
-                    data[7] = inventoryList[j].actualQty;
-                    data[8] = `=E${j + 1} * H${j + 1} `;
-                    data[9] = '';
-                    data[10] = '';
-                    data[11] = inventoryList[j].active;
-
-                    inventoryDataArr[j] = data;
-                }
-
-                this.el = jexcel(document.getElementById("inventorytableDiv"), '');
-                this.el.destroy();
-                var json = [];
-                var data = inventoryDataArr;
-                // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                // json[0] = data;
-                var options = {
-                    data: data,
-                    nestedHeaders: [
-                        [
-                            {
-                                title: '',
-                                colspan: '5',
-                            },
-                            // {
-                            //     title: 'Expected Stock',
-                            //     colspan: '2'
-                            // },
-                            {
-                                title: 'Manual Adjustment',
-                                colspan: '2'
-                            }, {
-                                title: 'Actual Stock count',
-                                colspan: '2'
-                            },
-                            // {
-                            //     title: 'Final Adjustment',
-                            //     colspan: '2'
-                            // },
-                            {
-                                title: '',
-                                colspan: '4',
+                    var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                    var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                    var dataSourceRequest = dataSourceOs.getAll();
+                    dataSourceRequest.onsuccess = function (event) {
+                        var dataSourceResult = [];
+                        dataSourceResult = dataSourceRequest.result;
+                        for (var k = 0; k < dataSourceResult.length; k++) {
+                            if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
+                                if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                    var dataSourceJson = {
+                                        name: dataSourceResult[k].label.label_en,
+                                        id: dataSourceResult[k].dataSourceId
+                                    }
+                                    dataSourceList[k] = dataSourceJson
+                                }
                             }
-                        ],
-                    ],
-                    columnDrag: true,
-                    colWidths: [110, 110, 100, 100, 100, 180, 180, 180, 180, 180, 180, 180, 180, 100],
-                    columns: [
-                        // { title: 'Month', type: 'text', readOnly: true },
-                        {
-                            title: 'Data source',
-                            type: 'dropdown',
-                            source: dataSourceList
-                        },
-                        {
-                            title: 'Region',
-                            type: 'dropdown',
-                            source: regionList
-                            // readOnly: true
-                        },
-                        {
-                            title: 'Inventory Date',
-                            type: 'calendar'
-                        },
-                        {
-                            title: 'Country SKU',
-                            type: 'dropdown'
-                        },
-                        // {
-                        //     title: 'SKU Code',
-                        //     type: 'text'
-                        // },
-                        {
-                            title: 'Conversion Units',
-                            type: 'text',
-                            readOnly: true
-                        },
-
-                        // {
-                        //     title: 'Quantity',
-                        //     type: 'text'
-                        // },
-                        // {
-                        //     title: 'Planning Unit Qty',
-                        //     type: 'text'
-                        // },
-                        {
-                            title: 'Quantity',
-                            type: 'text'
-                        },
-                        {
-                            title: 'Planning Unit Qty',
-                            type: 'text'
-                        },
-                        {
-                            title: 'Quantity',
-                            type: 'text'
-                        },
-                        {
-                            title: 'Planning Unit Qty',
-                            type: 'text'
-                        },
-                        // {
-                        //     title: 'Quantity',
-                        //     type: 'text'
-                        // },
-                        // {
-                        //     title: 'Planning Unit Qty',
-                        //     type: 'text'
-                        // },
-                        {
-                            title: 'Batch Number',
-                            type: 'text'
-                        },
-                        {
-                            title: 'Expire Date',
-                            type: 'calendar'
-                        },
-                        {
-                            title: 'Active',
-                            type: 'checkbox'
                         }
 
-                    ],
-                    pagination: 10,
-                    search: true,
-                    columnSorting: true,
-                    tableOverflow: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    onchange: this.changed
-                };
+                        var countrySKUTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                        var countrySKUOs = countrySKUTransaction.objectStore('realmCountryPlanningUnit');
+                        var countrySKURequest = countrySKUOs.getAll();
+                        countrySKURequest.onsuccess = function (event) {
+                            var countrySKUResult = [];
+                            countrySKUResult = countrySKURequest.result;
+                            for (var k = 0; k < countrySKUResult.length; k++) {
+                                if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId) {
+                                    var countrySKUJson = {
+                                        name: countrySKUResult[k].label.label_en,
+                                        id: countrySKUResult[k].realmCountryPlanningUnitId
+                                    }
+                                    countrySKUList[k] = countrySKUJson
+                                }
+                            }
+                            console.log("countryasdas", countrySKUList);
+                            var regionTransaction = db1.transaction(['region'], 'readwrite');
+                            var regionOs = regionTransaction.objectStore('region');
+                            var regionRequest = regionOs.getAll();
+                            regionRequest.onsuccess = function (event) {
+                                var regionResult = [];
+                                regionResult = regionRequest.result;
+                                for (var k = 0; k < regionResult.length; k++) {
+                                    if (regionResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
+                                        var regionJson = {
+                                            name: regionResult[k].label.label_en,
+                                            id: regionResult[k].regionId
+                                        }
+                                        regionList[k] = regionJson
+                                    }
+                                }
 
-                this.el = jexcel(document.getElementById("inventorytableDiv"), options);
+                                var inventoryList = programJson.inventoryList;
+                                this.setState({
+                                    inventoryList: inventoryList
+                                });
+
+                                var data = [];
+                                var inventoryDataArr = []
+                                if (inventoryList.length == 0) {
+                                    data = [];
+                                    inventoryDataArr[0] = data;
+                                }
+                                for (var j = 0; j < inventoryList.length; j++) {
+                                    data = [];
+                                    data[0] = inventoryList[j].dataSource.id;
+                                    data[1] = inventoryList[j].region.id;
+                                    data[2] = inventoryList[j].inventoryDate;
+                                    data[3] = inventoryList[j].realmCountryPlanningUnit.id;
+                                    data[4] = inventoryList[j].multiplier;
+                                    data[5] = inventoryList[j].adjustmentQty;
+                                    // data[5] = inventoryList[j].multiplier * inventoryList[j].adjustmentQty;
+                                    data[6] = `=E${j + 1} * F${j + 1} `
+                                    data[7] = inventoryList[j].actualQty;
+                                    data[8] = `=E${j + 1} * H${j + 1} `;
+                                    data[9] = '';
+                                    data[10] = '';
+                                    data[11] = inventoryList[j].active;
+
+                                    inventoryDataArr[j] = data;
+                                }
+
+                                this.el = jexcel(document.getElementById("inventorytableDiv"), '');
+                                this.el.destroy();
+                                var json = [];
+                                var data = inventoryDataArr;
+                                // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                                // json[0] = data;
+                                var options = {
+                                    data: data,
+                                    nestedHeaders: [
+                                        [
+                                            {
+                                                title: '',
+                                                colspan: '5',
+                                            },
+                                            // {
+                                            //     title: 'Expected Stock',
+                                            //     colspan: '2'
+                                            // },
+                                            {
+                                                title: 'Manual Adjustment',
+                                                colspan: '2'
+                                            }, {
+                                                title: 'Actual Stock count',
+                                                colspan: '2'
+                                            },
+                                            // {
+                                            //     title: 'Final Adjustment',
+                                            //     colspan: '2'
+                                            // },
+                                            {
+                                                title: '',
+                                                colspan: '4',
+                                            }
+                                        ],
+                                    ],
+                                    columnDrag: true,
+                                    colWidths: [110, 110, 100, 130, 100, 180, 180, 180, 180, 180, 180, 180, 180, 100],
+                                    columns: [
+                                        // { title: 'Month', type: 'text', readOnly: true },
+                                        {
+                                            title: 'Data source',
+                                            type: 'dropdown',
+                                            source: dataSourceList
+                                        },
+                                        {
+                                            title: 'Region',
+                                            type: 'dropdown',
+                                            source: regionList
+                                            // readOnly: true
+                                        },
+                                        {
+                                            title: 'Inventory Date',
+                                            type: 'calendar'
+                                        },
+                                        {
+                                            title: 'Country SKU',
+                                            type: 'dropdown',
+                                            source: countrySKUList
+                                        },
+                                        // {
+                                        //     title: 'SKU Code',
+                                        //     type: 'text'
+                                        // },
+                                        {
+                                            title: 'Conversion Units',
+                                            type: 'text',
+                                            readOnly: true
+                                        },
+
+                                        // {
+                                        //     title: 'Quantity',
+                                        //     type: 'text'
+                                        // },
+                                        // {
+                                        //     title: 'Planning Unit Qty',
+                                        //     type: 'text'
+                                        // },
+                                        {
+                                            title: 'Quantity',
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: 'Planning Unit Qty',
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: 'Quantity',
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: 'Planning Unit Qty',
+                                            type: 'text'
+                                        },
+                                        // {
+                                        //     title: 'Quantity',
+                                        //     type: 'text'
+                                        // },
+                                        // {
+                                        //     title: 'Planning Unit Qty',
+                                        //     type: 'text'
+                                        // },
+                                        {
+                                            title: 'Batch Number',
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: 'Expire Date',
+                                            type: 'calendar'
+                                        },
+                                        {
+                                            title: 'Active',
+                                            type: 'checkbox'
+                                        }
+
+                                    ],
+                                    pagination: 10,
+                                    search: true,
+                                    columnSorting: true,
+                                    tableOverflow: true,
+                                    wordWrap: true,
+                                    allowInsertColumn: false,
+                                    allowManualInsertColumn: false,
+                                    allowDeleteRow: false,
+                                    onchange: this.changed
+                                };
+
+                                this.el = jexcel(document.getElementById("inventorytableDiv"), options);
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
             }.bind(this)
-        }.bind(this)
+        }
     }
+
+    // -----------start of changed function
     changed = function (instance, cell, x, y, value) {
         //     $("#saveButtonDiv").show();
-        //     this.setState({
-        //         changedFlag: 1
-        //     })
+        this.setState({
+            changedFlag: 1
+        })
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -330,26 +353,49 @@ export default class AddInventory extends Component {
                 }
             }
         }
+        var skuData = {}
+        var elInstance = this.el;
         if (x == 3) {
             var col = ("D").concat(parseInt(y) + 1);
-            console.log(col);
             if (value == "") {
-                console.log("in if")
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
             } else {
-                console.log("in else")
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+
+                var db1;
+                var storeOS;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+
+                    db1 = e.target.result;
+                    var skuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                    var skuObjectStore = skuTransaction.objectStore('realmCountryPlanningUnit');
+                    var skuRequest = skuObjectStore.get(parseInt(value));
+                    skuRequest.onsuccess = function (e) {
+                        skuData = skuRequest.result;
+                        elInstance.setValueFromCoords(4, y, skuData.multiplier, true)
+                        // elInstance.setValueFromCoords(7, y, "", true)
+                        // elInstance.setValueFromCoords(8, y, skuData.qtyOfPlanningUnits, true)
+                        // elInstance.setValueFromCoords(9, y, skuData.planningUnit.qtyOfForecastingUnits, true)
+                        // if (elInstance.getValueFromCoords(11, y) > 0) {
+                        //     var qtyInTermsOfForecastUnit = parseFloat(logisticsUnitData.qtyOfPlanningUnits * logisticsUnitData.planningUnit.qtyOfForecastingUnits * elInstance.getValueFromCoords(11, y));
+                        //     elInstance.setValueFromCoords(12, y, qtyInTermsOfForecastUnit, true)
+                        // }
+                    }
+
+                }
             }
         }
     }.bind(this);
+
     checkValidation() {
         var valid = true;
         var json = this.el.getJson();
         for (var y = 0; y < json.length; y++) {
-
             var col = ("A").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(0, y);
             if (value == "Invalid date" || value == "") {
@@ -407,11 +453,17 @@ export default class AddInventory extends Component {
                 this.el.setComments(col, "");
             }
         }
+        return valid;
     }
 
     saveData = function () {
         var validation = this.checkValidation();
         if (validation == true) {
+            this.setState(
+                {
+                    changedFlag: 0
+                }
+            );
             console.log("all good...");
         } else {
             console.log("some thing get wrong...");
