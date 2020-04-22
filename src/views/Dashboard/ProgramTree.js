@@ -6,10 +6,15 @@ import {
     CardFooter,
     CardHeader,
     Col,
-    Row
+    Row,
+    FormGroup,
+    Label,
+    InputGroup,
+    Input,
+    InputGroupAddon
 } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import CountryService from "../../api/CountryService"
+import RealmCountryService from "../../api/RealmCountryService"
 import HealthAreaService from "../../api/HealthAreaService"
 import ProgramService from "../../api/ProgramService"
 import getLabelText from '../../CommonComponent/getLabelText'
@@ -19,7 +24,9 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import i18n from '../../i18n';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
+import RealmService from '../../api/RealmService';
 
+const entityname = i18n.t('static.dashboard.downloadprogram')
 class Program extends Component {
 
     constructor(props) {
@@ -27,26 +34,29 @@ class Program extends Component {
         this.toggle = this.toggle.bind(this);
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         this.downloadClicked = this.downloadClicked.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
+        this.getTree=this.getTree.bind(this);
         this.state = {
             dropdownOpen: false,
             radioSelected: 2,
             countryList: [],
             healthAreaList: [],
             prgList: [],
-            versionList: [{ id: 1, name: "v1.1", programId: 1 }, { id: 2, name: "v1.2", programId: 1 }, { id: 3, name: "v1.1", programId: 2 }, { id: 4, name: "v1.2", programId: 3 }],
+            realmList:[],
             lang: localStorage.getItem('lang'),
+            realmId:AuthenticationService.getRealmId()
         };
     }
 
-    componentDidMount() {
-
-        AuthenticationService.setupAxiosInterceptors();
-        CountryService.getCountryListActive()
+    componentDidMount(){
+        if(AuthenticationService.getRealmId()==-1){
+            document.getElementById("realmDiv").style.display="block"
+            AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("RealmCountry", response.data)
                     this.setState({
-                        countryList: response.data
+                        realmList: response.data
                     })
                 } else {
                     this.setState({
@@ -55,7 +65,6 @@ class Program extends Component {
                 }
             }).catch(
                 error => {
-                    console.log("Catch error", error)
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
@@ -75,7 +84,50 @@ class Program extends Component {
                     }
                 }
             );
-        HealthAreaService.getHealthAreaList()
+        }else{
+            document.getElementById("realmDiv").style.display="none"
+        }
+        
+    }
+
+    getTree() {
+        console.log(this.state.realmId)
+        document.getElementById("treeDiv").style.display = "block";
+        AuthenticationService.setupAxiosInterceptors();
+        RealmCountryService.getRealmCountryForProgram(this.state.realmId)
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("response.data------------>",response.data)
+                    this.setState({
+                        countryList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                console.log("Error code unkown");
+                                break;
+                        }
+                    }
+                }
+            );
+        HealthAreaService.getHealthAreaListForProgram(this.state.realmId)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
@@ -91,7 +143,7 @@ class Program extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -111,7 +163,6 @@ class Program extends Component {
         ProgramService.getProgramList()
             .then(response => {
                 if (response.status == 200) {
-                    console.log("Response--------------->", response.data)
                     this.setState({
                         prgList: response.data
                     })
@@ -125,7 +176,7 @@ class Program extends Component {
                     if (error.message === "Network Error") {
                         this.setState({ message: error.message });
                     } else {
-                        switch (error.response.status) {
+                        switch (error.response ? error.response.status : "") {
                             case 500:
                             case 401:
                             case 404:
@@ -151,6 +202,12 @@ class Program extends Component {
         });
     }
 
+    dataChange(event) {
+        if (event.target.name === "realmId") {
+            this.state.realmId = event.target.value;
+        }
+    };
+
     onRadioBtnClick(radioSelected) {
         this.setState({
             radioSelected: radioSelected,
@@ -160,46 +217,84 @@ class Program extends Component {
     loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
     render() {
+        const { realmList } = this.state;
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
         return (
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col xs="12" sm="12">
+                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <strong>Program</strong>
+                                <strong>{i18n.t('static.program.download')}</strong>
                             </CardHeader>
                             <CardBody>
-                                <div className="table-responsive">
+                                <Col md="3 pl-0" id="realmDiv">
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                        <div className="controls SelectGo">
+                                            <InputGroup>
+                                                <Input
+                                                    bsSize="sm"
+                                                    onChange={(e) => { this.dataChange(e) }}
+                                                    type="select" name="realmId" id="realmId">
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {realms}
+                                                </Input>
+                                                <InputGroupAddon addonType="append">
+                                                    <Button color="secondary Gobtn btn-sm" onClick={this.getTree}>{i18n.t('static.common.go')}</Button>
+                                                </InputGroupAddon>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                </Col>
+                            {/* </CardBody>
+                        </Card>
+                    </Col>
+                </Row>
+                <Row id="treeDiv" style={{ display: "none" }}>
+                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                        <Card>
+                            <CardBody> */}
+                                <div className="table-responsive"  id="treeDiv" style={{ display: "none" }}>
                                     <ul className="tree">
                                         <li>
                                             <input type="checkbox" id="c1" />
-                                            <label className="tree_label" htmlFor="c1">Program</label>
+                                            <label className="tree_label" htmlFor="c1">{i18n.t('static.program.program')}</label>
                                             <ul>
                                                 {
                                                     this.state.countryList.map(item => (
                                                         <li>
-                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.countryId)} />
-                                                            <label htmlFor={"c1-".concat(item.countryId)} className="tree_label">{getLabelText(item.label, this.state.lang)}</label>
+                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.country.countryId)} />
+                                                            <label htmlFor={"c1-".concat(item.country.countryId)} className="tree_label">{getLabelText(item.country.label, this.state.lang)}</label>
                                                             <ul>
                                                                 {
                                                                     this.state.healthAreaList.map(item1 => (
                                                                         <li>
-                                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.countryId).concat(item1.healthAreaId)} />
-                                                                            <label htmlFor={"c1-".concat(item.countryId).concat(item1.healthAreaId)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
+                                                                            <input type="checkbox" defaultChecked id={"c1-".concat(item.country.countryId).concat(item1.healthAreaId)} />
+                                                                            <label htmlFor={"c1-".concat(item.country.countryId).concat(item1.healthAreaId)} className="tree_label">{getLabelText(item1.label, this.state.lang)}</label>
                                                                             <ul>
                                                                                 {
-                                                                                    this.state.prgList.filter(c => c.realmCountry.country.countryId == item.countryId).filter(c => c.healthArea.id == item1.healthAreaId).map(item2 => (
+                                                                                    this.state.prgList.filter(c => c.realmCountry.country.countryId == item.country.countryId).filter(c => c.healthArea.id == item1.healthAreaId).map(item2 => (
                                                                                         <li>
                                                                                             <span className="tree_label">
                                                                                                 <span className="">
                                                                                                     <div className="checkbox m-0">
-                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.programId} id={"checkbox_".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(".0")} />
-                                                                                                        <label htmlFor={"checkbox_".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(".0")}>{getLabelText(item2.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
+                                                                                                        <input type="checkbox" name="programCheckBox" value={item2.programId} id={"checkbox_".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(".0")} />
+                                                                                                        <label htmlFor={"checkbox_".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(".0")}>{getLabelText(item2.label, this.state.lang)}<i className="ml-1 fa fa-eye"></i></label>
                                                                                                     </div>
                                                                                                 </span>
                                                                                             </span>
-                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId)} />
-                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId)}></label>
+                                                                                            <input type="checkbox" defaultChecked id={"fpm".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId)} />
+                                                                                            <label className="arrow_label" htmlFor={"fpm".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId)}></label>
                                                                                             <ul>
                                                                                                 {
                                                                                                     this.state.prgList.filter(c => c.programId == item2.programId).map(item3 => (
@@ -208,8 +303,8 @@ class Program extends Component {
                                                                                                             <li><span className="tree_label">
                                                                                                                 <span className="">
                                                                                                                     <div className="checkbox m-0">
-                                                                                                                        <input type="checkbox" value={item4.versionId} name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)} />
-                                                                                                                        <label htmlFor={"kf-v".concat(item.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)}>{"V~".concat(item4.versionId)}</label>
+                                                                                                                        <input type="checkbox" value={item4.versionId} name={"versionCheckBox".concat(item2.programId)} id={"kf-v".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)} />
+                                                                                                                        <label htmlFor={"kf-v".concat(item.country.countryId).concat(item1.healthAreaId).concat(item2.programId).concat(item4.versionId)}>{i18n.t('static.program.version').concat(item4.versionId)}</label>
                                                                                                                     </div>
                                                                                                                 </span>
                                                                                                             </span>
@@ -233,10 +328,10 @@ class Program extends Component {
                                     </ul>
                                 </div>
                             </CardBody>
+
                             <CardFooter>
-                                <Button type="submit" size="md" color="success"><i className="fa fa-dot-circle-o"></i> Import</Button>
-                                <Button className="ml-1" type="reset" size="md" color="danger"><i className="fa fa-dot-circle-o"></i> Export</Button>
-                                <button className="btn btn-outline-secondary float-right" type="file" onClick={this.downloadClicked}><i className="fa fa-lightbulb-o"></i>&nbsp;Download</button>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.downloadClicked()}><i className="fa fa-check"></i>{i18n.t('static.common.download')}</Button>
                             </CardFooter>
                         </Card>
                     </Col>
@@ -245,6 +340,10 @@ class Program extends Component {
 
             </div>
         );
+    }
+
+    cancelClicked() {
+        this.props.history.push(`/dashboard/` +    i18n.t('static.program.actioncancelled') )
     }
 
     downloadClicked() {
@@ -257,10 +356,8 @@ class Program extends Component {
             // And stick the checked ones onto an array...
             if (programCheckboxes[i].checked) {
                 programCheckedCount = programCheckedCount + 1;
-                console.log("ProgramVersionedCheckedIf", programCheckboxes[i].value)
                 var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
                 // loop over them all
-                console.log("VersionCheckboxes", versionCheckboxes.length)
                 if (versionCheckboxes.length > 0) {
                     var count = 0;
                     for (var j = 0; j < versionCheckboxes.length; j++) {
@@ -287,7 +384,6 @@ class Program extends Component {
             } else {
                 var versionCheckboxes = document.getElementsByName("versionCheckBox".concat(programCheckboxes[i].value));
                 // loop over them all
-                console.log("VersionCheckboxes", versionCheckboxes.length)
                 if (versionCheckboxes.length > 0) {
                     var count = 0;
                     for (var j = 0; j < versionCheckboxes.length; j++) {
@@ -303,34 +399,32 @@ class Program extends Component {
             }
         }
         if (programCheckedCount == 0) {
-            alert("Please select atleast one program for download.")
+            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectAtleastOneProgram'))
         } else if (programInvalidCheckedCount > 0) {
-            alert("Please select program if you are selecting version.")
-
+            this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errorSelectProgramIfYouSelectVersion'))
         } else {
             console.log("Checl boxes checked array", checkboxesChecked)
-            console.log("APi call will go here")
-            for (var program = 0; program < checkboxesChecked.length; program++) {
-                console.log("Program", program)
-                console.log("CheckboxCheced", (checkboxesChecked[program]).versionId)
-                var version = (checkboxesChecked[program]).versionId;
+            var programThenCount = 0;
+            for (var i = 0; i < checkboxesChecked.length; i++) {
+                // var version = (checkboxesChecked[i]).versionId;
                 if (navigator.onLine) {
                     AuthenticationService.setupAxiosInterceptors();
-                    ProgramService.getProgramData(checkboxesChecked[program])
+                    ProgramService.getProgramData(checkboxesChecked[i])
                         .then(response => {
+                            console.log("ProgramThenCount", programThenCount)
+                            console.log("Response data", response.data)
                             var json = response.data;
-                            console.log("Program json",json)
+
+                            // console("version befor -1 check",version)
+                            var version = json.downloadProgramVersion;
                             if (version == -1) {
                                 version = json.currentVersion.versionId
                             }
-                            console.log("Version",version);
-                            console.log("Json", json);
-                            console.log("Json length", json.length)
+                            console.log("Version", version)
                             var db1;
                             getDatabase();
                             var openRequest = indexedDB.open('fasp', 1);
                             openRequest.onsuccess = function (e) {
-                                console.log("in success");
                                 db1 = e.target.result;
                                 var transaction = db1.transaction(['programData'], 'readwrite');
                                 var program = transaction.objectStore('programData');
@@ -349,8 +443,6 @@ class Program extends Component {
                                         if (myResult[i].id == json.programId + "_v" + version + "_uId_" + userId) {
                                             count++;
                                         }
-                                        // }
-                                        console.log("count", count)
                                     }
                                     if (count == 0) {
                                         db1 = e.target.result;
@@ -368,13 +460,16 @@ class Program extends Component {
                                             programData: encryptedText.toString(),
                                             userId: userId
                                         };
+                                        console.log("Item------------>", item);
                                         var putRequest = programSaveData.put(item);
+                                        programThenCount++;
                                         putRequest.onerror = function (error) {
                                             this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                         }.bind(this);
                                         // }
                                         transactionForSavingData.oncomplete = function (event) {
-                                            console.log("in transaction complete")
+                                            console.log("in transaction complete");
+
                                             this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
                                         }.bind(this);
                                         transactionForSavingData.onerror = function (event) {
@@ -406,14 +501,15 @@ class Program extends Component {
                                                             programData: encryptedText.toString(),
                                                             userId: userId
                                                         };
+                                                        console.log("Item------------------>", item)
                                                         var putRequest = programOverWrite.put(item);
+                                                        programThenCount++;
                                                         putRequest.onerror = function (error) {
                                                             this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                                         }.bind(this);
 
                                                         // }
                                                         transactionForOverwrite.oncomplete = function (event) {
-                                                            console.log("in transaction complete")
                                                             this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
                                                         }.bind(this);
                                                         transactionForOverwrite.onerror = function (event) {
@@ -441,19 +537,35 @@ class Program extends Component {
                         })
                         .catch(
                             error => {
-                                switch (error.message) {
-                                    case "Network Error":
-                                        this.setState({
-                                            message: error.message
-                                        })
-                                        this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                        break
-                                    default:
-                                        this.setState({
-                                            message: error.response
-                                        })
-                                        this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                        break
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: error.response.data.messageCode });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            console.log("Error code unkown");
+                                            break;
+                                    }
+                                // switch (error.message) {
+                                //     case "Network Error":
+                                //         this.setState({
+                                //             message: error.message
+                                //         })
+                                //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
+                                //         break
+                                //     default:
+                                //         this.setState({
+                                //             message: error.response
+                                //         })
+                                //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
+                                //         break
                                 }
                             }
                         )
