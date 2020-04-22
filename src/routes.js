@@ -179,6 +179,8 @@ const PlanningUnitCountryList = React.lazy(() => import('./views/RealmCountry/Re
 const PlanningUnitCapacityList = React.lazy(() => import('./views/PlanningUnitCapacity/PlanningUnitCapacityList'));
 const RealmCountryRegion = React.lazy(() => import('./views/RealmCountry/RealmCountryRegion'));
 
+const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
@@ -358,6 +360,7 @@ const routes = [
   { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountry },
   { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCapacityList },
   { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: RealmCountryRegion },
+  { path: '/report/productCatalog', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.productcatalog'), component: ProductCatalog},
   
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

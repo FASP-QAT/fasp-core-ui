@@ -14,7 +14,8 @@ let initialValues = {
     currencyCode: '',
     currencySymbol: '',
     label: '',
-    conversionRate: ''
+    conversionRate: '',
+    isSync:true
 }
 
 const validationSchema = function (values) {
@@ -72,7 +73,8 @@ export default class UpdateCurrencyComponent extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-                conversionRateToUsd: ''
+                conversionRateToUsd: '',
+                isSync:'true'
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -98,6 +100,8 @@ export default class UpdateCurrencyComponent extends Component {
 
         else if (event.target.name === "conversionRate") {
             this.state.currency.conversionRateToUsd = event.target.value
+        }else if (event.target.name === "isSync") {
+            this.state.currency.isSync = event.target.id === "active2" ? false : true;
         }
 
         this.setState(
@@ -136,6 +140,7 @@ export default class UpdateCurrencyComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
+            console.log(JSON.stringify(response.data))
             this.setState({
                 currency: response.data
             });
@@ -172,7 +177,8 @@ export default class UpdateCurrencyComponent extends Component {
                                     currencyCode: this.state.currency.currencyCode,
                                     currencySymbol: this.state.currency.currencySymbol,
                                     label: getLabelText(this.state.currency.label, this.state.lang),
-                                    conversionRate: this.state.currency.conversionRateToUsd
+                                    conversionRate: this.state.currency.conversionRateToUsd,
+                                    isSync:this.state.currency.isSync
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -226,7 +232,7 @@ export default class UpdateCurrencyComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -243,7 +249,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -260,7 +266,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="label">{i18n.t('static.currency.currency')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -277,7 +283,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-exchange"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -292,6 +298,41 @@ export default class UpdateCurrencyComponent extends Component {
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.conversionRate}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="isSync">{i18n.t('static.common.issync')}  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="isSync"
+                                                                value={true}
+                                                                checked={this.state.currency.isSync===true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.program.yes')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active2"
+                                                                name="isSync"
+                                                                value={false}
+                                                                checked={this.state.currency.isSync===false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.program.no')}
+                                                            </Label>
+                                                        </FormGroup>
                                                     </FormGroup>
 
                                                 </CardBody>

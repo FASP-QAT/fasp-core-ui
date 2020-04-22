@@ -309,7 +309,17 @@ class DefaultLayout extends Component {
                           //   icon: 'fa fa-list',
                           // },
                         ]
-                      },
+                      }, {
+                        name: i18n.t('static.dashboard.report'),
+                        icon: 'fa fa-list',
+                        children: [
+                          {
+                            name: i18n.t('static.dashboard.productcatalog'),
+                            url: '/report/productCatalog',
+                            icon: 'fa fa-exchange'
+                          }
+                        ]
+                      }
                       // {
                       //   name: "Supply plan",
                       //   icon: 'fa fa-list',

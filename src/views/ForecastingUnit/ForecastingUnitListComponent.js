@@ -321,6 +321,7 @@ export default class ForecastingUnitListComponent extends Component {
             firstPageTitle: i18n.t('static.common.nextPage'),
             lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
+            paginationSize:2,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
             sizePerPageList: [{

@@ -12,7 +12,8 @@ const initialValues = {
     currencyCode: '',
     currencySymbol: '',
     label: '',
-    conversionRate: ''
+    conversionRate: '',
+    isSync:'true'
 }
 
 const validationSchema = function (values) {
@@ -66,7 +67,8 @@ export default class AddCurrencyComponent extends Component {
                 label_en: ''
 
             },
-            conversionRateToUsd: ''
+            conversionRateToUsd: '',
+            isSync:true
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -74,6 +76,7 @@ export default class AddCurrencyComponent extends Component {
     }
 
     dataChange(event) {
+        console.log(event.target.name)
         if (event.target.name === "currencyCode") {
             this.state.currencyCode = event.target.value.toUpperCase();
         } if (event.target.name === "currencySymbol") {
@@ -83,6 +86,8 @@ export default class AddCurrencyComponent extends Component {
         }
         else if (event.target.name === "conversionRate") {
             this.state.conversionRateToUsd = event.target.value;
+        }else if (event.target.name === "isSync") {
+            this.state.isSync = event.target.id === "active2" ? false : true;
         }
         let { currency } = this.state
         this.setState(
@@ -97,7 +102,8 @@ export default class AddCurrencyComponent extends Component {
             currencyCode: true,
             currencySymbol: true,
             label: true,
-            conversionRate: true
+            conversionRate: true,
+            isSync:true
         }
         )
         this.validateForm(errors)
@@ -191,7 +197,7 @@ export default class AddCurrencyComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -208,7 +214,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -224,7 +230,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="label">{i18n.t('static.currency.currency')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -241,10 +247,10 @@ export default class AddCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-exchange"></i></InputGroupText> */}
-                                                        <Input type="text"
+                                                        <Input type="number"
                                                             name="conversionRate"
                                                             id="conversionRate"
                                                             valid={!errors.conversionRate}
@@ -255,6 +261,41 @@ export default class AddCurrencyComponent extends Component {
                                                             required />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.conversionRate}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="isSync">{i18n.t('static.common.issync')}  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="isSync"
+                                                                value={true}
+                                                                checked={this.state.isSync===true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.program.yes')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active2"
+                                                                name="isSync"
+                                                                value={false}
+                                                                checked={this.state.isSync===false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.program.no')}
+                                                            </Label>
+                                                        </FormGroup>
                                                     </FormGroup>
 
                                                 </CardBody>
