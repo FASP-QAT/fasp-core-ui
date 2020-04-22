@@ -647,6 +647,7 @@ label.arrow_label:after {
     margin: 0 auto;
     // margin-left: 2%;
   }
+ 
 }
 
 @media (max-width: 489px) {
@@ -841,6 +842,7 @@ a:hover {
   .sidebar .nav-link {
     padding: 0.75rem 0.2rem !important;
   }
+  .f-End{    justify-content: flex-end !important}
 }
 /////
 h5,
