@@ -287,6 +287,11 @@ class DefaultLayout extends Component {
                                 icon: 'fa fa-download',
                               },
                               {
+                                name: 'Sync',
+                                url: '/program/syncPage',
+                                icon: 'fa fa-download',
+                              },
+                              {
                                 name: i18n.t('static.dashboard.exportprogram'),
                                 url: '/program/exportProgram',
                                 icon: 'fa fa-upload',
@@ -341,6 +346,11 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.downloadprogram'),
                             url: '/program/downloadProgram',
+                            icon: 'fa fa-download',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.downloadprogram'),
+                            url: '/program/syncPage',
                             icon: 'fa fa-download',
                           },
                           {

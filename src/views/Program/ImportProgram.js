@@ -232,7 +232,7 @@ export default class ImportProgram extends Component {
                                 console.log("filename", filename);
                                 programDataJson.filename = filename;
                                 fileName[i] = {
-                                    value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJsonDecrypted.downloadProgramVersion
+                                    value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJsonDecrypted.requestedProgramVersion
                                 }
                                 programListArray[i] = programDataJson;
                                 i++;

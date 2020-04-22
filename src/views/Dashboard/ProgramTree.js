@@ -35,59 +35,59 @@ class Program extends Component {
         this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
         this.downloadClicked = this.downloadClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.getTree=this.getTree.bind(this);
+        this.getTree = this.getTree.bind(this);
         this.state = {
             dropdownOpen: false,
             radioSelected: 2,
             countryList: [],
             healthAreaList: [],
             prgList: [],
-            realmList:[],
+            realmList: [],
             lang: localStorage.getItem('lang'),
-            realmId:AuthenticationService.getRealmId()
+            realmId: AuthenticationService.getRealmId()
         };
     }
 
-    componentDidMount(){
-        if(AuthenticationService.getRealmId()==-1){
-            document.getElementById("realmDiv").style.display="block"
+    componentDidMount() {
+        if (AuthenticationService.getRealmId() == -1) {
+            document.getElementById("realmDiv").style.display = "block"
             AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realmList: response.data
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
+            RealmService.getRealmListAll()
+                .then(response => {
+                    if (response.status == 200) {
+                        this.setState({
+                            realmList: response.data
+                        })
                     } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response.status) {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: error.response.data.messageCode });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    console.log("Error code unkown");
+                                    break;
+                            }
                         }
                     }
-                }
-            );
-        }else{
-            document.getElementById("realmDiv").style.display="none"
+                );
+        } else {
+            document.getElementById("realmDiv").style.display = "none"
         }
-        
+
     }
 
     getTree() {
@@ -97,7 +97,7 @@ class Program extends Component {
         RealmCountryService.getRealmCountryForProgram(this.state.realmId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log("response.data------------>",response.data)
+                    console.log("response.data------------>", response.data)
                     this.setState({
                         countryList: response.data
                     })
@@ -256,7 +256,7 @@ class Program extends Component {
                                         </div>
                                     </FormGroup>
                                 </Col>
-                            {/* </CardBody>
+                                {/* </CardBody>
                         </Card>
                     </Col>
                 </Row>
@@ -264,7 +264,7 @@ class Program extends Component {
                     <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody> */}
-                                <div className="table-responsive"  id="treeDiv" style={{ display: "none" }}>
+                                <div className="table-responsive" id="treeDiv" style={{ display: "none" }}>
                                     <ul className="tree">
                                         <li>
                                             <input type="checkbox" id="c1" />
@@ -343,7 +343,7 @@ class Program extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` +    i18n.t('static.program.actioncancelled') )
+        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
     }
 
     downloadClicked() {
@@ -416,7 +416,7 @@ class Program extends Component {
                             var json = response.data;
 
                             // console("version befor -1 check",version)
-                            var version = json.downloadProgramVersion;
+                            var version = json.requestedProgramVersion;
                             if (version == -1) {
                                 version = json.currentVersion.versionId
                             }
@@ -553,19 +553,19 @@ class Program extends Component {
                                             console.log("Error code unkown");
                                             break;
                                     }
-                                // switch (error.message) {
-                                //     case "Network Error":
-                                //         this.setState({
-                                //             message: error.message
-                                //         })
-                                //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                //         break
-                                //     default:
-                                //         this.setState({
-                                //             message: error.response
-                                //         })
-                                //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
-                                //         break
+                                    // switch (error.message) {
+                                    //     case "Network Error":
+                                    //         this.setState({
+                                    //             message: error.message
+                                    //         })
+                                    //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
+                                    //         break
+                                    //     default:
+                                    //         this.setState({
+                                    //             message: error.response
+                                    //         })
+                                    //         this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
+                                    //         break
                                 }
                             }
                         )

@@ -179,6 +179,7 @@ const PlanningUnitCountry = React.lazy(() => import('./views/RealmCountry/RealmC
 const PlanningUnitCountryList = React.lazy(() => import('./views/RealmCountry/RealmCountryPlanningUnitList'));
 const PlanningUnitCapacityList = React.lazy(() => import('./views/PlanningUnitCapacity/PlanningUnitCapacityList'));
 const RealmCountryRegion = React.lazy(() => import('./views/RealmCountry/RealmCountryRegion'));
+const syncPage = React.lazy(() => import('./views/Synchronisation/syncPage'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -294,6 +295,7 @@ const routes = [
   { path: '/dashboard/:message', component: Dashboard },
 
   { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: ProgramTree },
+  { path: '/program/syncPage', name: i18n.t('static.dashboard.downloadprogram'), component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: i18n.t('static.dashboard.exportprogram'), component: ExportProgram },
   { path: '/program/importProgram', name: i18n.t('static.dashboard.importprogram'), component: ImportProgram },
