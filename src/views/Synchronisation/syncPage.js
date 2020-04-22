@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
-import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer';
- 
+// import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer';
+
 const oldCode = `
 {
   "name": "Original name",
@@ -14,16 +14,17 @@ const newCode = `
   "status": "running"
 }
 `;
- 
+
 export default class syncPage extends PureComponent {
-    render = () => {
-        return (
-            <ReactDiffViewer
-                oldValue={oldCode}
-                newValue={newCode}
-                compareMethod={DiffMethod.WORDS}
-                splitView={true}
-            />
-        );
-    };
+  render = () => {
+    return (
+      <></>
+      // <ReactDiffViewer
+      //     oldValue={oldCode}
+      //     newValue={newCode}
+      //     compareMethod={DiffMethod.WORDS}
+      //     splitView={true}
+      // />
+    );
+  };
 }
