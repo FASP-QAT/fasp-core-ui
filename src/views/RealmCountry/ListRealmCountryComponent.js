@@ -307,9 +307,7 @@ class ListRealmCountryComponent extends Component {
 
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.realmcountrylist')}</strong>{' '}
                         <div className="card-header-actions">
-                            <div className="card-header-action">
-                                <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addSupplier}><i className="fa fa-plus-square"></i></a>
-                            </div>
+                            
                         </div>
                     </CardHeader>
                     <CardBody>
