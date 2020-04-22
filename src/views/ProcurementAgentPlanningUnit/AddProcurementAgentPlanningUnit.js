@@ -454,7 +454,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
@@ -491,13 +491,14 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                             setTouched
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='procurementAgentPlanningUnitForm'>
-                                                    <FormGroup>
+                                                    <Row>
+                                                    <FormGroup className="col-md-6"> 
                                                         <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                                         <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
                                                             {programs}
                                                         </Input>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                                         <Input
                                                             type="select"
@@ -516,7 +517,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
                                                         <Input
                                                             type="text"
@@ -531,7 +532,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.skuCode}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6"> 
                                                         <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.catalogPrice')}</Label>
                                                         <Input
                                                             type="number"
@@ -547,7 +548,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.catalogPrice}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}</Label>
                                                         <Input
                                                             type="number"
@@ -563,7 +564,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.moq}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}</Label>
                                                         <Input
                                                             type="number"
@@ -579,7 +580,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.unitsPerPallet}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}</Label>
                                                         <Input
                                                             type="number"
@@ -595,7 +596,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}</Label>
                                                         <Input
                                                             type="number"
@@ -611,7 +612,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.volume}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}</Label>
                                                         <Input
                                                             type="number"
@@ -627,16 +628,16 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.weight}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6 mt-md-4">
                                                         {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                                        <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                        <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                         &nbsp;
 
-                        </FormGroup>
+                        </FormGroup></Row>
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive>
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                     <thead>
                                         <tr>
@@ -655,6 +656,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
+                                   
                                         {
                                             this.state.rows.map((item, idx) => (
                                                 <tr id="addr0" key={idx}>
@@ -690,15 +692,17 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                         {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
                                                         <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
                                                     </td>
-                                                    <td>
+                                                    <td className="updateTextwhitebtn">
                                                         <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                     </td>
                                                 </tr>
                                             ))
                                         }
+                                        
                                     </tbody>
-
+                                    <div id="loader" class="center"></div>
                                 </Table>
+                                
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -719,3 +723,17 @@ export default class AddProcurementAgentPlanningUnit extends Component {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
+
+document.onreadystatechange = function() { 
+    if (document.readyState !== "complete") { 
+        document.querySelector( 
+          "table").style.visibility = "hidden"; 
+        document.querySelector( 
+          "#loader").style.visibility = "visible"; 
+    } else { 
+        document.querySelector( 
+          "#loader").style.display = "none"; 
+        document.querySelector( 
+          "table").style.visibility = "visible"; 
+    } 
+};

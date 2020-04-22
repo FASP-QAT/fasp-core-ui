@@ -546,6 +546,18 @@ label.arrow_label:after {
   }
 
 
+  // .forInlinebtnMapping{ display: flex;}
+  .forInlinebtnMapping .btn-info{color: #fff !important;margin-left: .2rem;}
+  .forInlinebtnMapping{display: flex;  justify-content: center;
+  }
+  .forInlinebtnMappinglistRealm{display: flex; justify-content: center;    width: 235px;
+  }
+  .updateTextwhitebtn .btn-info{color: #fff!important;}
+
+  // .forbtnMapping .mapUnitbtn{width: 140px !important;}
+  // .forbtnMapping .mapRegionbtn{width: 110px !important;}
+
+ 
 
 
 
@@ -1011,11 +1023,13 @@ h5,
 
 .dropdown-header {
   color: #212721;
-  font-size:15px;
+  font-size:13px;
 }
 
 .dropdown-item {
   color: #212721;
+  font-size:13px;
+
 }
 
 .Select--single>.Select-control .Select-value, .Select-placeholder {
@@ -1025,6 +1039,56 @@ h5,
 .sidebar .nav-dropdown-toggle::before {
    transform: scaleX(-1);
 }
+
+
+// .text-primary {
+//   color: #3f6ad8 !important;
+// }
+
+.icon-wrapper-alt {
+    margin: 0;
+    height: 48px;
+    width: 48x;
+    text-align: center;
+    overflow: visible;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+.rounded-circle {
+  border-radius: 50% !important;
+}
+.icon-wrapper-alt .icon-wrapper-bg {
+  opacity: .1;
+  transition: opacity .2s;
+  border-radius: 50%;
+}
+
+.icon-wrapper .icon-wrapper-bg {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 3;
+  opacity: .2;
+}
+.icon-wrapper-alt i {
+  font-size: 1.3rem;
+}
+.icon-wrapper i {
+  margin: 0 auto;
+  font-size: 20px;
+  position: relative;
+  z-index: 5;
+}
+
+// .app-header .nav-item {
+
+//   margin: 5px;
+ 
+// }
 
 .box-role{
   border-bottom: 0px solid #c0c9d1!important;
@@ -1049,9 +1113,39 @@ h5,
 .box-role i {
   display: inline-block;
   font-size: 19px!important;
-  margin-right: 10px!important;
-  margin-left: -30px!important;
+  margin-right: 3px!important;
+  margin-left: -25px!important;
   color: #20a8d8;
   text-align: center;
   vertical-align: middle;
+}
+
+.dropdown-item i {
+  color: #23a8d8;
+ 
+}
+
+.setting-icon{
+  background: rgba(0,0,0,0.06);
+  box-shadow: 0 0.125rem 0.625rem rgba(63,106,216,0.4), 0 0.0625rem 0.125rem rgba(63,106,216,0.5);
+  border-color: #3f6ad8;
+}
+
+
+.react-confirm-alert-overlay {
+  background: rgba(25, 24, 24, 0.45)!important;
+}
+///////
+.tittle-role{
+  font-weight: 550;
+  font-size: 15px;
+}
+
+.icon-size{font-size:16px;}
+
+.form-control:focus {
+  padding-right: calc(1.5em + 1.75rem);
+}
+.form-control-sm:hover {
+  padding-right: calc(1.5em + 1.75rem);
 }

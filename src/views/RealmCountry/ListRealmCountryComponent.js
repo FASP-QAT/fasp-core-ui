@@ -266,8 +266,9 @@ class ListRealmCountryComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<div><Button type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.planningunitupdate')}</Button><br/><br/>
-                <Button type="button" size="sm" color="success" onClick={(event) => this.RealmCountryRegion(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realmcountry.regionupdate')}</Button>
+                return (<div className="forInlinebtnMappinglistRealm">
+                    <Button className="mapUnitbtn" type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.planningunitupdate')}</Button>
+                <Button className="ml-1 mapRegionbtn" type="button" size="sm" color="success" onClick={(event) => this.RealmCountryRegion(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realmcountry.regionupdate')}</Button>
                </div> )
             }
         }];
