@@ -76,27 +76,27 @@ export default class ConsumptionDetails extends React.Component {
 
 
 
-            var categoryTransaction = db1.transaction(['productCategory'], 'readwrite');
-            var categoryOs = categoryTransaction.objectStore('productCategory');
-            var catRequest = categoryOs.getAll();
-            var catList = []
-            catRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            catRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = catRequest.result;
-                for (var i = 0; i < myResult.length; i++) {
-                    var categoryJson = {
-                        name: getLabelText(myResult[i].label, lan),
-                        id: myResult[i].productCategoryId
-                    }
-                    catList[i + 1] = categoryJson
-                }
-                this.setState({
-                    categoryList: catList
-                })
-            }.bind(this);
+            // var categoryTransaction = db1.transaction(['productCategory'], 'readwrite');
+            // var categoryOs = categoryTransaction.objectStore('productCategory');
+            // var catRequest = categoryOs.getAll();
+            // var catList = []
+            // catRequest.onerror = function (event) {
+            //     // Handle errors!
+            // };
+            // catRequest.onsuccess = function (event) {
+            //     var myResult = [];
+            //     myResult = catRequest.result;
+            //     for (var i = 0; i < myResult.length; i++) {
+            //         var categoryJson = {
+            //             name: myResult[i].label.label_en,
+            //             id: myResult[i].productCategoryId
+            //         }
+            //         catList[i + 1] = categoryJson
+            //     }
+            //     this.setState({
+            //         categoryList: catList
+            //     })
+            // }.bind(this);
 
 
 
