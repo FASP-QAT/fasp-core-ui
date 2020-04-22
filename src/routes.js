@@ -183,6 +183,8 @@ const syncPage = React.lazy(() => import('./views/Synchronisation/syncPage'));
 
 const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'));
 
+const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
