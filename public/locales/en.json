@@ -315,7 +315,7 @@
     "static.realm.orderFrequencyText": "Please enter order frequency",
     "static.realm.realmCodeLength": "Please Enter Length Less Then or Equal To 6",
     "static.procurementagent.procurmentAgentMaster": "Procurment Agent",
-    "static.procurementagent.procurementagentsubmittoapprovetime": "Submit to approve time",
+    "static.procurementagent.procurementagentsubmittoapprovetime": "Lead time from order submission to order approval",
     "static.currency.currencyMaster": "Currency",
     "static.currency.conversionrateNumber": "Please enter positive integer or decimal number.",
     "static.currency.conversionrateMin": "Please enter number greater then 0.",
@@ -536,7 +536,10 @@
     "static.program.version":"V~",
     "static.program.errorSelectAtleastOneProgram":"Please select atleast one program for download.",
     "static.program.errorSelectProgramIfYouSelectVersion":"Please select program if you are selecting version.",
-    "static.common.download":"Download"
-    
+    "static.common.download":"Download",
+    "static.dashboard.report":"Reports",
+    "static.dashboard.productcatalog":"Product Catalog",
+    "static.common.issync":"Sync online coversion rate"
+
 
 }
