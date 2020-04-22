@@ -7,6 +7,8 @@ import i18n from '../../i18n'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 const initialValues = {
     roleName: "",
@@ -17,11 +19,11 @@ const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required('Please enter role name'),
-        businessFunctions: Yup.string()
-            .required('Please select business functions'),
-        canCreateRole: Yup.string()
-            .required('Please select can create role')
+            .required(i18n.t('static.role.roletext'))
+        // businessFunctions: Yup.string()
+        //     .required('Please select business functions'),
+        // canCreateRole: Yup.string()
+        //     .required('Please select can create role')
     })
 }
 
@@ -54,11 +56,17 @@ class EditRoleComponent extends Component {
             businessFunctions: [],
             roles: [],
             role: this.props.location.state.role,
+            businessFunctionId: '',
+            businessFunctionList: [],
+            canCreateRoleId: '',
+            canCreateRoleList: [],
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.businessFunctionChange = this.businessFunctionChange.bind(this);
+        this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
     }
 
     Capitalize(str) {
@@ -75,17 +83,38 @@ class EditRoleComponent extends Component {
         if (event.target.name == "roleName") {
             role.label.label_en = event.target.value;
         }
-        if (event.target.name == "businessFunctions") {
-            role.businessFunctions = Array.from(event.target.selectedOptions, (item) => item.value);
-        }
-        if (event.target.name == "canCreateRole") {
-            role.canCreateRole = Array.from(event.target.selectedOptions, (item) => item.value);
-        }
         this.setState({
             role
         },
             () => { });
     };
+    businessFunctionChange(businessFunctionId) {
+        let { role } = this.state;
+        this.setState({ businessFunctionId });
+        var businessFunctionIdArray = [];
+        for (var i = 0; i < businessFunctionId.length; i++) {
+            businessFunctionIdArray[i] = businessFunctionId[i].value;
+        }
+        role.businessFunctions = businessFunctionIdArray;
+        this.setState({
+            role
+        },
+            () => { });
+    }
+
+    canCreateRoleChange(canCreateRoleId) {
+        let { role } = this.state;
+        this.setState({ canCreateRoleId });
+        var canCreateRoleIdArray = [];
+        for (var i = 0; i < canCreateRoleId.length; i++) {
+            canCreateRoleIdArray[i] = canCreateRoleId[i].value;
+        }
+        role.canCreateRole = canCreateRoleIdArray;
+        this.setState({
+            role
+        },
+            () => { });
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
@@ -115,8 +144,12 @@ class EditRoleComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
+                var businessFunctionList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
-                    businessFunctions: response.data
+                    businessFunctionList
                 })
             }).catch(
                 error => {
@@ -140,8 +173,12 @@ class EditRoleComponent extends Component {
             );
         UserService.getRoleList()
             .then(response => {
+                var canCreateRoleList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
-                    roles: response.data
+                    canCreateRoleList
                 })
             }).catch(
                 error => {
@@ -166,28 +203,6 @@ class EditRoleComponent extends Component {
     }
 
     render() {
-        const { businessFunctions } = this.state;
-        const { roles } = this.state;
-
-        let businessFunctionsList = businessFunctions.length > 0
-            && businessFunctions.map((item, i) => {
-                return (
-                    <>
-                        <option key={i} value={item.businessFunctionId}>
-                            {getLabelText(item.label, this.state.lang)}
-                        </option>
-                    </>
-                )
-            }, this);
-        let roleList = roles.length > 0
-            && roles.map((item, i) => {
-                return (
-                    <option key={i} value={item.roleId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
@@ -269,43 +284,44 @@ class EditRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label><Input
-                                                            type="select"
+                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Select
+                                                            valid={!errors.businessFunctions}
+                                                            bsSize="sm"
+                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
+                                                            onChange={(e) => { handleChange(e); this.businessFunctionChange(e) }}
+                                                            onBlur={handleBlur}
                                                             name="businessFunctions"
                                                             id="businessFunctions"
-                                                            bsSize="sm"
-                                                            valid={!errors.businessFunctions}
-                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            multi
                                                             required
+                                                            min={1}
+                                                            options={this.state.businessFunctionList}
                                                             value={this.state.role.businessFunctions}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                            {businessFunctionsList}
-
-                                                        </Input>
+                                                            error={errors.businessFunctions}
+                                                            touched={touched.businessFunctions}
+                                                        />
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
-                                                        <Input
-                                                            type="select"
+                                                        <Select
+                                                            valid={!errors.canCreateRole}
+                                                            bsSize="sm"
+                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
+                                                            onChange={(e) => { handleChange(e); this.canCreateRoleChange(e) }}
+                                                            onBlur={handleBlur}
                                                             name="canCreateRole"
                                                             id="canCreateRole"
-                                                            bsSize="sm"
-                                                            valid={!errors.canCreateRole}
-                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            multi
                                                             required
+                                                            min={1}
+                                                            options={this.state.canCreateRoleList}
                                                             value={this.state.role.canCreateRole}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                            {roleList}
-                                                        </Input> <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
+                                                            error={errors.canCreateRole}
+                                                            touched={touched.canCreateRole}
+                                                        />
+                                                        <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
