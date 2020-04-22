@@ -38,6 +38,11 @@ class RealmCountryService {
         return axios.get(`${API_URL}/api/realmCountry/${realmCountryId}/planningUnit/all`, {}
         );
     }
+
+    getRealmCountryForProgram(){
+        return axios.get(`${API_URL}/api/realmCountry/program`, {
+        });
+    }
     
 
 }
