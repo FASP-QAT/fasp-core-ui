@@ -148,7 +148,7 @@ export default class ProgramList extends Component {
   }
   buttonFormatter(cell, row) {
     // console.log("-----------", cell);
-    return <Button type="button" size="md" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
+    return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
   }
   addProductMapping(event, cell) {
     event.stopPropagation();

@@ -431,7 +431,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
-                    <Col sm={12} md={10} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
@@ -465,13 +465,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             setTouched
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='procurementAgentPlanningUnitForm'>
-                                                    <FormGroup>
+                                                    <Row>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
                                                         <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
                                                             {procurementAgents}
                                                         </Input>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="select">{i18n.t('static.procurementUnit.procurementUnit')}</Label>
                                                         <Input
                                                             type="select"
@@ -488,7 +489,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.procurementUnitId}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
                                                         <Input
                                                             type="text"
@@ -503,7 +504,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                         <FormFeedback className="red">{errors.skuCode}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6"> 
                                                         <Label htmlFor="vendorPrice">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}</Label>
                                                         <Input
                                                             type="number"
@@ -519,7 +520,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.vendorPrice}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="leadTime">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}</Label>
                                                         <Input
                                                             type="number"
@@ -535,7 +536,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
                                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-6">
                                                         <Label htmlFor="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
                                                         <Input
                                                             type="text"
@@ -549,16 +550,16 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                             onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
                                                         <FormFeedback className="red">{errors.gtin}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    <FormGroup className="col-md-12 md-mt-4">
                                                         {/* <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button> */}
                                                         <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                         &nbsp;
 
-                        </FormGroup>
+                        </FormGroup></Row>
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive>
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                     <thead>
                                         <tr>
                                             <th className="text-left">{i18n.t('static.procurementagent.procurementagent')}</th>
@@ -604,7 +605,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             ))
                                         }
                                     </tbody>
-
+                                    
                                 </Table>
                             </CardBody>
                             <CardFooter>
@@ -626,3 +627,4 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
+

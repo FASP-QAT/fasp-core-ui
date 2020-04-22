@@ -25,8 +25,9 @@ export default class AddInventory extends Component {
             programId: ''
         }
         this.options = props.options;
-        this.addRow = this.addRow.bind(this);
+        // this.addRow = this.addRow.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
+        this.checkValidation = this.checkValidation.bind(this);
     }
     componentDidMount() {
         const lan = 'en';
@@ -66,18 +67,16 @@ export default class AddInventory extends Component {
         }.bind(this);
 
     }
-    addRow = function () {
-        this.el.insertRow();
-    };
+    // addRow = function () {
+    //     this.el.insertRow();
+    // };
 
     formSubmit() {
         var programId = document.getElementById('programId').value;
         this.setState({ programId: programId });
-
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
-
         var dataSourceList = []
         var regionList = []
         openRequest.onsuccess = function (e) {
@@ -295,34 +294,45 @@ export default class AddInventory extends Component {
         //     })
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
-            console.log(col);
             if (value == "") {
-                console.log("in if")
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
             } else {
-                console.log("in else")
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
         }
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
-            console.log(col);
             if (value == "") {
-                console.log("in if")
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
             } else {
-                console.log("in else")
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
         }
         if (x == 2) {
             var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, "In valid Date.");
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
             console.log(col);
             if (value == "") {
                 console.log("in if")
@@ -335,7 +345,81 @@ export default class AddInventory extends Component {
                 this.el.setComments(col, "");
             }
         }
-    }.bind(this)
+    }.bind(this);
+    checkValidation() {
+        var valid = true;
+        var json = this.el.getJson();
+        for (var y = 0; y < json.length; y++) {
+
+            var col = ("A").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(0, y);
+            if (value == "Invalid date" || value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(1, y);
+            if (value == "Invalid date" || value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(2, y);
+            if (value == "Invalid date" || value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, "In valid Date.");
+                    valid = false;
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(3, y);
+            if (value == "Invalid date" || value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+    }
+
+    saveData = function () {
+        var validation = this.checkValidation();
+        if (validation == true) {
+            console.log("all good...");
+        } else {
+            console.log("some thing get wrong...");
+        }
+    }.bind(this);
+
+
     render() {
         const { programList } = this.state;
         let programs = programList.length > 0
@@ -405,7 +489,7 @@ export default class AddInventory extends Component {
                             </div>
                         </CardBody>
                         <CardFooter>
-                            <input type='button' value='Add new row' onClick={() => this.addRow()}></input>
+                            <input type='button' value='Save Data' onClick={() => this.saveData()}></input>
                         </CardFooter>
                     </Card>
                 </Col>
