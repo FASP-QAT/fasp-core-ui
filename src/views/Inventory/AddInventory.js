@@ -279,16 +279,62 @@ export default class AddInventory extends Component {
                     wordWrap: true,
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
-                    allowDeleteRow: false
+                    allowDeleteRow: false,
+                    onchange: this.changed
                 };
 
                 this.el = jexcel(document.getElementById("inventorytableDiv"), options);
             }.bind(this)
         }.bind(this)
-
-
-
     }
+    changed = function (instance, cell, x, y, value) {
+        //     $("#saveButtonDiv").show();
+        //     this.setState({
+        //         changedFlag: 1
+        //     })
+        if (x == 0) {
+            var col = ("A").concat(parseInt(y) + 1);
+            console.log(col);
+            if (value == "") {
+                console.log("in if")
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+            } else {
+                console.log("in else")
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            console.log(col);
+            if (value == "") {
+                console.log("in if")
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+            } else {
+                console.log("in else")
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            console.log(col);
+            if (value == "") {
+                console.log("in if")
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+            } else {
+                console.log("in else")
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+    }.bind(this)
     render() {
         const { programList } = this.state;
         let programs = programList.length > 0
