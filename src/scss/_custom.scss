@@ -558,6 +558,9 @@ label.arrow_label:after {
   .jexcel_filter div{margin-left: auto;}
   .f-End{padding-right: 18px !important;}
  
+  .jexcel_content{    overflow-y: auto !important;
+    max-height: 440px;
+}
  
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
