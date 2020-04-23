@@ -117,8 +117,13 @@ class MasterSyncService {
     }
 
     getRealmCountryPlanningUnitForSync(lastSyncDate){
-        return axios.get(`${API_URL}/api/realmCountry/1/planningUnit/all`, {}
-        );
+        return axios.get(`${API_URL}/api/sync/realmCountryPlanningUnit/${lastSyncDate}`, {
+        });
+    }
+
+    getProgramPlanningUnitForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/programPlanningUnit/${lastSyncDate}`, {
+        });
     }
 
 }
