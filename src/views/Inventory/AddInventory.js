@@ -24,6 +24,7 @@ export default class AddInventory extends Component {
             programId: '',
             changedFlag: 0,
             countrySKUList: []
+
         }
         this.options = props.options;
         this.addRow = this.addRow.bind(this);
@@ -71,7 +72,22 @@ export default class AddInventory extends Component {
 
     }
     addRow = function () {
-        this.el.insertRow();
+        var json = this.el.getJson();
+        var data = [];
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        data[3] = `=D${json.length}+E${json.length}`;
+        data[4] = "0";
+        data[5] = "";
+        data[6] = "";
+        data[7] = "";
+        data[8] = "";
+        this.el.insertRow(
+            data
+        );
+
+
     };
 
     getCountrySKUList() {
@@ -185,19 +201,32 @@ export default class AddInventory extends Component {
                                 inventoryDataArr[0] = data;
                             }
                             for (var j = 0; j < inventoryList.length; j++) {
-                                data = [];
-                                data[0] = inventoryList[j].dataSource.id;
-                                data[1] = inventoryList[j].region.id;
-                                data[2] = inventoryList[j].inventoryDate;
-                                data[3] = inventoryList[j].expectedBal;
-                                data[4] = inventoryList[j].adjustmentQty;
-                                data[5] = inventoryList[j].actualQty;
-                                data[6] = inventoryList[j].batchNo;
-                                data[7] = inventoryList[j].expiryDate;
-                                data[8] = inventoryList[j].active;
-                                inventoryDataArr[j] = data;
+                                if (j == 0) {
+                                    data = [];
+                                    data[0] = inventoryList[j].dataSource.id;
+                                    data[1] = inventoryList[j].region.id;
+                                    data[2] = inventoryList[j].inventoryDate;
+                                    data[3] = 0;
+                                    data[4] = inventoryList[j].adjustmentQty;
+                                    data[5] = inventoryList[j].actualQty;
+                                    data[6] = inventoryList[j].batchNo;
+                                    data[7] = inventoryList[j].expiryDate;
+                                    data[8] = inventoryList[j].active;
+                                    inventoryDataArr[j] = data;
+                                } else {
+                                    data = [];
+                                    data[0] = inventoryList[j].dataSource.id;
+                                    data[1] = inventoryList[j].region.id;
+                                    data[2] = inventoryList[j].inventoryDate;
+                                    data[3] = `=D${j}+E${j}`;
+                                    data[4] = inventoryList[j].adjustmentQty;
+                                    data[5] = inventoryList[j].actualQty;
+                                    data[6] = inventoryList[j].batchNo;
+                                    data[7] = inventoryList[j].expiryDate;
+                                    data[8] = inventoryList[j].active;
+                                    inventoryDataArr[j] = data;
+                                }
                             }
-
                             this.el = jexcel(document.getElementById("inventorytableDiv"), '');
                             this.el.destroy();
                             var json = [];
@@ -226,15 +255,16 @@ export default class AddInventory extends Component {
                                         type: 'calendar'
                                     },
                                     {
-                                        title: 'Expected Stock Qty',
+                                        title: 'Expected Stock',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Manual Adjustment',
                                         type: 'text'
                                     },
                                     {
-                                        title: 'Manual Adjustment Qty',
-                                        type: 'text'
-                                    },
-                                    {
-                                        title: 'Actual Stock Qty',
+                                        title: 'Actual Stock',
                                         type: 'text'
                                     },
                                     {
@@ -259,7 +289,10 @@ export default class AddInventory extends Component {
                                 allowInsertColumn: false,
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
-                                onchange: this.changed
+                                onchange: this.changed,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true
+                                // parseFormulas: true
                             };
 
                             this.el = jexcel(document.getElementById("inventorytableDiv"), options);
@@ -316,44 +349,57 @@ export default class AddInventory extends Component {
                 }
             }
         }
-        var skuData = {}
-        var elInstance = this.el;
-        if (x == 3) {
-            var col = ("D").concat(parseInt(y) + 1);
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-
-                var db1;
-                var storeOS;
-                getDatabase();
-                var openRequest = indexedDB.open('fasp', 1);
-                openRequest.onsuccess = function (e) {
-
-                    db1 = e.target.result;
-                    var skuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                    var skuObjectStore = skuTransaction.objectStore('realmCountryPlanningUnit');
-                    var skuRequest = skuObjectStore.get(parseInt(value));
-                    skuRequest.onsuccess = function (e) {
-                        skuData = skuRequest.result;
-                        elInstance.setValueFromCoords(4, y, skuData.multiplier, true)
-                        // elInstance.setValueFromCoords(7, y, "", true)
-                        // elInstance.setValueFromCoords(8, y, skuData.qtyOfPlanningUnits, true)
-                        // elInstance.setValueFromCoords(9, y, skuData.planningUnit.qtyOfForecastingUnits, true)
-                        // if (elInstance.getValueFromCoords(11, y) > 0) {
-                        //     var qtyInTermsOfForecastUnit = parseFloat(logisticsUnitData.qtyOfPlanningUnits * logisticsUnitData.planningUnit.qtyOfForecastingUnits * elInstance.getValueFromCoords(11, y));
-                        //     elInstance.setValueFromCoords(12, y, qtyInTermsOfForecastUnit, true)
-                        // }
-                    }
-
+                this.el.setValueFromCoords(4, y, 0, true)
+            } else {
+                if (isNaN(parseInt(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, "In valid number.");
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
                 }
             }
         }
+
+        if (x == 5) {
+            if (this.el.getValueFromCoords(5, y) != "") {
+                if (isNaN(parseInt(value))) {
+                    var col = ("F").concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, "In valid number.");
+                } else {
+                    var col = ("F").concat(parseInt(y) + 1);
+                    var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
+                    this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
+        if (x == 3) {
+            if (this.el.getValueFromCoords(5, y) != "") {
+                var col = ("F").concat(parseInt(y) + 1);
+                var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
+                this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+            }
+        }
+
     }.bind(this);
+    // -----end of changed function
+
+    onedit = function (instance, cell, x, y, value) {
+        if (x == 4) {
+            this.el.setValueFromCoords(5, y, "", true);
+        }
+    }.bind(this);
+
 
     checkValidation() {
         var valid = true;
@@ -404,17 +450,17 @@ export default class AddInventory extends Component {
             }
 
 
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+            // var col = ("D").concat(parseInt(y) + 1);
+            // var value = this.el.getValueFromCoords(3, y);
+            // if (value === "") {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, "This field is required.");
+            //     valid = false;
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // }
         }
         return valid;
     }
@@ -522,6 +568,7 @@ export default class AddInventory extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>Add Row</Button>
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
