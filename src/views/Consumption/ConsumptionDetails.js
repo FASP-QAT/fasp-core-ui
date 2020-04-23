@@ -307,6 +307,7 @@ export default class ConsumptionDetails extends React.Component {
                     data[1] = consumptionList[j].region.id;
                     data[2] = consumptionList[j].consumptionQty;
                     data[3] = consumptionList[j].dayOfStockOut;
+                    // data[3] = [0]
                     data[4] = consumptionList[j].startDate;
                     data[5] = consumptionList[j].stopDate;
                     data[7] = consumptionList[j].active;
@@ -1708,7 +1709,7 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value == "Invalid date" || value == "") {
+            if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
@@ -1720,7 +1721,7 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
-            if (value == "Invalid date" || value == "") {
+            if (value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
