@@ -937,6 +937,9 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </CardBody>
                         <CardFooter>
+                            <input type="button" value='Add Row' onClick={() => this.addRow()} />
+                        </CardFooter>
+                        <CardFooter>
                             <input type='button' value='Save Data' onClick={() => this.saveData()}></input>
                         </CardFooter>
                     </Card>
