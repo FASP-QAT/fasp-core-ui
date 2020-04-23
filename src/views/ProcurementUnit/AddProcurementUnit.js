@@ -558,7 +558,7 @@ export default class AddProcurementUnit extends Component {
                                                             invalid={touched.widthUnitId && !!errors.widthUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.procurementUnit.weightUnit.id}
+                                                            value={this.state.procurementUnit.widthUnit.id}
                                                             type="select" name="widthUnitId" id="widthUnitId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {units}
