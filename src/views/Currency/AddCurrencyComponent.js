@@ -5,6 +5,7 @@ import * as Yup from 'yup'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.currency.currencyMaster');
@@ -160,26 +161,26 @@ export default class AddCurrencyComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+                                        // .catch(
+                                        //     error => {
+                                        //         if (error.message === "Network Error") {
+                                        //             this.setState({ message: error.message });
+                                        //         } else {
+                                        //             switch (error.response ? error.response.status : "") {
+                                        //                 case 500:
+                                        //                 case 401:
+                                        //                 case 404:
+                                        //                 case 406:
+                                        //                 case 412:
+                                        //                     this.setState({ message: error.response.data.messageCode });
+                                        //                     break;
+                                        //                 default:
+                                        //                     this.setState({ message: 'static.unkownError' });
+                                        //                     break;
+                                        //             }
+                                        //         }
+                                        //     }
+                                        // );
                                 }}
 
 
