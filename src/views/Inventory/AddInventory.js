@@ -465,6 +465,8 @@ export default class AddInventory extends Component {
                 }
             );
             console.log("all good...");
+            var tableJson = this.el.getJson();
+            console.log(tableJson);
         } else {
             console.log("some thing get wrong...");
         }
