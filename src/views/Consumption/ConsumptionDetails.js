@@ -943,8 +943,9 @@ export default class ConsumptionDetails extends React.Component {
                             <strong>Consumption details</strong>
                         </CardHeader>
                         <CardBody>
-                            <div id="consumptiontableDiv" className="table-responsive">
-                            </div>
+                            <div className="table-responsive"><div id="consumptiontableDiv" >
+                            </div></div>
+                            
                         </CardBody>
                         <CardFooter>
                             <input type="button" value='Add Row' onClick={() => this.addRow()} />
