@@ -27,5 +27,10 @@ class ProcurementUnitService {
         return axios.put(`${API_URL}/api/procurementUnit/`, json, {}
         );
     }
+
+    getProcurementUnitByRealmId(json) {
+        return axios.get(`${API_URL}/api/procurementUnit/realmId/${json}`, {}
+        );
+    }
 }
 export default new ProcurementUnitService()

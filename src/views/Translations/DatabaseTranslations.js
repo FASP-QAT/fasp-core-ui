@@ -63,6 +63,7 @@ export default class DatabaseTranslations extends React.Component {
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
+                    position:'top',
                     paginationOptions: [25, 50, 75, 100],
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
@@ -163,7 +164,7 @@ export default class DatabaseTranslations extends React.Component {
                             <strong>{i18n.t('static.label.databaseTranslations')}</strong>
                         </CardHeader>
                         <CardBody className="table-responsive">
-                        <div id="loader" class="center"></div>
+                        <div id="loader" className="center"></div>
                         <div id="databaseTranslationTable"></div>
                         </CardBody>
                         <CardFooter>

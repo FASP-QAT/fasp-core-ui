@@ -195,7 +195,6 @@ class ListSubFundingSourceComponent extends Component {
             }]
         }
 
-
         return (
             <div className="animated">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
