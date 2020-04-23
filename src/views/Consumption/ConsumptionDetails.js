@@ -321,6 +321,7 @@ export default class ConsumptionDetails extends React.Component {
                             data[4] = consumptionList[j].startDate;
                             data[5] = consumptionList[j].stopDate;
                             data[7] = consumptionList[j].active;
+                            data[8] = consumptionList[j].actualFlag;
 
                             consumptionDataArr[j] = data;
                         }
@@ -334,7 +335,7 @@ export default class ConsumptionDetails extends React.Component {
                         var options = {
                             data: data,
                             columnDrag: true,
-                            colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
+                            colWidths: [180, 180, 180, 180, 180, 180, 180, 180,180],
                             columns: [
                                 // { title: 'Month', type: 'text', readOnly: true },
                                 {
@@ -366,6 +367,11 @@ export default class ConsumptionDetails extends React.Component {
                                 {
                                     title: 'Active',
                                     type: 'checkbox'
+                                },
+                                {
+                                    title: 'Actual Flag',
+                                    type: 'dropdown',
+                                    source: [{id:true,name:'Actual'},{id:false,name:'Forecast'}]
                                 },
 
 
@@ -757,6 +763,7 @@ export default class ConsumptionDetails extends React.Component {
                     var programJson = JSON.parse(programData);
                     var plannigUnitId = document.getElementById("planningUnitId").value;
                     var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+                    console.log("000000000000000   ",consumptionDataList)
                     for (var i = 0; i < consumptionDataList.length; i++) {
                         var map = new Map(Object.entries(tableJson[i]))
                         consumptionDataList[i].dataSource.id = map.get("0");
@@ -766,6 +773,7 @@ export default class ConsumptionDetails extends React.Component {
                         consumptionDataList[i].startDate = map.get("4");
                         consumptionDataList[i].stopDate = map.get("5");
                         consumptionDataList[i].active = map.get("6");
+                        consumptionDataList[i].actualFlag = map.get("7");
 
                     }
                     for (var i = consumptionDataList.length; i < tableJson.length; i++) {
@@ -783,12 +791,14 @@ export default class ConsumptionDetails extends React.Component {
                             startDate: map.get("4"),
                             stopDate: map.get("5"),
                             active: map.get("6"),
+                            actualFlag: map.get("7"),
                             planningUnit: {
                                 id: plannigUnitId
                             }
                         }
                         consumptionDataList[i] = json;
                     }
+                    console.log("1111111111111111111   ",consumptionDataList)
                     programJson.consumptionList = consumptionDataList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
@@ -1732,6 +1742,17 @@ export default class ConsumptionDetails extends React.Component {
                 }
             }
         }
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
         // var skuData = {}
         // var elInstance = this.el;
         // if (x == 3) {
@@ -1861,6 +1882,18 @@ export default class ConsumptionDetails extends React.Component {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
+            if (value == "Invalid date" || value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
 
 
