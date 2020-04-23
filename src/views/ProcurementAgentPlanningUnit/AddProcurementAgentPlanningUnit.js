@@ -656,7 +656,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                   
+
                                         {
                                             this.state.rows.map((item, idx) => (
                                                 <tr id="addr0" key={idx}>
@@ -698,11 +698,11 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                 </tr>
                                             ))
                                         }
-                                        
+
                                     </tbody>
-                                   
+                                    {/* <div id="loader" class="center"></div> */}
                                 </Table>
-                                
+
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
@@ -724,3 +724,19 @@ export default class AddProcurementAgentPlanningUnit extends Component {
     }
 }
 
+<<<<<<< HEAD
+=======
+document.onreadystatechange = function () {
+    if (document.readyState !== "complete") {
+        document.querySelector(
+            "table").style.visibility = "hidden";
+        document.querySelector(
+            "#loader").style.visibility = "visible";
+    } else {
+        document.querySelector(
+            "#loader").style.display = "none";
+        document.querySelector(
+            "table").style.visibility = "visible";
+    }
+};
+>>>>>>> dev
