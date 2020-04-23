@@ -18,30 +18,30 @@ import i18n from '../../../i18n'
 const validationSchema = function (values) {
     return Yup.object().shape({
         oldPassword: Yup.string()
-            .required('Please enter old password'),
+            .required(i18n.t('static.message.oldPassword')),
         newPassword: Yup.string()
-            .min(6, `Password has to be at least 6 characters`)
-            .matches(/^(?!.*password).*$/, 'Password should not contain password string')
-            .matches(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/, 'Password must contain atleast 1 special character')
-            .matches(/^(?=.*\d).*$/, 'Password must contain atleast 1 number')
-            .matches(/^(?=.*[A-Z]).*$/, 'Password must contain atleast 1 uppercase alphabet')
-            .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
-            .test('username', "New password should not be same as username ",
+            .min(6, i18n.t('static.message.newPasswordMinLength'))
+            .matches(/^(?!.*password).*$/, i18n.t('static.message.newPasswordPassString'))
+            .matches(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/, i18n.t('static.message.newPasswordSpecialChar'))
+            .matches(/^(?=.*\d).*$/, i18n.t('static.message.newPasswordNumber'))
+            .matches(/^(?=.*[A-Z]).*$/, i18n.t('static.message.newPasswordUppercase'))
+            .matches(/^[a-zA-Z]/i, i18n.t('static.message.newPasswordStartAlphabet'))
+            .test('username', i18n.t('static.message.newPasswordNotSameAsUsername'),
                 function (value) {
                     if ((values.username != value)) {
                         return true;
                     }
                 })
-            .test('oldPassword', "New password should not be same as old password ",
+            .test('oldPassword', i18n.t('static.message.newPasswordNotSameAsOldPassword'),
                 function (value) {
                     if (values.oldPassword != value) {
                         return true;
                     }
                 })
-            .required('Please enter new password'),
+            .required(i18n.t('static.message.newPasswordRequired')),
         confirmNewPassword: Yup.string()
-            .oneOf([values.newPassword], 'Passwords must match')
-            .required('Please confirm new password')
+            .oneOf([values.newPassword], i18n.t('static.message.confirmPassword'))
+            .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
 
@@ -77,7 +77,7 @@ class ChangePasswordComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/Action Canceled`)
+        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
@@ -107,7 +107,7 @@ class ChangePasswordComponent extends Component {
     componentDidMount() {
         let username = AuthenticationService.getLoggedInUsername();
         this.setState({ username },
-            () => {  });
+            () => { });
     }
     render() {
         return (
@@ -158,7 +158,7 @@ class ChangePasswordComponent extends Component {
 
                                     } else {
                                         this.setState({
-                                            message: "You must be online to update the password."
+                                            message: 'static.common.onlinepasswordtext'
                                         });
                                     }
                                 }}
@@ -184,7 +184,7 @@ class ChangePasswordComponent extends Component {
                                                         hidden
                                                     />
                                                     <FormGroup>
-                                                        <Label for="oldPassword">Old Password</Label>
+                                                        <Label for="oldPassword">{i18n.t('static.user.oldPasswordLabel')}</Label>
                                                         <Input type="password"
                                                             name="oldPassword"
                                                             id="oldPassword"
@@ -198,7 +198,7 @@ class ChangePasswordComponent extends Component {
                                                         <FormFeedback>{errors.oldPassword}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="newPassword">New Password</Label>
+                                                        <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
                                                         <Input type="password"
                                                             name="newPassword"
                                                             id="newPassword"
@@ -212,7 +212,7 @@ class ChangePasswordComponent extends Component {
                                                         <FormFeedback>{errors.newPassword}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="confirmNewPassword">Confirm New Password</Label>
+                                                        <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
                                                         <Input type="password"
                                                             name="confirmNewPassword"
                                                             id="confirmNewPassword"
@@ -228,8 +228,8 @@ class ChangePasswordComponent extends Component {
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                        <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                           </FormGroup>
                                                 </CardFooter>

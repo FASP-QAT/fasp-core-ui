@@ -405,7 +405,7 @@ class AccessControlComponent extends Component {
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <strong>Add Access Control</strong>
+                                <strong>{i18n.t('static.user.accessControl')}</strong>
                             </CardHeader>
                             
                             <CardBody>
