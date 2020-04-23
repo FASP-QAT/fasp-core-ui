@@ -62,12 +62,12 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'text' },
                         { type: 'text' },
                     ],
-                    pagination: 25,
+                    pagination: 10,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [25, 50, 75, 100],
+                    paginationOptions: [10, 25, 50, 100],
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     onchange: this.changed,
@@ -237,16 +237,4 @@ export default class DatabaseTranslations extends React.Component {
     }.bind(this)
 }
 
-document.onreadystatechange = function() { 
-    if (document.readyState !== "complete") { 
-        document.querySelector( 
-          "table").style.visibility = "hidden"; 
-        document.querySelector( 
-          "#loader").style.visibility = "visible"; 
-    } else { 
-        document.querySelector( 
-          "#loader").style.display = "none"; 
-        document.querySelector( 
-          "table").style.visibility = "visible"; 
-    } 
-};
+

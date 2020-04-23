@@ -7,6 +7,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.currency.currencyMaster');
@@ -15,7 +16,7 @@ let initialValues = {
     currencySymbol: '',
     label: '',
     conversionRate: '',
-    isSync:true
+    isSync: true
 }
 
 const validationSchema = function (values) {
@@ -74,7 +75,7 @@ export default class UpdateCurrencyComponent extends Component {
                     label_fr: ''
                 },
                 conversionRateToUsd: '',
-                isSync:'true'
+                isSync: 'true'
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -83,7 +84,11 @@ export default class UpdateCurrencyComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
 
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     dataChange(event) {
@@ -101,7 +106,7 @@ export default class UpdateCurrencyComponent extends Component {
 
         else if (event.target.name === "conversionRate") {
             this.state.currency.conversionRateToUsd = event.target.value
-        }else if (event.target.name === "isSync") {
+        } else if (event.target.name === "isSync") {
             this.state.currency.isSync = event.target.id === "active2" ? false : true;
         }
 
@@ -165,6 +170,7 @@ export default class UpdateCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -179,7 +185,7 @@ export default class UpdateCurrencyComponent extends Component {
                                     currencySymbol: this.state.currency.currencySymbol,
                                     label: getLabelText(this.state.currency.label, this.state.lang),
                                     conversionRate: this.state.currency.conversionRateToUsd,
-                                    isSync:this.state.currency.isSync
+                                    isSync: this.state.currency.isSync
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -195,26 +201,26 @@ export default class UpdateCurrencyComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+                                    // .catch(
+                                    //     error => {
+                                    //         if (error.message === "Network Error") {
+                                    //             this.setState({ message: error.message });
+                                    //         } else {
+                                    //             switch (error.response ? error.response.status : "") {
+                                    //                 case 500:
+                                    //                 case 401:
+                                    //                 case 404:
+                                    //                 case 406:
+                                    //                 case 412:
+                                    //                     this.setState({ message: error.response.data.messageCode });
+                                    //                     break;
+                                    //                 default:
+                                    //                     this.setState({ message: 'static.unkownError' });
+                                    //                     break;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // );
                                 }}
 
 
@@ -309,7 +315,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                                 id="active1"
                                                                 name="isSync"
                                                                 value={true}
-                                                                checked={this.state.currency.isSync===true}
+                                                                checked={this.state.currency.isSync === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -325,7 +331,7 @@ export default class UpdateCurrencyComponent extends Component {
                                                                 id="active2"
                                                                 name="isSync"
                                                                 value={false}
-                                                                checked={this.state.currency.isSync===false}
+                                                                checked={this.state.currency.isSync === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
