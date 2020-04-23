@@ -243,6 +243,21 @@ export default class syncPage extends Component {
     return (
       <div>
         <Row>
+        <Col md="12">
+          <Card>
+              <CardBody>
+                  <ul class="legend">
+                     <li><span class="lightpinklegend"></span> Light pink colour for difference </li>
+                     <li><span class="greenlegend"></span> New data from latest version</li>
+                      <li><span class="redlegend"></span> Inactive Data</li>
+                     <li><span class="notawesome"></span>  New data from current version</li>
+                  </ul>
+               </CardBody>
+             </Card>
+
+          </Col>
+        </Row>
+        <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
