@@ -134,7 +134,7 @@ export default class ForecastingUnitListComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
             .then(response => {
-
+console.log(JSON.stringify(response.data))
 
 
                 this.setState({
@@ -321,9 +321,10 @@ export default class ForecastingUnitListComponent extends Component {
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
+                console.log(JSON.stringify(item))
                 return (
                     <option key={i} value={item.productCategoryId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -393,6 +394,7 @@ export default class ForecastingUnitListComponent extends Component {
             firstPageTitle: i18n.t('static.common.nextPage'),
             lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
+            paginationSize:2,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
             sizePerPageList: [{

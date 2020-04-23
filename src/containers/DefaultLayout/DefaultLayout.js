@@ -26,6 +26,7 @@ const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
+
 class DefaultLayout extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
@@ -319,7 +320,17 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                           }
                         ]
-                      },
+                      }, {
+                        name: i18n.t('static.dashboard.report'),
+                        icon: 'fa fa-list',
+                        children: [
+                          {
+                            name: i18n.t('static.dashboard.productcatalog'),
+                            url: '/report/productCatalog',
+                            icon: 'fa fa-exchange'
+                          }
+                        ]
+                      }
                       // {
                       //   name: "Supply plan",
                       //   icon: 'fa fa-list',
@@ -409,5 +420,7 @@ class DefaultLayout extends Component {
     );
   }
 }
+
+
 
 export default DefaultLayout;
