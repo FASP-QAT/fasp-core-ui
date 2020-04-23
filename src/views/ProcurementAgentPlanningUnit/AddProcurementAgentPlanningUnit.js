@@ -492,147 +492,147 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='procurementAgentPlanningUnitForm'>
                                                     <Row>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
-                                                            <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
-                                                                {programs}
-                                                            </Input>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                            <Input
-                                                                type="select"
-                                                                name="planningUnitId"
-                                                                id="select"
-                                                                bsSize="sm"
-                                                                valid={!errors.planningUnitId}
-                                                                invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                                                value={this.state.planningUnitId}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
-                                                                required
-                                                            >
-                                                                <option value="">Please select</option>
-                                                                {products}
-                                                            </Input>
-                                                            <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
-                                                            <Input
-                                                                type="text"
-                                                                name="skuCode"
-                                                                id="skuCode"
-                                                                value={this.state.skuCode}
-                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
-                                                                bsSize="sm"
-                                                                valid={!errors.skuCode}
-                                                                invalid={touched.skuCode && !!errors.skuCode}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                            <FormFeedback className="red">{errors.skuCode}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.catalogPrice')}</Label>
-                                                            <Input
-                                                                type="number"
-                                                                min="0"
-                                                                name="catalogPrice"
-                                                                id="catalogPrice"
-                                                                value={this.state.catalogPrice}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.catalogPriceText')}
-                                                                bsSize="sm"
-                                                                valid={!errors.catalogPrice}
-                                                                invalid={touched.catalogPrice && !!errors.catalogPrice}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                            <FormFeedback className="red">{errors.catalogPrice}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}</Label>
-                                                            <Input
-                                                                type="number"
-                                                                min="0"
-                                                                name="moq"
-                                                                id="moq"
-                                                                value={this.state.moq}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.moqText')}
-                                                                bsSize="sm"
-                                                                valid={!errors.moq}
-                                                                invalid={touched.moq && !!errors.moq}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                            <FormFeedback className="red">{errors.moq}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}</Label>
-                                                            <Input
-                                                                type="number"
-                                                                min="0"
-                                                                name="unitsPerPallet"
-                                                                id="unitsPerPallet"
-                                                                value={this.state.unitsPerPallet}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerPalletText')}
-                                                                bsSize="sm"
-                                                                valid={!errors.unitsPerPallet}
-                                                                invalid={touched.unitsPerPallet && !!errors.unitsPerPallet}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                            <FormFeedback className="red">{errors.unitsPerPallet}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}</Label>
-                                                            <Input
-                                                                type="number"
-                                                                min="0"
-                                                                name="unitsPerContainer"
-                                                                id="unitsPerContainer"
-                                                                value={this.state.unitsPerContainer}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerContainerText')}
-                                                                bsSize="sm"
-                                                                valid={!errors.unitsPerContainer}
-                                                                invalid={touched.unitsPerContainer && !!errors.unitsPerContainer}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                            <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}</Label>
-                                                            <Input
-                                                                type="number"
-                                                                min="0"
-                                                                name="volume"
-                                                                id="volume"
-                                                                value={this.state.volume}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.volumeText')}
-                                                                bsSize="sm"
-                                                                valid={!errors.volume}
-                                                                invalid={touched.volume && !!errors.volume}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                            <FormFeedback className="red">{errors.volume}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}</Label>
-                                                            <Input
-                                                                type="number"
-                                                                min="0"
-                                                                name="weight"
-                                                                id="weight"
-                                                                value={this.state.weight}
-                                                                placeholder={i18n.t('static.procurementAgentPlanningUnit.weightText')}
-                                                                bsSize="sm"
-                                                                valid={!errors.weight}
-                                                                invalid={touched.weight && !!errors.weight}
-                                                                onBlur={handleBlur}
-                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                            <FormFeedback className="red">{errors.weight}</FormFeedback>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-6 mt-md-4">
-                                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
-                                                            <Button type="submit" size="md" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                            &nbsp;
-    
+                                                    <FormGroup className="col-md-6"> 
+                                                        <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
+                                                        <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
+                                                            {programs}
+                                                        </Input>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="planningUnitId"
+                                                            id="select"
+                                                            bsSize="sm"
+                                                            valid={!errors.planningUnitId}
+                                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                            value={this.state.planningUnitId}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            required
+                                                        >
+                                                            <option value="">Please select</option>
+                                                            {products}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="skuCode"
+                                                            id="skuCode"
+                                                            value={this.state.skuCode}
+                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.skuCode}
+                                                            invalid={touched.skuCode && !!errors.skuCode}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.skuCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6"> 
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.catalogPrice')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="catalogPrice"
+                                                            id="catalogPrice"
+                                                            value={this.state.catalogPrice}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.catalogPriceText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.catalogPrice}
+                                                            invalid={touched.catalogPrice && !!errors.catalogPrice}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.catalogPrice}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.moq')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="moq"
+                                                            id="moq"
+                                                            value={this.state.moq}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.moqText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.moq}
+                                                            invalid={touched.moq && !!errors.moq}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.moq}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerPallet')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="unitsPerPallet"
+                                                            id="unitsPerPallet"
+                                                            value={this.state.unitsPerPallet}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerPalletText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.unitsPerPallet}
+                                                            invalid={touched.unitsPerPallet && !!errors.unitsPerPallet}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.unitsPerPallet}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.unitPerContainer')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="unitsPerContainer"
+                                                            id="unitsPerContainer"
+                                                            value={this.state.unitsPerContainer}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.unitPerContainerText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.unitsPerContainer}
+                                                            invalid={touched.unitsPerContainer && !!errors.unitsPerContainer}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.unitsPerContainer}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.volume')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="volume"
+                                                            id="volume"
+                                                            value={this.state.volume}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.volumeText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.volume}
+                                                            invalid={touched.volume && !!errors.volume}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.volume}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="company">{i18n.t('static.procurementAgentPlanningUnit.weight')}</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            name="weight"
+                                                            id="weight"
+                                                            value={this.state.weight}
+                                                            placeholder={i18n.t('static.procurementAgentPlanningUnit.weightText')}
+                                                            bsSize="sm"
+                                                            valid={!errors.weight}
+                                                            invalid={touched.weight && !!errors.weight}
+                                                            onBlur={handleBlur}
+                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                        <FormFeedback className="red">{errors.weight}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6 mt-md-4">
+                                                        {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
+                                                        <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                        &nbsp;
+
                         </FormGroup></Row>
                                                 </Form>
                                             )} />

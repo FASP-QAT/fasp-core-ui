@@ -11,6 +11,7 @@ import 'react-select/dist/react-select.min.css';
 
 import LanguageService from '../../api/LanguageService.js'
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const initialValues = {
     languageName: "",
@@ -60,7 +61,6 @@ class AddLanguageComponent extends Component {
         }
 
         // this.Capitalize = this.Capitalize.bind(this);
-
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);

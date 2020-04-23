@@ -6,13 +6,15 @@ import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
     CardFooter, Button, Col, Form
-    , FormFeedback, Row
+    , FormFeedback, Row, InputGroup, InputGroupAddon
 } from 'reactstrap';
 import { Formik } from 'formik';
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import getLabelText from '../../CommonComponent/getLabelText'
+import getLabelText from '../../CommonComponent/getLabelText';
+import i18n from '../../i18n';
+
 
 export default class AddInventory extends Component {
     constructor(props) {
@@ -20,12 +22,15 @@ export default class AddInventory extends Component {
         this.state = {
             programList: [],
             programId: '',
-            changedFlag: 0
+            changedFlag: 0,
+            countrySKUList: []
         }
         this.options = props.options;
-        // this.addRow = this.addRow.bind(this);
+        this.addRow = this.addRow.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
+        this.getCountrySKUList = this.getCountrySKUList.bind(this);
     }
     componentDidMount() {
         const lan = 'en';
@@ -65,10 +70,50 @@ export default class AddInventory extends Component {
         }.bind(this);
 
     }
-    // addRow = function () {
-    //     this.el.insertRow();
-    // };
+    addRow = function () {
+        this.el.insertRow();
+    };
 
+    getCountrySKUList() {
+        var programId = document.getElementById('programId').value;
+        this.setState({ programId: programId });
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        var countrySKUList = []
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                var countrySKUTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                var countrySKUOs = countrySKUTransaction.objectStore('realmCountryPlanningUnit');
+                var countrySKURequest = countrySKUOs.getAll();
+                countrySKURequest.onsuccess = function (event) {
+                    var countrySKUResult = [];
+                    countrySKUResult = countrySKURequest.result;
+                    for (var k = 0; k < countrySKUResult.length; k++) {
+                        if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId) {
+                            var countrySKUJson = {
+                                name: countrySKUResult[k].label.label_en,
+                                id: countrySKUResult[k].realmCountryPlanningUnitId
+                            }
+                            countrySKUList[k] = countrySKUJson
+                        }
+                    }
+                    console.log("countryasdas", countrySKUList);
+                    this.setState({ countrySKUList: countrySKUList });
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
     formSubmit() {
         if (this.state.changedFlag == 1) {
             alert("Click save to continue !")
@@ -111,200 +156,118 @@ export default class AddInventory extends Component {
                             }
                         }
 
-                        var countrySKUTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-                        var countrySKUOs = countrySKUTransaction.objectStore('realmCountryPlanningUnit');
-                        var countrySKURequest = countrySKUOs.getAll();
-                        countrySKURequest.onsuccess = function (event) {
-                            var countrySKUResult = [];
-                            countrySKUResult = countrySKURequest.result;
-                            for (var k = 0; k < countrySKUResult.length; k++) {
-                                if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId) {
-                                    var countrySKUJson = {
-                                        name: countrySKUResult[k].label.label_en,
-                                        id: countrySKUResult[k].realmCountryPlanningUnitId
+
+                        var regionTransaction = db1.transaction(['region'], 'readwrite');
+                        var regionOs = regionTransaction.objectStore('region');
+                        var regionRequest = regionOs.getAll();
+                        regionRequest.onsuccess = function (event) {
+                            var regionResult = [];
+                            regionResult = regionRequest.result;
+                            for (var k = 0; k < regionResult.length; k++) {
+                                if (regionResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
+                                    var regionJson = {
+                                        name: regionResult[k].label.label_en,
+                                        id: regionResult[k].regionId
                                     }
-                                    countrySKUList[k] = countrySKUJson
+                                    regionList[k] = regionJson
                                 }
                             }
-                            console.log("countryasdas", countrySKUList);
-                            var regionTransaction = db1.transaction(['region'], 'readwrite');
-                            var regionOs = regionTransaction.objectStore('region');
-                            var regionRequest = regionOs.getAll();
-                            regionRequest.onsuccess = function (event) {
-                                var regionResult = [];
-                                regionResult = regionRequest.result;
-                                for (var k = 0; k < regionResult.length; k++) {
-                                    if (regionResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
-                                        var regionJson = {
-                                            name: regionResult[k].label.label_en,
-                                            id: regionResult[k].regionId
-                                        }
-                                        regionList[k] = regionJson
+                            var countrySKUId = document.getElementById('countrySKU').value;
+                            var inventoryList = (programJson.inventoryList).filter(i => i.realmCountryPlanningUnit.id == countrySKUId);
+                            this.setState({
+                                inventoryList: inventoryList
+                            });
+
+                            var data = [];
+                            var inventoryDataArr = []
+                            if (inventoryList.length == 0) {
+                                data = [];
+                                inventoryDataArr[0] = data;
+                            }
+                            for (var j = 0; j < inventoryList.length; j++) {
+                                data = [];
+                                data[0] = inventoryList[j].dataSource.id;
+                                data[1] = inventoryList[j].region.id;
+                                data[2] = inventoryList[j].inventoryDate;
+                                data[3] = inventoryList[j].expectedBal;
+                                data[4] = inventoryList[j].adjustmentQty;
+                                data[5] = inventoryList[j].actualQty;
+                                data[6] = inventoryList[j].batchNo;
+                                data[7] = inventoryList[j].expiryDate;
+                                data[8] = inventoryList[j].active;
+                                inventoryDataArr[j] = data;
+                            }
+
+                            this.el = jexcel(document.getElementById("inventorytableDiv"), '');
+                            this.el.destroy();
+                            var json = [];
+                            var data = inventoryDataArr;
+                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                            // json[0] = data;
+                            var options = {
+                                data: data,
+                                columnDrag: true,
+                                colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                                columns: [
+
+                                    {
+                                        title: 'Data source',
+                                        type: 'dropdown',
+                                        source: dataSourceList
+                                    },
+                                    {
+                                        title: 'Region',
+                                        type: 'dropdown',
+                                        source: regionList
+                                        // readOnly: true
+                                    },
+                                    {
+                                        title: 'Inventory Date',
+                                        type: 'calendar'
+                                    },
+                                    {
+                                        title: 'Expected Stock Qty',
+                                        type: 'text'
+                                    },
+                                    {
+                                        title: 'Manual Adjustment Qty',
+                                        type: 'text'
+                                    },
+                                    {
+                                        title: 'Actual Stock Qty',
+                                        type: 'text'
+                                    },
+                                    {
+                                        title: 'Batch Number',
+                                        type: 'text'
+                                    },
+                                    {
+                                        title: 'Expire Date',
+                                        type: 'calendar'
+                                    },
+                                    {
+                                        title: 'Active',
+                                        type: 'checkbox'
                                     }
-                                }
 
-                                var inventoryList = programJson.inventoryList;
-                                this.setState({
-                                    inventoryList: inventoryList
-                                });
+                                ],
+                                pagination: 10,
+                                search: true,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onchange: this.changed
+                            };
 
-                                var data = [];
-                                var inventoryDataArr = []
-                                if (inventoryList.length == 0) {
-                                    data = [];
-                                    inventoryDataArr[0] = data;
-                                }
-                                for (var j = 0; j < inventoryList.length; j++) {
-                                    data = [];
-                                    data[0] = inventoryList[j].dataSource.id;
-                                    data[1] = inventoryList[j].region.id;
-                                    data[2] = inventoryList[j].inventoryDate;
-                                    data[3] = inventoryList[j].realmCountryPlanningUnit.id;
-                                    data[4] = inventoryList[j].multiplier;
-                                    data[5] = inventoryList[j].adjustmentQty;
-                                    // data[5] = inventoryList[j].multiplier * inventoryList[j].adjustmentQty;
-                                    data[6] = `=E${j + 1} * F${j + 1} `
-                                    data[7] = inventoryList[j].actualQty;
-                                    data[8] = `=E${j + 1} * H${j + 1} `;
-                                    data[9] = '';
-                                    data[10] = '';
-                                    data[11] = inventoryList[j].active;
-
-                                    inventoryDataArr[j] = data;
-                                }
-
-                                this.el = jexcel(document.getElementById("inventorytableDiv"), '');
-                                this.el.destroy();
-                                var json = [];
-                                var data = inventoryDataArr;
-                                // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                                // json[0] = data;
-                                var options = {
-                                    data: data,
-                                    nestedHeaders: [
-                                        [
-                                            {
-                                                title: '',
-                                                colspan: '5',
-                                            },
-                                            // {
-                                            //     title: 'Expected Stock',
-                                            //     colspan: '2'
-                                            // },
-                                            {
-                                                title: 'Manual Adjustment',
-                                                colspan: '2'
-                                            }, {
-                                                title: 'Actual Stock count',
-                                                colspan: '2'
-                                            },
-                                            // {
-                                            //     title: 'Final Adjustment',
-                                            //     colspan: '2'
-                                            // },
-                                            {
-                                                title: '',
-                                                colspan: '4',
-                                            }
-                                        ],
-                                    ],
-                                    columnDrag: true,
-                                    colWidths: [110, 110, 100, 130, 100, 180, 180, 180, 180, 180, 180, 180, 180, 100],
-                                    columns: [
-                                        // { title: 'Month', type: 'text', readOnly: true },
-                                        {
-                                            title: 'Data source',
-                                            type: 'dropdown',
-                                            source: dataSourceList
-                                        },
-                                        {
-                                            title: 'Region',
-                                            type: 'dropdown',
-                                            source: regionList
-                                            // readOnly: true
-                                        },
-                                        {
-                                            title: 'Inventory Date',
-                                            type: 'calendar'
-                                        },
-                                        {
-                                            title: 'Country SKU',
-                                            type: 'dropdown',
-                                            source: countrySKUList
-                                        },
-                                        // {
-                                        //     title: 'SKU Code',
-                                        //     type: 'text'
-                                        // },
-                                        {
-                                            title: 'Conversion Units',
-                                            type: 'text',
-                                            readOnly: true
-                                        },
-
-                                        // {
-                                        //     title: 'Quantity',
-                                        //     type: 'text'
-                                        // },
-                                        // {
-                                        //     title: 'Planning Unit Qty',
-                                        //     type: 'text'
-                                        // },
-                                        {
-                                            title: 'Quantity',
-                                            type: 'text'
-                                        },
-                                        {
-                                            title: 'Planning Unit Qty',
-                                            type: 'text'
-                                        },
-                                        {
-                                            title: 'Quantity',
-                                            type: 'text'
-                                        },
-                                        {
-                                            title: 'Planning Unit Qty',
-                                            type: 'text'
-                                        },
-                                        // {
-                                        //     title: 'Quantity',
-                                        //     type: 'text'
-                                        // },
-                                        // {
-                                        //     title: 'Planning Unit Qty',
-                                        //     type: 'text'
-                                        // },
-                                        {
-                                            title: 'Batch Number',
-                                            type: 'text'
-                                        },
-                                        {
-                                            title: 'Expire Date',
-                                            type: 'calendar'
-                                        },
-                                        {
-                                            title: 'Active',
-                                            type: 'checkbox'
-                                        }
-
-                                    ],
-                                    pagination: 10,
-                                    search: true,
-                                    columnSorting: true,
-                                    tableOverflow: true,
-                                    wordWrap: true,
-                                    allowInsertColumn: false,
-                                    allowManualInsertColumn: false,
-                                    allowDeleteRow: false,
-                                    onchange: this.changed
-                                };
-
-                                this.el = jexcel(document.getElementById("inventorytableDiv"), options);
-                            }.bind(this)
+                            this.el = jexcel(document.getElementById("inventorytableDiv"), options);
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
+
         }
     }
 
@@ -483,72 +446,94 @@ export default class AddInventory extends Component {
                 )
             }, this);
 
+        const { countrySKUList } = this.state;
+        let countrySKUs = countrySKUList.length > 0
+            && countrySKUList.map((item, i) => {
+                return (
+                    //             // {this.getText(dataSource.label,lan)}
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
         return (
 
             <div className="animated fadeIn">
                 <Col xs="12" sm="12">
                     <Card>
-                        <Formik
-                            render={
-                                ({
-                                }) => (
-                                        <Form name='simpleForm'>
-                                            <CardHeader>
-                                                <strong>Inventory details</strong>
-                                            </CardHeader>
-                                            <CardBody>
-                                                <Card className="card-accent-success">
 
-                                                    <Row>
-                                                        <Col md="1"></Col>
-                                                        <Col md="3">
-                                                            <br />
-                                                            <Label htmlFor="select">Program</Label><br />
-                                                            <Input type="select"
-                                                                bsSize="sm"
-                                                                // value={this.state.programId}
-                                                                name="programId" id="programId"
-                                                            // onChange={(e) => { this.getPlanningUnitList(e) }}
-                                                            >
-                                                                <option value="0">Please select</option>
-                                                                {programs}
-                                                            </Input><br />
-                                                        </Col>
-
-
-                                                        <Col md="1">
-                                                            <br /><br />
-                                                            <FormGroup>
-                                                                <Button type="button" size="sm" color="primary" className="float-right btn btn-secondary Gobtn btn-sm mt-2" onClick={() => this.formSubmit()}> Go</Button>
-                                                                &nbsp;
-                                                            </FormGroup>
-
-                                                        </Col>
-                                                    </Row>
-
-                                                </Card>
-                                            </CardBody>
-                                        </Form>
-                                    )} />
-                    </Card>
-                </Col>
-                <Col xs="12" sm="12">
-                    <Card>
                         <CardHeader>
                             <strong>Inventory details</strong>
                         </CardHeader>
                         <CardBody>
-                            <div id="inventorytableDiv" className="table-responsive">
-                            </div>
+                            <Formik
+                                render={
+                                    ({
+                                    }) => (
+                                            <Form name='simpleForm'>
+
+                                                <Col md="9 pl-0">
+                                                    <div className="d-md-flex">
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        // value={this.state.programId}
+                                                                        name="programId" id="programId"
+                                                                        onChange={this.getCountrySKUList}
+                                                                    >
+                                                                        <option value="0">Please select</option>
+                                                                        {programs}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Country SKU</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="countrySKU"
+                                                                        id="countrySKU"
+                                                                        bsSize="sm"
+                                                                    >
+                                                                        <option value="0">Please Select</option>
+                                                                        {countrySKUs}
+                                                                    </Input>
+                                                                    <InputGroupAddon addonType="append">
+                                                                        <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                                                    </InputGroupAddon>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </div>
+                                                </Col>
+                                            </Form>
+                                        )} />
+
+                            <Col xs="12" sm="12">
+                                <div id="inventorytableDiv" className="table-responsive">
+                                </div>
+                            </Col>
                         </CardBody>
                         <CardFooter>
-                            <input type='button' value='Save Data' onClick={() => this.saveData()}></input>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
+                                &nbsp;
+</FormGroup>
                         </CardFooter>
                     </Card>
                 </Col>
 
             </div >
         );
+    }
+
+    cancelClicked() {
+        this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled'))
     }
 
 }

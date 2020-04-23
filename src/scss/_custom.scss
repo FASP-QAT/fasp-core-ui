@@ -553,6 +553,15 @@ label.arrow_label:after {
   .forInlinebtnMappinglistRealm{display: flex; justify-content: center;    width: 235px;
   }
   .updateTextwhitebtn .btn-info{color: #fff!important;}
+  // .select_sorting{position: absolute;bottom: 79px;}
+  // .bottom_entries{margin-left: 4rem;}
+  .jexcel_filter div{margin-left: auto;}
+  .f-End{padding-right: 18px !important;}
+ 
+  .jexcel_content{    overflow-y: auto !important;
+    max-height: 440px;
+}
+ 
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}
@@ -641,6 +650,7 @@ label.arrow_label:after {
     margin: 0 auto;
     // margin-left: 2%;
   }
+ 
 }
 
 @media (max-width: 489px) {
@@ -835,6 +845,7 @@ a:hover {
   .sidebar .nav-link {
     padding: 0.75rem 0.2rem !important;
   }
+  .f-End{    justify-content: flex-end !important}
 }
 /////
 h5,
@@ -1149,3 +1160,14 @@ h5,
 .form-control-sm:hover {
   padding-right: calc(1.5em + 1.75rem);
 }
+
+///legend sync 
+/* basic positioning */
+.legend { list-style: none;margin-top:6px; }
+.legend li { float: left; margin-right: 10px;margin: 10px; }
+.legend span {  float: left; width: 55px; height: 25px; margin: -4px 11px 0px 0px;border-radius: 3px; }
+/* your colors */
+.legend .lightpinklegend { background-color: rgb(255, 204, 203); border-color:1px solid rgb(255, 204, 203);}
+.legend .greenlegend { background-color:rgb(152, 251, 152);border-color:1px solid rgb(152, 251, 152); }
+.legend .redlegend { background-color: red; border-color:1px solid red; }
+.legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
