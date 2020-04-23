@@ -700,7 +700,7 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                         }
                                         
                                     </tbody>
-                                    <div id="loader" class="center"></div>
+                                   
                                 </Table>
                                 
                             </CardBody>
