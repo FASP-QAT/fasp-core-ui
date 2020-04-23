@@ -243,35 +243,8 @@ export default class ConsumptionDetails extends React.Component {
         var regionList = []
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-            var dataSourceRequest = dataSourceOs.getAll();
-            dataSourceRequest.onsuccess = function (event) {
-                var dataSourceResult = [];
-                dataSourceResult = dataSourceRequest.result;
-                for (var k = 0; k < dataSourceResult.length; k++) {
-                    var dataSourceJson = {
-                        name: dataSourceResult[k].label.label_en,
-                        id: dataSourceResult[k].dataSourceId
-                    }
-                    dataSourceList[k] = dataSourceJson
-                }
-            }
 
-            var regionTransaction = db1.transaction(['region'], 'readwrite');
-            var regionOs = regionTransaction.objectStore('region');
-            var regionRequest = regionOs.getAll();
-            regionRequest.onsuccess = function (event) {
-                var regionResult = [];
-                regionResult = regionRequest.result;
-                for (var k = 0; k < regionResult.length; k++) {
-                    var regionJson = {
-                        name: regionResult[k].label.label_en,
-                        id: regionResult[k].regionId
-                    }
-                    regionList[k] = regionJson
-                }
-            }
+
 
             var transaction = db1.transaction(['programData'], 'readwrite');
             var programTransaction = transaction.objectStore('programData');
@@ -282,100 +255,139 @@ export default class ConsumptionDetails extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
 
-                // Get inventory data from program
-                var consumptionList = programJson.consumptionList;
-                // var consumptionDataList = [];
-                // var consumptionDataArr = [];
-                // for (var i = 0; i < programProductList.length; i++) {
-                //     if (programProductList[i].product.productId == this.state.productId) {
-                //         consumptionDataList = programProductList[i].product.consumptionData;
-                //     }
-                // }
-                this.setState({
-                    consumptionList: consumptionList
-                });
-
-                var data = [];
-                var consumptionDataArr = []
-                if (consumptionList.length == 0) {
-                    data = [];
-                    consumptionDataArr[0] = data;
-                }
-                for (var j = 0; j < consumptionList.length; j++) {
-                    data = [];
-                    data[0] = consumptionList[j].dataSource.id;
-                    data[1] = consumptionList[j].region.id;
-                    data[2] = consumptionList[j].consumptionQty;
-                    data[3] = consumptionList[j].dayOfStockOut;
-                    // data[3] = [0]
-                    data[4] = consumptionList[j].startDate;
-                    data[5] = consumptionList[j].stopDate;
-                    data[7] = consumptionList[j].active;
-
-                    consumptionDataArr[j] = data;
-                }
-
-                this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
-                this.el.destroy();
-                var json = [];
-                var data = consumptionDataArr;
-                // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                // json[0] = data;
-                var options = {
-                    data: data,
-                    columnDrag: true,
-                    colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
-                    columns: [
-                        // { title: 'Month', type: 'text', readOnly: true },
-                        {
-                            title: 'Data source',
-                            type: 'dropdown',
-                            source: dataSourceList
-                        },
-                        {
-                            title: 'Region',
-                            type: 'dropdown',
-                            source: regionList
-                        },
-                        {
-                            title: 'Consumption Quantity',
-                            type: 'text'
-                        },
-                        {
-                            title: 'Days of Stock out',
-                            type: 'text'
-                        },
-                        {
-                            title: 'StartDate',
-                            type: 'calendar'
-                        },
-                        {
-                            title: 'StopDate',
-                            type: 'calendar'
-                        },
-                        {
-                            title: 'Active',
-                            type: 'checkbox'
-                        },
+                var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                var dataSourceRequest = dataSourceOs.getAll();
+                dataSourceRequest.onsuccess = function (event) {
+                    var dataSourceResult = [];
+                    dataSourceResult = dataSourceRequest.result;
+                    for (var k = 0; k < dataSourceResult.length; k++) {
+                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
+                            if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                var dataSourceJson = {
+                                    name: dataSourceResult[k].label.label_en,
+                                    id: dataSourceResult[k].dataSourceId
+                                }
+                                dataSourceList[k] = dataSourceJson
+                            }
+                        }
+                    }
 
 
-                        // { title: 'Create date', type: 'text', readOnly: true },
-                        // { title: 'Created By', type: 'text', readOnly: true },
-                        // { title: 'Last Modified date', type: 'text', readOnly: true },
-                        // { title: 'Last Modified by', type: 'text', readOnly: true }
-                    ],
-                    pagination: 10,
-                    search: true,
-                    columnSorting: true,
-                    tableOverflow: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    onchange: this.changed
-                };
 
-                this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
+                    var regionTransaction = db1.transaction(['region'], 'readwrite');
+                    var regionOs = regionTransaction.objectStore('region');
+                    var regionRequest = regionOs.getAll();
+                    regionRequest.onsuccess = function (event) {
+                        var regionResult = [];
+                        regionResult = regionRequest.result;
+                        for (var k = 0; k < regionResult.length; k++) {
+                            if (regionResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
+                                var regionJson = {
+                                    name: regionResult[k].label.label_en,
+                                    id: regionResult[k].regionId
+                                }
+                                regionList[k] = regionJson
+                            }
+                        }
+
+                        // Get inventory data from program
+                        var plannigUnitId = document.getElementById("planningUnitId").value;
+                        var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+                        // var consumptionDataList = [];
+                        // var consumptionDataArr = [];
+                        // for (var i = 0; i < programProductList.length; i++) {
+                        //     if (programProductList[i].product.productId == this.state.productId) {
+                        //         consumptionDataList = programProductList[i].product.consumptionData;
+                        //     }
+                        // }
+                        this.setState({
+                            consumptionList: consumptionList
+                        });
+
+                        var data = [];
+                        var consumptionDataArr = []
+                        if (consumptionList.length == 0) {
+                            data = [];
+                            consumptionDataArr[0] = data;
+                        }
+                        for (var j = 0; j < consumptionList.length; j++) {
+                            data = [];
+                            data[0] = consumptionList[j].dataSource.id;
+                            data[1] = consumptionList[j].region.id;
+                            data[2] = consumptionList[j].consumptionQty;
+                            data[3] = consumptionList[j].dayOfStockOut;
+                            // data[3] = [0]
+                            data[4] = consumptionList[j].startDate;
+                            data[5] = consumptionList[j].stopDate;
+                            data[7] = consumptionList[j].active;
+
+                            consumptionDataArr[j] = data;
+                        }
+
+                        this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
+                        this.el.destroy();
+                        var json = [];
+                        var data = consumptionDataArr;
+                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                        // json[0] = data;
+                        var options = {
+                            data: data,
+                            columnDrag: true,
+                            colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
+                            columns: [
+                                // { title: 'Month', type: 'text', readOnly: true },
+                                {
+                                    title: 'Data source',
+                                    type: 'dropdown',
+                                    source: dataSourceList
+                                },
+                                {
+                                    title: 'Region',
+                                    type: 'dropdown',
+                                    source: regionList
+                                },
+                                {
+                                    title: 'Consumption Quantity',
+                                    type: 'text'
+                                },
+                                {
+                                    title: 'Days of Stock out',
+                                    type: 'text'
+                                },
+                                {
+                                    title: 'StartDate',
+                                    type: 'calendar'
+                                },
+                                {
+                                    title: 'StopDate',
+                                    type: 'calendar'
+                                },
+                                {
+                                    title: 'Active',
+                                    type: 'checkbox'
+                                },
+
+
+                                // { title: 'Create date', type: 'text', readOnly: true },
+                                // { title: 'Created By', type: 'text', readOnly: true },
+                                // { title: 'Last Modified date', type: 'text', readOnly: true },
+                                // { title: 'Last Modified by', type: 'text', readOnly: true }
+                            ],
+                            pagination: 10,
+                            search: true,
+                            columnSorting: true,
+                            tableOverflow: true,
+                            wordWrap: true,
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            allowDeleteRow: false,
+                            onchange: this.changed
+                        };
+
+                        this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
+                    }.bind(this)
+                }.bind(this)
             }.bind(this)
         }.bind(this)
     }
@@ -724,7 +736,77 @@ export default class ConsumptionDetails extends React.Component {
                     changedFlag: 0
                 }
             );
-            console.log("all good...");
+            console.log("all good...", this.el.getJson());
+            var tableJson = this.el.getJson();
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    console.log("(programRequest.result)----", (programRequest.result))
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var plannigUnitId = document.getElementById("planningUnitId").value;
+                    var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+                    for (var i = 0; i < consumptionDataList.length; i++) {
+                        var map = new Map(Object.entries(tableJson[i]))
+                        consumptionDataList[i].dataSource.id = map.get("0");
+                        consumptionDataList[i].region.id = map.get("1");
+                        consumptionDataList[i].consumptionQty = map.get("2");
+                        consumptionDataList[i].dayOfStockOut = parseInt(map.get("3"));
+                        consumptionDataList[i].startDate = map.get("4");
+                        consumptionDataList[i].stopDate = map.get("5");
+                        consumptionDataList[i].active = map.get("6");
+
+                    }
+                    for (var i = consumptionDataList.length; i < tableJson.length; i++) {
+                        var map = new Map(Object.entries(tableJson[i]))
+                        var json = {
+                            consumptionId: 0,
+                            dataSource: {
+                                id: map.get("0")
+                            },
+                            region: {
+                                id: map.get("1")
+                            },
+                            consumptionQty: parseInt(map.get("2")),
+                            dayOfStockOut: parseInt(map.get("3")),
+                            startDate: map.get("4"),
+                            stopDate: map.get("5"),
+                            active: map.get("6"),
+                            planningUnit: {
+                                id: plannigUnitId
+                            }
+                        }
+                        consumptionDataList[i] = json;
+                    }
+                    programJson.consumptionList = consumptionDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        // $("#saveButtonDiv").hide();
+                        this.setState({
+                            message: `Consumption Data Saved`,
+                            changedFlag: 0
+                        })
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+
+
         } else {
             console.log("some thing get wrong...");
         }
@@ -756,6 +838,13 @@ export default class ConsumptionDetails extends React.Component {
         //             <option key={i} value={item.id}>{item.name}</option>
         //         )
         //     }, this);
+        const { planningUnitList } = this.state;
+        let planningUnits = planningUnitList.length > 0
+            && planningUnitList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
         return (
             <>
                 <Col xs="12" sm="12">
@@ -796,7 +885,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             // onChange={(e) => { this.getProductList(e) }}
                                                             >
                                                                 <option value="0">Please select</option>
-                                                                {/* {categories} */}
+                                                                {planningUnits}
                                                             </Input><br />
                                                         </Col>
                                                         {/* <Col md="3">
@@ -848,7 +937,7 @@ export default class ConsumptionDetails extends React.Component {
                             </div>
                         </CardBody>
                         <CardFooter>
-                        <input type='button' value='Save Data' onClick={() => this.saveData()}></input>
+                            <input type='button' value='Save Data' onClick={() => this.saveData()}></input>
                         </CardFooter>
                     </Card>
                 </Col>
@@ -964,7 +1053,7 @@ export default class ConsumptionDetails extends React.Component {
 
 
     getPlanningUnitList(event) {
-        console.log("in planning list")
+        console.log("-------------in planning list-------------")
         const lan = 'en';
         var db1;
         var storeOS;
@@ -972,8 +1061,8 @@ export default class ConsumptionDetails extends React.Component {
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var planningunitTransaction = db1.transaction(['planningUnit'], 'readwrite');
-            var planningunitOs = planningunitTransaction.objectStore('planningUnit');
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
             var planningunitRequest = planningunitOs.getAll();
             var planningList = []
             planningunitRequest.onerror = function (event) {
@@ -983,21 +1072,22 @@ export default class ConsumptionDetails extends React.Component {
                 var myResult = [];
                 myResult = planningunitRequest.result;
                 console.log("myResult", myResult);
-                var programId = document.getElementById("programId").value;
+                var programId = (document.getElementById("programId").value).split("_")[0];
                 console.log('programId----->>>', programId)
                 console.log(myResult);
-                // for (var i = 0; i < myResult.length; i++) {
-                //     if (myResult[i].planning.productCategoryId == programId) {
-                //         var productJson = {
-                //             name: getLabelText(myResult[i].label, lan),
-                //             id: myResult[i].productId
-                //         }
-                //         proList[i] = productJson
-                //     }
-                // }
-                // this.setState({
-                //     productList: proList
-                // })
+                var proList = []
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].program.id == programId) {
+                        var productJson = {
+                            name: getLabelText(myResult[i].planningUnit.label, lan),
+                            id: myResult[i].planningUnit.id
+                        }
+                        proList[i] = productJson
+                    }
+                }
+                this.setState({
+                    planningUnitList: proList
+                })
             }.bind(this);
         }.bind(this)
     }
