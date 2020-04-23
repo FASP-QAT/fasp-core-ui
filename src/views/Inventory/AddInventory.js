@@ -14,6 +14,7 @@ import { SECRET_KEY } from '../../Constants.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
+import moment from "moment";
 
 
 export default class AddInventory extends Component {
@@ -23,7 +24,8 @@ export default class AddInventory extends Component {
             programList: [],
             programId: '',
             changedFlag: 0,
-            countrySKUList: []
+            countrySKUList: [],
+            message: ''
 
         }
         this.options = props.options;
@@ -253,6 +255,7 @@ export default class AddInventory extends Component {
                                     {
                                         title: 'Inventory Date',
                                         type: 'calendar'
+
                                     },
                                     {
                                         title: 'Expected Stock',
@@ -274,6 +277,7 @@ export default class AddInventory extends Component {
                                     {
                                         title: 'Expire Date',
                                         type: 'calendar'
+
                                     },
                                     {
                                         title: 'Active',
@@ -292,7 +296,7 @@ export default class AddInventory extends Component {
                                 onchange: this.changed,
                                 oneditionend: this.onedit,
                                 copyCompatibility: true
-                                // parseFormulas: true
+
                             };
 
                             this.el = jexcel(document.getElementById("inventorytableDiv"), options);
@@ -354,7 +358,7 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                this.el.setValueFromCoords(4, y, 0, true)
+                // this.el.setValueFromCoords(4, y, 0, true)
             } else {
                 if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
@@ -432,21 +436,23 @@ export default class AddInventory extends Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value == "Invalid date" || value == "") {
+            console.log("--------", value);
+            if (value == "Invalid date" || value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
                 valid = false;
             } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+                // console.log("my val", Date.parse(value));
+                // if (isNaN(Date.parse(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, "In valid Date.");
+                //     valid = false;
+                // } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                // }
             }
 
 
@@ -473,12 +479,89 @@ export default class AddInventory extends Component {
                     changedFlag: 0
                 }
             );
-            console.log("all good...");
+
             var tableJson = this.el.getJson();
-            console.log(tableJson);
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programId = (document.getElementById("programId").value);
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var countrySKU = document.getElementById("countrySKU").value;
+                    var inventoryDataList = (programJson.inventoryList).filter(c => c.realmCountryPlanningUnit.id == countrySKU);
+
+                    for (var i = 0; i < inventoryDataList.length; i++) {
+                        var map = new Map(Object.entries(tableJson[i]))
+                        inventoryDataList[i].dataSource.id = map.get("0");
+                        inventoryDataList[i].region.id = map.get("1");
+                        inventoryDataList[i].inventoryDate = map.get("2");
+                        inventoryDataList[i].expectedBal = map.get("3");
+                        inventoryDataList[i].adjustmentQty = parseInt(map.get("4"));
+                        inventoryDataList[i].actualQty = map.get("5");
+                        inventoryDataList[i].batchNo = map.get("6");
+                        inventoryDataList[i].expiryDate = map.get("7");
+                        inventoryDataList[i].active = map.get("8");
+
+
+                    }
+                    for (var i = inventoryDataList.length; i < tableJson.length; i++) {
+                        var map = new Map(Object.entries(tableJson[i]))
+                        var json = {
+                            inventoryId: 0,
+                            dataSource: {
+                                id: map.get("0")
+                            },
+                            region: {
+                                id: map.get("1")
+                            },
+                            inventoryDate: map.get("2"),
+                            expectedBal: (map.get("3")),
+                            adjustmentQty: map.get("4"),
+                            actualQty: map.get("5"),
+                            batchNo: map.get("6"),
+                            expiryDate: map.get("7"),
+                            active: map.get("8"),
+
+                            realmCountryPlanningUnit: {
+                                id: countrySKU
+                            }
+                        }
+                        inventoryDataList[i] = json;
+                    }
+
+                    programJson.inventoryList = inventoryDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        // $("#saveButtonDiv").hide();
+                        this.setState({
+                            message: `Inventory Data Saved`,
+                            changedFlag: 0
+                        })
+                        this.props.history.push(`/dashboard/` + "Inventory Data Added Successfully")
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+
+
+
         } else {
             console.log("some thing get wrong...");
         }
+
     }.bind(this);
 
 
@@ -580,7 +663,7 @@ export default class AddInventory extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
     }
 
 }
