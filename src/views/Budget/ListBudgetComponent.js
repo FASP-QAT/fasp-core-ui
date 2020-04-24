@@ -14,6 +14,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import SubFundingSourceService from '../../api/SubFundingSourceService';
 import moment from 'moment';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const entityname = i18n.t('static.dashboard.budget');
 
@@ -105,26 +106,26 @@ class ListBudgetComponent extends Component {
           this.setState({ message: response.data.messageCode })
         }
       })
-      .catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
+    // .catch(
+    //   error => {
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message });
+    //     } else {
+    //       switch (error.response ? error.response.status : "") {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ message: error.response.data.messageCode });
+    //           break;
+    //         default:
+    //           this.setState({ message: 'static.unkownError' });
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
     SubFundingSourceService.getSubFundingSourceListAll()
       .then(response => {
         if (response.status == 200) {
@@ -135,27 +136,28 @@ class ListBudgetComponent extends Component {
         } else {
           this.setState({ message: response.data.messageCode })
         }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                console.log("Error code unkown");
-                break;
-            }
-          }
-        }
-      );
+      })
+    // .catch(
+    //   error => {
+    //     if (error.message === "Network Error") {
+    //       this.setState({ message: error.message });
+    //     } else {
+    //       switch (error.response ? error.response.status : "") {
+    //         case 500:
+    //         case 401:
+    //         case 404:
+    //         case 406:
+    //         case 412:
+    //           this.setState({ message: error.response.data.messageCode });
+    //           break;
+    //         default:
+    //           this.setState({ message: 'static.unkownError' });
+    //           console.log("Error code unkown");
+    //           break;
+    //       }
+    //     }
+    //   }
+    // );
 
   }
   // showSubFundingSourceLabel(cell, row) {
@@ -286,6 +288,9 @@ class ListBudgetComponent extends Component {
     }
     return (
       <div className="animated">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>

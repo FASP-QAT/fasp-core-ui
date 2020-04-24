@@ -7,7 +7,7 @@ import i18n from '../../i18n';
 import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import getLabelText from '../../CommonComponent/getLabelText';
 const entityname = i18n.t('static.procurementagent.procurementagent');
 
@@ -78,6 +78,10 @@ class EditProcurementAgentComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     Capitalize(str) {
@@ -145,32 +149,14 @@ class EditProcurementAgentComponent extends Component {
                 procurementAgent: response.data
             });
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+        })
     }
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -199,26 +185,6 @@ class EditProcurementAgentComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
                                 render={
                                     ({
@@ -365,27 +331,7 @@ class EditProcurementAgentComponent extends Component {
                 procurementAgent: response.data
             });
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+        })
     }
 }
 

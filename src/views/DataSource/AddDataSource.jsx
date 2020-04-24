@@ -10,7 +10,8 @@ import DataSourceTypeService from '../../api/DataSourceTypeService';
 import i18n from '../../i18n';
 import RealmService from "../../api/RealmService";
 import ProgramService from "../../api/ProgramService";
-import getLabelText from '../../CommonComponent/getLabelText'
+import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const initialValues = {
     realmId: [],
@@ -145,27 +146,7 @@ export default class AddDataSource extends Component {
                 this.setState({
                     realms: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
 
     getDataSourceTypeByRealmId(e) {
@@ -178,28 +159,7 @@ export default class AddDataSource extends Component {
                     dataSourceTypeList: response.data
                 })
 
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
 
     getProgramByRealmId(e) {
@@ -210,28 +170,7 @@ export default class AddDataSource extends Component {
                 this.setState({
                     programs: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
 
     Capitalize(str) {
@@ -270,6 +209,9 @@ export default class AddDataSource extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -290,26 +232,6 @@ export default class AddDataSource extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
 
 

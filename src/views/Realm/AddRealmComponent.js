@@ -6,6 +6,7 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 
 const entityname = i18n.t('static.realm.realm');
@@ -146,6 +147,9 @@ export default class AddRealmComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>

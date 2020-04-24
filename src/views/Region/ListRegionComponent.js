@@ -10,7 +10,8 @@ import RealmCountryService from "../../api/RealmCountryService.js";
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 
 
@@ -69,26 +70,27 @@ class RegionListComponent extends Component {
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
         RealmCountryService.getRealmCountryListAll()
             .then(response => {
@@ -101,27 +103,28 @@ class RegionListComponent extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     console.log("Error code unkown");
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     formatLabel(cell, row) {
@@ -204,13 +207,16 @@ class RegionListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
-                            
+
                         </div>
                     </CardHeader>
                     <CardBody>
@@ -253,11 +259,11 @@ class RegionListComponent extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                           /* rowEvents={{
-                                                onClick: (e, row, rowIndex) => {
-                                                    this.editRegion(row);
-                                                }
-                                            }}*/
+                                            /* rowEvents={{
+                                                 onClick: (e, row, rowIndex) => {
+                                                     this.editRegion(row);
+                                                 }
+                                             }}*/
                                             {...props.baseProps}
                                         />
                                     </div>

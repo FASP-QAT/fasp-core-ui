@@ -605,7 +605,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                             ))
                                         }
                                     </tbody>
-                                    
+                                    {/* <div id="loader" class="center"></div> */}
                                 </Table>
                             </CardBody>
                             <CardFooter>
@@ -627,4 +627,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
     }
 }
+
+
+
 

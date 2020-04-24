@@ -115,7 +115,6 @@ export default class ListProcurementUnit extends Component {
       );
 
 
-
   }
 
   addNewProcurementUnit() {

@@ -9,6 +9,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import data from '../Tables/DataTable/_data';
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.language.language');
@@ -66,30 +67,28 @@ export default class LanguageListComponent extends Component {
                 console.log(response.data)
                 if (response.status == 200) {
                     this.setState({ langaugeList: response.data, selSource: response.data })
-                } else {
-                    this.setState({ message: response.data.messageCode })
                 }
             })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response.status) {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
 
@@ -154,6 +153,9 @@ export default class LanguageListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
@@ -195,7 +197,6 @@ export default class LanguageListComponent extends Component {
                                 )
                             }
                         </ToolkitProvider>
-
                     </CardBody>
                 </Card>
 

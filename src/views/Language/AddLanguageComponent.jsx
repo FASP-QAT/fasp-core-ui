@@ -11,6 +11,7 @@ import 'react-select/dist/react-select.min.css';
 
 import LanguageService from '../../api/LanguageService.js'
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const initialValues = {
     languageName: "",
@@ -60,7 +61,6 @@ class AddLanguageComponent extends Component {
         }
 
         // this.Capitalize = this.Capitalize.bind(this);
-
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
@@ -130,6 +130,9 @@ class AddLanguageComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h6>{i18n.t(this.state.message)}</h6>
                 <h6>{i18n.t(this.props.match.params.message)}</h6>
                 <Row>
@@ -150,26 +153,26 @@ class AddLanguageComponent extends Component {
                                             })
                                         }
                                     })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response.status) {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+                                        // .catch(
+                                        //     error => {
+                                        //         if (error.message === "Network Error") {
+                                        //             this.setState({ message: error.message });
+                                        //         } else {
+                                        //             switch (error.response.status) {
+                                        //                 case 500:
+                                        //                 case 401:
+                                        //                 case 404:
+                                        //                 case 406:
+                                        //                 case 412:
+                                        //                     this.setState({ message: error.response.data.messageCode });
+                                        //                     break;
+                                        //                 default:
+                                        //                     this.setState({ message: 'static.unkownError' });
+                                        //                     break;
+                                        //             }
+                                        //         }
+                                        //     }
+                                        // );
                                 }}
                                 render={
                                     ({

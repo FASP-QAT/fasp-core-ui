@@ -7,6 +7,7 @@ import i18n from '../../i18n'
 import RegionService from "../../api/RegionService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const entityname = i18n.t('static.region.region');
 
@@ -74,6 +75,10 @@ class EditRegionComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     dataChange(event) {
@@ -124,32 +129,13 @@ class EditRegionComponent extends Component {
                 region: response.data
             });
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+        })
     }
 
     render() {
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -174,27 +160,6 @@ class EditRegionComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
                                 render={
                                     ({
@@ -294,34 +259,14 @@ class EditRegionComponent extends Component {
         this.props.history.push(`/region/listRegion/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
-    resetClicked(){
+    resetClicked() {
         AuthenticationService.setupAxiosInterceptors();
         RegionService.getRegionById(this.props.match.params.regionId).then(response => {
             this.setState({
                 region: response.data
             });
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+        })
     }
 }
 

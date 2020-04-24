@@ -101,6 +101,9 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('realmCountryPlanningUnit')) {
             storeOS = db1.createObjectStore('realmCountryPlanningUnit', { keyPath: 'realmCountryPlanningUnitId', autoIncrement: true });
         }
+        if (!db1.objectStoreNames.contains('programPlanningUnit')) {
+            storeOS = db1.createObjectStore('programPlanningUnit', { keyPath: 'programPlanningUnitId', autoIncrement: true });
+        }
     };
 }
 
