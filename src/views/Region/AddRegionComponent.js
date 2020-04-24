@@ -8,6 +8,7 @@ import RegionService from "../../api/RegionService";
 import RealmCountryService from "../../api/RealmCountryService.js";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.region.region');
 
@@ -121,27 +122,7 @@ class AddRegionComponent extends Component {
             message: response.data.messageCode
           })
         }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                console.log("Error code unkown");
-                break;
-            }
-          }
-        }
-      );
+      })
   }
 
   Capitalize(str) {
@@ -161,6 +142,9 @@ class AddRegionComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -172,7 +156,7 @@ class AddRegionComponent extends Component {
                 initialValues={initialValues}
                 validate={validate(validationSchema)}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                  console.log("Submit clicked-----------",this.state.region);
+                  console.log("Submit clicked-----------", this.state.region);
                   RegionService.addRegion(this.state.region)
                     .then(response => {
                       console.log("Response->", response);
@@ -184,26 +168,6 @@ class AddRegionComponent extends Component {
                         })
                       }
                     })
-                    .catch(
-                      error => {
-                        if (error.message === "Network Error") {
-                          this.setState({ message: error.message });
-                        } else {
-                          switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                              this.setState({ message: error.response.data.messageCode });
-                              break;
-                            default:
-                              this.setState({ message: 'static.unkownError' });
-                              break;
-                          }
-                        }
-                      }
-                    );
                 }}
                 render={
                   ({
