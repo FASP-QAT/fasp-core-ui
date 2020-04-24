@@ -191,6 +191,7 @@ export default class AddInventory extends Component {
                                 }
                             }
                             var countrySKUId = document.getElementById('countrySKU').value;
+                            console.log("countrySKU---", countrySKUId);
                             var inventoryList = (programJson.inventoryList).filter(i => i.realmCountryPlanningUnit.id == countrySKUId);
                             this.setState({
                                 inventoryList: inventoryList
@@ -290,6 +291,8 @@ export default class AddInventory extends Component {
                                 columnSorting: true,
                                 tableOverflow: true,
                                 wordWrap: true,
+                                paginationOptions: [10, 25, 50, 100],
+                                position: 'top',
                                 allowInsertColumn: false,
                                 allowManualInsertColumn: false,
                                 allowDeleteRow: false,
@@ -436,7 +439,7 @@ export default class AddInventory extends Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            console.log("--------", value);
+
             if (value == "Invalid date" || value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -497,21 +500,29 @@ export default class AddInventory extends Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var countrySKU = document.getElementById("countrySKU").value;
+
                     var inventoryDataList = (programJson.inventoryList).filter(c => c.realmCountryPlanningUnit.id == countrySKU);
+                    var inventoryDataListNotFiltered = programJson.inventoryList;
 
-                    for (var i = 0; i < inventoryDataList.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
-                        inventoryDataList[i].dataSource.id = map.get("0");
-                        inventoryDataList[i].region.id = map.get("1");
-                        inventoryDataList[i].inventoryDate = map.get("2");
-                        inventoryDataList[i].expectedBal = map.get("3");
-                        inventoryDataList[i].adjustmentQty = parseInt(map.get("4"));
-                        inventoryDataList[i].actualQty = map.get("5");
-                        inventoryDataList[i].batchNo = map.get("6");
-                        inventoryDataList[i].expiryDate = map.get("7");
-                        inventoryDataList[i].active = map.get("8");
-
-
+                    var count = 0;
+                    for (var i = 0; i < inventoryDataListNotFiltered.length; i++) {
+                        if (inventoryDataList[count] != undefined) {
+                            if (inventoryDataList[count].inventoryId == inventoryDataListNotFiltered[i].inventoryId) {
+                                var map = new Map(Object.entries(tableJson[count]));
+                                inventoryDataListNotFiltered[i].dataSource.id = map.get("0");
+                                inventoryDataListNotFiltered[i].region.id = map.get("1");
+                                inventoryDataListNotFiltered[i].inventoryDate = map.get("2");
+                                inventoryDataListNotFiltered[i].expectedBal = map.get("3");
+                                inventoryDataListNotFiltered[i].adjustmentQty = parseInt(map.get("4"));
+                                inventoryDataListNotFiltered[i].actualQty = map.get("5");
+                                inventoryDataListNotFiltered[i].batchNo = map.get("6");
+                                inventoryDataListNotFiltered[i].expiryDate = map.get("7");
+                                inventoryDataListNotFiltered[i].active = map.get("8");
+                                if (inventoryDataList.length >= count) {
+                                    count++;
+                                }
+                            }
+                        }
                     }
                     for (var i = inventoryDataList.length; i < tableJson.length; i++) {
                         var map = new Map(Object.entries(tableJson[i]))
@@ -535,10 +546,11 @@ export default class AddInventory extends Component {
                                 id: countrySKU
                             }
                         }
-                        inventoryDataList[i] = json;
+                        // inventoryDataList[i] = json;
+                        inventoryDataListNotFiltered.push(json);
                     }
 
-                    programJson.inventoryList = inventoryDataList;
+                    programJson.inventoryList = inventoryDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
 
@@ -643,7 +655,9 @@ export default class AddInventory extends Component {
                                         )} />
 
                             <Col xs="12" sm="12">
-                                <div id="inventorytableDiv" className="table-responsive">
+                                <div className="table-responsive">
+                                    <div id="inventorytableDiv" >
+                                    </div>
                                 </div>
                             </Col>
                         </CardBody>
