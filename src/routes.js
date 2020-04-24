@@ -182,6 +182,8 @@ const RealmCountryRegion = React.lazy(() => import('./views/RealmCountry/RealmCo
 const syncPage = React.lazy(() => import('./views/Synchronisation/syncPage'));
 
 const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'));
+const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'));
+const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -363,8 +365,10 @@ const routes = [
   { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountry },
   { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCapacityList },
   { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: RealmCountryRegion },
-  { path: '/report/productCatalog', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.productcatalog'), component: ProductCatalog},
-  
+  { path: '/report/productCatalog', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.productCatalog'), component: ProductCatalog},
+  { path: '/report/consumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.consumption'), component: ConsumptionReport},
+  { path: '/report/stockStatusMatrix', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.stockstatusmatrix'), component: StockStatusMatrixReport},
+ 
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
