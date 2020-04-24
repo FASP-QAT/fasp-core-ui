@@ -764,24 +764,37 @@ export default class ConsumptionDetails extends React.Component {
 
                 var programRequest = programTransaction.get(programId);
                 programRequest.onsuccess = function (event) {
-                    console.log("(programRequest.result)----", (programRequest.result))
+                    // console.log("(programRequest.result)----", (programRequest.result))
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var plannigUnitId = document.getElementById("planningUnitId").value;
-                    var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
-                    console.log("000000000000000   ", consumptionDataList)
-                    for (var i = 0; i < consumptionDataList.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
-                        consumptionDataList[i].dataSource.id = map.get("0");
-                        consumptionDataList[i].region.id = map.get("1");
-                        consumptionDataList[i].consumptionQty = map.get("2");
-                        consumptionDataList[i].dayOfStockOut = parseInt(map.get("3"));
-                        consumptionDataList[i].startDate = map.get("4");
-                        consumptionDataList[i].stopDate = map.get("5");
-                        consumptionDataList[i].actualFlag = map.get("6");
-                        consumptionDataList[i].active = map.get("7");
 
+                    var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+                    var consumptionDataListNotFiltered = programJson.consumptionList;
+
+                    // console.log("000000000000000   ", consumptionDataList)
+                    var count = 0;
+                    for (var i = 0; i < consumptionDataListNotFiltered.length; i++) {
+                        if (consumptionDataList[count] != undefined) {
+                            if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
+
+                                var map = new Map(Object.entries(tableJson[count]))
+                                consumptionDataListNotFiltered[i].dataSource.id = map.get("0");
+                                consumptionDataListNotFiltered[i].region.id = map.get("1");
+                                consumptionDataListNotFiltered[i].consumptionQty = map.get("2");
+                                consumptionDataListNotFiltered[i].dayOfStockOut = parseInt(map.get("3"));
+                                consumptionDataListNotFiltered[i].startDate = map.get("4");
+                                consumptionDataListNotFiltered[i].stopDate = map.get("5");
+                                consumptionDataListNotFiltered[i].actualFlag = map.get("6");
+                                consumptionDataListNotFiltered[i].active = map.get("7");
+
+                                if (consumptionDataList.length >= count) {
+                                    count++;
+                                }
+                            }
+
+                        }
 
                     }
                     for (var i = consumptionDataList.length; i < tableJson.length; i++) {
@@ -805,10 +818,11 @@ export default class ConsumptionDetails extends React.Component {
                                 id: plannigUnitId
                             }
                         }
-                        consumptionDataList[i] = json;
+                        // consumptionDataList[i] = json;
+                        consumptionDataListNotFiltered.push(json);
                     }
                     console.log("1111111111111111111   ", consumptionDataList)
-                    programJson.consumptionList = consumptionDataList;
+                    programJson.consumptionList = consumptionDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
 
