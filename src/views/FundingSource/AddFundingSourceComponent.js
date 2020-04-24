@@ -7,6 +7,8 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import FundingSourceService from "../../api/FundingSourceService";
 import RealmService from "../../api/RealmService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+
 import i18n from '../../i18n'
 const initialValues = {
   fundingSourceId: [],
@@ -115,26 +117,7 @@ class AddFundingSourceComponent extends Component {
         } else {
           this.setState({ message: response.data.messageCode })
         }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response.status) {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
+      })
   }
 
   render() {
@@ -149,6 +132,9 @@ class AddFundingSourceComponent extends Component {
       }, this);
     return (
       <div className="animated fadeIn">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -169,26 +155,6 @@ class AddFundingSourceComponent extends Component {
                         this.setState({ message: response.data.messageCode })
                       }
                     })
-                    .catch(
-                      error => {
-                        if (error.message === "Network Error") {
-                          this.setState({ message: error.message });
-                        } else {
-                          switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                              this.setState({ message: error.response.data.messageCode });
-                              break;
-                            default:
-                              this.setState({ message: 'static.unkownError' });
-                              break;
-                          }
-                        }
-                      }
-                    );
                 }}
                 render={
                   ({
@@ -265,11 +231,11 @@ class AddFundingSourceComponent extends Component {
   cancelClicked() {
     this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
   }
-  resetClicked(){
+  resetClicked() {
     let { fundingSource } = this.state;
-   
-      fundingSource.realm.id = ''
-      fundingSource.label.label_en = ''
+
+    fundingSource.realm.id = ''
+    fundingSource.label.label_en = ''
 
     this.setState({
       fundingSource
