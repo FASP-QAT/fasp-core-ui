@@ -12,36 +12,37 @@ import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
 import moment from 'moment';
+import i18n from '../../../i18n'
 
 
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         oldPassword: Yup.string()
-            .required('Please enter old password'),
+            .required(i18n.t('static.message.oldPassword')),
         newPassword: Yup.string()
-            .min(6, `Password has to be at least 6 characters`)
-            .matches(/^(?!.*password).*$/, 'Password should not contain password string')
-            .matches(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/, 'Password must contain atleast 1 special character')
-            .matches(/^(?=.*\d).*$/, 'Password must contain atleast 1 number')
-            .matches(/^(?=.*[A-Z]).*$/, 'Password must contain atleast 1 uppercase alphabet')
-            .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
-            .test('username', "New password should not be same as username ",
+            .min(6, i18n.t('static.message.newPasswordMinLength'))
+            .matches(/^(?!.*password).*$/, i18n.t('static.message.newPasswordPassString'))
+            .matches(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/, i18n.t('static.message.newPasswordSpecialChar'))
+            .matches(/^(?=.*\d).*$/, i18n.t('static.message.newPasswordNumber'))
+            .matches(/^(?=.*[A-Z]).*$/, i18n.t('static.message.newPasswordUppercase'))
+            .matches(/^[a-zA-Z]/i,  i18n.t('static.message.newPasswordStartAlphabet'))
+            .test('username',i18n.t('static.message.newPasswordNotSameAsUsername'),
                 function (value) {
                     if ((values.username != value)) {
                         return true;
                     }
                 })
-            .test('oldPassword', "New password should not be same as old password ",
+            .test('oldPassword',i18n.t('static.message.newPasswordNotSameAsOldPassword'),
                 function (value) {
                     if (values.oldPassword != value) {
                         return true;
                     }
                 })
-            .required('Please enter new password'),
+            .required(i18n.t('static.message.newPasswordRequired')),
         confirmNewPassword: Yup.string()
-            .oneOf([values.newPassword], 'Passwords must match')
-            .required('Please confirm new password')
+            .oneOf([values.newPassword], i18n.t('static.message.confirmPassword'))
+            .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
 
@@ -77,7 +78,7 @@ class UpdateExpiredPasswordComponent extends Component {
     }
 
     logoutClicked() {
-        this.props.history.push(`/login/You are logged out`)
+        this.props.history.push(`/login/`+ i18n.t('static.logoutSuccess'))
     }
 
     touchAll(setTouched, errors) {
@@ -120,7 +121,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                 <h5 className="mx-4">{this.state.message}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Update Expired Password</strong>{' '}
+                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.updateExpiredPassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={{
@@ -169,7 +170,7 @@ class UpdateExpiredPasswordComponent extends Component {
 
                                             } else {
                                                 this.setState({
-                                                    message: "You must be online to update the password."
+                                                    message: 'static.common.onlinepasswordtext'
                                                 });
                                             }
                                         }}
@@ -194,7 +195,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                 hidden
                                                             />
                                                             <FormGroup>
-                                                                <Label for="oldPassword">Old Password</Label>
+                                                                <Label for="oldPassword">{i18n.t('static.user.oldPasswordLabel')}</Label>
                                                                 <Input type="password"
                                                                     name="oldPassword"
                                                                     id="oldPassword"
@@ -208,7 +209,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                 <FormFeedback>{errors.oldPassword}</FormFeedback>
                                                             </FormGroup>
                                                             <FormGroup>
-                                                                <Label for="newPassword">New Password</Label>
+                                                                <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
                                                                 <Input type="password"
                                                                     name="newPassword"
                                                                     id="newPassword"
@@ -222,7 +223,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                                 <FormFeedback>{errors.newPassword}</FormFeedback>
                                                             </FormGroup>
                                                             <FormGroup>
-                                                                <Label for="confirmNewPassword">Confirm New Password</Label>
+                                                                <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
                                                                 <Input type="password"
                                                                     name="confirmNewPassword"
                                                                     id="confirmNewPassword"
@@ -238,8 +239,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         </CardBody>
                                                         <CardFooter>
                                                             <FormGroup>
-                                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i> Logout</Button>
-                                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.logoutClicked}><i className="fa fa-times"></i>{i18n.t('static.common.logout')}</Button>
+                                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>

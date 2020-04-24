@@ -13,22 +13,22 @@ import i18n from '../../../i18n'
 const validationSchema = function (values) {
     return Yup.object().shape({
         newPassword: Yup.string()
-            .min(6, `Password has to be at least 6 characters`)
-            .matches(/^(?!.*password).*$/, 'Password should not contain password string')
-            .matches(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/, 'Password must contain atleast 1 special character')
-            .matches(/^(?=.*\d).*$/, 'Password must contain atleast 1 number')
-            .matches(/^(?=.*[A-Z]).*$/, 'Password must contain atleast 1 uppercase alphabet')
-            .matches(/^[a-zA-Z]/i, 'Password must start with alphabet')
-            .test('username', "New password should not be same as username ",
+            .min(6, i18n.t('static.message.newPasswordMinLength'))
+            .matches(/^(?!.*password).*$/, i18n.t('static.message.newPasswordPassString'))
+            .matches(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/, i18n.t('static.message.newPasswordSpecialChar'))
+            .matches(/^(?=.*\d).*$/, i18n.t('static.message.newPasswordNumber'))
+            .matches(/^(?=.*[A-Z]).*$/, i18n.t('static.message.newPasswordUppercase'))
+            .matches(/^[a-zA-Z]/i, i18n.t('static.message.newPasswordStartAlphabet'))
+            .test('username', i18n.t('static.message.newPasswordNotSameAsUsername'),
                 function (value) {
                     if ((values.username != value)) {
                         return true;
                     }
                 })
-            .required('Please enter new password'),
+            .required(i18n.t('static.message.newPasswordRequired')),
         confirmNewPassword: Yup.string()
-            .oneOf([values.newPassword], 'Passwords must match')
-            .required('Please confirm new password')
+            .oneOf([values.newPassword], i18n.t('static.message.confirmPassword'))
+            .required(i18n.t('static.message.confirmPasswordRequired'))
     })
 }
 
@@ -65,7 +65,7 @@ class ResetPasswordComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/login/Action Canceled`)
+        this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
@@ -134,7 +134,7 @@ class ResetPasswordComponent extends Component {
                                 <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4">
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Reset Password</strong>{' '}
+                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.resetPassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={{
@@ -182,7 +182,7 @@ class ResetPasswordComponent extends Component {
 
                                             } else {
                                                 this.setState({
-                                                    message: "You must be online to update the password."
+                                                    message: 'static.common.onlinepasswordtext'
                                                 });
                                             }
                                         }}
@@ -208,7 +208,7 @@ class ResetPasswordComponent extends Component {
                                                                 hidden
                                                             />
                                                             <FormGroup>
-                                                                <Label for="newPassword">New Password</Label>
+                                                                <Label for="newPassword">{i18n.t('static.user.newPasswordLabel')}</Label>
                                                                 <Input type="password"
                                                                     name="newPassword"
                                                                     id="newPassword"
@@ -222,7 +222,7 @@ class ResetPasswordComponent extends Component {
                                                                 <FormFeedback>{errors.newPassword}</FormFeedback>
                                                             </FormGroup>
                                                             <FormGroup>
-                                                                <Label for="confirmNewPassword">Confirm New Password</Label>
+                                                                <Label for="confirmNewPassword">{i18n.t('static.user.confirmNewPasswordLabel')}</Label>
                                                                 <Input type="password"
                                                                     name="confirmNewPassword"
                                                                     id="confirmNewPassword"
@@ -238,8 +238,8 @@ class ResetPasswordComponent extends Component {
                                                         </CardBody>
                                                         <CardFooter>
                                                             <FormGroup>
-                                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                                <Button type="button" size="sm" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                                <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>

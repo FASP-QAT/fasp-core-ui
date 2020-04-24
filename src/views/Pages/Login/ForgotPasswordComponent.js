@@ -52,7 +52,7 @@ class ForgotPasswordComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/login/` + "Action Canceled")
+        this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
@@ -93,7 +93,7 @@ class ForgotPasswordComponent extends Component {
                                 <Card className="mx-4 ">
 
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Forgot Password</strong>{' '}
+                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.forgotpassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={initialValues}
@@ -157,7 +157,7 @@ class ForgotPasswordComponent extends Component {
                                                         <CardBody className="p-4">
 
                                                             <FormGroup>
-                                                                <Label for="emailId">Email Id</Label>
+                                                                <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
                                                                 <Input type="text"
                                                                     name="emailId"
                                                                     id="emailId"
@@ -173,8 +173,8 @@ class ForgotPasswordComponent extends Component {
                                                         </CardBody>
                                                         <CardFooter>
                                                             <FormGroup>
-                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>

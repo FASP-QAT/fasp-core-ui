@@ -10,6 +10,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import SubFundingSourceService from '../../api/SubFundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText'
 import { Date } from 'core-js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.dashboard.budget');
 const initialValues = {
@@ -185,52 +186,14 @@ class AddBudgetComponent extends Component {
                 this.setState({
                     programs: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
         SubFundingSourceService.getSubFundingSourceListAll()
             .then(response => {
                 this.setState({
                     subFundingSources: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
     }
 
     render() {
@@ -254,6 +217,9 @@ class AddBudgetComponent extends Component {
         }, this);
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -465,17 +431,17 @@ class AddBudgetComponent extends Component {
         this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
-    resetClicked(){
+    resetClicked() {
         let { budget } = this.state;
-        
-            budget.label.label_en = ''
-            budget.program.programId = ''
-            budget.subFundingSource.subFundingSourceId = ''
-            budget.budgetAmt = ''
-            budget.startDate = ''
-            budget.stopDate = ''
-            budget.stopDate = ''
-        
+
+        budget.label.label_en = ''
+        budget.program.programId = ''
+        budget.subFundingSource.subFundingSourceId = ''
+        budget.budgetAmt = ''
+        budget.startDate = ''
+        budget.stopDate = ''
+        budget.stopDate = ''
+
         this.setState({
             budget
         },
