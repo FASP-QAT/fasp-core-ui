@@ -39,8 +39,8 @@ export default class syncPage extends Component {
     this.loadedFunctionForMergeInventory = this.loadedFunctionForMergeInventory.bind(this);
     this.loadedFunctionInventory = this.loadedFunctionInventory.bind(this)
 
-    this.loadedFunctionLatestInventory=this.loadedFunctionLatestInventory.bind(this);
-    this.loadedFunctionLatest=this.loadedFunctionLatest.bind(this);
+    this.loadedFunctionLatestInventory = this.loadedFunctionLatestInventory.bind(this);
+    this.loadedFunctionLatest = this.loadedFunctionLatest.bind(this);
   }
 
   toggle(tabPane, tab) {
@@ -100,6 +100,8 @@ export default class syncPage extends Component {
       .then(response => {
         var dataSourceList = []
         var regionList = []
+        var planningUnitList = []
+        var countrySkuList = []
         var latestDataJsonConsumption = []
         var oldDataJsonConsumption = []
         var mergedDataConsumption = []
@@ -123,14 +125,15 @@ export default class syncPage extends Component {
         for (var j = 0; j < consumptionList.length; j++) {
           data = [];
           data[0] = consumptionList[j].consumptionId;
-          data[1] = consumptionList[j].dataSource.id;
-          data[2] = consumptionList[j].region.id;
-          data[3] = consumptionList[j].consumptionQty;
-          data[4] = consumptionList[j].dayOfStockOut;
-          data[5] = consumptionList[j].startDate;
-          data[6] = consumptionList[j].stopDate;
-          data[7] = consumptionList[j].active;
-          data[8] = consumptionList[j].actualFlag;
+          data[1] = consumptionList[j].planningUnit.id;
+          data[2] = consumptionList[j].dataSource.id;
+          data[3] = consumptionList[j].region.id;
+          data[4] = consumptionList[j].consumptionQty;
+          data[5] = consumptionList[j].dayOfStockOut;
+          data[6] = consumptionList[j].startDate;
+          data[7] = consumptionList[j].stopDate;
+          data[8] = consumptionList[j].active;
+          data[9] = consumptionList[j].actualFlag;
           consumptionDataArr[j] = data;
         }
         latestDataJsonConsumption = consumptionDataArr;
@@ -147,15 +150,16 @@ export default class syncPage extends Component {
         for (var j = 0; j < inventoryList.length; j++) {
           data = [];
           data[0] = inventoryList[j].inventoryId;
-          data[1] = inventoryList[j].dataSource.id;
-          data[2] = inventoryList[j].region.id;
-          data[3] = inventoryList[j].inventoryDate;
-          data[4] = inventoryList[j].expectedBal;
-          data[5] = inventoryList[j].adjustmentQty;
-          data[6] = inventoryList[j].actualQty;
-          data[7] = inventoryList[j].batchNo;
-          data[8] = inventoryList[j].expiryDate;
-          data[9] = inventoryList[j].active;
+          data[1] = consumptionList[j].realmCountryPlanningUnit.id;
+          data[2] = inventoryList[j].dataSource.id;
+          data[3] = inventoryList[j].region.id;
+          data[4] = inventoryList[j].inventoryDate;
+          data[5] = inventoryList[j].expectedBal;
+          data[6] = inventoryList[j].adjustmentQty;
+          data[7] = inventoryList[j].actualQty;
+          data[8] = inventoryList[j].batchNo;
+          data[9] = inventoryList[j].expiryDate;
+          data[10] = inventoryList[j].active;
           inventoryDataArr[j] = data;
         }
         latestDataJsonInventory = inventoryDataArr;
@@ -207,506 +211,572 @@ export default class syncPage extends Component {
                     regionList[k] = regionJson
                   }
                 }
-                var consumptionList = (programJson.consumptionList);
-                this.setState({
-                  consumptionList: consumptionList
-                });
-                var inventoryList = (programJson.inventoryList);
-                this.setState({
-                  inventoryList: inventoryList
-                });
-                var data = [];
-                var consumptionDataArr = []
-                if (consumptionList.length == 0) {
-                  data = [];
-                  consumptionDataArr[0] = data;
-                }
-                for (var j = 0; j < consumptionList.length; j++) {
-                  data = [];
-                  data[0] = consumptionList[j].consumptionId;
-                  data[1] = consumptionList[j].dataSource.id;
-                  data[2] = consumptionList[j].region.id;
-                  data[3] = consumptionList[j].consumptionQty;
-                  data[4] = consumptionList[j].dayOfStockOut;
-                  data[5] = consumptionList[j].startDate;
-                  data[6] = consumptionList[j].stopDate;
-                  data[7] = consumptionList[j].active;
-                  data[8] = consumptionList[j].actualFlag;
-                  consumptionDataArr[j] = data;
-                }
 
-                this.el = jexcel(document.getElementById("oldVersionConsumption"), '');
-                this.el.destroy();
-                oldDataJsonConsumption = consumptionDataArr;
-                this.setState({
-                  oldDataJsonConsumption: oldDataJsonConsumption
-                })
-                var options = {
-                  data: oldDataJsonConsumption,
-                  columnDrag: true,
-                  colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
-                  columns: [
-                    {
-                      title: 'Consumption Id',
-                      type: 'hidden'
-                    },
-                    {
-                      title: 'Data source',
-                      type: 'dropdown',
-                      source: dataSourceList
-                    },
-                    {
-                      title: 'Region',
-                      type: 'dropdown',
-                      source: regionList
-                    },
-                    {
-                      title: 'Consumption Quantity',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Days of Stock out',
-                      type: 'text'
-                    },
-                    {
-                      title: 'StartDate',
-                      type: 'calendar'
-                    },
-                    {
-                      title: 'StopDate',
-                      type: 'calendar'
-                    },
-                    {
-                      title: 'Active',
-                      type: 'hidden',
-                    },
-                    {
-                      title: 'Actual Flag',
-                      type: 'dropdown',
-                      source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                var planningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                var planningUnitOs = planningUnitTransaction.objectStore('programPlanningUnit');
+                var planningUnitRequest = planningUnitOs.getAll();
+                planningUnitRequest.onsuccess = function (event) {
+                  var planningUnitResult = [];
+                  planningUnitResult = planningUnitRequest.result;
+                  for (var k = 0; k < planningUnitResult.length; k++) {
+                    if (planningUnitResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
+                      var planningUnitJson = {
+                        name: getLabelText(planningUnitResult[k].label, lan),
+                        id: planningUnitResult[k].programPlanningUnitId
+                      }
+                      planningUnitList[k] = planningUnitJson
                     }
-                  ],
-                  pagination: 10,
-                  search: true,
-                  columnSorting: true,
-                  tableOverflow: true,
-                  wordWrap: true,
-                  allowInsertColumn: false,
-                  allowManualInsertColumn: false,
-                  allowDeleteRow: false,
-                  onchange: this.changed,
-                  editable: false,
-                  onload: this.loadedFunction
-                };
-
-                this.el = jexcel(document.getElementById("oldVersionConsumption"), options);
-
-
-                var data = [];
-                var inventoryDataArr = []
-                if (inventoryList.length == 0) {
-                  data = [];
-                  inventoryDataArr[0] = data;
-                }
-                for (var j = 0; j < inventoryList.length; j++) {
-
-                  data = [];
-                  data[0] = inventoryList[j].inventoryId;
-                  data[1] = inventoryList[j].dataSource.id;
-                  data[2] = inventoryList[j].region.id;
-                  data[3] = inventoryList[j].inventoryDate;
-                  data[4] = inventoryList[j].expectedBal;
-                  data[5] = inventoryList[j].adjustmentQty;
-                  data[6] = inventoryList[j].actualQty;
-                  data[7] = inventoryList[j].batchNo;
-                  data[8] = inventoryList[j].expiryDate;
-                  data[9] = inventoryList[j].active;
-                  inventoryDataArr[j] = data;
-
-                }
-                this.el = jexcel(document.getElementById("oldVersionInventory"), '');
-                this.el.destroy();
-                oldDataJsonInventory = inventoryDataArr;
-                this.setState({
-                  oldDataJsonInventory: oldDataJsonInventory
-                })
-                var options = {
-                  data: oldDataJsonInventory,
-                  columnDrag: true,
-                  colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
-                  columns: [
-                    {
-                      title: 'Inventory Id',
-                      type: 'hidden'
-                    },
-                    {
-                      title: 'Data source',
-                      type: 'dropdown',
-                      source: dataSourceList
-                    },
-                    {
-                      title: 'Region',
-                      type: 'dropdown',
-                      source: regionList
-                    },
-                    {
-                      title: 'Inventory Date',
-                      type: 'calendar'
-
-                    },
-                    {
-                      title: 'Expected Stock',
-                      type: 'hidden',
-                      readOnly: true
-                    },
-                    {
-                      title: 'Manual Adjustment',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Actual Stock',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Batch Number',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Expire Date',
-                      type: 'calendar'
-
-                    },
-                    {
-                      title: 'Active',
-                      type: 'hidden'
-                    }
-
-                  ],
-                  pagination: 10,
-                  search: true,
-                  columnSorting: true,
-                  tableOverflow: true,
-                  wordWrap: true,
-                  allowInsertColumn: false,
-                  allowManualInsertColumn: false,
-                  allowDeleteRow: false,
-                  onchange: this.changed,
-                  oneditionend: this.onedit,
-                  editable: false,
-                  onload: this.loadedFunctionInventory
-                };
-
-                this.el = jexcel(document.getElementById("oldVersionInventory"), options);
-
-                this.el = jexcel(document.getElementById("latestVersionConsumption"), '');
-                this.el.destroy();
-                var options = {
-                  data: latestDataJsonConsumption,
-                  columnDrag: true,
-                  colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
-                  columns: [
-                    {
-                      title: 'Consumption Id',
-                      type: 'hidden',
-                    },
-                    {
-                      title: 'Data source',
-                      type: 'dropdown',
-                      source: dataSourceList
-                    },
-                    {
-                      title: 'Region',
-                      type: 'dropdown',
-                      source: regionList
-                    },
-                    {
-                      title: 'Consumption Quantity',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Days of Stock out',
-                      type: 'text'
-                    },
-                    {
-                      title: 'StartDate',
-                      type: 'calendar'
-                    },
-                    {
-                      title: 'StopDate',
-                      type: 'calendar'
-                    },
-                    {
-                      title: 'Active',
-                      type: 'hidden'
-                    },
-                    {
-                      title: 'Actual Flag',
-                      type: 'dropdown',
-                      source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
-                    }
-                  ],
-                  pagination: 10,
-                  search: true,
-                  columnSorting: true,
-                  tableOverflow: true,
-                  wordWrap: true,
-                  allowInsertColumn: false,
-                  allowManualInsertColumn: false,
-                  allowDeleteRow: false,
-                  onchange: this.changed,
-                  editable: false,
-                  onload:this.loadedFunctionLatest
-                };
-
-                this.el = jexcel(document.getElementById("latestVersionConsumption"), options);
-
-                this.el = jexcel(document.getElementById("latestVersionInventory"), '');
-                this.el.destroy();
-                var options = {
-                  data: latestDataJsonInventory,
-                  columnDrag: true,
-                  colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
-                  columns: [
-                    {
-                      title: 'Inventory Id',
-                      type: 'hidden'
-                    },
-                    {
-                      title: 'Data source',
-                      type: 'dropdown',
-                      source: dataSourceList
-                    },
-                    {
-                      title: 'Region',
-                      type: 'dropdown',
-                      source: regionList
-                    },
-                    {
-                      title: 'Inventory Date',
-                      type: 'calendar'
-
-                    },
-                    {
-                      title: 'Expected Stock',
-                      type: 'hidden',
-                      readOnly: true
-                    },
-                    {
-                      title: 'Manual Adjustment',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Actual Stock',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Batch Number',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Expire Date',
-                      type: 'calendar'
-
-                    },
-                    {
-                      title: 'Active',
-                      type: 'hidden'
-                    }
-
-                  ],
-                  pagination: 10,
-                  search: true,
-                  columnSorting: true,
-                  tableOverflow: true,
-                  wordWrap: true,
-                  allowInsertColumn: false,
-                  allowManualInsertColumn: false,
-                  allowDeleteRow: false,
-                  onchange: this.changed,
-                  oneditionend: this.onedit,
-                  editable: false,
-                  onload:this.loadedFunctionLatestInventory
-                };
-
-                this.el = jexcel(document.getElementById("latestVersionInventory"), options);
-
-                var mergedDataConsumption = [];
-                for (var i = 0; i < latestDataJsonConsumption.length; i++) {
-                  if (oldDataJsonConsumption.length > i) {
-                    if ((latestDataJsonConsumption[i])[0] == (oldDataJsonConsumption[i])[0]) {
-                      mergedDataConsumption.push(oldDataJsonConsumption[i])
-                    } else {
-                      mergedDataConsumption.push(latestDataJsonConsumption[i])
-                    }
-                  } else {
-                    mergedDataConsumption.push(latestDataJsonConsumption[i]);
                   }
-                }
 
-                for (var i = 0; i < oldDataJsonConsumption.length; i++) {
-                  if ((oldDataJsonConsumption[i])[0] == 0) {
-                    mergedDataConsumption.push(oldDataJsonConsumption[i])
-                  }
-                }
-
-                this.el = jexcel(document.getElementById("mergedVersionConsumption"), '');
-                this.el.destroy();
-                mergedDataConsumption = mergedDataConsumption;
-                this.setState({
-                  mergedDataJsonConsumption: mergedDataConsumption
-                })
-                var options = {
-                  data: mergedDataConsumption,
-                  columnDrag: true,
-                  colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
-                  columns: [
-                    {
-                      title: 'Consumption Id',
-                      type: 'hidden',
-                    },
-                    {
-                      title: 'Data source',
-                      type: 'dropdown',
-                      source: dataSourceList
-                    },
-                    {
-                      title: 'Region',
-                      type: 'dropdown',
-                      source: regionList
-                    },
-                    {
-                      title: 'Consumption Quantity',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Days of Stock out',
-                      type: 'text'
-                    },
-                    {
-                      title: 'StartDate',
-                      type: 'calendar'
-                    },
-                    {
-                      title: 'StopDate',
-                      type: 'calendar'
-                    },
-                    {
-                      title: 'Active',
-                      type: 'hidden'
-                    },
-                    {
-                      title: 'Actual Flag',
-                      type: 'dropdown',
-                      source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                  var countrySKUTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                  var countrySKUOs = countrySKUTransaction.objectStore('realmCountryPlanningUnit');
+                  var countrySKURequest = countrySKUOs.getAll();
+                  countrySKURequest.onsuccess = function (event) {
+                    var countrySKUResult = [];
+                    countrySKUResult = countrySKURequest.result;
+                    for (var k = 0; k < countrySKUResult.length; k++) {
+                      if (countrySKUResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
+                        var countrySKUJson = {
+                          name: getLabelText(countrySKUResult[k].label, lan),
+                          id: countrySKUResult[k].realmCountryPlanningUnitId
+                        }
+                        countrySKUList[k] = countrySKUJson
+                      }
                     }
-                  ],
-                  pagination: 10,
-                  search: true,
-                  columnSorting: true,
-                  tableOverflow: true,
-                  wordWrap: true,
-                  allowInsertColumn: false,
-                  allowManualInsertColumn: false,
-                  allowDeleteRow: false,
-                  onchange: this.changed,
-                  editable: false,
-                  onload: this.loadedFunctionForMerge
-                };
-
-                this.el = jexcel(document.getElementById("mergedVersionConsumption"), options);
-
-                var mergedDataInventory = [];
-                for (var i = 0; i < latestDataJsonInventory.length; i++) {
-                  if (oldDataJsonInventory.length > i) {
-                    if ((latestDataJsonInventory[i])[0] == (oldDataJsonInventory[i])[0]) {
-                      mergedDataInventory.push(oldDataJsonInventory[i])
-                    } else {
-                      mergedDataInventory.push(latestDataJsonInventory[i])
+                    var consumptionList = (programJson.consumptionList);
+                    this.setState({
+                      consumptionList: consumptionList
+                    });
+                    var inventoryList = (programJson.inventoryList);
+                    this.setState({
+                      inventoryList: inventoryList
+                    });
+                    var data = [];
+                    var consumptionDataArr = []
+                    if (consumptionList.length == 0) {
+                      data = [];
+                      consumptionDataArr[0] = data;
                     }
-                  } else {
-                    mergedDataInventory.push(latestDataJsonInventory[i]);
-                  }
-                }
-
-                for (var i = 0; i < oldDataJsonInventory.length; i++) {
-                  if ((oldDataJsonInventory[i])[0] == 0) {
-                    mergedDataInventory.push(oldDataJsonInventory[i])
-                  }
-                }
-
-                this.el = jexcel(document.getElementById("mergedVersionInventory"), '');
-                this.el.destroy();
-                mergedDataInventory = mergedDataInventory;
-                this.setState({
-                  mergedDataInventory: mergedDataInventory
-                })
-                var options = {
-                  data: mergedDataInventory,
-                  columnDrag: true,
-                  colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
-                  columns: [
-                    {
-                      title: 'Inventory Id',
-                      type: 'hidden'
-                    },
-                    {
-                      title: 'Data source',
-                      type: 'dropdown',
-                      source: dataSourceList
-                    },
-                    {
-                      title: 'Region',
-                      type: 'dropdown',
-                      source: regionList
-                    },
-                    {
-                      title: 'Inventory Date',
-                      type: 'calendar'
-
-                    },
-                    {
-                      title: 'Expected Stock',
-                      type: 'hidden',
-                      readOnly: true
-                    },
-                    {
-                      title: 'Manual Adjustment',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Actual Stock',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Batch Number',
-                      type: 'text'
-                    },
-                    {
-                      title: 'Expire Date',
-                      type: 'calendar'
-
-                    },
-                    {
-                      title: 'Active',
-                      type: 'hidden'
+                    for (var j = 0; j < consumptionList.length; j++) {
+                      data = [];
+                      data[0] = consumptionList[j].consumptionId;
+                      data[1] = consumptionList[j].planningUnit.id;
+                      data[2] = consumptionList[j].dataSource.id;
+                      data[3] = consumptionList[j].region.id;
+                      data[4] = consumptionList[j].consumptionQty;
+                      data[5] = consumptionList[j].dayOfStockOut;
+                      data[6] = consumptionList[j].startDate;
+                      data[7] = consumptionList[j].stopDate;
+                      data[8] = consumptionList[j].active;
+                      data[9] = consumptionList[j].actualFlag;
+                      consumptionDataArr[j] = data;
                     }
 
-                  ],
-                  pagination: 10,
-                  search: true,
-                  columnSorting: true,
-                  tableOverflow: true,
-                  wordWrap: true,
-                  allowInsertColumn: false,
-                  allowManualInsertColumn: false,
-                  allowDeleteRow: false,
-                  onchange: this.changed,
-                  oneditionend: this.onedit,
-                  editable: false,
-                  onload: this.loadedFunctionForMergeInventory
-                };
+                    this.el = jexcel(document.getElementById("oldVersionConsumption"), '');
+                    this.el.destroy();
+                    oldDataJsonConsumption = consumptionDataArr;
+                    this.setState({
+                      oldDataJsonConsumption: oldDataJsonConsumption
+                    })
+                    var options = {
+                      data: oldDataJsonConsumption,
+                      columnDrag: true,
+                      colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
+                      columns: [
+                        {
+                          title: 'Consumption Id',
+                          type: 'hidden'
+                        },
+                        {
+                          title: 'Planning unit',
+                          type: 'dropdown',
+                          source: planningUnitList
+                        },
+                        {
+                          title: 'Data source',
+                          type: 'dropdown',
+                          source: dataSourceList
+                        },
+                        {
+                          title: 'Region',
+                          type: 'dropdown',
+                          source: regionList
+                        },
+                        {
+                          title: 'Consumption Quantity',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Days of Stock out',
+                          type: 'text'
+                        },
+                        {
+                          title: 'StartDate',
+                          type: 'calendar'
+                        },
+                        {
+                          title: 'StopDate',
+                          type: 'calendar'
+                        },
+                        {
+                          title: 'Active',
+                          type: 'hidden',
+                        },
+                        {
+                          title: 'Actual Flag',
+                          type: 'dropdown',
+                          source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                        }
+                      ],
+                      pagination: 10,
+                      search: true,
+                      columnSorting: true,
+                      tableOverflow: true,
+                      wordWrap: true,
+                      allowInsertColumn: false,
+                      allowManualInsertColumn: false,
+                      allowDeleteRow: false,
+                      onchange: this.changed,
+                      editable: false,
+                      onload: this.loadedFunction
+                    };
 
-                this.el = jexcel(document.getElementById("mergedVersionInventory"), options);
+                    this.el = jexcel(document.getElementById("oldVersionConsumption"), options);
+
+
+                    var data = [];
+                    var inventoryDataArr = []
+                    if (inventoryList.length == 0) {
+                      data = [];
+                      inventoryDataArr[0] = data;
+                    }
+                    for (var j = 0; j < inventoryList.length; j++) {
+
+                      data = [];
+                      data[0] = inventoryList[j].inventoryId;
+                      data[1] = consumptionList[j].realmCountryPlanningUnit.id;
+                      data[2] = inventoryList[j].dataSource.id;
+                      data[3] = inventoryList[j].region.id;
+                      data[4] = inventoryList[j].inventoryDate;
+                      data[5] = inventoryList[j].expectedBal;
+                      data[6] = inventoryList[j].adjustmentQty;
+                      data[7] = inventoryList[j].actualQty;
+                      data[8] = inventoryList[j].batchNo;
+                      data[9] = inventoryList[j].expiryDate;
+                      data[10] = inventoryList[j].active;
+                      inventoryDataArr[j] = data;
+
+                    }
+                    this.el = jexcel(document.getElementById("oldVersionInventory"), '');
+                    this.el.destroy();
+                    oldDataJsonInventory = inventoryDataArr;
+                    this.setState({
+                      oldDataJsonInventory: oldDataJsonInventory
+                    })
+                    var options = {
+                      data: oldDataJsonInventory,
+                      columnDrag: true,
+                      colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                      columns: [
+                        {
+                          title: 'Inventory Id',
+                          type: 'hidden'
+                        },
+                        {
+                          title: 'Country SKU',
+                          type: 'dropdown',
+                          source: countrySkuList
+                        },
+                        {
+                          title: 'Data source',
+                          type: 'dropdown',
+                          source: dataSourceList
+                        },
+                        {
+                          title: 'Region',
+                          type: 'dropdown',
+                          source: regionList
+                        },
+                        {
+                          title: 'Inventory Date',
+                          type: 'calendar'
+
+                        },
+                        {
+                          title: 'Expected Stock',
+                          type: 'hidden',
+                          readOnly: true
+                        },
+                        {
+                          title: 'Manual Adjustment',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Actual Stock',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Batch Number',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Expire Date',
+                          type: 'calendar'
+
+                        },
+                        {
+                          title: 'Active',
+                          type: 'hidden'
+                        }
+
+                      ],
+                      pagination: 10,
+                      search: true,
+                      columnSorting: true,
+                      tableOverflow: true,
+                      wordWrap: true,
+                      allowInsertColumn: false,
+                      allowManualInsertColumn: false,
+                      allowDeleteRow: false,
+                      onchange: this.changed,
+                      oneditionend: this.onedit,
+                      editable: false,
+                      onload: this.loadedFunctionInventory
+                    };
+
+                    this.el = jexcel(document.getElementById("oldVersionInventory"), options);
+
+                    this.el = jexcel(document.getElementById("latestVersionConsumption"), '');
+                    this.el.destroy();
+                    var options = {
+                      data: latestDataJsonConsumption,
+                      columnDrag: true,
+                      colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
+                      columns: [
+                        {
+                          title: 'Consumption Id',
+                          type: 'hidden',
+                        },
+                        {
+                          title: 'Planning unit',
+                          type: 'dropdown',
+                          source: planningUnitList
+                        },
+                        {
+                          title: 'Data source',
+                          type: 'dropdown',
+                          source: dataSourceList
+                        },
+                        {
+                          title: 'Region',
+                          type: 'dropdown',
+                          source: regionList
+                        },
+                        {
+                          title: 'Consumption Quantity',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Days of Stock out',
+                          type: 'text'
+                        },
+                        {
+                          title: 'StartDate',
+                          type: 'calendar'
+                        },
+                        {
+                          title: 'StopDate',
+                          type: 'calendar'
+                        },
+                        {
+                          title: 'Active',
+                          type: 'hidden'
+                        },
+                        {
+                          title: 'Actual Flag',
+                          type: 'dropdown',
+                          source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                        }
+                      ],
+                      pagination: 10,
+                      search: true,
+                      columnSorting: true,
+                      tableOverflow: true,
+                      wordWrap: true,
+                      allowInsertColumn: false,
+                      allowManualInsertColumn: false,
+                      allowDeleteRow: false,
+                      onchange: this.changed,
+                      editable: false,
+                      onload: this.loadedFunctionLatest
+                    };
+
+                    this.el = jexcel(document.getElementById("latestVersionConsumption"), options);
+
+                    this.el = jexcel(document.getElementById("latestVersionInventory"), '');
+                    this.el.destroy();
+                    var options = {
+                      data: latestDataJsonInventory,
+                      columnDrag: true,
+                      colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                      columns: [
+                        {
+                          title: 'Inventory Id',
+                          type: 'hidden'
+                        },
+                        {
+                          title: 'Country SKU',
+                          type: 'dropdown',
+                          source: countrySkuList
+                        },
+                        {
+                          title: 'Data source',
+                          type: 'dropdown',
+                          source: dataSourceList
+                        },
+                        {
+                          title: 'Region',
+                          type: 'dropdown',
+                          source: regionList
+                        },
+                        {
+                          title: 'Inventory Date',
+                          type: 'calendar'
+
+                        },
+                        {
+                          title: 'Expected Stock',
+                          type: 'hidden',
+                          readOnly: true
+                        },
+                        {
+                          title: 'Manual Adjustment',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Actual Stock',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Batch Number',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Expire Date',
+                          type: 'calendar'
+
+                        },
+                        {
+                          title: 'Active',
+                          type: 'hidden'
+                        }
+
+                      ],
+                      pagination: 10,
+                      search: true,
+                      columnSorting: true,
+                      tableOverflow: true,
+                      wordWrap: true,
+                      allowInsertColumn: false,
+                      allowManualInsertColumn: false,
+                      allowDeleteRow: false,
+                      onchange: this.changed,
+                      oneditionend: this.onedit,
+                      editable: false,
+                      onload: this.loadedFunctionLatestInventory
+                    };
+
+                    this.el = jexcel(document.getElementById("latestVersionInventory"), options);
+
+                    var mergedDataConsumption = [];
+                    for (var i = 0; i < latestDataJsonConsumption.length; i++) {
+                      if (oldDataJsonConsumption.length > i) {
+                        if ((latestDataJsonConsumption[i])[0] == (oldDataJsonConsumption[i])[0]) {
+                          mergedDataConsumption.push(oldDataJsonConsumption[i])
+                        } else {
+                          mergedDataConsumption.push(latestDataJsonConsumption[i])
+                        }
+                      } else {
+                        mergedDataConsumption.push(latestDataJsonConsumption[i]);
+                      }
+                    }
+
+                    for (var i = 0; i < oldDataJsonConsumption.length; i++) {
+                      if ((oldDataJsonConsumption[i])[0] == 0) {
+                        mergedDataConsumption.push(oldDataJsonConsumption[i])
+                      }
+                    }
+
+                    this.el = jexcel(document.getElementById("mergedVersionConsumption"), '');
+                    this.el.destroy();
+                    mergedDataConsumption = mergedDataConsumption;
+                    this.setState({
+                      mergedDataJsonConsumption: mergedDataConsumption
+                    })
+                    var options = {
+                      data: mergedDataConsumption,
+                      columnDrag: true,
+                      colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
+                      columns: [
+                        {
+                          title: 'Consumption Id',
+                          type: 'hidden',
+                        },
+                        {
+                          title: 'Planning unit',
+                          type: 'dropdown',
+                          source: planningUnitList
+                        },
+                        {
+                          title: 'Data source',
+                          type: 'dropdown',
+                          source: dataSourceList
+                        },
+                        {
+                          title: 'Region',
+                          type: 'dropdown',
+                          source: regionList
+                        },
+                        {
+                          title: 'Consumption Quantity',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Days of Stock out',
+                          type: 'text'
+                        },
+                        {
+                          title: 'StartDate',
+                          type: 'calendar'
+                        },
+                        {
+                          title: 'StopDate',
+                          type: 'calendar'
+                        },
+                        {
+                          title: 'Active',
+                          type: 'hidden'
+                        },
+                        {
+                          title: 'Actual Flag',
+                          type: 'dropdown',
+                          source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                        }
+                      ],
+                      pagination: 10,
+                      search: true,
+                      columnSorting: true,
+                      tableOverflow: true,
+                      wordWrap: true,
+                      allowInsertColumn: false,
+                      allowManualInsertColumn: false,
+                      allowDeleteRow: false,
+                      onchange: this.changed,
+                      editable: false,
+                      onload: this.loadedFunctionForMerge
+                    };
+
+                    this.el = jexcel(document.getElementById("mergedVersionConsumption"), options);
+
+                    var mergedDataInventory = [];
+                    for (var i = 0; i < latestDataJsonInventory.length; i++) {
+                      if (oldDataJsonInventory.length > i) {
+                        if ((latestDataJsonInventory[i])[0] == (oldDataJsonInventory[i])[0]) {
+                          mergedDataInventory.push(oldDataJsonInventory[i])
+                        } else {
+                          mergedDataInventory.push(latestDataJsonInventory[i])
+                        }
+                      } else {
+                        mergedDataInventory.push(latestDataJsonInventory[i]);
+                      }
+                    }
+
+                    for (var i = 0; i < oldDataJsonInventory.length; i++) {
+                      if ((oldDataJsonInventory[i])[0] == 0) {
+                        mergedDataInventory.push(oldDataJsonInventory[i])
+                      }
+                    }
+
+                    this.el = jexcel(document.getElementById("mergedVersionInventory"), '');
+                    this.el.destroy();
+                    mergedDataInventory = mergedDataInventory;
+                    this.setState({
+                      mergedDataInventory: mergedDataInventory
+                    })
+                    var options = {
+                      data: mergedDataInventory,
+                      columnDrag: true,
+                      colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                      columns: [
+                        {
+                          title: 'Inventory Id',
+                          type: 'hidden'
+                        },
+                        {
+                          title: 'Country SKU',
+                          type: 'dropdown',
+                          source: countrySkuList
+                        },
+                        {
+                          title: 'Data source',
+                          type: 'dropdown',
+                          source: dataSourceList
+                        },
+                        {
+                          title: 'Region',
+                          type: 'dropdown',
+                          source: regionList
+                        },
+                        {
+                          title: 'Inventory Date',
+                          type: 'calendar'
+
+                        },
+                        {
+                          title: 'Expected Stock',
+                          type: 'hidden',
+                          readOnly: true
+                        },
+                        {
+                          title: 'Manual Adjustment',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Actual Stock',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Batch Number',
+                          type: 'text'
+                        },
+                        {
+                          title: 'Expire Date',
+                          type: 'calendar'
+
+                        },
+                        {
+                          title: 'Active',
+                          type: 'hidden'
+                        }
+
+                      ],
+                      pagination: 10,
+                      search: true,
+                      columnSorting: true,
+                      tableOverflow: true,
+                      wordWrap: true,
+                      allowInsertColumn: false,
+                      allowManualInsertColumn: false,
+                      allowDeleteRow: false,
+                      onchange: this.changed,
+                      oneditionend: this.onedit,
+                      editable: false,
+                      onload: this.loadedFunctionForMergeInventory
+                    };
+
+                    this.el = jexcel(document.getElementById("mergedVersionInventory"), options);
+                  }.bind(this)
+                }.bind(this)
               }.bind(this)
             }.bind(this)
           }.bind(this)
@@ -735,12 +805,12 @@ export default class syncPage extends Component {
 
 
   loadedFunction = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     var elInstance = instance.jexcel;
     var latestDataJsonConsumption = this.state.latestDataJsonConsumption
     var jsonData = elInstance.getJson();
     for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[7] == true) {
+      if ((jsonData[y])[8] == true) {
         if ((jsonData[y])[0] != 0) {
           var latestFilteredData = (latestDataJsonConsumption[y])[0];
           var col = ("A").concat(parseInt(y) + 1);
@@ -773,13 +843,13 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMerge = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var oldDataJson = this.state.oldDataJsonConsumption
     var latestDataJson = this.state.latestDataJsonConsumption
     for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[7] == true) {
+      if ((jsonData[y])[8] == true) {
         if ((jsonData[y])[0] != 0) {
           if (oldDataJson.length > y) {
             var oldFilteredData = (oldDataJson[y])[0];
@@ -824,12 +894,12 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionInventory = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
     var elInstance = instance.jexcel;
     var latestDataJsonInventory = this.state.latestDataJsonInventory
     var jsonData = elInstance.getJson();
     for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[9] == true) {
+      if ((jsonData[y])[10] == true) {
         if ((jsonData[y])[0] != 0) {
           var latestFilteredData = (latestDataJsonInventory[y])[0];
           var col = ("A").concat(parseInt(y) + 1);
@@ -862,13 +932,13 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionForMergeInventory = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     var oldDataJson = this.state.oldDataJsonInventory
     var latestDataJson = this.state.latestDataJsonInventory
     for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[9] == true) {
+      if ((jsonData[y])[10] == true) {
         if ((jsonData[y])[0] != 0) {
           if (oldDataJson.length > y) {
             var oldFilteredData = (oldDataJson[y])[0];
@@ -913,11 +983,11 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionLatest = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[7] == true) {
+      if ((jsonData[y])[8] == true) {
       } else {
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(y) + 1);
@@ -928,11 +998,11 @@ export default class syncPage extends Component {
   }
 
   loadedFunctionLatestInventory = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
     for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[9] == true) {
+      if ((jsonData[y])[10] == true) {
       } else {
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(y) + 1);
