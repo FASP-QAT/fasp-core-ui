@@ -12,6 +12,8 @@ import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n'
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+
 
 let initialValues = {
     realmId: '',
@@ -86,6 +88,7 @@ export default class EditHealthAreaComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
         // this.getRealmCountryList = this.getRealmCountryList.bind(this);
 
         // initialValues = {
@@ -96,6 +99,11 @@ export default class EditHealthAreaComponent extends Component {
 
         console.log("state---", this.state);
     }
+
+    changeMessage(message) {
+        this.setState({ message: message })
+    }
+
     dataChange(event) {
         let { healthArea } = this.state
         console.log(event.target.name);
@@ -158,23 +166,8 @@ export default class EditHealthAreaComponent extends Component {
                     this.setState({
                         realms: response.data
                     })
-                }).catch(
-                    error => {
-                        switch (error.message) {
-                            case "Network Error":
-                                this.setState({
-                                    message: error.message
-                                })
-                                break
-                            default:
-                                this.setState({
-                                    message: error.response.data.message
-                                })
-                                break
-                        }
-                    }
-                );
-
+                })
+                
             HealthAreaService.getRealmCountryList(this.state.healthArea.realm.id)
                 .then(response => {
                     console.log("Realm Country List -------list---", response.data);
@@ -192,50 +185,11 @@ export default class EditHealthAreaComponent extends Component {
                             message: response.data.messageCode
                         })
                     }
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response.status) {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: error.response.data.messageCode });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    console.log("Error code unkown");
-                                    break;
-                            }
-                        }
-                    }
-                );
+                })
+                
 
-
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+        })
+        
     }
 
     updateFieldData(value) {
@@ -276,6 +230,7 @@ export default class EditHealthAreaComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -299,27 +254,6 @@ export default class EditHealthAreaComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
 
                                 }}
 
@@ -465,23 +399,8 @@ export default class EditHealthAreaComponent extends Component {
                     this.setState({
                         realms: response.data
                     })
-                }).catch(
-                    error => {
-                        switch (error.message) {
-                            case "Network Error":
-                                this.setState({
-                                    message: error.message
-                                })
-                                break
-                            default:
-                                this.setState({
-                                    message: error.response.data.message
-                                })
-                                break
-                        }
-                    }
-                );
-
+                })
+                
             HealthAreaService.getRealmCountryList(this.state.healthArea.realm.id)
                 .then(response => {
                     console.log("Realm Country List -------list---", response.data);
@@ -499,50 +418,12 @@ export default class EditHealthAreaComponent extends Component {
                             message: response.data.messageCode
                         })
                     }
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response.status) {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: error.response.data.messageCode });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    console.log("Error code unkown");
-                                    break;
-                            }
-                        }
-                    }
-                );
+                })
+                
 
 
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+        })
+        
     }
 
 }
