@@ -37,6 +37,7 @@ export default class ConsumptionDetails extends React.Component {
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
 
     componentDidMount = function () {
@@ -813,6 +814,7 @@ export default class ConsumptionDetails extends React.Component {
                             message: `Consumption Data Saved`,
                             changedFlag: 0
                         })
+                        this.props.history.push(`/dashboard/` + "Consumption Data Added Successfully")
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -1028,9 +1030,9 @@ export default class ConsumptionDetails extends React.Component {
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
                                 <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>Add Row</Button>
-                                
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
@@ -1970,17 +1972,17 @@ export default class ConsumptionDetails extends React.Component {
                 }
             }
 
-            var col = ("H").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(7, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+            // var col = ("H").concat(parseInt(y) + 1);
+            // var value = this.el.getValueFromCoords(7, y);
+            // if (value == "Invalid date" || value == "") {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, "This field is required.");
+            //     valid = false;
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // }
 
 
 
@@ -1997,6 +1999,9 @@ export default class ConsumptionDetails extends React.Component {
             // }
         }
         return valid;
+    }
+    cancelClicked() {
+        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
     }
 }
 
