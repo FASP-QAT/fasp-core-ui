@@ -582,5 +582,6 @@
     "static.common.quarter4":"Quarter 4",
     "static.common.display":"Display",
     "static.common.monthly":"Monthly",
-    "static.common.quarterly":"Quarterly"
+    "static.common.quarterly":"Quarterly",
+    "static.footer": "Quantification Analytics Tool"
 }
