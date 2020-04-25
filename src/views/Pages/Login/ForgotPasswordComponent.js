@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../../i18n'
 import '../../Forms/ValidationForms/ValidationForms.css';
+import image1 from '../../../../public/assets/img/QAT-logo.png';
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
@@ -85,7 +86,7 @@ class ForgotPasswordComponent extends Component {
                         <Row className="justify-content-center ">
                             <Col md="12">
                                 <div className="upper-logo mt-1">
-                                    <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                                    <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
