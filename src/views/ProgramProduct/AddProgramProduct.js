@@ -520,7 +520,7 @@ class AddprogramPlanningUnit extends Component {
                                                     <td>
                                                         <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
                                                     </td>
-                                                    <td>
+                                                    <td className="whitebtnColor">
                                                         <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                     </td>
                                                 </tr>

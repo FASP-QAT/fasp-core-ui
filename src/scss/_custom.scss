@@ -544,6 +544,9 @@ label.arrow_label:after {
       right: 0; 
       margin: auto; 
   }
+  .RemoveStriped .jexcel_content .jexcel .draggable{tr:nth-of-type(odd) {
+    background-color: #fff !important;
+}}
 
 
   // .forInlinebtnMapping{ display: flex;}
@@ -561,7 +564,7 @@ label.arrow_label:after {
   .jexcel_content{    overflow-y: auto !important;
     max-height: 440px;
 }
- 
+ .whitebtnColor .btn-info{color: #fff!important;}
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}

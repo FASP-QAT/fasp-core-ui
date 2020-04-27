@@ -265,7 +265,7 @@ export default class syncPage extends Component {
               </CardHeader>
               <CardBody>
                 <Col md="12 pl-0" id="realmDiv">
-                  <div id="oldVersion" className="table-responsive" />
+                  <div id="oldVersion" className="table-responsive RemoveStriped" />
                 </Col>
               </CardBody>
             </Card>
@@ -277,7 +277,7 @@ export default class syncPage extends Component {
               </CardHeader>
               <CardBody>
                 <Col md="12 pl-0" id="realmDiv">
-                  <div id="latestVersion" className="table-responsive" />
+                  <div id="latestVersion" className="table-responsive RemoveStriped " />
                 </Col>
               </CardBody>
             </Card>
@@ -291,7 +291,7 @@ export default class syncPage extends Component {
               </CardHeader>
               <CardBody>
                 <Col md="12 pl-0" id="realmDiv">
-                  <div id="mergeVersion" className="table-responsive" />
+                  <div id="mergeVersion" className="table-responsive RemoveStriped " />
                 </Col>
               </CardBody>
             </Card>
