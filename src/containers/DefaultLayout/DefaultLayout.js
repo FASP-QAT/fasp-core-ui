@@ -237,7 +237,7 @@ class DefaultLayout extends Component {
                           //   icon: 'icon-graph'
                           // },
                           {
-                            name: 'Product Category Tree',
+                            name: 'Product Category',
                             url: '/productCategory/productCategoryTree',
                             icon: 'icon-graph'
                           },

@@ -189,7 +189,7 @@ const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockSta
 const routes = [
 
   { path: '/inventory/addInventory', name: 'Inventory / Add Inventory', component: AddInventory },
-  { path: '/productCategory/productCategoryTree', name: 'Product Category Tree', component: ProductCategoryTree },
+  { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
   { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.dimension') }), component: AddDimension },
@@ -365,10 +365,10 @@ const routes = [
   { path: '/realmCountry/realmCountryPlanningUnit/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCountry },
   { path: '/planningUnitCapacity/listPlanningUnitCapacity', name: i18n.t('static.dashboard.planningunit') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: PlanningUnitCapacityList },
   { path: '/realmCountry/realmCountryRegion/:realmCountryId', name: i18n.t('static.dashboard.realmcountry') + " / " + i18n.t('static.dashboad.planningunitcountry'), component: RealmCountryRegion },
-  { path: '/report/productCatalog', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.productCatalog'), component: ProductCatalog},
-  { path: '/report/consumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.consumption'), component: ConsumptionReport},
-  { path: '/report/stockStatusMatrix', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.stockstatusmatrix'), component: StockStatusMatrixReport},
- 
+  { path: '/report/productCatalog', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.productCatalog'), component: ProductCatalog },
+  { path: '/report/consumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.consumption'), component: ConsumptionReport },
+  { path: '/report/stockStatusMatrix', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboad.stockstatusmatrix'), component: StockStatusMatrixReport },
+
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
