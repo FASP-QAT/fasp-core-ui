@@ -5,7 +5,7 @@ body {
 }
 
 ::placeholder {
-  color:#212721!important;
+  color:#eee!important;
 }
 /* ————————————————————–
   Tree core styles
@@ -407,7 +407,9 @@ label.arrow_label:after {
   color:#212721!important;
 }
 .red {
-  color: #f86c6b !important;
+  // color: #f86c6b !important;
+  color: red;
+  font-size: 12px;
 }
 
 
@@ -1171,3 +1173,7 @@ h5,
 .legend .greenlegend { background-color:rgb(152, 251, 152);border-color:1px solid rgb(152, 251, 152); }
 .legend .redlegend { background-color: red; border-color:1px solid red; }
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
+
+.card {
+  margin-top: -2%;
+}

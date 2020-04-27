@@ -65,7 +65,7 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}> {i18n.t('static.language.english')}</DropdownItem>
               <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}> {i18n.t('static.language.spanish')}</DropdownItem>
               <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}> {i18n.t('static.language.french')}</DropdownItem>
-              <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.pourtegese')}</DropdownItem>
+              <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown> 
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} /> 

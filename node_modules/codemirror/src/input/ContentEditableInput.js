@@ -99,9 +99,18 @@ export default class ContentEditableInput {
     on(div, "cut", onCopyCut)
   }
 
+  screenReaderLabelChanged(label) {
+    // Label for screenreaders, accessibility
+    if(label) {
+      this.div.setAttribute('aria-label', label)
+    } else {
+      this.div.removeAttribute('aria-label')
+    }
+  }
+
   prepareSelection() {
     let result = prepareSelection(this.cm, false)
-    result.focus = this.cm.state.focused
+    result.focus = document.activeElement == this.div
     return result
   }
 
@@ -195,7 +204,7 @@ export default class ContentEditableInput {
 
   focus() {
     if (this.cm.options.readOnly != "nocursor") {
-      if (!this.selectionInEditor())
+      if (!this.selectionInEditor() || document.activeElement != this.div)
         this.showSelection(this.prepareSelection(), true)
       this.div.focus()
     }
