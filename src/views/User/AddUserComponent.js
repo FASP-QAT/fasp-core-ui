@@ -143,15 +143,11 @@ class AddUserComponent extends Component {
 
             }
         }
-        console.log("count---" + count);
         if (count > 0) {
-            console.log("if");
             document.getElementById("showRealm").value = true;
         } else {
-            console.log("else");
             document.getElementById("showRealm").value = false;
         }
-        console.log("value---" + document.getElementById("showRealm").value);
         user.roles = roleIdArray;
         this.setState({
             user,

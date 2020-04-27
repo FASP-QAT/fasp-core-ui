@@ -11,7 +11,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.tracercategory.tracercategory');
 class ListTracerCategoryComponent extends Component {
@@ -64,27 +65,8 @@ class ListTracerCategoryComponent extends Component {
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
@@ -92,27 +74,8 @@ class ListTracerCategoryComponent extends Component {
                     tracerCategoryList: response.data,
                     selTracerCategory: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
     }
 
     formatLabel(cell, row) {
@@ -196,8 +159,11 @@ class ListTracerCategoryComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.tracercategorylist')}</strong>{' '}

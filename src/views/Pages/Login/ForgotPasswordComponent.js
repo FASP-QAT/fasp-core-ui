@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../../i18n'
 import '../../Forms/ValidationForms/ValidationForms.css';
+import image1 from '../../../../public/assets/img/QAT-logo.png';
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
@@ -52,7 +53,7 @@ class ForgotPasswordComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/login/` + "Action Canceled")
+        this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
@@ -85,7 +86,7 @@ class ForgotPasswordComponent extends Component {
                         <Row className="justify-content-center ">
                             <Col md="12">
                                 <div className="upper-logo mt-1">
-                                    <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                                    <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
@@ -93,7 +94,7 @@ class ForgotPasswordComponent extends Component {
                                 <Card className="mx-4 ">
 
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Forgot Password</strong>{' '}
+                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.forgotpassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={initialValues}
@@ -157,7 +158,7 @@ class ForgotPasswordComponent extends Component {
                                                         <CardBody className="p-4">
 
                                                             <FormGroup>
-                                                                <Label for="emailId">Email Id</Label>
+                                                                <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
                                                                 <Input type="text"
                                                                     name="emailId"
                                                                     id="emailId"
@@ -173,8 +174,8 @@ class ForgotPasswordComponent extends Component {
                                                         </CardBody>
                                                         <CardFooter>
                                                             <FormGroup>
-                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>

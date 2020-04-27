@@ -13,6 +13,7 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProductService from '../../api/ProductService';
 import TracerCategoryService from '../../api/TracerCategoryService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
@@ -54,26 +55,6 @@ export default class ForecastingUnitListComponent extends Component {
                 selSource: response.data
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
 
     }
 
@@ -134,32 +115,13 @@ export default class ForecastingUnitListComponent extends Component {
         let realmId = document.getElementById("realmId").value;
         ProductService.getProductCategoryList(realmId)
             .then(response => {
-console.log(JSON.stringify(response.data))
+                console.log(JSON.stringify(response.data))
 
 
                 this.setState({
                     productCategories: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
     }
     componentDidMount() {
@@ -179,79 +141,18 @@ console.log(JSON.stringify(response.data))
                             selSource: response.data
                         })
                     })
-                        .catch(
-                            error => {
-                                if (error.message === "Network Error") {
-                                    this.setState({ message: error.message });
-                                } else {
-                                    switch (error.response.status) {
-                                        case 500:
-                                        case 401:
-                                        case 404:
-                                        case 406:
-                                        case 412:
-                                            this.setState({ message: error.response.data.messageCode });
-                                            break;
-                                        default:
-                                            this.setState({ message: 'static.unkownError' });
-                                            break;
-                                    }
-                                }
-                            }
-                        );
 
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 this.setState({
                     tracerCategories: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
-
-
+            })
 
         ForecastingUnitService.getForecastingUnitListAll().then(response => {
             console.log("response------->" + response);
@@ -260,26 +161,6 @@ console.log(JSON.stringify(response.data))
                 selSource: response.data
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
 
     }
 
@@ -394,7 +275,7 @@ console.log(JSON.stringify(response.data))
             firstPageTitle: i18n.t('static.common.nextPage'),
             lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
-            paginationSize:2,
+            paginationSize: 2,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
             sizePerPageList: [{
@@ -412,6 +293,9 @@ console.log(JSON.stringify(response.data))
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>

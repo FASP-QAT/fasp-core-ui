@@ -34,7 +34,12 @@ class ProductService {
         return axios.get(`${API_URL}/api/productCategory/realmId/${realmId}`, {}
         );
     }
-
+    getConsumptionData(realmId,productCategoryId,productId){
+        return axios.get(`${API_URL}/api/consumption/${realmId}/${productCategoryId}/${productId}`,{});   
+    }
+    getStockStatusMatrixData(realmId,productCategoryId,productId,view){
+        return axios.get(`${API_URL}/api/stockmatrix/${realmId}/${productCategoryId}/${productId}/${view}`,{});   
+    }
 
 }
 export default new ProductService();

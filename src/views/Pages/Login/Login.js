@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
 import navigation from '../../../_nav';
 // routes config
-
+import image1 from '../../../../public/assets/img/QAT-login-logo.png';
+import image2 from '../../../../public/assets/img/wordmark.png';
+import image3 from '../../../../public/assets/img/PEPFAR-logo.png';
+import image4 from '../../../../public/assets/img/USAID-presidents-malaria-initiative.png';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -101,7 +104,7 @@ class Login extends Component {
             <Row className="justify-content-center">
               <Col md="12">
                 <div className="upper-logo mt-1">
-                  <img src={'assets/img/QAT-login-logo.png'} className="img-fluid " />
+                  <img src={image1} className="img-fluid " />
                 </div>
               </Col>
               <Col lg="5" md="7" xl="4">
@@ -118,7 +121,7 @@ class Login extends Component {
                             LoginService.authenticate(username, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng","lastActionTaken"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
 
@@ -292,18 +295,18 @@ class Login extends Component {
                 <Row className="text-center Login-bttom-logo">
                   <Col md="4">
                     <CardBody>
-                      <img src={'assets/img/wordmark.png'} className="img-fluid bottom-logo-img" />
+                      <img src={image2} className="img-fluid bottom-logo-img" />
                     </CardBody>
                   </Col>
 
                   <Col md="4">
                     <CardBody>
-                      <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
+                      <img src={image3} className="img-fluid bottom-logo-img" />
                     </CardBody>
                   </Col>
                   <Col md="4">
                     <CardBody>
-                      <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
+                      <img src={image4} className="img-fluid bottom-logo-img" />
                     </CardBody>
                   </Col>
                 </Row>

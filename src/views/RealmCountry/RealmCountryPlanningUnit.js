@@ -716,7 +716,7 @@ realmCountryPlanningUnitId:'',
                                                     {this.state.rows[idx].gtin}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].active ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
+                                                    {this.state.rows[idx].active==true ? i18n.t('static.common.active') : i18n.t('static.common.disabled')}
                                                 </td>
                                                 <td><div className="forInlinebtnMapping">
                                                      {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}

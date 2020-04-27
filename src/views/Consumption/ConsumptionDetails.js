@@ -7,7 +7,7 @@ import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
 import {
     Card, CardBody, CardHeader,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, Form
+    CardFooter, Button, Col, Form, InputGroup, InputGroupAddon
     , FormFeedback, Row
 } from 'reactstrap';
 import { Formik } from 'formik';
@@ -16,6 +16,7 @@ import { SECRET_KEY } from '../../Constants.js'
 import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import i18n from '../../i18n';
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -36,6 +37,7 @@ export default class ConsumptionDetails extends React.Component {
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.cancelClicked = this.cancelClicked.bind(this);
     }
 
     componentDidMount = function () {
@@ -317,10 +319,11 @@ export default class ConsumptionDetails extends React.Component {
                             data[1] = consumptionList[j].region.id;
                             data[2] = consumptionList[j].consumptionQty;
                             data[3] = consumptionList[j].dayOfStockOut;
-                            // data[3] = [0]
                             data[4] = consumptionList[j].startDate;
                             data[5] = consumptionList[j].stopDate;
+                            data[6] = consumptionList[j].actualFlag;
                             data[7] = consumptionList[j].active;
+
 
                             consumptionDataArr[j] = data;
                         }
@@ -364,9 +367,15 @@ export default class ConsumptionDetails extends React.Component {
                                     type: 'calendar'
                                 },
                                 {
+                                    title: 'Actual Flag',
+                                    type: 'dropdown',
+                                    source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                                },
+                                {
                                     title: 'Active',
                                     type: 'checkbox'
-                                },
+                                }
+
 
 
                                 // { title: 'Create date', type: 'text', readOnly: true },
@@ -382,7 +391,11 @@ export default class ConsumptionDetails extends React.Component {
                             allowInsertColumn: false,
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
-                            onchange: this.changed
+                            onchange: this.changed,
+                            oneditionend: this.onedit,
+                            copyCompatibility: true,
+                            paginationOptions: [10, 25, 50, 100],
+                            position: 'top'
                         };
 
                         this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
@@ -751,21 +764,37 @@ export default class ConsumptionDetails extends React.Component {
 
                 var programRequest = programTransaction.get(programId);
                 programRequest.onsuccess = function (event) {
-                    console.log("(programRequest.result)----", (programRequest.result))
+                    // console.log("(programRequest.result)----", (programRequest.result))
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var plannigUnitId = document.getElementById("planningUnitId").value;
+
                     var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
-                    for (var i = 0; i < consumptionDataList.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
-                        consumptionDataList[i].dataSource.id = map.get("0");
-                        consumptionDataList[i].region.id = map.get("1");
-                        consumptionDataList[i].consumptionQty = map.get("2");
-                        consumptionDataList[i].dayOfStockOut = parseInt(map.get("3"));
-                        consumptionDataList[i].startDate = map.get("4");
-                        consumptionDataList[i].stopDate = map.get("5");
-                        consumptionDataList[i].active = map.get("6");
+                    var consumptionDataListNotFiltered = programJson.consumptionList;
+
+                    // console.log("000000000000000   ", consumptionDataList)
+                    var count = 0;
+                    for (var i = 0; i < consumptionDataListNotFiltered.length; i++) {
+                        if (consumptionDataList[count] != undefined) {
+                            if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
+
+                                var map = new Map(Object.entries(tableJson[count]))
+                                consumptionDataListNotFiltered[i].dataSource.id = map.get("0");
+                                consumptionDataListNotFiltered[i].region.id = map.get("1");
+                                consumptionDataListNotFiltered[i].consumptionQty = map.get("2");
+                                consumptionDataListNotFiltered[i].dayOfStockOut = parseInt(map.get("3"));
+                                consumptionDataListNotFiltered[i].startDate = map.get("4");
+                                consumptionDataListNotFiltered[i].stopDate = map.get("5");
+                                consumptionDataListNotFiltered[i].actualFlag = map.get("6");
+                                consumptionDataListNotFiltered[i].active = map.get("7");
+
+                                if (consumptionDataList.length >= count) {
+                                    count++;
+                                }
+                            }
+
+                        }
 
                     }
                     for (var i = consumptionDataList.length; i < tableJson.length; i++) {
@@ -782,14 +811,18 @@ export default class ConsumptionDetails extends React.Component {
                             dayOfStockOut: parseInt(map.get("3")),
                             startDate: map.get("4"),
                             stopDate: map.get("5"),
-                            active: map.get("6"),
+                            actualFlag: map.get("6"),
+                            active: map.get("7"),
+
                             planningUnit: {
                                 id: plannigUnitId
                             }
                         }
-                        consumptionDataList[i] = json;
+                        // consumptionDataList[i] = json;
+                        consumptionDataListNotFiltered.push(json);
                     }
-                    programJson.consumptionList = consumptionDataList;
+                    console.log("1111111111111111111   ", consumptionDataList)
+                    programJson.consumptionList = consumptionDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
 
@@ -802,6 +835,7 @@ export default class ConsumptionDetails extends React.Component {
                             message: `Consumption Data Saved`,
                             changedFlag: 0
                         })
+                        this.props.history.push(`/dashboard/` + "Consumption Data Added Successfully")
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -846,106 +880,193 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
         return (
-            <>
+            // <>
+            //     <Col xs="12" sm="12">
+            //         <Card>
+            //             <CardHeader>
+            //                 <strong>Inventory details</strong>
+            //             </CardHeader>
+            //             <CardBody>
+            //                 <Formik
+            //                     render={
+            //                         ({
+            //                         }) => (
+            //                                 <Form name='simpleForm'>
+            //                                     <CardHeader>
+            //                                         <strong>Consumption details</strong>
+            //                                     </CardHeader>
+            //                                     <CardBody>
+            //                                         <Card className="card-accent-success">
+            //                                             {/* <Col xs="8" sm="8"> */}
+            //                                             <Row>
+            //                                                 <Col md="1"></Col>
+            //                                                 <Col md="3">
+            //                                                     <br />
+            //                                                     <Label htmlFor="select">Program</Label><br />
+            //                                                     <Input type="select"
+            //                                                         bsSize="sm"
+            //                                                         value={this.state.programId}
+            //                                                         name="programId" id="programId"
+            //                                                         onChange={(e) => { this.getPlanningUnitList(e) }}
+            //                                                     >
+            //                                                         <option value="0">Please select</option>
+            //                                                         {programs}
+            //                                                     </Input><br />
+            //                                                 </Col>
+            //                                                 <Col md="3">
+            //                                                     <br />
+            //                                                     <Label htmlFor="select">Planning Unit</Label><br />
+            //                                                     <Input type="select"
+            //                                                         bsSize="sm"
+            //                                                         value={this.state.planningUnitId}
+            //                                                         name="planningUnitId" id="planningUnitId"
+            //                                                     // onChange={(e) => { this.getProductList(e) }}
+            //                                                     >
+            //                                                         <option value="0">Please select</option>
+            //                                                         {planningUnits}
+            //                                                     </Input><br />
+            //                                                 </Col>
+            //                                                 {/* <Col md="3">
+            //                                                 <br />
+            //                                                 <Label htmlFor="select">Product category</Label><br />
+            //                                                 <Input type="select"
+            //                                                     bsSize="sm"
+            //                                                     value={this.state.productCategoryId}
+            //                                                     name="categoryId" id="categoryId"
+            //                                                     onChange={(e) => { this.getProductList(e) }}>
+            //                                                     <option value="0">Please select</option>
+            //                                                     {categories}
+            //                                                 </Input><br />
+            //                                             </Col>
+            //                                             <Col md="3">
+            //                                                 <br />
+            //                                                 <Label htmlFor="select">Product</Label><br />
+            //                                                 <Input type="select"
+            //                                                     bsSize="sm"
+            //                                                     value={this.state.productId}
+            //                                                     name="productId" id="productId">
+            //                                                     <option value="0">Please select</option>
+            //                                                     {products}
+            //                                                 </Input><br />
+            //                                             </Col> */}
+            //                                                 <Col md="1">
+            //                                                     <br /><br />
+            //                                                     <FormGroup>
+            //                                                         <Button type="button" size="sm" color="primary" className="float-right btn btn-secondary Gobtn btn-sm mt-2" onClick={() => this.formSubmit()}> Go</Button>
+            //                                                         &nbsp;
+            //                                                 </FormGroup>
+            //                                                     {/* <Button type="button" onClick={() => this.formSubmit()} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Go</Button> */}
+            //                                                 </Col>
+            //                                             </Row>
+            //                                             {/* </Col> */}
+            //                                         </Card>
+            //                                     </CardBody>
+            //                                 </Form>
+            //                             )} />
+            //             </CardBody>
+            //         </Card>
+            //     </Col>
+            //     <Col xs="12" sm="12">
+            //         <Card>
+            //             <CardHeader>
+            //                 <strong>Consumption details</strong>
+            //             </CardHeader>
+            //             <CardBody>
+            //                 <div className="table-responsive"><div id="consumptiontableDiv" >
+            //                 </div></div>
+
+            //             </CardBody>
+            //             <CardFooter>
+            //                 <input type="button" value='Add Row' onClick={() => this.addRow()} />
+            //             </CardFooter>
+            //             <CardFooter>
+            //                 <input type='button' value='Save Data' onClick={() => this.saveData()}></input>
+            //             </CardFooter>
+            //         </Card>
+            //     </Col>
+            // </>
+
+
+            <div className="animated fadeIn">
                 <Col xs="12" sm="12">
                     <Card>
-                        <Formik
-                            render={
-                                ({
-                                }) => (
-                                        <Form name='simpleForm'>
-                                            <CardHeader>
-                                                <strong>Consumption details</strong>
-                                            </CardHeader>
-                                            <CardBody>
-                                                <Card className="card-accent-success">
-                                                    {/* <Col xs="8" sm="8"> */}
-                                                    <Row>
-                                                        <Col md="1"></Col>
-                                                        <Col md="3">
-                                                            <br />
-                                                            <Label htmlFor="select">Program</Label><br />
-                                                            <Input type="select"
-                                                                bsSize="sm"
-                                                                value={this.state.programId}
-                                                                name="programId" id="programId"
-                                                                onChange={(e) => { this.getPlanningUnitList(e) }}
-                                                            >
-                                                                <option value="0">Please select</option>
-                                                                {programs}
-                                                            </Input><br />
-                                                        </Col>
-                                                        <Col md="3">
-                                                            <br />
-                                                            <Label htmlFor="select">Planning Unit</Label><br />
-                                                            <Input type="select"
-                                                                bsSize="sm"
-                                                                value={this.state.planningUnitId}
-                                                                name="planningUnitId" id="planningUnitId"
-                                                            // onChange={(e) => { this.getProductList(e) }}
-                                                            >
-                                                                <option value="0">Please select</option>
-                                                                {planningUnits}
-                                                            </Input><br />
-                                                        </Col>
-                                                        {/* <Col md="3">
-                                                            <br />
-                                                            <Label htmlFor="select">Product category</Label><br />
-                                                            <Input type="select"
-                                                                bsSize="sm"
-                                                                value={this.state.productCategoryId}
-                                                                name="categoryId" id="categoryId"
-                                                                onChange={(e) => { this.getProductList(e) }}>
-                                                                <option value="0">Please select</option>
-                                                                {categories}
-                                                            </Input><br />
-                                                        </Col>
-                                                        <Col md="3">
-                                                            <br />
-                                                            <Label htmlFor="select">Product</Label><br />
-                                                            <Input type="select"
-                                                                bsSize="sm"
-                                                                value={this.state.productId}
-                                                                name="productId" id="productId">
-                                                                <option value="0">Please select</option>
-                                                                {products}
-                                                            </Input><br />
-                                                        </Col> */}
-                                                        <Col md="1">
-                                                            <br /><br />
-                                                            <FormGroup>
-                                                                <Button type="button" size="sm" color="primary" className="float-right btn btn-secondary Gobtn btn-sm mt-2" onClick={() => this.formSubmit()}> Go</Button>
-                                                                &nbsp;
-                                                            </FormGroup>
-                                                            {/* <Button type="button" onClick={() => this.formSubmit()} size="sm" color="primary"><i className="fa fa-dot-circle-o"></i>Go</Button> */}
-                                                        </Col>
-                                                    </Row>
-                                                    {/* </Col> */}
-                                                </Card>
-                                            </CardBody>
-                                        </Form>
-                                    )} />
-                    </Card>
-                </Col>
-                <Col xs="12" sm="12">
-                    <Card>
+
                         <CardHeader>
                             <strong>Consumption details</strong>
                         </CardHeader>
                         <CardBody>
-                            <div className="table-responsive"><div id="consumptiontableDiv" >
-                            </div></div>
-                            
+                            <Formik
+                                render={
+                                    ({
+                                    }) => (
+                                            <Form name='simpleForm'>
+
+                                                <Col md="9 pl-0">
+                                                    <div className="d-md-flex">
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        value={this.state.programId}
+                                                                        name="programId" id="programId"
+                                                                        onChange={this.getPlanningUnitList}
+                                                                    >
+                                                                        <option value="0">Please select</option>
+                                                                        {programs}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="planningUnitId"
+                                                                        id="planningUnitId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.planningUnitId}
+                                                                    >
+                                                                        <option value="0">Please Select</option>
+                                                                        {planningUnits}
+                                                                    </Input>
+                                                                    <InputGroupAddon addonType="append">
+                                                                        <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                                                    </InputGroupAddon>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </div>
+                                                </Col>
+                                            </Form>
+                                        )} />
+
+                            <Col xs="12" sm="12">
+                                <div className="table-responsive">
+                                    <div id="consumptiontableDiv">
+                                    </div>
+                                </div>
+                            </Col>
                         </CardBody>
                         <CardFooter>
-                            <input type="button" value='Add Row' onClick={() => this.addRow()} />
-                        </CardFooter>
-                        <CardFooter>
-                            <input type='button' value='Save Data' onClick={() => this.saveData()}></input>
+                            <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>Add Row</Button>
+
+                                &nbsp;
+</FormGroup>
                         </CardFooter>
                     </Card>
                 </Col>
-            </>
+
+            </div >
+
+
+
 
             // <div>
             //     <div class="row">
@@ -1683,8 +1804,15 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                if (isNaN(Number.parseInt(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, "In valid number.");
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
             }
         }
         if (x == 3) {
@@ -1694,8 +1822,16 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, "This field is required.");
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                if (isNaN(Number.parseInt(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, "In valid number.");
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+
+
             }
         }
 
@@ -1733,6 +1869,19 @@ export default class ConsumptionDetails extends React.Component {
                 }
             }
         }
+
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+
         // var skuData = {}
         // var elInstance = this.el;
         // if (x == 3) {
@@ -1803,11 +1952,15 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value === "") {
+            if (value === "" || isNaN(Number.parseInt(value))) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
                 valid = false;
+                if (isNaN(Number.parseInt(value))) {
+                    this.el.setComments(col, "in valid number.");
+                } else {
+                    this.el.setComments(col, "This field is required.");
+                }
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -1815,16 +1968,19 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
-            if (value === "") {
+            if (value === "" || isNaN(Number.parseInt(value))) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                if (isNaN(Number.parseInt(value))) {
+                    this.el.setComments(col, "in valid number.");
+                } else {
+                    this.el.setComments(col, "This field is required.");
+                }
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
             }
-
 
             var col = ("E").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(4, y);
@@ -1834,15 +1990,15 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setComments(col, "This field is required.");
                 valid = false;
             } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+                // if (isNaN(Date.parse(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, "In valid Date.");
+                //     valid = false;
+                // } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                // }
             }
 
             var col = ("F").concat(parseInt(y) + 1);
@@ -1853,16 +2009,41 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setComments(col, "This field is required.");
                 valid = false;
             } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
-                    valid = false;
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+                // if (isNaN(Date.parse(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, "In valid Date.");
+                //     valid = false;
+                // } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                // }
             }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(6, y);
+            if (value == "Invalid date" || value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+
+            // var col = ("H").concat(parseInt(y) + 1);
+            // var value = this.el.getValueFromCoords(7, y);
+            // if (value == "Invalid date" || value == "") {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, "This field is required.");
+            //     valid = false;
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // }
+
 
 
 
@@ -1879,6 +2060,9 @@ export default class ConsumptionDetails extends React.Component {
             // }
         }
         return valid;
+    }
+    cancelClicked() {
+        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
     }
 }
 
