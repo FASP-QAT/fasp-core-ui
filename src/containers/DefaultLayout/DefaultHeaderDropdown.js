@@ -2,8 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Badge, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, ListGroup, ListGroupItem, Progress } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { Online } from "react-detect-offline";
+import { Online, Offline } from "react-detect-offline";
 import i18n from '../../i18n';
+
+import image4 from '../../../public/assets/img/avatars/4.jpg';
+import image5 from '../../../public/assets/img/avatars/5.jpg';
+import image6 from '../../../public/assets/img/avatars/6.jpg';
+import image7 from '../../../public/assets/img/avatars/7.jpg';
+import image8 from '../../../public/assets/img/avatars/8.jpg';
+
+import AuthenticationService from '../../views/Common/AuthenticationService';
+import getLabelText from '../../CommonComponent/getLabelText';
+
 const propTypes = {
   notif: PropTypes.bool,
   accnt: PropTypes.bool,
@@ -25,6 +35,8 @@ class DefaultHeaderDropdown extends Component {
     this.toggle = this.toggle.bind(this);
     this.state = {
       dropdownOpen: false,
+      roleList: AuthenticationService.getLoggedInUserRole(),
+      lang: localStorage.getItem('lang'),
     };
   }
 
@@ -79,13 +91,29 @@ class DefaultHeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+          <Online><img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" /></Online>
+          <Offline><img src={image5} className="img-avatar" alt="admin@bootstrapmaster.com" /></Offline>
           {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
             <i class="icon-settings icon-anim-pulse text-primary"></i>
         </button> */}
         </DropdownToggle>
         <DropdownMenu right>
-          <DropdownItem header tag="div" className="text-center"><strong>{i18n.t('static.common.settings')}</strong></DropdownItem>
+          <DropdownItem header tag="div" className="text-center"><strong>{i18n.t('static.common.profile')}</strong></DropdownItem>
+          <DropdownItem><i className="icon-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
+            {this.state.roleList.map(
+              role =>
+
+                <div className=" mb-1 mt-2" key={role.roleId}>
+                  {/* <small><i className="fa fa-dot-circle-o"></i>{getLabelText(role.label, this.state.lang)}</small> */}
+                  <small><i className="fa fa-dot-circle-o"></i>{role.label.label_en}</small>
+                </div>
+            )}
+          </DropdownItem>
+          {/* <DropdownItem header tag="div" className="text-center"><b>Change Preferred Language</b></DropdownItem>
+          <DropdownItem><i className="flag-icon flag-icon-us"></i> English</DropdownItem>
+          <DropdownItem><i className="flag-icon flag-icon-wf "></i> French</DropdownItem>
+          <DropdownItem><i className="flag-icon flag-icon-es"></i> Spanish</DropdownItem>
+          <DropdownItem><i className="flag-icon flag-icon-pt"></i> Pourtegese</DropdownItem> */}
           <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> {i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
           <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem>
         </DropdownMenu>
@@ -148,7 +176,7 @@ class DefaultHeaderDropdown extends Component {
             <div className="message">
               <div className="pt-3 mr-3 float-left">
                 <div className="avatar">
-                  <img src={'assets/img/avatars/7.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+                  <img src={image7} className="img-avatar" alt="admin@bootstrapmaster.com" />
                   <span className="avatar-status badge-success"></span>
                 </div>
               </div>
@@ -165,7 +193,7 @@ class DefaultHeaderDropdown extends Component {
             <div className="message">
               <div className="pt-3 mr-3 float-left">
                 <div className="avatar">
-                  <img src={'assets/img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+                  <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
                   <span className="avatar-status badge-warning"></span>
                 </div>
               </div>
@@ -182,7 +210,7 @@ class DefaultHeaderDropdown extends Component {
             <div className="message">
               <div className="pt-3 mr-3 float-left">
                 <div className="avatar">
-                  <img src={'assets/img/avatars/5.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+                  <img src={image5} className="img-avatar" alt="admin@bootstrapmaster.com" />
                   <span className="avatar-status badge-danger"></span>
                 </div>
               </div>
@@ -199,7 +227,7 @@ class DefaultHeaderDropdown extends Component {
             <div className="message">
               <div className="pt-3 mr-3 float-left">
                 <div className="avatar">
-                  <img src={'assets/img/avatars/4.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com" />
+                  <img src={image4} className="img-avatar" alt="admin@bootstrapmaster.com" />
                   <span className="avatar-status badge-info"></span>
                 </div>
               </div>

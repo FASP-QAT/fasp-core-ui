@@ -11,6 +11,7 @@ import OrganisationService from "../../api/OrganisationService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.organisation.organisation');
 
@@ -141,45 +142,15 @@ export default class AddOrganisationComponent extends Component {
                 this.setState({
                     countries: response.data
                 })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
+            })
+
         UserService.getRealmList()
             .then(response => {
                 console.log("realm list---", response.data);
                 this.setState({
                     realms: response.data
                 })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
+            })
     }
 
     updateFieldData(value) {
@@ -214,27 +185,7 @@ export default class AddOrganisationComponent extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
     }
 
@@ -273,6 +224,9 @@ export default class AddOrganisationComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -295,27 +249,6 @@ export default class AddOrganisationComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
 
                                 }}
 
@@ -374,7 +307,7 @@ export default class AddOrganisationComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.organisation.organisationCode}
-                                                            id="organisationCode"  />
+                                                            id="organisationCode" />
                                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                                     </FormGroup>
 
@@ -416,14 +349,14 @@ export default class AddOrganisationComponent extends Component {
     cancelClicked() {
         this.props.history.push(`/organisation/listOrganisation/` + i18n.t('static.message.cancelled', { entityname }))
     }
-    resetClicked(){
+    resetClicked() {
         let { organisation } = this.state
-        
-            organisation.label.label_en = ''
-            organisation.organisationCode = ''
-            organisation.realm.id = ''
-            this.state.realmCountryId = ''
-        
+
+        organisation.label.label_en = ''
+        organisation.organisationCode = ''
+        organisation.realm.id = ''
+        this.state.realmCountryId = ''
+
         this.setState({
             organisation
         }, (

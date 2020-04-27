@@ -2,6 +2,11 @@ import i18n from 'i18next';
 import Backend from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
+import en from '../public/locales/en.json';
+import fr from '../public/locales/fr.json';
+import pr from '../public/locales/pr.json';
+import sp from '../public/locales/sp.json';
+
 import { initReactI18next } from 'react-i18next';
 //import moment from 'moment';
 var lang =localStorage.getItem('lang');
@@ -17,7 +22,8 @@ if(lang==null){
     lng: lang,
     backend: {
       /* translation file path */
-      loadPath: '/locales/{{lng}}.json',
+      // loadPath: '/locales/{{lng}}.json',
+      loadPath: '/{{lng}}.json',
       crossDomain: true
     },
     fallbackLng: 'en',

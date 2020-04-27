@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
 import navigation from '../../../_nav';
 // routes config
-
+import image1 from '../../../../public/assets/img/QAT-login-logo.png';
+import image2 from '../../../../public/assets/img/wordmark.png';
+import image3 from '../../../../public/assets/img/PEPFAR-logo.png';
+import image4 from '../../../../public/assets/img/USAID-presidents-malaria-initiative.png';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -19,6 +22,8 @@ import LoginService from '../../../api/LoginService'
 import i18n from '../../../i18n'
 import axios from 'axios';
 import moment from 'moment';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 const initialValues = {
@@ -89,7 +94,18 @@ class Login extends Component {
   }
 
   forgotPassword() {
-    this.props.history.push(`/forgotPassword`)
+    if (navigator.onLine) {
+      this.props.history.push(`/forgotPassword`)
+    } else {
+      confirmAlert({
+        message: i18n.t('static.forgotPassword.offline'),
+        buttons: [
+          {
+            label: i18n.t('static.common.close')
+          }
+        ]
+      });
+    }
   }
   render() {
     return (
@@ -101,7 +117,7 @@ class Login extends Component {
             <Row className="justify-content-center">
               <Col md="12">
                 <div className="upper-logo mt-1">
-                  <img src={'assets/img/QAT-login-logo.png'} className="img-fluid " />
+                  <img src={image1} className="img-fluid " />
                 </div>
               </Col>
               <Col lg="5" md="7" xl="4">
@@ -118,16 +134,8 @@ class Login extends Component {
                             LoginService.authenticate(username, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng","lastActionTaken"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
-
-
-                                // localStorage.removeItem("token-" + decoded.userId);
-                                // localStorage.removeItem("user-" + decoded.userId);
-                                // localStorage.removeItem("curUser");
-                                // localStorage.removeItem("lang");
-                                // localStorage.removeItem("typeOfSession");
-                                // localStorage.removeItem("i18nextLng");
 
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
@@ -135,9 +143,7 @@ class Login extends Component {
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
-                                // AuthenticationService.setupAxiosInterceptors();
-                                let basicAuthHeader = 'Bearer ' + response.data.token
-                                console.log("basicAuthHeader---", basicAuthHeader);
+                          
                                 AuthenticationService.setupAxiosInterceptors();
                                 this.props.history.push(`/ApplicationDashboard`)
                               })
@@ -174,7 +180,7 @@ class Login extends Component {
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
-                                  this.setState({ message: 'Error occured' });
+                                  this.setState({ message: 'static.label.labelFail' });
                                 }
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
@@ -188,12 +194,12 @@ class Login extends Component {
                                   localStorage.removeItem("tempUser");
                                   this.props.history.push(`/ApplicationDashboard`)
                                 } else {
-                                  this.setState({ message: 'Bad credentials.' });
+                                  this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
                               }.bind(this));
                             }
                             else {
-                              this.setState({ message: 'User not found.' });
+                              this.setState({ message: 'static.message.login.invalidCredentials' });
                             }
                           }
                         }}
@@ -260,7 +266,7 @@ class Login extends Component {
                                     <Button type="submit" color="primary" className="px-4" onClick={() => this.touchAll(setTouched, errors)} >{i18n.t('static.login.login')}</Button>
                                   </Col>
                                   <Col xs="6" className="text-right">
-                                    <Online><Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button></Online>
+                                    <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
                                   </Col>
 
                                 </Row>
@@ -292,18 +298,18 @@ class Login extends Component {
                 <Row className="text-center Login-bttom-logo">
                   <Col md="4">
                     <CardBody>
-                      <img src={'assets/img/wordmark.png'} className="img-fluid bottom-logo-img" />
+                      <img src={image2} className="img-fluid bottom-logo-img" />
                     </CardBody>
                   </Col>
 
                   <Col md="4">
                     <CardBody>
-                      <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
+                      <img src={image3} className="img-fluid bottom-logo-img" />
                     </CardBody>
                   </Col>
                   <Col md="4">
                     <CardBody>
-                      <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
+                      <img src={image4} className="img-fluid bottom-logo-img" />
                     </CardBody>
                   </Col>
                 </Row>
