@@ -288,8 +288,8 @@ class Login extends Component {
                   health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health 
                   commodities to save lives and create a healthier future for all. The project purchases 
                   and delivers health commodities, offers comprehensive technical assistance to strengthen 
-                  national supply chain systems, and provides global supply chain leadership.For more 
-                  information, visit ghsupplychain.org. The information provided in this tool is not 
+                  national supply chain systems, and provides global supply chain leadership. For more 
+                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not 
                   official U.S. government information and does not represent the views or positions of the 
                   Agency for International Development or the U.S. government.
               </p>
