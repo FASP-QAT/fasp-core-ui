@@ -311,7 +311,7 @@ label.arrow_label:after {
 }
 
 .Gobtn {
-  margin-left: 20px;
+  margin-left: 5px;
   border-radius: 0.2rem !important;
   
 }
@@ -429,6 +429,12 @@ label.arrow_label:after {
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a{padding: 8px 30px 8px 30px;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item{padding: 2px;}
 
+
+.table thead tr th {position: sticky;
+  top: 0px;
+  background: #fff;position: -webkit-sticky;}
+
+
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
@@ -447,8 +453,8 @@ label.arrow_label:after {
 }
 
 .jexcel_selectall{background: #fff !important;}
-.jexcel > thead > tr > td {background: #fff !important;}
-
+.jexcel > thead > tr > td {background: #fff !important;   color: #212721 !important;
+  font-weight: bold;}
 .jexcel > tbody > tr > td:first-child {background-color: #fff !important;}
 .jexcel > tbody > tr > td{    padding: 6px !important }
 .jexcel > thead > tr > td {padding: 6px!important}
