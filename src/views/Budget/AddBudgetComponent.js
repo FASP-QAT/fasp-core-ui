@@ -7,7 +7,7 @@ import i18n from '../../i18n'
 import BudgetService from "../../api/BudgetService";
 import ProgramService from "../../api/ProgramService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-import SubFundingSourceService from '../../api/SubFundingSourceService';
+import FundingSourceService from '../../api/FundingSourceService';
 import getLabelText from '../../CommonComponent/getLabelText'
 import { Date } from 'core-js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
@@ -16,12 +16,12 @@ const entityname = i18n.t('static.dashboard.budget');
 const initialValues = {
     budget: '',
     programId: '',
-    subFundingSourceId: '',
+    fundingSourceId: '',
     budgetAmt: '',
     startDate: '',
     stopDate: '',
     programList: [],
-    subFundingSourceList: []
+    fundingSourceList: []
 }
 
 const validationSchema = function (values, t) {
@@ -30,8 +30,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.budget.budgetamountdesc')),
         programId: Yup.string()
             .required(i18n.t('static.budget.programtext')),
-        subFundingSourceId: Yup.string()
-            .required(i18n.t('static.budget.subfundingtext')),
+        fundingSourceId: Yup.string()
+            .required(i18n.t('static.budget.fundingtext')),
         budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
         startDate: Yup.string()
@@ -68,7 +68,7 @@ class AddBudgetComponent extends Component {
         super(props);
         this.state = {
             programs: [],
-            subFundingSources: [],
+            fundingSources: [],
             message: '',
             lang: localStorage.getItem('lang'),
             budget: {
@@ -86,7 +86,7 @@ class AddBudgetComponent extends Component {
                         label_fr: ''
                     }
                 },
-                subFundingSource: {
+                fundingSource: {
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -133,8 +133,8 @@ class AddBudgetComponent extends Component {
         if (event.target.name === "programId") {
             budget.program.programId = event.target.value;
         }
-        if (event.target.name === "subFundingSourceId") {
-            budget.subFundingSource.subFundingSourceId = event.target.value;
+        if (event.target.name === "fundingSourceId") {
+            budget.fundingSource.fundingSourceId = event.target.value;
         }
         if (event.target.name === "budgetAmt") {
             budget.budgetAmt = event.target.value;
@@ -156,7 +156,7 @@ class AddBudgetComponent extends Component {
         setTouched({
             budget: true,
             programId: true,
-            subFundingSourceId: true,
+            fundingSourceId: true,
             budgetAmt: true,
             startDate: true,
             stopDate: true
@@ -188,10 +188,10 @@ class AddBudgetComponent extends Component {
                 })
             })
 
-        SubFundingSourceService.getSubFundingSourceListAll()
+        FundingSourceService.getFundingSourceListAll()
             .then(response => {
                 this.setState({
-                    subFundingSources: response.data
+                    fundingSources: response.data
                 })
             })
     }
@@ -199,7 +199,7 @@ class AddBudgetComponent extends Component {
     render() {
 
         const { programs } = this.state;
-        const { subFundingSources } = this.state;
+        const { fundingSources } = this.state;
 
         let programList = programs.length > 0 && programs.map((item, i) => {
             return (
@@ -208,9 +208,9 @@ class AddBudgetComponent extends Component {
                 </option>
             )
         }, this);
-        let subFundingSourceList = subFundingSources.length > 0 && subFundingSources.map((item, i) => {
+        let fundingSourceList = fundingSources.length > 0 && fundingSources.map((item, i) => {
             return (
-                <option key={i} value={item.subFundingSourceId}>
+                <option key={i} value={item.fundingSourceId}>
                     {getLabelText(item.label, this.state.lang)}
                 </option>
             )
@@ -316,26 +316,26 @@ class AddBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
                                                         <Input
                                                             type="select"
-                                                            name="subFundingSourceId"
-                                                            id="subFundingSourceId"
+                                                            name="fundingSourceId"
+                                                            id="fundingSourceId"
                                                             bsSize="sm"
-                                                            valid={!errors.subFundingSourceId}
-                                                            invalid={touched.subFundingSourceId && !!errors.subFundingSourceId}
+                                                            valid={!errors.fundingSourceId}
+                                                            invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.budget.subFundingSource.subFundingSourceId}
+                                                            value={this.state.budget.fundingSource.fundingSourceId}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
-                                                            {subFundingSourceList}
+                                                            {fundingSourceList}
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.subFundingSourceId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span className="red Reqasterisk">*</span></Label>
@@ -436,7 +436,7 @@ class AddBudgetComponent extends Component {
 
         budget.label.label_en = ''
         budget.program.programId = ''
-        budget.subFundingSource.subFundingSourceId = ''
+        budget.fundingSource.fundingSourceId = ''
         budget.budgetAmt = ''
         budget.startDate = ''
         budget.stopDate = ''
