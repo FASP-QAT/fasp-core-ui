@@ -14,7 +14,7 @@ const initialValues = {
     currencySymbol: '',
     label: '',
     conversionRate: '',
-    isSync:'true'
+    isSync: 'true'
 }
 
 const validationSchema = function (values) {
@@ -69,7 +69,7 @@ export default class AddCurrencyComponent extends Component {
 
             },
             conversionRateToUsd: '',
-            isSync:true
+            isSync: true
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -88,7 +88,7 @@ export default class AddCurrencyComponent extends Component {
         }
         else if (event.target.name === "conversionRate") {
             this.state.conversionRateToUsd = event.target.value;
-        }else if (event.target.name === "isSync") {
+        } else if (event.target.name === "isSync") {
             this.state.isSync = event.target.id === "active2" ? false : true;
         }
         let { currency } = this.state
@@ -105,7 +105,7 @@ export default class AddCurrencyComponent extends Component {
             currencySymbol: true,
             label: true,
             conversionRate: true,
-            isSync:true
+            isSync: true
         }
         )
         this.validateForm(errors)
@@ -138,6 +138,9 @@ export default class AddCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -161,26 +164,26 @@ export default class AddCurrencyComponent extends Component {
                                                 })
                                             }
                                         })
-                                        // .catch(
-                                        //     error => {
-                                        //         if (error.message === "Network Error") {
-                                        //             this.setState({ message: error.message });
-                                        //         } else {
-                                        //             switch (error.response ? error.response.status : "") {
-                                        //                 case 500:
-                                        //                 case 401:
-                                        //                 case 404:
-                                        //                 case 406:
-                                        //                 case 412:
-                                        //                     this.setState({ message: error.response.data.messageCode });
-                                        //                     break;
-                                        //                 default:
-                                        //                     this.setState({ message: 'static.unkownError' });
-                                        //                     break;
-                                        //             }
-                                        //         }
-                                        //     }
-                                        // );
+                                    // .catch(
+                                    //     error => {
+                                    //         if (error.message === "Network Error") {
+                                    //             this.setState({ message: error.message });
+                                    //         } else {
+                                    //             switch (error.response ? error.response.status : "") {
+                                    //                 case 500:
+                                    //                 case 401:
+                                    //                 case 404:
+                                    //                 case 406:
+                                    //                 case 412:
+                                    //                     this.setState({ message: error.response.data.messageCode });
+                                    //                     break;
+                                    //                 default:
+                                    //                     this.setState({ message: 'static.unkownError' });
+                                    //                     break;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // );
                                 }}
 
 
@@ -275,7 +278,7 @@ export default class AddCurrencyComponent extends Component {
                                                                 id="active1"
                                                                 name="isSync"
                                                                 value={true}
-                                                                checked={this.state.isSync===true}
+                                                                checked={this.state.isSync === true}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
@@ -291,7 +294,7 @@ export default class AddCurrencyComponent extends Component {
                                                                 id="active2"
                                                                 name="isSync"
                                                                 value={false}
-                                                                checked={this.state.isSync===false}
+                                                                checked={this.state.isSync === false}
                                                                 onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             />
                                                             <Label
