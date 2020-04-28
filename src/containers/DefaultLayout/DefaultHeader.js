@@ -51,11 +51,17 @@ class DefaultHeader extends Component {
           </NavItem> */}
         </Nav>
         <Nav className="ml-auto " navbar>
-          
-          
-        <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> <span><b>{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : "Unknown"}</b></span>
-            <br></br><span><small>{AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole() : "Unknown"}</small></span></div>
-         <UncontrolledDropdown nav direction="down" className="lang-btn">
+
+
+          {/* <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> */}
+            {/* <span><b>
+          {AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : "Unknown"}
+          </b></span> */}
+            {/* <br></br><span>
+              <small>{AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole() : "Unknown"}</small>
+            </span> */}
+            {/* </div> */}
+          <UncontrolledDropdown nav direction="down" className="lang-btn">
             <DropdownToggle nav className="nav-link-lng">
 
               {localStorage.getItem('lang').toString() == 'undefined' ? 'en' : localStorage.getItem('lang').toString()}
@@ -67,13 +73,13 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}> {i18n.t('static.language.french')}</DropdownItem>
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.pourtegese')}</DropdownItem>
             </DropdownMenu>
-          </UncontrolledDropdown> 
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} /> 
- 
-  
+          </UncontrolledDropdown>
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} />
+
+
         </Nav>
-        
-      
+
+
       </React.Fragment>
     );
   }

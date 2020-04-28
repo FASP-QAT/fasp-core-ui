@@ -8,6 +8,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import PlanningUnitService from '../../api/PlanningUnitService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.dashboad.planningunitcapacity');
@@ -36,30 +37,9 @@ export default class PlanningUnitCapacityList extends Component {
                 selSource: response.data
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
     }
-   
-  
+
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         PlanningUnitService.getAllPlanningUnitList().then(response => {
@@ -69,31 +49,9 @@ export default class PlanningUnitCapacityList extends Component {
 
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-            
+    }
 
-         }
 
-    
 
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -190,13 +148,16 @@ export default class PlanningUnitCapacityList extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i>{i18n.t('static.dashboard.capacitylist')}
                         <div className="card-header-actions">
-                           
+
                         </div>
 
                     </CardHeader>
@@ -239,11 +200,11 @@ export default class PlanningUnitCapacityList extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                           /* rowEvents={{
-                                                onClick: (e, row, rowIndex) => {
-                                                    this.editPlanningUnitCapacity(row);
-                                                }
-                                            }}*/
+                                            /* rowEvents={{
+                                                 onClick: (e, row, rowIndex) => {
+                                                     this.editPlanningUnitCapacity(row);
+                                                 }
+                                             }}*/
                                             {...props.baseProps}
                                         />
                                     </div>

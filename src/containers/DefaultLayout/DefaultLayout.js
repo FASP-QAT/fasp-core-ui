@@ -167,11 +167,11 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-bank',
                             url: '/fundingSource/listFundingSource'
                           },
-                          {
-                            name: i18n.t('static.dashboard.subfundingsource'),
-                            url: '/subFundingSource/listSubFundingSource',
-                            icon: 'fa fa-building-o'
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.subfundingsource'),
+                          //   url: '/subFundingSource/listSubFundingSource',
+                          //   icon: 'fa fa-building-o'
+                          // },
                           {
                             name: i18n.t('static.dashboard.procurementagent'),
                             url: '/procurementAgent/listProcurementAgent',
@@ -237,7 +237,7 @@ class DefaultLayout extends Component {
                           //   icon: 'icon-graph'
                           // },
                           {
-                            name: 'Product Category Tree',
+                            name: 'Product Category',
                             url: '/productCategory/productCategoryTree',
                             icon: 'icon-graph'
                           },
@@ -363,16 +363,6 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.program'),
                         icon: 'fa fa-list',
                         children: [
-                          {
-                            name: i18n.t('static.dashboard.downloadprogram'),
-                            url: '/program/downloadProgram',
-                            icon: 'fa fa-download',
-                          },
-                          {
-                            name: i18n.t('static.dashboard.downloadprogram'),
-                            url: '/program/syncPage',
-                            icon: 'fa fa-download',
-                          },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',

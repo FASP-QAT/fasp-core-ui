@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,  } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -8,12 +8,13 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import i18n from '../../i18n';
 import UnitService from '../../api/UnitService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const initialValues = {
     unitId: [],
     label: '',
     forecastingUnitId: [],
-    multiplier:''
+    multiplier: ''
 }
 const entityname = i18n.t('static.planningunit.planningunit');
 
@@ -25,7 +26,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.planningunit.planningunittext')),
         forecastingUnitId: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext')),
-            multiplier: Yup.string()
+        multiplier: Yup.string()
             .required(i18n.t('static.planningunit.multipliertext'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
@@ -60,21 +61,21 @@ export default class AddPlanningUnit extends Component {
         super(props);
         this.state = {
             units: [],
-            forecastingUnits:[],
+            forecastingUnits: [],
 
             message: '',
             planningUnit:
             {
                 active: '',
-             unit: {
-                id:''
-            },
-            label: {
-                label_en: ''
-            },
-            forecastingUnit: {
-                forecastingUnitId: ''
-            },
+                unit: {
+                    id: ''
+                },
+                label: {
+                    label_en: ''
+                },
+                forecastingUnit: {
+                    forecastingUnitId: ''
+                },
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
@@ -85,7 +86,7 @@ export default class AddPlanningUnit extends Component {
 
     dataChange(event) {
         let { planningUnit } = this.state
-        console.log( event.target.value);
+        console.log(event.target.value);
         if (event.target.name === "label") {
             planningUnit.label.label_en = event.target.value
         }
@@ -98,7 +99,7 @@ export default class AddPlanningUnit extends Component {
         if (event.target.name === "multiplier") {
             planningUnit.multiplier = event.target.value;
         }
-      
+
         this.setState(
             {
                 planningUnit
@@ -112,7 +113,7 @@ export default class AddPlanningUnit extends Component {
             'label': true,
             'forecastingUnitId': true,
             'unitId': true,
-            multipler:true
+            multipler: true
         }
         )
         this.validateForm(errors)
@@ -139,26 +140,8 @@ export default class AddPlanningUnit extends Component {
                 this.setState({
                     units: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
         AuthenticationService.setupAxiosInterceptors();
         ForecastingUnitService.getForecastingUnitList().then(response => {
             console.log(response.data)
@@ -166,26 +149,6 @@ export default class AddPlanningUnit extends Component {
                 forecastingUnits: response.data
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
 
     }
 
@@ -215,10 +178,14 @@ export default class AddPlanningUnit extends Component {
             }, this);
 
 
-        
+
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -240,26 +207,7 @@ export default class AddPlanningUnit extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+
                                 }}
 
 
@@ -290,7 +238,7 @@ export default class AddPlanningUnit extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.planningUnit.forecastingUnit.forecastingUnitId}
-                                                             >
+                                                        >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {forecastingUnitList}
                                                         </Input>
@@ -336,13 +284,13 @@ export default class AddPlanningUnit extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.multiplier}
                                                             invalid={touched.multiplier && !!errors.multiplier}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
                                                             value={this.state.planningUnit.multiplier}
                                                             required />
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
-                                                   
+
                                                 </CardBody>
 
                                                 <CardFooter>
@@ -373,14 +321,14 @@ export default class AddPlanningUnit extends Component {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
-    resetClicked(){
+    resetClicked() {
         let { planningUnit } = this.state
-        
-            planningUnit.label.label_en = ''       
-            planningUnit.forecastingUnit.forecastingUnitId = ''
-            planningUnit.unit.id = ''
-            planningUnit.multiplier = ''
-      
+
+        planningUnit.label.label_en = ''
+        planningUnit.forecastingUnit.forecastingUnitId = ''
+        planningUnit.unit.id = ''
+        planningUnit.multiplier = ''
+
         this.setState(
             {
                 planningUnit

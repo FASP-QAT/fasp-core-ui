@@ -295,7 +295,8 @@ export default class ConsumptionDetails extends React.Component {
 
                         // Get inventory data from program
                         var plannigUnitId = document.getElementById("planningUnitId").value;
-                        var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+                        // var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+                        var consumptionList = (programJson.consumptionList);
                         // var consumptionDataList = [];
                         // var consumptionDataArr = [];
                         // for (var i = 0; i < programProductList.length; i++) {
@@ -306,28 +307,37 @@ export default class ConsumptionDetails extends React.Component {
                         this.setState({
                             consumptionList: consumptionList
                         });
-
+                        console.log("consumption list----", consumptionList);
                         var data = [];
                         var consumptionDataArr = []
-                        if (consumptionList.length == 0) {
+
+                        // if (consumptionList.length == 0) {
+                        //     data = [];
+                        //     consumptionDataArr[0] = data;
+                        // }
+                        var count = 0;
+                        for (var j = 0; j < consumptionList.length; j++) {
+                            if (consumptionList[j].planningUnit.id == plannigUnitId) {
+                                data = [];
+                                data[0] = consumptionList[j].dataSource.id;
+                                data[1] = consumptionList[j].region.id;
+                                data[2] = consumptionList[j].consumptionQty;
+                                data[3] = consumptionList[j].dayOfStockOut;
+                                data[4] = consumptionList[j].startDate;
+                                data[5] = consumptionList[j].stopDate;
+                                data[6] = consumptionList[j].actualFlag;
+                                data[7] = consumptionList[j].active;
+                                data[8] = j;
+                                consumptionDataArr[count] = data;
+                                count++;
+                            }
+                        }
+                        if (consumptionDataArr.length == 0) {
                             data = [];
                             consumptionDataArr[0] = data;
                         }
-                        for (var j = 0; j < consumptionList.length; j++) {
-                            data = [];
-                            data[0] = consumptionList[j].dataSource.id;
-                            data[1] = consumptionList[j].region.id;
-                            data[2] = consumptionList[j].consumptionQty;
-                            data[3] = consumptionList[j].dayOfStockOut;
-                            data[4] = consumptionList[j].startDate;
-                            data[5] = consumptionList[j].stopDate;
-                            data[6] = consumptionList[j].actualFlag;
-                            data[7] = consumptionList[j].active;
 
-
-                            consumptionDataArr[j] = data;
-                        }
-
+                        console.log("consumption aray-->", consumptionDataArr);
                         this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
                         this.el.destroy();
                         var json = [];
@@ -337,7 +347,7 @@ export default class ConsumptionDetails extends React.Component {
                         var options = {
                             data: data,
                             columnDrag: true,
-                            colWidths: [180, 180, 180, 180, 180, 180, 180, 180],
+                            colWidths: [130, 130, 120, 120, 100, 100, 100, 100],
                             columns: [
                                 // { title: 'Month', type: 'text', readOnly: true },
                                 {
@@ -374,6 +384,10 @@ export default class ConsumptionDetails extends React.Component {
                                 {
                                     title: 'Active',
                                     type: 'checkbox'
+                                },
+                                {
+                                    title: 'Index',
+                                    type: 'hidden'
                                 }
 
 
@@ -415,7 +429,21 @@ export default class ConsumptionDetails extends React.Component {
 
     addRow = function () {
         // document.getElementById("saveButtonDiv").style.display = "block";
-        this.el.insertRow();
+        // this.el.insertRow();
+        // var json = this.el.getJson();
+        var data = [];
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = "";
+        data[7] = true;
+        data[8] = -1;
+        this.el.insertRow(
+            data
+        );
     };
 
     // checkValidation() {
@@ -774,27 +802,27 @@ export default class ConsumptionDetails extends React.Component {
                     var consumptionDataListNotFiltered = programJson.consumptionList;
 
                     // console.log("000000000000000   ", consumptionDataList)
-                    var count = 0;
-                    for (var i = 0; i < consumptionDataListNotFiltered.length; i++) {
-                        if (consumptionDataList[count] != undefined) {
-                            if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
+                    // var count = 0;
+                    for (var i = 0; i < consumptionDataList.length; i++) {
+                        // if (consumptionDataList[count] != undefined) {
+                        // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
+                        // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId && consumptionDataList[count].planningUnit.id == consumptionDataListNotFiltered[i].planningUnit.id) {
+                        var map = new Map(Object.entries(tableJson[i]));
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].dataSource.id = map.get("0");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionQty = map.get("2");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].dayOfStockOut = parseInt(map.get("3"));
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = map.get("4");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = map.get("5");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].actualFlag = map.get("6");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
 
-                                var map = new Map(Object.entries(tableJson[count]))
-                                consumptionDataListNotFiltered[i].dataSource.id = map.get("0");
-                                consumptionDataListNotFiltered[i].region.id = map.get("1");
-                                consumptionDataListNotFiltered[i].consumptionQty = map.get("2");
-                                consumptionDataListNotFiltered[i].dayOfStockOut = parseInt(map.get("3"));
-                                consumptionDataListNotFiltered[i].startDate = map.get("4");
-                                consumptionDataListNotFiltered[i].stopDate = map.get("5");
-                                consumptionDataListNotFiltered[i].actualFlag = map.get("6");
-                                consumptionDataListNotFiltered[i].active = map.get("7");
+                        // if (consumptionDataList.length >= count) {
+                        //     count++;
+                        // }
+                        // }
 
-                                if (consumptionDataList.length >= count) {
-                                    count++;
-                                }
-                            }
-
-                        }
+                        // }
 
                     }
                     for (var i = consumptionDataList.length; i < tableJson.length; i++) {
