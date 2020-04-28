@@ -416,7 +416,7 @@ class AddprogramPlanningUnit extends Component {
                                                 <Form onSubmit={handleSubmit} noValidate name='programPlanningUnitForm'>
                                                     <Row>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
+                                                            <Label htmlFor="select">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
                                                             <Input
                                                                 type="select"
                                                                 value={this.state.programId}
@@ -427,7 +427,7 @@ class AddprogramPlanningUnit extends Component {
                                                             </Input>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
                                                             <Input
                                                                 type="select"
                                                                 name="planningUnitId"
@@ -446,7 +446,7 @@ class AddprogramPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.planningUnitId}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}</Label>
+                                                            <Label htmlFor="company">{i18n.t('static.program.reorderFrequencyInMonths')}<span className="red Reqasterisk">*</span></Label>
                                                             <Input
                                                                 type="number"
                                                                 min='0'
@@ -463,7 +463,7 @@ class AddprogramPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.reorderFrequencyInMonths}</FormFeedback>
                                                         </FormGroup>
                                                         <FormGroup className="col-md-6">
-                                                            <Label htmlFor="company">Minimum Month Of Stock</Label>
+                                                            <Label htmlFor="company">Minimum Month Of Stock<span className="red Reqasterisk">*</span></Label>
                                                             <Input
                                                                 type="number"
                                                                 min='0'
@@ -492,12 +492,12 @@ class AddprogramPlanningUnit extends Component {
                                 <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                     <thead>
                                         <tr>
-                                            <th className="text-left"> {i18n.t('static.program.program')} </th>
-                                            <th className="text-left"> {i18n.t('static.planningunit.planningunit')}</th>
-                                            <th className="text-left"> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
-                                            <th className="text-left">Minimum month of stock</th>
-                                            <th className="text-left">{i18n.t('static.common.status')}</th>
-                                            <th className="text-left">{i18n.t('static.common.update')}</th>
+                                            <th> {i18n.t('static.program.program')} </th>
+                                            <th> {i18n.t('static.planningunit.planningunit')}</th>
+                                            <th> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
+                                            <th>Minimum month of stock</th>
+                                            <th>{i18n.t('static.common.status')}</th>
+                                            <th>{i18n.t('static.common.update')}</th>
 
                                         </tr>
                                     </thead>
@@ -520,7 +520,7 @@ class AddprogramPlanningUnit extends Component {
                                                     <td>
                                                         <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
                                                     </td>
-                                                    <td>
+                                                    <td className="whitebtnColor">
                                                         <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                     </td>
                                                 </tr>

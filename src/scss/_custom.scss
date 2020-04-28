@@ -562,6 +562,7 @@ label.arrow_label:after {
     max-height: 440px;
 }
  
+.whitebtnColor .btn-info{color: #fff!important;}
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}
@@ -1161,6 +1162,10 @@ h5,
   padding-right: calc(1.5em + 1.75rem);
 }
 
+.RemoveStriped .jexcel_content .jexcel .draggable{tr:nth-of-type(odd) {
+  background-color: #fff !important;
+  }}
+
 ///legend sync 
 /* basic positioning */
 .legend { list-style: none;margin-top:6px; }
@@ -1169,7 +1174,7 @@ h5,
 /* your colors */
 .legend .lightpinklegend { background-color: rgb(255, 204, 203); border-color:1px solid rgb(255, 204, 203);}
 .legend .greenlegend { background-color:rgb(152, 251, 152);border-color:1px solid rgb(152, 251, 152); }
-.legend .redlegend { background-color: red; border-color:1px solid red; }
+.legend .redlegend { background-color: #FF8686; border-color:1px solid #FF8686; }
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
 .avatar .avatar-status {
   position: absolute;
