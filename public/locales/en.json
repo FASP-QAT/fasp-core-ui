@@ -586,5 +586,21 @@
     "static.footer": "Quantification Analytics Tool",
     "static.unknown": "Unknown",
     "static.forgotPassword.offline": "You need to be online to reset the password",
-    "static.common.close": "Close"
+    "static.common.close": "Close",
+    "static.inventory.inventory": "Inventory",
+    "static.inventory.program": "Program",
+    "static.inventory.countrySKU": "Program",
+    "static.common.saveData": "Save Data",
+    "static.common.addData": "Add Data",
+    "static.inventory.dataSource": "Data Source",
+    "static.inventory.region": "Region",
+    "static.inventory.inventoryDate": "Inventory Date",
+    "static.inventory.expectedStock": "Expected Stock",
+    "static.inventory.manualAdjustment": "Manual Adjustment",
+    "static.inventory.actualStock": "Actual Stock",
+    "static.inventory.batchNumber": "Batch Number",
+    "static.inventory.expireDate": "Expire Date",
+    "static.inventory.active": "Active"
+    
+
 }

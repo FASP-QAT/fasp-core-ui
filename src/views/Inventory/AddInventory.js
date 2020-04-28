@@ -16,7 +16,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import moment from "moment";
 
-
+const entityname = i18n.t('static.inventory.inventory')
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -243,45 +243,45 @@ export default class AddInventory extends Component {
                                 columns: [
 
                                     {
-                                        title: 'Data source',
+                                        title: i18n.t('static.inventory.dataSource'),
                                         type: 'dropdown',
                                         source: dataSourceList
                                     },
                                     {
-                                        title: 'Region',
+                                        title: i18n.t('static.inventory.region'),
                                         type: 'dropdown',
                                         source: regionList
                                         // readOnly: true
                                     },
                                     {
-                                        title: 'Inventory Date',
+                                        title: i18n.t('static.inventory.inventoryDate'),
                                         type: 'calendar'
 
                                     },
                                     {
-                                        title: 'Expected Stock',
+                                        title: i18n.t('static.inventory.expectedStock'),
                                         type: 'text',
                                         readOnly: true
                                     },
                                     {
-                                        title: 'Manual Adjustment',
+                                        title: i18n.t('static.inventory.manualAdjustment'),
                                         type: 'text'
                                     },
                                     {
-                                        title: 'Actual Stock',
+                                        title: i18n.t('static.inventory.actualStock'),
                                         type: 'text'
                                     },
                                     {
-                                        title: 'Batch Number',
+                                        title: i18n.t('static.inventory.batchNumber'),
                                         type: 'text'
                                     },
                                     {
-                                        title: 'Expire Date',
+                                        title: i18n.t('static.inventory.expireDate'),
                                         type: 'calendar'
 
                                     },
                                     {
-                                        title: 'Active',
+                                        title: i18n.t('static.inventory.active'),
                                         type: 'checkbox'
                                     }
 
@@ -563,7 +563,7 @@ export default class AddInventory extends Component {
                             message: `Inventory Data Saved`,
                             changedFlag: 0
                         })
-                        this.props.history.push(`/dashboard/` + "Inventory Data Added Successfully")
+                        this.props.history.push(`/dashboard/` + i18n.t('static.message.addSuccess', { entityname }))
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -599,11 +599,12 @@ export default class AddInventory extends Component {
         return (
 
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Col xs="12" sm="12">
                     <Card>
 
                         <CardHeader>
-                            <strong>Inventory details</strong>
+                            <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                         </CardHeader>
                         <CardBody>
                             <Formik
@@ -615,7 +616,7 @@ export default class AddInventory extends Component {
                                                 <Col md="9 pl-0">
                                                     <div className="d-md-flex">
                                                         <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                                             <div className="controls SelectGo">
                                                                 <InputGroup>
                                                                     <Input type="select"
@@ -631,7 +632,7 @@ export default class AddInventory extends Component {
                                                             </div>
                                                         </FormGroup>
                                                         <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Country SKU</Label>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
                                                             <div className="controls SelectGo">
                                                                 <InputGroup>
                                                                     <Input
@@ -664,8 +665,8 @@ export default class AddInventory extends Component {
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>Add Row</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addData')}</Button>
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
@@ -677,10 +678,11 @@ export default class AddInventory extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }
+
 
 
 
