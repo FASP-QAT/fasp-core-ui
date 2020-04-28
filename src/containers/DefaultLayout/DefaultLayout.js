@@ -55,7 +55,7 @@ class DefaultLayout extends Component {
             <Suspense>
 
               <Online>
-                <AppSidebarNav  navConfig={{
+                <AppSidebarNav navConfig={{
                   items:
                     [
                       {
@@ -237,7 +237,7 @@ class DefaultLayout extends Component {
                           //   icon: 'icon-graph'
                           // },
                           {
-                            name: 'Product Category Tree',
+                            name: 'Product Category',
                             url: '/productCategory/productCategoryTree',
                             icon: 'icon-graph'
                           },
@@ -277,7 +277,11 @@ class DefaultLayout extends Component {
                           // ]
                           // },
 
-
+                          {
+                            name: 'Synchronisation',
+                            url: '/program/syncPage',
+                            icon: 'fa fa-download',
+                          },
                           {
                             name: i18n.t('static.dashboard.program'),
                             icon: 'fa fa-list',
@@ -285,11 +289,6 @@ class DefaultLayout extends Component {
                               {
                                 name: i18n.t('static.dashboard.downloadprogram'),
                                 url: '/program/downloadProgram',
-                                icon: 'fa fa-download',
-                              },
-                              {
-                                name: 'Sync',
-                                url: '/program/syncPage',
                                 icon: 'fa fa-download',
                               },
                               {
@@ -365,14 +364,14 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
-                            name: i18n.t('static.dashboard.exportprogram'),
-                            url: '/program/exportProgram',
-                            icon: 'fa fa-upload',
-                          },
-                          {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
                             icon: 'fa fa-long-arrow-down',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.exportprogram'),
+                            url: '/program/exportProgram',
+                            icon: 'fa fa-upload',
                           }
                         ]
                       }

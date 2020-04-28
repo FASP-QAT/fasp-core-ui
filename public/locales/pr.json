@@ -49,5 +49,8 @@
     "static.common.reset": "Redefinir",
     "static.common.cancel": "Cancelar",
     "static.common.submit": "Enviar",
-    "static.dashboard.importprogram": "Programa de Importação"
+    "static.dashboard.importprogram": "Programa de Importação",
+    "static.dashboard.exportprogram": "Programa de Exportação",
+    "static.program.dataexportsuccess": "Dados exportados com sucesso",
+    "static.program.export": "Exportar dados do programa"
 }

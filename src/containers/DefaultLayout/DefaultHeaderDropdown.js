@@ -92,17 +92,17 @@ class DefaultHeaderDropdown extends Component {
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
           <Online>
-          <div className="avatar">
-            <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            <span className="avatar-status badge-success"></span>
+            <div className="avatar">
+              <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
+              <span className="avatar-status badge-success"></span>
             </div>
           </Online>
           <Offline>
-          <div className="avatar">
-            <img src={image5} className="img-avatar" alt="admin@bootstrapmaster.com" />
-            <span className="avatar-status badge-secondary"></span>
+            <div className="avatar">
+              <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
+              <span className="avatar-status badge-danger"></span>
             </div>
-            </Offline>
+          </Offline>
           {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
             <i class="icon-settings icon-anim-pulse text-primary"></i>
         </button> */}
