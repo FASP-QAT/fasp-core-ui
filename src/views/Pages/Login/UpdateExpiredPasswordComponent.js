@@ -13,6 +13,7 @@ import { SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
 import moment from 'moment';
 import i18n from '../../../i18n'
+import image1 from '../../../../public/assets/img/QAT-logo.png';
 
 
 
@@ -114,7 +115,7 @@ class UpdateExpiredPasswordComponent extends Component {
                         <Row className="justify-content-center">
                             <Col md="12">
                                 <div className="upper-logo mt-1">
-                                    <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                                    <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6 " className="mt-4">

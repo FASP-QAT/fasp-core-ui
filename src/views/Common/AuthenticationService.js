@@ -39,15 +39,16 @@ class AuthenticationService {
         let roles = "";
         for (let i = 0; i <= decryptedUser.roles.length; i++) {
             let role = decryptedUser.roles[i];
-            if (role != null && role != "") {
-                if (i > 0) {
-                    roles += "," + role.label.label_en;
-                } else {
-                    roles += role.label.label_en;
-                }
-            }
+            // if (role != null && role != "") {
+            //     if (i > 0) {
+            //         roles += "," + role.label.label_en;
+            //     } else {
+            //         roles += role.label.label_en;
+            //     }
+            // }
         }
-        return roles;
+        console.log("decryptedUser.roles---" + decryptedUser.roles);
+        return decryptedUser.roles;
     }
 
     getLoggedInUserId() {
