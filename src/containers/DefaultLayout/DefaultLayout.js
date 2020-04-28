@@ -55,7 +55,7 @@ class DefaultLayout extends Component {
             <Suspense>
 
               <Online>
-                <AppSidebarNav  navConfig={{
+                <AppSidebarNav navConfig={{
                   items:
                     [
                       {
@@ -365,14 +365,14 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
-                            name: i18n.t('static.dashboard.exportprogram'),
-                            url: '/program/exportProgram',
-                            icon: 'fa fa-upload',
-                          },
-                          {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
                             icon: 'fa fa-long-arrow-down',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.exportprogram'),
+                            url: '/program/exportProgram',
+                            icon: 'fa fa-upload',
                           }
                         ]
                       }
