@@ -79,7 +79,7 @@ const bar = {
   labels: ['Realm Name 1', 'Realm Name 2', 'Realm Name 3', 'Realm Name 4'],
   datasets: [
     {
-      label: 'Active Program',
+      label: 'Active Programs',
       backgroundColor: '#118B70',
       borderColor: 'rgba(179,181,198,1)',
       pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -89,7 +89,7 @@ const bar = {
       data: [65, 59, 90, 81, 56, 55, 40],
     },
     {
-      label: 'Inactive Program',
+      label: 'Inactive Programs',
       backgroundColor: '#cfcdc9',
       borderColor: 'rgba(255,99,132,1)',
       pointBackgroundColor: 'rgba(255,99,132,1)',

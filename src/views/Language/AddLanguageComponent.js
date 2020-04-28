@@ -127,14 +127,12 @@ class AddLanguageComponent extends Component {
 
 
     render() {
-
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h6>{i18n.t(this.state.message)}</h6>
-                <h6>{i18n.t(this.props.match.params.message)}</h6>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -153,26 +151,26 @@ class AddLanguageComponent extends Component {
                                             })
                                         }
                                     })
-                                        // .catch(
-                                        //     error => {
-                                        //         if (error.message === "Network Error") {
-                                        //             this.setState({ message: error.message });
-                                        //         } else {
-                                        //             switch (error.response.status) {
-                                        //                 case 500:
-                                        //                 case 401:
-                                        //                 case 404:
-                                        //                 case 406:
-                                        //                 case 412:
-                                        //                     this.setState({ message: error.response.data.messageCode });
-                                        //                     break;
-                                        //                 default:
-                                        //                     this.setState({ message: 'static.unkownError' });
-                                        //                     break;
-                                        //             }
-                                        //         }
-                                        //     }
-                                        // );
+                                    // .catch(
+                                    //     error => {
+                                    //         if (error.message === "Network Error") {
+                                    //             this.setState({ message: error.message });
+                                    //         } else {
+                                    //             switch (error.response.status) {
+                                    //                 case 500:
+                                    //                 case 401:
+                                    //                 case 404:
+                                    //                 case 406:
+                                    //                 case 412:
+                                    //                     this.setState({ message: error.response.data.messageCode });
+                                    //                     break;
+                                    //                 default:
+                                    //                     this.setState({ message: 'static.unkownError' });
+                                    //                     break;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // );
                                 }}
                                 render={
                                     ({

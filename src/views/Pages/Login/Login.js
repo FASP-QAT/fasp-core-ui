@@ -22,6 +22,8 @@ import LoginService from '../../../api/LoginService'
 import i18n from '../../../i18n'
 import axios from 'axios';
 import moment from 'moment';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 
 const initialValues = {
@@ -92,7 +94,18 @@ class Login extends Component {
   }
 
   forgotPassword() {
-    this.props.history.push(`/forgotPassword`)
+    if (navigator.onLine) {
+      this.props.history.push(`/forgotPassword`)
+    } else {
+      confirmAlert({
+        message: i18n.t('static.forgotPassword.offline'),
+        buttons: [
+          {
+            label: i18n.t('static.common.close')
+          }
+        ]
+      });
+    }
   }
   render() {
     return (
@@ -124,23 +137,13 @@ class Login extends Component {
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
-
-                                // localStorage.removeItem("token-" + decoded.userId);
-                                // localStorage.removeItem("user-" + decoded.userId);
-                                // localStorage.removeItem("curUser");
-                                // localStorage.removeItem("lang");
-                                // localStorage.removeItem("typeOfSession");
-                                // localStorage.removeItem("i18nextLng");
-
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
-                                // AuthenticationService.setupAxiosInterceptors();
-                                let basicAuthHeader = 'Bearer ' + response.data.token
-                                console.log("basicAuthHeader---", basicAuthHeader);
+                          
                                 AuthenticationService.setupAxiosInterceptors();
                                 this.props.history.push(`/ApplicationDashboard`)
                               })
@@ -177,7 +180,7 @@ class Login extends Component {
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
-                                  this.setState({ message: 'Error occured' });
+                                  this.setState({ message: 'static.label.labelFail' });
                                 }
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
@@ -191,12 +194,12 @@ class Login extends Component {
                                   localStorage.removeItem("tempUser");
                                   this.props.history.push(`/ApplicationDashboard`)
                                 } else {
-                                  this.setState({ message: 'Bad credentials.' });
+                                  this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
                               }.bind(this));
                             }
                             else {
-                              this.setState({ message: 'User not found.' });
+                              this.setState({ message: 'static.message.login.invalidCredentials' });
                             }
                           }
                         }}
@@ -263,7 +266,7 @@ class Login extends Component {
                                     <Button type="submit" color="primary" className="px-4" onClick={() => this.touchAll(setTouched, errors)} >{i18n.t('static.login.login')}</Button>
                                   </Col>
                                   <Col xs="6" className="text-right">
-                                    <Online><Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button></Online>
+                                    <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
                                   </Col>
 
                                 </Row>
@@ -279,17 +282,16 @@ class Login extends Component {
               <Col xs="12" className="Login-bttom ">
                 <CardBody>
 
-                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
-                  (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.
-                  GHSC-PSM connects technical solutions and proven commercial processes to
-                  promote efficient and cost-effective health supply chains worldwide.
-                  Our goal is to ensure uninterrupted supplies of health commodities to save
-                  lives and create a healthier future for all. The project purchases and delivers
-                  health commodities, offers comprehensive technical assistance to strengthen
-                  national supply chain systems, and provides global supply chain leadership.For more
-                  information,visit ghsupplychain.org.The information provided in this tool is not official
-                  U.S. government information and does not represent the views or positions of the Agency for International
-                  Development or the U.S. government.
+                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply 
+                  Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects 
+                  technical solutions and proven commercial processes to promote efficient and cost-effective 
+                  health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health 
+                  commodities to save lives and create a healthier future for all. The project purchases 
+                  and delivers health commodities, offers comprehensive technical assistance to strengthen 
+                  national supply chain systems, and provides global supply chain leadership. For more 
+                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not 
+                  official U.S. government information and does not represent the views or positions of the 
+                  Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
