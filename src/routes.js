@@ -188,7 +188,7 @@ const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockSta
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
-  { path: '/inventory/addInventory', name: 'Inventory / Add Inventory', component: AddInventory },
+  { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },

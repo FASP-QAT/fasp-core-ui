@@ -860,10 +860,10 @@ export default class ConsumptionDetails extends React.Component {
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
                         this.setState({
-                            message: `Consumption Data Saved`,
+                            message: 'static.message.consumptionSaved',
                             changedFlag: 0
                         })
-                        this.props.history.push(`/dashboard/` + "Consumption Data Added Successfully")
+                        this.props.history.push(`/dashboard/` + i18n.t('static.message.consumptionSuccess'))
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -1020,7 +1020,7 @@ export default class ConsumptionDetails extends React.Component {
                     <Card>
 
                         <CardHeader>
-                            <strong>Consumption details</strong>
+                            <strong>{i18n.t('static.consumption.consumptionadd')}</strong>
                         </CardHeader>
                         <CardBody>
                             <Formik
@@ -1032,7 +1032,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 <Col md="9 pl-0">
                                                     <div className="d-md-flex">
                                                         <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.program')}</Label>
                                                             <div className="controls SelectGo">
                                                                 <InputGroup>
                                                                     <Input type="select"
@@ -1041,14 +1041,14 @@ export default class ConsumptionDetails extends React.Component {
                                                                         name="programId" id="programId"
                                                                         onChange={this.getPlanningUnitList}
                                                                     >
-                                                                        <option value="0">Please select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {programs}
                                                                     </Input>
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
                                                         <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.planningunit')}</Label>
                                                             <div className="controls SelectGo">
                                                                 <InputGroup>
                                                                     <Input
@@ -1058,7 +1058,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                         bsSize="sm"
                                                                         value={this.state.planningUnitId}
                                                                     >
-                                                                        <option value="0">Please Select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {planningUnits}
                                                                     </Input>
                                                                     <InputGroupAddon addonType="append">
@@ -1238,6 +1238,7 @@ export default class ConsumptionDetails extends React.Component {
                         proList[i] = productJson
                     }
                 }
+                console.log("proList---" + proList);
                 this.setState({
                     planningUnitList: proList
                 })
