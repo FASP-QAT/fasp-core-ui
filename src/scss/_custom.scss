@@ -5,7 +5,11 @@ body {
 }
 
 ::placeholder {
-  color:#eee!important;
+  color:#7a7e7a!important;
+}
+
+.Select--single>.Select-control .Select-value, .Select-placeholder {
+  color: #7a7e7a!important;
 }
 /* ————————————————————–
   Tree core styles
@@ -407,11 +411,20 @@ label.arrow_label:after {
   color:#212721!important;
 }
 .red {
-  // color: #f86c6b !important;
-  color: red;
+  //  color: #f86c6b !important;
   font-size: 12px;
+  color: red!important;
 }
-
+ 
+.invalid-feedback {
+  display: none;
+  /* width: 100%; */
+  margin-top: 0.25rem;
+  // font-size: 80%;
+  font-size: 12px!important;
+  color: red!important;
+  // color: #f86c6b;
+}
 
 // table multiselect color
 .Select--multi .Select-value {color: #5c6873 !important;}
@@ -640,7 +653,7 @@ label.arrow_label:after {
 }
 .upper-logo {
   max-width: 325px;
-  margin-top: 2% !important;
+  margin-top: 1% !important;
   margin-left: 0%;
 }
 
@@ -1045,9 +1058,7 @@ h5,
 
 }
 
-.Select--single>.Select-control .Select-value, .Select-placeholder {
-  color: #212721!important;
-}
+
 
 .sidebar .nav-dropdown-toggle::before {
    transform: scaleX(-1);
@@ -1174,6 +1185,7 @@ h5,
 .legend .redlegend { background-color: red; border-color:1px solid red; }
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
 
-.card {
-  margin-top: -2%;
-}
+// .card {
+//   margin-top: -2%;
+// }
+

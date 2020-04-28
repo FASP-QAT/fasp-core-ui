@@ -200,15 +200,7 @@ class ListBudgetComponent extends Component {
     }, this);
 
     const columns = [
-      {
-        dataField: 'label',
-        text: i18n.t('static.budget.budget'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
 
-      },
       {
         dataField: 'program.label',
         text: i18n.t('static.budget.program'),
@@ -224,6 +216,15 @@ class ListBudgetComponent extends Component {
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
+      },
+      {
+        dataField: 'label',
+        text: i18n.t('static.budget.budget'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+
       },
       {
         dataField: 'budgetAmt',
