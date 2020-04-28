@@ -4,7 +4,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
   Col, Row, Card, CardBody, CardHeader, Form,
   FormGroup, Label, InputGroup, Input, InputGroupAddon, Button,
-  Nav, NavItem, NavLink, TabContent, TabPane
+  Nav, NavItem, NavLink, TabContent, TabPane,CardFooter
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY } from '../../Constants.js';
@@ -41,6 +41,8 @@ export default class syncPage extends Component {
 
     this.loadedFunctionLatestInventory = this.loadedFunctionLatestInventory.bind(this);
     this.loadedFunctionLatest = this.loadedFunctionLatest.bind(this);
+    this.cancelClicked=this.cancelClicked.bind(this);
+    this.synchronize=this.synchronize.bind(this);
   }
 
   toggle(tabPane, tab) {
@@ -150,7 +152,7 @@ export default class syncPage extends Component {
         for (var j = 0; j < inventoryList.length; j++) {
           data = [];
           data[0] = inventoryList[j].inventoryId;
-          data[1] = consumptionList[j].realmCountryPlanningUnit.id;
+          data[1] = inventoryList[j].realmCountryPlanningUnit.id;
           data[2] = inventoryList[j].dataSource.id;
           data[3] = inventoryList[j].region.id;
           data[4] = inventoryList[j].inventoryDate;
@@ -219,13 +221,11 @@ export default class syncPage extends Component {
                   var planningUnitResult = [];
                   planningUnitResult = planningUnitRequest.result;
                   for (var k = 0; k < planningUnitResult.length; k++) {
-                    if (planningUnitResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
-                      var planningUnitJson = {
-                        name: getLabelText(planningUnitResult[k].label, lan),
-                        id: planningUnitResult[k].programPlanningUnitId
-                      }
-                      planningUnitList[k] = planningUnitJson
+                    var planningUnitJson = {
+                      name: planningUnitResult[k].planningUnit.label.label_en,
+                      id: planningUnitResult[k].planningUnit.id
                     }
+                    planningUnitList[k] = planningUnitJson
                   }
 
                   var countrySKUTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
@@ -235,13 +235,13 @@ export default class syncPage extends Component {
                     var countrySKUResult = [];
                     countrySKUResult = countrySKURequest.result;
                     for (var k = 0; k < countrySKUResult.length; k++) {
-                      if (countrySKUResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
-                        var countrySKUJson = {
-                          name: getLabelText(countrySKUResult[k].label, lan),
-                          id: countrySKUResult[k].realmCountryPlanningUnitId
-                        }
-                        countrySKUList[k] = countrySKUJson
+                      // if (countrySKUResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
+                      var countrySKUJson = {
+                        name: countrySKUResult[k].label.label_en,
+                        id: countrySKUResult[k].realmCountryPlanningUnitId
                       }
+                      countrySkuList[k] = countrySKUJson
+                      // }
                     }
                     var consumptionList = (programJson.consumptionList);
                     this.setState({
@@ -354,7 +354,7 @@ export default class syncPage extends Component {
 
                       data = [];
                       data[0] = inventoryList[j].inventoryId;
-                      data[1] = consumptionList[j].realmCountryPlanningUnit.id;
+                      data[1] = inventoryList[j].realmCountryPlanningUnit.id;
                       data[2] = inventoryList[j].dataSource.id;
                       data[3] = inventoryList[j].region.id;
                       data[4] = inventoryList[j].inventoryDate;
@@ -404,7 +404,7 @@ export default class syncPage extends Component {
                         },
                         {
                           title: 'Expected Stock',
-                          type: 'hidden',
+                          type: 'text',
                           readOnly: true
                         },
                         {
@@ -546,7 +546,7 @@ export default class syncPage extends Component {
                         },
                         {
                           title: 'Expected Stock',
-                          type: 'hidden',
+                          type: 'text',
                           readOnly: true
                         },
                         {
@@ -734,7 +734,7 @@ export default class syncPage extends Component {
                         },
                         {
                           title: 'Expected Stock',
-                          type: 'hidden',
+                          type: 'text',
                           readOnly: true
                         },
                         {
@@ -1202,10 +1202,41 @@ export default class syncPage extends Component {
                   </div>
                 </div>
               </CardBody>
+              <CardFooter>
+                <FormGroup>
+                  <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                  <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.synchronize} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
+                  &nbsp;
+                                        </FormGroup>
+              </CardFooter>
             </Card>
           </Col>
         </Row>
       </div>
     );
   };
+
+  synchronize() {
+    document.getElementById("detailsDiv").style.display = "block";
+    var programId = document.getElementById('programId').value;
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open('fasp', 1);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programData'], 'readwrite');
+      var programTransaction = transaction.objectStore('programData');
+      var programRequest = programTransaction.get(programId);
+      programRequest.onsuccess = function (event) {
+        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        var programJson = JSON.parse(programData);
+        console.log("Program json",programJson);
+      }
+    }
+  }
+
+  cancelClicked() {
+    this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+  }
 }
