@@ -91,18 +91,17 @@ class DefaultHeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <Online>
-            <div className="avatar">
-              <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
+
+          <div className="avatar">
+            <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
+            <Online>
               <span className="avatar-status badge-success"></span>
-            </div>
-          </Online>
-          <Offline>
-            <div className="avatar">
-              <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
+            </Online>
+            <Offline>
               <span className="avatar-status badge-danger"></span>
-            </div>
-          </Offline>
+            </Offline>
+          </div>
+
           {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
             <i class="icon-settings icon-anim-pulse text-primary"></i>
         </button> */}
@@ -115,7 +114,7 @@ class DefaultHeaderDropdown extends Component {
 
                 <div className=" mb-1 mt-2" key={role.roleId}>
                   {/* <small><i className="fa fa-dot-circle-o"></i>{getLabelText(role.label, this.state.lang)}</small> */}
-                  <small><i className="fa fa-dot-circle-o"></i>{role.label.label_en}</small>
+                  <small><i className="fa fa-dot-circle-o"></i>{getLabelText(role.label, this.state.lang)}</small>
                 </div>
             )}
           </DropdownItem>

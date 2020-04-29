@@ -341,7 +341,7 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -352,7 +352,7 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -363,12 +363,12 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (isNaN(Date.parse(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -385,7 +385,7 @@ export default class AddInventory extends Component {
                 if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -399,7 +399,7 @@ export default class AddInventory extends Component {
                     var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     var col = ("F").concat(parseInt(y) + 1);
                     var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
@@ -436,7 +436,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -448,7 +448,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -462,7 +462,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 // console.log("my val", Date.parse(value));
@@ -605,7 +605,7 @@ export default class AddInventory extends Component {
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
                         this.setState({
-                            message: `Inventory Data Saved`,
+                            message: 'static.message.inventorysuccess',
                             changedFlag: 0
                         })
                         this.props.history.push(`/dashboard/` + i18n.t('static.message.addSuccess', { entityname }))
@@ -670,7 +670,7 @@ export default class AddInventory extends Component {
                                                                         name="programId" id="programId"
                                                                         onChange={this.getCountrySKUList}
                                                                     >
-                                                                        <option value="0">Please select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {programs}
                                                                     </Input>
                                                                 </InputGroup>
@@ -686,7 +686,7 @@ export default class AddInventory extends Component {
                                                                         id="countrySKU"
                                                                         bsSize="sm"
                                                                     >
-                                                                        <option value="0">Please Select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {countrySKUs}
                                                                     </Input>
                                                                     <InputGroupAddon addonType="append">

@@ -90,5 +90,9 @@
     "static.common.startdate": "Data de início",
     "static.common.stopdate": "Data final",
     "static.common.active": "Ativo",
-    "static.label.fieldRequired": "Este campo é obrigatório"
+    "static.label.fieldRequired": "Este campo é obrigatório",
+    "static.message.inventorysuccess": "Dados de inventário salvos",
+    "static.common.profile": "Perfil",
+    "static.dashboard.changepassword": "Mudar senha",
+    "static.common.logout": "Sair"
 }

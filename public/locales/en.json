@@ -614,5 +614,6 @@
     "static.consumption.daysofstockout": "Days of Stock out",
     "static.consumption.actualflag": "Actual Flag",
     "static.consumption.actual": "Actual",
-    "static.consumption.forcast": "Forecast"
+    "static.consumption.forcast": "Forecast",
+    "static.message.inventorysuccess": "Inventory Data Saved"
 }
