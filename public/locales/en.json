@@ -615,5 +615,9 @@
     "static.consumption.actualflag": "Actual Flag",
     "static.consumption.actual": "Actual",
     "static.consumption.forcast": "Forecast",
-    "static.message.inventorysuccess": "Inventory Data Saved"
+    "static.message.inventorysuccess": "Inventory Data Saved",
+    "static.language.preferredlng": "Change Preferred Language",
+    "static.language.portuguese": "Portuguese",
+    "static.planningunit.gtinNo": "Only numbers allowed",
+    "static.planningunit.maxGtin": "Max 14 digits allowed"
 }
