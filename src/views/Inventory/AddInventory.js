@@ -84,7 +84,8 @@ export default class AddInventory extends Component {
         data[5] = "";
         data[6] = "";
         data[7] = "";
-        data[8] = "";
+        data[8] = true;
+        data[9] = -1;
         this.el.insertRow(
             data
         );
@@ -192,43 +193,57 @@ export default class AddInventory extends Component {
                             }
                             var countrySKUId = document.getElementById('countrySKU').value;
                             console.log("countrySKU---", countrySKUId);
-                            var inventoryList = (programJson.inventoryList).filter(i => i.realmCountryPlanningUnit.id == countrySKUId);
+                            // var inventoryList = (programJson.inventoryList).filter(i => i.realmCountryPlanningUnit.id == countrySKUId);
+                            var inventoryList = (programJson.inventoryList);
                             this.setState({
                                 inventoryList: inventoryList
                             });
 
                             var data = [];
                             var inventoryDataArr = []
-                            if (inventoryList.length == 0) {
+                            // if (inventoryList.length == 0) {
+                            //     data = [];
+                            //     inventoryDataArr[0] = data;
+                            // }
+                            var count = 0;
+                            for (var j = 0; j < inventoryList.length; j++) {
+                                if (inventoryList[j].realmCountryPlanningUnit.id == countrySKUId) {
+                                    if (count == 0) {
+                                        data = [];
+                                        data[0] = inventoryList[j].dataSource.id;
+                                        data[1] = inventoryList[j].region.id;
+                                        data[2] = inventoryList[j].inventoryDate;
+                                        data[3] = 0;
+                                        data[4] = inventoryList[j].adjustmentQty;
+                                        data[5] = inventoryList[j].actualQty;
+                                        data[6] = inventoryList[j].batchNo;
+                                        data[7] = inventoryList[j].expiryDate;
+                                        data[8] = inventoryList[j].active;
+                                        data[9] = j;
+                                        inventoryDataArr[count] = data;
+                                        count++;
+                                    } else {
+                                        data = [];
+                                        data[0] = inventoryList[j].dataSource.id;
+                                        data[1] = inventoryList[j].region.id;
+                                        data[2] = inventoryList[j].inventoryDate;
+                                        data[3] = `=D${count}+E${count}`;
+                                        data[4] = inventoryList[j].adjustmentQty;
+                                        data[5] = inventoryList[j].actualQty;
+                                        data[6] = inventoryList[j].batchNo;
+                                        data[7] = inventoryList[j].expiryDate;
+                                        data[8] = inventoryList[j].active;
+                                        data[9] = j;
+                                        inventoryDataArr[count] = data;
+                                        // inventoryDataArr[j] = data;
+                                        count++;
+                                    }
+                                }
+                            }
+                            console.log("inventory Data Array-->", inventoryDataArr);
+                            if (inventoryDataArr.length == 0) {
                                 data = [];
                                 inventoryDataArr[0] = data;
-                            }
-                            for (var j = 0; j < inventoryList.length; j++) {
-                                if (j == 0) {
-                                    data = [];
-                                    data[0] = inventoryList[j].dataSource.id;
-                                    data[1] = inventoryList[j].region.id;
-                                    data[2] = inventoryList[j].inventoryDate;
-                                    data[3] = 0;
-                                    data[4] = inventoryList[j].adjustmentQty;
-                                    data[5] = inventoryList[j].actualQty;
-                                    data[6] = inventoryList[j].batchNo;
-                                    data[7] = inventoryList[j].expiryDate;
-                                    data[8] = inventoryList[j].active;
-                                    inventoryDataArr[j] = data;
-                                } else {
-                                    data = [];
-                                    data[0] = inventoryList[j].dataSource.id;
-                                    data[1] = inventoryList[j].region.id;
-                                    data[2] = inventoryList[j].inventoryDate;
-                                    data[3] = `=D${j}+E${j}`;
-                                    data[4] = inventoryList[j].adjustmentQty;
-                                    data[5] = inventoryList[j].actualQty;
-                                    data[6] = inventoryList[j].batchNo;
-                                    data[7] = inventoryList[j].expiryDate;
-                                    data[8] = inventoryList[j].active;
-                                    inventoryDataArr[j] = data;
-                                }
                             }
                             this.el = jexcel(document.getElementById("inventorytableDiv"), '');
                             this.el.destroy();
@@ -283,6 +298,10 @@ export default class AddInventory extends Component {
                                     {
                                         title: i18n.t('static.inventory.active'),
                                         type: 'checkbox'
+                                    },
+                                    {
+                                        title: 'Index',
+                                        type: 'hidden'
                                     }
 
                                 ],
@@ -322,7 +341,7 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -333,7 +352,7 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -344,12 +363,12 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (isNaN(Date.parse(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -366,7 +385,7 @@ export default class AddInventory extends Component {
                 if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -380,7 +399,7 @@ export default class AddInventory extends Component {
                     var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     var col = ("F").concat(parseInt(y) + 1);
                     var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
@@ -417,7 +436,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -429,7 +448,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -443,7 +462,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 // console.log("my val", Date.parse(value));
@@ -484,6 +503,7 @@ export default class AddInventory extends Component {
             );
 
             var tableJson = this.el.getJson();
+            console.log("tableJson------------------->", tableJson);
             var db1;
             var storeOS;
             getDatabase();
@@ -500,32 +520,55 @@ export default class AddInventory extends Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var countrySKU = document.getElementById("countrySKU").value;
-
                     var inventoryDataList = (programJson.inventoryList).filter(c => c.realmCountryPlanningUnit.id == countrySKU);
                     var inventoryDataListNotFiltered = programJson.inventoryList;
 
-                    var count = 0;
-                    for (var i = 0; i < inventoryDataListNotFiltered.length; i++) {
-                        if (inventoryDataList[count] != undefined) {
-                            if (inventoryDataList[count].inventoryId == inventoryDataListNotFiltered[i].inventoryId) {
-                                var map = new Map(Object.entries(tableJson[count]));
-                                inventoryDataListNotFiltered[i].dataSource.id = map.get("0");
-                                inventoryDataListNotFiltered[i].region.id = map.get("1");
-                                inventoryDataListNotFiltered[i].inventoryDate = map.get("2");
-                                inventoryDataListNotFiltered[i].expectedBal = map.get("3");
-                                inventoryDataListNotFiltered[i].adjustmentQty = parseInt(map.get("4"));
-                                inventoryDataListNotFiltered[i].actualQty = map.get("5");
-                                inventoryDataListNotFiltered[i].batchNo = map.get("6");
-                                inventoryDataListNotFiltered[i].expiryDate = map.get("7");
-                                inventoryDataListNotFiltered[i].active = map.get("8");
-                                if (inventoryDataList.length >= count) {
-                                    count++;
-                                }
-                            }
+                    // var count = 0;
+                    for (var i = 0; i < inventoryDataList.length; i++) {
+
+                        // if (inventoryDataList[count] != undefined) {
+                        //     if (inventoryDataList[count].inventoryId == inventoryDataListNotFiltered[i].inventoryId) {
+                        var map = new Map(Object.entries(tableJson[i]));
+                        var expBalance = 0
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].dataSource.id = map.get("0");
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].region.id = map.get("1");
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].inventoryDate = map.get("2");
+
+                        if (i == 0) {
+                            expBalance = 0;
+                        } else {
+                            // var previousMap = new Map(Object.entries(tableJson[i - 1]))
+                            expBalance = parseInt(inventoryDataListNotFiltered[parseInt(map.get("9")) - 1].expectedBal) + parseInt(inventoryDataListNotFiltered[parseInt(map.get("9")) - 1].adjustmentQty);
                         }
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].expectedBal = expBalance;
+                        // console.log("expBaalalance---------->", expBalance);
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].adjustmentQty = parseInt(map.get("4"));
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].actualQty = map.get("5");
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].batchNo = map.get("6");
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = map.get("7");
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].active = map.get("8");
+                        // if (inventoryDataList.length >= count) {
+                        //     count++;
+                        // }
+                        //     }
+                        // }
                     }
+
+
                     for (var i = inventoryDataList.length; i < tableJson.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
+                        var map = new Map(Object.entries(tableJson[i]));
+                        var expBalance = 0
+                        if (i == 0) {
+                            expBalance = 0;
+                        } else {
+                            // var previousMap = new Map(Object.entries(tableJson[i - 1]))
+                            // console.log("previous--->", previousMap);
+                            // console.log("val1--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].expectedBal));
+                            // console.log("val2--->", parseInt(inventoryDataListNotFiltered[parseInt(previousMap.get("9"))].adjustmentQty));
+                            // console.log("inventoryDataList----->", inventoryDataList[i - 1]);
+                            expBalance = parseInt(inventoryDataList[i - 1].expectedBal) + parseInt(inventoryDataList[i - 1].adjustmentQty);
+                            // console.log("expected bal--->", expBalance);
+                        }
                         var json = {
                             inventoryId: 0,
                             dataSource: {
@@ -535,7 +578,7 @@ export default class AddInventory extends Component {
                                 id: map.get("1")
                             },
                             inventoryDate: map.get("2"),
-                            expectedBal: (map.get("3")),
+                            expectedBal: expBalance,
                             adjustmentQty: map.get("4"),
                             actualQty: map.get("5"),
                             batchNo: map.get("6"),
@@ -546,9 +589,11 @@ export default class AddInventory extends Component {
                                 id: countrySKU
                             }
                         }
-                        // inventoryDataList[i] = json;
+                        inventoryDataList.push(json);
                         inventoryDataListNotFiltered.push(json);
                     }
+
+                    console.log("inventoryDataListNotFiltered------->", inventoryDataListNotFiltered);
 
                     programJson.inventoryList = inventoryDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -560,7 +605,7 @@ export default class AddInventory extends Component {
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
                         this.setState({
-                            message: `Inventory Data Saved`,
+                            message: 'static.message.inventorysuccess',
                             changedFlag: 0
                         })
                         this.props.history.push(`/dashboard/` + i18n.t('static.message.addSuccess', { entityname }))
@@ -625,7 +670,7 @@ export default class AddInventory extends Component {
                                                                         name="programId" id="programId"
                                                                         onChange={this.getCountrySKUList}
                                                                     >
-                                                                        <option value="0">Please select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {programs}
                                                                     </Input>
                                                                 </InputGroup>
@@ -641,7 +686,7 @@ export default class AddInventory extends Component {
                                                                         id="countrySKU"
                                                                         bsSize="sm"
                                                                     >
-                                                                        <option value="0">Please Select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {countrySKUs}
                                                                     </Input>
                                                                     <InputGroupAddon addonType="append">

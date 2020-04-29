@@ -182,7 +182,7 @@ export default class CountryListComponent extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '}
 
@@ -193,9 +193,9 @@ export default class CountryListComponent extends Component {
                         </div>
 
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>

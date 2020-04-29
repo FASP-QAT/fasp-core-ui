@@ -467,13 +467,13 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                 <Form onSubmit={handleSubmit} noValidate name='procurementAgentPlanningUnitForm'>
                                                     <Row>
                                                     <FormGroup className="col-md-6">
-                                                        <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
                                                             {procurementAgents}
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-6">
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.procurementUnit')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.procurementUnit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="procurementUnitId"
@@ -490,7 +490,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.procurementUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-6">
-                                                        <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
+                                                        <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="skuCode"
@@ -505,7 +505,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.skuCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-6"> 
-                                                        <Label htmlFor="vendorPrice">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}</Label>
+                                                        <Label htmlFor="vendorPrice">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number"
                                                             min="0"
@@ -521,7 +521,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.vendorPrice}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-6">
-                                                        <Label htmlFor="leadTime">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}</Label>
+                                                        <Label htmlFor="leadTime">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="number"
                                                             min="0"
@@ -537,7 +537,7 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-6">
-                                                        <Label htmlFor="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</Label>
+                                                        <Label htmlFor="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="gtin"

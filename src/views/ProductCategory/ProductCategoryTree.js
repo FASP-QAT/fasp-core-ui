@@ -78,6 +78,11 @@ export default class ProductCategoryTree extends Component {
         this.enableNode = this.enableNode.bind(this);
         this.getSortedFaltTreeData = this.getSortedFaltTreeData.bind(this);
         this.reSetTree = this.reSetTree.bind(this);
+        this.setTreeData = this.setTreeData.bind(this);
+    }
+
+    setTreeData(treeData) {
+        console.log("treeData----->", treeData);
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -432,7 +437,7 @@ export default class ProductCategoryTree extends Component {
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <strong>Product Category Tree</strong>
+                                <strong>Product Category</strong>
                             </CardHeader>
                             <CardBody>
                                 <Col md="3 pl-0" >
@@ -514,7 +519,8 @@ export default class ProductCategoryTree extends Component {
                                             treeData={this.state.treeData}
                                             generateNodeProps={rowInfo => {
                                                 // console.log(rowInfo);
-                                                if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
+                                                // if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
+                                                if (rowInfo.node.payload.active == true && (rowInfo.parentNode != null)) {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
@@ -528,7 +534,9 @@ export default class ProductCategoryTree extends Component {
 
                                                     }
                                                     return nodeprops;
-                                                } else if (rowInfo.node.payload.active == false && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
+                                                }
+                                                // else if (rowInfo.node.payload.active == false && (rowInfo.parentNode != null && rowInfo.parentNode.id != 1)) {
+                                                if (rowInfo.node.payload.active == false && (rowInfo.parentNode != null)) {
                                                     let nodeprops = {
                                                         buttons: [
                                                             <div>
@@ -541,7 +549,9 @@ export default class ProductCategoryTree extends Component {
 
                                                     }
                                                     return nodeprops;
-                                                } else if (rowInfo.node.isNew == false && (rowInfo.parentNode == null || rowInfo.parentNode.id == 1)) {
+                                                }
+                                                // else if (rowInfo.node.isNew == false && (rowInfo.parentNode == null || rowInfo.parentNode.id == 1)) {
+                                                else if (rowInfo.node.isNew == false && (rowInfo.parentNode == null)) {
                                                     let nodeprops = {
                                                         canDrag: false
                                                     }
@@ -550,6 +560,7 @@ export default class ProductCategoryTree extends Component {
                                             }
                                             }
                                             onChange={treeData => this.setState({ treeData })}
+                                        // onChange={treeData => this.setTreeData(treeData)}
                                         />
 
                                     </div>

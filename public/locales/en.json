@@ -25,6 +25,7 @@
     "static.program.import": "Import Program Data",
     "static.country.currencytext": "Please select Currency",
     "static.budget.subfundingtext": "Please select Sub Funding source",
+    "static.budget.fundingtext": "Please select Funding source",
     "static.budget.program": "Program",
     "static.program.delivedtoreceivedleadtime": "Delivered To Recived Lead Time",
     "static.message.user.forgotPasswordTokenError": "Could not confirm Token",
@@ -78,7 +79,6 @@
     "static.message.user.userCreated": "User has been created and credentials link sent on email",
     "static.program.selectfile": "Please select file",
     "static.message.login.incorrectEmailUser": "Incorrect email or username",
-    "static.budget.subfundingsource": "Sub Funding Source",
     "static.program.submittoapprovetext": "Enter submited to approved lead time",
     "static.procurementagent.realm": "Realm",
     "static.dashboard.language": "Language",
@@ -600,7 +600,20 @@
     "static.inventory.actualStock": "Actual Stock",
     "static.inventory.batchNumber": "Batch Number",
     "static.inventory.expireDate": "Expire Date",
-    "static.inventory.active": "Active"
-    
-
+    "static.inventory.active": "Active",
+    "static.dashboard.inventorydetails": "Inventory Details",
+    "static.message.consumptionSaved": "Consumption Data Saved",
+    "static.message.consumptionSuccess": "Consumption Data Added Successfully",
+    "static.consumption.consumptionadd": "Consumption Details",
+    "static.consumption.program": "Program",
+    "static.consumption.planningunit": "Planning Unit",
+    "static.common.addRow": "Add Row",
+    "static.message.invalidnumber": "Invalid number",
+    "static.message.invaliddate": "Invalid date",
+    "static.consumption.consumptionqty": "Consumption Quantity",
+    "static.consumption.daysofstockout": "Days of Stock out",
+    "static.consumption.actualflag": "Actual Flag",
+    "static.consumption.actual": "Actual",
+    "static.consumption.forcast": "Forecast",
+    "static.message.inventorysuccess": "Inventory Data Saved"
 }

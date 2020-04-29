@@ -91,21 +91,30 @@ class DefaultHeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <Online><img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" /></Online>
-          <Offline><img src={image5} className="img-avatar" alt="admin@bootstrapmaster.com" /></Offline>
+
+          <div className="avatar">
+            <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
+            <Online>
+              <span className="avatar-status badge-success"></span>
+            </Online>
+            <Offline>
+              <span className="avatar-status badge-danger"></span>
+            </Offline>
+          </div>
+
           {/* <button type="button" id="TooltipDemo" class="btn-open-options btn btn-warning rounded-circle">
             <i class="icon-settings icon-anim-pulse text-primary"></i>
         </button> */}
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>{i18n.t('static.common.profile')}</strong></DropdownItem>
-          <DropdownItem><i className="icon-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
+          <DropdownItem className="nonclickablebox"><i className="icon-user icons icon-size"></i><span className="tittle-role">{AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : i18n.t("static.unknown")}</span>
             {this.state.roleList.map(
               role =>
 
                 <div className=" mb-1 mt-2" key={role.roleId}>
                   {/* <small><i className="fa fa-dot-circle-o"></i>{getLabelText(role.label, this.state.lang)}</small> */}
-                  <small><i className="fa fa-dot-circle-o"></i>{role.label.label_en}</small>
+                  <small><i className="fa fa-dot-circle-o"></i>{getLabelText(role.label, this.state.lang)}</small>
                 </div>
             )}
           </DropdownItem>

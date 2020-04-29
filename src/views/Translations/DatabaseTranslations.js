@@ -232,3 +232,14 @@ export default class DatabaseTranslations extends React.Component {
     }.bind(this)
 }
 
+
+document.onreadystatechange = function() { 
+    if (document.readyState !== "complete") { 
+        document.querySelector("tbody").style.visibility = "hidden"; 
+        document.querySelector("#loader").style.visibility = "visible"; 
+    } else { 
+        document.querySelector("#loader").style.display = "none"; 
+        document.querySelector("tbody").style.visibility = "visible"; 
+    } 
+}; 
+
