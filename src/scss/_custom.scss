@@ -592,8 +592,15 @@ label.arrow_label:after {
   .jexcel_content{    overflow-y: auto !important;
     max-height: 440px;
 }
+.jexcel > tbody > tr > td.readonly {
+  color: #212721 !important;
+}
  
 .whitebtnColor .btn-info{color: #fff!important;}
+
+
+.breadcrumb {
+  margin-bottom: .5rem;}
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}
