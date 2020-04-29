@@ -185,12 +185,12 @@ const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'))
 const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'));
 const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
 
-const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
+const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/program/programOnboarding', name: 'Program / Program Onboarding', component: ProgramOnboarding },
-  { path: '/inventory/addInventory', name: 'Inventory / Add Inventory', component: AddInventory },
+
+  { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
@@ -301,7 +301,7 @@ const routes = [
   { path: '/dashboard/:message', component: Dashboard },
 
   { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: ProgramTree },
-  { path: '/program/syncPage', name: i18n.t('static.dashboard.downloadprogram'), component: syncPage },
+  { path: '/program/syncPage', name: "Synchronisation", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: i18n.t('static.dashboard.exportprogram'), component: ExportProgram },
   { path: '/program/importProgram', name: i18n.t('static.dashboard.importprogram'), component: ImportProgram },
@@ -434,6 +434,7 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
 
 
 ];

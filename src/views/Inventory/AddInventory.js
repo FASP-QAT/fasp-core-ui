@@ -16,7 +16,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import moment from "moment";
 
-
+const entityname = i18n.t('static.inventory.inventory')
 export default class AddInventory extends Component {
     constructor(props) {
         super(props);
@@ -258,45 +258,45 @@ export default class AddInventory extends Component {
                                 columns: [
 
                                     {
-                                        title: 'Data source',
+                                        title: i18n.t('static.inventory.dataSource'),
                                         type: 'dropdown',
                                         source: dataSourceList
                                     },
                                     {
-                                        title: 'Region',
+                                        title: i18n.t('static.inventory.region'),
                                         type: 'dropdown',
                                         source: regionList
                                         // readOnly: true
                                     },
                                     {
-                                        title: 'Inventory Date',
+                                        title: i18n.t('static.inventory.inventoryDate'),
                                         type: 'calendar'
 
                                     },
                                     {
-                                        title: 'Expected Stock',
+                                        title: i18n.t('static.inventory.expectedStock'),
                                         type: 'text',
                                         readOnly: true
                                     },
                                     {
-                                        title: 'Manual Adjustment',
+                                        title: i18n.t('static.inventory.manualAdjustment'),
                                         type: 'text'
                                     },
                                     {
-                                        title: 'Actual Stock',
+                                        title: i18n.t('static.inventory.actualStock'),
                                         type: 'text'
                                     },
                                     {
-                                        title: 'Batch Number',
+                                        title: i18n.t('static.inventory.batchNumber'),
                                         type: 'text'
                                     },
                                     {
-                                        title: 'Expire Date',
+                                        title: i18n.t('static.inventory.expireDate'),
                                         type: 'calendar'
 
                                     },
                                     {
-                                        title: 'Active',
+                                        title: i18n.t('static.inventory.active'),
                                         type: 'checkbox'
                                     },
                                     {
@@ -341,7 +341,7 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -352,7 +352,7 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -363,12 +363,12 @@ export default class AddInventory extends Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (isNaN(Date.parse(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -385,7 +385,7 @@ export default class AddInventory extends Component {
                 if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -399,7 +399,7 @@ export default class AddInventory extends Component {
                     var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     var col = ("F").concat(parseInt(y) + 1);
                     var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
@@ -436,7 +436,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -448,7 +448,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -462,7 +462,7 @@ export default class AddInventory extends Component {
             if (value == "Invalid date" || value === "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 // console.log("my val", Date.parse(value));
@@ -605,10 +605,10 @@ export default class AddInventory extends Component {
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
                         this.setState({
-                            message: `Inventory Data Saved`,
+                            message: 'static.message.inventorysuccess',
                             changedFlag: 0
                         })
-                        this.props.history.push(`/dashboard/` + "Inventory Data Added Successfully")
+                        this.props.history.push(`/dashboard/` + i18n.t('static.message.addSuccess', { entityname }))
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -644,11 +644,12 @@ export default class AddInventory extends Component {
         return (
 
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Col xs="12" sm="12">
                     <Card>
 
                         <CardHeader>
-                            <strong>Inventory details</strong>
+                            <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                         </CardHeader>
                         <CardBody>
                             <Formik
@@ -660,7 +661,7 @@ export default class AddInventory extends Component {
                                                 <Col md="9 pl-0">
                                                     <div className="d-md-flex">
                                                         <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
                                                             <div className="controls SelectGo">
                                                                 <InputGroup>
                                                                     <Input type="select"
@@ -669,14 +670,14 @@ export default class AddInventory extends Component {
                                                                         name="programId" id="programId"
                                                                         onChange={this.getCountrySKUList}
                                                                     >
-                                                                        <option value="0">Please select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {programs}
                                                                     </Input>
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
                                                         <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Country SKU</Label>
+                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
                                                             <div className="controls SelectGo">
                                                                 <InputGroup>
                                                                     <Input
@@ -685,7 +686,7 @@ export default class AddInventory extends Component {
                                                                         id="countrySKU"
                                                                         bsSize="sm"
                                                                     >
-                                                                        <option value="0">Please Select</option>
+                                                                        <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {countrySKUs}
                                                                     </Input>
                                                                     <InputGroupAddon addonType="append">
@@ -709,8 +710,8 @@ export default class AddInventory extends Component {
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>Add Row</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addData')}</Button>
                                 &nbsp;
 </FormGroup>
                         </CardFooter>
@@ -722,10 +723,11 @@ export default class AddInventory extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
+        this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
 }
+
 
 
 

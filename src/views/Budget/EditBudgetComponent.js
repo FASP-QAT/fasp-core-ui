@@ -75,7 +75,7 @@ class EditBudgetComponent extends Component {
                         label_fr: ''
                     }
                 },
-                subFundingSource: {
+                fundingSource: {
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -228,24 +228,7 @@ class EditBudgetComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            type="text"
-                                                            name="budgetName"
-                                                            id="budget"
-                                                            bsSize="sm"
-                                                            valid={!errors.budgetName}
-                                                            invalid={touched.budgetName && !!errors.budgetName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
-
-                                                        />
-
-                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
-                                                    </FormGroup>
+               
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
 
@@ -267,23 +250,41 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
+                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}</Label>
 
                                                         <Input
                                                             type="text"
-                                                            name="subFundingSourceId"
-                                                            id="subFundingSourceId"
+                                                            name="fundingSourceId"
+                                                            id="fundingSourceId"
                                                             bsSize="sm"
-                                                            valid={!errors.subFundingSourceId}
-                                                            invalid={touched.subFundingSourceId && !!errors.subFundingSourceId}
+                                                            valid={!errors.fundingSourceId}
+                                                            invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly
-                                                            value={getLabelText(this.state.budget.subFundingSource.label, this.state.lang)}
+                                                            value={getLabelText(this.state.budget.fundingSource.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.subFundingSourceId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            type="text"
+                                                            name="budgetName"
+                                                            id="budget"
+                                                            bsSize="sm"
+                                                            valid={!errors.budgetName}
+                                                            invalid={touched.budgetName && !!errors.budgetName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.budget.label.label_en}
+
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>

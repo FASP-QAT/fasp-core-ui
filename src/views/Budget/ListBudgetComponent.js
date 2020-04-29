@@ -12,7 +12,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import SubFundingSourceService from '../../api/SubFundingSourceService';
+import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
@@ -26,7 +26,7 @@ class ListBudgetComponent extends Component {
       lang: localStorage.getItem('lang'),
       message: '',
       selBudget: [],
-      subFundingSourceList: []
+      fundingSourceList: []
     }
 
     // this.options = {
@@ -56,9 +56,9 @@ class ListBudgetComponent extends Component {
 
 
   filterData() {
-    let subFundingSourceId = document.getElementById("subFundingSourceId").value;
-    if (subFundingSourceId != 0) {
-      const selBudget = this.state.budgetList.filter(c => c.subFundingSource.subFundingSourceId == subFundingSourceId)
+    let fundingSourceId = document.getElementById("fundingSourceId").value;
+    if (fundingSourceId != 0) {
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
       this.setState({
         selBudget: selBudget
       });
@@ -127,12 +127,12 @@ class ListBudgetComponent extends Component {
     //     }
     //   }
     // );
-    SubFundingSourceService.getSubFundingSourceListAll()
+    FundingSourceService.getFundingSourceListAll()
       .then(response => {
         if (response.status == 200) {
-          console.log("sub funding source after status 200--->" + response.data)
+          console.log("funding source after status 200--->" + response.data)
           this.setState({
-            subFundingSourceList: response.data
+            fundingSourceList: response.data
           })
         } else {
           this.setState({ message: response.data.messageCode })
@@ -178,7 +178,10 @@ class ListBudgetComponent extends Component {
   // }
 
   formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
+    console.log("celll----", cell);
+    if (cell != null && cell != "") {
+      return getLabelText(cell, this.state.lang);
+    }
   }
 
   addCommas(cell, row) {
@@ -198,7 +201,7 @@ class ListBudgetComponent extends Component {
   render() {
 
     const { SearchBar, ClearSearchButton } = Search;
-    const { subFundingSourceList } = this.state;
+    const { fundingSourceList } = this.state;
 
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
@@ -206,24 +209,16 @@ class ListBudgetComponent extends Component {
       </span>
     );
 
-    let subFundingSources = subFundingSourceList.length > 0 && subFundingSourceList.map((item, i) => {
+    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
       return (
-        <option key={i} value={item.subFundingSourceId}>
+        <option key={i} value={item.fundingSourceId}>
           {getLabelText(item.label, this.state.lang)}
         </option>
       )
     }, this);
 
     const columns = [
-      {
-        dataField: 'label',
-        text: i18n.t('static.budget.budget'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
 
-      },
       {
         dataField: 'program.label',
         text: i18n.t('static.budget.program'),
@@ -233,12 +228,20 @@ class ListBudgetComponent extends Component {
         formatter: this.formatLabel
       },
       {
-        dataField: 'subFundingSource.label',
-        text: i18n.t('static.budget.subfundingsource'),
+        dataField: 'fundingSource.label',
+        text: i18n.t('static.budget.fundingsource'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
+
+      },
+      {
+        dataField: 'notes',
+        text: i18n.t('static.program.notes'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
       },
       {
         dataField: 'budgetAmt',
@@ -331,17 +334,17 @@ class ListBudgetComponent extends Component {
             </BootstrapTable> */}
             <Col md="3 pl-0" >
               <FormGroup>
-                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.subfundingsource')}</Label>
+                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                 <div className="controls SelectGo">
                   <InputGroup>
                     <Input
                       type="select"
-                      name="subFundingSourceId"
-                      id="subFundingSourceId"
+                      name="fundingSourceId"
+                      id="fundingSourceId"
                       bsSize="sm"
                     >
                       <option value="0">{i18n.t('static.common.all')}</option>
-                      {subFundingSources}
+                      {fundingSources}
                     </Input>
                     <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
