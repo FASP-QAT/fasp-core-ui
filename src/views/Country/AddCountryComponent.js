@@ -16,7 +16,7 @@ const entityname = i18n.t('static.country.countryMaster');
 const initialValues = {
     label: '',
     countryCode: '',
-    languageId: '',
+    // languageId: '',
     currencyId: '',
     languageList: [],
     currencyList: [],
@@ -29,8 +29,8 @@ const validationSchema = function (values) {
         countryCode: Yup.string()
             .max(3, i18n.t('static.country.countrycodemax3digittext'))
             .required(i18n.t('static.country.countrycodetext')),
-        languageId: Yup.string()
-            .required(i18n.t('static.country.languagetext')),
+        // languageId: Yup.string()
+        //     .required(i18n.t('static.country.languagetext')),
         currencyId: Yup.string()
             .required(i18n.t('static.country.currencytext')),
     })
@@ -75,11 +75,11 @@ export default class AddCountryComponent extends Component {
                 currency: {
                     id: ''
                 },
-                language: {
-                    languageId: ''
-                }
+                // language: {
+                //     languageId: ''
+                // }
             },
-            languageList: [],
+            // languageList: [],
             currencyList: [],
             message: '',
             lang: localStorage.getItem('lang')
@@ -99,11 +99,12 @@ export default class AddCountryComponent extends Component {
         if (event.target.name === "countryCode") {
             country.countryCode = event.target.value.toUpperCase();
         }
-        if (event.target.name === "currencyId") {
+        else if (event.target.name === "currencyId") {
             country.currency.id = event.target.value
-        } else if (event.target.name === "languageId") {
-            country.language.languageId = event.target.value
         }
+        // else if (event.target.name === "languageId") {
+        //     country.language.languageId = event.target.value
+        // }
 
         this.setState(
             {
@@ -118,7 +119,7 @@ export default class AddCountryComponent extends Component {
         setTouched({
             label: true,
             countryCode: true,
-            languageId: true,
+            // languageId: true,
             currencyId: true
         }
         )
@@ -142,17 +143,17 @@ export default class AddCountryComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        LanguageService.getLanguageListActive().then(response => {
-            if (response.status == 200) {
-                this.setState({
-                    languageList: response.data
-                })
-            } else {
-                this.setState({
-                    message: response.data.messageCode
-                })
-            }
-        })
+        // LanguageService.getLanguageListActive().then(response => {
+        //     if (response.status == 200) {
+        //         this.setState({
+        //             languageList: response.data
+        //         })
+        //     } else {
+        //         this.setState({
+        //             message: response.data.messageCode
+        //         })
+        //     }
+        // })
         // .catch(
         //     error => {
         //         if (error.message === "Network Error") {
@@ -213,13 +214,13 @@ export default class AddCountryComponent extends Component {
     }
 
     render() {
-        const { languageList } = this.state;
-        let languageItems = languageList.length > 0
-            && languageList.map((item, i) => {
-                return (
-                    <option key={i} value={item.languageId}>{item.languageName}</option>
-                )
-            }, this);
+        // const { languageList } = this.state;
+        // let languageItems = languageList.length > 0
+        //     && languageList.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.languageId}>{item.languageName}</option>
+        //         )
+        //     }, this);
 
         const { currencyList } = this.state;
         let currencyItems = currencyList.length > 0
@@ -330,11 +331,11 @@ export default class AddCountryComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.countryCode}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label htmlFor="languageId">{i18n.t('static.country.language')}<span class="red Reqasterisk">*</span></Label>
+                                                    {/* <FormGroup>
+                                                        <Label htmlFor="languageId">{i18n.t('static.country.language')}<span class="red Reqasterisk">*</span></Label> */}
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-language"></i></InputGroupText> */}
-                                                        <Input
+                                                        {/* <Input
                                                             type="select"
                                                             name="languageId"
                                                             id="languageId"
@@ -348,10 +349,10 @@ export default class AddCountryComponent extends Component {
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
-                                                        </Input>
+                                                        </Input> */}
                                                         {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.languageId}</FormFeedback>
-                                                    </FormGroup>
+                                                        {/* <FormFeedback className="red">{errors.languageId}</FormFeedback>
+                                                    </FormGroup> */}
                                                     <FormGroup>
                                                         <Label htmlFor="currencyId">{i18n.t('static.country.currency')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
