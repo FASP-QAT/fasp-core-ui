@@ -5,13 +5,17 @@ import RealmService from '../../api/RealmService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import PlanningUnitService from '../../api/PlanningUnitService';
-import ToolkitProvider, { Search,CSVExport } from 'react-bootstrap-table2-toolkit';
+import ToolkitProvider, { Search, CSVExport } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import { ExcelFile, ExcelSheet } from "react-data-export";
+import Pdf from "react-to-pdf"
+
 
 import ProductService from '../../api/ProductService';
 const { ExportCSVButton } = CSVExport;
+const ref = React.createRef();
 const entityname = i18n.t('static.dashboard.productCatalog');
 export default class StockStatusMatrix extends React.Component {
     constructor(props) {
@@ -21,12 +25,12 @@ export default class StockStatusMatrix extends React.Component {
             productCategories: [],
             planningUnits: [],
             data: [],
-            view:1
+            view: 1
 
         }
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
-        this.getProductCategories=this.getProductCategories.bind(this)
+        this.getProductCategories = this.getProductCategories.bind(this)
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
@@ -34,17 +38,18 @@ export default class StockStatusMatrix extends React.Component {
         let planningUnitId = document.getElementById("planningUnitId").value;
         let view = document.getElementById("view").value;
         AuthenticationService.setupAxiosInterceptors();
-        ProductService.getStockStatusMatrixData(realmId, productCategoryId, planningUnitId,view)
+        ProductService.getStockStatusMatrixData(realmId, productCategoryId, planningUnitId, view)
             .then(response => {
                 console.log(JSON.stringify(response.data))
                 this.setState({
                     data: response.data,
-                    view:view
+                    view: view
                 })
             }).catch(
                 error => {
+                    console.log('in error')
                     this.setState({
-                        consumptions: []
+                        data: []
                     })
 
                     if (error.message === "Network Error") {
@@ -125,7 +130,7 @@ export default class StockStatusMatrix extends React.Component {
                 }
             );
 
-            this.filterData();
+        this.filterData();
 
     }
 
@@ -223,123 +228,123 @@ export default class StockStatusMatrix extends React.Component {
                 align: 'center',
                 headerAlign: 'center'
             },
-                 {
-                    dataField: 'Jan',
-                    text: i18n.t('static.common.jan'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Feb',
-                    text: i18n.t('static.common.feb'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Mar',
-                    text: i18n.t('static.common.mar'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Apr',
-                    text: i18n.t('static.common.apr'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'May',
-                    text: i18n.t('static.common.may'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Jun',
-                    text: i18n.t('static.common.jun'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Jul',
-                    text: i18n.t('static.common.jul'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Aug',
-                    text: i18n.t('static.common.aug'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Sep',
-                    text: i18n.t('static.common.sep'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Oct',
-                    text: i18n.t('static.common.oct'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Nov',
-                    text: i18n.t('static.common.nov'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'Dec',
-                    text: i18n.t('static.common.dec'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }
+            {
+                dataField: 'Jan',
+                text: i18n.t('static.common.jan'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Feb',
+                text: i18n.t('static.common.feb'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Mar',
+                text: i18n.t('static.common.mar'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Apr',
+                text: i18n.t('static.common.apr'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'May',
+                text: i18n.t('static.common.may'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Jun',
+                text: i18n.t('static.common.jun'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Jul',
+                text: i18n.t('static.common.jul'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Aug',
+                text: i18n.t('static.common.aug'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Sep',
+                text: i18n.t('static.common.sep'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Oct',
+                text: i18n.t('static.common.oct'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Nov',
+                text: i18n.t('static.common.nov'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Dec',
+                text: i18n.t('static.common.dec'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }
 
-          
+
         ];
-       
-            let columns1 = [
-                {
-                    dataField: 'PLANNING_UNIT_LABEL_EN',
-                    text: i18n.t('static.procurementUnit.planningUnit'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                }, {
-                    dataField: 'YEAR',
-                    text: i18n.t('static.common.year'),
-                    sort: true,
-                    align: 'center',
-                    headerAlign: 'center'
-                },
-                     {
-                        dataField: 'Q1',
-                        text: i18n.t('static.common.quarter1'),
-                        sort: true,
-                        align: 'center',
-                        headerAlign: 'center'
-                    }, {
-                        dataField: 'Q2',
-                        text: i18n.t('static.common.quarter2'),
-                        sort: true,
-                        align: 'center',
-                        headerAlign: 'center'
-                    }, {
-                        dataField: 'Q3',
-                        text: i18n.t('static.common.quarter3'),
-                        sort: true,
-                        align: 'center',
-                        headerAlign: 'center'
-                    }, {
-                        dataField: 'Q4',
-                        text: i18n.t('static.common.quarter4'),
-                        sort: true,
-                        align: 'center',
-                        headerAlign: 'center'
-                    } ] 
-        
+
+        let columns1 = [
+            {
+                dataField: 'PLANNING_UNIT_LABEL_EN',
+                text: i18n.t('static.procurementUnit.planningUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'YEAR',
+                text: i18n.t('static.common.year'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
+                dataField: 'Q1',
+                text: i18n.t('static.common.quarter1'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Q2',
+                text: i18n.t('static.common.quarter2'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Q3',
+                text: i18n.t('static.common.quarter3'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }, {
+                dataField: 'Q4',
+                text: i18n.t('static.common.quarter4'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            }]
+
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -368,18 +373,15 @@ export default class StockStatusMatrix extends React.Component {
         }
         const MyExportCSV = (props) => {
             const handleClick = () => {
-              props.onExport();
+                props.onExport();
             };
             return (
-              <div>
-            
-  <img style ={{height:'40px',width:'40px'}}src={require('../../assets/img/csv.png')} title="Export CSV" onClick={() => handleClick()} />
-         
-
-              </div>
+                    <img style={{ height: '40px', width: '40px' }} src={require('../../assets/img/csv.png')} title="Export CSV" onClick={() => handleClick()} />
             );
-          };
-          
+        };
+
+
+
         return (
 
             <div className="animated">
@@ -444,7 +446,7 @@ export default class StockStatusMatrix extends React.Component {
                                             >
                                                 <option value="1">{i18n.t('static.common.monthly')}</option>
                                                 <option value="2">{i18n.t('static.common.quarterly')}</option>
-                                               
+
                                             </Input>
 
                                         </InputGroup>
@@ -475,7 +477,7 @@ export default class StockStatusMatrix extends React.Component {
                         <ToolkitProvider
                             keyField="procurementUnitId"
                             data={this.state.data}
-                            columns={this.state.view==1?columns:columns1}
+                            columns={this.state.view == 1 ? columns : columns1}
                             search={{ searchFormatted: true }}
                             hover
                             filter={filterFactory()}
@@ -483,19 +485,26 @@ export default class StockStatusMatrix extends React.Component {
                         >
                             {
                                 props => (
-                                    <div className="TableCust">
-                                           
+                                    <div className="TableCust" >
+
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                      
+
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
-                                            <div className="col-md-6 pr-0 offset-md-6 text-center mob-Left">
-                                            <MyExportCSV { ...props.csvProps } /></div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                            pagination={paginationFactory(options)}
+                                        <div className="col-md-6 pr-0 offset-md-6 text-center mob-Left" >
+                                            <Pdf targetRef={ref} filename="stockStatusMatrix.pdf" >
+                                                {({ toPdf }) =>
+                                                 <img style={{ height: '40px', width: '40px' }} src={require('../../assets/img/pdf.png')} title="Export PDF" onClick={() => toPdf()} />
 
-                                            {...props.baseProps}
-                                        />
+                                               }
+                                            </Pdf>
+                                            <MyExportCSV {...props.csvProps} /></div>
+                                        <div ref={ref}>
+                                            <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                                pagination={paginationFactory(options)}
+
+                                                {...props.baseProps}
+                                            /></div>
                                     </div>
                                 )
                             }

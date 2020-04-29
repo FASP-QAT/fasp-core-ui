@@ -448,7 +448,7 @@ console.log(JSON.stringify(response.data))
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                    &nbsp;
+                                 {/*   &nbsp;
                                     <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                         <div className="controls SelectGo">
@@ -484,7 +484,7 @@ console.log(JSON.stringify(response.data))
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </div>
-                                    </FormGroup>
+                                 </FormGroup>*/}
                                 </div>
                             </Col>
                         </Form>

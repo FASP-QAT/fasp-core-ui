@@ -5,11 +5,16 @@ import RealmService from '../../api/RealmService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProcurementUnitService from "../../api/ProcurementUnitService";
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import ToolkitProvider, { Search,CSVExport } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+import Pdf from "react-to-pdf"
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 const entityname = i18n.t('static.dashboard.productcatalog');
+const { ExportCSVButton } = CSVExport;
+const ref = React.createRef();
 export default class ProductCatalog extends React.Component {
     constructor(props) {
         super(props);
@@ -94,6 +99,33 @@ export default class ProductCatalog extends React.Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
+    exportPDF = () => {
+        const unit = "pt";
+        const size = "A1"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+    
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size);
+    
+        doc.setFontSize(15);
+    
+        const title = "Product Catalog";
+        const headers = [["Forecasting Unit", "Product Category","Tracer Category","Planning unit","Multiplier","Unit","Procurement Unit","Multiplier","Unit","Supplier","Labeling","Status"]];
+    
+        const data = this.state.data.map(elt=> [ elt.planningUnit.forecastingUnit.label.label_en,elt.planningUnit.forecastingUnit.productCategory.label.label_en,elt.planningUnit.forecastingUnit.tracerCategory.label.label_en
+            ,elt.planningUnit.label.label_en,elt.planningUnit.multiplier,elt.planningUnit.unit.label.label_en,elt.label.label_en,elt.multiplier,elt.unit.label.label_en,elt.supplier.label.label_en, elt.labeling, elt.active]);
+    
+        let content = {
+          startY: 50,
+          head: headers,
+          body: data
+        };
+    
+        doc.text(title, marginLeft, 40);
+        doc.autoTable(content);
+        doc.save("report.pdf")
+      }
+   
 
     render() {
         const { realms } = this.state;
@@ -234,7 +266,17 @@ export default class ProductCatalog extends React.Component {
                     text: 'All', value: this.state.data.length
                 }]
             }
-           
+
+            const MyExportCSV = (props) => {
+                const handleClick = () => {
+                    props.onExport();
+                };
+                return (
+                        <img style={{ height: '40px', width: '40px' }} src={require('../../assets/img/csv.png')} title="Export CSV" onClick={() => handleClick()} />
+                );
+            };
+    
+            
         return (
           
              <div className="animated">
@@ -272,20 +314,26 @@ export default class ProductCatalog extends React.Component {
                             keyField="procurementUnitId"
                             data={this.state.data}
                             columns={columns}
+                            exportCSV exportCSV 
                             search={{ searchFormatted: true }}
                             hover
                             filter={filterFactory()}
+                              
                         >
                             {
                                 props => (
                                     <div className="TableCust">
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left"><SearchBar {...props.searchProps} />
-                                            <ClearSearchButton {...props.searchProps} /></div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                                 <img style={{ height: '40px', width: '40px' }} src={require('../../assets/img/pdf.png')} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                                            <MyExportCSV {...props.csvProps} /></div>
+                                       {/*} <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left"><SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} /></div>*/}
+                                           
+                                        <div ref={ref}> <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                            
                                             {...props.baseProps}
-                                        />
+                                        /></div>
                                     </div>
                                 )
                             }

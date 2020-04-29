@@ -347,7 +347,7 @@ export default class PlanningUnitListComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                &nbsp;
+                              {/*  &nbsp;
                             <FormGroup>
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
                                     <div className="controls SelectGo">
@@ -366,7 +366,7 @@ export default class PlanningUnitListComponent extends Component {
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </div>
-                                </FormGroup>
+                              </FormGroup>*/}
                             </div>
                         </Col>
                         <ToolkitProvider

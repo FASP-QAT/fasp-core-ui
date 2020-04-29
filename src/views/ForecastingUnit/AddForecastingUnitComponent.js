@@ -192,7 +192,7 @@ export default class AddForecastingUnitComponent extends Component {
                     }
                 }
             );
-        ProductService.getProductCategoryList()
+        ProductService.getProductCategoryList(1)
             .then(response => {
                 this.setState({
                     productcategories: response.data
@@ -247,8 +247,8 @@ export default class AddForecastingUnitComponent extends Component {
         let productCategoryList = productcategories.length > 0
             && productcategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.productCategoryId}>
-                        {getLabelText(item.label, this.state.lang)}
+                    <option key={i} value={item.payload.productCategoryId}>
+                        {getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
             }, this);

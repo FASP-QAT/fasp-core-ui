@@ -47,7 +47,7 @@ class DefaultHeader extends Component {
             <NavLink to="/dashboard" className="nav-link" >{i18n.t('static.common.dashboard')}</NavLink>
     </NavItem>*/}
           <NavItem className="px-3">
-            <NavLink to="/ProgramTree" className="nav-link" >KENYA-FAMILY PLANNING-MOH</NavLink>
+            <NavLink to="/ProgramTree" className="nav-link" >Program</NavLink>
           </NavItem>
         </Nav>
         <Nav className="ml-auto " navbar>

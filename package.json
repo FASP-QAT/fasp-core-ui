@@ -48,6 +48,7 @@
     "i18next-localstorage-cache": "^1.1.1",
     "i18next-xhr-backend": "^3.2.2",
     "jexcel": "^3.9.1",
+    "jspdf-autotable": "^3.4.4",
     "jsstore": "^3.7.6",
     "jszip": "^3.2.2",
     "jwt-decode": "^2.2.0",
@@ -67,6 +68,7 @@
     "react-confirm-alert": "^2.6.1",
     "react-contexify": "^4.1.1",
     "react-contextmenu": "^2.13.0",
+    "react-data-export": "^0.6.0",
     "react-dates": "^20.2.3",
     "react-detect-offline": "^2.4.0",
     "react-dom": "^16.8.6",
@@ -83,10 +85,12 @@
     "react-sortable-tree": "^2.7.1",
     "react-test-renderer": "^16.8.6",
     "react-text-mask-hoc": "^0.11.0",
+    "react-to-pdf": "0.0.11",
     "react-toastify": "^5.2.1",
     "reactstrap": "^8.0.0",
     "simple-line-icons": "^2.4.1",
     "spinkit": "1.2.5",
+    "xlsx": "^0.15.6",
     "yup": "^0.27.0"
   },
   "devDependencies": {
