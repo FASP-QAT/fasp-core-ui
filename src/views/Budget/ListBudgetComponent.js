@@ -50,6 +50,7 @@ class ListBudgetComponent extends Component {
     this.filterData = this.filterData.bind(this);
     this.formatDate = this.formatDate.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
+    this.addCommas = this.addCommas.bind(this);
   }
 
 
@@ -97,7 +98,7 @@ class ListBudgetComponent extends Component {
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          console.log("budget after status 200---->", response.data);
+          console.log("budget after status 200 new console --- ---->", response.data);
           this.setState({
             budgetList: response.data,
             selBudget: response.data
@@ -180,6 +181,20 @@ class ListBudgetComponent extends Component {
     return getLabelText(cell, this.state.lang);
   }
 
+  addCommas(cell, row) {
+    console.log("---------->m in");
+    cell += '';
+    var x = cell.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
+
+
   render() {
 
     const { SearchBar, ClearSearchButton } = Search;
@@ -230,7 +245,8 @@ class ListBudgetComponent extends Component {
         text: i18n.t('static.budget.budgetamount'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.addCommas
       },
       {
         dataField: 'startDate',

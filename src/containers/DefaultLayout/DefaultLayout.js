@@ -55,7 +55,7 @@ class DefaultLayout extends Component {
             <Suspense>
 
               <Online>
-                <AppSidebarNav  navConfig={{
+                <AppSidebarNav navConfig={{
                   items:
                     [
                       {
@@ -351,6 +351,11 @@ class DefaultLayout extends Component {
                       //       icon: 'fa fa-list-alt'
                       //     }
                       //   ]
+                      // },
+                      // {
+                      //   name: 'Program Onboarding',
+                      //   url: '/program/programOnboarding',
+                      //   icon: 'icon-graph'
                       // },
                     ]
 
