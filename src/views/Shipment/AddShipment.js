@@ -140,8 +140,8 @@ export default class ConsumptionDetails extends React.Component {
 
                         // Get inventory data from program
                         var plannigUnitId = document.getElementById("planningUnitId").value;
-                        var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId);
-
+                        // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId);
+                        var shipmentList = '';
                         this.setState({
                             shipmentList: shipmentList
                         });
@@ -161,11 +161,22 @@ export default class ConsumptionDetails extends React.Component {
                             data[4] = shipmentList[j].startDate;
                             data[5] = shipmentList[j].stopDate;
                             data[6] = shipmentList[j].actualFlag;
-                            data[7] = shipmentList[j].active;
 
 
                             shipmentDataArr[j] = data;
                         }
+
+                        data = [];
+                        data[0] = '102129';
+                        data[1] = '18 Jun 2020'
+                        data[2] = '01-SUGGESTED';
+                        data[3] = 'Ceftriaxone 250 mg Powder Vial - 10 Vials';
+                        data[4] = '44,773';
+                        data[5] = '44,773 ';
+                        data[6] = '';
+
+
+                        shipmentDataArr[j] = data;
 
 
 
@@ -183,43 +194,36 @@ export default class ConsumptionDetails extends React.Component {
                         var options = {
                             data: data,
                             columnDrag: true,
-                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100],
+                            colWidths: [100, 100, 100, 100, 100, 100, 100],
                             columns: [
                                 // { title: 'Month', type: 'text', readOnly: true },
                                 {
-                                    title: 'Qat ',
-                                    type: 'text',
-                                    source: dataSourceList
-                                },
-                                {
-                                    title: 'Region',
-                                    type: 'text',
-                                    source: regionList
-                                },
-                                {
-                                    title: 'Consumption Quantity',
+                                    title: 'Qat Order No',
                                     type: 'text'
                                 },
                                 {
-                                    title: 'Days of Stock out',
+                                    title: 'Expected Delivery date',
+                                    type: 'calendar'
+                                },
+                                {
+                                    title: 'Shipment Status',
                                     type: 'text'
                                 },
                                 {
-                                    title: 'StartDate',
-                                    type: 'calendar'
+                                    title: 'Planning Unit',
+                                    type: 'text'
                                 },
                                 {
-                                    title: 'StopDate',
-                                    type: 'calendar'
+                                    title: 'Suggested Order Qty',
+                                    type: 'text'
                                 },
                                 {
-                                    title: 'Actual Flag',
-                                    type: 'dropdown',
-                                    source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                                    title: 'Adjusted Order Qty',
+                                    type: 'text'
                                 },
                                 {
-                                    title: 'Active',
-                                    type: 'checkbox'
+                                    title: 'Notes',
+                                    type: 'text'
                                 }
 
                             ],
@@ -253,108 +257,108 @@ export default class ConsumptionDetails extends React.Component {
 
     saveData = function () {
 
-        var validation = this.checkValidation();
-        if (validation == true) {
-            this.setState(
-                {
-                    changedFlag: 0
-                }
-            );
-            console.log("all good...", this.el.getJson());
-            var tableJson = this.el.getJson();
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
+        // var validation = this.checkValidation();
+        // if (validation == true) {
+        //     this.setState(
+        //         {
+        //             changedFlag: 0
+        //         }
+        //     );
+        //     console.log("all good...", this.el.getJson());
+        //     var tableJson = this.el.getJson();
+        //     var db1;
+        //     var storeOS;
+        //     getDatabase();
+        //     var openRequest = indexedDB.open('fasp', 1);
+        //     openRequest.onsuccess = function (e) {
+        //         db1 = e.target.result;
+        //         var transaction = db1.transaction(['programData'], 'readwrite');
+        //         var programTransaction = transaction.objectStore('programData');
 
-                var programId = (document.getElementById("programId").value);
+        //         var programId = (document.getElementById("programId").value);
 
-                var programRequest = programTransaction.get(programId);
-                programRequest.onsuccess = function (event) {
-                    // console.log("(programRequest.result)----", (programRequest.result))
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var plannigUnitId = document.getElementById("planningUnitId").value;
+        //         var programRequest = programTransaction.get(programId);
+        //         programRequest.onsuccess = function (event) {
+        //             // console.log("(programRequest.result)----", (programRequest.result))
+        //             var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+        //             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+        //             var programJson = JSON.parse(programData);
+        //             var plannigUnitId = document.getElementById("planningUnitId").value;
 
-                    var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
-                    var consumptionDataListNotFiltered = programJson.consumptionList;
+        //             var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+        //             var consumptionDataListNotFiltered = programJson.consumptionList;
 
-                    // console.log("000000000000000   ", consumptionDataList)
-                    var count = 0;
-                    for (var i = 0; i < consumptionDataListNotFiltered.length; i++) {
-                        if (consumptionDataList[count] != undefined) {
-                            if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
+        //             // console.log("000000000000000   ", consumptionDataList)
+        //             var count = 0;
+        //             for (var i = 0; i < consumptionDataListNotFiltered.length; i++) {
+        //                 if (consumptionDataList[count] != undefined) {
+        //                     if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
 
-                                var map = new Map(Object.entries(tableJson[count]))
-                                consumptionDataListNotFiltered[i].dataSource.id = map.get("0");
-                                consumptionDataListNotFiltered[i].region.id = map.get("1");
-                                consumptionDataListNotFiltered[i].consumptionQty = map.get("2");
-                                consumptionDataListNotFiltered[i].dayOfStockOut = parseInt(map.get("3"));
-                                consumptionDataListNotFiltered[i].startDate = map.get("4");
-                                consumptionDataListNotFiltered[i].stopDate = map.get("5");
-                                consumptionDataListNotFiltered[i].actualFlag = map.get("6");
-                                consumptionDataListNotFiltered[i].active = map.get("7");
+        //                         var map = new Map(Object.entries(tableJson[count]))
+        //                         consumptionDataListNotFiltered[i].dataSource.id = map.get("0");
+        //                         consumptionDataListNotFiltered[i].region.id = map.get("1");
+        //                         consumptionDataListNotFiltered[i].consumptionQty = map.get("2");
+        //                         consumptionDataListNotFiltered[i].dayOfStockOut = parseInt(map.get("3"));
+        //                         consumptionDataListNotFiltered[i].startDate = map.get("4");
+        //                         consumptionDataListNotFiltered[i].stopDate = map.get("5");
+        //                         consumptionDataListNotFiltered[i].actualFlag = map.get("6");
+        //                         consumptionDataListNotFiltered[i].active = map.get("7");
 
-                                if (consumptionDataList.length >= count) {
-                                    count++;
-                                }
-                            }
+        //                         if (consumptionDataList.length >= count) {
+        //                             count++;
+        //                         }
+        //                     }
 
-                        }
+        //                 }
 
-                    }
-                    for (var i = consumptionDataList.length; i < tableJson.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
-                        var json = {
-                            consumptionId: 0,
-                            dataSource: {
-                                id: map.get("0")
-                            },
-                            region: {
-                                id: map.get("1")
-                            },
-                            consumptionQty: parseInt(map.get("2")),
-                            dayOfStockOut: parseInt(map.get("3")),
-                            startDate: map.get("4"),
-                            stopDate: map.get("5"),
-                            actualFlag: map.get("6"),
-                            active: map.get("7"),
+        //             }
+        //             for (var i = consumptionDataList.length; i < tableJson.length; i++) {
+        //                 var map = new Map(Object.entries(tableJson[i]))
+        //                 var json = {
+        //                     consumptionId: 0,
+        //                     dataSource: {
+        //                         id: map.get("0")
+        //                     },
+        //                     region: {
+        //                         id: map.get("1")
+        //                     },
+        //                     consumptionQty: parseInt(map.get("2")),
+        //                     dayOfStockOut: parseInt(map.get("3")),
+        //                     startDate: map.get("4"),
+        //                     stopDate: map.get("5"),
+        //                     actualFlag: map.get("6"),
+        //                     active: map.get("7"),
 
-                            planningUnit: {
-                                id: plannigUnitId
-                            }
-                        }
-                        // consumptionDataList[i] = json;
-                        consumptionDataListNotFiltered.push(json);
-                    }
-                    console.log("1111111111111111111   ", consumptionDataList)
-                    programJson.consumptionList = consumptionDataListNotFiltered;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
+        //                     planningUnit: {
+        //                         id: plannigUnitId
+        //                     }
+        //                 }
+        //                 // consumptionDataList[i] = json;
+        //                 consumptionDataListNotFiltered.push(json);
+        //             }
+        //             console.log("1111111111111111111   ", consumptionDataList)
+        //             programJson.consumptionList = consumptionDataListNotFiltered;
+        //             programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+        //             var putRequest = programTransaction.put(programRequest.result);
 
-                    putRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    putRequest.onsuccess = function (event) {
-                        // $("#saveButtonDiv").hide();
-                        this.setState({
-                            message: `Consumption Data Saved`,
-                            changedFlag: 0
-                        })
-                        this.props.history.push(`/dashboard/` + "Consumption Data Added Successfully")
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
+        //             putRequest.onerror = function (event) {
+        //                 // Handle errors!
+        //             };
+        //             putRequest.onsuccess = function (event) {
+        //                 // $("#saveButtonDiv").hide();
+        //                 this.setState({
+        //                     message: `Consumption Data Saved`,
+        //                     changedFlag: 0
+        //                 })
+        //                 this.props.history.push(`/dashboard/` + "Consumption Data Added Successfully")
+        //             }.bind(this)
+        //         }.bind(this)
+        //     }.bind(this)
 
 
-        } else {
-            console.log("some thing get wrong...");
-        }
+        // } else {
+        //     console.log("some thing get wrong...");
+        // }
 
     }.bind(this);
 
@@ -383,7 +387,7 @@ export default class ConsumptionDetails extends React.Component {
                     <Card>
 
                         <CardHeader>
-                            <strong>Consumption details</strong>
+                            <strong>Shipment details</strong>
                         </CardHeader>
                         <CardBody>
                             <Formik
