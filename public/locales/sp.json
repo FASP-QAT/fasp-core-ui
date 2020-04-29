@@ -125,5 +125,8 @@
     "static.common.startdate": "Fecha de inicio",
     "static.common.stopdate": "Fecha final",
     "static.common.active": "Activo",
-    "static.label.fieldRequired": "este campo es requerido"
+    "static.label.fieldRequired": "este campo es requerido",
+    "static.message.inventorysuccess": "Datos de inventario guardados",
+    "static.dashboard.changepassword": "Cambia la contraseña",
+    "static.common.logout": "Cerrar sesión"
 }
