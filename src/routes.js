@@ -185,11 +185,14 @@ const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'))
 const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'));
 const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
 
+const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
-  { path: '/inventory/addInventory', name: 'Inventory / Add Inventory', component: AddInventory },
-  { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
+
+  { path: '/inventory/addInventory', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.inventory.inventory') }), component: AddInventory },
+  { path: '/productCategory/productCategoryTree', name: 'Product Category Tree', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
   { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.dimension') }), component: AddDimension },
@@ -432,6 +435,7 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
 
 
 ];

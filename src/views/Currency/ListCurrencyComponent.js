@@ -130,13 +130,13 @@ export default class CurrencyListComponent extends Component {
                 align: 'center',
                 headerAlign: 'center'
             },
-            {
-                dataField: 'currencySymbol',
-                text: i18n.t('static.currency.currencysymbol'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
+            // {
+            //     dataField: 'currencySymbol',
+            //     text: i18n.t('static.currency.currencysymbol'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center'
+            // },
             {
                 dataField: 'conversionRateToUsd',
                 text: i18n.t('static.currency.conversionrateusd'),
