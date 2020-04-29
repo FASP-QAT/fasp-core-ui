@@ -177,7 +177,10 @@ class ListBudgetComponent extends Component {
   // }
 
   formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
+    console.log("celll----", cell);
+    if (cell != null && cell != "") {
+      return getLabelText(cell, this.state.lang);
+    }
   }
 
   render() {
@@ -200,15 +203,7 @@ class ListBudgetComponent extends Component {
     }, this);
 
     const columns = [
-      {
-        dataField: 'label',
-        text: i18n.t('static.budget.budget'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
 
-      },
       {
         dataField: 'program.label',
         text: i18n.t('static.budget.program'),
@@ -224,6 +219,7 @@ class ListBudgetComponent extends Component {
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
+
       },
       {
         dataField: 'budgetAmt',

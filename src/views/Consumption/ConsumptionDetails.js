@@ -24,6 +24,7 @@ export default class ConsumptionDetails extends React.Component {
         super(props);
         this.options = props.options;
         this.state = {
+            lang:localStorage.getItem("lang"),
             programList: [],
             categoryList: [],
             productList: [],
@@ -351,38 +352,38 @@ export default class ConsumptionDetails extends React.Component {
                             columns: [
                                 // { title: 'Month', type: 'text', readOnly: true },
                                 {
-                                    title: 'Data source',
+                                    title: i18n.t('static.inventory.dataSource'),
                                     type: 'dropdown',
                                     source: dataSourceList
                                 },
                                 {
-                                    title: 'Region',
+                                    title: i18n.t('static.inventory.region'),
                                     type: 'dropdown',
                                     source: regionList
                                 },
                                 {
-                                    title: 'Consumption Quantity',
+                                    title: i18n.t('static.consumption.consumptionqty'),
                                     type: 'text'
                                 },
                                 {
-                                    title: 'Days of Stock out',
+                                    title: i18n.t('static.consumption.daysofstockout'),
                                     type: 'text'
                                 },
                                 {
-                                    title: 'StartDate',
+                                    title: i18n.t('static.common.startdate'),
                                     type: 'calendar'
                                 },
                                 {
-                                    title: 'StopDate',
+                                    title: i18n.t('static.common.stopdate'),
                                     type: 'calendar'
                                 },
                                 {
-                                    title: 'Actual Flag',
+                                    title: i18n.t('static.consumption.actualflag'),
                                     type: 'dropdown',
-                                    source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                                    source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                 },
                                 {
-                                    title: 'Active',
+                                    title: i18n.t('static.common.active'),
                                     type: 'checkbox'
                                 },
                                 {
@@ -1082,8 +1083,8 @@ export default class ConsumptionDetails extends React.Component {
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>Add Row</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addRow')}</Button>
 
                                 &nbsp;
 </FormGroup>
@@ -1809,7 +1810,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -1820,7 +1821,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -1831,12 +1832,12 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (isNaN(Number.parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -1849,12 +1850,12 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (isNaN(Number.parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -1869,12 +1870,12 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (isNaN(Date.parse(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -1886,12 +1887,12 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 if (isNaN(Date.parse(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -1904,7 +1905,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
@@ -1960,7 +1961,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1972,7 +1973,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -1986,9 +1987,9 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 valid = false;
                 if (isNaN(Number.parseInt(value))) {
-                    this.el.setComments(col, "in valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
-                    this.el.setComments(col, "This field is required.");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
             } else {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -2001,9 +2002,9 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 if (isNaN(Number.parseInt(value))) {
-                    this.el.setComments(col, "in valid number.");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
-                    this.el.setComments(col, "This field is required.");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 }
                 valid = false;
             } else {
@@ -2016,7 +2017,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 // if (isNaN(Date.parse(value))) {
@@ -2035,7 +2036,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 // if (isNaN(Date.parse(value))) {
@@ -2054,7 +2055,7 @@ export default class ConsumptionDetails extends React.Component {
             if (value == "Invalid date" || value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 this.el.setStyle(col, "background-color", "transparent");

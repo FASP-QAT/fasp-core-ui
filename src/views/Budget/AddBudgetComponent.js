@@ -276,24 +276,7 @@ class AddBudgetComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="budget"
-                                                            id="budget"
-                                                            bsSize="sm"
-                                                            valid={!errors.budget}
-                                                            invalid={touched.budget && !!errors.budget}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
+                                                <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa-object-group"></i></InputGroupText> */}
@@ -315,6 +298,8 @@ class AddBudgetComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
+              
+                                    
                                                     <FormGroup>
                                                         <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
@@ -336,6 +321,23 @@ class AddBudgetComponent extends Component {
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            name="budget"
+                                                            id="budget"
+                                                            bsSize="sm"
+                                                            valid={!errors.budget}
+                                                            invalid={touched.budget && !!errors.budget}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.budget.label.label_en}
+                                                            required />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span className="red Reqasterisk">*</span></Label>

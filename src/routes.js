@@ -185,6 +185,8 @@ const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'))
 const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'));
 const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
 
+const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
@@ -432,6 +434,7 @@ const routes = [
   { path: '/apps/invoicing/invoice', name: 'Invoice', component: Invoice },
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
 
 
 ];

@@ -165,7 +165,7 @@ class ListTracerCategoryComponent extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.tracercategorylist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -173,9 +173,9 @@ class ListTracerCategoryComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -210,7 +210,7 @@ class ListTracerCategoryComponent extends Component {
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable  hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {

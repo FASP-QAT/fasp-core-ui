@@ -5,7 +5,11 @@ body {
 }
 
 ::placeholder {
-  color:#212721!important;
+  color:#7a7e7a!important;
+}
+
+.Select--single>.Select-control .Select-value, .Select-placeholder {
+  color: #7a7e7a!important;
 }
 /* ————————————————————–
   Tree core styles
@@ -311,7 +315,7 @@ label.arrow_label:after {
 }
 
 .Gobtn {
-  margin-left: 20px;
+  margin-left: 5px;
   border-radius: 0.2rem !important;
   
 }
@@ -407,12 +411,30 @@ label.arrow_label:after {
   color:#212721!important;
 }
 .red {
-  color: #f86c6b !important;
+  //  color: #f86c6b !important;
+  font-size: 12px;
+  color: red!important;
+}
+ 
+.invalid-feedback {
+  display: none;
+  /* width: 100%; */
+  margin-top: 0.25rem;
+  // font-size: 80%;
+  font-size: 12px!important;
+  color: red!important;
+  // color: #f86c6b;
 }
 
-
 // table multiselect color
-.Select--multi .Select-value {color: #5c6873 !important;}
+.Select--multi .Select-value {
+  color: #212721 !important;
+  font-size: 12px!important;
+}
+
+.Select--multi .Select-value-icon:focus, .Select--multi .Select-value-icon:hover {
+  color: #212721!important;
+}
 .form-check-inline .form-check-input {margin-left: 2rem;}
 // table radio button
 .P-absltRadio{position: absolute;}
@@ -428,6 +450,12 @@ label.arrow_label:after {
 }// table dropdown footer
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a{padding: 8px 30px 8px 30px;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item{padding: 2px;}
+
+
+.table thead tr th {position: sticky;
+  top: 0px;
+  background: #fff;position: -webkit-sticky;}
+
 
 // table height scroll
 .react-bootstrap-table {
@@ -447,8 +475,8 @@ label.arrow_label:after {
 }
 
 .jexcel_selectall{background: #fff !important;}
-.jexcel > thead > tr > td {background: #fff !important;}
-
+.jexcel > thead > tr > td {background: #fff !important;   color: #212721 !important;
+  font-weight: bold;}
 .jexcel > tbody > tr > td:first-child {background-color: #fff !important;}
 .jexcel > tbody > tr > td{    padding: 6px !important }
 .jexcel > thead > tr > td {padding: 6px!important}
@@ -544,6 +572,9 @@ label.arrow_label:after {
       right: 0; 
       margin: auto; 
   }
+  .RemoveStriped .jexcel_content .jexcel .draggable{tr:nth-of-type(odd) {
+    background-color: #fff !important;
+}}
 
 
   // .forInlinebtnMapping{ display: flex;}
@@ -639,7 +670,7 @@ label.arrow_label:after {
 }
 .upper-logo {
   max-width: 325px;
-  margin-top: 2% !important;
+  margin-top: 1% !important;
   margin-left: 0%;
 }
 
@@ -1044,9 +1075,7 @@ h5,
 
 }
 
-.Select--single>.Select-control .Select-value, .Select-placeholder {
-  color: #212721!important;
-}
+
 
 .sidebar .nav-dropdown-toggle::before {
    transform: scaleX(-1);
@@ -1176,6 +1205,12 @@ h5,
 .legend .greenlegend { background-color:rgb(152, 251, 152);border-color:1px solid rgb(152, 251, 152); }
 .legend .redlegend { background-color: #FF8686; border-color:1px solid #FF8686; }
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
+
+// .card {
+//   margin-top: -2%;
+// }
+
+///avtar icon
 .avatar .avatar-status {
   position: absolute;
   right: -2px;
@@ -1185,4 +1220,31 @@ h5,
   height: 14px;
   border: 1px solid #fff;
   border-radius: 50em;
-  }
+}
+
+.form-control:focus {
+  color: #212721;
+  background-color: #fff;
+  border-color: #8ad4ee;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.25);
+}
+
+select > option[value=""]{
+  color: #7a7e7a!important;
+}
+select > option:first-child {
+  color: #7a7e7a!important;
+}
+select > option[value="0"]{
+  color: #7a7e7a!important;
+}
+
+input[value=''] {
+  color: #7a7e7a!important;
+}
+
+.nonclickablebox{
+  pointer-events: none!important;
+}
+

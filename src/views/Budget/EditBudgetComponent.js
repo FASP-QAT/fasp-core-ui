@@ -224,24 +224,7 @@ class EditBudgetComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            type="text"
-                                                            name="budgetName"
-                                                            id="budget"
-                                                            bsSize="sm"
-                                                            valid={!errors.budgetName}
-                                                            invalid={touched.budgetName && !!errors.budgetName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
-
-                                                        />
-
-                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
-                                                    </FormGroup>
+               
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
 
@@ -280,6 +263,24 @@ class EditBudgetComponent extends Component {
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            type="text"
+                                                            name="budgetName"
+                                                            id="budget"
+                                                            bsSize="sm"
+                                                            valid={!errors.budgetName}
+                                                            invalid={touched.budgetName && !!errors.budgetName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.budget.label.label_en}
+
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
