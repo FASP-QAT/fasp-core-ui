@@ -1201,9 +1201,9 @@ h5,
 .legend li { float: left; margin-right: 10px;margin: 10px; }
 .legend span {  float: left; width: 55px; height: 25px; margin: -4px 11px 0px 0px;border-radius: 3px; }
 /* your colors */
-.legend .lightpinklegend { background-color: rgb(255, 204, 203); border-color:1px solid rgb(255, 204, 203);}
-.legend .greenlegend { background-color:rgb(152, 251, 152);border-color:1px solid rgb(152, 251, 152); }
-.legend .redlegend { background-color: #FF8686; border-color:1px solid #FF8686; }
+.legend .lightpinklegend { background-color: yellow; border-color:1px solid yellow;}
+.legend .greenlegend { background-color:green;border-color:1px solid green; }
+.legend .redlegend { background-color:red; border-color:1px solid red; }
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
 
 // .card {
@@ -1230,20 +1230,69 @@ h5,
   box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.25);
 }
 
-select > option[value=""]{
-  color: #7a7e7a!important;
+// select > option[value=""]{
+//   color: #7a7e7a!important;
+// }
+// select > option:first-child {
+//   color: #7a7e7a!important;
+// }
+// select > option[value="0"]{
+//   color: #7a7e7a!important;
+// }
+/* with the :focus here, we would show grey when not using the element */
+select {
+  color: #7a7e7a;
 }
-select > option:first-child {
-  color: #7a7e7a!important;
+/* with the :focus here, we show grey when using the element */
+select:focus {
+  color: #7a7e7a;
 }
-select > option[value="0"]{
-  color: #7a7e7a!important;
+option {
+  color: #212721;
+}
+option:first-of-type {
+  color: #7a7e7a;
+}
+select > option:focus,
+select > option:active,
+select > option:checked{
+  color: #7a7e7a;
 }
 
+select:required:invalid {
+  color: #7a7e7a;
+}
+select:required {
+  color: #7a7e7a;
+}
+
+select:required.form-control:focus {
+  color: #212721;
+}
+
+select > option[value="0"]:is-valid {
+  color: #7a7e7a;
+}
+
+// select:required:form-control {
+//   color: #7a7e7a;
+// }
+// select:form-control:focus{
+//   color: #212721;
+// }
 input[value=''] {
   color: #7a7e7a!important;
 }
-
+input[value='0'] {
+  color: #7a7e7a!important;
+}
+input::placeholder {
+  color: #7a7e7a!important;
+}
+select:required:invalid,
+select option[value="0"] {
+color: #7a7e7a;
+}
 .nonclickablebox{
   pointer-events: none!important;
 }
@@ -1261,6 +1310,10 @@ input[value=''] {
 }
 
 .ps__rail-y {
-  width: 5px!important;
+  width: 13px!important;
   right: 0;
+}
+
+.dropdown-item i:active {
+  color: #fff;
 }
