@@ -113,7 +113,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebPackPlugin({
-            template: path.resolve(__dirname, 'public/index.html'),
+            template: path.resolve(__dirname, 'src/assets/img/index.html'),
             filename: 'index.html'
         }),
         new WorkboxPlugin.GenerateSW({
