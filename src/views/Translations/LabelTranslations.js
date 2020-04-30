@@ -1,6 +1,6 @@
 import React from "react";
-// import jexcel from 'jexcel';
-import jexcel from '../jexcel/dist/jexcel';
+import jexcel from 'jexcel';
+
 
 
 import "../ProductCategory/style.css"
