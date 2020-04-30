@@ -6,6 +6,7 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import DimensionService from '../../api/DimensionService.js';
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 let initialValues = {
     label: ""
@@ -50,13 +51,21 @@ export default class UpdateDimensionComponent extends Component {
                 dimensionId: '',
                 label: {
                     labelId: '',
-                    label_en: ''
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
                 }
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     dataChange(event) {
@@ -95,9 +104,11 @@ export default class UpdateDimensionComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        this.setState({
-            dimension: this.props.location.state.dimension
-        });
+        DimensionService.getDiamensionById(this.props.match.params.dimensionId).then(response => {
+            this.setState({
+                dimension: response.data
+            });
+        })
 
     }
 
@@ -110,6 +121,8 @@ export default class UpdateDimensionComponent extends Component {
     } render() {
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -118,7 +131,7 @@ export default class UpdateDimensionComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ language: this.state.language }}
+                                initialValues={{ label: this.state.dimension.label.label_en }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     DimensionService.updateDimension(this.state.dimension).then(response => {
@@ -132,22 +145,6 @@ export default class UpdateDimensionComponent extends Component {
 
                                     }
                                     )
-                                        .catch(
-                                            error => {
-                                                switch (error.message) {
-                                                    case "Network Error":
-                                                        this.setState({
-                                                            message: error.response.data
-                                                        })
-                                                        break
-                                                    default:
-                                                        this.setState({
-                                                            message: error.response.data.message
-                                                        })
-                                                        break
-                                                }
-                                            }
-                                        )
 
                                 }}
                                 render={
@@ -165,7 +162,7 @@ export default class UpdateDimensionComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='diamensionForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
+                                                        <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -176,16 +173,17 @@ export default class UpdateDimensionComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.dimension.label.label_en}
                                                             required />
-                                                            <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
-                                            <CardFooter>
-                                                <FormGroup>
-                                                    <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                                                    <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
+                                                <CardFooter>
+                                                    <FormGroup>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
-                                            </CardFooter>
+                                                </CardFooter>
                                             </Form>
 
                                         )} />
@@ -199,6 +197,15 @@ export default class UpdateDimensionComponent extends Component {
                 </div>
             </div>
         );
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        DimensionService.getDiamensionById(this.props.match.params.dimensionId).then(response => {
+            this.setState({
+                dimension: response.data
+            });
+        })
     }
 
 }

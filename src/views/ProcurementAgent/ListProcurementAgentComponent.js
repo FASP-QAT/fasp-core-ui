@@ -12,6 +12,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.procurementagent.procurementagent')
 class ListProcurementAgentComponent extends Component {
@@ -28,15 +29,111 @@ class ListProcurementAgentComponent extends Component {
         this.filterData = this.filterData.bind(this);
         this.addNewProcurementAgent = this.addNewProcurementAgent.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.buttonFormatter = this.buttonFormatter.bind(this);
+        this.buttonFormatterForProcurementUnit = this.buttonFormatterForProcurementUnit.bind(this);
+        this.addPlanningUnitMapping = this.addPlanningUnitMapping.bind(this);
+        this.addProcurementUnitMapping = this.addProcurementUnitMapping.bind(this);
 
     }
+
+    addPlanningUnitMapping(event, cell) {
+        event.stopPropagation();
+        this.props.history.push({
+            pathname: `/procurementAgent/addProcurementAgentPlanningUnit/${cell}`,
+        });
+        // AuthenticationService.setupAxiosInterceptors();
+        // ProcurementAgentService.getProcurementAgentPlaningUnitList(cell)
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             let myReasponse = response.data;
+        //             this.props.history.push({
+        //                 pathname: "/procurementAgent/addProcurementAgentPlanningUnit",
+        //                 state: {
+        //                     procurementAgentPlanningUnit: myReasponse,
+        //                     procurementAgentId:cell
+        //                 }
+
+        //             })
+        //         } else {
+        //             this.setState({
+        //                 message: response.data.messageCode
+        //             })
+        //         }
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({ message: error.message });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
+        //                     case 500:
+        //                     case 401:
+        //                     case 404:
+        //                     case 406:
+        //                     case 412:
+        //                         this.setState({ message: error.response.data.messageCode });
+        //                         break;
+        //                     default:
+        //                         this.setState({ message: 'static.unkownError' });
+        //                         console.log("Error code unkown");
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
+    }
+
+    addProcurementUnitMapping(event, cell) {
+        event.stopPropagation();
+        this.props.history.push({
+            pathname: `/procurementAgent/addProcurementAgentProcurementUnit/${cell}`,
+        });
+        // AuthenticationService.setupAxiosInterceptors();
+        // ProcurementAgentService.getProcurementAgentProcurementUnitList(cell)
+        //     .then(response => {
+        //         if (response.status == 200) {
+        //             let myResponse = response.data;
+        //             this.props.history.push({
+        //                 pathname: "/procurementAgent/addProcurementAgentProcurementUnit",
+        //                 state: {
+        //                     procurementAgentProcurementUnit: myResponse,
+        //                     procurementAgentId:cell
+        //                 }
+        //             })
+        //         } else {
+        //             this.setState({
+        //                 message: response.data.messageCode
+        //             })
+        //         }
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({ message: error.message });
+        //             } else {
+        //                 switch (error.response ? error.response.status : "") {
+        //                     case 500:
+        //                     case 401:
+        //                     case 404:
+        //                     case 406:
+        //                     case 412:
+        //                         this.setState({ message: error.response.data.messageCode });
+        //                         break;
+        //                     default:
+        //                         this.setState({ message: 'static.unkownError' });
+        //                         console.log("Error code unkown");
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
+    }
+
     addNewProcurementAgent() {
         this.props.history.push("/procurementAgent/addProcurementAgent");
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selProcurementAgent = this.state.procurementAgentList.filter(c => c.realm.realmId == realmId)
+            const selProcurementAgent = this.state.procurementAgentList.filter(c => c.realm.id == realmId)
             this.setState({
                 selProcurementAgent
             });
@@ -48,11 +145,18 @@ class ListProcurementAgentComponent extends Component {
     }
     editProcurementAgent(procurementAgent) {
         this.props.history.push({
-            pathname: "/procurementAgent/editProcurementAgent",
-            state: { procurementAgent }
+            pathname: `/procurementAgent/editProcurementAgent/${procurementAgent.procurementAgentId}`,
+            // state: { procurementAgent }
         });
     }
+    buttonFormatter(cell, row) {
+        console.log("button formater cell-----------", cell);
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addPlanningUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
+    }
 
+    buttonFormatterForProcurementUnit(cell, row) {
+        return <Button type="button" size="sm" color="success" onClick={(event) => this.addProcurementUnitMapping(event, cell)} ><i className="fa fa-check"></i> {i18n.t('static.common.add')}</Button>;
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
@@ -64,26 +168,27 @@ class ListProcurementAgentComponent extends Component {
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
         ProcurementAgentService.getProcurementAgentListAll()
             .then(response => {
@@ -91,26 +196,27 @@ class ListProcurementAgentComponent extends Component {
                     procurementAgentList: response.data,
                     selProcurementAgent: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
     }
 
     formatLabel(cell, row) {
@@ -178,7 +284,24 @@ class ListProcurementAgentComponent extends Component {
                         (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
                     );
                 }
-            }];
+            },
+            {
+                dataField: 'procurementAgentId',
+                text: i18n.t('static.program.mapPlanningUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.buttonFormatter
+            },
+            {
+                dataField: 'procurementAgentId',
+                text: i18n.t('static.procurementAgentProcurementUnit.mapProcurementUnit'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: this.buttonFormatterForProcurementUnit
+            }
+        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -207,8 +330,11 @@ class ListProcurementAgentComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message)}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}

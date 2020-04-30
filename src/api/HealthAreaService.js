@@ -26,5 +26,10 @@ class HealthAreaService {
         return axios.get(`${API_URL}/api/healthArea/${json}`, {}
         );
     }
+
+    getHealthAreaListForProgram(json){
+        return axios.get(`${API_URL}/api/healthArea/program/realmId/${json}`, {
+        });
+    }
 }
 export default new HealthAreaService()

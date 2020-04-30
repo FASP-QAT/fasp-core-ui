@@ -11,11 +11,15 @@ class RealmService {
     getRealmListAll() {
         return axios.get(`${API_URL}/api/realm/`, {
         });
-    } 
+    }
 
     updateRealm(json) {
         return axios.put(`${API_URL}/api/realm/`, json, {
         });
+    }
+    getRealmById(json) {
+        return axios.get(`${API_URL}/api/realm/${json}`, {}
+        );
     }
 
 

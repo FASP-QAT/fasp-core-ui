@@ -11,6 +11,7 @@ import HealthAreaService from "../../api/HealthAreaService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.healtharea.healtharea');
 
@@ -82,6 +83,7 @@ export default class AddHealthAreaComponent extends Component {
     this.dataChange = this.dataChange.bind(this);
     this.updateFieldData = this.updateFieldData.bind(this);
     this.getRealmCountryList = this.getRealmCountryList.bind(this);
+    this.resetClicked = this.resetClicked.bind(this);
   }
 
   dataChange(event) {
@@ -91,7 +93,7 @@ export default class AddHealthAreaComponent extends Component {
     if (event.target.name === "healthAreaName") {
       healthArea.label.label_en = event.target.value
     } else if (event.target.name === "realmId") {
-      healthArea.realm.realmId = event.target.value
+      healthArea.realm.id = event.target.value
     }
     this.setState({
       healthArea
@@ -138,44 +140,16 @@ export default class AddHealthAreaComponent extends Component {
         this.setState({
           countries: response.data
         })
-      }).catch(
-        error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
-          }
-        }
-      );
+      })
+
     UserService.getRealmList()
       .then(response => {
         console.log("realm list---", response.data);
         this.setState({
           realms: response.data
         })
-      }).catch(
-        error => {
-          switch (error.message) {
-            case "Network Error":
-              this.setState({
-                message: error.message
-              })
-              break
-            default:
-              this.setState({
-                message: error.response.data.message
-              })
-              break
-          }
-        }
-      );
+      })
+
   }
   updateFieldData(value) {
     let { healthArea } = this.state;
@@ -209,28 +183,7 @@ export default class AddHealthAreaComponent extends Component {
             message: response.data.messageCode
           })
         }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response.status) {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                console.log("Error code unkown");
-                break;
-            }
-          }
-        }
-      );
-
+      })
   }
 
   Capitalize(str) {
@@ -259,6 +212,9 @@ export default class AddHealthAreaComponent extends Component {
 
     return (
       <div className="animated fadeIn">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
@@ -281,27 +237,6 @@ export default class AddHealthAreaComponent extends Component {
                         })
                       }
                     })
-                    .catch(
-                      error => {
-                        if (error.message === "Network Error") {
-                          this.setState({ message: error.message });
-                        } else {
-                          switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                              this.setState({ message: error.response.data.messageCode });
-                              break;
-                            default:
-                              this.setState({ message: 'static.unkownError' });
-                              console.log("Error code unkown");
-                              break;
-                          }
-                        }
-                      }
-                    );
 
                 }}
 
@@ -322,22 +257,23 @@ export default class AddHealthAreaComponent extends Component {
                         <CardBody>
 
                           <FormGroup>
-                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')} </Label>
+                            <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                             <Input
-                            bsSize="sm"
+                              bsSize="sm"
                               type="text" name="healthAreaName" valid={!errors.healthAreaName}
                               invalid={touched.healthAreaName && !!errors.healthAreaName}
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                               onBlur={handleBlur}
+                              value={this.state.healthArea.label.label_en}
                               id="healthAreaName" />
                             <FormFeedback className="red">{errors.healthAreaName}</FormFeedback>
                           </FormGroup>
 
                           <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.healtharea.realm')}</Label>
+                            <Label htmlFor="select">{i18n.t('static.healtharea.realm')}<span class="red Reqasterisk">*</span></Label>
                             <Input
-                            bsSize="sm"
-                              value={this.state.healthArea.realm.realmId}
+                              bsSize="sm"
+                              value={this.state.healthArea.realm.id}
                               valid={!errors.realmId}
                               invalid={touched.realmId && !!errors.realmId}
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
@@ -350,9 +286,9 @@ export default class AddHealthAreaComponent extends Component {
                           </FormGroup>
 
                           <FormGroup>
-                            <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}</Label>
+                            <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                             <Select
-                            bsSize="sm"
+                              bsSize="sm"
                               valid={!errors.realmCountryId}
                               invalid={touched.realmCountryId && !!errors.realmCountryId}
                               onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -368,8 +304,9 @@ export default class AddHealthAreaComponent extends Component {
 
                         <CardFooter>
                           <FormGroup>
-                            <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
-                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
+                            <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
                                                   </FormGroup>
@@ -396,6 +333,21 @@ export default class AddHealthAreaComponent extends Component {
 
   cancelClicked() {
     this.props.history.push(`/healthArea/listHealthArea/` + i18n.t('static.message.cancelled', { entityname }))
+  }
+
+  resetClicked() {
+    let { healthArea } = this.state
+
+    healthArea.label.label_en = ''
+    healthArea.realm.id = ''
+    this.state.realmCountryId = ''
+
+    this.setState({
+      healthArea
+    }, (
+    ) => {
+      console.log("state after update---", this.state.healthArea)
+    })
   }
 
 }

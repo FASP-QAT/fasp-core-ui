@@ -58,12 +58,13 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'hidden' },
                         { type: 'text', readOnly: true }
                     ],
-                    pagination: 25,
+                    pagination: 10,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [25, 50, 75, 100],
+                    paginationOptions: [10, 25, 50, 100],
+                    position:'top',
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     onchange: this.changed,
@@ -162,7 +163,8 @@ export default class DatabaseTranslations extends React.Component {
                         <CardHeader>
                             <strong>{i18n.t('static.label.databaseTranslations')}</strong>
                         </CardHeader>
-                        <CardBody className="table-responsive">
+                        <CardBody className="table-responsive pt-md-1 pb-md-1">
+                        <div id="loader" className="center"></div>
                         <div id="databaseTranslationTable"></div>
                         </CardBody>
                         <CardFooter>
@@ -230,4 +232,14 @@ export default class DatabaseTranslations extends React.Component {
     }.bind(this)
 }
 
+
+document.onreadystatechange = function() { 
+    if (document.readyState !== "complete") { 
+        document.querySelector("tbody").style.visibility = "hidden"; 
+        document.querySelector("#loader").style.visibility = "visible"; 
+    } else { 
+        document.querySelector("#loader").style.display = "none"; 
+        document.querySelector("tbody").style.visibility = "visible"; 
+    } 
+}; 
 

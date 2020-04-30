@@ -119,6 +119,7 @@ class ListRoleComponent extends Component {
         }
         return (
             <div className="animated">
+                
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>

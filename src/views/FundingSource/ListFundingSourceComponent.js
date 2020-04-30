@@ -12,7 +12,10 @@ import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const entityname = i18n.t('static.fundingsource.fundingsource');
+
+
 class FundingSourceListComponent extends Component {
     constructor(props) {
         super(props);
@@ -30,7 +33,7 @@ class FundingSourceListComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selSource = this.state.fundingSourceList.filter(c => c.realm.realmId == realmId)
+            const selSource = this.state.fundingSourceList.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
             });
@@ -42,8 +45,8 @@ class FundingSourceListComponent extends Component {
     }
     editFundingSource(fundingSource) {
         this.props.history.push({
-            pathname: "/fundingSource/editFundingSource",
-            state: { fundingSource }
+            pathname: `/fundingSource/editFundingSource/${fundingSource.fundingSourceId}`,
+            // state: { fundingSource }
         });
     }
 
@@ -64,26 +67,27 @@ class FundingSourceListComponent extends Component {
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
         FundingSourceService.getFundingSourceListAll()
             .then(response => {
@@ -95,27 +99,28 @@ class FundingSourceListComponent extends Component {
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response.status) {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     console.log("Error code unkown");
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
     formatLabel(cell, row) {
@@ -194,6 +199,9 @@ class FundingSourceListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
@@ -205,7 +213,7 @@ class FundingSourceListComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-md-0">
                         <Col md="3 pl-0">
                             <FormGroup>
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>

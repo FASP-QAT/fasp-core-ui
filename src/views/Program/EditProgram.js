@@ -15,6 +15,7 @@ import i18n from "../../i18n"
 import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.program.programMaster');
@@ -132,7 +133,7 @@ export default class EditProgram extends Component {
                     }
                 },
                 organisation: {
-                    organisationId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -160,7 +161,7 @@ export default class EditProgram extends Component {
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
                 healthArea: {
-                    healthAreaId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -190,8 +191,14 @@ export default class EditProgram extends Component {
 
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.Capitalize=this.Capitalize.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
 
+    }
+
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     Capitalize(str) {
@@ -208,7 +215,7 @@ export default class EditProgram extends Component {
                 programName: getLabelText(this.state.program.label, lang),
                 realmId: this.state.program.realmCountry.realm.realmId,
                 realmCountryId: this.state.program.realmCountry.realmCountryId,
-                organisationId: this.state.program.organisation.organisationId,
+                organisationId: this.state.program.organisation.id,
                 userId: this.state.program.programManager.userId,
                 airFreightPerc: this.state.program.airFreightPerc,
                 seaFreightPerc: this.state.program.seaFreightPerc,
@@ -219,7 +226,7 @@ export default class EditProgram extends Component {
                 approvedToShippedLeadTime: this.state.program.approvedToShippedLeadTime,
                 monthsInFutureForAmc: this.state.program.monthsInFutureForAmc,
                 monthsInPastForAmc: this.state.program.monthsInPastForAmc,
-                healthAreaId: this.state.program.healthArea.healthAreaId,
+                healthAreaId: this.state.program.healthArea.id,
                 programNotes: this.state.program.programNotes,
                 regionArray: this.state.program.regionArray
             }
@@ -236,27 +243,8 @@ export default class EditProgram extends Component {
                             message: response.data.messageCode
                         })
                     }
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: error.response.data.messageCode });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    console.log("Error code unkown");
-                                    break;
-                            }
-                        }
-                    }
-                );
+                })
+
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
@@ -274,48 +262,9 @@ export default class EditProgram extends Component {
                             message: response.data.messageCode
                         })
                     }
-                }).catch(
-                    error => {
-                        if (error.message === "Network Error") {
-                            this.setState({ message: error.message });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 500:
-                                case 401:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.setState({ message: error.response.data.messageCode });
-                                    break;
-                                default:
-                                    this.setState({ message: 'static.unkownError' });
-                                    console.log("Error code unkown");
-                                    break;
-                            }
-                        }
-                    }
-                );
-        }).catch(
-            error => {
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            console.log("Error code unkown");
-                            break;
-                    }
-                }
-            }
-        );
+                })
+
+        })
 
     }
     updateFieldData(value) {
@@ -338,7 +287,7 @@ export default class EditProgram extends Component {
         } if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
         } if (event.target.name == 'organisationId') {
-            program.organisation.organisationId = event.target.value;
+            program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
@@ -358,7 +307,7 @@ export default class EditProgram extends Component {
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
-            program.healthArea.healthAreaId = event.target.value;
+            program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }
@@ -420,7 +369,8 @@ export default class EditProgram extends Component {
         return (
 
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -441,27 +391,7 @@ export default class EditProgram extends Component {
 
                                     }
                                     )
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        )
+
                                 }}
                                 render={
                                     ({
@@ -478,301 +408,296 @@ export default class EditProgram extends Component {
 
                                             <Form onSubmit={handleSubmit} noValidate name='programForm'>
                                                 <CardHeader>
-                                                    <strong>{i18n.t('static.common.editEntity',{entityname})}</strong>
+                                                    <strong>{i18n.t('static.common.editEntity', { entityname })}</strong>
                                                 </CardHeader>
                                                 <CardBody>
                                                     <FormGroup>
-                                                            <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
-                                                       
-                                                            <Input
-                                                                type="text" name="programName" valid={!errors.programName}
-                                                                bsSize="sm"
-                                                                invalid={touched.programName && !!errors.programName}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={this.state.program.label.label_en}
-                                                                id="programName" placeholder={i18n.t('static.program.programtext')} />
-                                                            <FormFeedback>{errors.programName}</FormFeedback>
-                                                      
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            type="text" name="programName" valid={!errors.programName}
+                                                            bsSize="sm"
+                                                            invalid={touched.programName && !!errors.programName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.program.label.label_en}
+                                                            id="programName" placeholder={i18n.t('static.program.programtext')} />
+                                                        <FormFeedback>{errors.programName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                      
-                                                            <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
-                                                       
-                                                            <Input
-                                                                value={getLabelText(this.state.program.realmCountry.realm.label, this.state.lang)}
-                                                                bsSize="sm"
-                                                                valid={!errors.realmId}
-                                                                invalid={touched.realmId && !!errors.realmId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                disabled
-                                                                type="text"
-                                                                name="realmId" id="realmId">
 
-                                                            </Input>
-                                                            <FormFeedback>{errors.realmId}</FormFeedback>
-                                                       
+                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+
+                                                        <Input
+                                                            value={getLabelText(this.state.program.realmCountry.realm.label, this.state.lang)}
+                                                            bsSize="sm"
+                                                            valid={!errors.realmId}
+                                                            invalid={touched.realmId && !!errors.realmId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            disabled
+                                                            type="text"
+                                                            name="realmId" id="realmId">
+
+                                                        </Input>
+                                                        <FormFeedback>{errors.realmId}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup>
-                                                         <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
-                                                      
-                                                            <Input
-                                                                value={getLabelText(this.state.program.realmCountry.country.label, this.state.lang)}
-                                                                bsSize="sm"
-                                                                valid={!errors.realmCountryId}
-                                                                invalid={touched.realmCountryId && !!errors.realmCountryId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                disabled
-                                                                type="text" name="realmCountryId" id="realmCountryId">
+                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
 
-                                                            </Input>
-                                                            <FormFeedback>{errors.realmCountryId}</FormFeedback>
-                                                    
+                                                        <Input
+                                                            value={getLabelText(this.state.program.realmCountry.country.label, this.state.lang)}
+                                                            bsSize="sm"
+                                                            valid={!errors.realmCountryId}
+                                                            invalid={touched.realmCountryId && !!errors.realmCountryId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            disabled
+                                                            type="text" name="realmCountryId" id="realmCountryId">
+
+                                                        </Input>
+                                                        <FormFeedback>{errors.realmCountryId}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup >
-                                                        
-                                                            <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
-                                                        
-                                                            <Select
-                                                                valid={!errors.regionId}
-                                                                bsSize="sm"
-                                                                invalid={touched.reagonId && !!errors.regionId}
-                                                                onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
-                                                                onBlur={handleBlur} name="regionId" id="regionId"
-                                                                multi
-                                                                options={this.state.regionList}
-                                                                value={this.state.program.regionArray}
-                                                            />
-                                                            <FormFeedback>{errors.regionId}</FormFeedback>
-                                                       
+                                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Select
+                                                            valid={!errors.regionId}
+                                                            bsSize="sm"
+                                                            invalid={touched.reagonId && !!errors.regionId}
+                                                            onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
+                                                            onBlur={handleBlur} name="regionId" id="regionId"
+                                                            multi
+                                                            options={this.state.regionList}
+                                                            value={this.state.program.regionArray}
+                                                        />
+                                                        <FormFeedback>{errors.regionId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                            <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
-                                                      
-                                                            <Input
-                                                                value={getLabelText(this.state.program.organisation.label, this.state.lang)}
-                                                                bsSize="sm"
-                                                                valid={!errors.organisationId}
-                                                                invalid={touched.organisationId && !!errors.organisationId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                disabled
-                                                                type="text" name="organisationId" id="organisationId">
+                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
 
-                                                            </Input>
-                                                            <FormFeedback>{errors.organisationId}</FormFeedback>
-                                                       
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                       
-                                                            <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
-                                                       
-                                                            <Input
-                                                                value={getLabelText(this.state.program.healthArea.label, this.state.lang)}
-                                                                bsSize="sm"
-                                                                valid={!errors.healthAreaId}
-                                                                invalid={touched.healthAreaId && !!errors.healthAreaId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur} disabled type="text" name="healthAreaId" id="healthAreaId">
+                                                        <Input
+                                                            value={getLabelText(this.state.program.organisation.label, this.state.lang)}
+                                                            bsSize="sm"
+                                                            valid={!errors.organisationId}
+                                                            invalid={touched.organisationId && !!errors.organisationId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            disabled
+                                                            type="text" name="organisationId" id="organisationId">
 
-                                                            </Input>
-                                                            <FormFeedback>{errors.healthAreaId}</FormFeedback>
-                                                      
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                      
-                                                            <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
-                                                       
-                                                            <Input
-                                                                value={this.state.program.programManager.userId}
-                                                                bsSize="sm"
-                                                                valid={!errors.userId}
-                                                                invalid={touched.userId && !!errors.userId}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur} type="select" name="userId" id="userId">
-                                                                {/* <option value="0">Please select</option> */}
-                                                                {/* <option value="1">Anchal</option> */}
-                                                                {programManagers}
-
-                                                            </Input>
-                                                            <FormFeedback>{errors.userId}</FormFeedback>
-                                                  
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                       
-                                                            <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                                      
-                                                            <Input
-                                                                value={this.state.program.programNotes}
-                                                                bsSize="sm"
-                                                                valid={!errors.programNotes}
-                                                                invalid={touched.programNotes && !!errors.programNotes}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="textarea" name="programNotes" id="programNotes" />
-                                                            <FormFeedback>{errors.programNotes}</FormFeedback>
-                                               
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                      
-                                                            <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
-                                                       
-                                                            <Input
-                                                                value={this.state.program.airFreightPerc}
-                                                                bsSize="sm"
-                                                                valid={!errors.airFreightPerc}
-                                                                invalid={touched.airFreightPerc && !!errors.airFreightPerc}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
-                                                            <FormFeedback>{errors.airFreightPerc}</FormFeedback>
-                                                        
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        
-                                                            <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
-                                                      
-                                                            <Input
-                                                                value={this.state.program.seaFreightPerc}
-                                                                bsSize="sm"
-                                                                valid={!errors.seaFreightPerc}
-                                                                invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperctext')} />
-                                                            <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
-                                                     
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                      
-                                                            <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
-                                                        
-                                                            <Input
-                                                                value={this.state.program.plannedToDraftLeadTime}
-                                                                bsSize="sm"
-                                                                valid={!errors.plannedToDraftLeadTime}
-                                                                invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
-                                                            <FormFeedback>{errors.plannedToDraftLeadTime}</FormFeedback>
-                                                      
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                      
-                                                            <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}</Label>
-                                                       
-                                                            <Input
-                                                                value={this.state.program.draftToSubmittedLeadTime}
-                                                                bsSize="sm"
-                                                                valid={!errors.draftToSubmittedLeadTime}
-                                                                invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
-                                                            <FormFeedback>{errors.draftToSubmittedLeadTime}</FormFeedback>
+                                                        </Input>
+                                                        <FormFeedback>{errors.organisationId}</FormFeedback>
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                       
-                                                            <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}</Label>
-                                                       
-                                                            <Input
-                                                                value={this.state.program.submittedToApprovedLeadTime}
-                                                                bsSize="sm"
-                                                                valid={!errors.submittedToApprovedLeadTime}
-                                                                invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
-                                                            <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
-                                                    
+
+                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
+
+                                                        <Input
+                                                            value={getLabelText(this.state.program.healthArea.label, this.state.lang)}
+                                                            bsSize="sm"
+                                                            valid={!errors.healthAreaId}
+                                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur} disabled type="text" name="healthAreaId" id="healthAreaId">
+
+                                                        </Input>
+                                                        <FormFeedback>{errors.healthAreaId}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup>
-                                                      
-                                                            <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}</Label>
-                                                      
-                                                            <Input
-                                                                value={this.state.program.approvedToShippedLeadTime}
-                                                                bsSize="sm"
-                                                                valid={!errors.approvedToShippedLeadTime}
-                                                                invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
-                                                            <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
-                                                   
+                                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            value={this.state.program.programManager.userId}
+                                                            bsSize="sm"
+                                                            valid={!errors.userId}
+                                                            invalid={touched.userId && !!errors.userId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur} type="select" name="userId" id="userId">
+                                                            {/* <option value="0">Please select</option> */}
+                                                            {/* <option value="1">Anchal</option> */}
+                                                            {programManagers}
+
+                                                        </Input>
+                                                        <FormFeedback>{errors.userId}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup>
-                                                       
-                                                            <Label htmlFor="company">{i18n.t('static.program.delivedtoreceivedleadtime')}</Label>
-                                                     
-                                                            <Input
-                                                                value={this.state.program.deliveredToReceivedLeadTime}
-                                                                bsSize="sm"
-                                                                valid={!errors.deliveredToReceivedLeadTime}
-                                                                invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
-                                                            <FormFeedback>{errors.deliveredToReceivedLeadTime}</FormFeedback>
-                                                        
+
+                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.programNotes}
+                                                            bsSize="sm"
+                                                            valid={!errors.programNotes}
+                                                            invalid={touched.programNotes && !!errors.programNotes}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="textarea" name="programNotes" id="programNotes" />
+                                                        <FormFeedback>{errors.programNotes}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        
-                                                            <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}</Label>
-                                                       
-                                                            <Input
-                                                                value={this.state.program.monthsInPastForAmc}
-                                                                bsSize="sm"
-                                                                valid={!errors.monthsInPastForAmc}
-                                                                invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
-                                                            <FormFeedback>{errors.monthsInPastForAmc}</FormFeedback>
-                                                      
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.airFreightPerc}
+                                                            bsSize="sm"
+                                                            valid={!errors.airFreightPerc}
+                                                            invalid={touched.airFreightPerc && !!errors.airFreightPerc}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
+                                                        <FormFeedback>{errors.airFreightPerc}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup>
-                                                      
-                                                            <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}</Label>
-                                                     
-                                                            <Input
-                                                                value={this.state.program.monthsInFutureForAmc}
-                                                                bsSize="sm"
-                                                                valid={!errors.monthsInFutureForAmc}
-                                                                invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                                onBlur={handleBlur}
-                                                                type="number" 
-                                                                min="0"
-                                                                name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
-                                                            <FormFeedback>{errors.monthsInFutureForAmc}</FormFeedback>
-                                                     
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.seaFreightPerc}
+                                                            bsSize="sm"
+                                                            valid={!errors.seaFreightPerc}
+                                                            invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperctext')} />
+                                                        <FormFeedback>{errors.seaFreightPerc}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.plannedToDraftLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.plannedToDraftLeadTime}
+                                                            invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
+                                                        <FormFeedback>{errors.plannedToDraftLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.draftToSubmittedLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.draftToSubmittedLeadTime}
+                                                            invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
+                                                        <FormFeedback>{errors.draftToSubmittedLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.submittedToApprovedLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.submittedToApprovedLeadTime}
+                                                            invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
+                                                        <FormFeedback>{errors.submittedToApprovedLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.approvedToShippedLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.approvedToShippedLeadTime}
+                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
+                                                        <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.delivedtoreceivedleadtime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.deliveredToReceivedLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.deliveredToReceivedLeadTime}
+                                                            invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
+                                                        <FormFeedback>{errors.deliveredToReceivedLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.monthsInPastForAmc}
+                                                            bsSize="sm"
+                                                            valid={!errors.monthsInPastForAmc}
+                                                            invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
+                                                        <FormFeedback>{errors.monthsInPastForAmc}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.monthsInFutureForAmc}
+                                                            bsSize="sm"
+                                                            valid={!errors.monthsInFutureForAmc}
+                                                            invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
+                                                        <FormFeedback>{errors.monthsInFutureForAmc}</FormFeedback>
                                                     </FormGroup>
 
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                             </FormGroup>
@@ -790,4 +715,66 @@ export default class EditProgram extends Component {
         this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getProgramById(this.props.match.params.programId).then(response => {
+            this.setState({
+                program: response.data
+            })
+            initialValues = {
+                programName: getLabelText(this.state.program.label, lang),
+                realmId: this.state.program.realmCountry.realm.realmId,
+                realmCountryId: this.state.program.realmCountry.realmCountryId,
+                organisationId: this.state.program.organisation.id,
+                userId: this.state.program.programManager.userId,
+                airFreightPerc: this.state.program.airFreightPerc,
+                seaFreightPerc: this.state.program.seaFreightPerc,
+                deliveredToReceivedLeadTime: this.state.program.deliveredToReceivedLeadTime,
+                draftToSubmittedLeadTime: this.state.program.draftToSubmittedLeadTime,
+                plannedToDraftLeadTime: this.state.program.plannedToDraftLeadTime,
+                submittedToApprovedLeadTime: this.state.program.submittedToApprovedLeadTime,
+                approvedToShippedLeadTime: this.state.program.approvedToShippedLeadTime,
+                monthsInFutureForAmc: this.state.program.monthsInFutureForAmc,
+                monthsInPastForAmc: this.state.program.monthsInPastForAmc,
+                healthAreaId: this.state.program.healthArea.id,
+                programNotes: this.state.program.programNotes,
+                regionArray: this.state.program.regionArray
+            }
+            AuthenticationService.setupAxiosInterceptors();
+            ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
+                .then(response => {
+                    console.log("realm list---", response.data);
+                    if (response.status == 200) {
+                        this.setState({
+                            programManagerList: response.data
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+                
+            ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
+                .then(response => {
+                    if (response.status == 200) {
+                        console.log("region list---", response.data);
+                        var json = response.data;
+                        var regList = [];
+                        for (var i = 0; i < json.length; i++) {
+                            regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lan) }
+                        }
+                        this.setState({
+                            regionList: regList
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                })
+                
+        })
+        
+    }
 }

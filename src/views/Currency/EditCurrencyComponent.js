@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button,CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, CardBody, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -7,14 +7,16 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import CurrencyService from '../../api/CurrencyService.js';
 import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.currency.currencyMaster');
 let initialValues = {
     currencyCode: '',
-    currencySymbol: '',
+    // currencySymbol: '',
     label: '',
-    conversionRate: ''
+    conversionRate: '',
+    isSync: true
 }
 
 const validationSchema = function (values) {
@@ -22,11 +24,11 @@ const validationSchema = function (values) {
         currencyCode: Yup.string()
             .required(i18n.t('static.currency.currencycodetext'))
             .max(4, i18n.t('static.currency.currencycodemax4digittext')),
-        currencySymbol: Yup.string()
-            .required(i18n.t('static.currency.currencysymboltext')).
-            max(3, i18n.t('static.country.countrycodemax3digittext')).
-            // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
-            matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
+        // currencySymbol: Yup.string()
+        //     .required(i18n.t('static.currency.currencysymboltext')).
+        //     max(3, i18n.t('static.country.countrycodemax3digittext')).
+        //     // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+        //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.number()
@@ -62,19 +64,31 @@ export default class UpdateCurrencyComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currency: this.props.location.state.currency,
+            // currency: this.props.location.state.currency,
+            currency: {
+                currencyCode: '',
+                // currencySymbol: '',
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                conversionRateToUsd: '',
+                isSync: 'true'
+            },
             message: '',
             lang: localStorage.getItem('lang')
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
-        initialValues = {
-            currencyCode: this.props.location.state.currency.currencyCode,
-            currencySymbol: this.props.location.state.currency.currencySymbol,
-            label: getLabelText(this.props.location.state.currency.label, this.state.lang),
-            conversionRate: this.props.location.state.currency.conversionRateToUsd
-        }
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     dataChange(event) {
@@ -83,15 +97,17 @@ export default class UpdateCurrencyComponent extends Component {
         if (event.target.name === "currencyCode") {
             this.state.currency.currencyCode = event.target.value.toUpperCase();
         }
-        if (event.target.name === "currencySymbol") {
-            this.state.currency.currencySymbol = event.target.value;
-        }
+        // if (event.target.name === "currencySymbol") {
+        //     this.state.currency.currencySymbol = event.target.value;
+        // }
         if (event.target.name === "label") {
             this.state.currency.label.label_en = event.target.value
         }
 
         else if (event.target.name === "conversionRate") {
             this.state.currency.conversionRateToUsd = event.target.value
+        } else if (event.target.name === "isSync") {
+            this.state.currency.isSync = event.target.id === "active2" ? false : true;
         }
 
         this.setState(
@@ -105,7 +121,7 @@ export default class UpdateCurrencyComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             currencyCode: true,
-            currencySymbol: true,
+            // currencySymbol: true,
             label: true,
             conversionRate: true
         }
@@ -129,14 +145,21 @@ export default class UpdateCurrencyComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        // this.setState({
-        //     currency: this.props.location.state.currency
-        // });
+        CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
+            console.log(JSON.stringify(response.data))
+            this.setState({
+                currency: response.data
+            });
+        })
+
     }
 
     Capitalize(str) {
-        let { currency } = this.state
-        currency.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        if (str != null && str != "") {
+            let { currency } = this.state
+            currency.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
+
     }
 
     cancelClicked() {
@@ -147,7 +170,8 @@ export default class UpdateCurrencyComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -155,7 +179,14 @@ export default class UpdateCurrencyComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    currencyCode: this.state.currency.currencyCode,
+                                    currencySymbol: this.state.currency.currencySymbol,
+                                    label: getLabelText(this.state.currency.label, this.state.lang),
+                                    conversionRate: this.state.currency.conversionRateToUsd,
+                                    isSync: this.state.currency.isSync
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
 
@@ -170,26 +201,6 @@ export default class UpdateCurrencyComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
 
 
@@ -208,41 +219,7 @@ export default class UpdateCurrencyComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}</Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="currencyCode"
-                                                            id="currencyCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.currencyCode}
-                                                            invalid={touched.currencyCode && !!errors.currencyCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.currency.currencyCode}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}</Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
-                                                        <Input type="text"
-                                                            name="currencySymbol"
-                                                            id="currencySymbol"
-                                                            bsSize="sm"
-                                                            valid={!errors.currencySymbol}
-                                                            invalid={touched.currencySymbol && !!errors.currencySymbol}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.currency.currencySymbol}
-                                                            required />
-                                                        {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.currency.currency')}</Label>
+                                                        <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-money"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -259,7 +236,38 @@ export default class UpdateCurrencyComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}</Label>
+                                                        <Label for="currencyCode">{i18n.t('static.currency.currencycode')}<span class="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-pencil"></i></InputGroupText> */}
+                                                        <Input type="text"
+                                                            name="currencyCode"
+                                                            id="currencyCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.currencyCode}
+                                                            invalid={touched.currencyCode && !!errors.currencyCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.currency.currencyCode}
+                                                            required />
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    {/* <FormGroup>
+                                                        <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="currencySymbol"
+                                                            id="currencySymbol"
+                                                            bsSize="sm"
+                                                            valid={!errors.currencySymbol}
+                                                            invalid={touched.currencySymbol && !!errors.currencySymbol}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.currency.currencySymbol}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
+                                                    </FormGroup> */}
+                                                    <FormGroup>
+                                                        <Label for="conversionRate">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-exchange"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -275,12 +283,48 @@ export default class UpdateCurrencyComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.conversionRate}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="isSync">{i18n.t('static.common.issync')}  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active1"
+                                                                name="isSync"
+                                                                value={true}
+                                                                checked={this.state.currency.isSync === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.program.yes')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="active2"
+                                                                name="isSync"
+                                                                value={false}
+                                                                checked={this.state.currency.isSync === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.program.no')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                    </FormGroup>
 
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -294,6 +338,15 @@ export default class UpdateCurrencyComponent extends Component {
                 </Row>
             </div>
         );
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        CurrencyService.getCurrencyById(this.props.match.params.currencyId).then(response => {
+            this.setState({
+                currency: response.data
+            });
+        })
     }
 
 }

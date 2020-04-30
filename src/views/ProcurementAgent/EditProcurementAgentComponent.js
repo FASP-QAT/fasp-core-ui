@@ -7,7 +7,7 @@ import i18n from '../../i18n';
 import RealmService from "../../api/RealmService";
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import getLabelText from '../../CommonComponent/getLabelText';
 const entityname = i18n.t('static.procurementagent.procurementagent');
 
@@ -23,6 +23,10 @@ const validationSchema = function (values) {
         submittedToApprovedLeadTime: Yup.string()
             .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
             .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
+        // submittedToApprovedLeadTime: Yup.number()
+        //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
+        //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
+        //     .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
 
@@ -52,18 +56,42 @@ class EditProcurementAgentComponent extends Component {
         super(props);
         this.state = {
             realms: [],
-            procurementAgent: this.props.location.state.procurementAgent,
+            // procurementAgent: this.props.location.state.procurementAgent,
+            procurementAgent: {
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    }
+                },
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                },
+                procurementAgentCode: ''
+            },
             message: '',
             lang: localStorage.getItem('lang')
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     Capitalize(str) {
         if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+            let { procurementAgent } = this.state;
+            procurementAgent.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         } else {
             return "";
         }
@@ -118,18 +146,29 @@ class EditProcurementAgentComponent extends Component {
         }
     }
 
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
+            this.setState({
+                procurementAgent: response.data
+            });
+
+        })
+    }
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
 
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
@@ -149,26 +188,6 @@ class EditProcurementAgentComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
                                 render={
                                     ({
@@ -208,13 +227,13 @@ class EditProcurementAgentComponent extends Component {
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
                                                             readOnly={true}
-                                                            value={this.Capitalize(this.state.procurementAgent.procurementAgentCode)}
+                                                            value={this.state.procurementAgent.procurementAgentCode}
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentCode}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}</Label>
+                                                        <Label for="procurementAgentName">{i18n.t('static.procurementagent.procurementagentname')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-pencil-square-o"></i></InputGroupText> */}
                                                         <Input type="text"
@@ -223,16 +242,16 @@ class EditProcurementAgentComponent extends Component {
                                                             id="procurementAgentName"
                                                             valid={!errors.procurementAgentName}
                                                             invalid={touched.procurementAgentName && !!errors.procurementAgentName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.Capitalize(getLabelText(this.state.procurementAgent.label, this.state.lang))}
+                                                            value={getLabelText(this.state.procurementAgent.label, this.state.lang)}
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.procurementAgentName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}</Label>
+                                                        <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetime')}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-clock-o"></i></InputGroupText> */}
                                                         <Input type="number"
@@ -289,6 +308,7 @@ class EditProcurementAgentComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -305,6 +325,16 @@ class EditProcurementAgentComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/procurementAgent/listProcurementAgent/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        ProcurementAgentService.getProcurementAgentById(this.props.match.params.procurementAgentId).then(response => {
+            this.setState({
+                procurementAgent: response.data
+            });
+
+        })
     }
 }
 

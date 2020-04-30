@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
 import navigation from '../../../_nav';
 // routes config
-
+import image1 from '../../../../public/assets/img/QAT-login-logo.png';
+import image2 from '../../../../public/assets/img/wordmark.png';
+import image3 from '../../../../public/assets/img/PEPFAR-logo.png';
+import image4 from '../../../../public/assets/img/USAID-presidents-malaria-initiative.png';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -17,6 +20,11 @@ import jwt_decode from 'jwt-decode'
 import { SECRET_KEY } from '../../../Constants.js'
 import LoginService from '../../../api/LoginService'
 import i18n from '../../../i18n'
+import axios from 'axios';
+import moment from 'moment';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 
 const initialValues = {
   username: "",
@@ -86,7 +94,18 @@ class Login extends Component {
   }
 
   forgotPassword() {
-    this.props.history.push(`/forgotPassword`)
+    if (navigator.onLine) {
+      this.props.history.push(`/forgotPassword`)
+    } else {
+      confirmAlert({
+        message: i18n.t('static.forgotPassword.offline'),
+        buttons: [
+          {
+            label: i18n.t('static.common.close')
+          }
+        ]
+      });
+    }
   }
   render() {
     return (
@@ -94,14 +113,14 @@ class Login extends Component {
 
         <div className="Login-component">
           <Container className="container-login">
-        
+
             <Row className="justify-content-center">
-            <Col md="12">
-              <div className="upper-logo mt-1">
-               <img src={'assets/img/QAT-login-logo.png'} className="img-fluid " />
-             </div>
-             </Col>
-            <Col lg="5" md="7" xl="4">
+              <Col md="12">
+                <div className="upper-logo mt-1">
+                  <img src={image1} className="img-fluid " />
+                </div>
+              </Col>
+              <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <Card className="p-4 Login-card mt-2">
                     <CardBody>
@@ -115,14 +134,16 @@ class Login extends Component {
                             LoginService.authenticate(username, password)
                               .then(response => {
                                 var decoded = jwt_decode(response.data.token);
-                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng"];
+                                let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
+                                localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
+                          
                                 AuthenticationService.setupAxiosInterceptors();
                                 this.props.history.push(`/ApplicationDashboard`)
                               })
@@ -131,7 +152,7 @@ class Login extends Component {
                                   if (error.message === "Network Error") {
                                     this.setState({ message: error.message });
                                   } else {
-                                    switch (error.response.status) {
+                                    switch (error.response ? error.response.status : "") {
                                       case 500:
                                       case 401:
                                       case 404:
@@ -159,7 +180,7 @@ class Login extends Component {
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
-                                  this.setState({ message: 'Error occured' });
+                                  this.setState({ message: 'static.label.labelFail' });
                                 }
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
@@ -173,12 +194,12 @@ class Login extends Component {
                                   localStorage.removeItem("tempUser");
                                   this.props.history.push(`/ApplicationDashboard`)
                                 } else {
-                                  this.setState({ message: 'Bad credentials.' });
+                                  this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
                               }.bind(this));
                             }
                             else {
-                              this.setState({ message: 'User not found.' });
+                              this.setState({ message: 'static.message.login.invalidCredentials' });
                             }
                           }
                         }}
@@ -197,7 +218,7 @@ class Login extends Component {
                               <Form onSubmit={handleSubmit} noValidate name="loginForm">
                                 <h5 >{i18n.t(this.props.match.params.message)}</h5>
                                 <h5 >{i18n.t(this.state.message)}</h5>
-                              
+
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
                                 <p className="text-muted">{i18n.t('static.login.signintext')}</p>
@@ -245,7 +266,7 @@ class Login extends Component {
                                     <Button type="submit" color="primary" className="px-4" onClick={() => this.touchAll(setTouched, errors)} >{i18n.t('static.login.login')}</Button>
                                   </Col>
                                   <Col xs="6" className="text-right">
-                                    <Online><Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button></Online>
+                                    <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
                                   </Col>
 
                                 </Row>
@@ -256,46 +277,45 @@ class Login extends Component {
 
                 </CardGroup>
               </Col>
-           
 
-            <Col xs="12"className="Login-bttom ">
+
+              <Col xs="12" className="Login-bttom ">
                 <CardBody>
 
-                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
-                  (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.
-                  GHSC-PSM connects technical solutions and proven commercial processes to
-                  promote efficient and cost-effective health supply chains worldwide.
-                  Our goal is to ensure uninterrupted supplies of health commodities to save
-                  lives and create a healthier future for all. The project purchases and delivers
-                  health commodities, offers comprehensive technical assistance to strengthen
-                  national supply chain systems, and provides global supply chain leadership.For more
-                  information,visit ghsupplychain.org.The information provided in this tool is not official
-                  U.S. government information and does not represent the views or positions of the Agency for International
-                  Development or the U.S. government.
+                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply 
+                  Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects 
+                  technical solutions and proven commercial processes to promote efficient and cost-effective 
+                  health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health 
+                  commodities to save lives and create a healthier future for all. The project purchases 
+                  and delivers health commodities, offers comprehensive technical assistance to strengthen 
+                  national supply chain systems, and provides global supply chain leadership. For more 
+                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not 
+                  official U.S. government information and does not represent the views or positions of the 
+                  Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
-                <Col md="4">
-                  <CardBody>
-                    <img src={'assets/img/wordmark.png'} className="img-fluid bottom-logo-img" />
-                  </CardBody>
-                </Col>
-                
-                <Col md="4">
-                  <CardBody>
-                    <img src={'assets/img/PEPFAR-logo.png'} className="img-fluid bottom-logo-img" />
-                  </CardBody>
-                </Col>
-                <Col md="4">
-                  <CardBody>
-                    <img src={'assets/img/USAID-presidents-malaria-initiative.png'} className="img-fluid bottom-logo-img" />
-                  </CardBody>
-                </Col>
-              </Row>
+                  <Col md="4">
+                    <CardBody>
+                      <img src={image2} className="img-fluid bottom-logo-img" />
+                    </CardBody>
+                  </Col>
+
+                  <Col md="4">
+                    <CardBody>
+                      <img src={image3} className="img-fluid bottom-logo-img" />
+                    </CardBody>
+                  </Col>
+                  <Col md="4">
+                    <CardBody>
+                      <img src={image4} className="img-fluid bottom-logo-img" />
+                    </CardBody>
+                  </Col>
+                </Row>
 
               </Col>
-             
-              </Row>
+
+            </Row>
           </Container>
         </div>
       </div>

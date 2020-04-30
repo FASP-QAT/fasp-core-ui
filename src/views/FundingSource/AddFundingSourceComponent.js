@@ -7,6 +7,8 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import FundingSourceService from "../../api/FundingSourceService";
 import RealmService from "../../api/RealmService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+
 import i18n from '../../i18n'
 const initialValues = {
   fundingSourceId: [],
@@ -60,12 +62,13 @@ class AddFundingSourceComponent extends Component {
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
     this.Capitalize = this.Capitalize.bind(this);
+    this.resetClicked = this.resetClicked.bind(this);
   }
 
   dataChange(event) {
     let { fundingSource } = this.state;
     if (event.target.name == "realmId") {
-      fundingSource.realm.realmId = event.target.value;
+      fundingSource.realm.id = event.target.value;
     }
     if (event.target.name == "fundingSource") {
       fundingSource.label.label_en = event.target.value;
@@ -114,26 +117,7 @@ class AddFundingSourceComponent extends Component {
         } else {
           this.setState({ message: response.data.messageCode })
         }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response.status) {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
+      })
   }
 
   render() {
@@ -142,12 +126,16 @@ class AddFundingSourceComponent extends Component {
       && realms.map((item, i) => {
         return (
           <option key={i} value={item.realmId}>
-            {getLabelText(item.label,this.state.lang)}
+            {getLabelText(item.label, this.state.lang)}
           </option>
         )
       }, this);
     return (
       <div className="animated fadeIn">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
+        <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -168,26 +156,6 @@ class AddFundingSourceComponent extends Component {
                         this.setState({ message: response.data.messageCode })
                       }
                     })
-                    .catch(
-                      error => {
-                        if (error.message === "Network Error") {
-                          this.setState({ message: error.message });
-                        } else {
-                          switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                              this.setState({ message: error.response.data.messageCode });
-                              break;
-                            default:
-                              this.setState({ message: 'static.unkownError' });
-                              break;
-                          }
-                        }
-                      }
-                    );
                 }}
                 render={
                   ({
@@ -204,7 +172,7 @@ class AddFundingSourceComponent extends Component {
                       <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
                         <CardBody>
                           <FormGroup>
-                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}</Label><Input
+                            <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}<span className="red Reqasterisk">*</span></Label><Input
                               type="select"
                               name="realmId"
                               id="realmId"
@@ -214,7 +182,7 @@ class AddFundingSourceComponent extends Component {
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
                               required
-                              value={this.state.realmId}
+                              value={this.state.fundingSource.realm.id}
                             >
                               <option value="">{i18n.t('static.common.select')}</option>
                               {realmList}
@@ -222,7 +190,7 @@ class AddFundingSourceComponent extends Component {
                             <FormFeedback className="red">{errors.realmId}</FormFeedback>
                           </FormGroup>
                           <FormGroup>
-                            <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
+                            <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}<span className="red Reqasterisk">*</span> </Label>
                             <Input type="text"
                               name="fundingSource"
                               id="fundingSource"
@@ -241,6 +209,7 @@ class AddFundingSourceComponent extends Component {
 
 
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;
@@ -262,6 +231,17 @@ class AddFundingSourceComponent extends Component {
   }
   cancelClicked() {
     this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
+  }
+  resetClicked() {
+    let { fundingSource } = this.state;
+
+    fundingSource.realm.id = ''
+    fundingSource.label.label_en = ''
+
+    this.setState({
+      fundingSource
+    },
+      () => { });
   }
 }
 

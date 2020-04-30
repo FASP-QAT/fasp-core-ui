@@ -26,6 +26,7 @@ const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
+
 class DefaultLayout extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
@@ -35,7 +36,7 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    this.props.history.push(`/logout`)
+    this.props.history.push(`/logout/static.logoutSuccess`)
   }
 
   render() {
@@ -130,8 +131,20 @@ class DefaultLayout extends Component {
                           ,
                           {
                             name: i18n.t('static.dashboard.realm'),
-                            url: '/realm/realmlist',
-                            icon: 'fa fa-th-large'
+                            icon: 'fa fa-list',
+                            children: [{
+                              name: i18n.t('static.dashboard.realm'),
+                              url: '/realm/realmlist',
+                              icon: 'fa fa-th-large'
+                            }, {
+                              name: i18n.t('static.dashboard.realmcountry'),
+                              url: '/realmCountry/listRealmCountry',
+                              icon: 'fa fa-globe'
+                            }, {
+                              name: i18n.t('static.dashboad.planningunitcountry'),
+                              url: '/realmCountry/listRealmCountryPlanningUnit',
+                              icon: 'fa fa-globe'
+                            }]
                           },
                         ]
                       },
@@ -154,11 +167,11 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-bank',
                             url: '/fundingSource/listFundingSource'
                           },
-                          {
-                            name: i18n.t('static.dashboard.subfundingsource'),
-                            url: '/subFundingSource/listSubFundingSource',
-                            icon: 'fa fa-building-o'
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.subfundingsource'),
+                          //   url: '/subFundingSource/listSubFundingSource',
+                          //   icon: 'fa fa-building-o'
+                          // },
                           {
                             name: i18n.t('static.dashboard.procurementagent'),
                             url: '/procurementAgent/listProcurementAgent',
@@ -218,10 +231,16 @@ class DefaultLayout extends Component {
                             icon: 'icon-graph'
                           },
                           // {
+
                           //   name: 'Product Category',
                           //   url: '/ProductCategory/AddProductCategory',
                           //   icon: 'icon-graph'
                           // },
+                          {
+                            name: 'Product Category',
+                            url: '/productCategory/productCategoryTree',
+                            icon: 'icon-graph'
+                          },
                           {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
@@ -230,6 +249,15 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
                             icon: 'icon-graph'
+                          }, {
+                            name: i18n.t('static.dashboad.planningunitcapacity'),
+                            url: '/planningUnitCapacity/listPlanningUnitcapacity',
+                            icon: 'icon-graph'
+                          },
+                          {
+                            name: i18n.t('static.procurementUnit.procurementUnit'),
+                            url: '/procurementUnit/listProcurementUnit',
+                            icon: 'fa fa-building'
                           },
                           // {
                           //   name: i18n.t('static.dashboard.product'),
@@ -249,40 +277,74 @@ class DefaultLayout extends Component {
                           // ]
                           // },
 
-
-                          // {
-                          //   name: i18n.t('static.dashboard.program'),
-                          //   icon: 'fa fa-list',
-                          //   children: [
-                          //     {
-                          //       name: i18n.t('static.dashboard.downloadprogram'),
-                          //       url: '/program/downloadProgram',
-                          //       icon: 'fa fa-download',
-                          //     },
-                          //     {
-                          //       name: i18n.t('static.dashboard.exportprogram'),
-                          //       url: '/program/exportProgram',
-                          //       icon: 'fa fa-upload',
-                          //     },
-                          //     {
-                          //       name: i18n.t('static.dashboard.importprogram'),
-                          //       url: '/program/importProgram',
-                          //       icon: 'fa fa-long-arrow-down',
-                          //     }
-                          //   ]
-                          // },
+                          {
+                            name: 'Synchronisation',
+                            url: '/program/syncPage',
+                            icon: 'fa fa-download',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.program'),
+                            icon: 'fa fa-list',
+                            children: [
+                              {
+                                name: i18n.t('static.dashboard.downloadprogram'),
+                                url: '/program/downloadProgram',
+                                icon: 'fa fa-download',
+                              },
+                              {
+                                name: i18n.t('static.dashboard.exportprogram'),
+                                url: '/program/exportProgram',
+                                icon: 'fa fa-upload',
+                              },
+                              {
+                                name: i18n.t('static.dashboard.importprogram'),
+                                url: '/program/importProgram',
+                                icon: 'fa fa-long-arrow-down',
+                              }
+                            ]
+                          },
                           {
                             name: i18n.t('static.dashboard.datasync'),
                             url: '/masterDataSync',
                             icon: 'fa fa-list',
                           },
-                          // {
-                          //   name: i18n.t('static.dashboard.consumptiondetails'),
-                          //   url: '/consumptionDetails',
-                          //   icon: 'fa fa-list',
-                          // },
+                          {
+                            name: i18n.t('static.dashboard.consumptiondetails'),
+                            url: '/consumptionDetails',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: 'Inventory Details',
+                            url: '/inventory/addInventory',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: 'Shipment Details',
+                            url: '/shipment/addShipment',
+                            icon: 'fa fa-list',
+                          }
                         ]
-                      },
+                      }, {
+                        name: i18n.t('static.dashboard.report'),
+                        icon: 'fa fa-list',
+                        children: [
+                          {
+                            name: i18n.t('static.dashboard.productcatalog'),
+                            url: '/report/productCatalog',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.consumption'),
+                            url: '/report/consumption',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.stockstatusmatrix'),
+                            url: '/report/stockStatusMatrix',
+                            icon: 'fa fa-exchange'
+                          }
+                        ]
+                      }
                       // {
                       //   name: "Supply plan",
                       //   icon: 'fa fa-list',
@@ -293,6 +355,11 @@ class DefaultLayout extends Component {
                       //       icon: 'fa fa-list-alt'
                       //     }
                       //   ]
+                      // },
+                      // {
+                      //   name: 'Program Onboarding',
+                      //   url: '/program/programOnboarding',
+                      //   icon: 'icon-graph'
                       // },
                     ]
 
@@ -307,9 +374,9 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
-                            name: i18n.t('static.dashboard.downloadprogram'),
-                            url: '/program/downloadProgram',
-                            icon: 'fa fa-download',
+                            name: i18n.t('static.dashboard.importprogram'),
+                            url: '/program/importProgram',
+                            icon: 'fa fa-long-arrow-down',
                           },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
@@ -317,9 +384,14 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-upload',
                           },
                           {
-                            name: i18n.t('static.dashboard.importprogram'),
-                            url: '/program/importProgram',
-                            icon: 'fa fa-long-arrow-down',
+                            name: i18n.t('static.dashboard.consumptiondetails'),
+                            url: '/consumptionDetails',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.inventorydetails'),
+                            url: '/inventory/addInventory',
+                            icon: 'fa fa-list',
                           }
                         ]
                       }
@@ -367,5 +439,7 @@ class DefaultLayout extends Component {
     );
   }
 }
+
+
 
 export default DefaultLayout;

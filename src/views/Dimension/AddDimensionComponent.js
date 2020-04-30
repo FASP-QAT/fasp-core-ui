@@ -9,6 +9,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import DimensionService from '../../api/DimensionService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const initialValues = {
     label: ""
@@ -56,7 +57,7 @@ export default class AddDimensionComponent extends Component {
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
@@ -109,6 +110,10 @@ export default class AddDimensionComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -175,7 +180,7 @@ export default class AddDimensionComponent extends Component {
 
 
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
+                                                        <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
@@ -188,10 +193,11 @@ export default class AddDimensionComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
- 
+
                                                     <FormGroup>
 
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -212,5 +218,15 @@ export default class AddDimensionComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/diamension/diamensionlist/` + "Action Canceled")
+    }
+
+    resetClicked() {
+        let { dimension } = this.state
+        dimension.label.label_en = ''
+        this.setState(
+            {
+                dimension
+            }
+        )
     }
 } 

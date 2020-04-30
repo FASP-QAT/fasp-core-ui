@@ -8,7 +8,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import getLabelText from '../../CommonComponent/getLabelText'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import i18n from '../../i18n';
 const entityname = i18n.t('static.dimension.dimension');
 export default class DimensionListComponent extends Component {
@@ -49,33 +49,33 @@ export default class DimensionListComponent extends Component {
                 selSource: response.data
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            // .catch(
+            //     error => {
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response.status) {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: error.response.data.messageCode });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
     }
 
 
     editDimension(dimension) {
         this.props.history.push({
-            pathname: "/diamension/editDiamension",
-            state: { dimension: dimension }
+            pathname: `/diamension/editDiamension/${dimension.dimensionId}`,
+            // state: { dimension: dimension }
         });
     }
 
@@ -135,6 +135,9 @@ export default class DimensionListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
@@ -149,7 +152,7 @@ export default class DimensionListComponent extends Component {
                     </CardHeader>
                     <CardBody>
                         <ToolkitProvider
-                            keyField="dataSourceTypeId"
+                            keyField="dimensionId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}

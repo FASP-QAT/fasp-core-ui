@@ -10,7 +10,8 @@ import RealmService from "../../api/RealmService";
 import ProductService from '../../api/ProductService';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import { stringify } from 'querystring';
-import getLabelText from '../../CommonComponent/getLabelText'
+import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const initialValues = {
     realmId: [],
@@ -84,6 +85,7 @@ export default class AddForecastingUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -93,13 +95,13 @@ export default class AddForecastingUnitComponent extends Component {
             forecastingUnit.label.label_en = event.target.value
         }
         if (event.target.name == "realmId") {
-            forecastingUnit.realm.realmId = event.target.value;
+            forecastingUnit.realm.id = event.target.value;
         }
         if (event.target.name == "tracerCategoryId") {
-            forecastingUnit.tracerCategory.tracerCategoryId = event.target.value;
+            forecastingUnit.tracerCategory.id = event.target.value;
         }
         if (event.target.name == "productCategoryId") {
-            forecastingUnit.productCategory.productCategoryId = event.target.value;
+            forecastingUnit.productCategory.id = event.target.value;
         }
         if (event.target.name == "genericLabel") {
             forecastingUnit.genericLabel.label_en = event.target.value;
@@ -145,78 +147,22 @@ export default class AddForecastingUnitComponent extends Component {
                 this.setState({
                     realms: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 this.setState({
                     tracerCategories: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
         ProductService.getProductCategoryList()
             .then(response => {
                 this.setState({
                     productcategories: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
     }
 
     Capitalize(str) {
@@ -238,7 +184,7 @@ export default class AddForecastingUnitComponent extends Component {
             && tracerCategories.map((item, i) => {
                 return (
                     <option key={i} value={item.tracerCategoryId}>
-                        {getLabelText(item.label,this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -247,12 +193,16 @@ export default class AddForecastingUnitComponent extends Component {
             && productcategories.map((item, i) => {
                 return (
                     <option key={i} value={item.productCategoryId}>
-                        {getLabelText(item.label,this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -274,26 +224,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+
                                 }}
 
 
@@ -312,7 +243,7 @@ export default class AddForecastingUnitComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='forecastingUnit'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="realmId"
@@ -323,7 +254,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.forecastingUnit.realm.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realmList}
@@ -331,7 +262,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                                        <Label htmlFor="tracerCategoryId">{i18n.t('static.tracercategory.tracercategory')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="tracerCategoryId"
@@ -342,7 +273,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.forecastingUnit.tracerCategory.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {tracerCategoryList}
@@ -350,7 +281,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.tracerCategoryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}</Label>
+                                                        <Label htmlFor="productCategoryId">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="productCategoryId"
@@ -361,7 +292,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                            value={this.state.realmId}
+                                                            value={this.state.forecastingUnit.productCategory.id}
                                                         >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {productCategoryList}
@@ -369,7 +300,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.productCategoryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}</Label> <Input type="text"
+                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label> <Input type="text"
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
@@ -382,7 +313,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
+                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="genericLabel"
                                                             id="genericLabel"
@@ -391,6 +322,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             invalid={touched.genericLabel && !!errors.genericLabel}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.forecastingUnit.genericLabel.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
 
@@ -401,6 +333,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                     <FormGroup>
 
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -421,5 +354,23 @@ export default class AddForecastingUnitComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { forecastingUnit } = this.state
+
+        forecastingUnit.label.label_en = ''
+        forecastingUnit.realm.id = ''
+        forecastingUnit.tracerCategory.id = ''
+        forecastingUnit.productCategory.id = ''
+        forecastingUnit.genericLabel.label_en = ''
+
+        this.setState(
+            {
+                forecastingUnit
+            }, () => {
+            }
+        )
+
     }
 }

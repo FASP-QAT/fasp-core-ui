@@ -13,6 +13,7 @@ import RealmService from '../../api/RealmService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import ProductService from '../../api/ProductService';
 import TracerCategoryService from '../../api/TracerCategoryService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
@@ -29,12 +30,15 @@ export default class ForecastingUnitListComponent extends Component {
             message: '',
             selSource: [],
             lang: localStorage.getItem('lang'),
+            realmId: '',
         }
 
         this.editForecastingUnit = this.editForecastingUnit.bind(this);
         this.addNewForecastingUnit = this.addNewForecastingUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.filterDataForRealm = this.filterDataForRealm.bind(this);
+        this.getProductCategories = this.getProductCategories.bind(this)
     }
 
 
@@ -42,44 +46,61 @@ export default class ForecastingUnitListComponent extends Component {
         return getLabelText(cell, this.state.lang);
     }
 
-    filterData() {
+    filterDataForRealm() {
         let realmId = document.getElementById("realmId").value;
+        ForecastingUnitService.getForcastingUnitByRealmId(realmId).then(response => {
+            console.log("response------->" + response);
+            this.setState({
+                forecastingUnitList: response.data,
+                selSource: response.data
+            })
+        })
+
+    }
+
+    filterData() {
+        // let realmId = document.getElementById("realmId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
-        //alert(realmId+" "+productCategoryId+" "+tracerCategoryId)
-        if (realmId != 0 && productCategoryId != 0 && tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId && c.tracerCategory.tracerCategoryId == tracerCategoryId && c.productCategory.productCategoryId == productCategoryId)
-            this.setState({
-                selSource
-            });
-        } else if (realmId != 0 && productCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId && c.productCategory.productCategoryId == productCategoryId)
-            this.setState({
-                selSource
-            });
-        } else if (realmId != 0 && tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId && c.tracerCategory.tracerCategoryId == tracerCategoryId)
 
+        // if (realmId != 0 && productCategoryId != 0 && tracerCategoryId != 0) {
+        //     const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId && c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
+        //     this.setState({
+        //         selSource
+        //     });
+        // } else
+        //  if (realmId != 0 && productCategoryId != 0) {
+        //     const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId && c.productCategory.id == productCategoryId)
+        //     this.setState({
+        //         selSource
+        //     });
+        // } else 
+        // if (realmId != 0 && tracerCategoryId != 0) {
+        //     const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId && c.tracerCategory.id == tracerCategoryId)
+
+        //     this.setState({
+        //         selSource
+        //     });
+        // } else 
+        if (productCategoryId != 0 && tracerCategoryId != 0) {
+            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId && c.productCategory.id == productCategoryId)
             this.setState({
                 selSource
             });
-        } else if (productCategoryId != 0 && tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.tracerCategoryId == tracerCategoryId && c.productCategory.productCategoryId == productCategoryId)
-            this.setState({
-                selSource
-            });
-        } else if (realmId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.realm.realmId == realmId)
-            this.setState({
-                selSource
-            });
-        } else if (productCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.productCategory.productCategoryId == productCategoryId)
+        }
+        // else if (realmId != 0) {
+        //     const selSource = this.state.forecastingUnitList.filter(c => c.realm.id == realmId)
+        //     this.setState({
+        //         selSource
+        //     });
+        // } 
+        else if (productCategoryId != 0) {
+            const selSource = this.state.forecastingUnitList.filter(c => c.productCategory.id == productCategoryId)
             this.setState({
                 selSource
             });
         } else if (tracerCategoryId != 0) {
-            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.tracerCategoryId == tracerCategoryId)
+            const selSource = this.state.forecastingUnitList.filter(c => c.tracerCategory.id == tracerCategoryId)
             this.setState({
                 selSource
             });
@@ -89,91 +110,49 @@ export default class ForecastingUnitListComponent extends Component {
             });
         }
     }
+    getProductCategories() {
+        AuthenticationService.setupAxiosInterceptors();
+        let realmId = document.getElementById("realmId").value;
+        ProductService.getProductCategoryList(realmId)
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+
+
+                this.setState({
+                    productCategories: response.data
+                })
+            })
+
+    }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        realms: response.data
+                        realms: response.data,
+                        realmId: response.data[0].realmId
                     })
+                    this.getProductCategories();
+                    ForecastingUnitService.getForcastingUnitByRealmId(this.state.realmId).then(response => {
+                        console.log("response------->" + response);
+                        this.setState({
+                            forecastingUnitList: response.data,
+                            selSource: response.data
+                        })
+                    })
+
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
                 this.setState({
                     tracerCategories: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-        ProductService.getProductCategoryList()
-            .then(response => {
-                this.setState({
-                    productCategories: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
-
+            })
 
         ForecastingUnitService.getForecastingUnitListAll().then(response => {
             console.log("response------->" + response);
@@ -182,32 +161,13 @@ export default class ForecastingUnitListComponent extends Component {
                 selSource: response.data
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+
     }
 
     editForecastingUnit(forecastingUnit) {
         this.props.history.push({
-            pathname: "/forecastingUnit/editForecastingUnit",
-            state: { forecastingUnit: forecastingUnit }
+            pathname: `/forecastingUnit/editForecastingUnit/${forecastingUnit.forecastingUnitId}`,
+            // state: { forecastingUnit: forecastingUnit }
         });
 
     }
@@ -242,9 +202,10 @@ export default class ForecastingUnitListComponent extends Component {
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
+                console.log(JSON.stringify(item))
                 return (
                     <option key={i} value={item.productCategoryId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.payload.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -314,6 +275,7 @@ export default class ForecastingUnitListComponent extends Component {
             firstPageTitle: i18n.t('static.common.nextPage'),
             lastPageTitle: i18n.t('static.common.lastPage'),
             showTotal: true,
+            paginationSize: 2,
             paginationTotalRenderer: customTotal,
             disablePageTitle: true,
             sizePerPageList: [{
@@ -331,6 +293,9 @@ export default class ForecastingUnitListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
@@ -357,13 +322,17 @@ export default class ForecastingUnitListComponent extends Component {
                                                     id="realmId"
                                                     bsSize="sm"
                                                 >
-                                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                                    {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+
                                                     {realmList}
                                                 </Input>
-
+                                                <InputGroupAddon addonType="append">
+                                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
+                                                </InputGroupAddon>
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
+                                    &nbsp;
                                     <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                         <div className="controls SelectGo">

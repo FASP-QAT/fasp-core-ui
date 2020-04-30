@@ -14,6 +14,7 @@ import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
@@ -33,7 +34,7 @@ const initialValues = {
     monthsInPastForAmc: '',
     healthAreaId: '',
     programNotes: ''
-    
+
 }
 
 const validationSchema = function (values) {
@@ -70,7 +71,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validhealthareatext')),
         programNotes: Yup.string()
             .required(i18n.t('static.program.validnotestext')),
-        
+
     })
 }
 
@@ -115,7 +116,7 @@ export default class AddProgram extends Component {
                     realmCountryId: ''
                 },
                 organisation: {
-                    organisationId: ''
+                    id: ''
                 },
                 programManager: {
                     userId: '',
@@ -136,7 +137,7 @@ export default class AddProgram extends Component {
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
                 healthArea: {
-                    healthAreaId: ''
+                    id: ''
                 },
                 programNotes: '',
                 regionArray: [],
@@ -162,6 +163,7 @@ export default class AddProgram extends Component {
         this.getRegionList = this.getRegionList.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -182,28 +184,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
     getDependentLists(e) {
         console.log(e.target.value)
@@ -221,26 +202,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
         ProgramService.getRealmCountryList(e.target.value)
             .then(response => {
@@ -254,27 +216,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getOrganisationList(e.target.value)
@@ -289,27 +231,8 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getHealthAreaList(e.target.value)
@@ -324,28 +247,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
 
     getRegionList(e) {
@@ -368,28 +270,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
     updateFieldData(value) {
         let { program } = this.state;
@@ -411,7 +292,7 @@ export default class AddProgram extends Component {
         } if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
         } if (event.target.name == 'organisationId') {
-            program.organisation.organisationId = event.target.value;
+            program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
@@ -431,7 +312,7 @@ export default class AddProgram extends Component {
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
-            program.healthArea.healthAreaId = event.target.value;
+            program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }
@@ -460,7 +341,7 @@ export default class AddProgram extends Component {
             monthsInPastForAmc: true,
             healthAreaId: true,
             programNotes: true,
-        
+
         }
         )
         this.validateForm(errors)
@@ -536,6 +417,9 @@ export default class AddProgram extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
@@ -555,27 +439,7 @@ export default class AddProgram extends Component {
                                         }
                                     }
                                     )
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        )
+
                                 }}
                                 render={
                                     ({
@@ -596,7 +460,7 @@ export default class AddProgram extends Component {
                                                 </CardHeader>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             type="text" name="programName" valid={!errors.programName}
@@ -609,7 +473,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.realm.realmId}
@@ -618,6 +482,7 @@ export default class AddProgram extends Component {
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.program.realm.realmId}
                                                             type="select" name="realmId" id="realmId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realms}
@@ -627,10 +492,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.realmCountry.realmCountryId}
+                                                            value={this.state.program.realmCountry.realmCountryId}
                                                             bsSize="sm"
                                                             valid={!errors.realmCountryId}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
@@ -647,7 +512,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup >
-                                                        <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
 
                                                         <Select
                                                             valid={!errors.regionId}
@@ -664,9 +529,9 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.regionId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.organisation.organisationId}
+                                                            value={this.state.program.organisation.id}
                                                             bsSize="sm"
                                                             valid={!errors.organisationId}
                                                             invalid={touched.organisationId && !!errors.organisationId}
@@ -682,9 +547,9 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.organisationId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.healthArea.healthAreaId}
+                                                            value={this.state.program.healthArea.id}
                                                             bsSize="sm"
                                                             valid={!errors.healthAreaId}
                                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
@@ -700,9 +565,9 @@ export default class AddProgram extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.programManager.userId}
+                                                            value={this.state.program.programManager.userId}
                                                             bsSize="sm"
                                                             valid={!errors.userId}
                                                             invalid={touched.userId && !!errors.userId}
@@ -718,9 +583,9 @@ export default class AddProgram extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.programNotes}
+                                                            value={this.state.program.programNotes}
                                                             bsSize="sm"
                                                             valid={!errors.programNotes}
                                                             invalid={touched.programNotes && !!errors.programNotes}
@@ -730,9 +595,9 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.airFreightPerc}
+                                                            value={this.state.program.airFreightPerc}
                                                             bsSize="sm"
                                                             valid={!errors.airFreightPerc}
                                                             invalid={touched.airFreightPerc && !!errors.airFreightPerc}
@@ -744,9 +609,9 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.seaFreightPerc}
+                                                            value={this.state.program.seaFreightPerc}
                                                             bsSize="sm"
                                                             valid={!errors.seaFreightPerc}
                                                             invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
@@ -758,10 +623,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.plannedToDraftLeadTime}
+                                                            value={this.state.program.plannedToDraftLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.plannedToDraftLeadTime}
                                                             invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
@@ -775,10 +640,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.draftToSubmittedLeadTime}
+                                                            value={this.state.program.draftToSubmittedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.draftToSubmittedLeadTime}
                                                             invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
@@ -793,10 +658,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.submittedToApprovedLeadTime}
+                                                            value={this.state.program.submittedToApprovedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.submittedToApprovedLeadTime}
                                                             invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
@@ -810,10 +675,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.approvedToShippedLeadTime}
+                                                            value={this.state.program.approvedToShippedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.approvedToShippedLeadTime}
                                                             invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
@@ -827,10 +692,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.deliveredToReceivedLeadTime}
+                                                            value={this.state.program.deliveredToReceivedLeadTime}
                                                             bsSize="sm"
                                                             valid={!errors.deliveredToReceivedLeadTime}
                                                             invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
@@ -844,10 +709,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.monthsInPastForAmc}
+                                                            value={this.state.program.monthsInPastForAmc}
                                                             bsSize="sm"
                                                             valid={!errors.monthsInPastForAmc}
                                                             invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
@@ -861,10 +726,10 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.monthsInFutureForAmc}
+                                                            value={this.state.program.monthsInFutureForAmc}
                                                             bsSize="sm"
                                                             valid={!errors.monthsInFutureForAmc}
                                                             invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
@@ -882,6 +747,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
                                                         &nbsp;
@@ -898,5 +764,29 @@ export default class AddProgram extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+    resetClicked() {
+        let { program } = this.state;
+
+        program.label.label_en = ''
+        program.realm.realmId = ''
+        program.realmCountry.realmCountryId = ''
+        this.state.regionId = ''
+        program.organisation.id = ''
+        program.airFreightPerc = ''
+        program.seaFreightPerc = ''
+        program.deliveredToReceivedLeadTime = ''
+        program.draftToSubmittedLeadTime = ''
+        program.plannedToDraftLeadTime = ''
+        program.submittedToApprovedLeadTime = ''
+        program.approvedToShippedLeadTime = ''
+        program.monthsInFutureForAmc = ''
+        program.monthsInPastForAmc = ''
+        program.healthArea.id = ''
+        program.programManager.userId = ''
+        program.programNotes = ''
+
+        this.setState({ program }, () => { })
+
     }
 }

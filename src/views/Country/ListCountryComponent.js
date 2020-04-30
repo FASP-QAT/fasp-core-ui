@@ -9,6 +9,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 import i18n from '../../i18n';
 import { boolean } from 'yup';
@@ -64,8 +65,8 @@ export default class CountryListComponent extends Component {
     editCountry(country) {
         console.log(country);
         this.props.history.push({
-            pathname: "/country/editCountry",
-            state: { country: country }
+            pathname: `/country/editCountry/${country.countryId}`,
+            // state: { country: country }
         });
 
     }
@@ -83,26 +84,26 @@ export default class CountryListComponent extends Component {
                 this.setState({ message: response.data.messageCode })
             }
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
 
@@ -175,12 +176,15 @@ export default class CountryListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -189,9 +193,9 @@ export default class CountryListComponent extends Component {
                         </div>
 
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>

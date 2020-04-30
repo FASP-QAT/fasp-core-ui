@@ -1,25 +1,35 @@
 import axios from "axios";
-import {API_URL} from '../Constants.js';
+import { API_URL } from '../Constants.js';
 
-class ForecastingUnitService{
+class ForecastingUnitService {
 
-addForecastingUnit(json){
-return axios.post(`${API_URL}/api/forecastingUnit/`,json,{}
-);
-}
+    addForecastingUnit(json) {
+        return axios.post(`${API_URL}/api/forecastingUnit/`, json, {}
+        );
+    }
 
-getForecastingUnitList() {
-    return axios.get(`${API_URL}/api/forecastingUnit/`, {
-    });
-}
-getForecastingUnitListAll() {
-    return axios.get(`${API_URL}/api/forecastingUnit/all/`, {
-    });
-}
 
-editForecastingUnit(json) {
-    return axios.put(`${API_URL}/api/forecastingUnit/`, json, {
-    });
-}
+    getForecastingUnitList() {
+        return axios.get(`${API_URL}/api/forecastingUnit/`, {
+        });
+    }
+
+    getForecastingUnitListAll() {
+        return axios.get(`${API_URL}/api/forecastingUnit/all/`, {
+        });
+    }
+
+    editForecastingUnit(json) {
+        return axios.put(`${API_URL}/api/forecastingUnit/`, json, {
+        });
+    }
+    getForcastingUnitById(json) {
+        return axios.get(`${API_URL}/api/forecastingUnit/${json}`, {}
+        );
+    }
+    getForcastingUnitByRealmId(json) {
+        return axios.get(`${API_URL}/api/forecastingUnit/realmId/${json}`, {}
+        );
+    }
 }
 export default new ForecastingUnitService();

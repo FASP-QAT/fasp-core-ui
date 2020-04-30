@@ -2,8 +2,9 @@ import axios from "axios"
 import { API_URL } from '../Constants.js'
 
 class ProgramService {
-    getProgramData(programId) {
-        return axios.get(`${API_URL}/api/getProgramData?programId=${programId}`, {
+    getProgramData(json) {
+        console.log("Json",json)
+        return axios.get(`${API_URL}/api/programData/programId/${json.programId}/versionId/${json.versionId}`, {
         });
     }
 
@@ -49,12 +50,18 @@ class ProgramService {
         return axios.get(`${API_URL}/api/programProduct/${json}`, {}
         );
     }
-
+    getProgramPlaningUnitListByProgramId(json) {
+        return axios.get(`${API_URL}/api/program/${json}/planningUnit/all/`, {}
+        );
+    }
     addProgramProductMapping(json) {
         return axios.put(`${API_URL}/api/programProduct/`, json, {}
         );
     }
-
+    addprogramPlanningUnitMapping(json) {
+        return axios.put(`${API_URL}/api/program/planningUnit/`, json, {}
+        );
+    }
     getProgramById(json) {
         return axios.get(`${API_URL}/api/program/${json}`, {}
         );
@@ -62,6 +69,11 @@ class ProgramService {
 
     getProgramManagerList(json) {
         return axios.get(`${API_URL}/api/user/realmId/${json}`, {}
+        );
+    }
+
+    getProgramByRealmId(json) {
+        return axios.get(`${API_URL}/api/program/realmId/${json}`, {}
         );
     }
 }

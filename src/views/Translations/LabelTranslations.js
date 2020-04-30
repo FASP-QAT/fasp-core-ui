@@ -62,12 +62,12 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'text' },
                         { type: 'text' },
                     ],
-                    pagination: 25,
+                    pagination: 10,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [25, 50, 75, 100],
+                    paginationOptions: [10, 25, 50, 100],
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     onchange: this.changed,
@@ -164,9 +164,11 @@ export default class DatabaseTranslations extends React.Component {
                     <Col xs="12" sm="12">
                         <Card>
                             <CardHeader>
+                            
                                 <strong>{i18n.t('static.label.labelTranslations')}</strong>
                             </CardHeader>
-                            <CardBody className="table-responsive">
+                            <CardBody className="table-responsive pt-md-1 pb-md-1">
+                            <div id="loader" className="center"></div>
                                 <div id="labelTranslationTable"></div>
                             </CardBody>
                             <CardFooter>
