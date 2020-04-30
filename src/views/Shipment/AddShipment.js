@@ -167,8 +167,8 @@ export default class ConsumptionDetails extends React.Component {
                         }
 
                         data = [];
-                        data[0] = '102129';
-                        data[1] = '18 Jun 2020'
+                        data[0] = '';
+                        data[1] = '03/08/20'
                         data[2] = '01-SUGGESTED';
                         data[3] = 'Ceftriaxone 250 mg Powder Vial - 10 Vials';
                         data[4] = '44,773';
@@ -194,32 +194,40 @@ export default class ConsumptionDetails extends React.Component {
                         var options = {
                             data: data,
                             columnDrag: true,
-                            colWidths: [100, 100, 100, 100, 100, 100, 100],
+                            colWidths: [150, 150, 150, 150, 150, 150, 150],
                             columns: [
                                 // { title: 'Month', type: 'text', readOnly: true },
                                 {
                                     title: 'Qat Order No',
-                                    type: 'text'
+                                    type: 'text',
+                                    readOnly: true
                                 },
                                 {
                                     title: 'Expected Delivery date',
-                                    type: 'calendar'
+                                    // type: 'calendar',
+                                    type: 'text',
+                                    readOnly: true
+                                    
                                 },
                                 {
                                     title: 'Shipment Status',
-                                    type: 'text'
+                                    type: 'text',
+                                    readOnly: true
                                 },
                                 {
                                     title: 'Planning Unit',
-                                    type: 'text'
+                                    type: 'text',
+                                    readOnly: true
                                 },
                                 {
                                     title: 'Suggested Order Qty',
-                                    type: 'text'
+                                    type: 'text',
+                                    readOnly: true
                                 },
                                 {
                                     title: 'Adjusted Order Qty',
-                                    type: 'text'
+                                    type: 'text',
+                                    readOnly: true
                                 },
                                 {
                                     title: 'Notes',
