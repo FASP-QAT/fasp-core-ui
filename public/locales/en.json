@@ -153,7 +153,7 @@
     "static.product.unit1": "Forcasting Unit",
     "static.dashboard.role": "Role",
     "static.dashboard.applicationmaster": "Application Masters",
-    "static.program.notes": "Program Notes",
+    "static.program.notes": "Notes",
     "static.message.fundingSource.listNotFound": "No Funding Source found",
     "static.message.user.notExist": "User does not exists",
     "static.budget.stopdatetext": "Please enter Stop date",
@@ -615,5 +615,9 @@
     "static.consumption.actualflag": "Actual Flag",
     "static.consumption.actual": "Actual",
     "static.consumption.forcast": "Forecast",
-    "static.message.inventorysuccess": "Inventory Data Saved"
+    "static.message.inventorysuccess": "Inventory Data Saved",
+    "static.language.preferredlng": "Change Preferred Language",
+    "static.language.portuguese": "Portuguese",
+    "static.planningunit.gtinNo": "Only numbers allowed",
+    "static.planningunit.maxGtin": "Max 14 digits allowed"
 }
