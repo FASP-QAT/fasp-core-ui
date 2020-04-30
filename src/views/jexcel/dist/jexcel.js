@@ -171,7 +171,7 @@ var jexcel = (function(el, options) {
         // Texts
         text:{
             noRecordsFound: 'No records found',
-            showingPage: 'Showing page {0} of {1} Results',
+            showingPage: 'Showing page {0} of {1}',
             show: '',
             search: 'Search',
             entries: '',
