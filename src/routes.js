@@ -190,9 +190,8 @@ const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
-
-  { path: '/inventory/addInventory', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.inventory.inventory') }), component: AddInventory },
-  { path: '/productCategory/productCategoryTree', name: 'Product Category Tree', component: ProductCategoryTree },
+  { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
+  { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
   { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.dimension') }), component: AddDimension },

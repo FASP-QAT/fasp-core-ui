@@ -1,5 +1,7 @@
 import React from "react";
 import jexcel from 'jexcel';
+// import jexcel from '../jexcel/dist/jexcel';
+
 
 import "../ProductCategory/style.css"
 import "../../../node_modules/jexcel/dist/jexcel.css";
@@ -167,7 +169,7 @@ export default class DatabaseTranslations extends React.Component {
                             
                                 <strong>{i18n.t('static.label.labelTranslations')}</strong>
                             </CardHeader>
-                            <CardBody className="table-responsive">
+                            <CardBody className="table-responsive pt-md-1 pb-md-1">
                             <div id="loader" className="center"></div>
                                 <div id="labelTranslationTable"></div>
                             </CardBody>

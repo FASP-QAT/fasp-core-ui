@@ -8,7 +8,7 @@ body {
   color:#7a7e7a!important;
 }
 
-.Select--single>.Select-control .Select-value, .Select-placeholder {
+Select >.Select-control .Select-value, .Select-placeholder {
   color: #7a7e7a!important;
 }
 /* ————————————————————–
@@ -412,7 +412,7 @@ label.arrow_label:after {
 }
 .red {
   //  color: #f86c6b !important;
-  font-size: 12px;
+  
   color: red!important;
 }
  
@@ -592,8 +592,15 @@ label.arrow_label:after {
   .jexcel_content{    overflow-y: auto !important;
     max-height: 440px;
 }
+.jexcel > tbody > tr > td.readonly {
+  color: #212721 !important;
+}
  
 .whitebtnColor .btn-info{color: #fff!important;}
+
+
+.breadcrumb {
+  margin-bottom: .5rem;}
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}
@@ -1240,16 +1247,7 @@ h5,
 //   color: #7a7e7a!important;
 // }
 /* with the :focus here, we would show grey when not using the element */
-select {
-  color: #7a7e7a;
-}
-/* with the :focus here, we show grey when using the element */
-select:focus {
-  color: #7a7e7a;
-}
-option {
-  color: #212721;
-}
+
 option:first-of-type {
   color: #7a7e7a;
 }
@@ -1262,35 +1260,32 @@ select > option:checked{
 select:required:invalid {
   color: #7a7e7a;
 }
-select:required {
+
+select:invalid {
   color: #7a7e7a;
 }
-
-select:required.form-control:focus {
-  color: #212721;
-}
-
 select > option[value="0"]:is-valid {
   color: #7a7e7a;
 }
 
-// select:required:form-control {
-//   color: #7a7e7a;
-// }
-// select:form-control:focus{
-//   color: #212721;
-// }
 input[value=''] {
   color: #7a7e7a!important;
 }
-input[value='0'] {
-  color: #7a7e7a!important;
-}
+// input[value='0'] {
+//   color: #7a7e7a!important;
+// }
+// input[value='0.0'] {
+//   color: #7a7e7a!important;
+// }
 input::placeholder {
   color: #7a7e7a!important;
 }
-select:required:invalid,
+select:invalid,
 select option[value="0"] {
+color: #7a7e7a;
+}
+select:invalid,
+select option[value=""] {
 color: #7a7e7a;
 }
 .nonclickablebox{

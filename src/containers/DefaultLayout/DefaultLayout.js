@@ -356,6 +356,11 @@ class DefaultLayout extends Component {
                       //     }
                       //   ]
                       // },
+                      // {
+                      //   name: 'Program Onboarding',
+                      //   url: '/program/programOnboarding',
+                      //   icon: 'icon-graph'
+                      // },
                     ]
 
                 }} {...this.props} />
@@ -377,6 +382,16 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
                             icon: 'fa fa-upload',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.consumptiondetails'),
+                            url: '/consumptionDetails',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.inventorydetails'),
+                            url: '/inventory/addInventory',
+                            icon: 'fa fa-list',
                           }
                         ]
                       }
