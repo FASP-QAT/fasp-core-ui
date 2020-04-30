@@ -50,6 +50,7 @@ class ListBudgetComponent extends Component {
     this.filterData = this.filterData.bind(this);
     this.formatDate = this.formatDate.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
+    this.addCommas = this.addCommas.bind(this);
   }
 
 
@@ -97,7 +98,7 @@ class ListBudgetComponent extends Component {
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          console.log("budget after status 200---->", response.data);
+          console.log("budget after status 200 new console --- ---->", response.data);
           this.setState({
             budgetList: response.data,
             selBudget: response.data
@@ -183,6 +184,20 @@ class ListBudgetComponent extends Component {
     }
   }
 
+  addCommas(cell, row) {
+    console.log("---------->m in");
+    cell += '';
+    var x = cell.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
+
+
   render() {
 
     const { SearchBar, ClearSearchButton } = Search;
@@ -222,11 +237,19 @@ class ListBudgetComponent extends Component {
 
       },
       {
+        dataField: 'notes',
+        text: i18n.t('static.program.notes'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+      },
+      {
         dataField: 'budgetAmt',
         text: i18n.t('static.budget.budgetamount'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.addCommas
       },
       {
         dataField: 'startDate',
@@ -290,7 +313,7 @@ class ListBudgetComponent extends Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
-          <CardHeader>
+          <CardHeader className="mb-md-3 pb-lg-1">
             <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
@@ -298,7 +321,7 @@ class ListBudgetComponent extends Component {
               </div>
             </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="pb-lg-0 ">
             {/* <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
               <TableHeaderColumn isKey dataField="budgetId" hidden>Budget Id</TableHeaderColumn>
               <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showBudgetLabel} dataSort>{i18n.t('static.budget.budget')}</TableHeaderColumn>
@@ -310,7 +333,7 @@ class ListBudgetComponent extends Component {
               <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>{i18n.t('static.common.active')}</TableHeaderColumn>
             </BootstrapTable> */}
             <Col md="3 pl-0" >
-              <FormGroup>
+              <FormGroup className="Selectdiv">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                 <div className="controls SelectGo">
                   <InputGroup>
