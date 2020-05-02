@@ -562,14 +562,14 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                 <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                     <thead>
                                         <tr>
-                                            <th className="text-left">{i18n.t('static.procurementagent.procurementagent')}</th>
-                                            <th className="text-left">{i18n.t('static.procurementUnit.procurementUnit')}</th>
-                                            <th className="text-left">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</th>
-                                            <th className="text-left">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}</th>
-                                            <th className="text-left">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}</th>
-                                            <th className="text-left">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>
-                                            <th className="text-left">{i18n.t('static.common.status')}</th>
-                                            <th className="text-left">{i18n.t('static.common.update')}</th>
+                                            <th className="text-center">{i18n.t('static.procurementagent.procurementagent')}</th>
+                                            <th className="text-center">{i18n.t('static.procurementUnit.procurementUnit')}</th>
+                                            <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</th>
+                                            <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}</th>
+                                            <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}</th>
+                                            <th className="text-center">{i18n.t('static.procurementAgentProcurementUnit.gtin')}</th>
+                                            <th className="text-center">{i18n.t('static.common.status')}</th>
+                                            <th className="text-center">{i18n.t('static.common.update')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
