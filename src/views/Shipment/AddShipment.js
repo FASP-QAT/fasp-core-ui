@@ -138,15 +138,14 @@ export default class ConsumptionDetails extends React.Component {
                     //         }
                     //     }
                     // }
+                    programId = (document.getElementById("programId").value).split("_")[0];
 
+                    var programTransaction1 = db1.transaction(['program'], 'readwrite');
+                    var programOs1 = programTransaction1.objectStore('program');
+                    var programRequest1 = programOs1.getAll();
                     if (shipmentStatusId == 1) {
 
                         document.getElementById("addButton").style.display = "block";
-                        programId = (document.getElementById("programId").value).split("_")[0];
-
-                        var programTransaction1 = db1.transaction(['program'], 'readwrite');
-                        var programOs1 = programTransaction1.objectStore('program');
-                        var programRequest1 = programOs1.getAll();
 
                         programRequest1.onsuccess = function (event) {
                             var expectedDeliveryInDays = 0;
@@ -176,21 +175,21 @@ export default class ConsumptionDetails extends React.Component {
                                 data = [];
                                 shipmentDataArr[0] = data;
                             }
-                            for (var j = 0; j < shipmentList.length; j++) {
-                                data = [];
-                                data[0] = shipmentList[j].dataSource.id;
-                                data[1] = shipmentList[j].region.id;
-                                data[2] = shipmentList[j].consumptionQty;
-                                data[3] = shipmentList[j].dayOfStockOut;
-                                data[4] = shipmentList[j].startDate;
-                                data[5] = shipmentList[j].stopDate;
-                                data[6] = shipmentList[j].actualFlag;
+                            // for (var j = 0; j < shipmentList.length; j++) {
+                            //     data = [];
+                            //     data[0] = shipmentList[j].dataSource.id;
+                            //     data[1] = shipmentList[j].region.id;
+                            //     data[2] = shipmentList[j].consumptionQty;
+                            //     data[3] = shipmentList[j].dayOfStockOut;
+                            //     data[4] = shipmentList[j].startDate;
+                            //     data[5] = shipmentList[j].stopDate;
+                            //     data[6] = shipmentList[j].actualFlag;
 
-                                shipmentDataArr[j] = data;
-                            }
+                            //     shipmentDataArr[j] = data;
+                            // }
 
                             data = [];
-                            data[0] = '';
+                            data[0] = 0;
                             data[1] = expectedDeliveryDate;
                             data[2] = '01-SUGGESTED';
                             data[3] = planningUnitText;
@@ -198,7 +197,7 @@ export default class ConsumptionDetails extends React.Component {
                             data[5] = '44,773 ';
                             data[6] = '';
 
-                            shipmentDataArr[j] = data;
+                            // shipmentDataArr[j] = data;
 
                             this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
                             this.el.destroy();
@@ -267,6 +266,132 @@ export default class ConsumptionDetails extends React.Component {
 
                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
                         }.bind(this)
+                    }
+                    if (shipmentStatusId == 3) {
+
+                        document.getElementById("addButton").style.display = "none";
+                        programRequest1.onsuccess = function (event) {
+                            // var shipmentList = (programJson.shipmentList);
+                            var shipmentList = '';
+
+                            this.setState({
+                                shipmentList: shipmentList
+                            });
+
+                            var data = [];
+                            var shipmentDataArr = []
+                            if (shipmentList.length == 0) {
+                                data = [];
+                                shipmentDataArr[0] = data;
+                            }
+
+                            // for (var j = 0; j < shipmentList.length; j++) {
+                            //     if (shipmentList[j].shipmentId == 0 && shipmentList[j].shipmentStatusId == 1) {
+                            //         data = [];
+                            //         data[0] = shipmentList[j].dataSource.id;
+                            //         data[1] = shipmentList[j].region.id;
+                            //         data[2] = shipmentList[j].consumptionQty;
+                            //         data[3] = shipmentList[j].dayOfStockOut;
+                            //         data[4] = shipmentList[j].startDate;
+                            //         data[5] = shipmentList[j].stopDate;
+                            //         data[6] = shipmentList[j].actualFlag;
+                            //     }
+
+                            //     shipmentDataArr[j] = data;
+                            // }
+
+                            data = [];
+                            data[0] = 0;
+                            data[1] = '';
+                            data[2] = '01-SUGGESTED';
+                            data[3] = '';
+                            data[4] = '44,773';
+                            data[5] = '44,773 ';
+                            data[6] = '';
+
+                            // shipmentDataArr[j] = data;
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                            this.el.destroy();
+                            var json = [];
+                            var data = shipmentDataArr;
+                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                            // json[0] = data;
+                            var options = {
+                                data: data,
+                                columnDrag: true,
+                                colWidths: [100, 100, 100, 100, 100, 100, 100],
+                                columns: [
+                                    // { title: 'Month', type: 'text', readOnly: true },
+                                    {
+                                        title: 'Qat Order No',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Expected Delivery date',
+                                        // type: 'calendar',
+                                        type: 'text',
+                                        readOnly: true
+
+                                    },
+                                    {
+                                        title: 'Shipment Status',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Procurement Agent',
+                                        type: 'dropdown',
+                                    },
+                                    {
+                                        title: 'Funding Source',
+                                        type: 'dropdown',
+                                    },
+                                    {
+                                        title: 'Budget',
+                                        type: 'dropdown',
+                                    },
+                                    {
+                                        title: 'Planning Unit',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Suggested Order Qty',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Order Qty',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Notes',
+                                        type: 'text'
+                                    }
+
+                                ],
+                                pagination: 10,
+                                search: true,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onchange: this.changed,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true,
+                                paginationOptions: [10, 25, 50, 100],
+                                position: 'top'
+                            };
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+
+                        }
                     }
                 } else {
                     document.getElementById("addButton").style.display = "none";
@@ -375,7 +500,7 @@ export default class ConsumptionDetails extends React.Component {
                     };
 
                     var shipmentDataBytes = CryptoJS.AES.decrypt((shipmentRequest1.result).shipment, SECRET_KEY);
-                    // var shipmentData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var shipmentData = shipmentDataBytes.toString(CryptoJS.enc.Utf8);
                     // var programJson = JSON.parse(programData);
                     // var plannigUnitId = document.getElementById("planningUnitId").value;
 
