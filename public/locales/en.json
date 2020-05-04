@@ -590,7 +590,7 @@
     "static.common.close": "Close",
     "static.inventory.inventory": "Inventory",
     "static.inventory.program": "Program",
-    "static.inventory.countrySKU": "Program",
+    "static.inventory.countrySKU": "Country SKU",
     "static.common.saveData": "Save Data",
     "static.common.addData": "Add Data",
     "static.inventory.dataSource": "Data Source",
