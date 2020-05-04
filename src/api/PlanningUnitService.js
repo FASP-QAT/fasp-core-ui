@@ -39,5 +39,9 @@ class PlanningUnitService {
         return axios.put(`${API_URL}/api/planningUnit/capacity`, json, {}
         );
     }
+    getPlanningUnitByProductCategoryId(json) {
+        return axios.get(`${API_URL}/api/planningUnit/realmId/${json}`, {}
+        );
+    }
 }
 export default new PlanningUnitService();
