@@ -8,7 +8,7 @@ body {
   color:#7a7e7a!important;
 }
 
-.Select--single>.Select-control .Select-value, .Select-placeholder {
+Select >.Select-control .Select-value, .Select-placeholder {
   color: #7a7e7a!important;
 }
 /* ————————————————————–
@@ -412,7 +412,7 @@ label.arrow_label:after {
 }
 .red {
   //  color: #f86c6b !important;
-  font-size: 12px;
+  
   color: red!important;
 }
  
@@ -989,16 +989,16 @@ h5,
   overflow-y: hidden;
 }
 
-.ps__rail-y {
-  width: 8px!important;
-  overflow-y: hidden!important;
-  right: 0;
-}
-.ps__rail-y:hover > .ps__thumb-y, .ps__rail-y:focus > .ps__thumb-y, .ps__rail-y.ps--clicking .ps__thumb-y {
-  background-color: #999;
-  width: 0px!important;
+// .ps__rail-y {
+//   width: 8px!important;
+//   overflow-y: hidden!important;
+//   right: 0;
+// }
+// .ps__rail-y:hover > .ps__thumb-y, .ps__rail-y:focus > .ps__thumb-y, .ps__rail-y.ps--clicking .ps__thumb-y {
+//   background-color: #999;
+//   width: 0px!important;
   
-}
+// }
 
 .dropdown-menu {
   min-width: 5rem;
@@ -1208,9 +1208,9 @@ h5,
 .legend li { float: left; margin-right: 10px;margin: 10px; }
 .legend span {  float: left; width: 55px; height: 25px; margin: -4px 11px 0px 0px;border-radius: 3px; }
 /* your colors */
-.legend .lightpinklegend { background-color: rgb(255, 204, 203); border-color:1px solid rgb(255, 204, 203);}
-.legend .greenlegend { background-color:rgb(152, 251, 152);border-color:1px solid rgb(152, 251, 152); }
-.legend .redlegend { background-color: #FF8686; border-color:1px solid #FF8686; }
+.legend .lightpinklegend { background-color: yellow; border-color:1px solid yellow;}
+.legend .greenlegend { background-color:green;border-color:1px solid green; }
+.legend .redlegend { background-color:red; border-color:1px solid red; }
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
 
 // .card {
@@ -1237,21 +1237,78 @@ h5,
   box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.25);
 }
 
-select > option[value=""]{
-  color: #7a7e7a!important;
+// select > option[value=""]{
+//   color: #7a7e7a!important;
+// }
+// select > option:first-child {
+//   color: #7a7e7a!important;
+// }
+// select > option[value="0"]{
+//   color: #7a7e7a!important;
+// }
+/* with the :focus here, we would show grey when not using the element */
+
+option:first-of-type {
+  color: #7a7e7a;
 }
-select > option:first-child {
-  color: #7a7e7a!important;
+select > option:focus,
+select > option:active,
+select > option:checked{
+  color: #7a7e7a;
 }
-select > option[value="0"]{
-  color: #7a7e7a!important;
+
+select:required:invalid {
+  color: #7a7e7a;
+}
+
+select:invalid {
+  color: #7a7e7a;
+}
+select > option[value="0"]:is-valid {
+  color: #7a7e7a;
 }
 
 input[value=''] {
   color: #7a7e7a!important;
 }
-
+// input[value='0'] {
+//   color: #7a7e7a!important;
+// }
+// input[value='0.0'] {
+//   color: #7a7e7a!important;
+// }
+input::placeholder {
+  color: #7a7e7a!important;
+}
+select:invalid,
+select option[value="0"] {
+color: #7a7e7a;
+}
+select:invalid,
+select option[value=""] {
+color: #7a7e7a;
+}
 .nonclickablebox{
   pointer-events: none!important;
 }
 
+.ps__rail-y.ps--clicking .ps__thumb-y, .ps__rail-y:focus>.ps__thumb-y, .ps__rail-y:hover>.ps__thumb-y {
+  background-color: #999;
+  width: 11px!important;
+}
+
+.ps__thumb-y {
+  transition: background-color .2s linear,width .2s ease-in-out;
+  -webkit-transition: background-color .2s linear,width .2s ease-in-out;
+  width: 0px!important;
+  right: 2px;
+}
+
+.ps__rail-y {
+  width: 13px!important;
+  right: 0;
+}
+
+.dropdown-item i:active {
+  color: #fff;
+}

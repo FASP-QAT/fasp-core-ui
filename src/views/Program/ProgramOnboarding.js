@@ -1,124 +1,764 @@
 import React, { Component } from 'react';
+// import "../node_modules/react-step-progress-bar/styles.css";
+import "../../../node_modules/react-step-progress-bar/styles.css"
+import { ProgressBar, Step } from "react-step-progress-bar";
 import {
-    Row, Col, Card, CardHeader, CardFooter, Button,
-    CardBody, Modal, ModalBody, ModalFooter, ModalHeader,
-    ListGroup, ListGroupItem, ListGroupItemHeading, ListGroupItemText,
-    TabContent, TabPane
+    Row, Col,
+    Card, CardHeader, CardFooter,
+    Button, FormFeedback, CardBody,
+    FormText, Form, FormGroup, Label, Input,
+    InputGroupAddon, InputGroupText
 } from 'reactstrap';
-
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
+import i18n from '../../i18n';
+import HealthAreaService from "../../api/HealthAreaService";
+import AuthenticationService from '../Common/AuthenticationService.js';
+import ProgramService from "../../api/ProgramService";
+import getLabelText from '../../CommonComponent/getLabelText'
 
 export default class ProgramOnboarding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            modal: false,
-            large: false,
-            small: false,
-            primary: false,
-            success: false,
-            warning: false,
-            danger: false,
-            info: false,
-            activeTab: 0
-        };
-        this.toggleLarge = this.toggleLarge.bind(this);
-        this.toggle = this.toggle.bind(this);
-    }
-    toggle(tab) {
-        if (this.state.activeTab !== tab) {
-            this.setState({
-                activeTab: tab
-            });
+            program: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                realm: {
+                    realmId: ''
+                },
+                realmCountry: {
+                    realmCountryId: ''
+                },
+                organisation: {
+                    id: ''
+                },
+                programManager: {
+                    userId: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                airFreightPerc: '',
+                seaFreightPerc: '',
+                deliveredToReceivedLeadTime: '',
+                draftToSubmittedLeadTime: '',
+                plannedToDraftLeadTime: '',
+                submittedToApprovedLeadTime: '',
+                approvedToShippedLeadTime: '',
+                monthsInFutureForAmc: '',
+                monthsInPastForAmc: '',
+                healthArea: {
+                    id: ''
+                },
+                programNotes: '',
+                regionArray: [],
+            },
+            lang: localStorage.getItem('lang'),
+            regionId: '',
+            realmList: [],
+            realmCountryList: [],
+            organisationList: [],
+            healthAreaList: [],
+            programManagerList: [],
+            regionList: [],
+            message: '',
+
+            progressPer: 0
         }
+        this.Capitalize = this.Capitalize.bind(this);
+
+        this.dataChange = this.dataChange.bind(this);
+        this.getDependentLists = this.getDependentLists.bind(this);
+        this.getRegionList = this.getRegionList.bind(this);
+        this.updateFieldData = this.updateFieldData.bind(this);
+
+        this.finishedStepOne = this.finishedStepOne.bind(this);
+        this.finishedStepTwo = this.finishedStepTwo.bind(this);
+        this.finishedStepThree = this.finishedStepThree.bind(this);
+        this.finishedStepFour = this.finishedStepFour.bind(this);
+        this.finishedStepFive = this.finishedStepFive.bind(this);
+        this.finishedStepSix = this.finishedStepSix.bind(this);
+        this.finishedStepSeven = this.finishedStepSeven.bind(this);
+
+        this.previousToStepOne = this.previousToStepOne.bind(this);
+        this.previousToStepTwo = this.previousToStepTwo.bind(this);
+        this.previousToStepThree = this.previousToStepThree.bind(this);
+        this.previousToStepFour = this.previousToStepFour.bind(this);
+        this.previousToStepFive = this.previousToStepFive.bind(this);
+        this.previousToStepSix = this.previousToStepSix.bind(this);
     }
-    toggleLarge() {
-        this.setState({
-            large: !this.state.large,
-        });
+    componentDidMount() {
+        document.getElementById('stepOne').style.display = 'block';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+
+        AuthenticationService.setupAxiosInterceptors();
+        HealthAreaService.getRealmList()
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realmList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
     }
+    finishedStepOne() {
+        this.setState({ progressPer: 17 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'block';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    finishedStepTwo() {
+        this.setState({ progressPer: 34 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'block';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    finishedStepThree() {
+        this.setState({ progressPer: 51 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'block';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    finishedStepFour() {
+        this.setState({ progressPer: 68 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'block';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    finishedStepFive() {
+        this.setState({ progressPer: 85 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'block';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    finishedStepSix() {
+        this.setState({ progressPer: 102 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'block';
+    }
+
+    finishedStepSeven() {
+        console.log("hi-----------", this.state.program);
+    }
+    previousToStepOne() {
+        this.setState({ progressPer: 0 });
+        document.getElementById('stepOne').style.display = 'block';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+
+    previousToStepTwo() {
+        this.setState({ progressPer: 17 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'block';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+
+    previousToStepThree() {
+        this.setState({ progressPer: 34 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'block';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+
+    previousToStepFour() {
+        this.setState({ progressPer: 51 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'block';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    previousToStepFive() {
+        this.setState({ progressPer: 68 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'block';
+        document.getElementById('stepSix').style.display = 'none';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    previousToStepSix() {
+        this.setState({ progressPer: 85 });
+        document.getElementById('stepOne').style.display = 'none';
+        document.getElementById('stepTwo').style.display = 'none';
+        document.getElementById('stepThree').style.display = 'none';
+        document.getElementById('stepFour').style.display = 'none';
+        document.getElementById('stepFive').style.display = 'none';
+        document.getElementById('stepSix').style.display = 'block';
+        document.getElementById('stepSeven').style.display = 'none';
+    }
+    Capitalize(str) {
+        let { program } = this.state
+        program.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+    }
+    dataChange(event) {
+        let { program } = this.state;
+        if (event.target.name == "programName") {
+            program.label.label_en = event.target.value;
+        } if (event.target.name == "realmId") {
+            program.realm.realmId = event.target.value;
+        } if (event.target.name == 'realmCountryId') {
+            program.realmCountry.realmCountryId = event.target.value;
+        } if (event.target.name == 'organisationId') {
+            program.organisation.id = event.target.value;
+        } if (event.target.name == 'airFreightPerc') {
+            program.airFreightPerc = event.target.value;
+        } if (event.target.name == 'seaFreightPerc') {
+            program.seaFreightPerc = event.target.value;
+        } if (event.target.name == 'deliveredToReceivedLeadTime') {
+            program.deliveredToReceivedLeadTime = event.target.value;
+        } if (event.target.name == 'draftToSubmittedLeadTime') {
+            program.draftToSubmittedLeadTime = event.target.value;
+        } if (event.target.name == 'plannedToDraftLeadTime') {
+            program.plannedToDraftLeadTime = event.target.value;
+        } if (event.target.name == 'submittedToApprovedLeadTime') {
+            program.submittedToApprovedLeadTime = event.target.value;
+        } if (event.target.name == 'approvedToShippedLeadTime') {
+            program.approvedToShippedLeadTime = event.target.value;
+        } if (event.target.name == 'monthsInFutureForAmc') {
+            program.monthsInFutureForAmc = event.target.value;
+        } if (event.target.name == 'monthsInPastForAmc') {
+            program.monthsInPastForAmc = event.target.value;
+        } if (event.target.name == 'healthAreaId') {
+            program.healthArea.id = event.target.value;
+        } if (event.target.name == 'userId') {
+            program.programManager.userId = event.target.value;
+        }
+        else if (event.target.name == 'programNotes') {
+            program.programNotes = event.target.value;
+        }
+
+        this.setState({ program }, () => { })
+
+    }
+
+    getDependentLists(e) {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getProgramManagerList(e.target.value)
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        programManagerList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+
+        ProgramService.getRealmCountryList(e.target.value)
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        realmCountryList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getOrganisationList(e.target.value)
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        organisationList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+
+
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getHealthAreaList(e.target.value)
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({
+                        healthAreaList: response.data
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+    }
+
+    getRegionList(e) {
+        AuthenticationService.setupAxiosInterceptors();
+        ProgramService.getRegionList(e.target.value)
+            .then(response => {
+                if (response.status == 200) {
+                    var json = response.data;
+                    var regList = [];
+                    for (var i = 0; i < json.length; i++) {
+                        regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
+                    }
+                    this.setState({
+                        regionId: '',
+                        regionList: regList
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            })
+    }
+    updateFieldData(value) {
+        let { program } = this.state;
+        this.setState({ regionId: value });
+        var regionId = value;
+        var regionIdArray = [];
+        for (var i = 0; i < regionId.length; i++) {
+            regionIdArray[i] = regionId[i].value;
+        }
+        program.regionArray = regionIdArray;
+        this.setState({ program: program });
+    }
+
     render() {
+        const { realmList } = this.state;
+        const { programManagerList } = this.state;
+        const { realmCountryList } = this.state;
+        const { organisationList } = this.state;
+        const { healthAreaList } = this.state;
+
+        let realms = realmList.length > 0
+            && realmList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        let realmCountries = realmCountryList.length > 0
+            && realmCountryList.map((item, i) => {
+                return (
+                    <option key={i} value={item.realmCountryId}>
+                        {getLabelText(item.country.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        let realmOrganisation = organisationList.length > 0
+            && organisationList.map((item, i) => {
+                return (
+                    <option key={i} value={item.organisationId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+        let realmHealthArea = healthAreaList.length > 0
+            && healthAreaList.map((item, i) => {
+                return (
+                    <option key={i} value={item.healthAreaId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+
+
+        let programManagers = programManagerList.length > 0
+            && programManagerList.map((item, i) => {
+                return (
+                    <option key={i} value={item.userId}>
+                        {item.username}
+                    </option>
+                )
+            }, this);
+
+
+
         return (
             <div className="animated fadeIn">
                 <Row>
-                    <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <i className="icon-note"></i><strong>Program Onboarding</strong>{' '}
                             </CardHeader>
                             <CardBody>
-                                <Button type="button" onClick={this.toggleLarge} size="md" color="success" className="float-right mr-1">Add Program</Button>
-                                <Modal isOpen={this.state.large} toggle={this.toggleLarge}
-                                    className={'modal-lg ' + this.props.className}>
-                                    <ModalHeader toggle={this.toggleLarge}>Program Onboarding</ModalHeader>
-                                    <ModalBody>
-                                        <Row>
-                                            <Col xs="4">
-                                                <ListGroup id="list-tab" role="tablist">
-                                                    <ListGroupItem onClick={() => this.toggle(0)} action active={this.state.activeTab === 0} >What is Program ?</ListGroupItem>
-                                                    <ListGroupItem onClick={() => this.toggle(1)} action active={this.state.activeTab === 1} >Country</ListGroupItem>
-                                                    <ListGroupItem onClick={() => this.toggle(2)} action active={this.state.activeTab === 2} >Health Area</ListGroupItem>
-                                                    <ListGroupItem onClick={() => this.toggle(3)} action active={this.state.activeTab === 3} >Organization</ListGroupItem>
-                                                    <ListGroupItem onClick={() => this.toggle(4)} action active={this.state.activeTab === 4} >Create Program</ListGroupItem>
-                                                </ListGroup>
-                                            </Col>
-                                            <Col xs="8">
-                                                <TabContent activeTab={this.state.activeTab}>
-                                                    <TabPane tabId={0} >
-                                                        <p>Velit aute mollit ipsum ad dolor consectetur nulla officia culpa adipisicing exercitation fugiat tempor. Voluptate deserunt sit sunt
-                                                          nisi aliqua fugiat proident ea ut. Mollit voluptate reprehenderit occaecat nisi ad non minim
-                                                          tempor sunt voluptate consectetur exercitation id ut nulla. Ea et fugiat aliquip nostrud sunt incididunt consectetur culpa aliquip
-                                                        eiusmod dolor. Anim ad Lorem aliqua in cupidatat nisi enim eu nostrud do aliquip veniam minim.
-                                                        Velit aute mollit ipsum ad dolor consectetur nulla officia culpa adipisicing exercitation fugiat tempor. Voluptate deserunt sit sunt
-                                                          nisi aliqua fugiat proident ea ut. Mollit voluptate reprehenderit occaecat nisi ad non minim
-                                                          tempor sunt voluptate consectetur exercitation id ut nulla. Ea et fugiat aliquip nostrud sunt incididunt consectetur culpa aliquip
-                                                        eiusmod dolor. Anim ad Lorem aliqua in cupidatat nisi enim eu nostrud do aliquip veniam minim.
-                          </p>
-                                                    </TabPane>
-                                                    <TabPane tabId={1}>
-                                                        <p>Cupidatat quis ad sint excepteur laborum in esse qui. Et excepteur consectetur ex nisi eu do cillum ad laborum. Mollit et eu officia
-                                                          dolore sunt Lorem culpa qui commodo velit ex amet id ex. Officia anim incididunt laboris deserunt
-                                                          anim aute dolor incididunt veniam aute dolore do exercitation. Dolor nisi culpa ex ad irure in elit eu dolore. Ad laboris ipsum
-                          reprehenderit irure non commodo enim culpa commodo veniam incididunt veniam ad.</p>
-                                                    </TabPane>
-                                                    <TabPane tabId={2}>
-                                                        <p>Ut ut do pariatur aliquip aliqua aliquip exercitation do nostrud commodo reprehenderit aute ipsum voluptate. Irure Lorem et laboris
-                                                          nostrud amet cupidatat cupidatat anim do ut velit mollit consequat enim tempor. Consectetur
-                                                          est minim nostrud nostrud consectetur irure labore voluptate irure. Ipsum id Lorem sit sint voluptate est pariatur eu ad cupidatat et
-                                                          deserunt culpa sit eiusmod deserunt. Consectetur et fugiat anim do eiusmod aliquip nulla
-                          laborum elit adipisicing pariatur cillum.</p>
-                                                    </TabPane>
-                                                    <TabPane tabId={3}>
-                                                        <p>Irure enim occaecat labore sit qui aliquip reprehenderit amet velit. Deserunt ullamco ex elit nostrud ut dolore nisi officia magna
-                                                          sit occaecat laboris sunt dolor. Nisi eu minim cillum occaecat aute est cupidatat aliqua labore
-                                                          aute occaecat ea aliquip sunt amet. Aute mollit dolor ut exercitation irure commodo non amet consectetur quis amet culpa. Quis ullamco
-                                                          nisi amet qui aute irure eu. Magna labore dolor quis ex labore id nostrud deserunt dolor
-                          eiusmod eu pariatur culpa mollit in irure.</p>
-                                                    </TabPane>
-                                                    <TabPane tabId={4}>
-                                                        <p>Irure enim occaecat labore sit qui aliquip reprehenderit amet velit. Deserunt ullamco ex elit nostrud ut dolore nisi officia magna
-                                                          sit occaecat laboris sunt dolor. Nisi eu minim cillum occaecat aute est cupidatat aliqua labore
-                                                          aute occaecat ea aliquip sunt amet. Aute mollit dolor ut exercitation irure commodo non amet consectetur quis amet culpa. Quis ullamco
-                                                          nisi amet qui aute irure eu. Magna labore dolor quis ex labore id nostrud deserunt dolor
-                          eiusmod eu pariatur culpa mollit in irure.</p>
-                                                    </TabPane>
-                                                </TabContent>
-                                            </Col>
-                                        </Row>
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        {/* <Button color="primary" onClick={this.toggleLarge}>Do Something</Button>{' '} */}
-                                        <Button color="secondary" onClick={this.toggleLarge}>Skip</Button>
-                                    </ModalFooter>
-                                </Modal>
 
-                            </CardBody>
-                            <CardFooter>
-                            </CardFooter>
-                        </Card>
-                    </Col>
-                </Row>
+                                <ProgressBar
+                                    percent={this.state.progressPer}
+                                    filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+                                    style={{ width: '75%' }}
+                                >
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+                                            // <h2>1</h2>
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="https://pngimg.com/uploads/number1/number1_PNG14871.png"
+                                            />
 
-            </div>
+                                        )}
+
+                                    </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
+                                            />
+                                            // <h2>2</h2>
+                                        )}
+                                    </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="https://www.obiettivocoaching.it/wp-content/uploads/2016/04/recruit-circle-3-icon-blue.png"
+                                            />
+                                            // <h2>3</h2>
+                                        )}
+                                    </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
+                                            />
+                                            // <h2>4</h2>
+                                        )}
+                                    </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="https://dwidude.com/wp-content/uploads/2016/09/recruit-circle-5-icon-blue.png"
+                                            />
+                                            // <h2>5</h2>
+                                        )}
+                                    </Step>
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="http://pngimg.com/uploads/number6/number6_PNG18583.png"
+                                            />
+                                            // <h2>6</h2>
+                                        )}
+                                    </Step>
+
+                                    <Step transition="scale">
+                                        {({ accomplished }) => (
+                                            <img
+                                                style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
+                                                width="30"
+                                                src="https://www.library.ucla.edu/sites/default/files/styles/custom_crop/public/static_images/BYS7.jpg?itok=9890vsGz"
+                                            />
+                                            // <h2>7</h2>
+                                        )}
+                                    </Step>
+                                </ProgressBar>
+                                <br></br>
+                                <br></br>
+                                <div id="stepOne">
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
+
+                                        <Input
+                                            bsSize="sm"
+                                            className="col-md-6"
+                                            type="select" name="realmId" id="realmId"
+                                            onChange={(e) => { this.dataChange(e); this.getDependentLists(e) }}
+                                        >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realms}
+                                        </Input>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next</Button>
+                                        &nbsp;
+                                    </FormGroup>
+                                </div>
+                                <div id="stepTwo">
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onChange={(e) => { this.dataChange(e); this.getRegionList(e) }}
+                                            bsSize="sm"
+                                            className="col-md-6"
+                                            type="select" name="realmCountryId" id="realmCountryId">
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmCountries}
+                                        </Input>
+                                    </FormGroup>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="countrySub" id="countrySub" onClick={this.finishedStepTwo} >Next</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} >Previous</Button>
+                                    &nbsp;
+
+                                </div>
+                                <div id="stepThree">
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            bsSize="sm"
+                                            type="select"
+                                            name="healthAreaId"
+                                            id="healthAreaId"
+                                            className="col-md-6"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                        >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmHealthArea}
+                                        </Input>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthAreaSub" id="healthAreaSub" onClick={this.finishedStepThree} >Next</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} >Previous</Button>
+                                        &nbsp;
+
+                                    </FormGroup>
+                                </div>
+                                <div id="stepFour">
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            bsSize="sm"
+                                            type="select"
+                                            name="organisationId"
+                                            id="organisationId"
+                                            className="col-md-6"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                        >
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {realmOrganisation}
+
+                                        </Input>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationSub" id="organizationSub" onClick={this.finishedStepFour} >Next</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.previousToStepThree} >Previous</Button>
+                                        &nbsp;
+
+                                    </FormGroup>
+                                </div>
+                                <div id="stepFive">
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
+                                        <Select
+                                            onChange={(e) => { this.updateFieldData(e) }}
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            name="regionId"
+                                            id="regionId"
+                                            multi
+                                            options={this.state.regionList}
+                                            value={this.state.regionId}
+                                        />
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} >Previous</Button>
+                                        &nbsp;
+
+                                    </FormGroup>
+                                </div>
+                                <div id="stepSix">
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            type="text" name="programName"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e); this.Capitalize(e.target.value) }}
+                                            value={this.state.program.label.label_en}
+                                            id="programName" placeholder={i18n.t('static.program.programtext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="select" name="userId" id="userId">
+                                            <option value="">{i18n.t('static.common.select')}</option>
+                                            {programManagers}
+                                        </Input>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="textarea" name="programNotes" id="programNotes" />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            className="col-md-6"
+                                            bsSize="sm"
+                                            onChange={(e) => { this.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
+                                    </FormGroup>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSix}>Next</Button>
+                                    &nbsp;
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFive} >Previous</Button>
+                                </div>
+                                <div id="stepSeven">
+                                    <FormGroup>
+                                        <h1>Planning Units</h1>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}>Submit</Button>
+                                        &nbsp;
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} >Previous</Button>
+                                    </FormGroup>
+                                </div>
+                            </CardBody></Card></Col></Row></div>
         );
     }
 }
