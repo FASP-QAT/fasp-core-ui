@@ -508,29 +508,26 @@ export default class AddInventory extends Component {
 
             var col = ("F").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(5, y);
-            if (x == 5) {
-                if (value != "") {
-                    if (isNaN(parseInt(value)) || value < 0) {
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setStyle(col, "background-color", "yellow");
-                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
-                        this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
-                        this.el.setStyle(col, "background-color", "transparent");
-                        this.el.setComments(col, "");
-                    }
+
+            if (value != "") {
+                if (isNaN(parseInt(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
+                    this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
                 }
             }
+
 
             if (value != "") {
                 var col = ("F").concat(parseInt(y) + 1);
                 var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
                 this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
             }
-
-
-
 
 
 

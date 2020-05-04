@@ -33,7 +33,7 @@ export default class ConsumptionDetails extends React.Component {
             shipmentStatusList: [],
             message: '',
         }
-        this.getProductList = this.getProductList.bind(this);
+
         // this.getConsumptionData = this.getConsumptionData.bind(this);
         this.saveData = this.saveData.bind(this)
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -370,7 +370,9 @@ export default class ConsumptionDetails extends React.Component {
                 shipmentRequest1.onsuccess = function (event) {
 
                     var shipmentDataToStore = [];
-                    var shipmentJson = {};
+                    var shipmentJson = {
+                        shipmentList: []
+                    };
 
                     var shipmentDataBytes = CryptoJS.AES.decrypt((shipmentRequest1.result).shipment, SECRET_KEY);
                     var shipmentData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -422,12 +424,13 @@ export default class ConsumptionDetails extends React.Component {
                             notes: map.get("6")
 
                         }
-                        
+
                         shipmentDataToStore.push(json);
                     }
                     console.log("1111111111111111111   ", shipmentDataToStore)
+                    shipmentJson.shipmentList = shipmentDataToStore;
                     // programJson.consumptionList = consumptionDataListNotFiltered;
-                    shipmentRequest1.result.shipment = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    shipmentRequest1.result.shipment = (CryptoJS.AES.encrypt(JSON.stringify(shipmentJson), SECRET_KEY)).toString();
                     var putRequest = shipmentTransaction1.put(shipmentRequest1.result);
 
                     putRequest.onerror = function (event) {
@@ -436,10 +439,10 @@ export default class ConsumptionDetails extends React.Component {
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
                         this.setState({
-                            message: `Consumption Data Saved`,
+                            message: `Shipment Data Saved`,
                             changedFlag: 0
                         })
-                        this.props.history.push(`/dashboard/` + "Consumption Data Added Successfully")
+                        this.props.history.push(`/dashboard/` + "Shipment Data Added Successfully")
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -735,8 +738,9 @@ export default class ConsumptionDetails extends React.Component {
     }.bind(this)
 
     checkValidation() {
-        // var valid = true;
-        // var json = this.el.getJson();
+        var valid = true;
+        var json = this.el.getJson();
+
         // for (var y = 0; y < json.length; y++) {
         //     var col = ("A").concat(parseInt(y) + 1);
         //     var value = this.el.getValueFromCoords(0, y);
@@ -845,7 +849,15 @@ export default class ConsumptionDetails extends React.Component {
         //     }
 
         // }
-        // return valid;
+
+        var shipmentStatusId = document.getElementById('shipmentId').value;
+        if (shipmentStatusId == 1) {
+            valid = true;
+        } else {
+            valid = false;
+        }
+
+        return valid;
     }
     cancelClicked() {
         this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
