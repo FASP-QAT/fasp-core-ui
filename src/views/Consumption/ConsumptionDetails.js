@@ -24,7 +24,7 @@ export default class ConsumptionDetails extends React.Component {
         super(props);
         this.options = props.options;
         this.state = {
-            lang:localStorage.getItem("lang"),
+            lang: localStorage.getItem("lang"),
             programList: [],
             categoryList: [],
             productList: [],
@@ -363,11 +363,11 @@ export default class ConsumptionDetails extends React.Component {
                                 },
                                 {
                                     title: i18n.t('static.consumption.consumptionqty'),
-                                    type: 'text'
+                                    type: 'numeric'
                                 },
                                 {
                                     title: i18n.t('static.consumption.daysofstockout'),
-                                    type: 'text'
+                                    type: 'numeric'
                                 },
                                 {
                                     title: i18n.t('static.common.startdate'),
@@ -1834,7 +1834,7 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value))) {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1852,7 +1852,7 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value))) {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1982,11 +1982,11 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value === "" || isNaN(Number.parseInt(value))) {
+            if (value === "" || isNaN(Number.parseInt(value)) || value < 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 valid = false;
-                if (isNaN(Number.parseInt(value))) {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
                     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
@@ -1998,18 +1998,35 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
-            if (value === "" || isNaN(Number.parseInt(value))) {
+            // if (value === "" || isNaN(Number.parseInt(value)) || !Number.isInteger(value) ) {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     if (isNaN(Number.parseInt(value)) || !Number.isInteger(value) ) {
+            //         this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+            //     } else {
+            //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            //     }
+            //     valid = false;
+            // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            // }
+
+            if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
-                if (isNaN(Number.parseInt(value))) {
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
                 } else {
-                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
                 }
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+
+
             }
 
             var col = ("E").concat(parseInt(y) + 1);
