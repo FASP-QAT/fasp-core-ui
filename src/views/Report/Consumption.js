@@ -305,6 +305,7 @@ class Consumption extends Component {
 
 
   componentDidMount() {
+    if (navigator.onLine) {
     AuthenticationService.setupAxiosInterceptors();
     RealmService.getRealmListAll()
       .then(response => {
@@ -337,10 +338,47 @@ class Consumption extends Component {
             }
           }
         }
-      );
+      );}else{
+
+        console.log("In component did mount", new Date())
+        const lan = 'en';
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = {
+                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            id: myResult[i].id
+                        }
+                        proList[i] = programJson
+                    }
+                }
+                this.setState({
+                    programList: proList
+                })
+
+            }.bind(this);
+      }
 
   }
-
+  }
 
   toggle() {
     this.setState({
