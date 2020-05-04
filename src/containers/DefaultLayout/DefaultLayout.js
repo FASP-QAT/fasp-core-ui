@@ -356,11 +356,11 @@ class DefaultLayout extends Component {
                       //     }
                       //   ]
                       // },
-                      // {
-                      //   name: 'Program Onboarding',
-                      //   url: '/program/programOnboarding',
-                      //   icon: 'icon-graph'
-                      // },
+                      ,{
+                        name: 'Program Onboarding',
+                        url: '/program/programOnboarding',
+                        icon: 'icon-graph'
+                      },
                     ]
 
                 }} {...this.props} />
