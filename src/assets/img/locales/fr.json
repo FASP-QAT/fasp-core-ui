@@ -96,5 +96,6 @@
     "static.language.english": "Anglais",
     "static.language.french": "Français",
     "static.language.spanish": "Espagnol",
-    "static.language.portuguese": "Portugais"
+    "static.language.portuguese": "Portugais",
+    "static.common.select": "S'il vous plaît Sélectionner"
 }

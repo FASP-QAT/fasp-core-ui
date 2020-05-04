@@ -211,14 +211,16 @@ class ListRealmCountryComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
-            dataField: 'palletUnit.label',
-            text: i18n.t('static.dashboard.unit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
+        },
+        // {
+        //     dataField: 'palletUnit.label',
+        //     text: i18n.t('static.dashboard.unit'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center',
+        //     formatter: this.formatLabel
+        // },
+         {
             dataField: 'airFreightPercentage',
             text: i18n.t('static.realmcountry.airFreightPercentage'),
             sort: true,
@@ -303,16 +305,16 @@ class ListRealmCountryComponent extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
 
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.realmcountrylist')}</strong>{' '}
                         <div className="card-header-actions">
                             
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>

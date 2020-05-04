@@ -1,20 +1,13 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import jexcel from 'jexcel';
-import "../../../node_modules/jexcel/dist/jexcel.css";
-import {
-    Card, CardBody, CardHeader,
-    Label, Input, FormGroup,
-    CardFooter, Button, Col, Form
-    , FormFeedback, Row, InputGroup, InputGroupAddon
-} from 'reactstrap';
-import { Formik } from 'formik';
 import CryptoJS from 'crypto-js';
-import { SECRET_KEY } from '../../Constants.js';
-import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { Formik } from 'formik';
+import jexcel from 'jexcel';
+import React, { Component } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
+import "../../../node_modules/jexcel/dist/jexcel.css";
 import getLabelText from '../../CommonComponent/getLabelText';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
-import moment from "moment";
 
 const entityname = i18n.t('static.inventory.inventory')
 export default class AddInventory extends Component {
@@ -135,7 +128,7 @@ export default class AddInventory extends Component {
     }
     formSubmit() {
         if (this.state.changedFlag == 1) {
-            alert("Click save to continue !")
+
         } else {
             var programId = document.getElementById('programId').value;
             this.setState({ programId: programId });
@@ -382,6 +375,15 @@ export default class AddInventory extends Component {
                 this.el.setComments(col, "");
                 // this.el.setValueFromCoords(4, y, 0, true)
             } else {
+
+                // console.log("VALUE------>",value,"RESULT----------->",value);
+                // if(value % 1 === 0){
+                //     console.log("INT____",value);
+                // }else{
+                //     console.log("DEC____",value);
+                // }
+
+
                 if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -395,7 +397,7 @@ export default class AddInventory extends Component {
 
         if (x == 5) {
             if (this.el.getValueFromCoords(5, y) != "") {
-                if (isNaN(parseInt(value))) {
+                if (isNaN(parseInt(value)) || value < 0) {
                     var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -476,6 +478,61 @@ export default class AddInventory extends Component {
                 this.el.setComments(col, "");
                 // }
             }
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(4, y);
+
+            if (value == "") {
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+                // this.el.setValueFromCoords(4, y, 0, true)
+            } else {
+
+                // console.log("VALUE------>",value,"RESULT----------->",value);
+                // if(value % 1 === 0){
+                //     console.log("INT____",value);
+                // }else{
+                //     console.log("DEC____",value);
+                // }
+
+
+                if (isNaN(parseInt(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(5, y);
+            if (x == 5) {
+                if (value != "") {
+                    if (isNaN(parseInt(value)) || value < 0) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
+                        this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+
+            if (value != "") {
+                var col = ("F").concat(parseInt(y) + 1);
+                var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
+                this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);
+            }
+
+
+
+
+
 
 
             // var col = ("D").concat(parseInt(y) + 1);
