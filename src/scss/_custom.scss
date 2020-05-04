@@ -653,8 +653,12 @@ label.arrow_label:after {
   top: 0;
   width: 100%;
 }
+@media only screen and (min-width: 1200px) {
+  .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+}
 
 @media only screen and (min-width: 992px) {
+  
   .Login-component {
     // background: url(../assets/img/bg-image/bg-login.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;

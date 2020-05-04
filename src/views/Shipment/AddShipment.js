@@ -375,7 +375,7 @@ export default class ConsumptionDetails extends React.Component {
                     };
 
                     var shipmentDataBytes = CryptoJS.AES.decrypt((shipmentRequest1.result).shipment, SECRET_KEY);
-                    var shipmentData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    // var shipmentData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     // var programJson = JSON.parse(programData);
                     // var plannigUnitId = document.getElementById("planningUnitId").value;
 
