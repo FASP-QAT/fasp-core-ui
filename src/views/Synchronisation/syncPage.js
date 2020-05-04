@@ -1149,7 +1149,7 @@ export default class syncPage extends Component {
                               {programs}
                             </Input>
                             <InputGroupAddon addonType="append">
-                              <Button color="secondary Gobtn btn-sm" onClick={this.getDataForCompare}>{i18n.t('static.common.go')}</Button>
+                              <Button color="secondary Gobtn btn-sm" onClick={this.getDataForCompare}>{i18n.t('static.common.compare')}</Button>
                             </InputGroupAddon>
                           </InputGroup>
                         </div>

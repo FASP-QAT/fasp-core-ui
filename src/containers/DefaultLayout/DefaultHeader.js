@@ -54,14 +54,14 @@ class DefaultHeader extends Component {
 
 
           {/* <div className="box-role d-none d-sm-block"><i className="icon-user-follow "></i> */}
-            {/* <span><b>
+          {/* <span><b>
           {AuthenticationService.getLoggedInUsername() ? AuthenticationService.getLoggedInUsername() : "Unknown"}
           </b></span> */}
-            {/* <br></br><span>
+          {/* <br></br><span>
               <small>{AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole() : "Unknown"}</small>
             </span> */}
-            {/* </div> */}
-          <UncontrolledDropdown nav direction="down" className="lang-btn">
+          {/* </div> */}
+          {/* <UncontrolledDropdown nav direction="down" className="lang-btn">
             <DropdownToggle nav className="nav-link-lng">
 
               {localStorage.getItem('lang').toString() == 'undefined' ? 'en' : localStorage.getItem('lang').toString()}
@@ -73,9 +73,16 @@ class DefaultHeader extends Component {
               <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}> {i18n.t('static.language.french')}</DropdownItem>
               <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}> {i18n.t('static.language.Portuguese')}</DropdownItem>
             </DropdownMenu>
-          </UncontrolledDropdown>
+          </UncontrolledDropdown> */}
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} />
-
+          <NavItem className="">
+            <NavLink to="#" className="nav-link">
+              <span class="icon-wrapper icon-wrapper-alt rounded-circle ">
+                <span class="icon-wrapper-bg "></span>
+                <i class="icon-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout}></i>
+              </span>
+            </NavLink>
+          </NavItem>
 
         </Nav>
 

@@ -91,5 +91,10 @@
     "static.message.inventorysuccess": "Données d'inventaire enregistrées",
     "static.common.profile": "Profil",
     "static.dashboard.changepassword": "Changer le mot de passe",
-    "static.common.logout": "Se déconnecter"
+    "static.common.logout": "Se déconnecter",
+    "static.language.preferredlng": "Changer la langue préférée",
+    "static.language.english": "Anglais",
+    "static.language.french": "Français",
+    "static.language.spanish": "Espagnol",
+    "static.language.portuguese": "Portugais"
 }

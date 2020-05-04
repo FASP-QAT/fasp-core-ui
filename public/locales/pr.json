@@ -94,5 +94,10 @@
     "static.message.inventorysuccess": "Dados de inventário salvos",
     "static.common.profile": "Perfil",
     "static.dashboard.changepassword": "Mudar senha",
-    "static.common.logout": "Sair"
+    "static.common.logout": "Sair",
+    "static.language.preferredlng": "Alterar idioma preferido",
+    "static.language.english": "Inglês",
+    "static.language.french": "Francês",
+    "static.language.spanish": "Espanhol",
+    "static.language.portuguese": "Português"
 }

@@ -33,11 +33,18 @@ class DefaultHeaderDropdown extends Component {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.changeLanguage = this.changeLanguage.bind(this);
     this.state = {
       dropdownOpen: false,
       roleList: AuthenticationService.getLoggedInUserRole(),
       lang: localStorage.getItem('lang'),
     };
+  }
+
+  changeLanguage(lang) {
+    localStorage.setItem('lang', lang);
+    i18n.changeLanguage(lang)
+    window.location.reload();
   }
 
   toggle() {
@@ -118,13 +125,15 @@ class DefaultHeaderDropdown extends Component {
                 </div>
             )}
           </DropdownItem>
-          {/* <DropdownItem header tag="div" className="text-center"><b>Change Preferred Language</b></DropdownItem>
-          <DropdownItem><i className="flag-icon flag-icon-us"></i> English</DropdownItem>
-          <DropdownItem><i className="flag-icon flag-icon-wf "></i> French</DropdownItem>
-          <DropdownItem><i className="flag-icon flag-icon-es"></i> Spanish</DropdownItem>
-          <DropdownItem><i className="flag-icon flag-icon-pt"></i> Pourtegese</DropdownItem> */}
+          <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.language.preferredlng')}</b></DropdownItem>
+          <DropdownItem onClick={this.changeLanguage.bind(this, 'en')}><i className="flag-icon flag-icon-us"></i>
+            {localStorage.getItem('lang').toString() == 'undefined' || localStorage.getItem('lang').toString() == 'en' ? <b>{i18n.t('static.language.english')}</b> : i18n.t('static.language.english')}
+          </DropdownItem>
+          <DropdownItem onClick={this.changeLanguage.bind(this, 'fr')}><i className="flag-icon flag-icon-wf "></i>{localStorage.getItem('lang').toString() == "fr" ? <b>{i18n.t('static.language.french')}</b> : i18n.t('static.language.french')}</DropdownItem>
+          <DropdownItem onClick={this.changeLanguage.bind(this, 'sp')}><i className="flag-icon flag-icon-es"></i> {localStorage.getItem('lang').toString() == "sp" ? <b>{i18n.t('static.language.spanish')}</b> : i18n.t('static.language.spanish')}</DropdownItem>
+          <DropdownItem onClick={this.changeLanguage.bind(this, 'pr')}><i className="flag-icon flag-icon-pt"></i> {localStorage.getItem('lang').toString() == "pr" ? <b>{i18n.t('static.language.portuguese')}</b> : i18n.t('static.language.portuguese')}</DropdownItem>
           <Online><DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i> {i18n.t('static.dashboard.changepassword')}</DropdownItem></Online>
-          <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem>
+          {/* <DropdownItem onClick={this.props.onLogout}><i className="fa fa-sign-out"></i>{i18n.t('static.common.logout')}</DropdownItem> */}
         </DropdownMenu>
       </Dropdown>
     );
