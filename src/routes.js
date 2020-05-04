@@ -186,10 +186,11 @@ const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'))
 const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
 
 const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
+const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-
+  { path: '/program/programOnboarding', name: 'Program Onboarding', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/', exact: true, name: 'Home' },
