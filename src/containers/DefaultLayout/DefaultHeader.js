@@ -79,7 +79,7 @@ class DefaultHeader extends Component {
             <NavLink to="#" className="nav-link">
               <span class="icon-wrapper icon-wrapper-alt rounded-circle ">
                 <span class="icon-wrapper-bg "></span>
-                <i class="icon-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout}></i>
+                <i class="icon-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout} title="Logout"></i>
               </span>
             </NavLink>
           </NavItem>

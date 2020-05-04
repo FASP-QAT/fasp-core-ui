@@ -29,9 +29,11 @@ export default class ConsumptionDetails extends React.Component {
             productList: [],
             consumptionDataList: [],
             changedFlag: 0,
-            planningUnitList: []
+            planningUnitList: [],
+            shipmentStatusList: [],
+            message: '',
         }
-        this.getProductList = this.getProductList.bind(this);
+
         // this.getConsumptionData = this.getConsumptionData.bind(this);
         this.saveData = this.saveData.bind(this)
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -41,7 +43,8 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     componentDidMount = function () {
-        console.log("In component did mount", new Date())
+        document.getElementById("addButton").style.display = "none";
+
         const lan = 'en';
         var db1;
         getDatabase();
@@ -76,21 +79,37 @@ export default class ConsumptionDetails extends React.Component {
                 })
 
             }.bind(this);
+
+            // For Shipment Status
+            var shipStatusList = [];
+            shipStatusList[0] = { id: 1, name: "Suggested" };
+            shipStatusList[1] = { id: 2, name: "Planned" };
+            shipStatusList[2] = { id: 3, name: "Cancelled" };
+            shipStatusList[3] = { id: 4, name: "Submitted" };
+            shipStatusList[4] = { id: 5, name: "Approved" };
+            shipStatusList[5] = { id: 6, name: "Shipped" };
+            shipStatusList[6] = { id: 7, name: "Arrived" };
+            shipStatusList[7] = { id: 8, name: "Delivered" };
+
+            this.setState({
+                shipmentStatusList: shipStatusList
+            })
+
         }.bind(this)
 
 
     };
 
     formSubmit() {
-        var programId = document.getElementById('programId').value;
+        var programId = document.getElementById("programId").value;
+        var shipmentStatusId = document.getElementById('shipmentId').value;
         this.setState({ programId: programId });
+        this.setState({ shipmentStatusId: shipmentStatusId });
 
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
 
-        var dataSourceList = []
-        var regionList = []
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
@@ -103,144 +122,286 @@ export default class ConsumptionDetails extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
 
-                var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                var dataSourceRequest = dataSourceOs.getAll();
-                dataSourceRequest.onsuccess = function (event) {
-                    var dataSourceResult = [];
-                    dataSourceResult = dataSourceRequest.result;
-                    for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
-                            if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
-                                var dataSourceJson = {
-                                    name: dataSourceResult[k].label.label_en,
-                                    id: dataSourceResult[k].dataSourceId
+
+                if (shipmentStatusId != 0) {
+
+                    // var dataSourceResult = [];
+                    // dataSourceResult = dataSourceRequest.result;
+                    // for (var k = 0; k < dataSourceResult.length; k++) {
+                    //     if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
+                    //         if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                    //             var dataSourceJson = {
+                    //                 name: dataSourceResult[k].label.label_en,
+                    //                 id: dataSourceResult[k].dataSourceId
+                    //             }
+                    //             dataSourceList[k] = dataSourceJson
+                    //         }
+                    //     }
+                    // }
+                    programId = (document.getElementById("programId").value).split("_")[0];
+
+                    var programTransaction1 = db1.transaction(['program'], 'readwrite');
+                    var programOs1 = programTransaction1.objectStore('program');
+                    var programRequest1 = programOs1.getAll();
+                    if (shipmentStatusId == 1) {
+
+                        document.getElementById("addButton").style.display = "block";
+
+                        programRequest1.onsuccess = function (event) {
+                            var expectedDeliveryInDays = 0;
+                            var programResult = [];
+                            programResult = programRequest1.result;
+
+                            for (var k = 0; k < programResult.length; k++) {
+                                if (programResult[k].programId == programId) {
+                                    expectedDeliveryInDays = parseInt(programResult[k].plannedToDraftLeadTime) + parseInt(programResult[k].draftToSubmittedLeadTime) + parseInt(programResult[k].submittedToApprovedLeadTime) + parseInt(programResult[k].approvedToShippedLeadTime) + parseInt(programResult[k].deliveredToReceivedLeadTime);
                                 }
-                                dataSourceList[k] = dataSourceJson
                             }
+
+                            var expectedDeliveryDate = this.addDays(new Date(), expectedDeliveryInDays);
+                            var sel = document.getElementById("planningUnitId");
+                            var planningUnitText = sel.options[sel.selectedIndex].text;
+                            // Get inventory data from program
+                            var plannigUnitId = document.getElementById("planningUnitId").value;
+                            // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId);
+                            var shipmentList = '';
+                            this.setState({
+                                shipmentList: shipmentList
+                            });
+
+                            var data = [];
+                            var shipmentDataArr = []
+                            if (shipmentList.length == 0) {
+                                data = [];
+                                shipmentDataArr[0] = data;
+                            }
+                            // for (var j = 0; j < shipmentList.length; j++) {
+                            //     data = [];
+                            //     data[0] = shipmentList[j].dataSource.id;
+                            //     data[1] = shipmentList[j].region.id;
+                            //     data[2] = shipmentList[j].consumptionQty;
+                            //     data[3] = shipmentList[j].dayOfStockOut;
+                            //     data[4] = shipmentList[j].startDate;
+                            //     data[5] = shipmentList[j].stopDate;
+                            //     data[6] = shipmentList[j].actualFlag;
+
+                            //     shipmentDataArr[j] = data;
+                            // }
+
+                            data = [];
+                            data[0] = 0;
+                            data[1] = expectedDeliveryDate;
+                            data[2] = '01-SUGGESTED';
+                            data[3] = planningUnitText;
+                            data[4] = '44,773';
+                            data[5] = '44,773 ';
+                            data[6] = '';
+
+                            // shipmentDataArr[j] = data;
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                            this.el.destroy();
+                            var json = [];
+                            var data = shipmentDataArr;
+                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                            // json[0] = data;
+                            var options = {
+                                data: data,
+                                columnDrag: true,
+                                colWidths: [150, 150, 150, 150, 150, 150, 150],
+                                columns: [
+                                    // { title: 'Month', type: 'text', readOnly: true },
+                                    {
+                                        title: 'Qat Order No',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Expected Delivery date',
+                                        // type: 'calendar',
+                                        type: 'text',
+                                        readOnly: true
+
+                                    },
+                                    {
+                                        title: 'Shipment Status',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Planning Unit',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Suggested Order Qty',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Order Qty',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Notes',
+                                        type: 'text'
+                                    }
+
+                                ],
+                                pagination: 10,
+                                search: true,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onchange: this.changed,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true,
+                                paginationOptions: [10, 25, 50, 100],
+                                position: 'top'
+                            };
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                        }.bind(this)
+                    }
+                    if (shipmentStatusId == 3) {
+
+                        document.getElementById("addButton").style.display = "none";
+                        programRequest1.onsuccess = function (event) {
+                            // var shipmentList = (programJson.shipmentList);
+                            var shipmentList = '';
+
+                            this.setState({
+                                shipmentList: shipmentList
+                            });
+
+                            var data = [];
+                            var shipmentDataArr = []
+                            if (shipmentList.length == 0) {
+                                data = [];
+                                shipmentDataArr[0] = data;
+                            }
+
+                            // for (var j = 0; j < shipmentList.length; j++) {
+                            //     if (shipmentList[j].shipmentId == 0 && shipmentList[j].shipmentStatusId == 1) {
+                            //         data = [];
+                            //         data[0] = shipmentList[j].dataSource.id;
+                            //         data[1] = shipmentList[j].region.id;
+                            //         data[2] = shipmentList[j].consumptionQty;
+                            //         data[3] = shipmentList[j].dayOfStockOut;
+                            //         data[4] = shipmentList[j].startDate;
+                            //         data[5] = shipmentList[j].stopDate;
+                            //         data[6] = shipmentList[j].actualFlag;
+                            //     }
+
+                            //     shipmentDataArr[j] = data;
+                            // }
+
+                            data = [];
+                            data[0] = 0;
+                            data[1] = '';
+                            data[2] = '01-SUGGESTED';
+                            data[3] = '';
+                            data[4] = '44,773';
+                            data[5] = '44,773 ';
+                            data[6] = '';
+
+                            // shipmentDataArr[j] = data;
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                            this.el.destroy();
+                            var json = [];
+                            var data = shipmentDataArr;
+                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                            // json[0] = data;
+                            var options = {
+                                data: data,
+                                columnDrag: true,
+                                colWidths: [100, 100, 100, 100, 100, 100, 100],
+                                columns: [
+                                    // { title: 'Month', type: 'text', readOnly: true },
+                                    {
+                                        title: 'Qat Order No',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Expected Delivery date',
+                                        // type: 'calendar',
+                                        type: 'text',
+                                        readOnly: true
+
+                                    },
+                                    {
+                                        title: 'Shipment Status',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Procurement Agent',
+                                        type: 'dropdown',
+                                    },
+                                    {
+                                        title: 'Funding Source',
+                                        type: 'dropdown',
+                                    },
+                                    {
+                                        title: 'Budget',
+                                        type: 'dropdown',
+                                    },
+                                    {
+                                        title: 'Planning Unit',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Suggested Order Qty',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Order Qty',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Notes',
+                                        type: 'text'
+                                    }
+
+                                ],
+                                pagination: 10,
+                                search: true,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onchange: this.changed,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true,
+                                paginationOptions: [10, 25, 50, 100],
+                                position: 'top'
+                            };
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+
                         }
                     }
+                } else {
+                    document.getElementById("addButton").style.display = "none";
+                    this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                    this.el.destroy();
 
-
-                    var regionTransaction = db1.transaction(['region'], 'readwrite');
-                    var regionOs = regionTransaction.objectStore('region');
-                    var regionRequest = regionOs.getAll();
-                    regionRequest.onsuccess = function (event) {
-                        var regionResult = [];
-                        regionResult = regionRequest.result;
-                        for (var k = 0; k < regionResult.length; k++) {
-                            if (regionResult[k].realmCountry.realmCountryId == programJson.realmCountry.realmCountryId) {
-                                var regionJson = {
-                                    name: regionResult[k].label.label_en,
-                                    id: regionResult[k].regionId
-                                }
-                                regionList[k] = regionJson
-                            }
-                        }
-
-                        // Get inventory data from program
-                        var plannigUnitId = document.getElementById("planningUnitId").value;
-                        var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId);
-
-                        this.setState({
-                            shipmentList: shipmentList
-                        });
-
-                        var data = [];
-                        var shipmentDataArr = []
-                        if (shipmentList.length == 0) {
-                            data = [];
-                            shipmentDataArr[0] = data;
-                        }
-                        for (var j = 0; j < shipmentList.length; j++) {
-                            data = [];
-                            data[0] = shipmentList[j].dataSource.id;
-                            data[1] = shipmentList[j].region.id;
-                            data[2] = shipmentList[j].consumptionQty;
-                            data[3] = shipmentList[j].dayOfStockOut;
-                            data[4] = shipmentList[j].startDate;
-                            data[5] = shipmentList[j].stopDate;
-                            data[6] = shipmentList[j].actualFlag;
-                            data[7] = shipmentList[j].active;
-
-
-                            shipmentDataArr[j] = data;
-                        }
-
-
-
-
-
-
-
-
-                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                        this.el.destroy();
-                        var json = [];
-                        var data = shipmentDataArr;
-                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                        // json[0] = data;
-                        var options = {
-                            data: data,
-                            columnDrag: true,
-                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100],
-                            columns: [
-                                // { title: 'Month', type: 'text', readOnly: true },
-                                {
-                                    title: 'Qat ',
-                                    type: 'text',
-                                    source: dataSourceList
-                                },
-                                {
-                                    title: 'Region',
-                                    type: 'text',
-                                    source: regionList
-                                },
-                                {
-                                    title: 'Consumption Quantity',
-                                    type: 'text'
-                                },
-                                {
-                                    title: 'Days of Stock out',
-                                    type: 'text'
-                                },
-                                {
-                                    title: 'StartDate',
-                                    type: 'calendar'
-                                },
-                                {
-                                    title: 'StopDate',
-                                    type: 'calendar'
-                                },
-                                {
-                                    title: 'Actual Flag',
-                                    type: 'dropdown',
-                                    source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
-                                },
-                                {
-                                    title: 'Active',
-                                    type: 'checkbox'
-                                }
-
-                            ],
-                            pagination: 10,
-                            search: true,
-                            columnSorting: true,
-                            tableOverflow: true,
-                            wordWrap: true,
-                            allowInsertColumn: false,
-                            allowManualInsertColumn: false,
-                            allowDeleteRow: false,
-                            onchange: this.changed,
-                            oneditionend: this.onedit,
-                            copyCompatibility: true,
-                            paginationOptions: [10, 25, 50, 100],
-                            position: 'top'
-                        };
-
-                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-                    }.bind(this)
-                }.bind(this)
+                    this.setState({
+                        message: 'Please Select Shipment Status'
+                    })
+                }
             }.bind(this)
         }.bind(this)
     }
@@ -248,8 +409,65 @@ export default class ConsumptionDetails extends React.Component {
 
     addRow = function () {
         // document.getElementById("saveButtonDiv").style.display = "block";
-        this.el.insertRow();
+
+        var programId = document.getElementById("programId").value;
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            programId = (document.getElementById("programId").value).split("_")[0];
+            var programTransaction1 = db1.transaction(['program'], 'readwrite');
+            var programOs1 = programTransaction1.objectStore('program');
+            var programRequest1 = programOs1.getAll();
+
+            programRequest1.onsuccess = function (event) {
+
+                var expectedDeliveryInDays = 0;
+                var programResult = [];
+                programResult = programRequest1.result;
+
+                for (var k = 0; k < programResult.length; k++) {
+                    if (programResult[k].programId == programId) {
+                        expectedDeliveryInDays = parseInt(programResult[k].plannedToDraftLeadTime) + parseInt(programResult[k].draftToSubmittedLeadTime) + parseInt(programResult[k].submittedToApprovedLeadTime) + parseInt(programResult[k].approvedToShippedLeadTime) + parseInt(programResult[k].deliveredToReceivedLeadTime);
+                    }
+                }
+
+                var expectedDeliveryDate = this.addDays(new Date(), expectedDeliveryInDays);
+                var sel = document.getElementById("planningUnitId");
+                var planningUnitText = sel.options[sel.selectedIndex].text;
+
+                var data = [];
+                data[0] = '';
+                data[1] = expectedDeliveryDate;
+                data[2] = '01-SUGGESTED';
+                data[3] = planningUnitText;
+                data[4] = '';
+                data[5] = '';
+                data[6] = '';
+                this.el.insertRow(
+                    data
+                );
+
+
+
+
+            }.bind(this)
+        }.bind(this)
+
+
     };
+
+    addDays = function (theDate, days) {
+        var someDate = new Date(theDate.getTime() + days * 24 * 60 * 60 * 1000);
+        var dd = someDate.getDate();
+        var mm = someDate.getMonth() + 1;
+        var y = someDate.getFullYear();
+        var someFormattedDate = dd + '-' + mm + '-' + y;
+        return someFormattedDate;
+    }.bind(this)
 
     saveData = function () {
 
@@ -268,74 +486,77 @@ export default class ConsumptionDetails extends React.Component {
             var openRequest = indexedDB.open('fasp', 1);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
+                var transaction = db1.transaction(['shipment'], 'readwrite');
+                var shipmentTransaction1 = transaction.objectStore('shipment');
 
-                var programId = (document.getElementById("programId").value);
+                // var programId = (document.getElementById("programId").value);
 
-                var programRequest = programTransaction.get(programId);
-                programRequest.onsuccess = function (event) {
-                    // console.log("(programRequest.result)----", (programRequest.result))
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var plannigUnitId = document.getElementById("planningUnitId").value;
+                var shipmentRequest1 = shipmentTransaction1.get();
+                shipmentRequest1.onsuccess = function (event) {
 
-                    var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
-                    var consumptionDataListNotFiltered = programJson.consumptionList;
+                    var shipmentDataToStore = [];
+                    var shipmentJson = {
+                        shipmentList: []
+                    };
 
-                    // console.log("000000000000000   ", consumptionDataList)
-                    var count = 0;
-                    for (var i = 0; i < consumptionDataListNotFiltered.length; i++) {
-                        if (consumptionDataList[count] != undefined) {
-                            if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
+                    var shipmentDataBytes = CryptoJS.AES.decrypt((shipmentRequest1.result).shipment, SECRET_KEY);
+                    var shipmentData = shipmentDataBytes.toString(CryptoJS.enc.Utf8);
+                    // var programJson = JSON.parse(programData);
+                    // var plannigUnitId = document.getElementById("planningUnitId").value;
 
-                                var map = new Map(Object.entries(tableJson[count]))
-                                consumptionDataListNotFiltered[i].dataSource.id = map.get("0");
-                                consumptionDataListNotFiltered[i].region.id = map.get("1");
-                                consumptionDataListNotFiltered[i].consumptionQty = map.get("2");
-                                consumptionDataListNotFiltered[i].dayOfStockOut = parseInt(map.get("3"));
-                                consumptionDataListNotFiltered[i].startDate = map.get("4");
-                                consumptionDataListNotFiltered[i].stopDate = map.get("5");
-                                consumptionDataListNotFiltered[i].actualFlag = map.get("6");
-                                consumptionDataListNotFiltered[i].active = map.get("7");
+                    // var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
+                    // var consumptionDataListNotFiltered = programJson.consumptionList;
 
-                                if (consumptionDataList.length >= count) {
-                                    count++;
-                                }
-                            }
 
-                        }
+                    // var count = 0;
+                    // for (var i = 0; i < consumptionDataListNotFiltered.length; i++) {
+                    //     if (consumptionDataList[count] != undefined) {
+                    //         if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
 
-                    }
-                    for (var i = consumptionDataList.length; i < tableJson.length; i++) {
+                    //             var map = new Map(Object.entries(tableJson[count]))
+                    //             consumptionDataListNotFiltered[i].dataSource.id = map.get("0");
+                    //             consumptionDataListNotFiltered[i].region.id = map.get("1");
+                    //             consumptionDataListNotFiltered[i].consumptionQty = map.get("2");
+                    //             consumptionDataListNotFiltered[i].dayOfStockOut = parseInt(map.get("3"));
+                    //             consumptionDataListNotFiltered[i].startDate = map.get("4");
+                    //             consumptionDataListNotFiltered[i].stopDate = map.get("5");
+                    //             consumptionDataListNotFiltered[i].actualFlag = map.get("6");
+                    //             consumptionDataListNotFiltered[i].active = map.get("7");
+
+                    //             if (consumptionDataList.length >= count) {
+                    //                 count++;
+                    //             }
+                    //         }
+
+                    //     }
+
+                    // }
+
+                    for (var i = 0; i < tableJson.length; i++) {
                         var map = new Map(Object.entries(tableJson[i]))
                         var json = {
-                            consumptionId: 0,
-                            dataSource: {
-                                id: map.get("0")
+                            shipmentId: '',
+                            expectedDeliveryDate: map.get("1"),
+                            shipmentStatus: {
+                                id: 1
                             },
-                            region: {
-                                id: map.get("1")
+                            program: {
+                                id: (document.getElementById("programId").value).split("_")[0]
                             },
-                            consumptionQty: parseInt(map.get("2")),
-                            dayOfStockOut: parseInt(map.get("3")),
-                            startDate: map.get("4"),
-                            stopDate: map.get("5"),
-                            actualFlag: map.get("6"),
-                            active: map.get("7"),
-
                             planningUnit: {
-                                id: plannigUnitId
-                            }
+                                id: document.getElementById("planningUnitId")
+                            },
+                            notes: map.get("6")
+
                         }
-                        // consumptionDataList[i] = json;
-                        consumptionDataListNotFiltered.push(json);
+
+                        shipmentDataToStore.push(json);
                     }
-                    console.log("1111111111111111111   ", consumptionDataList)
-                    programJson.consumptionList = consumptionDataListNotFiltered;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
+                    console.log("1111111111111111111   ", shipmentDataToStore)
+                    shipmentJson.shipmentList = shipmentDataToStore;
+                    // programJson.consumptionList = consumptionDataListNotFiltered;
+                    shipmentRequest1.result.shipment = (CryptoJS.AES.encrypt(JSON.stringify(shipmentJson), SECRET_KEY)).toString();
+                    var putRequest = shipmentTransaction1.put(shipmentRequest1.result);
 
                     putRequest.onerror = function (event) {
                         // Handle errors!
@@ -343,10 +564,10 @@ export default class ConsumptionDetails extends React.Component {
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
                         this.setState({
-                            message: `Consumption Data Saved`,
+                            message: `Shipment Data Saved`,
                             changedFlag: 0
                         })
-                        this.props.history.push(`/dashboard/` + "Consumption Data Added Successfully")
+                        this.props.history.push(`/dashboard/` + "Shipment Data Added Successfully")
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -376,14 +597,26 @@ export default class ConsumptionDetails extends React.Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
+
+        const { shipmentStatusList } = this.state;
+        let shipmentStatus = shipmentStatusList.length > 0
+            && shipmentStatusList.map((item, i) => {
+                return (
+                    //             // {this.getText(dataSource.label,lan)}
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
+
         return (
 
             <div className="animated fadeIn">
                 <Col xs="12" sm="12">
+                    <h5>{i18n.t(this.state.message)}</h5>
                     <Card>
 
                         <CardHeader>
-                            <strong>Consumption details</strong>
+                            <strong>Shipment details</strong>
                         </CardHeader>
                         <CardBody>
                             <Formik
@@ -424,6 +657,22 @@ export default class ConsumptionDetails extends React.Component {
                                                                         <option value="0">Please Select</option>
                                                                         {planningUnits}
                                                                     </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Shipment Status</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        value={this.state.shipmentId}
+                                                                        name="shipmentId" id="shipmentId"
+                                                                    // onChange={this.displayInsertRowButton}
+                                                                    >
+                                                                        <option value="0">Please select</option>
+                                                                        {shipmentStatus}
+                                                                    </Input>
                                                                     <InputGroupAddon addonType="append">
                                                                         <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
                                                                     </InputGroupAddon>
@@ -446,7 +695,7 @@ export default class ConsumptionDetails extends React.Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>Add Row</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} id="addButton"><i className="fa fa-check"></i>Add Row</Button>
 
                                 &nbsp;
 </FormGroup>
@@ -458,48 +707,8 @@ export default class ConsumptionDetails extends React.Component {
         );
     }
 
-    getProductList(event) {
-        console.log("in product list")
-        const lan = 'en';
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var productTransaction = db1.transaction(['product'], 'readwrite');
-            var productOs = productTransaction.objectStore('product');
-            var productRequest = productOs.getAll();
-            var proList = []
-            productRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            productRequest.onsuccess = function (e) {
-                var myResult = [];
-                myResult = productRequest.result;
-                console.log("myResult", myResult);
-                // console.log(event.target.value);
-                var categoryId = document.getElementById("categoryId").value;
-                console.log(categoryId)
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].productCategory.productCategoryId == categoryId) {
-                        var productJson = {
-                            name: getLabelText(myResult[i].label, lan),
-                            id: myResult[i].productId
-                        }
-                        proList[i] = productJson
-                    }
-                }
-                this.setState({
-                    productList: proList
-                })
-            }.bind(this);
-        }.bind(this)
-    }
-
-
     getPlanningUnitList(event) {
-        console.log("-------------in planning list-------------")
+        // console.log("-------------in planning list-------------")
         const lan = 'en';
         var db1;
         var storeOS;
@@ -517,9 +726,9 @@ export default class ConsumptionDetails extends React.Component {
             planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
-                console.log("myResult", myResult);
+                // console.log("myResult", myResult);
                 var programId = (document.getElementById("programId").value).split("_")[0];
-                console.log('programId----->>>', programId)
+                // console.log('programId----->>>', programId)
                 console.log(myResult);
                 var proList = []
                 for (var i = 0; i < myResult.length; i++) {
@@ -541,229 +750,238 @@ export default class ConsumptionDetails extends React.Component {
 
     changed = function (instance, cell, x, y, value) {
 
-        this.setState({
-            changedFlag: 1
-        })
-        if (x == 0) {
-            var col = ("A").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-        if (x == 1) {
-            var col = ("B").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(Number.parseInt(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+        // this.setState({
+        //     changedFlag: 1
+        // })
+        // if (x == 0) {
+        //     var col = ("A").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
+        // if (x == 1) {
+        //     var col = ("B").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
+        // if (x == 2) {
+        //     var col = ("C").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //     } else {
+        //         if (isNaN(Number.parseInt(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, "In valid number.");
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
 
-            }
-        }
-        if (x == 3) {
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(Number.parseInt(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid number.");
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+        //     }
+        // }
+        // if (x == 3) {
+        //     var col = ("D").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //     } else {
+        //         if (isNaN(Number.parseInt(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, "In valid number.");
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
 
 
-            }
-        }
+        //     }
+        // }
 
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, "In valid Date.");
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        // if (x == 4) {
+        //     var col = ("E").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //     } else {
+        //         if (isNaN(Date.parse(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, "In valid Date.");
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
+        // if (x == 5) {
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //     } else {
+        //         if (isNaN(Date.parse(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, "In valid Date.");
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
 
-        if (x == 6) {
-            var col = ("G").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
+        // if (x == 6) {
+        //     var col = ("G").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
 
     }.bind(this)
 
     checkValidation() {
         var valid = true;
         var json = this.el.getJson();
-        for (var y = 0; y < json.length; y++) {
-            var col = ("A").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(0, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
 
-            var col = ("B").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(1, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+        // for (var y = 0; y < json.length; y++) {
+        //     var col = ("A").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(0, y);
+        //     if (value == "Invalid date" || value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //         valid = false;
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
 
-            var col = ("C").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(2, y);
-            if (value === "" || isNaN(Number.parseInt(value))) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                valid = false;
-                if (isNaN(Number.parseInt(value))) {
-                    this.el.setComments(col, "in valid number.");
-                } else {
-                    this.el.setComments(col, "This field is required.");
-                }
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+        //     var col = ("B").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(1, y);
+        //     if (value == "Invalid date" || value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //         valid = false;
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
 
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(3, y);
-            if (value === "" || isNaN(Number.parseInt(value))) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                if (isNaN(Number.parseInt(value))) {
-                    this.el.setComments(col, "in valid number.");
-                } else {
-                    this.el.setComments(col, "This field is required.");
-                }
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+        //     var col = ("C").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(2, y);
+        //     if (value === "" || isNaN(Number.parseInt(value))) {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         valid = false;
+        //         if (isNaN(Number.parseInt(value))) {
+        //             this.el.setComments(col, "in valid number.");
+        //         } else {
+        //             this.el.setComments(col, "This field is required.");
+        //         }
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
 
-            var col = ("E").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(4, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                // if (isNaN(Date.parse(value))) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     this.el.setComments(col, "In valid Date.");
-                //     valid = false;
-                // } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                // }
-            }
+        //     var col = ("D").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(3, y);
+        //     if (value === "" || isNaN(Number.parseInt(value))) {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         if (isNaN(Number.parseInt(value))) {
+        //             this.el.setComments(col, "in valid number.");
+        //         } else {
+        //             this.el.setComments(col, "This field is required.");
+        //         }
+        //         valid = false;
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
 
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(5, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                // if (isNaN(Date.parse(value))) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     this.el.setComments(col, "In valid Date.");
-                //     valid = false;
-                // } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                // }
-            }
+        //     var col = ("E").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(4, y);
+        //     if (value == "Invalid date" || value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //         valid = false;
+        //     } else {
+        //         // if (isNaN(Date.parse(value))) {
+        //         //     this.el.setStyle(col, "background-color", "transparent");
+        //         //     this.el.setStyle(col, "background-color", "yellow");
+        //         //     this.el.setComments(col, "In valid Date.");
+        //         //     valid = false;
+        //         // } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //         // }
+        //     }
 
-            var col = ("G").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(6, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(5, y);
+        //     if (value == "Invalid date" || value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //         valid = false;
+        //     } else {
+        //         // if (isNaN(Date.parse(value))) {
+        //         //     this.el.setStyle(col, "background-color", "transparent");
+        //         //     this.el.setStyle(col, "background-color", "yellow");
+        //         //     this.el.setComments(col, "In valid Date.");
+        //         //     valid = false;
+        //         // } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //         // }
+        //     }
 
+        //     var col = ("G").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(6, y);
+        //     if (value == "Invalid date" || value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, "This field is required.");
+        //         valid = false;
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+
+        // }
+
+        var shipmentStatusId = document.getElementById('shipmentId').value;
+        if (shipmentStatusId == 1) {
+            valid = true;
+        } else {
+            valid = false;
         }
+
         return valid;
     }
     cancelClicked() {

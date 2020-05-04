@@ -211,14 +211,16 @@ class ListRealmCountryComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
-            dataField: 'palletUnit.label',
-            text: i18n.t('static.dashboard.unit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
+        },
+        // {
+        //     dataField: 'palletUnit.label',
+        //     text: i18n.t('static.dashboard.unit'),
+        //     sort: true,
+        //     align: 'center',
+        //     headerAlign: 'center',
+        //     formatter: this.formatLabel
+        // },
+         {
             dataField: 'airFreightPercentage',
             text: i18n.t('static.realmcountry.airFreightPercentage'),
             sort: true,

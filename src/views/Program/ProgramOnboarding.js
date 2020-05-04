@@ -465,9 +465,11 @@ export default class ProgramOnboarding extends Component {
                                             // <h2>1</h2>
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="https://pngimg.com/uploads/number1/number1_PNG14871.png"
+                                                width="40"
+                                                // src="https://pngimg.com/uploads/number1/number1_PNG14871.png"
+                                                src="../../../../public/assets/img/numbers/number1.png"
                                             />
+                                            
 
                                         )}
 
@@ -476,8 +478,9 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
+                                                width="40"
+                                                src="../../../../public/assets/img/numbers/number2.png"
+                                                // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
                                             />
                                             // <h2>2</h2>
                                         )}
@@ -486,8 +489,9 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="https://www.obiettivocoaching.it/wp-content/uploads/2016/04/recruit-circle-3-icon-blue.png"
+                                                width="40"
+                                                src="../../../../public/assets/img/numbers/number3.png"
+                                                // src="https://www.obiettivocoaching.it/wp-content/uploads/2016/04/recruit-circle-3-icon-blue.png"
                                             />
                                             // <h2>3</h2>
                                         )}
@@ -496,8 +500,9 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
+                                                width="40"
+                                                src="../../../../public/assets/img/numbers/number4.png"
+                                                // src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
                                             />
                                             // <h2>4</h2>
                                         )}
@@ -507,8 +512,9 @@ export default class ProgramOnboarding extends Component {
 
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="https://dwidude.com/wp-content/uploads/2016/09/recruit-circle-5-icon-blue.png"
+                                                width="40"
+                                                src="../../../../public/assets/img/numbers/number5.png"
+                                                // src="https://dwidude.com/wp-content/uploads/2016/09/recruit-circle-5-icon-blue.png"
                                             />
                                             // <h2>5</h2>
                                         )}
@@ -517,8 +523,9 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="http://pngimg.com/uploads/number6/number6_PNG18583.png"
+                                                width="40"
+                                                src="../../../../public/assets/img/numbers/number6.png"
+                                                // src="http://pngimg.com/uploads/number6/number6_PNG18583.png"
                                             />
                                             // <h2>6</h2>
                                         )}
@@ -528,13 +535,72 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="30"
-                                                src="https://www.library.ucla.edu/sites/default/files/styles/custom_crop/public/static_images/BYS7.jpg?itok=9890vsGz"
+                                                width="40"
+                                                src="../../../../public/assets/img/numbers/number7.png"
+                                                // src="https://www.library.ucla.edu/sites/default/files/styles/custom_crop/public/static_images/BYS7.jpg?itok=9890vsGz"
                                             />
                                             // <h2>7</h2>
                                         )}
                                     </Step>
                                 </ProgressBar>
+
+                                    
+            <Row className="progress-text" >
+                
+                <Col md="1">
+                <div class="text-center ">Realm</div>
+                
+               </Col>
+                
+               <Col md="2">
+                <div class="text-center Country-bartext">Country</div>
+                
+               </Col>
+                
+               <Col md="2">
+                <div class="text-center ">Health Area</div>
+                
+               </Col>
+                
+               <Col md="2">
+                <div class="text-center ">Organization</div>
+                
+               </Col>
+               <Col md="2">
+                <div class="text-center region-bartext">Region</div>
+                
+               </Col>
+               <Col md="2">
+                <div class="text-center otherfeild-text">Other Field</div>
+                
+               </Col>
+               <Col md="1" className="planning-text">
+                <div class="text-center ">Planning Units</div>
+                
+               </Col>
+            </Row>
+
+                                {/* <div class="checkout-wrap">
+  <ul class="checkout-bar">
+
+    <li class="visited first">
+      Realm
+    </li>
+    
+    <li class="previous visited">Country</li>
+    
+    <li class="active">Health Area</li>
+    
+    <li class="next">Organization</li>
+    
+    <li class="">Region</li>
+    <li class="">Other Field</li>
+
+    <li class="">Planning Units</li>
+
+       
+  </ul>
+</div> */}
                                 <br></br>
                                 <br></br>
                                 <div id="stepOne">
