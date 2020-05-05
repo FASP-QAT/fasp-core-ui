@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
 import navigation from '../../../_nav';
 // routes config
+
+import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../../public/assets/img/QAT-login-logo.png';
 import image2 from '../../../../public/assets/img/wordmark.png';
 import image3 from '../../../../public/assets/img/PEPFAR-logo.png';
@@ -111,7 +113,7 @@ class Login extends Component {
     return (
       <div className="main-content flex-row align-items-center">
 
-        <div className="Login-component">
+        <div className="Login-component"  style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
           <Container className="container-login">
 
             <Row className="justify-content-center">
