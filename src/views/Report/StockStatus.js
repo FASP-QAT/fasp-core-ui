@@ -84,7 +84,7 @@ for (var i = 0; i <= elements; i++) {
 
 
 
-class Consumption extends Component {
+class StockStatus extends Component {
   constructor(props) {
     super(props);
 
@@ -97,7 +97,7 @@ class Consumption extends Component {
       realms: [],
       programs: [],
       planningUnits: [],
-      consumptions: [],
+      stockStatusList: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -117,16 +117,16 @@ class Consumption extends Component {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     AuthenticationService.setupAxiosInterceptors();
-    ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
+    ProductService.getStockStatusData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
       .then(response => {
         console.log(JSON.stringify(response.data));
         this.setState({
-          consumptions: response.data
+          stockStatusList: response.data
         })
       }).catch(
         error => {
           this.setState({
-            consumptions: []
+            stockStatusList: []
           })
 
           if (error.message === "Network Error") {
@@ -441,20 +441,20 @@ class Consumption extends Component {
       }, this);
     const bar = {
 
-      labels: this.state.consumptions.map((item, index) => (item.consumption_date)),
+      labels: this.state.stockStatusList.map((item, index) => (item.consumption_date)),
       datasets: [
         {
-          label: 'Actual Consumption',
+          label: 'Actual StockStatus',
           backgroundColor: '#86CD99',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
           pointHoverBackgroundColor: '#fff',
           pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.consumptions.map((item, index) => (item.Actual)),
+          data: this.state.stockStatusList.map((item, index) => (item.Actual)),
         }, {
           type: "line",
-          label: "Forecast Consumption",
+          label: "Forecast StockStatus",
           backgroundColor: 'transparent',
           borderColor: 'rgba(179,181,158,1)',
           borderStyle: 'dotted',
@@ -464,7 +464,7 @@ class Consumption extends Component {
           },
           showInLegend: true,
           yValueFormatString: "$#,##0",
-          data: this.state.consumptions.map((item, index) => (item.forcast))
+          data: this.state.stockStatusList.map((item, index) => (item.forcast))
         }
       ],
 
@@ -487,10 +487,10 @@ class Consumption extends Component {
           <Col lg="12">
             <Card>
               <CardHeader className="text-center">
-                <b className="count-text">Consumption Report</b>
+                <b className="count-text">StockStatus Report</b>
                 <div className="card-header-actions">
                   <a className="card-header-action">
-                    <Pdf targetRef={ref} filename="consumption.pdf">
+                    <Pdf targetRef={ref} filename="StockStatus.pdf">
                       {({ toPdf }) =>
                         <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
 
@@ -503,7 +503,7 @@ class Consumption extends Component {
                 <div className="TableCust" >
                   <div className="col-md-12 pr-0"> <div ref={ref}> <div className="col-md-9 pr-0" >
                     <Form >
-                      <Col md="9 pl-0">
+                      <Col md="12 pl-0">
                         <div className="d-md-flex">
                           <FormGroup>
                             <Label htmlFor="appendedInputButton">Select Period</Label>
@@ -588,7 +588,7 @@ class Consumption extends Component {
                       </Col>
                     </Form>
 
-                    <div className="chart-wrapper chart-graph">
+                 {/*}   <div className="chart-wrapper chart-graph">
                       <Bar data={bar} options={options} />
                     </div> <br /><br />
                   </div></div>
@@ -597,35 +597,35 @@ class Consumption extends Component {
 
                       <thead>
                         <tr>
-                          <th className="text-center"> Consumption Date </th>
+                          <th className="text-center"> StockStatus Date </th>
                           <th className="text-center"> Forecast </th>
                           <th className="text-center">Actual</th>
                         </tr>
                       </thead>
                       <tbody>
                         {
-                          this.state.consumptions.length > 0
+                          this.state.stockStatusList.length > 0
                           &&
-                          this.state.consumptions.map((item, idx) =>
+                          this.state.stockStatusList.map((item, idx) =>
 
                             <tr id="addr0" key={idx} >
                               <td>
-                                {this.state.consumptions[idx].consumption_date}
+                                {this.state.stockStatusList[idx].consumption_date}
                               </td>
                               <td>
 
-                                {this.state.consumptions[idx].forcast}
+                                {this.state.stockStatusList[idx].forcast}
                               </td>
                               <td>
-                                {this.state.consumptions[idx].Actual}
+                                {this.state.stockStatusList[idx].Actual}
                               </td></tr>)
 
                         }
                       </tbody>
 
-                    </Table>
+                      </Table>*/}</div>
                    
-                  </div></div>
+                      </div></div></div>
               </CardBody>
             </Card>
           </Col>
@@ -638,4 +638,4 @@ class Consumption extends Component {
   }
 }
 
-export default Consumption;
+export default StockStatus;

@@ -184,6 +184,7 @@ const syncPage = React.lazy(() => import('./views/Synchronisation/syncPage'));
 const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'));
 const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'));
 const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
+const StockStatusReport = React.lazy(() => import('./views/Report/StockStatus'));
 
 const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
@@ -371,6 +372,7 @@ const routes = [
   { path: '/report/productCatalog', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.productcatalog'), component: ProductCatalog },
   { path: '/report/consumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.consumption'), component: ConsumptionReport },
   { path: '/report/stockStatusMatrix', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusmatrix'), component: StockStatusMatrixReport },
+  { path: '/report/stockStatus', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
 
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },

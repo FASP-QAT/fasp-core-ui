@@ -620,5 +620,6 @@
     "static.language.preferredlng": "Change Preferred Language",
     "static.language.portuguese": "Portuguese",
     "static.planningunit.gtinNo": "Only numbers allowed",
-    "static.planningunit.maxGtin": "Max 14 digits allowed"
+    "static.planningunit.maxGtin": "Max 14 digits allowed",
+    "static.dashboard.stockstatus":"Stock Status"
 }
