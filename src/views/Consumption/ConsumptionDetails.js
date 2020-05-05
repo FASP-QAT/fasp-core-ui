@@ -66,7 +66,7 @@ export default class ConsumptionDetails extends React.Component {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -335,6 +335,7 @@ export default class ConsumptionDetails extends React.Component {
                         }
                         if (consumptionDataArr.length == 0) {
                             data = [];
+                            data[7] = true;
                             consumptionDataArr[0] = data;
                         }
 
@@ -1233,7 +1234,7 @@ export default class ConsumptionDetails extends React.Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].program.id == programId) {
                         var productJson = {
-                            name: getLabelText(myResult[i].planningUnit.label, lan),
+                            name: getLabelText(myResult[i].planningUnit.label, this.state.lang),
                             id: myResult[i].planningUnit.id
                         }
                         proList[i] = productJson
@@ -1846,13 +1847,14 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
         if (x == 3) {
+            var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1982,7 +1984,7 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("C").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(2, y);
-            if (value === "" || isNaN(Number.parseInt(value)) || value < 0) {
+            if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 valid = false;
@@ -1998,6 +2000,7 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
+            var reg = /^[0-9\b]+$/;
             // if (value === "" || isNaN(Number.parseInt(value)) || !Number.isInteger(value) ) {
             //     this.el.setStyle(col, "background-color", "transparent");
             //     this.el.setStyle(col, "background-color", "yellow");
@@ -2017,10 +2020,11 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");

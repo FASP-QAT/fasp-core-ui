@@ -37,8 +37,13 @@ class ProductService {
     getConsumptionData(realmId,programId,productId,startDate,endDate){
         return axios.get(`${API_URL}/api/consumption/${realmId}/${programId}/${productId}/${startDate}/${endDate}`,{});   
     }
-    getStockStatusMatrixData(realmId,productCategoryId,productId,view){
-        return axios.get(`${API_URL}/api/stockmatrix/${realmId}/${productCategoryId}/${productId}/${view}`,{});   
+    getStockStatusMatrixData(realmId,productCategoryId,productId,view,startDate,endDate){
+        return axios.get(`${API_URL}/api/stockmatrix/${realmId}/${productCategoryId}/${productId}/${view}/${startDate}/${endDate}`,{});   
+    }
+
+    getProductCategoryListByProgram(programId) {
+        return axios.get(`${API_URL}/api/productCategory/programId/${programId}`, {}
+        );
     }
 
 }

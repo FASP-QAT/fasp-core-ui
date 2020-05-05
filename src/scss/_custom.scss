@@ -653,8 +653,12 @@ label.arrow_label:after {
   top: 0;
   width: 100%;
 }
+@media only screen and (min-width: 1200px) {
+  .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+}
 
 @media only screen and (min-width: 992px) {
+  
   .Login-component {
     // background: url(../assets/img/bg-image/bg-login.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;
@@ -790,7 +794,10 @@ label.arrow_label:after {
   text-align: center;
   font-size: 12px;
 }
-
+.login-text{
+  font-size:15px;
+  font-weight: 600;
+}
 ///forgot password
 .fwd-btn {
   margin-left: 10px;
@@ -1202,6 +1209,8 @@ h5,
   background-color: #fff !important;
   }}
 
+.jexcel {white-space: pre-wrap !important;}
+
 ///legend sync 
 /* basic positioning */
 .legend { list-style: none;margin-top:6px; }
@@ -1312,3 +1321,35 @@ color: #7a7e7a;
 .dropdown-item i:active {
   color: #fff;
 }
+
+////progranonboarding progressbar css
+
+.RSPBprogressBar {
+  margin: 0px 25px 0px 25px;
+}
+
+.RSPBprogressBar .RSPBprogression {
+ 
+  background: #20a8d8!important;
+  
+}
+.btn-info {
+  color: #fff!important;
+  background-color: #20a8d8!important;
+  border-color: #20a8d8!important;
+}
+.btn-info:hover {
+  color: #fff!important;
+  background-color: #20a8d8!important;
+  border-color: #20a8d8!important;
+}
+
+
+    .progress-text{
+      margin-top: 25px;
+    }
+
+    .Country-bartext{margin-left: 34%;}
+    .region-bartext{margin-left: -25px;}
+    .otherfeild-text{margin-left: -37%;}
+    .planning-text{    margin-left: 0px;}

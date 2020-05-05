@@ -342,6 +342,11 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.stockstatus'),
+                            url: '/report/stockStatus',
+                            icon: 'fa fa-exchange'
                           }
                         ]
                       }
@@ -406,6 +411,11 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.stockstatus'),
+                            url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
                           }
                         ]

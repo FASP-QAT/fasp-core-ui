@@ -18,7 +18,8 @@ export default class AddInventory extends Component {
             programId: '',
             changedFlag: 0,
             countrySKUList: [],
-            message: ''
+            message: '',
+            lang: localStorage.getItem('lang')
 
         }
         this.options = props.options;
@@ -52,7 +53,7 @@ export default class AddInventory extends Component {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                         var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            name: getLabelText(JSON.parse(programNameLabel), this.state.lang) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -114,7 +115,7 @@ export default class AddInventory extends Component {
                     for (var k = 0; k < countrySKUResult.length; k++) {
                         if (countrySKUResult[k].realmCountry.id == programJson.realmCountry.realmCountryId) {
                             var countrySKUJson = {
-                                name: countrySKUResult[k].label.label_en,
+                                name: getLabelText(countrySKUResult[k].label, this.state.lang),
                                 id: countrySKUResult[k].realmCountryPlanningUnitId
                             }
                             countrySKUList[k] = countrySKUJson
@@ -191,7 +192,7 @@ export default class AddInventory extends Component {
                             this.setState({
                                 inventoryList: inventoryList
                             });
-
+                            console.log("inventoryList----------------->>", inventoryList);
                             var data = [];
                             var inventoryDataArr = []
                             // if (inventoryList.length == 0) {
@@ -199,43 +200,47 @@ export default class AddInventory extends Component {
                             //     inventoryDataArr[0] = data;
                             // }
                             var count = 0;
-                            for (var j = 0; j < inventoryList.length; j++) {
-                                if (inventoryList[j].realmCountryPlanningUnit.id == countrySKUId) {
-                                    if (count == 0) {
-                                        data = [];
-                                        data[0] = inventoryList[j].dataSource.id;
-                                        data[1] = inventoryList[j].region.id;
-                                        data[2] = inventoryList[j].inventoryDate;
-                                        data[3] = 0;
-                                        data[4] = inventoryList[j].adjustmentQty;
-                                        data[5] = inventoryList[j].actualQty;
-                                        data[6] = inventoryList[j].batchNo;
-                                        data[7] = inventoryList[j].expiryDate;
-                                        data[8] = inventoryList[j].active;
-                                        data[9] = j;
-                                        inventoryDataArr[count] = data;
-                                        count++;
-                                    } else {
-                                        data = [];
-                                        data[0] = inventoryList[j].dataSource.id;
-                                        data[1] = inventoryList[j].region.id;
-                                        data[2] = inventoryList[j].inventoryDate;
-                                        data[3] = `=D${count}+E${count}`;
-                                        data[4] = inventoryList[j].adjustmentQty;
-                                        data[5] = inventoryList[j].actualQty;
-                                        data[6] = inventoryList[j].batchNo;
-                                        data[7] = inventoryList[j].expiryDate;
-                                        data[8] = inventoryList[j].active;
-                                        data[9] = j;
-                                        inventoryDataArr[count] = data;
-                                        // inventoryDataArr[j] = data;
-                                        count++;
+                            if (inventoryList.length != 0) {
+                                for (var j = 0; j < inventoryList.length; j++) {
+                                    if (inventoryList[j].realmCountryPlanningUnit.id == countrySKUId) {
+                                        if (count == 0) {
+                                            data = [];
+                                            data[0] = inventoryList[j].dataSource.id;
+                                            data[1] = inventoryList[j].region.id;
+                                            data[2] = inventoryList[j].inventoryDate;
+                                            data[3] = 0;
+                                            data[4] = inventoryList[j].adjustmentQty;
+                                            data[5] = inventoryList[j].actualQty;
+                                            data[6] = inventoryList[j].batchNo;
+                                            data[7] = inventoryList[j].expiryDate;
+                                            data[8] = inventoryList[j].active;
+                                            data[9] = j;
+                                            inventoryDataArr[count] = data;
+                                            count++;
+                                        } else {
+                                            data = [];
+                                            data[0] = inventoryList[j].dataSource.id;
+                                            data[1] = inventoryList[j].region.id;
+                                            data[2] = inventoryList[j].inventoryDate;
+                                            data[3] = `=D${count}+E${count}`;
+                                            data[4] = inventoryList[j].adjustmentQty;
+                                            data[5] = inventoryList[j].actualQty;
+                                            data[6] = inventoryList[j].batchNo;
+                                            data[7] = inventoryList[j].expiryDate;
+                                            data[8] = inventoryList[j].active;
+                                            data[9] = j;
+                                            inventoryDataArr[count] = data;
+                                            // inventoryDataArr[j] = data;
+                                            count++;
+                                        }
                                     }
                                 }
                             }
+
                             console.log("inventory Data Array-->", inventoryDataArr);
                             if (inventoryDataArr.length == 0) {
                                 data = [];
+                                data[8] = true;
                                 inventoryDataArr[0] = data;
                             }
                             this.el = jexcel(document.getElementById("inventorytableDiv"), '');
@@ -369,22 +374,14 @@ export default class AddInventory extends Component {
             }
         }
         if (x == 4) {
+            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 // this.el.setValueFromCoords(4, y, 0, true)
             } else {
-
-                // console.log("VALUE------>",value,"RESULT----------->",value);
-                // if(value % 1 === 0){
-                //     console.log("INT____",value);
-                // }else{
-                //     console.log("DEC____",value);
-                // }
-
-
-                if (isNaN(parseInt(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -396,8 +393,9 @@ export default class AddInventory extends Component {
         }
 
         if (x == 5) {
+            var reg = /^[0-9\b]+$/;
             if (this.el.getValueFromCoords(5, y) != "") {
-                if (isNaN(parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -481,6 +479,7 @@ export default class AddInventory extends Component {
 
             var col = ("E").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(4, y);
+            var reg = /^[0-9\b]+$/;
 
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -496,10 +495,11 @@ export default class AddInventory extends Component {
                 // }
 
 
-                if (isNaN(parseInt(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -510,10 +510,11 @@ export default class AddInventory extends Component {
             var value = this.el.getValueFromCoords(5, y);
 
             if (value != "") {
-                if (isNaN(parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
                 } else {
                     var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
                     this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);

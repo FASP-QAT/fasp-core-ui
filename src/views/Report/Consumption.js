@@ -122,9 +122,7 @@ class Consumption extends Component {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    console.log("startDate---", startDate)
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-    console.log("endDate---", endDate)
     if (navigator.onLine) {
       let realmId = document.getElementById("realmId").value;
       AuthenticationService.setupAxiosInterceptors();
@@ -173,22 +171,20 @@ class Consumption extends Component {
           var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson = JSON.parse(programData);
-          console.log("filter programJson---", programJson);
           var offlineConsumptionList = (programJson.consumptionList);
+          console.log("offlineConsumptionList---",offlineConsumptionList);
 
           const planningUnitFilter = offlineConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
-          console.log("planningUnitFilter---", planningUnitFilter);
+          // console.log("planningUnitFilter---", planningUnitFilter);
 
-          const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-          console.log("dateFilter---", dateFilter);
+          // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+          const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isBetween(startDate, endDate, null, '[)') && moment(c.stopDate).isBetween(startDate, endDate, null, '[)'))
+
           const sorted = dateFilter.sort((a, b) => {
             var dateA = new Date(a.startDate).getTime();
-            console.log("dateA---", dateA);
             var dateB = new Date(b.stopDate).getTime();
-            console.log("dateB---", dateB);
             return dateA > dateB ? 1 : -1;
           });
-          console.log("sorted array---", sorted);
           let previousDate = "";
           let finalOfflineConsumption = [];
           var json;
@@ -197,15 +193,10 @@ class Consumption extends Component {
             let forcast = 0;
             let actual = 0;
             if (sorted[i] != null && sorted[i] != "") {
-              console.log("sorted[i].startDate---", sorted[i].startDate);
-              // if (sorted[i].startDate != undefined && sorted[i].startDate != null && sorted[i].startDate != "") {
-              console.log("for start date---", sorted[i].startDate);
               previousDate = sorted[i].startDate;
-              console.log("previousDate---", previousDate);
               for (let j = 0; j <= sorted.length; j++) {
                 if (sorted[j] != null && sorted[j] != "") {
                   if (previousDate == sorted[j].startDate) {
-                    console.log("in if");
                     if (!sorted[j].actualFlag) {
                       forcast = forcast + sorted[j].consumptionQty;
                     }
@@ -213,31 +204,21 @@ class Consumption extends Component {
                       actual = actual + sorted[j].consumptionQty;
                     }
                   }
-                  // else {
-                  //   console.log("in else");
-                  //   forcast = 0;
-                  //   actual = 0;
-                  //   if (!sorted[j].actualFlag) {
-                  //     forcast = sorted[j].consumptionQty;
-                  //   }
-                  //   if (sorted[j].actualFlag) {
-                  //     actual = sorted[j].consumptionQty;
-                  //   }
-                  // }
                 }
               }
 
               let date = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
-              console.log("date---", date);
               json = {
                 consumption_date: date,
                 Actual: actual,
                 forcast: forcast
               }
-              console.log("json---", json);
-              finalOfflineConsumption.push(json);
-              console.log("finalOfflineConsumption---", finalOfflineConsumption);
-              // }
+              
+              if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
+                finalOfflineConsumption.push(json);
+              }
+
+              // console.log("finalOfflineConsumption---", finalOfflineConsumption);
 
             }
           }
@@ -636,7 +617,7 @@ class Consumption extends Component {
                 <div className="TableCust" >
                   <div className="col-md-12 pr-0"> <div ref={ref}> <div className="col-md-9 pr-0" >
                     <Form >
-                      <Col md="12 pl-0">
+                      <Col md="9 pl-0">
                         <div className="d-md-flex">
                           <FormGroup>
                             <Label htmlFor="appendedInputButton">Select Period</Label>

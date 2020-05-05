@@ -221,7 +221,7 @@ class Login extends Component {
 
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
-                                <p className="text-muted">{i18n.t('static.login.signintext')}</p>
+                                <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
 
                                 <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
