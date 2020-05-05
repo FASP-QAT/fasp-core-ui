@@ -532,7 +532,7 @@ export default class AddInventory extends Component {
                         var expBalance = 0
                         inventoryDataListNotFiltered[parseInt(map.get("9"))].dataSource.id = map.get("0");
                         inventoryDataListNotFiltered[parseInt(map.get("9"))].region.id = map.get("1");
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].inventoryDate = map.get("2");
+                        inventoryDataListNotFiltered[parseInt(map.get("9"))].inventoryDate = moment(map.get("2")).format("YYYY-MM-DD");
 
                         if (i == 0) {
                             expBalance = 0;
@@ -545,7 +545,11 @@ export default class AddInventory extends Component {
                         inventoryDataListNotFiltered[parseInt(map.get("9"))].adjustmentQty = parseInt(map.get("4"));
                         inventoryDataListNotFiltered[parseInt(map.get("9"))].actualQty = map.get("5");
                         inventoryDataListNotFiltered[parseInt(map.get("9"))].batchNo = map.get("6");
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = map.get("7");
+                        if (inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != null && inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != "") {
+                            inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = moment(map.get("7")).format("YYYY-MM-DD");
+                        } else {
+                            inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = "";
+                        }
                         inventoryDataListNotFiltered[parseInt(map.get("9"))].active = map.get("8");
                         // if (inventoryDataList.length >= count) {
                         //     count++;
@@ -569,6 +573,12 @@ export default class AddInventory extends Component {
                             expBalance = parseInt(inventoryDataList[i - 1].expectedBal) + parseInt(inventoryDataList[i - 1].adjustmentQty);
                             // console.log("expected bal--->", expBalance);
                         }
+                        var expiryDate = "";
+                        if (map.get("7") != null && map.get("7") != "") {
+                            expiryDate = moment(map.get("7")).format("YYYY-MM-DD")
+                        } else {
+                            expiryDate = ""
+                        }
                         var json = {
                             inventoryId: 0,
                             dataSource: {
@@ -577,12 +587,12 @@ export default class AddInventory extends Component {
                             region: {
                                 id: map.get("1")
                             },
-                            inventoryDate: map.get("2"),
+                            inventoryDate: moment(map.get("2")).format("YYYY-MM-DD"),
                             expectedBal: expBalance,
                             adjustmentQty: map.get("4"),
                             actualQty: map.get("5"),
                             batchNo: map.get("6"),
-                            expiryDate: map.get("7"),
+                            expiryDate: expiryDate,
                             active: map.get("8"),
 
                             realmCountryPlanningUnit: {

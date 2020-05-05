@@ -812,8 +812,8 @@ export default class ConsumptionDetails extends React.Component {
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionQty = map.get("2");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].dayOfStockOut = parseInt(map.get("3"));
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = map.get("4");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = map.get("5");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = moment(map.get("4")).format("YYYY-MM-DD");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = moment(map.get("5")).format("YYYY-MM-DD");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].actualFlag = map.get("6");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
 
@@ -837,8 +837,8 @@ export default class ConsumptionDetails extends React.Component {
                             },
                             consumptionQty: parseInt(map.get("2")),
                             dayOfStockOut: parseInt(map.get("3")),
-                            startDate: map.get("4"),
-                            stopDate: map.get("5"),
+                            startDate: moment(map.get("4")).format("YYYY-MM-DD"),
+                            stopDate: moment(map.get("5")).format("YYYY-MM-DD"),
                             actualFlag: map.get("6"),
                             active: map.get("7"),
 

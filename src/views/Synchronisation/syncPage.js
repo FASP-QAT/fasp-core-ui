@@ -1231,7 +1231,8 @@ export default class syncPage extends Component {
         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
         var programJson = JSON.parse(programData);
-        console.log("Program json",programJson);
+        ProgramService.saveProgramData(programJson);
+        console.log("Program json", programJson);
       }
     }
   }

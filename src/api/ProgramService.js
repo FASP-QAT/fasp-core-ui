@@ -76,5 +76,10 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/realmId/${json}`, {}
         );
     }
+
+    saveProgramData(json){
+        return axios.put(`${API_URL}/api/programData/`, json, {}
+        );
+    }
 }
 export default new ProgramService()
