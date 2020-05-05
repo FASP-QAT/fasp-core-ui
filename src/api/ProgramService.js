@@ -76,5 +76,9 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/realmId/${json}`, {}
         );
     }
+    getProgramPlaningUnitListByProgramAndProductCategory(programId,ProductCategoryId) {
+        return axios.get(`${API_URL}/api/program/${programId}/${ProductCategoryId}/planningUnit/all/`, {}
+        );
+    }
 }
 export default new ProgramService()
