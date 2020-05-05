@@ -44,6 +44,8 @@ import { SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
+import { Online, Offline } from "react-detect-offline";
+
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
@@ -92,12 +94,16 @@ class Consumption extends Component {
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
     this.state = {
+      sortType: 'asc',
       dropdownOpen: false,
       radioSelected: 2,
       realms: [],
       programs: [],
+      offlinePrograms: [],
       planningUnits: [],
       consumptions: [],
+      offlineConsumptionList: [],
+      offlinePlanningUnitList: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -113,41 +119,137 @@ class Consumption extends Component {
 
   }
   filterData() {
-    let realmId = document.getElementById("realmId").value;
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
-    AuthenticationService.setupAxiosInterceptors();
-    ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
-      .then(response => {
-        console.log(JSON.stringify(response.data));
-        this.setState({
-          consumptions: response.data
-        })
-      }).catch(
-        error => {
+    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+    console.log("startDate---", startDate)
+    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+    console.log("endDate---", endDate)
+    if (navigator.onLine) {
+      let realmId = document.getElementById("realmId").value;
+      AuthenticationService.setupAxiosInterceptors();
+      ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+        .then(response => {
+          console.log(JSON.stringify(response.data));
           this.setState({
-            consumptions: []
+            consumptions: response.data
           })
+        }).catch(
+          error => {
+            this.setState({
+              consumptions: []
+            })
 
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
+            if (error.message === "Network Error") {
+              this.setState({ message: error.message });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
             }
           }
-        }
-      );
+        );
+    } else {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open('fasp', 1);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
 
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var programTransaction = transaction.objectStore('programData');
+        var programRequest = programTransaction.get(programId);
+
+        programRequest.onsuccess = function (event) {
+          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson = JSON.parse(programData);
+          console.log("filter programJson---", programJson);
+          var offlineConsumptionList = (programJson.consumptionList);
+
+          const planningUnitFilter = offlineConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
+          console.log("planningUnitFilter---", planningUnitFilter);
+
+          const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+          console.log("dateFilter---", dateFilter);
+          const sorted = dateFilter.sort((a, b) => {
+            var dateA = new Date(a.startDate).getTime();
+            console.log("dateA---", dateA);
+            var dateB = new Date(b.stopDate).getTime();
+            console.log("dateB---", dateB);
+            return dateA > dateB ? 1 : -1;
+          });
+          console.log("sorted array---", sorted);
+          let previousDate = "";
+          let finalOfflineConsumption = [];
+          var json;
+
+          for (let i = 0; i <= sorted.length; i++) {
+            let forcast = 0;
+            let actual = 0;
+            if (sorted[i] != null && sorted[i] != "") {
+              console.log("sorted[i].startDate---", sorted[i].startDate);
+              // if (sorted[i].startDate != undefined && sorted[i].startDate != null && sorted[i].startDate != "") {
+              console.log("for start date---", sorted[i].startDate);
+              previousDate = sorted[i].startDate;
+              console.log("previousDate---", previousDate);
+              for (let j = 0; j <= sorted.length; j++) {
+                if (sorted[j] != null && sorted[j] != "") {
+                  if (previousDate == sorted[j].startDate) {
+                    console.log("in if");
+                    if (!sorted[j].actualFlag) {
+                      forcast = forcast + sorted[j].consumptionQty;
+                    }
+                    if (sorted[j].actualFlag) {
+                      actual = actual + sorted[j].consumptionQty;
+                    }
+                  }
+                  // else {
+                  //   console.log("in else");
+                  //   forcast = 0;
+                  //   actual = 0;
+                  //   if (!sorted[j].actualFlag) {
+                  //     forcast = sorted[j].consumptionQty;
+                  //   }
+                  //   if (sorted[j].actualFlag) {
+                  //     actual = sorted[j].consumptionQty;
+                  //   }
+                  // }
+                }
+              }
+
+              let date = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
+              console.log("date---", date);
+              json = {
+                consumption_date: date,
+                Actual: actual,
+                forcast: forcast
+              }
+              console.log("json---", json);
+              finalOfflineConsumption.push(json);
+              console.log("finalOfflineConsumption---", finalOfflineConsumption);
+              // }
+
+            }
+          }
+
+          this.setState({
+            offlineConsumptionList: finalOfflineConsumption
+          });
+
+        }.bind(this)
+
+      }.bind(this)
+    }
   }
 
   getPrograms() {
@@ -294,90 +396,99 @@ class Consumption extends Component {
           }
           console.log("proList---" + proList);
           this.setState({
-            planningUnitList: proList
+            offlinePlanningUnitList: proList
           })
         }.bind(this);
       }.bind(this)
 
     }
-   
+
   }
 
 
   componentDidMount() {
+    console.log("inside component did mount");
     if (navigator.onLine) {
-    AuthenticationService.setupAxiosInterceptors();
-    RealmService.getRealmListAll()
-      .then(response => {
-        if (response.status == 200) {
-          this.setState({
-            realms: response.data,
-            realmId: response.data[0].realmId
-          })
-          this.getPrograms();
+      console.log("online report");
+      AuthenticationService.setupAxiosInterceptors();
+      RealmService.getRealmListAll()
+        .then(response => {
+          if (response.status == 200) {
+            this.setState({
+              realms: response.data,
+              realmId: response.data[0].realmId
+            })
+            this.getPrograms();
 
-        } else {
-          this.setState({ message: response.data.messageCode })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
           } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
+            this.setState({ message: response.data.messageCode })
+          }
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({ message: error.message });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: error.response.data.messageCode });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
             }
           }
-        }
-      );}else{
+        );
+    } else {
+      console.log("offline report");
+      const lan = 'en';
+      console.log("---1---");
+      var db1;
+      console.log("---2---");
+      getDatabase();
 
-        console.log("In component did mount", new Date())
-        const lan = 'en';
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-            var proList = []
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                            id: myResult[i].id
-                        }
-                        proList[i] = programJson
-                    }
-                }
-                this.setState({
-                    programList: proList
-                })
+      var openRequest = indexedDB.open('fasp', 1);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var program = transaction.objectStore('programData');
+        var getRequest = program.getAll();
+        var proList = []
+        getRequest.onerror = function (event) {
+          // Handle errors!
+        };
+        getRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result;
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          for (var i = 0; i < myResult.length; i++) {
+            if (myResult[i].userId == userId) {
+              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+              console.log("programNameLabel---", programNameLabel);
+              console.log("version---", myResult[i].version);
+              var programJson = {
+                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                id: myResult[i].id
+              }
+              proList[i] = programJson
+            }
+          }
+          console.log("programJson---", programJson);
+          console.log("proList---", proList);
+          this.setState({
+            offlinePrograms: proList
+          })
 
-            }.bind(this);
-      }
+        }.bind(this);
+      }.bind(this);
 
-  }
+    }
   }
 
   toggle() {
@@ -422,53 +533,75 @@ class Consumption extends Component {
         )
       }, this);
     const { planningUnits } = this.state;
-    let planningUnitList = planningUnits.length > 0
-      && planningUnits.map((item, i) => {
-        return (
-          <option key={i} value={item.planningUnit.id}>
-            {getLabelText(item.planningUnit.label, this.state.lang)}
-          </option>
-        )
-      }, this);
+    const { offlinePlanningUnitList } = this.state;
+
     const { programs } = this.state;
-    let programList = programs.length > 0
-      && programs.map((item, i) => {
-        return (
-          <option key={i} value={item.programId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
-    const bar = {
+    const { offlinePrograms } = this.state;
+    let bar = "";
+    if (navigator.onLine) {
+      bar = {
 
-      labels: this.state.consumptions.map((item, index) => (item.consumption_date)),
-      datasets: [
-        {
-          label: 'Actual Consumption',
-          backgroundColor: '#86CD99',
-          borderColor: 'rgba(179,181,198,1)',
-          pointBackgroundColor: 'rgba(179,181,198,1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.consumptions.map((item, index) => (item.Actual)),
-        }, {
-          type: "bar",
-          label: "Forecast Consumption",
-          backgroundColor: '#006400',
-          borderColor: 'rgba(179,181,158,1)',
-          borderStyle: 'dotted',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          showInLegend: true,
-          yValueFormatString: "$#,##0",
-          data: this.state.consumptions.map((item, index) => (item.forcast))
-        }
-      ],
+        labels: this.state.consumptions.map((item, index) => (item.consumption_date)),
+        datasets: [
+          {
+            label: 'Actual Consumption',
+            backgroundColor: '#86CD99',
+            borderColor: 'rgba(179,181,198,1)',
+            pointBackgroundColor: 'rgba(179,181,198,1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(179,181,198,1)',
+            data: this.state.consumptions.map((item, index) => (item.Actual)),
+          }, {
+            type: "bar",
+            label: "Forecast Consumption",
+            backgroundColor: '#006400',
+            borderColor: 'rgba(179,181,158,1)',
+            borderStyle: 'dotted',
+            ticks: {
+              fontSize: 2,
+              fontColor: 'transparent',
+            },
+            showInLegend: true,
+            yValueFormatString: "$#,##0",
+            data: this.state.consumptions.map((item, index) => (item.forcast))
+          }
+        ],
 
-    };
+      }
+    }
+    if (!navigator.onLine) {
+      bar = {
+
+        labels: this.state.offlineConsumptionList.map((item, index) => (item.consumption_date)),
+        datasets: [
+          {
+            label: 'Actual Consumption',
+            backgroundColor: '#86CD99',
+            borderColor: 'rgba(179,181,198,1)',
+            pointBackgroundColor: 'rgba(179,181,198,1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(179,181,198,1)',
+            data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
+          }, {
+            type: "bar",
+            label: "Forecast Consumption",
+            backgroundColor: '#006400',
+            borderColor: 'rgba(179,181,158,1)',
+            borderStyle: 'dotted',
+            ticks: {
+              fontSize: 2,
+              fontColor: 'transparent',
+            },
+            showInLegend: true,
+            yValueFormatString: "$#,##0",
+            data: this.state.offlineConsumptionList.map((item, index) => (item.forcast))
+          }
+        ],
+
+      }
+    }
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       from: 'From', to: 'To',
@@ -525,65 +658,139 @@ class Consumption extends Component {
                           </FormGroup>
 
 
-                          <FormGroup>
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                            <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="realmId"
-                                  id="realmId"
-                                  bsSize="sm"
-                                  onChange={this.getPrograms}
-                                >
-                                  {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+                          <Online>
+                            <FormGroup>
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                              <div className="controls SelectGo">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="realmId"
+                                    id="realmId"
+                                    bsSize="sm"
+                                    onChange={this.getPrograms}
+                                  >
+                                    {/* <option value="0">{i18n.t('static.common.all')}</option> */}
 
-                                  {realmList}
-                                </Input>
+                                    {realmList}
+                                  </Input>
 
-                              </InputGroup>
-                            </div>
-                          </FormGroup>
-                         
-                                    <FormGroup className="tab-ml-1">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                            <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="programId"
-                                  id="programId"
-                                  bsSize="sm"
-                                  onChange={this.getPlanningUnit}
+                                </InputGroup>
+                              </div>
+                            </FormGroup>
+                          </Online>
+                          <Online>
+                            <FormGroup className="tab-ml-1">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                              <div className="controls SelectGo">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="programId"
+                                    id="programId"
+                                    bsSize="sm"
+                                    onChange={this.getPlanningUnit}
 
-                                >
-                                  <option value="0">{i18n.t('static.common.select')}</option>
-                                  {programList}
-                                </Input>
+                                  >
+                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                    {programs.length > 0
+                                      && programs.map((item, i) => {
+                                        return (
+                                          <option key={i} value={item.programId}>
+                                            {getLabelText(item.label, this.state.lang)}
+                                          </option>
+                                        )
+                                      }, this)}
+                                  </Input>
 
-                              </InputGroup>
-                            </div>
-                          </FormGroup>
-                          <FormGroup className="tab-ml-1">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                            <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="planningUnitId"
-                                  id="planningUnitId"
-                                  bsSize="sm"
-                                  onChange={this.filterData}
-                                >
-                                  <option value="0">{i18n.t('static.common.select')}</option>
-                                  {planningUnitList}
-                                </Input>
-                                <InputGroupAddon addonType="append">
-                                  <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                </InputGroupAddon>
-                              </InputGroup>
-                            </div>
-                          </FormGroup>
+                                </InputGroup>
+                              </div>
+                            </FormGroup>
+                          </Online>
+                          <Offline>
+                            <FormGroup className="tab-ml-1">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                              <div className="controls SelectGo">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="programId"
+                                    id="programId"
+                                    bsSize="sm"
+                                    onChange={this.getPlanningUnit}
+
+                                  >
+                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                    {offlinePrograms.length > 0
+                                      && offlinePrograms.map((item, i) => {
+                                        return (
+                                          <option key={i} value={item.id}>
+                                            {item.name}
+                                          </option>
+                                        )
+                                      }, this)}
+                                  </Input>
+
+                                </InputGroup>
+                              </div>
+                            </FormGroup>
+                          </Offline>
+                          <Online>
+                            <FormGroup className="tab-ml-1">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                              <div className="controls SelectGo">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="planningUnitId"
+                                    id="planningUnitId"
+                                    bsSize="sm"
+                                    onChange={this.filterData}
+                                  >
+                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                    {planningUnits.length > 0
+                                      && planningUnits.map((item, i) => {
+                                        return (
+                                          <option key={i} value={item.planningUnit.id}>
+                                            {getLabelText(item.planningUnit.label, this.state.lang)}
+                                          </option>
+                                        )
+                                      }, this)}
+                                  </Input>
+                                  <InputGroupAddon addonType="append">
+                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                  </InputGroupAddon>
+                                </InputGroup>
+                              </div>
+                            </FormGroup>
+                          </Online>
+                          <Offline>
+                            <FormGroup className="tab-ml-1">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                              <div className="controls SelectGo">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="planningUnitId"
+                                    id="planningUnitId"
+                                    bsSize="sm"
+                                    onChange={this.filterData}
+                                  >
+                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                    {offlinePlanningUnitList.length > 0
+                                      && offlinePlanningUnitList.map((item, i) => {
+                                        return (
+                                          <option key={i} value={item.id}>{item.name}</option>
+                                        )
+                                      }, this)}
+                                  </Input>
+                                  <InputGroupAddon addonType="append">
+                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                  </InputGroupAddon>
+                                </InputGroup>
+                              </div>
+                            </FormGroup>
+                          </Offline>
                         </div>
                       </Col>
                     </Form>
@@ -602,29 +809,52 @@ class Consumption extends Component {
                           <th className="text-center">Actual</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {
-                          this.state.consumptions.length > 0
-                          &&
-                          this.state.consumptions.map((item, idx) =>
+                      <Online>
+                        <tbody>
+                          {
+                            this.state.consumptions.length > 0
+                            &&
+                            this.state.consumptions.map((item, idx) =>
 
-                            <tr id="addr0" key={idx} >
-                              <td>
-                                {this.state.consumptions[idx].consumption_date}
-                              </td>
-                              <td>
+                              <tr id="addr0" key={idx} >
+                                <td>
+                                  {this.state.consumptions[idx].consumption_date}
+                                </td>
+                                <td>
 
-                                {this.state.consumptions[idx].forcast}
-                              </td>
-                              <td>
-                                {this.state.consumptions[idx].Actual}
-                              </td></tr>)
+                                  {this.state.consumptions[idx].forcast}
+                                </td>
+                                <td>
+                                  {this.state.consumptions[idx].Actual}
+                                </td></tr>)
 
-                        }
-                      </tbody>
+                          }
+                        </tbody>
+                      </Online>
+                      <Offline>
+                        <tbody>
+                          {
+                            this.state.offlineConsumptionList.length > 0
+                            &&
+                            this.state.offlineConsumptionList.map((item, idx) =>
 
+                              <tr id="addr0" key={idx} >
+                                <td>
+                                  {this.state.offlineConsumptionList[idx].consumption_date}
+                                </td>
+                                <td>
+
+                                  {this.state.offlineConsumptionList[idx].forcast}
+                                </td>
+                                <td>
+                                  {this.state.offlineConsumptionList[idx].Actual}
+                                </td></tr>)
+
+                          }
+                        </tbody>
+                      </Offline>
                     </Table>
-                   
+
                   </div></div>
               </CardBody>
             </Card>
