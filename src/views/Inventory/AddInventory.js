@@ -374,22 +374,14 @@ export default class AddInventory extends Component {
             }
         }
         if (x == 4) {
+            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 // this.el.setValueFromCoords(4, y, 0, true)
             } else {
-
-                // console.log("VALUE------>",value,"RESULT----------->",value);
-                // if(value % 1 === 0){
-                //     console.log("INT____",value);
-                // }else{
-                //     console.log("DEC____",value);
-                // }
-
-
-                if (isNaN(parseInt(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -401,8 +393,9 @@ export default class AddInventory extends Component {
         }
 
         if (x == 5) {
+            var reg = /^[0-9\b]+$/;
             if (this.el.getValueFromCoords(5, y) != "") {
-                if (isNaN(parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     var col = ("F").concat(parseInt(y) + 1);
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
@@ -486,6 +479,7 @@ export default class AddInventory extends Component {
 
             var col = ("E").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(4, y);
+            var reg = /^[0-9\b]+$/;
 
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
@@ -501,10 +495,11 @@ export default class AddInventory extends Component {
                 // }
 
 
-                if (isNaN(parseInt(value))) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
@@ -515,10 +510,11 @@ export default class AddInventory extends Component {
             var value = this.el.getValueFromCoords(5, y);
 
             if (value != "") {
-                if (isNaN(parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
                 } else {
                     var manualAdj = this.el.getValueFromCoords(5, y) - this.el.getValueFromCoords(3, y);
                     this.el.setValueFromCoords(4, y, parseInt(manualAdj), true);

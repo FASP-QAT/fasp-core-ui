@@ -999,6 +999,10 @@ export default class ConsumptionDetails extends React.Component {
         //     }
         // }
 
+        // this.setState({
+        //     changedFlag: 1
+        // })
+
     }.bind(this)
 
     checkValidation() {
