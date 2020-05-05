@@ -199,7 +199,7 @@ export default class ConsumptionDetails extends React.Component {
                             data[2] = '01-SUGGESTED';
                             data[3] = planningUnitText;
                             data[4] = '44,773';
-                            data[5] = '44,773 ';
+                            data[5] = '';
                             data[6] = '';
 
                             shipmentDataArr[0] = data;
