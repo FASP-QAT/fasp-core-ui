@@ -16,6 +16,8 @@ import HealthAreaService from "../../api/HealthAreaService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService";
 import getLabelText from '../../CommonComponent/getLabelText'
+import MapPlanningUnits from './MapPlanningUnits';
+
 
 export default class ProgramOnboarding extends Component {
     constructor(props) {
@@ -79,6 +81,8 @@ export default class ProgramOnboarding extends Component {
         this.getDependentLists = this.getDependentLists.bind(this);
         this.getRegionList = this.getRegionList.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
+
+
 
         this.finishedStepOne = this.finishedStepOne.bind(this);
         this.finishedStepTwo = this.finishedStepTwo.bind(this);
@@ -180,8 +184,12 @@ export default class ProgramOnboarding extends Component {
     }
 
     finishedStepSeven() {
-        console.log("hi-----------", this.state.program);
+        console.log("program-----------", this.state.program);
+        var j = this.refs.child.myFunction();
+        console.log("planningUnit ----------------", j);
+
     }
+
     previousToStepOne() {
         this.setState({ progressPer: 0 });
         document.getElementById('stepOne').style.display = 'block';
@@ -380,6 +388,7 @@ export default class ProgramOnboarding extends Component {
         program.regionArray = regionIdArray;
         this.setState({ program: program });
     }
+
 
     render() {
         const { realmList } = this.state;
@@ -773,9 +782,12 @@ export default class ProgramOnboarding extends Component {
                                     <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFive} >Previous</Button>
                                 </div>
                                 <div id="stepSeven">
+                                    <h6>Map Planning Units</h6>
+                                    <MapPlanningUnits ref="child"></MapPlanningUnits>
                                     <FormGroup>
                                         <h1>Planning Units</h1>
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}>Submit</Button>
+                                        
                                         &nbsp;
                                     <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} >Previous</Button>
                                     </FormGroup>

@@ -117,7 +117,7 @@ class Consumption extends Component {
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     AuthenticationService.setupAxiosInterceptors();
-    ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+    ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
       .then(response => {
         console.log(JSON.stringify(response.data));
         this.setState({
@@ -453,9 +453,9 @@ class Consumption extends Component {
           pointHoverBorderColor: 'rgba(179,181,198,1)',
           data: this.state.consumptions.map((item, index) => (item.Actual)),
         }, {
-          type: "bar",
+          type: "line",
           label: "Forecast Consumption",
-          backgroundColor: '#006400',
+          backgroundColor: 'transparent',
           borderColor: 'rgba(179,181,158,1)',
           borderStyle: 'dotted',
           ticks: {
@@ -503,7 +503,7 @@ class Consumption extends Component {
                 <div className="TableCust" >
                   <div className="col-md-12 pr-0"> <div ref={ref}> <div className="col-md-9 pr-0" >
                     <Form >
-                      <Col md="12 pl-0">
+                      <Col md="9 pl-0">
                         <div className="d-md-flex">
                           <FormGroup>
                             <Label htmlFor="appendedInputButton">Select Period</Label>
