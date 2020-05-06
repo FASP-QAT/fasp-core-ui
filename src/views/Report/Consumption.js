@@ -98,6 +98,7 @@ class Consumption extends Component {
       programs: [],
       planningUnits: [],
       consumptions: [],
+      productCategories: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -109,6 +110,7 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
+    this.getProductCategories=this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
 
   }
@@ -303,7 +305,41 @@ class Consumption extends Component {
    
   }
 
-
+  getProductCategories() {
+    AuthenticationService.setupAxiosInterceptors();
+    let programId = document.getElementById("programId").value;
+    ProductService.getProductCategoryListByProgram(programId)
+        .then(response => {
+            console.log(JSON.stringify(response.data))
+            this.setState({
+                productCategories: response.data
+            })
+        }).catch(
+            error => {
+                this.setState({
+                    productCategories: []
+                })
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            break;
+                    }
+                }
+            }
+        );
+        this.getPlanningUnit();
+        
+}
   componentDidMount() {
     if (navigator.onLine) {
     AuthenticationService.setupAxiosInterceptors();
@@ -439,6 +475,15 @@ class Consumption extends Component {
           </option>
         )
       }, this);
+      const { productCategories } = this.state;
+      let productCategoryList = productCategories.length > 0
+          && productCategories.map((item, i) => {
+              return (
+                  <option key={i} value={item.payload.productCategoryId}>
+                      {getLabelText(item.payload.label, this.state.lang)}
+                  </option>
+              )
+          }, this);
     const bar = {
 
       labels: this.state.consumptions.map((item, index) => (item.consumption_date)),
@@ -554,7 +599,7 @@ class Consumption extends Component {
                                   name="programId"
                                   id="programId"
                                   bsSize="sm"
-                                  onChange={this.getPlanningUnit}
+                                  onChange={this.getProductCategories}
 
                                 >
                                   <option value="0">{i18n.t('static.common.select')}</option>
@@ -564,6 +609,26 @@ class Consumption extends Component {
                               </InputGroup>
                             </div>
                           </FormGroup>
+
+                          <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.getPlanningUnit}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {productCategoryList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                         
                           <FormGroup className="tab-ml-1">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                             <div className="controls SelectGo">

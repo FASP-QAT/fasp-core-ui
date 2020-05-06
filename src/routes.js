@@ -185,7 +185,7 @@ const ProductCatalog = React.lazy(() => import('./views/Report/ProductCatalog'))
 const ConsumptionReport = React.lazy(() => import('./views/Report/Consumption'));
 const StockStatusMatrixReport = React.lazy(() => import('./views/Report/StockStatusMatrix'));
 const StockStatusReport = React.lazy(() => import('./views/Report/StockStatus'));
-
+const GlobalConsumptionReport = React.lazy(() => import('./views/Report/GlobalConsumption'));
 const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
 
@@ -373,7 +373,8 @@ const routes = [
   { path: '/report/consumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.consumption'), component: ConsumptionReport },
   { path: '/report/stockStatusMatrix', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusmatrix'), component: StockStatusMatrixReport },
   { path: '/report/stockStatus', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
-
+  { path: '/report/globalConsumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.consumption'), component: GlobalConsumptionReport },
+  
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
