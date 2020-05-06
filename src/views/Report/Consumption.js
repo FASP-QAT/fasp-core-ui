@@ -104,6 +104,7 @@ class Consumption extends Component {
       consumptions: [],
       offlineConsumptionList: [],
       offlinePlanningUnitList: [],
+      productCategories: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -115,6 +116,7 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
+    this.getProductCategories=this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
 
   }
@@ -386,7 +388,41 @@ class Consumption extends Component {
 
   }
 
-
+  getProductCategories() {
+    AuthenticationService.setupAxiosInterceptors();
+    let programId = document.getElementById("programId").value;
+    ProductService.getProductCategoryListByProgram(programId)
+        .then(response => {
+            console.log(JSON.stringify(response.data))
+            this.setState({
+                productCategories: response.data
+            })
+        }).catch(
+            error => {
+                this.setState({
+                    productCategories: []
+                })
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            break;
+                    }
+                }
+            }
+        );
+        this.getPlanningUnit();
+        
+}
   componentDidMount() {
     console.log("inside component did mount");
     if (navigator.onLine) {
@@ -534,7 +570,7 @@ class Consumption extends Component {
             pointHoverBorderColor: 'rgba(179,181,198,1)',
             data: this.state.consumptions.map((item, index) => (item.Actual)),
           }, {
-            type: "bar",
+            type: "line",
             label: "Forecast Consumption",
             backgroundColor: '#006400',
             borderColor: 'rgba(179,181,158,1)',
@@ -548,6 +584,23 @@ class Consumption extends Component {
             data: this.state.consumptions.map((item, index) => (item.forcast))
           }
         ],
+    let programList = programs.length > 0
+      && programs.map((item, i) => {
+        return (
+          <option key={i} value={item.programId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
+      const { productCategories } = this.state;
+      let productCategoryList = productCategories.length > 0
+          && productCategories.map((item, i) => {
+              return (
+                  <option key={i} value={item.payload.productCategoryId}>
+                      {getLabelText(item.payload.label, this.state.lang)}
+                  </option>
+              )
+          }, this);
 
       }
     }
@@ -566,7 +619,7 @@ class Consumption extends Component {
             pointHoverBorderColor: 'rgba(179,181,198,1)',
             data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
           }, {
-            type: "bar",
+            type: "line",
             label: "Forecast Consumption",
             backgroundColor: '#006400',
             borderColor: 'rgba(179,181,158,1)',
@@ -717,6 +770,25 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
+  <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.getPlanningUnit}
+                                            >
+                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                {productCategoryList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+
                             <FormGroup className="tab-ml-1">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">

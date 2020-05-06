@@ -26,6 +26,7 @@ import {
   CardColumns,
   Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
+import Select from 'react-select';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
@@ -38,7 +39,7 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import ProgramService from '../../api/ProgramService';
+import CountryService from '../../api/CountryService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
@@ -84,7 +85,7 @@ for (var i = 0; i <= elements; i++) {
 
 
 
-class StockStatus extends Component {
+class Consumption extends Component {
   constructor(props) {
     super(props);
 
@@ -95,13 +96,16 @@ class StockStatus extends Component {
       dropdownOpen: false,
       radioSelected: 2,
       realms: [],
-      programs: [],
-      productCategories: [],
+      countrys: [],
       planningUnits: [],
-      stockStatusList: [],
+      consumptions: [],
+      productCategories: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+
+
+
     };
-    this.getPrograms = this.getPrograms.bind(this);
+    this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
@@ -113,19 +117,19 @@ class StockStatus extends Component {
   }
   filterData() {
     let realmId = document.getElementById("realmId").value;
-    let programId = document.getElementById("programId").value;
+    let CountryId = document.getElementById("CountryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     AuthenticationService.setupAxiosInterceptors();
-    ProductService.getStockStatusData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+    ProductService.getConsumptionData(realmId, CountryId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
       .then(response => {
         console.log(JSON.stringify(response.data));
         this.setState({
-          stockStatusList: response.data
+          consumptions: response.data
         })
       }).catch(
         error => {
           this.setState({
-            stockStatusList: []
+            consumptions: []
           })
 
           if (error.message === "Network Error") {
@@ -137,7 +141,7 @@ class StockStatus extends Component {
               case 404:
               case 406:
               case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                 break;
               default:
                 this.setState({ message: 'static.unkownError' });
@@ -149,20 +153,20 @@ class StockStatus extends Component {
 
   }
 
-  getPrograms() {
+  getCountrys() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let realmId = document.getElementById("realmId").value;
-      ProgramService.getProgramByRealmId(realmId)
+      CountryService.getCountryByRealmId(realmId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
-            programs: response.data
+            countrys: response.data
           })
         }).catch(
           error => {
             this.setState({
-              programs: []
+              countrys: []
             })
             if (error.message === "Network Error") {
               this.setState({ message: error.message });
@@ -173,7 +177,7 @@ class StockStatus extends Component {
                 case 404:
                 case 406:
                 case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                   break;
                 default:
                   this.setState({ message: 'static.unkownError' });
@@ -190,9 +194,9 @@ class StockStatus extends Component {
       var openRequest = indexedDB.open('fasp', 1);
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
+        var transaction = db1.transaction(['CountryData'], 'readwrite');
+        var Country = transaction.objectStore('CountryData');
+        var getRequest = Country.getAll();
         var proList = []
         getRequest.onerror = function (event) {
           // Handle errors!
@@ -204,17 +208,17 @@ class StockStatus extends Component {
           var userId = userBytes.toString(CryptoJS.enc.Utf8);
           for (var i = 0; i < myResult.length; i++) {
             if (myResult[i].userId == userId) {
-              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var programJson = {
-                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+              var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
+              var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+              var CountryJson = {
+                name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
                 id: myResult[i].id
               }
-              proList[i] = programJson
+              proList[i] = CountryJson
             }
           }
           this.setState({
-            programs: proList
+            countrys: proList
           })
 
         }.bind(this);
@@ -229,8 +233,8 @@ class StockStatus extends Component {
     if (navigator.onLine) {
       console.log('changed')
       AuthenticationService.setupAxiosInterceptors();
-      let programId = document.getElementById("programId").value;
-      ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+      let CountryId = document.getElementById("CountryId").value;
+      CountryService.getCountryPlaningUnitListByCountryId(CountryId).then(response => {
         console.log('**' + JSON.stringify(response.data))
         this.setState({
           planningUnits: response.data,
@@ -267,8 +271,8 @@ class StockStatus extends Component {
       var openRequest = indexedDB.open('fasp', 1);
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
-        var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-        var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+        var planningunitTransaction = db1.transaction(['CountryPlanningUnit'], 'readwrite');
+        var planningunitOs = planningunitTransaction.objectStore('CountryPlanningUnit');
         var planningunitRequest = planningunitOs.getAll();
         var planningList = []
         planningunitRequest.onerror = function (event) {
@@ -278,12 +282,12 @@ class StockStatus extends Component {
           var myResult = [];
           myResult = planningunitRequest.result;
           console.log("myResult", myResult);
-          var programId = (document.getElementById("programId").value).split("_")[0];
-          console.log('programId----->>>', programId)
+          var CountryId = (document.getElementById("CountryId").value).split("_")[0];
+          console.log('CountryId----->>>', CountryId)
           console.log(myResult);
           var proList = []
           for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].program.id == programId) {
+            if (myResult[i].Country.id == CountryId) {
               var productJson = {
                 name: getLabelText(myResult[i].planningUnit.label, lan),
                 id: myResult[i].planningUnit.id
@@ -301,10 +305,11 @@ class StockStatus extends Component {
     }
    
   }
+
   getProductCategories() {
     AuthenticationService.setupAxiosInterceptors();
-    let programId = document.getElementById("programId").value;
-    ProductService.getProductCategoryListByProgram(programId)
+    let CountryId = document.getElementById("CountryId").value;
+    ProductService.getProductCategoryListByCountry(CountryId)
         .then(response => {
             console.log(JSON.stringify(response.data))
             this.setState({
@@ -336,7 +341,6 @@ class StockStatus extends Component {
         this.getPlanningUnit();
         
 }
-
   componentDidMount() {
     if (navigator.onLine) {
     AuthenticationService.setupAxiosInterceptors();
@@ -347,7 +351,7 @@ class StockStatus extends Component {
             realms: response.data,
             realmId: response.data[0].realmId
           })
-          this.getPrograms();
+          this.getCountrys();
 
         } else {
           this.setState({ message: response.data.messageCode })
@@ -380,9 +384,9 @@ class StockStatus extends Component {
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
+            var transaction = db1.transaction(['CountryData'], 'readwrite');
+            var Country = transaction.objectStore('CountryData');
+            var getRequest = Country.getAll();
             var proList = []
             getRequest.onerror = function (event) {
                 // Handle errors!
@@ -394,17 +398,17 @@ class StockStatus extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
+                        var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var CountryJson = {
+                            name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
                             id: myResult[i].id
                         }
-                        proList[i] = programJson
+                        proList[i] = CountryJson
                     }
                 }
                 this.setState({
-                    programList: proList
+                    CountryList: proList
                 })
 
             }.bind(this);
@@ -463,31 +467,33 @@ class StockStatus extends Component {
           </option>
         )
       }, this);
-    const { programs } = this.state;
-    let programList = programs.length > 0
-      && programs.map((item, i) => {
-        return (
-          <option key={i} value={item.programId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
+    const { countrys } = this.state;
+  
+      const { productCategories } = this.state;
+      let productCategoryList = productCategories.length > 0
+          && productCategories.map((item, i) => {
+              return (
+                  <option key={i} value={item.payload.productCategoryId}>
+                      {getLabelText(item.payload.label, this.state.lang)}
+                  </option>
+              )
+          }, this);
     const bar = {
 
-      labels: this.state.stockStatusList.map((item, index) => (item.consumption_date)),
+      labels: this.state.consumptions.map((item, index) => (item.consumption_date)),
       datasets: [
         {
-          label: 'Actual StockStatus',
+          label: 'Actual Consumption',
           backgroundColor: '#86CD99',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
           pointBorderColor: '#fff',
           pointHoverBackgroundColor: '#fff',
           pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.stockStatusList.map((item, index) => (item.Actual)),
+          data: this.state.consumptions.map((item, index) => (item.Actual)),
         }, {
           type: "line",
-          label: "Forecast StockStatus",
+          label: "Forecast Consumption",
           backgroundColor: 'transparent',
           borderColor: 'rgba(179,181,158,1)',
           borderStyle: 'dotted',
@@ -497,20 +503,11 @@ class StockStatus extends Component {
           },
           showInLegend: true,
           yValueFormatString: "$#,##0",
-          data: this.state.stockStatusList.map((item, index) => (item.forcast))
+          data: this.state.consumptions.map((item, index) => (item.forcast))
         }
       ],
 
     };
-    const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-        && productCategories.map((item, i) => {
-            return (
-                <option key={i} value={item.payload.productCategoryId}>
-                    {getLabelText(item.payload.label, this.state.lang)}
-                </option>
-            )
-        }, this);
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       from: 'From', to: 'To',
@@ -529,10 +526,10 @@ class StockStatus extends Component {
           <Col lg="12">
             <Card>
               <CardHeader className="text-center">
-                <b className="count-text">StockStatus Report</b>
+                <b className="count-text">Consumption Report</b>
                 <div className="card-header-actions">
                   <a className="card-header-action">
-                    <Pdf targetRef={ref} filename="StockStatus.pdf">
+                    <Pdf targetRef={ref} filename="consumption.pdf">
                       {({ toPdf }) =>
                         <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
 
@@ -545,7 +542,7 @@ class StockStatus extends Component {
                 <div className="TableCust" >
                   <div className="col-md-12 pr-0"> <div ref={ref}> <div className="col-md-9 pr-0" >
                     <Form >
-                      <Col md="12 pl-0">
+                      <Col md="9 pl-0">
                         <div className="d-md-flex">
                           <FormGroup>
                             <Label htmlFor="appendedInputButton">Select Period</Label>
@@ -576,7 +573,7 @@ class StockStatus extends Component {
                                   name="realmId"
                                   id="realmId"
                                   bsSize="sm"
-                                  onChange={this.getPrograms}
+                                  onChange={this.getCountrys}
                                 >
                                   {/* <option value="0">{i18n.t('static.common.all')}</option> */}
 
@@ -587,27 +584,27 @@ class StockStatus extends Component {
                             </div>
                           </FormGroup>
                          
-                                    <FormGroup className="tab-ml-1">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                            <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="programId"
-                                  id="programId"
-                                  bsSize="sm"
-                                  onChange={this.getProductCategories}
+                          <FormGroup>
+                                                        <Label htmlFor="countrysId">{i18n.t('static.country.country')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Select
+                                                            bsSize="sm"
+                                                            name="countrysId"
+                                                            id="countrysId"
+                                                            multi
+                                                            required
+                                                            min={1}
+                                                            options={this.state.countrys}
+                                                            value={this.state.countrysId}
+                                                           />
+                                                        {!!this.props.error &&
+                                                            this.props.touched && (
+                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                            )}
+                                                      
+                                                    </FormGroup>
+                                                    
 
-                                >
-                                  <option value="0">{i18n.t('static.common.select')}</option>
-                                  {programList}
-                                </Input>
-
-                              </InputGroup>
-                            </div>
-                          </FormGroup>
-                        
-                                    <FormGroup className="tab-ml-1">
+                          <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
@@ -650,7 +647,7 @@ class StockStatus extends Component {
                       </Col>
                     </Form>
 
-                 {/*}   <div className="chart-wrapper chart-graph">
+                    <div className="chart-wrapper chart-graph">
                       <Bar data={bar} options={options} />
                     </div> <br /><br />
                   </div></div>
@@ -659,35 +656,35 @@ class StockStatus extends Component {
 
                       <thead>
                         <tr>
-                          <th className="text-center"> StockStatus Date </th>
+                          <th className="text-center"> Consumption Date </th>
                           <th className="text-center"> Forecast </th>
                           <th className="text-center">Actual</th>
                         </tr>
                       </thead>
                       <tbody>
                         {
-                          this.state.stockStatusList.length > 0
+                          this.state.consumptions.length > 0
                           &&
-                          this.state.stockStatusList.map((item, idx) =>
+                          this.state.consumptions.map((item, idx) =>
 
                             <tr id="addr0" key={idx} >
                               <td>
-                                {this.state.stockStatusList[idx].consumption_date}
+                                {this.state.consumptions[idx].consumption_date}
                               </td>
                               <td>
 
-                                {this.state.stockStatusList[idx].forcast}
+                                {this.state.consumptions[idx].forcast}
                               </td>
                               <td>
-                                {this.state.stockStatusList[idx].Actual}
+                                {this.state.consumptions[idx].Actual}
                               </td></tr>)
 
                         }
                       </tbody>
 
-                      </Table>*/}</div>
+                    </Table>
                    
-                      </div></div></div>
+                  </div></div>
               </CardBody>
             </Card>
           </Col>
@@ -700,4 +697,4 @@ class StockStatus extends Component {
   }
 }
 
-export default StockStatus;
+export default Consumption;

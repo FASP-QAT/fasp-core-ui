@@ -343,11 +343,15 @@ class DefaultLayout extends Component {
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
                           },
-                          {
+                          /*{
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
-                          }
+                          },{
+                            name: i18n.t('static.dashboard.consumption'),
+                            url: '/report/globalConsumption',
+                            icon: 'fa fa-exchange'
+                          }*/
                         ]
                       }
                       // {
@@ -413,11 +417,11 @@ class DefaultLayout extends Component {
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
                           },
-                          {
+                         /* {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
-                          }
+                          }*/
                         ]
                       }
                     ]

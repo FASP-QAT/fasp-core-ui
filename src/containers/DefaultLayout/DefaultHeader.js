@@ -77,9 +77,9 @@ class DefaultHeader extends Component {
           <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} />
           <NavItem className="">
             <NavLink to="#" className="nav-link">
-              <span class="icon-wrapper icon-wrapper-alt rounded-circle ">
-                <span class="icon-wrapper-bg "></span>
-                <i class="icon-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout} title="Logout"></i>
+              <span className="icon-wrapper icon-wrapper-alt rounded-circle ">
+                <span className="icon-wrapper-bg "></span>
+                <i className="icon-logout icons   icon-anim-pulse text-primary " onClick={this.props.onLogout} title="Logout"></i>
               </span>
             </NavLink>
           </NavItem>

@@ -51,6 +51,7 @@ class ListBudgetComponent extends Component {
     this.formatDate = this.formatDate.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
     this.addCommas = this.addCommas.bind(this);
+    this.rowClassNameFormat=this.rowClassNameFormat.bind(this)
   }
 
 
@@ -176,7 +177,11 @@ class ListBudgetComponent extends Component {
   //     return "Disabled";
   //   }
   // }
-
+  rowClassNameFormat(row, rowIdx) {
+    // row is whole row object
+    // rowIdx is index of row
+    return row.stopDate<new Date().getTime() ? 'background-red' : '';
+  }
   formatLabel(cell, row) {
     console.log("celll----", cell);
     if (cell != null && cell != "") {
@@ -368,7 +373,7 @@ class ListBudgetComponent extends Component {
                       <SearchBar {...props.searchProps} />
                       <ClearSearchButton {...props.searchProps} />
                     </div>
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                    <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                       pagination={paginationFactory(options)}
                       rowEvents={{
                         onClick: (e, row, rowIndex) => {
@@ -378,7 +383,7 @@ class ListBudgetComponent extends Component {
                         }
                       }}
                       {...props.baseProps}
-                    />
+                    /><h5>*Row is in red color indicates there is no money left or budget hits the end date</h5>
                   </div>
                 )
               }
