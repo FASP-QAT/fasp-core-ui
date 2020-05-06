@@ -102,8 +102,11 @@ class Consumption extends Component {
       offlinePrograms: [],
       planningUnits: [],
       consumptions: [],
+<<<<<<< HEAD
       offlineConsumptionList: [],
       offlinePlanningUnitList: [],
+=======
+>>>>>>> f4e2fd30a2af4f60d1ea7d820db1e533df2b06e6
       productCategories: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
@@ -386,8 +389,11 @@ class Consumption extends Component {
 
     }
 
+<<<<<<< HEAD
   }
 
+=======
+>>>>>>> f4e2fd30a2af4f60d1ea7d820db1e533df2b06e6
   getProductCategories() {
     AuthenticationService.setupAxiosInterceptors();
     let programId = document.getElementById("programId").value;
@@ -554,6 +560,8 @@ class Consumption extends Component {
 
     const { programs } = this.state;
     const { offlinePrograms } = this.state;
+
+    const { productCategories } = this.state;
     let bar = "";
     if (navigator.onLine) {
       bar = {
@@ -584,23 +592,8 @@ class Consumption extends Component {
             data: this.state.consumptions.map((item, index) => (item.forcast))
           }
         ],
-    let programList = programs.length > 0
-      && programs.map((item, i) => {
-        return (
-          <option key={i} value={item.programId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
-      const { productCategories } = this.state;
-      let productCategoryList = productCategories.length > 0
-          && productCategories.map((item, i) => {
-              return (
-                  <option key={i} value={item.payload.productCategoryId}>
-                      {getLabelText(item.payload.label, this.state.lang)}
-                  </option>
-              )
-          }, this);
+    
+
 
       }
     }
@@ -692,6 +685,7 @@ class Consumption extends Component {
                           </FormGroup>
 
 
+
                           <Online>
                             <FormGroup>
                               <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
@@ -770,7 +764,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-  <FormGroup className="tab-ml-1">
+                          <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
