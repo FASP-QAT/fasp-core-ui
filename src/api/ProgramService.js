@@ -3,7 +3,7 @@ import { API_URL } from '../Constants.js'
 
 class ProgramService {
     getProgramData(json) {
-        console.log("Json",json)
+        console.log("Json", json)
         return axios.get(`${API_URL}/api/programData/programId/${json.programId}/versionId/${json.versionId}`, {
         });
     }
@@ -76,7 +76,13 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/realmId/${json}`, {}
         );
     }
-    getProgramPlaningUnitListByProgramAndProductCategory(programId,ProductCategoryId) {
+
+    saveProgramData(json) {
+        return axios.put(`${API_URL}/api/programData/`, json, {}
+        );
+    }
+
+    getProgramPlaningUnitListByProgramAndProductCategory(programId, ProductCategoryId) {
         return axios.get(`${API_URL}/api/program/${programId}/${ProductCategoryId}/planningUnit/all/`, {}
         );
     }

@@ -100,6 +100,34 @@ export default class ProductCatalog extends React.Component {
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
     }
+    exportCSV(columns){
+
+        var csvRow=[];
+        const headers =[];
+            columns.map( (item, idx) =>{ headers[idx]=item.text});
+            
+         
+        var A=[headers]
+        var re=this.state.data
+    
+          this.state.data.map(elt =>A.push( [ elt.planningUnit.forecastingUnit.label.label_en.replaceAll(',',' '),elt.planningUnit.forecastingUnit.productCategory.label.label_en,elt.planningUnit.forecastingUnit.tracerCategory.label.label_en
+            ,elt.planningUnit.label.label_en.replaceAll(',',' '),elt.planningUnit.multiplier,elt.planningUnit.unit.label.label_en,elt.label.label_en.replaceAll(',',' '),elt.multiplier,elt.unit.label.label_en,elt.supplier.label.label_en?elt.supplier.label.label_en.replaceAll(',',''):'',elt.labeling? elt.labeling.replaceAll(',',' '):'', elt.active]));
+  
+       
+       for(var i=0;i<A.length;i++){
+        csvRow.push(A[i].join(','))
+      } 
+  
+      var csvString=csvRow.join("%0A")
+      var a=document.createElement("a")
+      a.href='data:attachment/csv,'+csvString
+      a.target="_Blank"
+      a.download="productCatalog.csv"
+      document.body.appendChild(a)
+      a.click()
+      }
+   
+      
     exportPDF = (columns) => {
         const unit = "pt";
         const size = "A1"; // Use A1, A2, A3 or A4
@@ -243,7 +271,6 @@ export default class ProductCatalog extends React.Component {
                   align: 'center',
                   headerAlign: 'center'
                 },
-                ,
                 {
                   dataField: 'active',
                   text: i18n.t('static.common.status'),
@@ -303,7 +330,9 @@ export default class ProductCatalog extends React.Component {
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
-                            
+                        <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(columns)}/>
+                        <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />                  
+                                        
                         </div>
                     </CardHeader>
                     <CardBody  className="pb-md-0">
@@ -343,10 +372,6 @@ export default class ProductCatalog extends React.Component {
                                          <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                          <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
-                                            <div className="col-md-6 pr-0 offset-md-6 text-center mob-Left">
-                                            <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(columns)}/>
-                                          
-                                            <MyExportCSV { ...props.csvProps } /></div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
 

@@ -19,7 +19,7 @@ export default class SyncMasterData extends Component {
     constructor() {
         super();
         this.state = {
-            totalMasters: 25,
+            totalMasters: 24,
             syncedMasters: 0,
             syncedPercentage: 0
         }
@@ -291,17 +291,19 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                             .then(response => {
                                                                                                                                                                                                 if (response.status == 200) {
                                                                                                                                                                                                     console.log("Product category Response", response.data)
-                                                                                                                                                                                                    var json = (response.data).treeList;
+                                                                                                                                                                                                    var json = (response.data).flatList;
                                                                                                                                                                                                     var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
                                                                                                                                                                                                     var productCategoryObjectStore = productCategoryTransaction.objectStore('productCategory');
                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
                                                                                                                                                                                                         productCategoryObjectStore.put(json[i]);
                                                                                                                                                                                                     }
+                                                                                                                                                                                                    console.log("After put")
                                                                                                                                                                                                     this.setState({
                                                                                                                                                                                                         syncedMasters: this.state.syncedMasters + 1,
                                                                                                                                                                                                         syncedPercentage: Math.floor(((this.state.syncedMasters + 1) / this.state.totalMasters) * 100)
                                                                                                                                                                                                     })
                                                                                                                                                                                                     if (navigator.onLine) {
+                                                                                                                                                                                                        console.log("Before sync program list");
                                                                                                                                                                                                         //Code to Sync Program list
                                                                                                                                                                                                         MasterSyncService.getProgramListForSync(lastSyncDateRealm)
                                                                                                                                                                                                             .then(response => {

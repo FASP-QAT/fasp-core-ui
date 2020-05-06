@@ -329,6 +329,11 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
+                            name: "Supply Plan",
+                            url: '/supplyPlan',
+                            icon: 'fa fa-list-alt'
+                          },
+                          {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
                             icon: 'fa fa-exchange'
