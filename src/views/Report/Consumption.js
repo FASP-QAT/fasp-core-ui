@@ -45,6 +45,7 @@ import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import { Online, Offline } from "react-detect-offline";
+import csvicon from '../../assets/img/csv.png'
 
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -119,6 +120,25 @@ class Consumption extends Component {
     this.getProductCategories = this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
 
+  }
+  exportCSV(){
+
+    var csvRow=[];
+    var A=[["Consumption Month","Forecast Consumption","Actual Consumption"]]
+    var re=this.state.consumptions
+   for(var item=0;item<re.length;item++){
+     A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
+   } 
+   for(var i=0;i<A.length;i++){
+    csvRow.push(A[i].join(","))
+  } 
+  var csvString=csvRow.join("%0A")
+  var a=document.createElement("a")
+  a.href='data:attachment/csv,'+csvString
+  a.target="_Blank"
+  a.download="consumption_"+this.state.rangeValue.from.year+this.state.rangeValue.from.month+"_to_"+this.state.rangeValue.to.year+this.state.rangeValue.to.month+".csv"
+  document.body.appendChild(a)
+  a.click()
   }
   filterData() {
     let programId = document.getElementById("programId").value;
@@ -573,8 +593,8 @@ class Consumption extends Component {
           }, {
             type: "line",
             label: "Forecast Consumption",
-            backgroundColor: '#006400',
-            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            borderColor: 'rgba(179,181,158,1)',
             borderStyle: 'dotted',
             ticks: {
               fontSize: 2,
@@ -607,7 +627,7 @@ class Consumption extends Component {
           }, {
             type: "line",
             label: "Forecast Consumption",
-            backgroundColor: '#006400',
+            backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
             borderStyle: 'dotted',
             ticks: {
@@ -650,6 +670,7 @@ class Consumption extends Component {
                       }
                     </Pdf>
                   </a>
+                  <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV()} />
                 </div>
               </CardHeader>
               <CardBody>
