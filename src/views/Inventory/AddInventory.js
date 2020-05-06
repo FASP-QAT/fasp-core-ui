@@ -522,7 +522,7 @@ export default class AddInventory extends Component {
                     var countrySKU = document.getElementById("countrySKU").value;
                     var inventoryDataList = (programJson.inventoryList).filter(c => c.realmCountryPlanningUnit.id == countrySKU);
                     var inventoryDataListNotFiltered = programJson.inventoryList;
-
+                    var planningUnitId = inventoryDataList[0].planningUnit.id;
                     // var count = 0;
                     for (var i = 0; i < inventoryDataList.length; i++) {
 
@@ -597,6 +597,9 @@ export default class AddInventory extends Component {
 
                             realmCountryPlanningUnit: {
                                 id: countrySKU
+                            },
+                            planningUnit: {
+                                id: planningUnitId
                             }
                         }
                         inventoryDataList.push(json);
