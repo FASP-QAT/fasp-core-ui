@@ -106,6 +106,7 @@ class Consumption extends Component {
       offlineConsumptionList: [],
       offlinePlanningUnitList: [],
       productCategories: [],
+      offlineProductCategoryList: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -121,27 +122,34 @@ class Consumption extends Component {
     //this.pickRange = React.createRef()
 
   }
-  exportCSV(){
+  exportCSV() {
 
-    var csvRow=[];
-    var A=[["Consumption Month","Forecast Consumption","Actual Consumption"]]
-    var re=this.state.consumptions
-   for(var item=0;item<re.length;item++){
-     A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
-   } 
-   for(var i=0;i<A.length;i++){
-    csvRow.push(A[i].join(","))
-  } 
-  var csvString=csvRow.join("%0A")
-  var a=document.createElement("a")
-  a.href='data:attachment/csv,'+csvString
-  a.target="_Blank"
-  a.download="consumption_"+this.state.rangeValue.from.year+this.state.rangeValue.from.month+"_to_"+this.state.rangeValue.to.year+this.state.rangeValue.to.month+".csv"
-  document.body.appendChild(a)
-  a.click()
+    var csvRow = [];
+    var re;
+    var A = [["Consumption Month", "Forecast Consumption", "Actual Consumption"]]
+    if (navigator.onLine) {
+      re = this.state.consumptions
+    } else {
+      re = this.state.offlineConsumptionList
+    }
+
+    for (var item = 0; item < re.length; item++) {
+      A.push([re[item].consumption_date, re[item].forcast, re[item].Actual])
+    }
+    for (var i = 0; i < A.length; i++) {
+      csvRow.push(A[i].join(","))
+    }
+    var csvString = csvRow.join("%0A")
+    var a = document.createElement("a")
+    a.href = 'data:attachment/csv,' + csvString
+    a.target = "_Blank"
+    a.download = "consumption_" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + "_to_" + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    document.body.appendChild(a)
+    a.click()
   }
   filterData() {
     let programId = document.getElementById("programId").value;
+    let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
@@ -179,79 +187,84 @@ class Consumption extends Component {
           }
         );
     } else {
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
+      if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
 
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var programTransaction = transaction.objectStore('programData');
-        var programRequest = programTransaction.get(programId);
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var programRequest = programTransaction.get(programId);
 
-        programRequest.onsuccess = function (event) {
-          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson = JSON.parse(programData);
-          var offlineConsumptionList = (programJson.consumptionList);
-          console.log("offlineConsumptionList---", offlineConsumptionList);
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            console.log("program json---", programJson);
+            var offlineConsumptionList = (programJson.consumptionList);
+            console.log("offlineConsumptionList---", offlineConsumptionList);
 
-          const planningUnitFilter = offlineConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
-          // console.log("planningUnitFilter---", planningUnitFilter);
+            const planningUnitFilter = offlineConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
+            console.log("planningUnitFilter---", planningUnitFilter);
+            const productCategoryFilter = planningUnitFilter.filter(c => c.planningUnit.forecastingUnit.productCategory.id == productCategoryId);
+            console.log("productCategoryFilter---", productCategoryFilter);
 
-          // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-          const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isBetween(startDate, endDate, null, '[)') && moment(c.stopDate).isBetween(startDate, endDate, null, '[)'))
+            // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+            const dateFilter = productCategoryFilter.filter(c => moment(c.startDate).isBetween(startDate, endDate, null, '[)') && moment(c.stopDate).isBetween(startDate, endDate, null, '[)'))
 
-          const sorted = dateFilter.sort((a, b) => {
-            var dateA = new Date(a.startDate).getTime();
-            var dateB = new Date(b.stopDate).getTime();
-            return dateA > dateB ? 1 : -1;
-          });
-          let previousDate = "";
-          let finalOfflineConsumption = [];
-          var json;
+            const sorted = dateFilter.sort((a, b) => {
+              var dateA = new Date(a.startDate).getTime();
+              var dateB = new Date(b.stopDate).getTime();
+              return dateA > dateB ? 1 : -1;
+            });
+            let previousDate = "";
+            let finalOfflineConsumption = [];
+            var json;
 
-          for (let i = 0; i <= sorted.length; i++) {
-            let forcast = 0;
-            let actual = 0;
-            if (sorted[i] != null && sorted[i] != "") {
-              previousDate = sorted[i].startDate;
-              for (let j = 0; j <= sorted.length; j++) {
-                if (sorted[j] != null && sorted[j] != "") {
-                  if (previousDate == sorted[j].startDate) {
-                    if (!sorted[j].actualFlag) {
-                      forcast = forcast + sorted[j].consumptionQty;
-                    }
-                    if (sorted[j].actualFlag) {
-                      actual = actual + sorted[j].consumptionQty;
+            for (let i = 0; i <= sorted.length; i++) {
+              let forcast = 0;
+              let actual = 0;
+              if (sorted[i] != null && sorted[i] != "") {
+                previousDate = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
+                for (let j = 0; j <= sorted.length; j++) {
+                  if (sorted[j] != null && sorted[j] != "") {
+                    if (previousDate == moment(sorted[j].startDate, 'YYYY-MM-DD').format('MM-YYYY')) {
+                      if (!sorted[j].actualFlag) {
+                        forcast = forcast + sorted[j].consumptionQty;
+                      }
+                      if (sorted[j].actualFlag) {
+                        actual = actual + sorted[j].consumptionQty;
+                      }
                     }
                   }
                 }
+
+                let date = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
+                json = {
+                  consumption_date: date,
+                  Actual: actual,
+                  forcast: forcast
+                }
+
+                if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
+                  finalOfflineConsumption.push(json);
+                }
+
+                // console.log("finalOfflineConsumption---", finalOfflineConsumption);
+
               }
-
-              let date = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
-              json = {
-                consumption_date: date,
-                Actual: actual,
-                forcast: forcast
-              }
-
-              if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
-                finalOfflineConsumption.push(json);
-              }
-
-              // console.log("finalOfflineConsumption---", finalOfflineConsumption);
-
             }
-          }
 
-          this.setState({
-            offlineConsumptionList: finalOfflineConsumption
-          });
+            this.setState({
+              offlineConsumptionList: finalOfflineConsumption
+            });
+
+          }.bind(this)
 
         }.bind(this)
-
-      }.bind(this)
+      }
     }
   }
 
@@ -408,37 +421,86 @@ class Consumption extends Component {
 
   }
   getProductCategories() {
-    AuthenticationService.setupAxiosInterceptors();
     let programId = document.getElementById("programId").value;
-    ProductService.getProductCategoryListByProgram(programId)
-      .then(response => {
-        console.log(JSON.stringify(response.data))
-        this.setState({
-          productCategories: response.data
-        })
-      }).catch(
-        error => {
+    if (navigator.onLine) {
+      AuthenticationService.setupAxiosInterceptors();
+      ProductService.getProductCategoryListByProgram(programId)
+        .then(response => {
+          console.log(JSON.stringify(response.data))
           this.setState({
-            productCategories: []
+            productCategories: response.data
           })
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
+        }).catch(
+          error => {
+            this.setState({
+              productCategories: []
+            })
+            if (error.message === "Network Error") {
+              this.setState({ message: error.message });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
             }
           }
-        }
-      );
+        );
+    } else {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open('fasp', 1);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var programTransaction = transaction.objectStore('programData');
+        var programRequest = programTransaction.get(programId);
+
+        programRequest.onsuccess = function (event) {
+          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson = JSON.parse(programData);
+          console.log("program json---", programJson);
+          var offlineConsumptionList = (programJson.consumptionList);
+          console.log("offlineConsumptionList---", offlineConsumptionList);
+
+          let offlineProductCategoryList = [];
+          var json;
+          
+          for (let i = 0; i <= offlineConsumptionList.length; i++) {
+            let count = 0;
+            if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "") {
+              for (let j = 0; j <= offlineProductCategoryList.length; j++) {
+                if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
+                  count++;
+                }
+              }
+              if (count == 0 || i == 0) {
+                offlineProductCategoryList.push({
+                  id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
+                  name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en + "-" + offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id
+                });
+              }
+            }
+          }
+          console.log("offlineProductCategoryList---", offlineProductCategoryList);
+          this.setState({
+            offlineProductCategoryList
+          });
+
+        }.bind(this)
+
+      }.bind(this)
+
+    }
     this.getPlanningUnit();
 
   }
@@ -575,6 +637,8 @@ class Consumption extends Component {
     const { offlinePrograms } = this.state;
 
     const { productCategories } = this.state;
+    const { offlineProductCategoryList } = this.state;
+
     let bar = "";
     if (navigator.onLine) {
       bar = {
@@ -759,7 +823,7 @@ class Consumption extends Component {
                                     name="programId"
                                     id="programId"
                                     bsSize="sm"
-                                    onChange={this.getPlanningUnit}
+                                    onChange={this.getProductCategories}
 
                                   >
                                     <option value="0">{i18n.t('static.common.select')}</option>
@@ -781,28 +845,55 @@ class Consumption extends Component {
                             <FormGroup className="tab-ml-1">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="productCategoryId"
-                                  id="productCategoryId"
-                                  bsSize="sm"
-                                  onChange={this.getPlanningUnit}
-                                >
-                                  <option value="0">{i18n.t('static.common.all')}</option>
-                                  {productCategories.length > 0
-                                    && productCategories.map((item, i) => {
-                                      return (
-                                        <option key={i} value={item.payload.productCategoryId}>
-                                          {getLabelText(item.payload.label, this.state.lang)}
-                                        </option>
-                                      )
-                                    }, this)}
-                                </Input>
-                              </InputGroup></div>
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="productCategoryId"
+                                    id="productCategoryId"
+                                    bsSize="sm"
+                                    onChange={this.getPlanningUnit}
+                                  >
+                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                    {productCategories.length > 0
+                                      && productCategories.map((item, i) => {
+                                        return (
+                                          <option key={i} value={item.payload.productCategoryId}>
+                                            {getLabelText(item.payload.label, this.state.lang)}
+                                          </option>
+                                        )
+                                      }, this)}
+                                  </Input>
+                                </InputGroup></div>
 
                             </FormGroup>
-</Online> <Online>
+                          </Online>
+                          <Offline>
+                            <FormGroup className="tab-ml-1">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                              <div className="controls SelectGo">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="productCategoryId"
+                                    id="productCategoryId"
+                                    bsSize="sm"
+                                    onChange={this.getPlanningUnit}
+                                  >
+                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                    {offlineProductCategoryList.length > 0
+                                      && offlineProductCategoryList.map((item, i) => {
+                                        return (
+                                          <option key={i} value={item.id}>
+                                            {item.name}
+                                          </option>
+                                        )
+                                      }, this)}
+                                  </Input>
+                                </InputGroup></div>
+
+                            </FormGroup>
+                          </Offline>
+                          <Online>
                             <FormGroup className="tab-ml-1">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
@@ -828,7 +919,7 @@ class Consumption extends Component {
                                     <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                   </InputGroupAddon>
                                 </InputGroup>
-                             </div>
+                              </div>
                             </FormGroup>
                           </Online>
                           <Offline>
