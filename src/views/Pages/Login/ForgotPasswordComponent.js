@@ -4,8 +4,10 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../../i18n'
 import '../../Forms/ValidationForms/ValidationForms.css';
-import image1 from '../../../../public/assets/img/QAT-logo.png';
+// import image1 from '../../../../public/assets/img/QAT-logo.png';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
+import image1 from '../../../assets/img/QAT-logo.png';
+
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';

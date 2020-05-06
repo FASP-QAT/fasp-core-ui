@@ -3,12 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
 import navigation from '../../../_nav';
 // routes config
-
+import image1 from '../../../assets/img/QAT-login-logo.png';
+import image2 from '../../../assets/img/wordmark.png';
+import image3 from '../../../assets/img/PEPFAR-logo.png';
+import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
-import image1 from '../../../../public/assets/img/QAT-login-logo.png';
-import image2 from '../../../../public/assets/img/wordmark.png';
-import image3 from '../../../../public/assets/img/PEPFAR-logo.png';
-import image4 from '../../../../public/assets/img/USAID-presidents-malaria-initiative.png';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup'

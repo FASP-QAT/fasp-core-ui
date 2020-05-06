@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom';
 import { Online, Offline } from "react-detect-offline";
 import i18n from '../../i18n';
 
-import image4 from '../../../public/assets/img/avatars/4.jpg';
-import image5 from '../../../public/assets/img/avatars/5.jpg';
-import image6 from '../../../public/assets/img/avatars/6.jpg';
-import image7 from '../../../public/assets/img/avatars/7.jpg';
-import image8 from '../../../public/assets/img/avatars/8.jpg';
+import image4 from '../../assets/img/avatars/4.jpg';
+import image5 from '../../assets/img/avatars/5.jpg';
+import image6 from '../../assets/img/avatars/6.jpg';
+import image7 from '../../assets/img/avatars/7.jpg';
+import image8 from '../../assets/img/avatars/8.jpg';
 
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import getLabelText from '../../CommonComponent/getLabelText';

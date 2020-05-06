@@ -3,13 +3,13 @@ import { Nav, NavItem, NavLink, Progress, TabContent, TabPane, ListGroup, ListGr
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { AppSwitch } from '@coreui/react'
-import image2 from '../../../public/assets/img/avatars/2.jpg';
-import image3 from '../../../public/assets/img/avatars/3.jpg';
-import image4 from '../../../public/assets/img/avatars/4.jpg';
-import image5 from '../../../public/assets/img/avatars/5.jpg';
-import image6 from '../../../public/assets/img/avatars/6.jpg';
-import image7 from '../../../public/assets/img/avatars/7.jpg';
-import image8 from '../../../public/assets/img/avatars/8.jpg';
+import image2 from '../../assets/img/avatars/2.jpg';
+import image3 from '../../assets/img/avatars/3.jpg';
+import image4 from '../../assets/img/avatars/4.jpg';
+import image5 from '../../assets/img/avatars/5.jpg';
+import image6 from '../../assets/img/avatars/6.jpg';
+import image7 from '../../assets/img/avatars/7.jpg';
+import image8 from '../../assets/img/avatars/8.jpg';
 
 const propTypes = {
   children: PropTypes.node,
