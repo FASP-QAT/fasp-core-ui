@@ -9,7 +9,7 @@ body {
 }
 
 Select >.Select-control .Select-value, .Select-placeholder {
-  color: #7a7e7a!important;
+  color: #697069!important;
 }
 /* ————————————————————–
   Tree core styles
@@ -1048,7 +1048,8 @@ h5,
 
 .form-control {
  
-  color: #212721;
+  // color: #212721;
+  color:#697069;
   
 }
 
@@ -1259,46 +1260,41 @@ h5,
 // }
 /* with the :focus here, we would show grey when not using the element */
 
-option:first-of-type {
-  color: #7a7e7a;
-}
-select > option:focus,
-select > option:active,
-select > option:checked{
-  color: #7a7e7a;
-}
+// option:first-of-type {
+//   color: #7a7e7a;
+// }
+// select > option:focus,
+// select > option:active,
+// select > option:checked{
+//   color: #7a7e7a;
+// }
 
-select:required:invalid {
-  color: #7a7e7a;
-}
+// select:required:invalid {
+//   color: #7a7e7a;
+// }
 
-select:invalid {
-  color: #7a7e7a;
-}
-select > option[value="0"]:is-valid {
-  color: #7a7e7a;
-}
+// select:invalid {
+//   color: #7a7e7a;
+// }
+// select > option[value="0"]:is-valid {
+//   color: #7a7e7a;
+// }
 
 input[value=''] {
   color: #7a7e7a!important;
 }
-// input[value='0'] {
-//   color: #7a7e7a!important;
-// }
-// input[value='0.0'] {
-//   color: #7a7e7a!important;
-// }
+
 input::placeholder {
   color: #7a7e7a!important;
 }
-select:invalid,
-select option[value="0"] {
-color: #7a7e7a;
-}
-select:invalid,
-select option[value=""] {
-color: #7a7e7a;
-}
+// select:invalid,
+// select option[value="0"] {
+// color: #7a7e7a;
+// }
+// select:invalid,
+// select option[value=""] {
+// color: #7a7e7a;
+// }
 .nonclickablebox{
   pointer-events: none!important;
 }
@@ -1360,6 +1356,7 @@ color: #7a7e7a;
  
     height: 5px;
     margin-top: 20px;
+    margin-bottom: 12px;
     line-height: 1;
     position: relative;
     display: flex;
@@ -1381,3 +1378,33 @@ color: #7a7e7a;
 .progressbartext5{left: 63.64%;}
 .progressbartext6{left: 78.79%;}
 .progressbartext7{left:94.95%;}
+
+.chartjs-tooltip {
+  left: 388px!important;
+  top: 222px!important;
+  
+}
+
+.react-confirm-alert-body {
+  width: 100%!important;
+  font-weight: 600;
+  font-size: 17px!important;
+  padding: 30px;
+  color: #212721!important;
+  padding-bottom: 16%!important; 
+}
+
+.react-confirm-alert-button-group {
+  float: right!important;
+  margin-top: 11% !important;
+}
+
+.react-confirm-alert-button-group > button {
+  background: #20a8d8!important;
+  font-weight: 550!important;
+  font-size: 14px!important;
+}
+
+.form-control.is-valid {
+  color: #212721;
+}
