@@ -553,7 +553,7 @@ export default class ProgramOnboarding extends Component {
                                     <li className="progressbartext3">Health Area</li>
                                     <li className="progressbartext4">Organization</li>
                                     <li className="progressbartext5">Region</li>
-                                    <li className="progressbartext6">Other Field</li>
+                                    <li className="progressbartext6">Program Data</li>
                                     <li className="progressbartext7">Planning Units</li>
                               </ul>
                           </div>
@@ -572,7 +572,7 @@ export default class ProgramOnboarding extends Component {
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realms}
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>
@@ -588,9 +588,9 @@ export default class ProgramOnboarding extends Component {
                                             {realmCountries}
                                         </Input>
                                     </FormGroup>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="countrySub" id="countrySub" onClick={this.finishedStepTwo} >Next</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="countrySub" id="countrySub" onClick={this.finishedStepTwo} >Next <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} >Previous</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                     &nbsp;
 
                                 </div>
@@ -608,9 +608,9 @@ export default class ProgramOnboarding extends Component {
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmHealthArea}
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthAreaSub" id="healthAreaSub" onClick={this.finishedStepThree} >Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthAreaSub" id="healthAreaSub" onClick={this.finishedStepThree} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} >Previous</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
 
                                     </FormGroup>
@@ -630,9 +630,9 @@ export default class ProgramOnboarding extends Component {
                                             {realmOrganisation}
 
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationSub" id="organizationSub" onClick={this.finishedStepFour} >Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationSub" id="organizationSub" onClick={this.finishedStepFour} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.previousToStepThree} >Previous</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
 
                                     </FormGroup>
@@ -650,28 +650,29 @@ export default class ProgramOnboarding extends Component {
                                             options={this.state.regionList}
                                             value={this.state.regionId}
                                         />
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} >Previous</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
 
                                     </FormGroup>
                                 </div>
                                 <div id="stepSix">
-                                    <FormGroup>
+                                    <Row>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                        
                                             type="text" name="programName"
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e); this.Capitalize(e.target.value) }}
                                             value={this.state.program.label.label_en}
                                             id="programName" placeholder={i18n.t('static.program.programtext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                        
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="select" name="userId" id="userId">
@@ -679,117 +680,121 @@ export default class ProgramOnboarding extends Component {
                                             {programManagers}
                                         </Input>
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                          
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="textarea" name="programNotes" id="programNotes" />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                          
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                           
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                           
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
                                     </FormGroup>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSix}>Next</Button>
+                                    <FormGroup className="col-md-12">
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSix}>Next <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFive} >Previous</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                    </FormGroup>
+                               
+                                </Row>
                                 </div>
                                 <div id="stepSeven">
                                     <h6>Map Planning Units</h6>
                                     <MapPlanningUnits ref="child"></MapPlanningUnits>
                                     <FormGroup>
                                         <h1>Planning Units</h1>
-                                        <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}>Submit</Button>
+                                        <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i> Submit</Button>
                                         
                                         &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} >Previous</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Previous</Button>
                                     </FormGroup>
                                 </div>
                             </CardBody></Card></Col></Row></div>
