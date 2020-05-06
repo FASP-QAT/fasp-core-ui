@@ -390,12 +390,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
-                            icon: 'fa fa-long-arrow-down',
+                            icon: 'fa fa-cloud-download',
                           },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
-                            icon: 'fa fa-upload',
+                            icon: 'fa fa-sign-in',
                           },
                           {
                             name: i18n.t('static.dashboard.consumptiondetails'),

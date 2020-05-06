@@ -7,6 +7,7 @@ import image1 from '../../../assets/img/QAT-login-logo.png';
 import image2 from '../../../assets/img/wordmark.png';
 import image3 from '../../../assets/img/PEPFAR-logo.png';
 import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
+import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -111,7 +112,7 @@ class Login extends Component {
     return (
       <div className="main-content flex-row align-items-center">
 
-        <div className="Login-component">
+        <div className="Login-component"  style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
           <Container className="container-login">
 
             <Row className="justify-content-center">

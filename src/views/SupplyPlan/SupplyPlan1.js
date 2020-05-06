@@ -300,6 +300,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <strong>Supply plan</strong>
                         </CardHeader>
                         <CardBody>
+                          
                             <Table bordered responsive size="sm" options={this.options}>
                                 <thead>
                                     <tr>
