@@ -261,7 +261,7 @@ class ListBudgetComponent extends Component {
       {
 
         dataField: 'usedAmt',
-        text: i18n.t('static.common.status'),
+        text: i18n.t('static.budget.availableAmt'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
