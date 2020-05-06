@@ -337,7 +337,39 @@ export default class StockStatusMatrix extends React.Component {
             );
 
     }
+    exportCSV(columns){
 
+      var csvRow=[];
+      const headers =[];
+          columns.map( (item, idx) =>{ headers[idx]=item.text});
+          
+       
+      var A=[headers]
+      var re=this.state.data
+     
+      if(this.state.view==1){
+        this.state.data.map(ele =>A.push([ele.PLANNING_UNIT_LABEL_EN.replaceAll(',',' '),ele.YEAR,ele.Jan,ele.Feb,ele.Mar,ele.Apr,ele.May,ele.Jun,ele.Jul,ele.Aug,ele.Sep,ele.Oct,ele.Nov
+          ,ele.Dec] ));
+      }else{
+        this.state.data.map(ele =>A.push([ele.PLANNING_UNIT_LABEL_EN.replaceAll(',',' '),ele.YEAR,ele.Q1,ele.Q2,ele.Q3,ele.Q4] ));
+
+      }
+     /*for(var item=0;item<re.length;item++){
+       A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
+     } */
+     for(var i=0;i<A.length;i++){
+      csvRow.push(A[i].join(","))
+    } 
+
+    var csvString=csvRow.join("%0A")
+    var a=document.createElement("a")
+    a.href='data:attachment/csv,'+csvString
+    a.target="_Blank"
+    a.download="stockStatusmatrix"+this.state.rangeValue.from.year+this.state.rangeValue.from.month+"_to_"+this.state.rangeValue.to.year+this.state.rangeValue.to.month+".csv"
+    document.body.appendChild(a)
+    a.click()
+    }
+   
     exportPDF = (columns) => {
         const unit = "pt";
         const size = "A1"; // Use A1, A2, A3 or A4
@@ -610,7 +642,8 @@ export default class StockStatusMatrix extends React.Component {
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
                         <div className="card-header-actions">
-
+                        <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
+                        <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
                         </div>
                     </CardHeader>
                     <CardBody className="pb-md-0">
@@ -738,7 +771,7 @@ export default class StockStatusMatrix extends React.Component {
                             search={{ searchFormatted: true }}
                             hover
                             filter={filterFactory()}
-                            exportCSV
+                           
                         >
                             {
                                 props => (
@@ -748,11 +781,7 @@ export default class StockStatusMatrix extends React.Component {
                                       
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
-                                            <div className="col-md-6 pr-0 offset-md-6 text-center mob-Left">
-                                            <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
-                                          
-                                            <MyExportCSV { ...props.csvProps } /></div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                             <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
 
                                             {...props.baseProps}
