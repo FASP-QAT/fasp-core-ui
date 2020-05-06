@@ -5,7 +5,11 @@ body {
 }
 
 ::placeholder {
-  color:#212721!important;
+  color:#7a7e7a!important;
+}
+
+Select >.Select-control .Select-value, .Select-placeholder {
+  color: #7a7e7a!important;
 }
 /* ————————————————————–
   Tree core styles
@@ -311,7 +315,7 @@ label.arrow_label:after {
 }
 
 .Gobtn {
-  margin-left: 20px;
+  margin-left: 5px;
   border-radius: 0.2rem !important;
   
 }
@@ -407,12 +411,30 @@ label.arrow_label:after {
   color:#212721!important;
 }
 .red {
-  color: #f86c6b !important;
+  //  color: #f86c6b !important;
+  
+  color: red!important;
+}
+ 
+.invalid-feedback {
+  display: none;
+  /* width: 100%; */
+  margin-top: 0.25rem;
+  // font-size: 80%;
+  font-size: 12px!important;
+  color: red!important;
+  // color: #f86c6b;
 }
 
-
 // table multiselect color
-.Select--multi .Select-value {color: #5c6873 !important;}
+.Select--multi .Select-value {
+  color: #212721 !important;
+  font-size: 12px!important;
+}
+
+.Select--multi .Select-value-icon:focus, .Select--multi .Select-value-icon:hover {
+  color: #212721!important;
+}
 .form-check-inline .form-check-input {margin-left: 2rem;}
 // table radio button
 .P-absltRadio{position: absolute;}
@@ -428,6 +450,12 @@ label.arrow_label:after {
 }// table dropdown footer
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a{padding: 8px 30px 8px 30px;}
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item{padding: 2px;}
+
+
+.table thead tr th {position: sticky;
+  top: 0px;
+  background: #fff;position: -webkit-sticky;}
+
 
 // table height scroll
 .react-bootstrap-table {
@@ -447,8 +475,8 @@ label.arrow_label:after {
 }
 
 .jexcel_selectall{background: #fff !important;}
-.jexcel > thead > tr > td {background: #fff !important;}
-
+.jexcel > thead > tr > td {background: #fff !important;   color: #212721 !important;
+  font-weight: bold;}
 .jexcel > tbody > tr > td:first-child {background-color: #fff !important;}
 .jexcel > tbody > tr > td{    padding: 6px !important }
 .jexcel > thead > tr > td {padding: 6px!important}
@@ -544,6 +572,9 @@ label.arrow_label:after {
       right: 0; 
       margin: auto; 
   }
+  .RemoveStriped .jexcel_content .jexcel .draggable{tr:nth-of-type(odd) {
+    background-color: #fff !important;
+}}
 
 
   // .forInlinebtnMapping{ display: flex;}
@@ -561,8 +592,15 @@ label.arrow_label:after {
   .jexcel_content{    overflow-y: auto !important;
     max-height: 440px;
 }
+.jexcel > tbody > tr > td.readonly {
+  color: #212721 !important;
+}
  
 .whitebtnColor .btn-info{color: #fff!important;}
+
+
+.breadcrumb {
+  margin-bottom: .5rem;}
 
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}
@@ -615,8 +653,12 @@ label.arrow_label:after {
   top: 0;
   width: 100%;
 }
+@media only screen and (min-width: 1200px) {
+  .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+}
 
 @media only screen and (min-width: 992px) {
+  
   .Login-component {
     // background: url(../assets/img/bg-image/bg-login.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;
@@ -639,7 +681,7 @@ label.arrow_label:after {
 }
 .upper-logo {
   max-width: 325px;
-  margin-top: 2% !important;
+  margin-top: 1% !important;
   margin-left: 0%;
 }
 
@@ -752,7 +794,10 @@ label.arrow_label:after {
   text-align: center;
   font-size: 12px;
 }
-
+.login-text{
+  font-size:15px;
+  font-weight: 600;
+}
 ///forgot password
 .fwd-btn {
   margin-left: 10px;
@@ -951,16 +996,16 @@ h5,
   overflow-y: hidden;
 }
 
-.ps__rail-y {
-  width: 8px!important;
-  overflow-y: hidden!important;
-  right: 0;
-}
-.ps__rail-y:hover > .ps__thumb-y, .ps__rail-y:focus > .ps__thumb-y, .ps__rail-y.ps--clicking .ps__thumb-y {
-  background-color: #999;
-  width: 0px!important;
+// .ps__rail-y {
+//   width: 8px!important;
+//   overflow-y: hidden!important;
+//   right: 0;
+// }
+// .ps__rail-y:hover > .ps__thumb-y, .ps__rail-y:focus > .ps__thumb-y, .ps__rail-y.ps--clicking .ps__thumb-y {
+//   background-color: #999;
+//   width: 0px!important;
   
-}
+// }
 
 .dropdown-menu {
   min-width: 5rem;
@@ -1044,9 +1089,7 @@ h5,
 
 }
 
-.Select--single>.Select-control .Select-value, .Select-placeholder {
-  color: #212721!important;
-}
+
 
 .sidebar .nav-dropdown-toggle::before {
    transform: scaleX(-1);
@@ -1166,13 +1209,151 @@ h5,
   background-color: #fff !important;
   }}
 
+.jexcel {white-space: pre-wrap !important;}
+
 ///legend sync 
 /* basic positioning */
 .legend { list-style: none;margin-top:6px; }
 .legend li { float: left; margin-right: 10px;margin: 10px; }
 .legend span {  float: left; width: 55px; height: 25px; margin: -4px 11px 0px 0px;border-radius: 3px; }
 /* your colors */
-.legend .lightpinklegend { background-color: rgb(255, 204, 203); border-color:1px solid rgb(255, 204, 203);}
-.legend .greenlegend { background-color:rgb(152, 251, 152);border-color:1px solid rgb(152, 251, 152); }
-.legend .redlegend { background-color: #FF8686; border-color:1px solid #FF8686; }
+.legend .lightpinklegend { background-color: yellow; border-color:1px solid yellow;}
+.legend .greenlegend { background-color:green;border-color:1px solid green; }
+.legend .redlegend { background-color:red; border-color:1px solid red; }
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
+
+// .card {
+//   margin-top: -2%;
+// }
+
+///avtar icon
+.avatar .avatar-status {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #fff;
+  border-radius: 50em;
+}
+
+.form-control:focus {
+  color: #212721;
+  background-color: #fff;
+  border-color: #8ad4ee;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.25);
+}
+
+// select > option[value=""]{
+//   color: #7a7e7a!important;
+// }
+// select > option:first-child {
+//   color: #7a7e7a!important;
+// }
+// select > option[value="0"]{
+//   color: #7a7e7a!important;
+// }
+/* with the :focus here, we would show grey when not using the element */
+
+option:first-of-type {
+  color: #7a7e7a;
+}
+select > option:focus,
+select > option:active,
+select > option:checked{
+  color: #7a7e7a;
+}
+
+select:required:invalid {
+  color: #7a7e7a;
+}
+
+select:invalid {
+  color: #7a7e7a;
+}
+select > option[value="0"]:is-valid {
+  color: #7a7e7a;
+}
+
+input[value=''] {
+  color: #7a7e7a!important;
+}
+// input[value='0'] {
+//   color: #7a7e7a!important;
+// }
+// input[value='0.0'] {
+//   color: #7a7e7a!important;
+// }
+input::placeholder {
+  color: #7a7e7a!important;
+}
+select:invalid,
+select option[value="0"] {
+color: #7a7e7a;
+}
+select:invalid,
+select option[value=""] {
+color: #7a7e7a;
+}
+.nonclickablebox{
+  pointer-events: none!important;
+}
+
+.ps__rail-y.ps--clicking .ps__thumb-y, .ps__rail-y:focus>.ps__thumb-y, .ps__rail-y:hover>.ps__thumb-y {
+  background-color: #999;
+  width: 11px!important;
+}
+
+.ps__thumb-y {
+  transition: background-color .2s linear,width .2s ease-in-out;
+  -webkit-transition: background-color .2s linear,width .2s ease-in-out;
+  width: 0px!important;
+  right: 2px;
+}
+
+.ps__rail-y {
+  width: 13px!important;
+  right: 0;
+}
+
+.dropdown-item i:active {
+  color: #fff;
+}
+
+////progranonboarding progressbar css
+
+.RSPBprogressBar {
+  margin: 0px 25px 0px 25px;
+}
+
+.RSPBprogressBar .RSPBprogression {
+ 
+  background: #20a8d8!important;
+  
+}
+.btn-info {
+  color: #fff!important;
+  background-color: #20a8d8!important;
+  border-color: #20a8d8!important;
+}
+.btn-info:hover {
+  color: #fff!important;
+  background-color: #20a8d8!important;
+  border-color: #20a8d8!important;
+}
+
+
+    .progress-text{
+      margin-top: 25px;
+    }
+
+    .Country-bartext{margin-left: 34%;}
+    .region-bartext{margin-left: -25px;}
+    .otherfeild-text{margin-left: -37%;}
+    .planning-text{    margin-left: 0px;}
+
+    .background-red {
+      background-color: red;
+    }

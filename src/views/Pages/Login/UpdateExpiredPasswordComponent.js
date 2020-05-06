@@ -13,7 +13,7 @@ import { SECRET_KEY } from '../../../Constants.js'
 import UserService from '../../../api/UserService'
 import moment from 'moment';
 import i18n from '../../../i18n'
-import image1 from '../../../../public/assets/img/QAT-logo.png';
+import image1 from '../../../assets/img/QAT-logo.png';
 
 
 

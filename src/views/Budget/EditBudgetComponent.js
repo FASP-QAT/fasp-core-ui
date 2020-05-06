@@ -16,8 +16,8 @@ const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
     budgetName: '',
     budgetAmt: '',
-    startDate: '',
-    stopDate: ''
+    // startDate: '',
+    // stopDate: ''
 }
 
 const validationSchema = function (values) {
@@ -26,10 +26,10 @@ const validationSchema = function (values) {
             .required(i18n.t('static.budget.budgetamountdesc')),
         budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
-        startDate: Yup.string()
-            .required(i18n.t('static.budget.startdatetext')),
-        stopDate: Yup.string()
-            .required(i18n.t('static.budget.stopdatetext'))
+        // startDate: Yup.string()
+        //     .required(i18n.t('static.budget.startdatetext')),
+        // stopDate: Yup.string()
+        //     .required(i18n.t('static.budget.stopdatetext'))
     })
 }
 
@@ -75,7 +75,7 @@ class EditBudgetComponent extends Component {
                         label_fr: ''
                     }
                 },
-                subFundingSource: {
+                fundingSource: {
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -85,7 +85,8 @@ class EditBudgetComponent extends Component {
                 },
                 startDate: '',
                 stopDate: '',
-                budgetAmt: ''
+                budgetAmt: '',
+                notes: ''
 
             },
             message: '',
@@ -143,6 +144,8 @@ class EditBudgetComponent extends Component {
             budget.stopDate = ''
         } if (event.target.name === "stopDate") {
             budget.stopDate = event.target.value;
+        } if (event.target.name === "notes") {
+            budget.notes = event.target.value;
         } else if (event.target.name === "active") {
             budget.active = event.target.id === "active2" ? false : true;
         }
@@ -156,8 +159,8 @@ class EditBudgetComponent extends Component {
         setTouched({
             budgetName: true,
             budgetAmt: true,
-            startDate: true,
-            stopDate: true
+            // startDate: true,
+            // stopDate: true
         });
         this.validateForm(errors)
     }
@@ -192,12 +195,13 @@ class EditBudgetComponent extends Component {
                                 initialValues={{
                                     budgetName: getLabelText(this.state.budget.label, this.state.lang),
                                     budgetAmt: this.state.budget.budgetAmt,
-                                    startDate: this.state.budget.startDate,
-                                    stopDate: this.state.budget.stopDate
+                                    // startDate: this.state.budget.startDate,
+                                    // stopDate: this.state.budget.stopDate
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
+                                    console.log("this.state.budget----->", this.state.budget);
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
@@ -224,24 +228,7 @@ class EditBudgetComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
-
-                                                        <Input
-                                                            type="text"
-                                                            name="budgetName"
-                                                            id="budget"
-                                                            bsSize="sm"
-                                                            valid={!errors.budgetName}
-                                                            invalid={touched.budgetName && !!errors.budgetName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
-
-                                                        />
-
-                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
-                                                    </FormGroup>
+               
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
 
@@ -263,23 +250,41 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
+                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}</Label>
 
                                                         <Input
                                                             type="text"
-                                                            name="subFundingSourceId"
-                                                            id="subFundingSourceId"
+                                                            name="fundingSourceId"
+                                                            id="fundingSourceId"
                                                             bsSize="sm"
-                                                            valid={!errors.subFundingSourceId}
-                                                            invalid={touched.subFundingSourceId && !!errors.subFundingSourceId}
+                                                            valid={!errors.fundingSourceId}
+                                                            invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly
-                                                            value={getLabelText(this.state.budget.subFundingSource.label, this.state.lang)}
+                                                            value={getLabelText(this.state.budget.fundingSource.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.subFundingSourceId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            type="text"
+                                                            name="budgetName"
+                                                            id="budget"
+                                                            bsSize="sm"
+                                                            valid={!errors.budgetName}
+                                                            invalid={touched.budgetName && !!errors.budgetName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.budget.label.label_en}
+
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
@@ -300,44 +305,50 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
                                                             name="startDate"
                                                             id="startDate"
-                                                            bsSize="sm"
-                                                            valid={!errors.startDate}
-                                                            invalid={touched.startDate && !!errors.startDate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            // bsSize="sm"
+                                                            // valid={!errors.startDate}
+                                                            // invalid={touched.startDate && !!errors.startDate}
+                                                            onChange={(e) => {
+                                                                // handleChange(e); 
+                                                                this.dataChange(e)
+                                                            }}
+                                                            // onBlur={handleBlur}
                                                             type="date"
                                                             min={this.currentDate()}
                                                             value={this.state.budget.startDate}
                                                             placeholder="{i18n.t('static.budget.budgetstartdate')}"
                                                         />
 
-                                                        <FormFeedback className="red">{errors.startDate}</FormFeedback>
+                                                        <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
                                                             name="stopDate"
                                                             id="stopDate"
-                                                            bsSize="sm"
-                                                            valid={!errors.stopDate}
-                                                            invalid={touched.stopDate && !!errors.stopDate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            // bsSize="sm"
+                                                            // valid={!errors.stopDate}
+                                                            // invalid={touched.stopDate && !!errors.stopDate}
+                                                            onChange={(e) => {
+                                                                // handleChange(e); 
+                                                                this.dataChange(e)
+                                                            }}
+                                                            // onBlur={handleBlur}
                                                             type="date"
                                                             min={this.state.budget.startDate}
                                                             value={this.state.budget.stopDate}
                                                             placeholder="{i18n.t('static.budget.budgetstopdate')}"
                                                         />
 
-                                                        <FormFeedback className="red">{errors.stopDate}</FormFeedback>
+                                                        <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
 
@@ -375,6 +386,19 @@ class EditBudgetComponent extends Component {
                                                                 {i18n.t('static.common.disabled')}
                                                             </Label>
                                                         </FormGroup>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="notes">{i18n.t('static.program.notes')}</Label>
+                                                        <Input
+                                                            value={this.state.budget.notes}
+                                                            name="notes"
+                                                            id="notes"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.dataChange(e) }}
+
+                                                            type="textarea"
+                                                        />
+                                                        <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

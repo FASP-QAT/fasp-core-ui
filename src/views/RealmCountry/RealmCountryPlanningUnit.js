@@ -51,7 +51,10 @@ const validationSchema = function (values, t) {
         multiplier: Yup.number()
             .required(i18n.t('static.planningunit.multipliertext')).min(0, i18n.t('static.program.validvaluetext')),
         unitId: Yup.string()
-            .required(i18n.t('static.product.productunittext'))
+            .required(i18n.t('static.product.productunittext')),
+            gtin: Yup.string()
+            .max(14, i18n.t('static.procurementUnit.validMaxValueText'))
+            .matches(/^[a-zA-Z0-9]*$/, i18n.t('static.procurementUnit.onlyalphaNumericText')),
     })
 }
 
@@ -197,7 +200,8 @@ realmCountryPlanningUnitId:'',
             label: true,
             skuCode: true,
             multiplier: true,
-            unitId: true
+            unitId: true,
+            gtin: true
 
         }
         )

@@ -12,7 +12,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import SubFundingSourceService from '../../api/SubFundingSourceService';
+import FundingSourceService from '../../api/FundingSourceService';
 import moment from 'moment';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
@@ -26,7 +26,7 @@ class ListBudgetComponent extends Component {
       lang: localStorage.getItem('lang'),
       message: '',
       selBudget: [],
-      subFundingSourceList: []
+      fundingSourceList: []
     }
 
     // this.options = {
@@ -50,14 +50,16 @@ class ListBudgetComponent extends Component {
     this.filterData = this.filterData.bind(this);
     this.formatDate = this.formatDate.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
+    this.addCommas = this.addCommas.bind(this);
+    this.rowClassNameFormat=this.rowClassNameFormat.bind(this)
   }
 
 
 
   filterData() {
-    let subFundingSourceId = document.getElementById("subFundingSourceId").value;
-    if (subFundingSourceId != 0) {
-      const selBudget = this.state.budgetList.filter(c => c.subFundingSource.subFundingSourceId == subFundingSourceId)
+    let fundingSourceId = document.getElementById("fundingSourceId").value;
+    if (fundingSourceId != 0) {
+      const selBudget = this.state.budgetList.filter(c => c.fundingSource.fundingSourceId == fundingSourceId)
       this.setState({
         selBudget: selBudget
       });
@@ -97,7 +99,7 @@ class ListBudgetComponent extends Component {
       .then(response => {
         console.log(response)
         if (response.status == 200) {
-          console.log("budget after status 200---->", response.data);
+          console.log("budget after status 200 new console --- ---->", response.data);
           this.setState({
             budgetList: response.data,
             selBudget: response.data
@@ -126,12 +128,12 @@ class ListBudgetComponent extends Component {
     //     }
     //   }
     // );
-    SubFundingSourceService.getSubFundingSourceListAll()
+    FundingSourceService.getFundingSourceListAll()
       .then(response => {
         if (response.status == 200) {
-          console.log("sub funding source after status 200--->" + response.data)
+          console.log("funding source after status 200--->" + response.data)
           this.setState({
-            subFundingSourceList: response.data
+            fundingSourceList: response.data
           })
         } else {
           this.setState({ message: response.data.messageCode })
@@ -175,15 +177,36 @@ class ListBudgetComponent extends Component {
   //     return "Disabled";
   //   }
   // }
-
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
+  rowClassNameFormat(row, rowIdx) {
+    // row is whole row object
+    // rowIdx is index of row
+    return row.stopDate<new Date().getTime() ? 'background-red' : '';
   }
+  formatLabel(cell, row) {
+    console.log("celll----", cell);
+    if (cell != null && cell != "") {
+      return getLabelText(cell, this.state.lang);
+    }
+  }
+
+  addCommas(cell, row) {
+    console.log("---------->m in");
+    cell += '';
+    var x = cell.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+    }
+    return x1 + x2;
+  }
+
 
   render() {
 
     const { SearchBar, ClearSearchButton } = Search;
-    const { subFundingSourceList } = this.state;
+    const { fundingSourceList } = this.state;
 
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
@@ -191,24 +214,16 @@ class ListBudgetComponent extends Component {
       </span>
     );
 
-    let subFundingSources = subFundingSourceList.length > 0 && subFundingSourceList.map((item, i) => {
+    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.map((item, i) => {
       return (
-        <option key={i} value={item.subFundingSourceId}>
+        <option key={i} value={item.fundingSourceId}>
           {getLabelText(item.label, this.state.lang)}
         </option>
       )
     }, this);
 
     const columns = [
-      {
-        dataField: 'label',
-        text: i18n.t('static.budget.budget'),
-        sort: true,
-        align: 'center',
-        headerAlign: 'center',
-        formatter: this.formatLabel
 
-      },
       {
         dataField: 'program.label',
         text: i18n.t('static.budget.program'),
@@ -218,19 +233,28 @@ class ListBudgetComponent extends Component {
         formatter: this.formatLabel
       },
       {
-        dataField: 'subFundingSource.label',
-        text: i18n.t('static.budget.subfundingsource'),
+        dataField: 'fundingSource.label',
+        text: i18n.t('static.budget.fundingsource'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
         formatter: this.formatLabel
+
+      },
+      {
+        dataField: 'notes',
+        text: i18n.t('static.program.notes'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
       },
       {
         dataField: 'budgetAmt',
         text: i18n.t('static.budget.budgetamount'),
         sort: true,
         align: 'center',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: this.addCommas
       },
       {
         dataField: 'startDate',
@@ -294,7 +318,7 @@ class ListBudgetComponent extends Component {
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
-          <CardHeader>
+          <CardHeader className="mb-md-3 pb-lg-1">
             <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
@@ -302,7 +326,7 @@ class ListBudgetComponent extends Component {
               </div>
             </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="pb-lg-0 ">
             {/* <BootstrapTable data={this.state.table} version="4" striped hover pagination search options={this.options}>
               <TableHeaderColumn isKey dataField="budgetId" hidden>Budget Id</TableHeaderColumn>
               <TableHeaderColumn filterFormatted dataField="label" dataFormat={this.showBudgetLabel} dataSort>{i18n.t('static.budget.budget')}</TableHeaderColumn>
@@ -314,18 +338,18 @@ class ListBudgetComponent extends Component {
               <TableHeaderColumn dataFormat={this.showStatus} dataField="active" dataSort>{i18n.t('static.common.active')}</TableHeaderColumn>
             </BootstrapTable> */}
             <Col md="3 pl-0" >
-              <FormGroup>
-                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.subfundingsource')}</Label>
+              <FormGroup className="Selectdiv">
+                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                 <div className="controls SelectGo">
                   <InputGroup>
                     <Input
                       type="select"
-                      name="subFundingSourceId"
-                      id="subFundingSourceId"
+                      name="fundingSourceId"
+                      id="fundingSourceId"
                       bsSize="sm"
                     >
                       <option value="0">{i18n.t('static.common.all')}</option>
-                      {subFundingSources}
+                      {fundingSources}
                     </Input>
                     <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
@@ -349,7 +373,7 @@ class ListBudgetComponent extends Component {
                       <SearchBar {...props.searchProps} />
                       <ClearSearchButton {...props.searchProps} />
                     </div>
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                    <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                       pagination={paginationFactory(options)}
                       rowEvents={{
                         onClick: (e, row, rowIndex) => {
@@ -359,7 +383,7 @@ class ListBudgetComponent extends Component {
                         }
                       }}
                       {...props.baseProps}
-                    />
+                    /><h5>*Row is in red color indicates there is no money left or budget hits the end date</h5>
                   </div>
                 )
               }

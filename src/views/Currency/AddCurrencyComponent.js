@@ -11,7 +11,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const entityname = i18n.t('static.currency.currencyMaster');
 const initialValues = {
     currencyCode: '',
-    currencySymbol: '',
+    // currencySymbol: '',
     label: '',
     conversionRate: '',
     isSync: 'true'
@@ -22,11 +22,11 @@ const validationSchema = function (values) {
         currencyCode: Yup.string()
             .required(i18n.t('static.currency.currencycodetext')).
             max(4, i18n.t('static.currency.currencycodemax4digittext')),
-        currencySymbol: Yup.string()
-            .required(i18n.t('static.currency.currencysymboltext')).
-            max(3, i18n.t('static.country.countrycodemax3digittext')).
-            // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
-            matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
+        // currencySymbol: Yup.string()
+        //     .required(i18n.t('static.currency.currencysymboltext')).
+        //     max(3, i18n.t('static.country.countrycodemax3digittext')).
+        //     // matches(/^[A-Z@~`!@#$%^&*()_=+\\\\';:\"\\/?>.<,-]*$/i, i18n.t('static.currency.numbernotallowedtext')),
+        //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             .required(i18n.t('static.currency.currencytext')),
         conversionRate: Yup.number()
@@ -63,7 +63,7 @@ export default class AddCurrencyComponent extends Component {
         super(props);
         this.state = {
             currencyCode: '',
-            currencySymbol: '',
+            // currencySymbol: '',
             label: {
                 label_en: ''
 
@@ -81,9 +81,11 @@ export default class AddCurrencyComponent extends Component {
         console.log(event.target.name)
         if (event.target.name === "currencyCode") {
             this.state.currencyCode = event.target.value.toUpperCase();
-        } if (event.target.name === "currencySymbol") {
-            this.state.currencySymbol = event.target.value;
-        } if (event.target.name === "label") {
+        } 
+        // if (event.target.name === "currencySymbol") {
+        //     this.state.currencySymbol = event.target.value;
+        // } 
+        if (event.target.name === "label") {
             this.state.label.label_en = event.target.value;
         }
         else if (event.target.name === "conversionRate") {
@@ -102,7 +104,7 @@ export default class AddCurrencyComponent extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             currencyCode: true,
-            currencySymbol: true,
+            // currencySymbol: true,
             label: true,
             conversionRate: true,
             isSync: true
@@ -164,26 +166,7 @@ export default class AddCurrencyComponent extends Component {
                                                 })
                                             }
                                         })
-                                    // .catch(
-                                    //     error => {
-                                    //         if (error.message === "Network Error") {
-                                    //             this.setState({ message: error.message });
-                                    //         } else {
-                                    //             switch (error.response ? error.response.status : "") {
-                                    //                 case 500:
-                                    //                 case 401:
-                                    //                 case 404:
-                                    //                 case 406:
-                                    //                 case 412:
-                                    //                     this.setState({ message: error.response.data.messageCode });
-                                    //                     break;
-                                    //                 default:
-                                    //                     this.setState({ message: 'static.unkownError' });
-                                    //                     break;
-                                    //             }
-                                    //         }
-                                    //     }
-                                    // );
+                                  
                                 }}
 
 
@@ -235,10 +218,8 @@ export default class AddCurrencyComponent extends Component {
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.currencyCode}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
                                                         <Label for="currencySymbol">{i18n.t('static.currency.currencysymbol')}<span className="red Reqasterisk">*</span></Label>
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-usd"></i></InputGroupText> */}
                                                         <Input type="text"
                                                             name="currencySymbol"
                                                             id="currencySymbol"
@@ -249,9 +230,8 @@ export default class AddCurrencyComponent extends Component {
                                                             onBlur={handleBlur}
                                                             value={this.state.currencySymbol}
                                                             required />
-                                                        {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.currencySymbol}</FormFeedback>
-                                                    </FormGroup>
+                                                    </FormGroup> */}
                                                     <FormGroup>
                                                         <Label for="laconversionRatebel">{i18n.t('static.currency.conversionrateusd')}<span class="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}

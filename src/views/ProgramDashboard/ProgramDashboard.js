@@ -51,7 +51,7 @@ const chartColors = {
 };
 
 const bar = {
-  labels: ['Program1', 'Program2', 'Program3', 'Program4'],
+  labels: ['Program 1', 'Program 2', 'Program 3', 'Program 4'],
   datasets:[
     {
       label:"Inventory",

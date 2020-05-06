@@ -43,7 +43,7 @@
     .jexcel_content { padding-right:10px; } 
 }
 
-.jexcel_content::-webkit-scrollbar {
+/* .jexcel_content::-webkit-scrollbar {
     width: 5px;
     height: 5px;
 }
@@ -54,7 +54,7 @@
  
 .jexcel_content::-webkit-scrollbar-thumb {
   background: #666; 
-}
+} */
 
 .jexcel {
     border-collapse:separate;
@@ -104,7 +104,7 @@
     cursor:move;
 }
 
-.jexcel > thead.resizable > tr > td::after
+/* .jexcel > thead.resizable > tr > td::after
 {
     content:'\00a0';
     width:3px;
@@ -113,7 +113,7 @@
     top:0px;
     right:0px;
     cursor:col-resize;
-}
+} */
 
 .jexcel > thead > tr > td.dragging
 {
@@ -156,7 +156,7 @@
     text-align:center;
 }
 
-.jexcel > tbody.resizable > tr > td:first-child::before
+/* .jexcel > tbody.resizable > tr > td:first-child::before
 {
     content:'\00a0';
     width:100%;
@@ -165,7 +165,7 @@
     bottom:0px;
     left:0px;
     cursor:row-resize;
-}
+} */
 
 .jexcel > tbody.draggable > tr > td:first-child::after
 {

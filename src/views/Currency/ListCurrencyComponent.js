@@ -130,13 +130,13 @@ export default class CurrencyListComponent extends Component {
                 align: 'center',
                 headerAlign: 'center'
             },
-            {
-                dataField: 'currencySymbol',
-                text: i18n.t('static.currency.currencysymbol'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
+            // {
+            //     dataField: 'currencySymbol',
+            //     text: i18n.t('static.currency.currencysymbol'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center'
+            // },
             {
                 dataField: 'conversionRateToUsd',
                 text: i18n.t('static.currency.conversionrateusd'),
@@ -192,7 +192,7 @@ export default class CurrencyListComponent extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.currencylist')}</strong>{' '}
 
                         <div className="card-header-actions">
@@ -201,7 +201,7 @@ export default class CurrencyListComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         {/* <BootstrapTable data={this.state.currencyList} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey filterFormatted dataField="currencyCode" dataSort dataAlign="center">{i18n.t('static.currency.currencycode')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="currencySymbol" dataSort dataAlign="center">{i18n.t('static.currency.currencysymbol')}</TableHeaderColumn>

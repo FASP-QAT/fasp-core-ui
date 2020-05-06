@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardGroup, Col, Container, ContainerFluid, Form, Input, InputGroup, InputGroupAddon, InputGroupText, Row, FormFeedback, Label, FormGroup } from 'reactstrap';
 import navigation from '../../../_nav';
 // routes config
-import image1 from '../../../../public/assets/img/QAT-login-logo.png';
-import image2 from '../../../../public/assets/img/wordmark.png';
-import image3 from '../../../../public/assets/img/PEPFAR-logo.png';
-import image4 from '../../../../public/assets/img/USAID-presidents-malaria-initiative.png';
+import image1 from '../../../assets/img/QAT-login-logo.png';
+import image2 from '../../../assets/img/wordmark.png';
+import image3 from '../../../assets/img/PEPFAR-logo.png';
+import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
 
 import { Formik } from 'formik';
 import * as Yup from 'yup'
@@ -221,7 +221,7 @@ class Login extends Component {
 
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
-                                <p className="text-muted">{i18n.t('static.login.signintext')}</p>
+                                <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
 
                                 <InputGroup className="mb-3">
                                   <InputGroupAddon addonType="prepend">
@@ -282,17 +282,16 @@ class Login extends Component {
               <Col xs="12" className="Login-bttom ">
                 <CardBody>
 
-                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply Management
-                  (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004.
-                  GHSC-PSM connects technical solutions and proven commercial processes to
-                  promote efficient and cost-effective health supply chains worldwide.
-                  Our goal is to ensure uninterrupted supplies of health commodities to save
-                  lives and create a healthier future for all. The project purchases and delivers
-                  health commodities, offers comprehensive technical assistance to strengthen
-                  national supply chain systems, and provides global supply chain leadership.For more
-                  information,visit ghsupplychain.org.The information provided in this tool is not official
-                  U.S. government information and does not represent the views or positions of the Agency for International
-                  Development or the U.S. government.
+                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply 
+                  Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects 
+                  technical solutions and proven commercial processes to promote efficient and cost-effective 
+                  health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health 
+                  commodities to save lives and create a healthier future for all. The project purchases 
+                  and delivers health commodities, offers comprehensive technical assistance to strengthen 
+                  national supply chain systems, and provides global supply chain leadership. For more 
+                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not 
+                  official U.S. government information and does not represent the views or positions of the 
+                  Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
