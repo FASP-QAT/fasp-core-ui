@@ -102,11 +102,8 @@ class Consumption extends Component {
       offlinePrograms: [],
       planningUnits: [],
       consumptions: [],
-<<<<<<< HEAD
       offlineConsumptionList: [],
       offlinePlanningUnitList: [],
-=======
->>>>>>> f4e2fd30a2af4f60d1ea7d820db1e533df2b06e6
       productCategories: [],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
@@ -119,7 +116,7 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories=this.getProductCategories.bind(this)
+    this.getProductCategories = this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
 
   }
@@ -177,7 +174,7 @@ class Consumption extends Component {
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson = JSON.parse(programData);
           var offlineConsumptionList = (programJson.consumptionList);
-          console.log("offlineConsumptionList---",offlineConsumptionList);
+          console.log("offlineConsumptionList---", offlineConsumptionList);
 
           const planningUnitFilter = offlineConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
           // console.log("planningUnitFilter---", planningUnitFilter);
@@ -218,7 +215,7 @@ class Consumption extends Component {
                 Actual: actual,
                 forcast: forcast
               }
-              
+
               if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
                 finalOfflineConsumption.push(json);
               }
@@ -389,46 +386,42 @@ class Consumption extends Component {
 
     }
 
-<<<<<<< HEAD
   }
-
-=======
->>>>>>> f4e2fd30a2af4f60d1ea7d820db1e533df2b06e6
   getProductCategories() {
     AuthenticationService.setupAxiosInterceptors();
     let programId = document.getElementById("programId").value;
     ProductService.getProductCategoryListByProgram(programId)
-        .then(response => {
-            console.log(JSON.stringify(response.data))
-            this.setState({
-                productCategories: response.data
-            })
-        }).catch(
-            error => {
-                this.setState({
-                    productCategories: []
-                })
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
-                    }
-                }
+      .then(response => {
+        console.log(JSON.stringify(response.data))
+        this.setState({
+          productCategories: response.data
+        })
+      }).catch(
+        error => {
+          this.setState({
+            productCategories: []
+          })
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
             }
-        );
-        this.getPlanningUnit();
-        
-}
+          }
+        }
+      );
+    this.getPlanningUnit();
+
+  }
   componentDidMount() {
     console.log("inside component did mount");
     if (navigator.onLine) {
@@ -581,7 +574,7 @@ class Consumption extends Component {
             type: "line",
             label: "Forecast Consumption",
             backgroundColor: '#006400',
-            borderColor: 'rgba(179,181,158,1)',
+            borderColor: 'transparent',
             borderStyle: 'dotted',
             ticks: {
               fontSize: 2,
@@ -592,7 +585,7 @@ class Consumption extends Component {
             data: this.state.consumptions.map((item, index) => (item.forcast))
           }
         ],
-    
+
 
 
       }
@@ -661,9 +654,9 @@ class Consumption extends Component {
               </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                  <div className="col-md-12 pr-0"> <div ref={ref}> <div className="col-md-9 pr-0" >
+                  <div className="col-md-15 pr-0"> <div ref={ref}> <div className="col-md-15 pr-0" >
                     <Form >
-                      <Col md="9 pl-0">
+                      <Col md="15 pl-0">
                         <div className="d-md-flex">
                           <FormGroup>
                             <Label htmlFor="appendedInputButton">Select Period</Label>
@@ -717,7 +710,7 @@ class Consumption extends Component {
                                     name="programId"
                                     id="programId"
                                     bsSize="sm"
-                                    onChange={this.getPlanningUnit}
+                                    onChange={this.getProductCategories}
 
                                   >
                                     <option value="0">{i18n.t('static.common.select')}</option>
@@ -764,25 +757,31 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                          <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="productCategoryId"
-                                                id="productCategoryId"
-                                                bsSize="sm"
-                                                onChange={this.getPlanningUnit}
-                                            >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {productCategoryList}
-                                            </Input>
+                            <FormGroup className="tab-ml-1">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                              <div className="controls SelectGo">
+                              <InputGroup>
+                                <Input
+                                  type="select"
+                                  name="productCategoryId"
+                                  id="productCategoryId"
+                                  bsSize="sm"
+                                  onChange={this.getPlanningUnit}
+                                >
+                                  <option value="0">{i18n.t('static.common.all')}</option>
+                                  {productCategories.length > 0
+                                    && productCategories.map((item, i) => {
+                                      return (
+                                        <option key={i} value={item.payload.productCategoryId}>
+                                          {getLabelText(item.payload.label, this.state.lang)}
+                                        </option>
+                                      )
+                                    }, this)}
+                                </Input>
+                              </InputGroup></div>
 
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-
+                            </FormGroup>
+</Online> <Online>
                             <FormGroup className="tab-ml-1">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
@@ -808,7 +807,7 @@ class Consumption extends Component {
                                     <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                   </InputGroupAddon>
                                 </InputGroup>
-                              </div>
+                             </div>
                             </FormGroup>
                           </Online>
                           <Offline>
