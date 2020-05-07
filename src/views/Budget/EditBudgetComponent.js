@@ -10,7 +10,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import moment from 'moment';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DatePicker from 'react-datepicker';
+import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
@@ -83,6 +85,17 @@ class EditBudgetComponent extends Component {
                         label_fr: ''
                     }
                 },
+                currency: {
+                    currencyId: '',
+                    conversionRateToUsd: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+
+                },
                 startDate: '',
                 stopDate: '',
                 budgetAmt: '',
@@ -100,21 +113,43 @@ class EditBudgetComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
         // console.log(this.state);
+        this.dataChangeDate = this.dataChangeDate.bind(this);
+        this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
 
     }
     changeMessage(message) {
         this.setState({ message: message })
     }
 
+    dataChangeDate(date) {
+        let { budget } = this.state
+        budget.startDate = date;
+        budget.stopDate = '';
+        this.setState({ budget: budget });
+    }
+
+    dataChangeEndDate(date) {
+        let { budget } = this.state;
+        budget.stopDate = date;
+        this.setState({ budget: budget });
+    }
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
-                response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
-                response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                // response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                // response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                // new Date('2019-06-11')
+
+                console.log("(response.data.startDate)--", new Date(response.data.startDate));
+                response.data.startDate = new Date(response.data.startDate);
+                response.data.stopDate = new Date(response.data.stopDate);
                 this.setState({
                     budget: response.data
                 });
+
+
             })
 
     }
@@ -139,12 +174,14 @@ class EditBudgetComponent extends Component {
         }
         if (event.target.name === "budgetAmt") {
             budget.budgetAmt = event.target.value;
-        } if (event.target.name === "startDate") {
-            budget.startDate = event.target.value;
-            budget.stopDate = ''
-        } if (event.target.name === "stopDate") {
-            budget.stopDate = event.target.value;
-        } if (event.target.name === "notes") {
+        }
+        // if (event.target.name === "startDate") {
+        //     budget.startDate = event.target.value;
+        //     budget.stopDate = ''
+        // } if (event.target.name === "stopDate") {
+        //     budget.stopDate = event.target.value;
+        // } 
+        if (event.target.name === "notes") {
             budget.notes = event.target.value;
         } else if (event.target.name === "active") {
             budget.active = event.target.id === "active2" ? false : true;
@@ -228,7 +265,7 @@ class EditBudgetComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
-               
+
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
 
@@ -286,6 +323,41 @@ class EditBudgetComponent extends Component {
 
                                                         <FormFeedback className="red">{errors.budgetName}</FormFeedback>
                                                     </FormGroup>
+
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="currencyId">Currency<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
+                                                        <Input
+                                                            type="text"
+                                                            name="currencyId"
+                                                            id="currencyId"
+                                                            bsSize="sm"
+                                                            value={this.state.budget.currency.label.label_en}
+                                                            disabled
+                                                        >
+                                                        </Input>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.currencyId}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label for="budget">Conversion Rate To USD<span className="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="conversionRateToUsd"
+                                                            id="conversionRateToUsd"
+                                                            bsSize="sm"
+                                                            value={this.state.budget.currency.conversionRateToUsd}
+                                                            disabled />
+                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
+                                                    </FormGroup>
+
+
+
+
+
                                                     <FormGroup>
                                                         <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
 
@@ -305,40 +377,40 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        {/* <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
                                                             name="startDate"
-                                                            id="startDate"
-                                                            // bsSize="sm"
-                                                            // valid={!errors.startDate}
-                                                            // invalid={touched.startDate && !!errors.startDate}
-                                                            onChange={(e) => {
-                                                                // handleChange(e); 
-                                                                this.dataChange(e)
-                                                            }}
-                                                            // onBlur={handleBlur}
+                                                            id="startDate" */}
+                                                        {/* // bsSize="sm" */}
+                                                        {/* // valid={!errors.startDate} */}
+                                                        {/* // invalid={touched.startDate && !!errors.startDate} */}
+                                                        {/* onChange={(e) => { */}
+                                                        {/* // handleChange(e);  */}
+                                                        {/* this.dataChange(e) */}
+                                                        {/* }} */}
+                                                        {/* // onBlur={handleBlur}
                                                             type="date"
                                                             min={this.currentDate()}
                                                             value={this.state.budget.startDate}
                                                             placeholder="{i18n.t('static.budget.budgetstartdate')}"
-                                                        />
+                                                        /> */}
 
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        {/* <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
                                                             name="stopDate"
-                                                            id="stopDate"
-                                                            // bsSize="sm"
+                                                            id="stopDate" */}
+                                                        {/* // bsSize="sm"
                                                             // valid={!errors.stopDate}
                                                             // invalid={touched.stopDate && !!errors.stopDate}
-                                                            onChange={(e) => {
-                                                                // handleChange(e); 
+                                                            onChange={(e) => { */}
+                                                        {/* // handleChange(e); 
                                                                 this.dataChange(e)
                                                             }}
                                                             // onBlur={handleBlur}
@@ -346,7 +418,7 @@ class EditBudgetComponent extends Component {
                                                             min={this.state.budget.startDate}
                                                             value={this.state.budget.stopDate}
                                                             placeholder="{i18n.t('static.budget.budgetstopdate')}"
-                                                        />
+                                                        /> */}
 
                                                         <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
@@ -399,6 +471,30 @@ class EditBudgetComponent extends Component {
                                                             type="textarea"
                                                         />
                                                         <FormFeedback className="red"></FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <DatePicker
+                                                            id="startDate"
+                                                            name="startDate"
+                                                            minDate={new Date()}
+                                                            selected={this.state.budget.startDate}
+                                                            onChange={(date) => { this.dataChangeDate(date) }}
+                                                            placeholderText="mm-dd-yyy"
+
+                                                        />
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <DatePicker
+                                                            id="stopDate"
+                                                            name="stopDate"
+                                                            minDate={this.state.budget.startDate}
+                                                            selected={this.state.budget.stopDate}
+                                                            onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                            placeholderText="mm-dd-yyy"
+
+                                                        />
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
