@@ -186,6 +186,7 @@ class ApplicationDashboard extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <Row>
           <Col md="12">
+         
           <Card>
             <CardHeader className="text-center">
               <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
