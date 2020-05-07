@@ -104,6 +104,12 @@ export function getDatabase() {
         if (!db1.objectStoreNames.contains('programPlanningUnit')) {
             storeOS = db1.createObjectStore('programPlanningUnit', { keyPath: 'programPlanningUnitId', autoIncrement: true });
         }
+        if (!db1.objectStoreNames.contains('procurementAgentPlanningUnit')) {
+            storeOS = db1.createObjectStore('procurementAgentPlanningUnit', { keyPath: 'procurementAgentPlanningUnitId', autoIncrement: true });
+        }
+        if (!db1.objectStoreNames.contains('procurementAgentProcurementUnit')) {
+            storeOS = db1.createObjectStore('procurementAgentProcurementUnit', { keyPath: 'procurementAgentProcurementUnitId', autoIncrement: true });
+        }
     };
 }
 

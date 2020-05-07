@@ -4,7 +4,7 @@ import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
   Col, Row, Card, CardBody, CardHeader, Form,
   FormGroup, Label, InputGroup, Input, InputGroupAddon, Button,
-  Nav, NavItem, NavLink, TabContent, TabPane,CardFooter
+  Nav, NavItem, NavLink, TabContent, TabPane, CardFooter
 } from 'reactstrap';
 import CryptoJS from 'crypto-js';
 import { SECRET_KEY } from '../../Constants.js';
@@ -41,8 +41,8 @@ export default class syncPage extends Component {
 
     this.loadedFunctionLatestInventory = this.loadedFunctionLatestInventory.bind(this);
     this.loadedFunctionLatest = this.loadedFunctionLatest.bind(this);
-    this.cancelClicked=this.cancelClicked.bind(this);
-    this.synchronize=this.synchronize.bind(this);
+    this.cancelClicked = this.cancelClicked.bind(this);
+    this.synchronize = this.synchronize.bind(this);
   }
 
   toggle(tabPane, tab) {

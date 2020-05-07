@@ -402,8 +402,10 @@ class ListBudgetComponent extends Component {
                       pagination={paginationFactory(options)}
                       rowEvents={{
                         onClick: (e, row, rowIndex) => {
-                          row.startDate = moment(row.startDate).format('YYYY-MM-DD');
-                          row.stopDate = moment(row.stopDate).format('YYYY-MM-DD');
+                          // row.startDate = moment(row.startDate).format('YYYY-MM-DD');
+                          // row.stopDate = moment(row.stopDate).format('YYYY-MM-DD');
+                          // row.startDate = moment(row.startDate);
+                          // row.stopDate = moment(row.stopDate);
                           this.editBudget(row);
                         }
                       }}

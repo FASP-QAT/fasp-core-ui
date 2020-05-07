@@ -744,7 +744,7 @@ class Consumption extends Component {
                     <Form >
                       <Col md="12 pl-0">
                         <div className="row">
-                          <FormGroup className="col-md-3">
+                          <FormGroup className="col-md-3"title="click here to select period">
                             
                             <Label htmlFor="appendedInputButton">Select Period</Label>
                             <span class="consumption-box-icon fa fa-sort-desc ml-1"></span>

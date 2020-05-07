@@ -97,5 +97,11 @@
     "static.language.french": "Français",
     "static.language.spanish": "Espagnol",
     "static.language.portuguese": "Portugais",
-    "static.common.select": "S'il vous plaît Sélectionner"
+    "static.common.select": "S'il vous plaît Sélectionner",
+    "static.graph.activeProgram": "Programmes actifs",
+    "static.graph.inactiveProgram": "Programmes inactifs",
+    "static.graph.totalRealmCount": "Nombre total de domaines :",
+    "static.dashboard.applicationdashboard": "Tableau de bord d'application",
+    "static.logout.confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter?",
+    "static.home": "Accueil"
 }
