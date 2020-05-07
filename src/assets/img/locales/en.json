@@ -626,5 +626,6 @@
     "static.graph.activeProgram": "Active Programs",
     "static.graph.inactiveProgram": "Inactive Programs",
     "static.graph.totalRealmCount": "Total Realms Count :",
-    "static.logout.confirmLogout": "Are you sure you want to log out?"
+    "static.logout.confirmLogout": "Are you sure you want to log out?",
+    "static.home": "Home"
 }

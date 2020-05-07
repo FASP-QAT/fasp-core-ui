@@ -103,5 +103,6 @@
     "static.graph.activeProgram": "Programas ativos",
     "static.graph.inactiveProgram": "Programas inativos",
     "static.graph.totalRealmCount": "Contagem total de reinos :",
-    "static.logout.confirmLogout": "Tem certeza que deseja sair?"
+    "static.logout.confirmLogout": "Tem certeza que deseja sair?",
+    "static.home": "Casa"
 }

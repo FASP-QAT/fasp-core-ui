@@ -102,5 +102,6 @@
     "static.graph.inactiveProgram": "Programmes inactifs",
     "static.graph.totalRealmCount": "Nombre total de domaines :",
     "static.dashboard.applicationdashboard": "Tableau de bord d'application",
-    "static.logout.confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter?"
+    "static.logout.confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter?",
+    "static.home": "Accueil"
 }

@@ -138,5 +138,6 @@
     "static.graph.inactiveProgram": "Programas inactivos",
     "static.graph.totalRealmCount": "Recuento total de reinos :",
     "static.dashboard.applicationdashboard": "Panel de aplicación",
-    "static.logout.confirmLogout": "¿Estás seguro de que quieres cerrar sesión?"
+    "static.logout.confirmLogout": "¿Estás seguro de que quieres cerrar sesión?",
+    "static.home": "Casa"
 }
