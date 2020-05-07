@@ -51,6 +51,7 @@ class ListBudgetComponent extends Component {
     this.formatDate = this.formatDate.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
     this.addCommas = this.addCommas.bind(this);
+    this.rowClassNameFormat=this.rowClassNameFormat.bind(this)
   }
 
 
@@ -176,7 +177,13 @@ class ListBudgetComponent extends Component {
   //     return "Disabled";
   //   }
   // }
-
+  rowClassNameFormat(row, rowIdx) {
+    // row is whole row object
+    // rowIdx is index of row
+    console.log('in rowClassNameFormat')
+    console.log(new Date(row.stopDate).getTime()<new Date().getTime())
+    return new Date(row.stopDate)<new Date()||(row.budgetAmt-row.usedAmt)<=0 ? 'background-red' : '';
+  }
   formatLabel(cell, row) {
     console.log("celll----", cell);
     if (cell != null && cell != "") {
@@ -251,6 +258,29 @@ class ListBudgetComponent extends Component {
         headerAlign: 'center',
         formatter: this.addCommas
       },
+      {
+
+        dataField: 'usedAmt',
+        text: i18n.t('static.budget.availableAmt'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+          
+             
+           var cell1= row.budgetAmt-row.usedAmt
+           cell1 += '';
+           var x = cell1.split('.');
+           var x1 = x[0];
+           var x2 = x.length > 1 ? '.' + x[1] : '';
+           var rgx = /(\d+)(\d{3})/;
+           while (rgx.test(x1)) {
+             x1 = x1.replace(rgx, '$1' + ',' + '$2');
+           }
+           return x1 + x2;
+         }
+        }
+       ,
       {
         dataField: 'startDate',
         text: i18n.t('static.common.startdate'),
@@ -368,7 +398,7 @@ class ListBudgetComponent extends Component {
                       <SearchBar {...props.searchProps} />
                       <ClearSearchButton {...props.searchProps} />
                     </div>
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                    <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                       pagination={paginationFactory(options)}
                       rowEvents={{
                         onClick: (e, row, rowIndex) => {
@@ -378,7 +408,7 @@ class ListBudgetComponent extends Component {
                         }
                       }}
                       {...props.baseProps}
-                    />
+                    /><h5>*Row is in red color indicates there is no money left or budget hits the end date</h5>
                   </div>
                 )
               }

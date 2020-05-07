@@ -15,7 +15,9 @@ module.exports = {
     },
     devServer: {
         port: 4202,
-        historyApiFallback: true
+        historyApiFallback: true,
+        compress: true, 
+        disableHostCheck: true
     },
     module: {
         rules: [
@@ -113,7 +115,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebPackPlugin({
-            template: path.resolve(__dirname, 'public/index.html'),
+            template: path.resolve(__dirname, 'src/assets/img/index.html'),
             filename: 'index.html'
         }),
         new WorkboxPlugin.GenerateSW({

@@ -52,8 +52,8 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.region.validcountry')),
         currencyId: Yup.number()
             .required(i18n.t('static.country.currencytext')),
-        unitId: Yup.string()
-            .required(i18n.t('static.common.realmtext'))
+        // unitId: Yup.string()
+        //     .required(i18n.t('static.common.realmtext'))
     })
 }
 
@@ -149,7 +149,7 @@ class RealmCountry extends Component {
                         label_en: this.state.rows[idx].defaultCurrency.label.label_en
                     }
                 },    currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
-                    unitId: this.state.rows[idx].palletUnit.unitId,
+                    // unitId: this.state.rows[idx].palletUnit.unitId,
                     label: {
                         label_en: this.state.rows[idx].palletUnit.label.label_en
                     }
@@ -180,7 +180,8 @@ class RealmCountry extends Component {
                     label: {
                         label_en: this.state.rows[idx].palletUnit.label.label_en
                     }
-                },unitId: this.state.rows[idx].palletUnit.unitId,
+                },
+                // unitId: this.state.rows[idx].palletUnit.unitId,
                 airFreightPercentage: this.state.rows[idx].airFreightPercentage,
                 seaFreightPercentage: this.state.rows[idx].seaFreightPercentage,
                 shippedToArrivedAirLeadTime: this.state.rows[idx].shippedToArrivedAirLeadTime,
@@ -211,7 +212,7 @@ class RealmCountry extends Component {
         setTouched({
             country: true,
             currency: true,
-            unit: true
+            // unit: true
 
         }
         )
@@ -244,10 +245,10 @@ class RealmCountry extends Component {
             this.state.defaultCurrency.currencyId = event.target.value;
             this.state.defaultCurrency.label.label_en = event.target[event.target.selectedIndex].text;
         }
-        if (event.target.name === "unitId") {
-            this.state.palletUnit.unitId = event.target.value;
-            this.state.palletUnit.label.label_en = event.target[event.target.selectedIndex].text;
-        }
+        // if (event.target.name === "unitId") {
+        //     this.state.palletUnit.unitId = event.target.value;
+        //     this.state.palletUnit.label.label_en = event.target[event.target.selectedIndex].text;
+        // }
         if (event.target.name === "airFreightPercentage") {
             this.state.airFreightPercentage = event.target.value;
         }
@@ -452,31 +453,31 @@ class RealmCountry extends Component {
                         }
                     }
                 });
-        UnitService.getUnitListAll()
-            .then(response => {
-                this.setState({
-                    units: response.data
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+        // UnitService.getUnitListAll()
+        //     .then(response => {
+        //         this.setState({
+        //             units: response.data
+        //         })
+        //     }).catch(
+        //         error => {
+        //             if (error.message === "Network Error") {
+        //                 this.setState({ message: error.message });
+        //             } else {
+        //                 switch (error.response.status) {
+        //                     case 500:
+        //                     case 401:
+        //                     case 404:
+        //                     case 406:
+        //                     case 412:
+        //                         this.setState({ message: error.response.data.messageCode });
+        //                         break;
+        //                     default:
+        //                         this.setState({ message: 'static.unkownError' });
+        //                         break;
+        //                 }
+        //             }
+        //         }
+        //     );
 
 
     }
@@ -497,15 +498,15 @@ class RealmCountry extends Component {
                 </option>
             )
         }, this);
-        const { units } = this.state;
-        let unitList = units.length > 0
-            && units.map((item, i) => {
-                return (
-                    <option key={i} value={item.unitId}>
-                        {item.label.label_en}
-                    </option>
-                )
-            }, this);
+        // const { units } = this.state;
+        // let unitList = units.length > 0
+        //     && units.map((item, i) => {
+        //         return (
+        //             <option key={i} value={item.unitId}>
+        //                 {item.label.label_en}
+        //             </option>
+        //         )
+        //     }, this);
         return (<div className="animated fadeIn">
             <h5>{i18n.t(this.state.message)}</h5>
             <Row>
@@ -520,7 +521,7 @@ class RealmCountry extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors,resetForm }) => {
-                                    if (this.state.country.countryId != "" && this.state.defaultCurrency.currencyId != "" && this.state.palletUnit.unitId != "" ) {
+                                    if (this.state.country.countryId != "" && this.state.defaultCurrency.currencyId != "" ) {
                                         var json =
                                         { realmCountryId:this.state.realmCountryId,
                                             realm: {
@@ -539,12 +540,12 @@ class RealmCountry extends Component {
                                                     label_en: this.state.defaultCurrency.label.label_en
                                                 }
                                             }
-                                            , palletUnit: {
-                                                unitId: this.state.palletUnit.unitId,
-                                                label: {
-                                                    label_en: this.state.palletUnit.label.label_en
-                                                }
-                                            }
+                                            // , palletUnit: {
+                                            //     unitId: this.state.palletUnit.unitId,
+                                            //     label: {
+                                            //         label_en: this.state.palletUnit.label.label_en
+                                            //     }
+                                            // }
                                             ,
                                             airFreightPercentage: this.state.airFreightPercentage,
                                             seaFreightPercentage: this.state.seaFreightPercentage,
@@ -571,12 +572,12 @@ class RealmCountry extends Component {
                                                 label_en: ''
                                             }
                                         }
-                                        , palletUnit: {
-                                            unitId: '',
-                                            label: {
-                                                label_en:''
-                                            }
-                                        }
+                                        // , palletUnit: {
+                                        //     unitId: '',
+                                        //     label: {
+                                        //         label_en:''
+                                        //     }
+                                        // }
                                         ,
                                         airFreightPercentage: '0.0',
                                         seaFreightPercentage: '0.0',
@@ -604,12 +605,12 @@ class RealmCountry extends Component {
                                                 label_en: ''
                                             }
                                         }
-                                        , palletUnit: {
-                                            unitId: '',
-                                            label: {
-                                                label_en:''
-                                            }
-                                        }
+                                        // , palletUnit: {
+                                        //     unitId: '',
+                                        //     label: {
+                                        //         label_en:''
+                                        //     }
+                                        // }
                                         ,
                                         airFreightPercentage: '0.0',
                                         seaFreightPercentage: '0.0',
@@ -673,7 +674,7 @@ class RealmCountry extends Component {
                                                 {currencyList}
                                             </Input> <FormFeedback className="red">{errors.currencyId}</FormFeedback>
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
+                                        {/* <FormGroup className="col-md-6">
                                             <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
                                             <Input
                                                 type="select"
@@ -690,7 +691,7 @@ class RealmCountry extends Component {
                                                 {unitList}
                                             </Input>
                                             <FormFeedback className="red">{errors.unitId}</FormFeedback>
-                                        </FormGroup>
+                                        </FormGroup> */}
 
                                         <FormGroup className="col-md-6">
                                             <Label for="airFreightPercentage">{i18n.t('static.realmcountry.airFreightPercentage')}</Label>
@@ -783,7 +784,7 @@ class RealmCountry extends Component {
                                             <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
                                         </FormGroup>
 
-                                        <FormGroup className="col-md-6 mt-md-4">
+                                        <FormGroup className="col-md-12 mt-md-4">
                                             {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)}  className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                             &nbsp;
@@ -796,7 +797,7 @@ class RealmCountry extends Component {
                                     <tr>
                                         <th className="text-center"> {i18n.t('static.dashboard.country')} </th>
                                         <th className="text-center"> {i18n.t('static.dashboard.currency')}</th>
-                                        <th className="text-center"> {i18n.t('static.dashboard.unit')} </th>
+                                        {/* <th className="text-center"> {i18n.t('static.dashboard.unit')} </th> */}
                                         <th className="text-center">{i18n.t('static.realmcountry.airFreightPercentage')}</th>
                                         <th className="text-center">{i18n.t('static.realmcountry.seaFreightPercentage')}</th>
                                         <th className="text-center">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}</th>
@@ -819,9 +820,9 @@ class RealmCountry extends Component {
                                                 <td>
                                                     {this.state.rows[idx].defaultCurrency.label.label_en}
                                                 </td>
-                                                <td>
+                                                {/* <td>
                                                     {this.state.rows[idx].palletUnit.label.label_en}
-                                                </td>
+                                                </td> */}
                                                 <td>
                                                     {this.state.rows[idx].airFreightPercentage}
                                                 </td>
