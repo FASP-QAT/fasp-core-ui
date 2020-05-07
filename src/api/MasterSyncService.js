@@ -126,5 +126,20 @@ class MasterSyncService {
         });
     }
 
+    getProcurementAgentPlanningUnitForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/procurementAgent/planningUnit/${lastSyncDate}`, {
+        });
+    }
+
+    getProcurementAgentProcurementUnitForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/procurementAgent/procurementUnit/${lastSyncDate}`, {
+        });
+    }
+
+    getShipmentStatusForSync(lastSyncDate){
+        return axios.get(`${API_URL}/api/sync/shipmentStatus/${lastSyncDate}`, {
+        });
+    }
+
 }
 export default new MasterSyncService()

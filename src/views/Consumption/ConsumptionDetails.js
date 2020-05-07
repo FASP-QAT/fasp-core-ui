@@ -814,8 +814,8 @@ export default class ConsumptionDetails extends React.Component {
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionQty = map.get("2");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].dayOfStockOut = parseInt(map.get("3"));
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = map.get("4");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = map.get("5");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = moment(map.get("4")).format("YYYY-MM-DD");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = moment(map.get("5")).format("YYYY-MM-DD");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].actualFlag = map.get("6");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
 
@@ -839,8 +839,8 @@ export default class ConsumptionDetails extends React.Component {
                             },
                             consumptionQty: parseInt(map.get("2")),
                             dayOfStockOut: parseInt(map.get("3")),
-                            startDate: map.get("4"),
-                            stopDate: map.get("5"),
+                            startDate: moment(map.get("4")).format("YYYY-MM-DD"),
+                            stopDate: moment(map.get("5")).format("YYYY-MM-DD"),
                             actualFlag: map.get("6"),
                             active: map.get("7"),
 
@@ -1847,13 +1847,14 @@ export default class ConsumptionDetails extends React.Component {
             }
         }
         if (x == 3) {
+            var reg = /^[0-9\b]+$/;
             var col = ("D").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -1999,6 +2000,7 @@ export default class ConsumptionDetails extends React.Component {
 
             var col = ("D").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(3, y);
+            var reg = /^[0-9\b]+$/;
             // if (value === "" || isNaN(Number.parseInt(value)) || !Number.isInteger(value) ) {
             //     this.el.setStyle(col, "background-color", "transparent");
             //     this.el.setStyle(col, "background-color", "yellow");
@@ -2018,10 +2020,11 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
+                if (isNaN(parseInt(value)) || !(reg.test(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");

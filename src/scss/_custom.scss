@@ -9,7 +9,7 @@ body {
 }
 
 Select >.Select-control .Select-value, .Select-placeholder {
-  color: #7a7e7a!important;
+  color: #697069!important;
 }
 /* ————————————————————–
   Tree core styles
@@ -605,7 +605,9 @@ label.arrow_label:after {
   // .forbtnMapping .mapUnitbtn{width: 140px !important;}
   // .forbtnMapping .mapRegionbtn{width: 110px !important;}
 
- 
+//  producttree
+.rst__row{    height: 25px !important;
+  margin-top: .5rem !important;}
 
 
 
@@ -646,6 +648,8 @@ label.arrow_label:after {
   background-size: cover;
   height: auto;
   left: 0;
+  background-position: center;
+  background-repeat: no-repeat;
   margin: 0;
   min-height: 100%;
   padding: 0;
@@ -653,8 +657,12 @@ label.arrow_label:after {
   top: 0;
   width: 100%;
 }
+@media only screen and (min-width: 1200px) {
+  .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+}
 
 @media only screen and (min-width: 992px) {
+  
   .Login-component {
     // background: url(../assets/img/bg-image/bg-login.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;
@@ -1042,7 +1050,8 @@ h5,
 
 .form-control {
  
-  color: #212721;
+  // color: #212721;
+  color:#697069;
   
 }
 
@@ -1205,6 +1214,8 @@ h5,
   background-color: #fff !important;
   }}
 
+.jexcel {white-space: pre-wrap !important;}
+
 ///legend sync 
 /* basic positioning */
 .legend { list-style: none;margin-top:6px; }
@@ -1214,7 +1225,11 @@ h5,
 .legend .lightpinklegend { background-color: yellow; border-color:1px solid yellow;}
 .legend .greenlegend { background-color:green;border-color:1px solid green; }
 .legend .redlegend { background-color:red; border-color:1px solid red; }
+.legend .purplelegend{ background-color:rgb(170, 85, 161); border-color:1px solid rgb(170, 85, 161);}
+.legend .blacklegend{ background-color:#000; border-color:1px solid #000;}
+
 .legend .notawesome { background-color: #e5edf5; border-color:1px solid #e5edf5; }
+
 
 // .card {
 //   margin-top: -2%;
@@ -1251,46 +1266,41 @@ h5,
 // }
 /* with the :focus here, we would show grey when not using the element */
 
-option:first-of-type {
-  color: #7a7e7a;
-}
-select > option:focus,
-select > option:active,
-select > option:checked{
-  color: #7a7e7a;
-}
+// option:first-of-type {
+//   color: #7a7e7a;
+// }
+// select > option:focus,
+// select > option:active,
+// select > option:checked{
+//   color: #7a7e7a;
+// }
 
-select:required:invalid {
-  color: #7a7e7a;
-}
+// select:required:invalid {
+//   color: #7a7e7a;
+// }
 
-select:invalid {
-  color: #7a7e7a;
-}
-select > option[value="0"]:is-valid {
-  color: #7a7e7a;
-}
+// select:invalid {
+//   color: #7a7e7a;
+// }
+// select > option[value="0"]:is-valid {
+//   color: #7a7e7a;
+// }
 
 input[value=''] {
   color: #7a7e7a!important;
 }
-// input[value='0'] {
-//   color: #7a7e7a!important;
-// }
-// input[value='0.0'] {
-//   color: #7a7e7a!important;
-// }
+
 input::placeholder {
   color: #7a7e7a!important;
 }
-select:invalid,
-select option[value="0"] {
-color: #7a7e7a;
-}
-select:invalid,
-select option[value=""] {
-color: #7a7e7a;
-}
+// select:invalid,
+// select option[value="0"] {
+// color: #7a7e7a;
+// }
+// select:invalid,
+// select option[value=""] {
+// color: #7a7e7a;
+// }
 .nonclickablebox{
   pointer-events: none!important;
 }
@@ -1320,6 +1330,7 @@ color: #7a7e7a;
 
 .RSPBprogressBar {
   margin: 0px 25px 0px 25px;
+  height: 5px!important;
 }
 
 .RSPBprogressBar .RSPBprogression {
@@ -1339,11 +1350,96 @@ color: #7a7e7a;
 }
 
 
-    .progress-text{
-      margin-top: 25px;
+// .progress-text{
+//       margin-top: 25px;
+//  }
+// .Country-bartext{margin-left: 34%;}
+// .region-bartext{margin-left: -25px;}
+// .otherfeild-text{margin-left: -37%;}
+// .planning-text{    margin-left: 0px;}
+
+.progressbar {
+ 
+    height: 5px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    line-height: 1;
+    position: relative;
+    display: flex;
+    color:#212721;
+    justify-content: space-between;
+    z-index: 0;
+}
+.progressbar li {
+  list-style: none; 
+  text-align: center;
+  display: inline-flex;
+  position: absolute;
+
+}
+.progressbartext1{left:7px;}
+.progressbartext2{ left: 16%;}
+.progressbartext3{ left: 31%;}
+.progressbartext4{left: 46.46%;}
+.progressbartext5{left: 64%;}
+.progressbartext6{left: 78.79%;}
+.progressbartext7{left:94.95%;}
+
+@media only screen and (max-width: 1024px){
+  .progressbartext1{left:7px;}
+  .progressbartext2{ left: 16%;}
+  .progressbartext3{ left: 30%;}
+  .progressbartext4{left: 45.45%;}
+  .progressbartext5{left: 63%;}
+  .progressbartext6{left: 76.79%;}
+  .progressbartext7{left:92.95%;}
+}
+
+@media (max-width: 768px){
+  .progressbartext1{left:7px;}
+.progressbartext2{ left: 16%;}
+.progressbartext3{ left: 30%;}
+.progressbartext4{left: 44.46%;}
+.progressbartext5{left: 63%;}
+.progressbartext6{left: 76.79%;}
+.progressbartext7{left:92.95%;}
+}
+.chartjs-tooltip {
+  left: 388px!important;
+  top: 222px!important;
+  
+}
+
+.react-confirm-alert-body {
+  width: 100%!important;
+  font-weight: 600;
+  font-size: 17px!important;
+  padding: 30px;
+  color: #212721!important;
+  padding-bottom: 16%!important; 
+}
+
+.react-confirm-alert-button-group {
+  float: right!important;
+  margin-top: 11% !important;
+}
+
+.react-confirm-alert-button-group > button {
+  background: #20a8d8!important;
+  font-weight: 550!important;
+  font-size: 14px!important;
+}
+
+.form-control.is-valid {
+  color: #212721;
+}
+    // .Country-bartext{margin-left: 34%;}
+    // .region-bartext{margin-left: -25px;}
+    // .otherfeild-text{margin-left: -37%;}
+    // .planning-text{    margin-left: 0px;}
+
+    .background-red {
+      background-color: red;
     }
 
-    .Country-bartext{margin-left: 34%;}
-    .region-bartext{margin-left: -25px;}
-    .otherfeild-text{margin-left: -37%;}
-    .planning-text{    margin-left: 0px;}
+    

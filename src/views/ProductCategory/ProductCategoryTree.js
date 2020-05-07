@@ -434,12 +434,12 @@ export default class ProductCategoryTree extends Component {
             <div className="animated fadeIn">
                 <h5 className="red">{this.state.message}</h5>
                 <Row>
-                    <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
-                        <Card>
-                            <CardHeader>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                        <Card className="mb-lg-0">
+                            <CardHeader className="pb-lg-1">
                                 <strong>Product Category</strong>
                             </CardHeader>
-                            <CardBody>
+                            <CardBody className="pb-lg-0">
                                 <Col md="3 pl-0" >
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
@@ -465,7 +465,7 @@ export default class ProductCategoryTree extends Component {
                 </Row>
 
                 <Row id="treeDiv" style={{ display: "none" }}>
-                    <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardBody>
                                 <Formik
@@ -491,7 +491,7 @@ export default class ProductCategoryTree extends Component {
                                                 <Form onSubmit={handleSubmit} noValidate name='productCategoryForm'>
                                                     <FormGroup>
                                                         <Row>
-                                                            <Col md={8}>
+                                                            <Col md={4} className="pr-lg-1">
                                                                 <Label for="product category">{i18n.t('static.productCategory.productCategoryName')}</Label>
                                                                 <Input
                                                                     type="text"
@@ -504,8 +504,8 @@ export default class ProductCategoryTree extends Component {
                                                                     name="productCategory" />
                                                                 <FormFeedback className="red">{errors.productCategory}</FormFeedback>
                                                             </Col>
-                                                            <Col md={2} style={{ paddingTop: '29px' }}>
-                                                                <Button type="submit" size="sm" color="info" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>Add</Button>
+                                                            <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
+                                                                <Button  className="text-white" type="submit" size="sm" color="info" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>Add</Button>
                                                             </Col>
                                                         </Row>
                                                     </FormGroup>
