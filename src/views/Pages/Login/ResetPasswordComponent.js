@@ -7,6 +7,7 @@ import AuthenticationService from '../../Common/AuthenticationService.js';
 import { Online } from "react-detect-offline";
 import UserService from '../../../api/UserService'
 import i18n from '../../../i18n'
+import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import image1 from '../../../assets/img/QAT-logo.png';
 
 
@@ -122,7 +123,7 @@ class ResetPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <div className="Login-component">
+                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center">
                             <Col md="12">

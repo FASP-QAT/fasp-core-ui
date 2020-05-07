@@ -1101,7 +1101,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                             {regions}
                                                                         </Input>
                                                                         <InputGroupAddon addonType="append">
-                                                                            <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                                                            &nbsp;<Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                 </div>
@@ -1109,7 +1109,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                         </div>
                                                     </Col>
                                                 </Form>
+                                                
                                             )} />
+                                            
                                 <Table bordered responsive size="sm" options={this.options} id="supplyPlanTableId" style={{ display: 'none' }}>
                                     <thead>
                                         <tr>
