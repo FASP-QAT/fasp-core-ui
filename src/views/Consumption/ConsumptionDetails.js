@@ -837,7 +837,7 @@ export default class ConsumptionDetails extends React.Component {
                             region: {
                                 id: map.get("1")
                             },
-                            consumptionQty: parseInt(map.get("2")),
+                            consumptionQty: map.get("2"),
                             dayOfStockOut: parseInt(map.get("3")),
                             startDate: map.get("4"),
                             stopDate: map.get("5"),

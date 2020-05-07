@@ -166,117 +166,6 @@ export default class ConsumptionDetails extends React.Component {
 
                             var expectedDeliveryDate = this.addDays(new Date(), expectedDeliveryInDays);
 
-                            // Get inventory data from program
-                            var plannigUnitId = document.getElementById("planningUnitId").value;
-                            // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId);
-                            var shipmentList = '';
-                            this.setState({
-                                shipmentList: shipmentList
-                            });
-
-                            var data = [];
-                            var shipmentDataArr = []
-                            if (shipmentList.length == 0) {
-                                data = [];
-                                shipmentDataArr[0] = data;
-                            }
-                            // for (var j = 0; j < shipmentList.length; j++) {
-                            //     data = [];
-                            //     data[0] = shipmentList[j].dataSource.id;
-                            //     data[1] = shipmentList[j].region.id;
-                            //     data[2] = shipmentList[j].consumptionQty;
-                            //     data[3] = shipmentList[j].dayOfStockOut;
-                            //     data[4] = shipmentList[j].startDate;
-                            //     data[5] = shipmentList[j].stopDate;
-                            //     data[6] = shipmentList[j].actualFlag;
-
-                            //     shipmentDataArr[j] = data;
-                            // }
-
-                            data = [];
-                            data[0] = '';
-                            data[1] = expectedDeliveryDate;
-                            data[2] = '01-SUGGESTED';
-                            data[3] = planningUnitText;
-                            data[4] = '44,773';
-                            data[5] = '';
-                            data[6] = '';
-
-                            shipmentDataArr[0] = data;
-
-                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                            this.el.destroy();
-                            var json = [];
-                            var data = shipmentDataArr;
-                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                            // json[0] = data;
-                            var options = {
-                                data: data,
-                                columnDrag: true,
-                                colWidths: [150, 150, 150, 150, 150, 150, 150],
-                                columns: [
-                                    // { title: 'Month', type: 'text', readOnly: true },
-                                    {
-                                        title: 'Qat Order No',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Expected Delivery date',
-                                        // type: 'calendar',
-                                        type: 'text',
-                                        readOnly: true
-
-                                    },
-                                    {
-                                        title: 'Shipment Status',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Planning Unit',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Suggested Order Qty',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Adjusted Order Qty',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Notes',
-                                        type: 'text'
-                                    }
-
-                                ],
-                                pagination: 10,
-                                search: true,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                onchange: this.changed,
-                                oneditionend: this.onedit,
-                                copyCompatibility: true,
-                                paginationOptions: [10, 25, 50, 100],
-                                position: 'top'
-                            };
-
-                            this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-                        }.bind(this)
-                    }
-                    if (shipmentStatusId == 2) {
-
-                        document.getElementById("addButton").style.display = "none";
-                        programRequest1.onsuccess = function (event) {
-
                             var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
                             var procurementAgentRequest = procurementAgentOs.getAll();
@@ -324,21 +213,12 @@ export default class ConsumptionDetails extends React.Component {
                                             budgetList[k] = budgetJson
                                         }
 
-                                        console.log("fundingSourceList-----",fundingSourceList)
-                                        console.log("budgetList---------",budgetList);
-                                        console.log("procurementAgentList",procurementAgentList);
 
 
-
-
-
-
-
-
-
-                                        // var shipmentList = (programJson.shipmentList);
+                                        // Get inventory data from program
+                                        var plannigUnitId = document.getElementById("planningUnitId").value;
+                                        // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId && c.shipmentStatus.id == 1);
                                         var shipmentList = '';
-
                                         this.setState({
                                             shipmentList: shipmentList
                                         });
@@ -351,42 +231,30 @@ export default class ConsumptionDetails extends React.Component {
                                         }
 
                                         // for (var j = 0; j < shipmentList.length; j++) {
-                                        //     if (shipmentList[j].shipmentId == 0 && shipmentList[j].shipmentStatusId == 1) {
-                                        //         data = [];
-                                        //         data[0] = shipmentList[j].dataSource.id;
-                                        //         data[1] = shipmentList[j].region.id;
-                                        //         data[2] = shipmentList[j].consumptionQty;
-                                        //         data[3] = shipmentList[j].dayOfStockOut;
-                                        //         data[4] = shipmentList[j].startDate;
-                                        //         data[5] = shipmentList[j].stopDate;
-                                        //         data[6] = shipmentList[j].actualFlag;
-                                        //     }
+                                        //     data = [];
+                                        //     data[0] = shipmentList[j].dataSource.id;
+                                        //     data[1] = shipmentList[j].region.id;
+                                        //     data[2] = shipmentList[j].consumptionQty;
+                                        //     data[3] = shipmentList[j].dayOfStockOut;
+                                        //     data[4] = shipmentList[j].startDate;
+                                        //     data[5] = shipmentList[j].stopDate;
+                                        //     data[6] = shipmentList[j].actualFlag;
 
                                         //     shipmentDataArr[j] = data;
                                         // }
 
                                         data = [];
-                                        data[0] = 0;
-                                        data[1] = '10-09-2020';
+                                        data[0] = '';
+                                        // data[1] = expectedDeliveryDate;
+                                        data[1] = '10-31-2020';
                                         data[2] = '01-SUGGESTED';
-                                        data[3] = '';
-                                        data[4] = '';
+                                        data[3] = planningUnitText;
+                                        data[4] = '44773';
                                         data[5] = '';
-                                        data[6] = planningUnitText;
-                                        data[7] = '44,773';
-                                        data[8] = '45,000'; //moq
-                                        data[9] = '30.00';
-                                        data[10] = '1.50';
-                                        data[11] = '';
-                                        data[12] = '';
-                                        data[13] = '';
-                                        data[14] = '60,000 ';
-                                        data[15] = '40.00';
-                                        data[16] = '2.00';
-                                        data[17] = '$8.73';
-                                        data[18] = '$7.83';
-                                        data[19] = '$469,800.00';
-                                        data[20] = '';
+                                        data[6] = '';
+                                        data[7] = '';
+                                        data[8] = '';
+                                        data[9] = '';
 
                                         shipmentDataArr[0] = data;
 
@@ -399,7 +267,7 @@ export default class ConsumptionDetails extends React.Component {
                                         var options = {
                                             data: data,
                                             columnDrag: true,
-                                            colWidths: [100, 100, 100, 100, 100, 100, 100,100, 100, 100, 100, 100, 100, 100,100, 100, 100, 100, 100, 100, 100],
+                                            colWidths: [150, 150, 150, 150, 150, 150, 150, 150, 150, 150],
                                             columns: [
                                                 // { title: 'Month', type: 'text', readOnly: true },
                                                 {
@@ -420,6 +288,21 @@ export default class ConsumptionDetails extends React.Component {
                                                     readOnly: true
                                                 },
                                                 {
+                                                    title: 'Planning Unit',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Suggested Order Qty',
+                                                    type: 'number',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Adjusted Order Qty',
+                                                    type: 'number',
+                                                    readOnly: true
+                                                },
+                                                {
                                                     title: 'Procurement Agent',
                                                     type: 'dropdown',
                                                     source: procurementAgentList,
@@ -435,78 +318,9 @@ export default class ConsumptionDetails extends React.Component {
                                                     source: budgetList,
                                                 },
                                                 {
-                                                    title: 'Planning Unit',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Suggested Order Qty',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'MoQ',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'No of Pallets',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'No of Containers',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Order based on',
-                                                    type: 'dropdown',
-                                                    source:[{id:1,name:'Container'},{id:2,name:'Suggested Order Qty'},{id:3,name:'MoQ'},{id:4,name:'Pallet'}]
-                                                    
-                                                },
-                                                {
-                                                    title: 'Rounding option',
-                                                    type: 'dropdown',
-                                                    source:[{id:1,name:'Round Up'},{id:2,name:'Round Down'}]
-                                                },
-                                                {
-                                                    title: 'User Qty',
-                                                    type: 'text',
-                                                },
-                                                {
-                                                    title: 'Adjusted Order Qty',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Pallets',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Containers',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Manual Price per Planning Unit',
-                                                    type: 'text',
-                                                },
-                                                {
-                                                    title: 'Price per Planning Unit',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Amt',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
                                                     title: 'Notes',
                                                     type: 'text'
-                                                }
+                                                },
 
                                             ],
                                             pagination: 10,
@@ -525,11 +339,235 @@ export default class ConsumptionDetails extends React.Component {
                                         };
 
                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-
-
                                     }.bind(this)
                                 }.bind(this)
                             }.bind(this)
+                        }.bind(this)
+                    }
+                    if (shipmentStatusId == 2) {
+
+                        document.getElementById("addButton").style.display = "none";
+                        programRequest1.onsuccess = function (event) {
+
+
+
+                            // console.log("fundingSourceList-----",fundingSourceList)
+                            // console.log("budgetList---------",budgetList);
+                            // console.log("procurementAgentList",procurementAgentList);
+
+
+
+
+                            // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId && c.shipmentStatus.id == 2);
+                            var shipmentList = '';
+
+                            this.setState({
+                                shipmentList: shipmentList
+                            });
+
+                            var data = [];
+                            var shipmentDataArr = []
+                            if (shipmentList.length == 0) {
+                                data = [];
+                                shipmentDataArr[0] = data;
+                            }
+
+                            // for (var j = 0; j < shipmentList.length; j++) {
+                            //     if (shipmentList[j].shipmentId == 0 && shipmentList[j].shipmentStatusId == 1) {
+                            //         data = [];
+                            //         data[0] = shipmentList[j].dataSource.id;
+                            //         data[1] = shipmentList[j].region.id;
+                            //         data[2] = shipmentList[j].consumptionQty;
+                            //         data[3] = shipmentList[j].dayOfStockOut;
+                            //         data[4] = shipmentList[j].startDate;
+                            //         data[5] = shipmentList[j].stopDate;
+                            //         data[6] = shipmentList[j].actualFlag;
+                            //     }
+
+                            //     shipmentDataArr[j] = data;
+                            // }
+
+                            data = [];
+                            data[0] = '';
+                            data[1] = '10-09-2020';
+                            data[2] = '02-PLANNED';
+                            data[3] = 'PSM';
+                            data[4] = 'USAID';
+                            data[5] = 'Kenya - 2020 budget	';
+                            data[6] = planningUnitText;
+                            data[7] = '44773';
+                            data[8] = '45000'; //moq
+                            data[9] = '30.00';
+                            data[10] = '1.50';
+                            data[11] = '';
+                            data[12] = '';
+                            data[13] = '';
+                            data[14] = '';
+                            data[15] = '';
+                            data[16] = '';
+                            data[17] = '';
+                            data[18] = '7.83';
+                            data[19] = '';
+                            data[20] = '';
+                            data[21] = false;
+                            data[22] = 'dgre43';
+                            data[23] = '1500';
+                            data[24] = '30000';
+
+                            shipmentDataArr[0] = data;
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                            this.el.destroy();
+                            var json = [];
+                            var data = shipmentDataArr;
+                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                            // json[0] = data;
+                            var options = {
+                                data: data,
+                                columnDrag: true,
+                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                columns: [
+                                    // { title: 'Month', type: 'text', readOnly: true },
+                                    {
+                                        title: 'Qat Order No',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Expected Delivery date',
+                                        // type: 'calendar',
+                                        type: 'text',
+                                        readOnly: true
+
+                                    },
+                                    {
+                                        title: 'Shipment Status',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Procurement Agent',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Funding Source',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Budget',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Planning Unit',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Suggested Order Qty',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'MoQ',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'No of Pallets',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'No of Containers',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Order based on',
+                                        type: 'dropdown',
+                                        source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }]
+
+                                    },
+                                    {
+                                        title: 'Rounding option',
+                                        type: 'dropdown',
+                                        source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }]
+                                    },
+                                    {
+                                        title: 'User Qty',
+                                        type: 'text',
+                                    },
+                                    {
+                                        title: 'Adjusted Order Qty',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Pallets',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Containers',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Manual Price per Planning Unit',
+                                        type: 'text',
+                                    },
+                                    {
+                                        title: 'Price per Planning Unit',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Amt',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Notes',
+                                        type: 'text'
+                                    },
+                                    {
+                                        title: 'Cancelled Order',
+                                        type: 'checkbox'
+                                    },
+                                    {
+                                        title: 'RO Number',
+                                        type: 'text'
+                                    },
+                                    {
+                                        title: 'Unit/Pallet',
+                                        type: 'hidden'
+                                    },
+                                    {
+                                        title: 'Unit/Container',
+                                        type: 'hidden'
+                                    }
+
+                                ],
+                                pagination: 10,
+                                search: true,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onchange: this.changed,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true,
+                                paginationOptions: [10, 25, 50, 100],
+                                position: 'top'
+                            };
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
                         }.bind(this)
                     }
                 } else {
@@ -548,6 +586,9 @@ export default class ConsumptionDetails extends React.Component {
 
     addRow = function () {
         // document.getElementById("saveButtonDiv").style.display = "block";
+        var procurementAgentList = [];
+        var fundingSourceList = [];
+        var budgetList = [];
 
         var programId = document.getElementById("programId").value;
 
@@ -578,24 +619,79 @@ export default class ConsumptionDetails extends React.Component {
                 var sel = document.getElementById("planningUnitId");
                 var planningUnitText = sel.options[sel.selectedIndex].text;
 
-                var data = [];
-                data[0] = '';
-                data[1] = expectedDeliveryDate;
-                data[2] = '01-SUGGESTED';
-                data[3] = planningUnitText;
-                data[4] = '';
-                data[5] = '';
-                data[6] = '';
-                this.el.insertRow(
-                    data
-                );
+                var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+                var procurementAgentRequest = procurementAgentOs.getAll();
+
+                procurementAgentRequest.onsuccess = function (event) {
+                    var procurementAgentResult = [];
+                    procurementAgentResult = procurementAgentRequest.result;
+                    for (var k = 0; k < procurementAgentResult.length; k++) {
+                        var procurementAgentJson = {
+                            name: procurementAgentResult[k].label.label_en,
+                            id: procurementAgentResult[k].procurementAgentId
+                        }
+                        procurementAgentList[k] = procurementAgentJson
+                    }
 
 
+                    var fundingSourceTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                    var fundingSourceOs = fundingSourceTransaction.objectStore('fundingSource');
+                    var fundingSourceRequest = fundingSourceOs.getAll();
+
+                    fundingSourceRequest.onsuccess = function (event) {
+                        var fundingSourceResult = [];
+                        fundingSourceResult = fundingSourceRequest.result;
+                        for (var k = 0; k < fundingSourceResult.length; k++) {
+                            var fundingSourceJson = {
+                                name: fundingSourceResult[k].label.label_en,
+                                id: fundingSourceResult[k].fundingSourceId
+                            }
+                            fundingSourceList[k] = fundingSourceJson
+                        }
 
 
+                        var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+                        var budgetOs = budgetTransaction.objectStore('budget');
+                        var budgetRequest = budgetOs.getAll();
+
+                        budgetRequest.onsuccess = function (event) {
+                            var budgetResult = [];
+                            budgetResult = budgetRequest.result;
+                            for (var k = 0; k < budgetResult.length; k++) {
+                                var budgetJson = {
+                                    name: budgetResult[k].label.label_en,
+                                    id: budgetResult[k].budgetId
+                                }
+                                budgetList[k] = budgetJson
+                            }
+
+
+                            var data = [];
+                            data[0] = '';
+                            data[1] = expectedDeliveryDate;
+                            data[2] = '01-SUGGESTED';
+                            data[3] = planningUnitText;
+                            data[4] = '';
+                            data[5] = '';
+                            data[6] = '';
+                            data[7] = '';
+                            data[8] = '';
+                            data[9] = '';
+
+                            // var col = ("E");
+                            // this.el.removeClass(col, 'readonly');
+
+                            this.el.insertRow(
+                                data
+                            );
+
+
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
             }.bind(this)
         }.bind(this)
-
 
     };
 
@@ -604,7 +700,7 @@ export default class ConsumptionDetails extends React.Component {
         var dd = someDate.getDate();
         var mm = someDate.getMonth() + 1;
         var y = someDate.getFullYear();
-        var someFormattedDate = dd + '-' + mm + '-' + y;
+        var someFormattedDate = mm + '-' + dd + '-' + y;
         return someFormattedDate;
     }.bind(this)
 
@@ -888,7 +984,7 @@ export default class ConsumptionDetails extends React.Component {
 
 
     changed = function (instance, cell, x, y, value) {
-
+        // console.log("VALUE----------",value);
         // this.setState({
         //     changedFlag: 1
         // })
@@ -999,9 +1095,1170 @@ export default class ConsumptionDetails extends React.Component {
         //     }
         // }
 
-        // this.setState({
-        //     changedFlag: 1
-        // })
+
+
+        //---------------------------
+        this.setState({
+            changedFlag: 1
+        })
+        var shipmentStatusId = document.getElementById('shipmentId').value;
+        if (shipmentStatusId == 1) {
+            if (x == 6) {
+                var col = ("G").concat(parseInt(y) + 1);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 8) {
+                var col = ("I").concat(parseInt(y) + 1);
+                if (value == "") {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+
+        }
+        if (shipmentStatusId == 2) {
+            // if (x == 11 || x == 12 || x == 13) {
+
+            var isValidForManualPrice = true;
+            var isValidForUserQty = true;
+
+            console.log("CHECK oF XXXXXXXXXXX ", x);
+            if (x == 11 && isValidForManualPrice && isValidForUserQty) {
+                var rowData = this.el.getRowData(y);
+                var orderBasedOn = rowData[11];
+                var roundingOption = rowData[12];
+
+
+                if (value == "") {
+
+                    var col = ("L").concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+
+                } else {
+                    var col = ("L").concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+
+                    if (this.el.getValueFromCoords(13, y) == "") {
+                        //Calculation based on Suggested order quantity
+                        console.log("IF Calculation based on Suggested order quantity");
+
+                        if (roundingOption != "") {
+                            //calculation based on Rounding Options
+                            console.log("IF calculation based on Rounding Options");
+
+                            //checking the value of dropdown of order based on
+                            if (value == 1) {
+                                //container
+                                console.log("IF container");
+
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                if (roundingOption == 1) {
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(24, y)), true);
+                                } else {
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(24, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(24, y), true);
+                                    }
+                                }
+
+
+                            } else if (value == 4) {
+                                //Pallet
+                                console.log("IF pallet");
+
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                if (roundingOption == 1) {
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(23, y)), true);
+                                } else {
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(23, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(23, y), true);
+                                    }
+                                }
+
+                            }
+
+
+                            if (this.el.getValueFromCoords(14, y) != "") {
+
+                                //set adjust pallet and container 
+                                this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                            }
+
+
+                        }
+
+                        if (value == 2) {
+                            //suggested order quantity
+                            console.log("IF suggested order quantity");
+                            if (this.el.getValueFromCoords(7, y) < this.el.getValueFromCoords(8, y)) {
+                                this.el.setValueFromCoords(13, y, '', true);
+                                this.el.setValueFromCoords(14, y, '', true);
+                                this.el.setValueFromCoords(15, y, '', true);
+                                this.el.setValueFromCoords(16, y, '', true);
+                                this.el.setValueFromCoords(19, y, '', true);
+                                alert("Sorry! Suggested order quantity is less than MoQ")
+                            } else {
+                                this.el.setValueFromCoords(13, y, '', true);
+                                this.el.setValueFromCoords(14, y, this.el.getValueFromCoords(7, y), true);
+                            }
+
+                        } else if (value == 3) {
+                            //MOQ
+                            console.log("MOQ-----------");
+                            this.el.setValueFromCoords(13, y, '', true);
+                            this.el.setValueFromCoords(14, y, this.el.getValueFromCoords(8, y), true);
+                            // this.el.setValueFromCoords(14, y, 1, true);
+
+                        }
+
+
+                    } else {
+                        //calculation based on user quantity
+                        console.log("ELSE Calculation based on Suggested order quantity");
+
+                        if (roundingOption != "") {
+                            //calculation based on Rounding Options
+
+                            //checking the value of dropdown of order based on
+                            if (value == 1) {
+                                //container
+
+                                var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                if (roundingOption == 1) {
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(24, y)), true);
+                                } else {
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(24, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(24, y), true);
+                                    }
+                                }
+
+
+                            } else if (value == 4) {
+                                //Pallet
+
+                                var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                if (roundingOption == 1) {
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(23, y)), true);
+                                } else {
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(23, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(23, y), true);
+                                    }
+                                }
+
+                            }
+
+                            if (this.el.getValueFromCoords(14, y) != "") {
+
+                                //set adjust pallet and container 
+                                this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                            }
+
+
+                        }
+
+                        if (value == 2) {
+                            //suggested order quantity
+                            if (this.el.getValueFromCoords(7, y) < this.el.getValueFromCoords(8, y)) {
+                                this.el.setValueFromCoords(13, y, '', true);
+                                this.el.setValueFromCoords(14, y, '', true);
+                                this.el.setValueFromCoords(15, y, '', true);
+                                this.el.setValueFromCoords(16, y, '', true);
+                                this.el.setValueFromCoords(19, y, '', true);
+                                alert("Sorry! Suggested order quantity is less than MoQ")
+                            } else {
+                                this.el.setValueFromCoords(13, y, '', true);
+                                this.el.setValueFromCoords(14, y, this.el.getValueFromCoords(7, y), true);
+                            }
+
+                        } else if (value == 3) {
+                            //MOQ
+                            this.el.setValueFromCoords(13, y, '', true);
+                            this.el.setValueFromCoords(14, y, this.el.getValueFromCoords(8, y), true);
+
+                        }
+
+                    }
+
+
+
+                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                        //set adjust Amt
+                        // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                        // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                        if (this.el.getValueFromCoords(17, y) != "") {
+                            this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                        } else {
+                            this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                        }
+
+
+                    }
+
+
+                }
+
+
+
+
+            }
+
+
+            //*************************2222222222222222******************************
+
+
+            if (x == 12 && isValidForManualPrice && isValidForUserQty) {
+                var rowData = this.el.getRowData(y);
+                var orderBasedOn = rowData[11];
+                var roundingOption = rowData[12];
+
+
+                if (this.el.getValueFromCoords(13, y) == "") {
+                    //Calculation based on Suggested order quantity
+                    console.log("IF Calculation based on Suggested order quantity");
+
+                    if (value != "") {
+                        //calculation based on Rounding Options
+                        console.log("IF calculation based on Rounding Options");
+
+                        //checking the value of dropdown of Rounding Option
+                        if (value == 1) {
+                            //Rounding Up
+                            console.log("Rounding Up--->>>", this.el.getRowData(y));
+
+                            if (orderBasedOn == 1) {
+                                //order based on conrainer
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+                                console.log("modulusUp--", modulusUp);
+                                console.log("modulusDown--", modulusDown);
+                                console.log("Result--", parseInt(modulusUp * this.el.getValueFromCoords(24, y)));
+
+
+                                this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(24, y)), true);
+
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+
+                            } else if (orderBasedOn == 4) {
+                                //order based on pallet
+
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+
+                                this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(23, y)), true);
+
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+                            }
+
+
+
+                        } else {
+                            //Rounding Down
+                            console.log("Rounding Down");
+                            if (orderBasedOn == 1) {
+                                //order based on conrainer
+
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+
+                                if (parseInt(modulusDown * this.el.getValueFromCoords(24, y)) < this.el.getValueFromCoords(8, y)) {
+                                    this.el.setValueFromCoords(14, y, '', true);
+                                    this.el.setValueFromCoords(15, y, '', true);
+                                    this.el.setValueFromCoords(16, y, '', true);
+                                    this.el.setValueFromCoords(19, y, '', true);
+                                    alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                } else {
+                                    // this.el.setValueFromCoords(12, y, 1, true);
+                                    this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(24, y), true);
+                                }
+
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+
+
+
+
+
+                            } else if (orderBasedOn == 4) {
+                                //order based on pallet
+
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+
+                                if (parseInt(modulusDown * this.el.getValueFromCoords(23, y)) < this.el.getValueFromCoords(8, y)) {
+                                    this.el.setValueFromCoords(14, y, '', true);
+                                    this.el.setValueFromCoords(15, y, '', true);
+                                    this.el.setValueFromCoords(16, y, '', true);
+                                    this.el.setValueFromCoords(19, y, '', true);
+                                    alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                } else {
+                                    // this.el.setValueFromCoords(12, y, 1, true);
+                                    this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(23, y), true);
+                                }
+
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+
+
+                            }
+
+                        }
+                    }
+                } else {
+                    //Calculation based on user quantity
+
+                    if (value != "") {
+                        //calculation based on Rounding Options
+                        console.log("IF calculation based on Rounding Options");
+
+                        //checking the value of dropdown of Rounding Option
+                        if (value == 1) {
+                            //Rounding Up
+                            console.log("Rounding Up");
+
+                            if (orderBasedOn == 1) {
+                                //order based on conrainer
+                                var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                if (value == 1) {
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(24, y)), true);
+                                }
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+
+                            } else if (orderBasedOn == 4) {
+                                //order based on pallet
+
+                                var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                if (value == 1) {
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(23, y)), true);
+                                }
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+                            }
+
+
+
+                        } else {
+                            //Rounding Down
+                            console.log("Rounding Down");
+                            if (orderBasedOn == 1) {
+                                //order based on conrainer
+
+                                var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+                                console.log("MODULUS UP--------", modulusUp);
+                                console.log("MODULUS DOWN-------", modulusDown);
+                                console.log("parseInt(modulusDown * this.el.getValueFromCoords(24, y)", parseInt(modulusDown * this.el.getValueFromCoords(24, y)));
+                                console.log("this.el.getValueFromCoords(8, y)", this.el.getValueFromCoords(8, y));
+
+                                if (parseInt(modulusDown * this.el.getValueFromCoords(24, y)) < this.el.getValueFromCoords(8, y)) {
+                                    console.log("----------IF------------");
+                                    this.el.setValueFromCoords(14, y, '', true);
+                                    this.el.setValueFromCoords(15, y, '', true);
+                                    this.el.setValueFromCoords(16, y, '', true);
+                                    this.el.setValueFromCoords(19, y, '', true);
+                                    alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                } else {
+                                    console.log("----------ELSE------------");
+                                    // this.el.setValueFromCoords(12, y, 1, true);
+                                    this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(24, y), true);
+                                }
+
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+
+
+
+
+
+                            } else if (orderBasedOn == 4) {
+                                //order based on pallet
+
+                                var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                if (value == 2) {
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(23, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(23, y), true);
+                                    }
+                                }
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+
+
+                            }
+
+                        }
+                    }
+
+
+
+                }
+
+                if (this.el.getValueFromCoords(14, y) != "") {
+
+                    //set adjust Amt
+                    // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                    // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                    if (this.el.getValueFromCoords(17, y) != "") {
+                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                    } else {
+                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                    }
+
+
+                }
+
+            }
+
+
+            //*************************************333333333333*******************************************
+
+            if (x == 13) {
+                var reg = /^[0-9\b]+$/;
+                var col = ("N").concat(parseInt(y) + 1);
+
+                var rowData = this.el.getRowData(y);
+                var orderBasedOn = rowData[11];
+                var roundingOption = rowData[12];
+
+
+                if (value != "") {
+                    if (!(reg.test(value)) || isNaN(value) || value == 0) {
+                        // console.log("if----------Problem-------------");
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        isValidForUserQty = false;
+
+                        this.el.setValueFromCoords(14, y, '', true);
+                        this.el.setValueFromCoords(15, y, '', true);
+                        this.el.setValueFromCoords(16, y, '', true);
+                        this.el.setValueFromCoords(19, y, '', true);
+
+                    } else {
+                        // console.log("else---------Not a problem------------");
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        isValidForUserQty = true;
+
+
+                        if (value != "" && isValidForManualPrice && isValidForUserQty) {
+                            //Calculation based on user Qty
+
+                            if (roundingOption == 1) {
+                                //calculation based on Rounding up
+
+
+                                if (orderBasedOn == 1) {
+                                    //order based on conrainer
+                                    var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(24, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(24, y)), true);
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+                                } else if (orderBasedOn == 4) {
+                                    //For pallet
+                                    var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(23, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(23, y)), true);
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+
+                                }
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust Amt
+                                    // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                                    if (this.el.getValueFromCoords(17, y) != "") {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                                    } else {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                                    }
+
+                                }
+
+
+
+                            } else {
+                                //calculation based on Rounding down
+
+                                if (orderBasedOn == 1) {
+                                    //Based on container
+
+                                    var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(24, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(24, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(24, y), true);
+                                    }
+
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+
+
+
+                                } else if (orderBasedOn == 4) {
+                                    //Based on Pallet
+
+                                    var modulus = this.el.getValueFromCoords(13, y) / this.el.getValueFromCoords(23, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(23, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(23, y), true);
+                                    }
+
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+                                }
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust Amt
+                                    // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                                    if (this.el.getValueFromCoords(17, y) != "") {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                                    } else {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                                    }
+
+                                }
+
+
+
+                            }
+
+                        } else {
+                            //order based on Suggested order quatity
+
+                            if (roundingOption == 1) {
+                                //calculation based on Rounding up
+
+
+                                if (orderBasedOn == 1) {
+                                    //order based on conrainer
+                                    var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(24, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(24, y)), true);
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+                                } else if (orderBasedOn == 4) {
+                                    //For pallet
+                                    var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(23, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+                                    this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(23, y)), true);
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+
+                                }
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust Amt
+                                    // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                                    if (this.el.getValueFromCoords(17, y) != "") {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                                    } else {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                                    }
+
+                                }
+
+
+
+                            } else {
+                                //calculation based on Rounding down
+
+                                if (orderBasedOn == 1) {
+                                    //Based on container
+
+                                    var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(24, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(24, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(24, y), true);
+                                    }
+
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+
+
+
+                                } else if (orderBasedOn == 4) {
+                                    //Based on Pallet
+
+                                    var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(23, y);
+                                    modulus = parseInt(Math.ceil(modulus));
+                                    var modulusUp = modulus;
+                                    var modulusDown = modulus - 1;
+                                    if (modulusDown == 0) {
+                                        modulusDown = 1;
+                                    }
+
+
+                                    if (parseInt(modulusDown * this.el.getValueFromCoords(23, y)) < this.el.getValueFromCoords(8, y)) {
+                                        this.el.setValueFromCoords(14, y, '', true);
+                                        this.el.setValueFromCoords(15, y, '', true);
+                                        this.el.setValueFromCoords(16, y, '', true);
+                                        this.el.setValueFromCoords(19, y, '', true);
+                                        alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                    } else {
+                                        // this.el.setValueFromCoords(12, y, 1, true);
+                                        this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(23, y), true);
+                                    }
+
+
+                                    if (this.el.getValueFromCoords(14, y) != "") {
+
+                                        //set adjust pallet and container 
+                                        this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                        this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                    }
+                                }
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust Amt
+                                    // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                                    if (this.el.getValueFromCoords(17, y) != "") {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                                    } else {
+                                        this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    isValidForUserQty = true;
+
+
+                    if (isValidForManualPrice) {
+                        if (roundingOption == 1) {
+                            //calculation based on Rounding up
+
+
+                            if (orderBasedOn == 1) {
+                                //order based on conrainer
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(24, y)), true);
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+                            } else if (orderBasedOn == 4) {
+                                //For pallet
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+                                this.el.setValueFromCoords(14, y, parseInt(modulusUp * this.el.getValueFromCoords(23, y)), true);
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+                            }
+
+                            if (this.el.getValueFromCoords(14, y) != "") {
+
+                                //set adjust Amt
+                                // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                                if (this.el.getValueFromCoords(17, y) != "") {
+                                    this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                                } else {
+                                    this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                                }
+
+                            }
+
+
+
+                        } else {
+                            //calculation based on Rounding down
+
+                            if (orderBasedOn == 1) {
+                                //Based on container
+
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(24, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+
+                                if (parseInt(modulusDown * this.el.getValueFromCoords(24, y)) < this.el.getValueFromCoords(8, y)) {
+                                    this.el.setValueFromCoords(14, y, '', true);
+                                    this.el.setValueFromCoords(15, y, '', true);
+                                    this.el.setValueFromCoords(16, y, '', true);
+                                    this.el.setValueFromCoords(19, y, '', true);
+                                    alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                } else {
+                                    // this.el.setValueFromCoords(12, y, 1, true);
+                                    this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(24, y), true);
+                                }
+
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+
+
+
+                            } else if (orderBasedOn == 4) {
+                                //Based on Pallet
+
+                                var modulus = this.el.getValueFromCoords(7, y) / this.el.getValueFromCoords(23, y);
+                                modulus = parseInt(Math.ceil(modulus));
+                                var modulusUp = modulus;
+                                var modulusDown = modulus - 1;
+                                if (modulusDown == 0) {
+                                    modulusDown = 1;
+                                }
+
+
+                                if (parseInt(modulusDown * this.el.getValueFromCoords(23, y)) < this.el.getValueFromCoords(8, y)) {
+                                    this.el.setValueFromCoords(14, y, '', true);
+                                    this.el.setValueFromCoords(15, y, '', true);
+                                    this.el.setValueFromCoords(16, y, '', true);
+                                    this.el.setValueFromCoords(19, y, '', true);
+                                    alert("Sorry! Rounding Down options goes Adjested order quantity below the MoQ.");
+                                } else {
+                                    // this.el.setValueFromCoords(12, y, 1, true);
+                                    this.el.setValueFromCoords(14, y, modulusDown * this.el.getValueFromCoords(23, y), true);
+                                }
+
+
+                                if (this.el.getValueFromCoords(14, y) != "") {
+
+                                    //set adjust pallet and container 
+                                    this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                    this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+
+                                }
+                            }
+
+                            if (this.el.getValueFromCoords(14, y) != "") {
+
+                                //set adjust Amt
+                                // this.el.setValueFromCoords(15, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(23, y), true);//set Adjusted pallet
+                                // this.el.setValueFromCoords(16, y, this.el.getValueFromCoords(14, y) / this.el.getValueFromCoords(24, y), true);//set Adjusted container
+                                if (this.el.getValueFromCoords(17, y) != "") {
+                                    this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y)), true);
+                                } else {
+                                    this.el.setValueFromCoords(19, y, (this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y)), true);
+                                }
+
+                            }
+
+                        }
+
+
+                    }
+
+
+
+
+
+
+                }
+
+
+
+
+
+
+
+
+
+            }
+
+
+            //***********************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+            if (x == 17) {
+                var col = ("R").concat(parseInt(y) + 1);
+                if (value != "") {
+                    if (isNaN(value) || value <= 0) {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                        isValidForManualPrice = false;
+
+                        this.el.setValueFromCoords(14, y, '', true);
+                        this.el.setValueFromCoords(15, y, '', true);
+                        this.el.setValueFromCoords(16, y, '', true);
+                        this.el.setValueFromCoords(19, y, '', true);
+
+
+                    } else {
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                        isValidForManualPrice = true;
+
+                        if (this.el.getValueFromCoords(17, y) != "" && this.el.getValueFromCoords(17, y) != 0 && isValidForManualPrice && isValidForUserQty) {
+                            this.el.setValueFromCoords(19, y, this.el.getValueFromCoords(17, y) * this.el.getValueFromCoords(14, y), true);
+                        } else {
+                            this.el.setValueFromCoords(19, y, this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y), true);
+                        }
+
+                    }
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                    isValidForManualPrice = true;
+
+                    if (isValidForUserQty) {
+                        this.el.setValueFromCoords(19, y, this.el.getValueFromCoords(18, y) * this.el.getValueFromCoords(14, y), true);
+                    }
+
+                }
+
+
+
+
+            }
+
+        }
 
     }.bind(this)
 
