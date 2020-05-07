@@ -723,8 +723,9 @@ class Consumption extends Component {
         <Row>
           <Col lg="12">
             <Card>
-              <CardHeader className="text-center">
-                <b className="count-text">Consumption Report</b>
+              <CardHeader >
+                {/* <b className="count-text">Consumption Report</b> */}
+              <b>  <i className="icon-menu"></i>&nbsp;&nbsp;<strong>Consumption Report</strong></b>
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <Pdf targetRef={ref} filename="consumption.pdf">
@@ -741,10 +742,12 @@ class Consumption extends Component {
                 <div className="TableCust" >
                   <div className="col-md-15 pr-0"> <div ref={ref}> <div className="col-md-15 pr-0" >
                     <Form >
-                      <Col md="15 pl-0">
-                        <div className="d-md-flex">
-                          <FormGroup>
+                      <Col md="12 pl-0">
+                        <div className="row">
+                          <FormGroup className="col-md-3">
+                            
                             <Label htmlFor="appendedInputButton">Select Period</Label>
+                            <span class="consumption-box-icon fa fa-sort-desc ml-1"></span>
                             <div className="controls SelectGo edit">
 
                               <Picker
@@ -765,7 +768,7 @@ class Consumption extends Component {
 
 
                           <Online>
-                            <FormGroup>
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -786,7 +789,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -814,7 +817,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -842,7 +845,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -868,7 +871,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -894,7 +897,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -923,7 +926,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
