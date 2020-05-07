@@ -48,7 +48,7 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.planningunit.Countrytext')),
         skuCode: Yup.string()
             .required(i18n.t('static.procurementAgentProcurementUnit.skuCodeText')),
-        multiplier: Yup.number()
+        multiplier: Yup.string()
             .required(i18n.t('static.planningunit.multipliertext')).min(0, i18n.t('static.program.validvaluetext')),
         unitId: Yup.string()
             .required(i18n.t('static.product.productunittext')),
@@ -609,7 +609,7 @@ realmCountryPlanningUnitId:'',
                                             <FormFeedback className="red">{errors.label}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}</Label>
+                                            <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="text"
                                                 name="skuCode"
                                                 id="skuCode" bsSize="sm"
@@ -642,7 +642,7 @@ realmCountryPlanningUnitId:'',
                                             <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label for="multiplier">{i18n.t('static.unit.multiplier')}</Label>
+                                            <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="number"
                                                 name="multiplier"
                                                 id="multiplier"
