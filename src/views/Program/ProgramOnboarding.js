@@ -462,34 +462,36 @@ export default class ProgramOnboarding extends Component {
                                 >
                                     <Step transition="scale">
                                         {({ accomplished }) => (
-                                            // <h2>1</h2>
+                                           
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="40"
+                                                width="30"
                                                 // src="https://pngimg.com/uploads/number1/number1_PNG14871.png"
                                                 src="../../../../public/assets/img/numbers/number1.png"
                                             />
                                             
 
                                         )}
-
+                                        
                                     </Step>
+                                   
                                     <Step transition="scale">
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="40"
+                                                width="30"
                                                 src="../../../../public/assets/img/numbers/number2.png"
                                                 // src="https://cdn.clipart.email/096a56141a18c8a5b71ee4a53609b16a_data-privacy-news-five-stories-that-you-need-to-know-about-_688-688.png"
                                             />
                                             // <h2>2</h2>
                                         )}
+                                        
                                     </Step>
                                     <Step transition="scale">
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="40"
+                                                width="30"
                                                 src="../../../../public/assets/img/numbers/number3.png"
                                                 // src="https://www.obiettivocoaching.it/wp-content/uploads/2016/04/recruit-circle-3-icon-blue.png"
                                             />
@@ -500,7 +502,7 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="40"
+                                                width="30"
                                                 src="../../../../public/assets/img/numbers/number4.png"
                                                 // src="https://pngriver.com/wp-content/uploads/2017/12/number-4-digit-png-transparent-images-transparent-backgrounds-4.png"
                                             />
@@ -512,7 +514,7 @@ export default class ProgramOnboarding extends Component {
 
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="40"
+                                                width="30"
                                                 src="../../../../public/assets/img/numbers/number5.png"
                                                 // src="https://dwidude.com/wp-content/uploads/2016/09/recruit-circle-5-icon-blue.png"
                                             />
@@ -523,7 +525,7 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="40"
+                                                width="30"
                                                 src="../../../../public/assets/img/numbers/number6.png"
                                                 // src="http://pngimg.com/uploads/number6/number6_PNG18583.png"
                                             />
@@ -535,7 +537,7 @@ export default class ProgramOnboarding extends Component {
                                         {({ accomplished }) => (
                                             <img
                                                 style={{ filter: `grayscale(${accomplished ? 0 : 80}%)` }}
-                                                width="40"
+                                                width="30"
                                                 src="../../../../public/assets/img/numbers/number7.png"
                                                 // src="https://www.library.ucla.edu/sites/default/files/styles/custom_crop/public/static_images/BYS7.jpg?itok=9890vsGz"
                                             />
@@ -543,65 +545,19 @@ export default class ProgramOnboarding extends Component {
                                         )}
                                     </Step>
                                 </ProgressBar>
+                
+                            <div className="d-sm-down-none  progressbar">
+                                <ul>
+                                    <li className="progressbartext1">Realm</li>
+                                    <li className="progressbartext2">Country</li>
+                                    <li className="progressbartext3">Health Area</li>
+                                    <li className="progressbartext4">Organization</li>
+                                    <li className="progressbartext5">Region</li>
+                                    <li className="progressbartext6">Program Data</li>
+                                    <li className="progressbartext7">Planning Units</li>
+                              </ul>
+                          </div>
 
-                                    
-            <Row className="progress-text" >
-                
-                <Col md="1">
-                <div class="text-center ">Realm</div>
-                
-               </Col>
-                
-               <Col md="2">
-                <div class="text-center Country-bartext">Country</div>
-                
-               </Col>
-                
-               <Col md="2">
-                <div class="text-center ">Health Area</div>
-                
-               </Col>
-                
-               <Col md="2">
-                <div class="text-center ">Organization</div>
-                
-               </Col>
-               <Col md="2">
-                <div class="text-center region-bartext">Region</div>
-                
-               </Col>
-               <Col md="2">
-                <div class="text-center otherfeild-text">Other Field</div>
-                
-               </Col>
-               <Col md="1" className="planning-text">
-                <div class="text-center ">Planning Units</div>
-                
-               </Col>
-            </Row>
-
-                                {/* <div class="checkout-wrap">
-  <ul class="checkout-bar">
-
-    <li class="visited first">
-      Realm
-    </li>
-    
-    <li class="previous visited">Country</li>
-    
-    <li class="active">Health Area</li>
-    
-    <li class="next">Organization</li>
-    
-    <li class="">Region</li>
-    <li class="">Other Field</li>
-
-    <li class="">Planning Units</li>
-
-       
-  </ul>
-</div> */}
-                                <br></br>
                                 <br></br>
                                 <div id="stepOne">
                                     <FormGroup>
@@ -616,7 +572,7 @@ export default class ProgramOnboarding extends Component {
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realms}
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>
@@ -632,9 +588,9 @@ export default class ProgramOnboarding extends Component {
                                             {realmCountries}
                                         </Input>
                                     </FormGroup>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="countrySub" id="countrySub" onClick={this.finishedStepTwo} >Next</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="countrySub" id="countrySub" onClick={this.finishedStepTwo} >Next <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} >Previous</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                     &nbsp;
 
                                 </div>
@@ -652,9 +608,9 @@ export default class ProgramOnboarding extends Component {
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmHealthArea}
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthAreaSub" id="healthAreaSub" onClick={this.finishedStepThree} >Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthAreaSub" id="healthAreaSub" onClick={this.finishedStepThree} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} >Previous</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
 
                                     </FormGroup>
@@ -674,9 +630,9 @@ export default class ProgramOnboarding extends Component {
                                             {realmOrganisation}
 
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationSub" id="organizationSub" onClick={this.finishedStepFour} >Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationSub" id="organizationSub" onClick={this.finishedStepFour} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.previousToStepThree} >Previous</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
 
                                     </FormGroup>
@@ -694,28 +650,29 @@ export default class ProgramOnboarding extends Component {
                                             options={this.state.regionList}
                                             value={this.state.regionId}
                                         />
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} >Previous</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
 
                                     </FormGroup>
                                 </div>
                                 <div id="stepSix">
-                                    <FormGroup>
+                                    <Row>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                        
                                             type="text" name="programName"
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e); this.Capitalize(e.target.value) }}
                                             value={this.state.program.label.label_en}
                                             id="programName" placeholder={i18n.t('static.program.programtext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                        
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="select" name="userId" id="userId">
@@ -723,115 +680,121 @@ export default class ProgramOnboarding extends Component {
                                             {programManagers}
                                         </Input>
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                          
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="textarea" name="programNotes" id="programNotes" />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                          
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                           
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                            
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
                                     </FormGroup>
-                                    <FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            className="col-md-6"
+                                           
                                             bsSize="sm"
                                             onChange={(e) => { this.dataChange(e) }}
                                             type="number"
                                             min="0"
                                             name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
                                     </FormGroup>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSix}>Next</Button>
+                                    <FormGroup className="col-md-12">
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSix}>Next <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFive} >Previous</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                    </FormGroup>
+                               
+                                </Row>
                                 </div>
                                 <div id="stepSeven">
                                     <h6>Map Planning Units</h6>
                                     <MapPlanningUnits ref="child"></MapPlanningUnits>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}>Submit</Button>
+                                        <h1>Planning Units</h1>
+                                        <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i> Submit</Button>
+                                        
                                         &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} >Previous</Button>
+                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Previous</Button>
                                     </FormGroup>
                                 </div>
                             </CardBody></Card></Col></Row></div>

@@ -329,6 +329,11 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
+                            name: "Supply Plan",
+                            url: '/supplyPlan',
+                            icon: 'fa fa-list-alt'
+                          },
+                          {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
                             icon: 'fa fa-exchange'
@@ -342,7 +347,16 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
-                          }
+                          },
+                          /*{
+                            name: i18n.t('static.dashboard.stockstatus'),
+                            url: '/report/stockStatus',
+                            icon: 'fa fa-exchange'
+                          },{
+                            name: i18n.t('static.dashboard.consumption'),
+                            url: '/report/globalConsumption',
+                            icon: 'fa fa-exchange'
+                          }*/
                         ]
                       }
                       // {
@@ -376,12 +390,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.importprogram'),
                             url: '/program/importProgram',
-                            icon: 'fa fa-long-arrow-down',
+                            icon: 'fa fa-cloud-download',
                           },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
-                            icon: 'fa fa-upload',
+                            icon: 'fa fa-sign-in',
                           },
                           {
                             name: i18n.t('static.dashboard.consumptiondetails'),
@@ -407,7 +421,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
-                          }
+                          },
+                         /* {
+                            name: i18n.t('static.dashboard.stockstatus'),
+                            url: '/report/stockStatus',
+                            icon: 'fa fa-exchange'
+                          }*/
                         ]
                       }
                     ]
