@@ -54,7 +54,8 @@ export default class ConsumptionDetails extends React.Component {
             var transaction = db1.transaction(['programData'], 'readwrite');
             var program = transaction.objectStore('programData');
             var getRequest = program.getAll();
-            var proList = []
+            var proList = [];
+            var shipStatusList = []
             getRequest.onerror = function (event) {
                 // Handle errors!
             };
@@ -78,9 +79,31 @@ export default class ConsumptionDetails extends React.Component {
                     programList: proList
                 })
 
+                var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
+                var shipmentStatusRequest = shipmentStatusOs.getAll();
+
+
+                shipmentStatusRequest.onsuccess = function (event) {
+
+                    // var shipmentStatusResult = [];
+                    // shipmentStatusResult = shipmentStatusRequest.result;
+                    // for (var k = 0; k < shipmentStatusResult.length; k++) {
+                    //     var shipmentStatusJson = {
+                    //         name: shipmentStatusResult[k].label.label_en,
+                    //         id: shipmentStatusResult[k].shipmentStatusId
+                    //     }
+                    //     shipStatusList[k] = shipmentStatusJson;
+                    // }
+
+                    // this.setState({
+                    //     shipmentStatusList: shipStatusList
+                    // })
+
+                }.bind(this);
             }.bind(this);
 
-            // For Shipment Status
+            // For Shipment Status hard coded
             var shipStatusList = [];
             shipStatusList[0] = { id: 1, name: "Suggested" };
             shipStatusList[1] = { id: 2, name: "Planned" };
@@ -149,6 +172,8 @@ export default class ConsumptionDetails extends React.Component {
                     var programTransaction1 = db1.transaction(['program'], 'readwrite');
                     var programOs1 = programTransaction1.objectStore('program');
                     var programRequest1 = programOs1.getAll();
+
+
                     if (shipmentStatusId == 1) {
 
                         document.getElementById("addButton").style.display = "block";
@@ -256,6 +281,7 @@ export default class ConsumptionDetails extends React.Component {
                                         data[8] = '';
                                         data[9] = '';
 
+
                                         shipmentDataArr[0] = data;
 
                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
@@ -295,7 +321,7 @@ export default class ConsumptionDetails extends React.Component {
                                                 {
                                                     title: 'Suggested Order Qty',
                                                     type: 'number',
-                                                    readOnly: true
+                                                    // readOnly: true
                                                 },
                                                 {
                                                     title: 'Adjusted Order Qty',
@@ -332,6 +358,7 @@ export default class ConsumptionDetails extends React.Component {
                                             allowManualInsertColumn: false,
                                             allowDeleteRow: false,
                                             onchange: this.changed,
+                                            onload: this.load,
                                             oneditionend: this.onedit,
                                             copyCompatibility: true,
                                             paginationOptions: [10, 25, 50, 100],
@@ -339,6 +366,12 @@ export default class ConsumptionDetails extends React.Component {
                                         };
 
                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+                                        // var col = ("E").concat(parseInt(0) + 1);
+                                        // this.el.setAttribute(col, "readonly", true);
+                                        // this.el.setStyle(col, "readOnly", true);
+
+                                        // this.el.setStyle(col, "background-color", "yellow");
                                     }.bind(this)
                                 }.bind(this)
                             }.bind(this)
@@ -347,13 +380,23 @@ export default class ConsumptionDetails extends React.Component {
                     if (shipmentStatusId == 2) {
 
                         document.getElementById("addButton").style.display = "none";
-                        programRequest1.onsuccess = function (event) {
 
+                        var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                        var procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
+                        var procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
 
+                        procurementAgentPlanningUnitRequest.onsuccess = function (event) {
 
-                            // console.log("fundingSourceList-----",fundingSourceList)
-                            // console.log("budgetList---------",budgetList);
-                            // console.log("procurementAgentList",procurementAgentList);
+                            // var procurementAgentResult = [];
+                            // procurementAgentResult = procurementAgentPlanningUnitRequest.result;
+                            // for (var k = 0; k < procurementAgentResult.length; k++) {
+                            //     var procurementAgentJson = {
+                            //         // name: procurementAgentResult[k].label.label_en,
+                            //         // id: procurementAgentResult[k].procurementAgentId
+                            //     }
+                            //     procurementAgentList[k] = procurementAgentJson
+                            // }
+
 
 
 
@@ -366,11 +409,8 @@ export default class ConsumptionDetails extends React.Component {
                             });
 
                             var data = [];
-                            var shipmentDataArr = []
-                            if (shipmentList.length == 0) {
-                                data = [];
-                                shipmentDataArr[0] = data;
-                            }
+                            var shipmentDataArr = [];
+
 
                             // for (var j = 0; j < shipmentList.length; j++) {
                             //     if (shipmentList[j].shipmentId == 0 && shipmentList[j].shipmentStatusId == 1) {
@@ -408,9 +448,9 @@ export default class ConsumptionDetails extends React.Component {
                             data[17] = '';
                             data[18] = '7.83';
                             data[19] = '';
-                            data[20] = '';
+                            data[20] = 'dgre43';
                             data[21] = false;
-                            data[22] = 'dgre43';
+                            data[22] = '';
                             data[23] = '1500';
                             data[24] = '30000';
 
@@ -530,16 +570,16 @@ export default class ConsumptionDetails extends React.Component {
                                         readOnly: true
                                     },
                                     {
+                                        title: 'RO Number',
+                                        type: 'text'
+                                    },
+                                    {
                                         title: 'Notes',
                                         type: 'text'
                                     },
                                     {
                                         title: 'Cancelled Order',
                                         type: 'checkbox'
-                                    },
-                                    {
-                                        title: 'RO Number',
-                                        type: 'text'
                                     },
                                     {
                                         title: 'Unit/Pallet',
@@ -568,7 +608,210 @@ export default class ConsumptionDetails extends React.Component {
 
                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
-                        }.bind(this)
+                        }.bind(this);
+                    }
+
+                    if (shipmentStatusId == 3) {
+                        document.getElementById("addButton").style.display = "block";
+
+                        // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId && c.shipmentStatus.id == 2);
+                        var shipmentList = '';
+
+                        this.setState({
+                            shipmentList: shipmentList
+                        });
+
+                        var data = [];
+                        var shipmentDataArr = [];
+
+
+                        // for (var j = 0; j < shipmentList.length; j++) {
+                        //     if (shipmentList[j].shipmentId == 0 && shipmentList[j].shipmentStatusId == 1) {
+                        //         data = [];
+                        //         data[0] = shipmentList[j].dataSource.id;
+                        //         data[1] = shipmentList[j].region.id;
+                        //         data[2] = shipmentList[j].consumptionQty;
+                        //         data[3] = shipmentList[j].dayOfStockOut;
+                        //         data[4] = shipmentList[j].startDate;
+                        //         data[5] = shipmentList[j].stopDate;
+                        //         data[6] = shipmentList[j].actualFlag;
+                        //     }
+
+                        //     shipmentDataArr[j] = data;
+                        // }
+
+                        data = [];
+                        data[0] = '';
+                        data[1] = '10-09-2020';
+                        data[2] = '02-CANCELLED';
+                        data[3] = 'PSM';
+                        data[4] = 'USAID';
+                        data[5] = 'Kenya - 2020 budget';
+                        data[6] = planningUnitText;
+                        data[7] = '44773';
+                        data[8] = '45000'; //moq
+                        data[9] = 'Container';
+                        data[10] = 'RoundUp';
+                        data[11] = '';
+                        data[12] = '60000';
+                        data[13] = '40000';
+                        data[14] = '2';
+                        data[15] = '8.73';
+                        data[16] = '7.83';
+                        data[17] = '670000';
+                        data[18] = 'dgre43';
+                        data[19] = '';
+                        data[20] = true;
+
+
+                        shipmentDataArr[0] = data;
+
+                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                        this.el.destroy();
+                        var json = [];
+                        var data = shipmentDataArr;
+                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                        // json[0] = data;
+                        var options = {
+                            data: data,
+                            columnDrag: true,
+                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                            columns: [
+                                // { title: 'Month', type: 'text', readOnly: true },
+                                {
+                                    title: 'Qat Order No',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Expected Delivery date',
+                                    // type: 'calendar',
+                                    type: 'text',
+                                    readOnly: true
+
+                                },
+                                {
+                                    title: 'Shipment Status',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Procurement Agent',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Funding Source',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Budget',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Planning Unit',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Suggested Order Qty',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'MoQ',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Order based on',
+                                    type: 'text',
+                                    readOnly: true
+
+                                },
+                                {
+                                    title: 'Rounding option',
+                                    type: 'text',
+                                    readOnly: true
+
+                                },
+                                {
+                                    title: 'User Qty',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Adjusted Order Qty',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Adjusted Pallets',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Adjusted Containers',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Manual Price per Planning Unit',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Price per Planning Unit',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Amt',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'RO Number',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Notes',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Cancelled Order',
+                                    type: 'checkbox'
+                                }
+
+
+
+                            ],
+                            pagination: 10,
+                            search: true,
+                            columnSorting: true,
+                            tableOverflow: true,
+                            wordWrap: true,
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            allowDeleteRow: false,
+                            onchange: this.changed,
+                            oneditionend: this.onedit,
+                            copyCompatibility: true,
+                            paginationOptions: [10, 25, 50, 100],
+                            position: 'top'
+                        };
+
+                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+
+
+
+
+
                     }
                 } else {
                     document.getElementById("addButton").style.display = "none";
@@ -678,9 +921,6 @@ export default class ConsumptionDetails extends React.Component {
                             data[7] = '';
                             data[8] = '';
                             data[9] = '';
-
-                            // var col = ("E");
-                            // this.el.removeClass(col, 'readonly');
 
                             this.el.insertRow(
                                 data
@@ -983,120 +1223,17 @@ export default class ConsumptionDetails extends React.Component {
     }
 
 
+    load = function (instance, cell, x, y, value) {
+        // console.log("*****************************************");
+        // var col = ("E").concat(parseInt(0) + 1);
+        // this.el.setStyle(col, "readonly", "true");
+        // this.el.setStyle(col, "background-color", "yellow");
+        // col.addClass('readonly');
+
+
+    }.bind(this);
+
     changed = function (instance, cell, x, y, value) {
-        // console.log("VALUE----------",value);
-        // this.setState({
-        //     changedFlag: 1
-        // })
-        // if (x == 0) {
-        //     var col = ("A").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, "This field is required.");
-        //     } else {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setComments(col, "");
-        //     }
-        // }
-        // if (x == 1) {
-        //     var col = ("B").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, "This field is required.");
-        //     } else {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setComments(col, "");
-        //     }
-        // }
-        // if (x == 2) {
-        //     var col = ("C").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, "This field is required.");
-        //     } else {
-        //         if (isNaN(Number.parseInt(value))) {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setStyle(col, "background-color", "yellow");
-        //             this.el.setComments(col, "In valid number.");
-        //         } else {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setComments(col, "");
-        //         }
-
-        //     }
-        // }
-        // if (x == 3) {
-        //     var col = ("D").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, "This field is required.");
-        //     } else {
-        //         if (isNaN(Number.parseInt(value))) {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setStyle(col, "background-color", "yellow");
-        //             this.el.setComments(col, "In valid number.");
-        //         } else {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setComments(col, "");
-        //         }
-
-
-        //     }
-        // }
-
-        // if (x == 4) {
-        //     var col = ("E").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, "This field is required.");
-        //     } else {
-        //         if (isNaN(Date.parse(value))) {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setStyle(col, "background-color", "yellow");
-        //             this.el.setComments(col, "In valid Date.");
-        //         } else {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setComments(col, "");
-        //         }
-        //     }
-        // }
-        // if (x == 5) {
-        //     var col = ("F").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, "This field is required.");
-        //     } else {
-        //         if (isNaN(Date.parse(value))) {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setStyle(col, "background-color", "yellow");
-        //             this.el.setComments(col, "In valid Date.");
-        //         } else {
-        //             this.el.setStyle(col, "background-color", "transparent");
-        //             this.el.setComments(col, "");
-        //         }
-        //     }
-        // }
-
-        // if (x == 6) {
-        //     var col = ("G").concat(parseInt(y) + 1);
-        //     if (value == "") {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setStyle(col, "background-color", "yellow");
-        //         this.el.setComments(col, "This field is required.");
-        //     } else {
-        //         this.el.setStyle(col, "background-color", "transparent");
-        //         this.el.setComments(col, "");
-        //     }
-        // }
-
-
-
         //---------------------------
         this.setState({
             changedFlag: 1
