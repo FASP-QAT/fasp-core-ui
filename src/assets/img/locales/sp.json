@@ -133,5 +133,10 @@
     "static.language.english": "Inglés",
     "static.language.french": "Francés",
     "static.language.spanish": "Español",
-    "static.language.portuguese": "Portugués"
+    "static.language.portuguese": "Portugués",
+    "static.graph.activeProgram": "Programas activos",
+    "static.graph.inactiveProgram": "Programas inactivos",
+    "static.graph.totalRealmCount": "Recuento total de reinos :",
+    "static.dashboard.applicationdashboard": "Panel de aplicación",
+    "static.logout.confirmLogout": "¿Estás seguro de que quieres cerrar sesión?"
 }

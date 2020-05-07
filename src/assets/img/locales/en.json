@@ -621,6 +621,10 @@
     "static.language.portuguese": "Portuguese",
     "static.planningunit.gtinNo": "Only numbers allowed",
     "static.planningunit.maxGtin": "Max 14 digits allowed",
-    "static.dashboard.stockstatus":"Stock Status",
-   "static.budget.availableAmt":"Remaining Amount"
+    "static.dashboard.stockstatus": "Stock Status",
+    "static.budget.availableAmt": "Remaining Amount",
+    "static.graph.activeProgram": "Active Programs",
+    "static.graph.inactiveProgram": "Inactive Programs",
+    "static.graph.totalRealmCount": "Total Realms Count :",
+    "static.logout.confirmLogout": "Are you sure you want to log out?"
 }
