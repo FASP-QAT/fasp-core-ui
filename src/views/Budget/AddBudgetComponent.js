@@ -47,7 +47,7 @@ const validationSchema = function (values, t) {
         // stopDate: Yup.string()
         //     .required(i18n.t('static.budget.stopdatetext'))
         currencyId: Yup.string()
-            .required("Currency is required"),
+            .required(i18n.t('static.country.currencytext')),
     })
 }
 const validate = (getValidationSchema) => {
@@ -419,7 +419,7 @@ class AddBudgetComponent extends Component {
 
 
                                                     <FormGroup>
-                                                        <Label htmlFor="currencyId">Currency<span className="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
                                                         <Input
@@ -442,7 +442,7 @@ class AddBudgetComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="budget">Conversion Rate To USD<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="conversionRateToUsd"

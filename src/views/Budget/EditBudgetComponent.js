@@ -326,7 +326,7 @@ class EditBudgetComponent extends Component {
 
 
                                                     <FormGroup>
-                                                        <Label htmlFor="currencyId">Currency<span className="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
                                                         {/* <InputGroupAddon addonType="prepend"> */}
                                                         {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
                                                         <Input
@@ -343,7 +343,7 @@ class EditBudgetComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label for="budget">Conversion Rate To USD<span className="red Reqasterisk">*</span></Label>
+                                                        <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="text"
                                                             name="conversionRateToUsd"
