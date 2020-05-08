@@ -126,7 +126,7 @@ class Consumption extends Component {
 
     var csvRow = [];
     var re;
-    var A = [["Consumption Month", "Forecast Consumption", "Actual Consumption"]]
+    var A = [[i18n.t('static.report.consumptionDate'), i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption')]]
     if (navigator.onLine) {
       re = this.state.consumptions
     } else {
@@ -143,7 +143,7 @@ class Consumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = "consumption_" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + "_to_" + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    a.download = i18n.t('static.report.consumption_') + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -187,84 +187,82 @@ class Consumption extends Component {
           }
         );
     } else {
-      if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
+      // if (planningUnitId != "" && planningUnitId != 0 && productCategoryId != "" && productCategoryId != 0) {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open('fasp', 1);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
 
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var programRequest = programTransaction.get(programId);
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var programTransaction = transaction.objectStore('programData');
+        var programRequest = programTransaction.get(programId);
 
-          programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            console.log("program json---", programJson);
-            var offlineConsumptionList = (programJson.consumptionList);
-            console.log("offlineConsumptionList---", offlineConsumptionList);
+        programRequest.onsuccess = function (event) {
+          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson = JSON.parse(programData);
+          var offlineConsumptionList = (programJson.consumptionList);
 
-            const planningUnitFilter = offlineConsumptionList.filter(c => c.planningUnit.id == planningUnitId);
-            console.log("planningUnitFilter---", planningUnitFilter);
-            const productCategoryFilter = planningUnitFilter.filter(c => c.planningUnit.forecastingUnit.productCategory.id == productCategoryId);
-            console.log("productCategoryFilter---", productCategoryFilter);
+          const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
 
-            // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-            const dateFilter = productCategoryFilter.filter(c => moment(c.startDate).isBetween(startDate, endDate, null, '[)') && moment(c.stopDate).isBetween(startDate, endDate, null, '[)'))
+          const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
+          const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
 
-            const sorted = dateFilter.sort((a, b) => {
-              var dateA = new Date(a.startDate).getTime();
-              var dateB = new Date(b.stopDate).getTime();
-              return dateA > dateB ? 1 : -1;
-            });
-            let previousDate = "";
-            let finalOfflineConsumption = [];
-            var json;
+          // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+          const dateFilter = productCategoryFilter.filter(c => moment(c.startDate).isBetween(startDate, endDate, null, '[)') && moment(c.stopDate).isBetween(startDate, endDate, null, '[)'))
 
-            for (let i = 0; i <= sorted.length; i++) {
-              let forcast = 0;
-              let actual = 0;
-              if (sorted[i] != null && sorted[i] != "") {
-                previousDate = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
-                for (let j = 0; j <= sorted.length; j++) {
-                  if (sorted[j] != null && sorted[j] != "") {
-                    if (previousDate == moment(sorted[j].startDate, 'YYYY-MM-DD').format('MM-YYYY')) {
-                      if (!sorted[j].actualFlag) {
-                        forcast = forcast + sorted[j].consumptionQty;
-                      }
-                      if (sorted[j].actualFlag) {
-                        actual = actual + sorted[j].consumptionQty;
-                      }
+          const sorted = dateFilter.sort((a, b) => {
+            var dateA = new Date(a.startDate).getTime();
+            var dateB = new Date(b.stopDate).getTime();
+            return dateA > dateB ? 1 : -1;
+          });
+          let previousDate = "";
+          let finalOfflineConsumption = [];
+          var json;
+
+          for (let i = 0; i <= sorted.length; i++) {
+            let forcast = 0;
+            let actual = 0;
+            if (sorted[i] != null && sorted[i] != "") {
+              previousDate = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
+              for (let j = 0; j <= sorted.length; j++) {
+                if (sorted[j] != null && sorted[j] != "") {
+                  if (previousDate == moment(sorted[j].startDate, 'YYYY-MM-DD').format('MM-YYYY')) {
+                    if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
+                      forcast = forcast + sorted[j].consumptionQty;
+                    }
+                    if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
+                      actual = actual + sorted[j].consumptionQty;
                     }
                   }
                 }
-
-                let date = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
-                json = {
-                  consumption_date: date,
-                  Actual: actual,
-                  forcast: forcast
-                }
-
-                if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
-                  finalOfflineConsumption.push(json);
-                }
-
-                // console.log("finalOfflineConsumption---", finalOfflineConsumption);
-
               }
+
+              let date = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
+              json = {
+                consumption_date: date,
+                Actual: actual,
+                forcast: forcast
+              }
+
+              if (!finalOfflineConsumption.some(f => f.consumption_date === date)) {
+                finalOfflineConsumption.push(json);
+              }
+
+              // console.log("finalOfflineConsumption---", finalOfflineConsumption);
+
             }
+          }
 
-            this.setState({
-              offlineConsumptionList: finalOfflineConsumption
-            });
-
-          }.bind(this)
+          this.setState({
+            offlineConsumptionList: finalOfflineConsumption
+          });
 
         }.bind(this)
-      }
+
+      }.bind(this)
+      // }
     }
   }
 
@@ -346,7 +344,6 @@ class Consumption extends Component {
   }
   getPlanningUnit() {
     if (navigator.onLine) {
-      console.log('changed')
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
       ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -396,10 +393,7 @@ class Consumption extends Component {
         planningunitRequest.onsuccess = function (e) {
           var myResult = [];
           myResult = planningunitRequest.result;
-          console.log("myResult", myResult);
           var programId = (document.getElementById("programId").value).split("_")[0];
-          console.log('programId----->>>', programId)
-          console.log(myResult);
           var proList = []
           for (var i = 0; i < myResult.length; i++) {
             if (myResult[i].program.id == programId) {
@@ -410,7 +404,6 @@ class Consumption extends Component {
               proList[i] = productJson
             }
           }
-          console.log("proList---" + proList);
           this.setState({
             offlinePlanningUnitList: proList
           })
@@ -468,16 +461,14 @@ class Consumption extends Component {
           var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson = JSON.parse(programData);
-          console.log("program json---", programJson);
           var offlineConsumptionList = (programJson.consumptionList);
-          console.log("offlineConsumptionList---", offlineConsumptionList);
 
           let offlineProductCategoryList = [];
           var json;
-          
+
           for (let i = 0; i <= offlineConsumptionList.length; i++) {
             let count = 0;
-            if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "") {
+            if (offlineConsumptionList[i] != null && offlineConsumptionList[i] != "" && offlineConsumptionList[i].planningUnit.forecastingUnit != null && offlineConsumptionList[i].planningUnit.forecastingUnit != "") {
               for (let j = 0; j <= offlineProductCategoryList.length; j++) {
                 if (offlineProductCategoryList[j] != null && offlineProductCategoryList[j] != "" && (offlineProductCategoryList[j].id == offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id)) {
                   count++;
@@ -491,7 +482,6 @@ class Consumption extends Component {
               }
             }
           }
-          console.log("offlineProductCategoryList---", offlineProductCategoryList);
           this.setState({
             offlineProductCategoryList
           });
@@ -505,9 +495,7 @@ class Consumption extends Component {
 
   }
   componentDidMount() {
-    console.log("inside component did mount");
     if (navigator.onLine) {
-      console.log("online report");
       AuthenticationService.setupAxiosInterceptors();
       RealmService.getRealmListAll()
         .then(response => {
@@ -542,11 +530,8 @@ class Consumption extends Component {
           }
         );
     } else {
-      console.log("offline report");
       const lan = 'en';
-      console.log("---1---");
       var db1;
-      console.log("---2---");
       getDatabase();
 
       var openRequest = indexedDB.open('fasp', 1);
@@ -568,8 +553,6 @@ class Consumption extends Component {
             if (myResult[i].userId == userId) {
               var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
               var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              console.log("programNameLabel---", programNameLabel);
-              console.log("version---", myResult[i].version);
               var programJson = {
                 name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
                 id: myResult[i].id
@@ -577,8 +560,6 @@ class Consumption extends Component {
               proList[i] = programJson
             }
           }
-          console.log("programJson---", programJson);
-          console.log("proList---", proList);
           this.setState({
             offlinePrograms: proList
           })
@@ -618,7 +599,7 @@ class Consumption extends Component {
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
   render() {
     const { realms } = this.state;
@@ -646,7 +627,7 @@ class Consumption extends Component {
         labels: this.state.consumptions.map((item, index) => (item.consumption_date)),
         datasets: [
           {
-            label: 'Actual Consumption',
+            label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#86CD99',
             borderColor: 'rgba(179,181,198,1)',
             pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -656,7 +637,7 @@ class Consumption extends Component {
             data: this.state.consumptions.map((item, index) => (item.Actual)),
           }, {
             type: "line",
-            label: "Forecast Consumption",
+            label: i18n.t('static.report.forcastConsumption'),
             backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
             borderStyle: 'dotted',
@@ -680,7 +661,7 @@ class Consumption extends Component {
         labels: this.state.offlineConsumptionList.map((item, index) => (item.consumption_date)),
         datasets: [
           {
-            label: 'Actual Consumption',
+            label: i18n.t('static.report.actualConsumption'),
             backgroundColor: '#86CD99',
             borderColor: 'rgba(179,181,198,1)',
             pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -690,7 +671,7 @@ class Consumption extends Component {
             data: this.state.offlineConsumptionList.map((item, index) => (item.Actual)),
           }, {
             type: "line",
-            label: "Forecast Consumption",
+            label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
             borderStyle: 'dotted',
@@ -707,7 +688,7 @@ class Consumption extends Component {
       }
     }
     const pickerLang = {
-      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
       from: 'From', to: 'To',
     }
     const { rangeValue } = this.state
@@ -724,18 +705,39 @@ class Consumption extends Component {
           <Col lg="12">
             <Card>
               <CardHeader className="text-center">
-                <b className="count-text">Consumption Report</b>
-                <div className="card-header-actions">
-                  <a className="card-header-action">
-                    <Pdf targetRef={ref} filename="consumption.pdf">
-                      {({ toPdf }) =>
-                        <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
+                <b className="count-text">{i18n.t('static.report.consumptionReport')}</b>
+                <Online>
+                  {
+                    this.state.consumptions.length > 0 &&
+                    <div className="card-header-actions">
+                      <a className="card-header-action">
+                        <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                          {({ toPdf }) =>
+                            <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
-                      }
-                    </Pdf>
-                  </a>
-                  <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV()} />
-                </div>
+                          }
+                        </Pdf>
+                      </a>
+                      <img style={{ height: '40px', width: '40px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                    </div>
+                  }
+                </Online>
+                <Offline>
+                  {
+                    this.state.offlineConsumptionList.length > 0 &&
+                    <div className="card-header-actions">
+                      <a className="card-header-action">
+                        <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                          {({ toPdf }) =>
+                            <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
+
+                          }
+                        </Pdf>
+                      </a>
+                      <img style={{ height: '40px', width: '40px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                    </div>
+                  }
+                </Offline>
               </CardHeader>
               <CardBody>
                 <div className="TableCust" >
@@ -744,7 +746,7 @@ class Consumption extends Component {
                       <Col md="15 pl-0">
                         <div className="d-md-flex">
                           <FormGroup>
-                            <Label htmlFor="appendedInputButton">Select Period</Label>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
                             <div className="controls SelectGo edit">
 
                               <Picker
@@ -765,7 +767,7 @@ class Consumption extends Component {
 
 
                           <Online>
-                            <FormGroup>
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -786,7 +788,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -814,7 +816,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -842,7 +844,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -853,7 +855,7 @@ class Consumption extends Component {
                                     bsSize="sm"
                                     onChange={this.getPlanningUnit}
                                   >
-                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                    <option value="0">{i18n.t('static.common.select')}</option>
                                     {productCategories.length > 0
                                       && productCategories.map((item, i) => {
                                         return (
@@ -868,7 +870,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -879,7 +881,7 @@ class Consumption extends Component {
                                     bsSize="sm"
                                     onChange={this.getPlanningUnit}
                                   >
-                                    <option value="0">{i18n.t('static.common.all')}</option>
+                                    <option value="0">{i18n.t('static.common.select')}</option>
                                     {offlineProductCategoryList.length > 0
                                       && offlineProductCategoryList.map((item, i) => {
                                         return (
@@ -894,7 +896,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -923,7 +925,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -952,19 +954,31 @@ class Consumption extends Component {
                         </div>
                       </Col>
                     </Form>
-
-                    <div className="chart-wrapper chart-graph">
-                      <Bar data={bar} options={options} />
-                    </div> <br /><br />
-                  </div></div>
+                    <Online>
+                      {
+                        this.state.consumptions.length > 0
+                        &&
+                        <div className="chart-wrapper chart-graph">
+                          <Bar data={bar} options={options} />
+                        </div>}
+                    </Online>
+                    <Offline>
+                      {
+                        this.state.offlineConsumptionList.length > 0
+                        &&
+                        <div className="chart-wrapper chart-graph">
+                          <Bar data={bar} options={options} />
+                        </div>}
+                    </Offline>
+                  </div></div><br /><br /><br />
 
                     <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                       <thead>
                         <tr>
-                          <th className="text-center"> Consumption Date </th>
-                          <th className="text-center"> Forecast </th>
-                          <th className="text-center">Actual</th>
+                          <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
+                          <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
+                          <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
                         </tr>
                       </thead>
                       <Online>

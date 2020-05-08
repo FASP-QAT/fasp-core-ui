@@ -646,12 +646,12 @@ export default class StockStatusMatrix extends React.Component {
                         <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
                         </div>
                     </CardHeader>
-                    <CardBody className="pb-md-0">
+                    <CardBody className="pb-md-3">
                         <Col md="12 pl-0">
-                            <div className="d-md-flex">
-                            <FormGroup>
-                            <Label htmlFor="appendedInputButton">Select Period</Label>
-                            <div className="controls SelectGo edit">
+                            <div className="row">
+                            <FormGroup className="col-md-3" title="click here to select period">
+                            <Label htmlFor="appendedInputButton">Select Period <span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                            <div className="controls edit">
 
                               <Picker
                                 ref="pickRange"
@@ -668,9 +668,9 @@ export default class StockStatusMatrix extends React.Component {
 
                           </FormGroup>
 
-                                <FormGroup>
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -687,7 +687,7 @@ export default class StockStatusMatrix extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                             <div className="controls SelectGo">
                               <InputGroup>
@@ -706,9 +706,9 @@ export default class StockStatusMatrix extends React.Component {
                               </InputGroup>
                             </div>
                           </FormGroup>
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -724,9 +724,11 @@ export default class StockStatusMatrix extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                </div>
+                                <div className="row">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -742,9 +744,9 @@ export default class StockStatusMatrix extends React.Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -777,7 +779,7 @@ export default class StockStatusMatrix extends React.Component {
                                 props => (
                                     <div className="TableCust">
                                            
-                                        <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                        <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
                                       
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
