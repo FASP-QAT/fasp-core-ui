@@ -661,10 +661,42 @@ label.arrow_label:after {
 // .forbtnMapping .mapRegionbtn{width: 110px !important;}
 
 //  producttree
-.rst__row {
-  height: 25px !important;
-  margin-top: 0.5rem !important;
-}
+.rst__row{    height: 25px !important;
+  margin-top: .5rem !important;}
+
+
+  // stock status matrix
+.stock-status-search{position: absolute;
+  // left: -75px;
+  left: -35px;
+  top: 185px;}
+  // stock status matrix calender box
+  .box{height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.76562rem;
+    line-height: 1.5;
+    border: 1px solid #e4e7ea;
+    border-radius: 0.2rem;}
+    // .box{color:#20a8d8 !important}
+    // .box:hover{color:black !important;border: 1px solid #20a8d8;}
+    .stock-box-icon {
+      position: absolute;
+      top: 33px;
+      right: 20px;
+      color: 697069;
+    }
+.consumption-box-icon{position: absolute;
+  top: 33px;
+  left: 175px;
+  color: 697069;}
+  // .month-picker > .rmp-container .rmp-popup .rmp-pad li {
+   
+  //   line-height: initial !important;}
+
+
+
+
+
 
 // .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 
@@ -697,11 +729,8 @@ label.arrow_label:after {
   width: 100%;
 }
 @media only screen and (min-width: 1200px) {
-  .Selectdiv2 {
-    position: absolute;
-    top: -25px;
-    margin-bottom: 0.5rem;
-  }
+  .Selectdiv2{position: absolute;top:-25px;margin-bottom: 0.5rem;}
+  
 }
 
 @media only screen and (min-width: 992px) {
@@ -721,6 +750,7 @@ label.arrow_label:after {
     position: fixed;
     width: 100%;
   }
+  
 }
 .main-content {
   width: 100%;
@@ -742,6 +772,9 @@ label.arrow_label:after {
 }
 
 @media (max-width: 489px) {
+  .stock-status-search{position: relative;
+    margin-left: 0px;
+    top: 0px;}
   .upper-logo {
     // min-width: 100%;
     min-width: 300px;

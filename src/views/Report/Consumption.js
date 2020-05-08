@@ -202,17 +202,12 @@ class Consumption extends Component {
           var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson = JSON.parse(programData);
-          console.log("program json---", programJson);
           var offlineConsumptionList = (programJson.consumptionList);
-          console.log("offlineConsumptionList---", offlineConsumptionList);
 
           const activeFilter = offlineConsumptionList.filter(c => (c.active == true || c.active == "true"));
-          console.log("active filter---", activeFilter);
 
           const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-          console.log("planningUnitFilter---", planningUnitFilter);
           const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
-          console.log("productCategoryFilter---", productCategoryFilter);
 
           // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
           const dateFilter = productCategoryFilter.filter(c => moment(c.startDate).isBetween(startDate, endDate, null, '[)') && moment(c.stopDate).isBetween(startDate, endDate, null, '[)'))
@@ -349,7 +344,6 @@ class Consumption extends Component {
   }
   getPlanningUnit() {
     if (navigator.onLine) {
-      console.log('changed')
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
       ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
@@ -399,10 +393,7 @@ class Consumption extends Component {
         planningunitRequest.onsuccess = function (e) {
           var myResult = [];
           myResult = planningunitRequest.result;
-          console.log("myResult", myResult);
           var programId = (document.getElementById("programId").value).split("_")[0];
-          console.log('programId----->>>', programId)
-          console.log(myResult);
           var proList = []
           for (var i = 0; i < myResult.length; i++) {
             if (myResult[i].program.id == programId) {
@@ -413,7 +404,6 @@ class Consumption extends Component {
               proList[i] = productJson
             }
           }
-          console.log("proList---" + proList);
           this.setState({
             offlinePlanningUnitList: proList
           })
@@ -471,9 +461,7 @@ class Consumption extends Component {
           var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson = JSON.parse(programData);
-          console.log("program json---", programJson);
           var offlineConsumptionList = (programJson.consumptionList);
-          console.log("offlineConsumptionList---", offlineConsumptionList);
 
           let offlineProductCategoryList = [];
           var json;
@@ -494,7 +482,6 @@ class Consumption extends Component {
               }
             }
           }
-          console.log("offlineProductCategoryList---", offlineProductCategoryList);
           this.setState({
             offlineProductCategoryList
           });
@@ -780,7 +767,7 @@ class Consumption extends Component {
 
 
                           <Online>
-                            <FormGroup>
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -801,7 +788,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -829,7 +816,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -857,7 +844,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -883,7 +870,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -909,7 +896,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
@@ -938,7 +925,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="tab-ml-1">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls SelectGo">
                                 <InputGroup>
