@@ -29,7 +29,9 @@ export default class syncPage extends Component {
       mergedDataConsumption: [],
       oldDataJsonInventory: [],
       latestDataJsonInventory: [],
-      mergedDataInventory: []
+      mergedDataInventory: [],
+      consumptionIdArray: [],
+      inventoryIdArray: []
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -248,6 +250,7 @@ export default class syncPage extends Component {
                       consumptionList: consumptionList
                     });
                     var inventoryList = (programJson.inventoryList);
+                    console.log("Inventory List",inventoryList);
                     this.setState({
                       inventoryList: inventoryList
                     });
@@ -589,29 +592,36 @@ export default class syncPage extends Component {
                     this.el = jexcel(document.getElementById("latestVersionInventory"), options);
 
                     var mergedDataConsumption = [];
-                    for (var i = 0; i < latestDataJsonConsumption.length; i++) {
-                      if (oldDataJsonConsumption.length > i) {
-                        if ((latestDataJsonConsumption[i])[0] == (oldDataJsonConsumption[i])[0]) {
-                          mergedDataConsumption.push(oldDataJsonConsumption[i])
-                        } else {
-                          mergedDataConsumption.push(latestDataJsonConsumption[i])
-                        }
-                      } else {
-                        mergedDataConsumption.push(latestDataJsonConsumption[i]);
+                    var consumptionIdArray = [];
+                    for (var i = 0; i < oldDataJsonConsumption.length; i++) {
+                      console.log("(oldDataJsonConsumption[i])[0]", (oldDataJsonConsumption[i])[0]);
+                      if ((oldDataJsonConsumption[i])[0] != 0) {
+                        mergedDataConsumption.push(oldDataJsonConsumption[i]);
+                        consumptionIdArray.push((oldDataJsonConsumption[i])[0]);
                       }
                     }
-
+                    console.log("oldDataJsonConsumption.length", oldDataJsonConsumption.length);
+                    console.log("mergedDataConsumption", mergedDataConsumption);
+                    for (var i = 0; i < latestDataJsonConsumption.length; i++) {
+                      if (consumptionIdArray.includes((latestDataJsonConsumption[i])[0])) {
+                      } else {
+                        mergedDataConsumption.push(latestDataJsonConsumption[i]);
+                        // consumptionIdArray.push(latestDataJsonConsumption[i].consumptionId);
+                      }
+                    }
+                    console.log("mergedDataConsumption 1-------->", mergedDataConsumption);
                     for (var i = 0; i < oldDataJsonConsumption.length; i++) {
                       if ((oldDataJsonConsumption[i])[0] == 0) {
                         mergedDataConsumption.push(oldDataJsonConsumption[i])
                       }
                     }
-
+                    console.log("mergedDataConsumption 2-------->", mergedDataConsumption);
                     this.el = jexcel(document.getElementById("mergedVersionConsumption"), '');
                     this.el.destroy();
                     mergedDataConsumption = mergedDataConsumption;
                     this.setState({
-                      mergedDataJsonConsumption: mergedDataConsumption
+                      mergedDataJsonConsumption: mergedDataConsumption,
+                      consumptionIdArray: consumptionIdArray
                     })
                     var options = {
                       data: mergedDataConsumption,
@@ -679,18 +689,20 @@ export default class syncPage extends Component {
                     this.el = jexcel(document.getElementById("mergedVersionConsumption"), options);
 
                     var mergedDataInventory = [];
-                    for (var i = 0; i < latestDataJsonInventory.length; i++) {
-                      if (oldDataJsonInventory.length > i) {
-                        if ((latestDataJsonInventory[i])[0] == (oldDataJsonInventory[i])[0]) {
-                          mergedDataInventory.push(oldDataJsonInventory[i])
-                        } else {
-                          mergedDataInventory.push(latestDataJsonInventory[i])
-                        }
-                      } else {
-                        mergedDataInventory.push(latestDataJsonInventory[i]);
+                    var inventoryIdArray = [];
+                    for (var i = 0; i < oldDataJsonInventory.length; i++) {
+                      if ((oldDataJsonInventory[i])[0] != 0) {
+                        mergedDataInventory.push(oldDataJsonInventory[i]);
+                        inventoryIdArray.push((oldDataJsonInventory[i])[0]);
                       }
                     }
-
+                    for (var i = 0; i < latestDataJsonInventory.length; i++) {
+                      if (inventoryIdArray.includes((latestDataJsonInventory[i])[0])) {
+                      } else {
+                        mergedDataInventory.push(latestDataJsonInventory[i]);
+                        // inventoryIdArray.push(latestDataJsonInventory[i].consumptionId);
+                      }
+                    }
                     for (var i = 0; i < oldDataJsonInventory.length; i++) {
                       if ((oldDataJsonInventory[i])[0] == 0) {
                         mergedDataInventory.push(oldDataJsonInventory[i])
@@ -701,7 +713,8 @@ export default class syncPage extends Component {
                     this.el.destroy();
                     mergedDataInventory = mergedDataInventory;
                     this.setState({
-                      mergedDataInventory: mergedDataInventory
+                      mergedDataInventory: mergedDataInventory,
+                      inventoryIdArray: inventoryIdArray
                     })
                     var options = {
                       data: mergedDataInventory,
@@ -846,45 +859,45 @@ export default class syncPage extends Component {
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
-    var oldDataJson = this.state.oldDataJsonConsumption
     var latestDataJson = this.state.latestDataJsonConsumption
+    var consumptionIdArray = this.state.consumptionIdArray;
     for (var y = 0; y < jsonData.length; y++) {
       if ((jsonData[y])[8] == true) {
         if ((jsonData[y])[0] != 0) {
-          if (oldDataJson.length > y) {
-            var oldFilteredData = (oldDataJson[y])[0];
-            var col = ("A").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(0, y);
-            if (value == oldFilteredData) {
-              for (var j = 1; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                var valueToCompare = elInstance.getValueFromCoords(j, y);
-                var valueToCompareWith = (latestDataJson[y])[j];
-                if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-                  elInstance.setStyle(col, "background-color", "transparent");
-                } else {
-                  elInstance.setStyle(col, "background-color", "#FFCCCB");
+          if (consumptionIdArray.includes((jsonData[y])[0])) {
+            for (var z = 0; z < latestDataJson.length; z++) {
+              if ((jsonData[y])[0] == (latestDataJson[z])[0]) {
+                for (var j = 1; j < colArr.length; j++) {
+                  var col = (colArr[j]).concat(parseInt(y) + 1);
+                  var valueToCompare = (jsonData[y])[j];
+                  var valueToCompareWith = (latestDataJson[z])[j];
+                  if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                  } else {
+                    elInstance.setStyle(col, "background-color", "#FFCCCB");
+                  }
                 }
-              }
-            } else {
-              for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "#e5edf5");
+                z = latestDataJson.length
               }
             }
           } else {
+            // Else for new data in latest version
             for (var j = 0; j < colArr.length; j++) {
               var col = (colArr[j]).concat(parseInt(y) + 1);
               elInstance.setStyle(col, "background-color", "#e5edf5");
             }
           }
         } else {
+
+          // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "#98FB98");
           }
         }
       } else {
+
+        // Else part for inactive colour
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(y) + 1);
           elInstance.setStyle(col, "background-color", "#FF8686");
@@ -935,45 +948,44 @@ export default class syncPage extends Component {
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
     var elInstance = instance.jexcel;
     var jsonData = elInstance.getJson();
-    var oldDataJson = this.state.oldDataJsonInventory
     var latestDataJson = this.state.latestDataJsonInventory
+    var inventoryIdArray = this.state.inventoryIdArray;
     for (var y = 0; y < jsonData.length; y++) {
       if ((jsonData[y])[10] == true) {
         if ((jsonData[y])[0] != 0) {
-          if (oldDataJson.length > y) {
-            var oldFilteredData = (oldDataJson[y])[0];
-            var col = ("A").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(0, y);
-            if (value == oldFilteredData) {
-              for (var j = 1; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                var valueToCompare = elInstance.getValueFromCoords(j, y);
-                var valueToCompareWith = (latestDataJson[y])[j];
-                if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-                  elInstance.setStyle(col, "background-color", "transparent");
-                } else {
-                  elInstance.setStyle(col, "background-color", "#FFCCCB");
+          if (inventoryIdArray.includes((jsonData[y])[0])) {
+            for (var z = 0; z < latestDataJson.length; z++) {
+              if ((jsonData[y])[0] == (latestDataJson[z])[0]) {
+                for (var j = 1; j < colArr.length; j++) {
+                  var col = (colArr[j]).concat(parseInt(y) + 1);
+                  var valueToCompare = (jsonData[y])[j];
+                  var valueToCompareWith = (latestDataJson[z])[j];
+                  if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                  } else {
+                    elInstance.setStyle(col, "background-color", "#FFCCCB");
+                  }
                 }
-              }
-            } else {
-              for (var j = 0; j < colArr.length; j++) {
-                var col = (colArr[j]).concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "#e5edf5");
+                z = latestDataJson.length
               }
             }
           } else {
+            // Else for new data in latest version
             for (var j = 0; j < colArr.length; j++) {
               var col = (colArr[j]).concat(parseInt(y) + 1);
               elInstance.setStyle(col, "background-color", "#e5edf5");
             }
           }
         } else {
+
+          // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
             elInstance.setStyle(col, "background-color", "#98FB98");
           }
         }
       } else {
+        // Else part for inactive colour
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(y) + 1);
           elInstance.setStyle(col, "background-color", "#FF8686");

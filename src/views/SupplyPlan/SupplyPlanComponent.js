@@ -46,7 +46,8 @@ export default class SupplyPlanComponent extends React.Component {
             minStockArray: [],
             maxStockArray: [],
             minMonthOfStock: 0,
-            reorderFrequency: 0
+            reorderFrequency: 0,
+            programPlanningUnitList: []
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -303,6 +304,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                     this.setState({
                         planningUnitList: proList,
+                        programPlanningUnitList: myResult,
                         regionList: regionList
                     })
                 }.bind(this);
@@ -318,7 +320,8 @@ export default class SupplyPlanComponent extends React.Component {
         var programId = document.getElementById("programId").value;
         var regionId = document.getElementById("regionId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        var programPlanningUnit = ((this.state.planningUnitList).filter(p => p.planningUnitId = planningUnitId))[0]
+
+        var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id = planningUnitId))[0];
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
         var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
         var regionListFiltered = [];
@@ -357,13 +360,13 @@ export default class SupplyPlanComponent extends React.Component {
                 }
 
                 for (var i = 0; i < 24; i++) {
-                    var c = consumptionList.filter(c => (c.startDate >= m[i].startDate && c.startDate <= m[i].endDate) || (c.stopDate >= m[i].startDate && c.stopDate <= m[i].endDate))
+                    var c = consumptionList.filter(c => (c.consumptionDate >= m[i].startDate && c.consumptionDate <= m[i].endDate))
                     var consumptionQty = 0;
                     var filteredJson = { consumptionQty: '', region: { id: 0 } };
                     for (var j = 0; j < c.length; j++) {
                         var count = 0;
                         for (var k = 0; k < c.length; k++) {
-                            if (c[j].startDate == c[k].startDate && c[j].stopDate == c[k].stopDate && c[j].region.id == c[k].region.id && j != k) {
+                            if (c[j].consumptionDate == c[k].consumptionDate && c[j].region.id == c[k].region.id && j != k) {
                                 count++;
                             } else {
 
@@ -371,11 +374,11 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                         if (count == 0) {
                             consumptionQty += parseInt((c[j].consumptionQty));
-                            filteredJson = { month: m[i], region: c[j].region, consumptionQty: consumptionQty, consumptionId: c[j].consumptionId, actualFlag: c[j].actualFlag, startDate: c[j].startDate, stopDate: c[j].stopDate };
+                            filteredJson = { month: m[i], region: c[j].region, consumptionQty: consumptionQty, consumptionId: c[j].consumptionId, actualFlag: c[j].actualFlag, consumptionDate: c[j].consumptionDate };
                         } else {
                             if (c[j].actualFlag.toString() == 'true') {
                                 consumptionQty += parseInt((c[j].consumptionQty));
-                                filteredJson = { month: m[i], region: c[j].region, consumptionQty: consumptionQty, consumptionId: c[j].consumptionId, actualFlag: c[j].actualFlag, startDate: c[j].startDate, stopDate: c[j].stopDate };
+                                filteredJson = { month: m[i], region: c[j].region, consumptionQty: consumptionQty, consumptionId: c[j].consumptionId, actualFlag: c[j].actualFlag, consumptionDate: c[j].consumptionDate };
                             }
                         }
                     }
@@ -393,7 +396,9 @@ export default class SupplyPlanComponent extends React.Component {
                             + parseInt(amcDataMonth[i + 1]) + parseInt(amcDataMonth[i + 2])
                             + parseInt(amcDataMonth[i + 3]) + parseInt(amcDataMonth[i + 4])) / 7);
                         amcTotalData.push(amcCalcualted);
+                        console.log(parseInt(minMonthsOfStock))
                         var minStock = parseInt(parseInt(amcCalcualted) * parseInt(minMonthsOfStock));
+                        console.log("MinStock", minStock);
                         minStockArray.push(minStock);
                         var maxForMonths = 0;
                         if (3 > minMonthsOfStock) {
@@ -507,7 +512,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
 
-    consumptionDetailsClicked(startDate, stopDate, region, actualFlag, month) {
+    consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
         if (this.state.consumptionChangedFlag == 0) {
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programId = document.getElementById("programId").value;
@@ -547,16 +552,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                         var consumptionListUnFiltered = (programJson.consumptionList);
                         console.log("Planning Unit Id", planningUnitId);
-                        console.log("Consumption list without var------------>", consumptionListUnFiltered.filter(c => c.planningUnit.id == planningUnitId && c.region.id == region && (c.startDate >= startDate && c.startDate <= stopDate) || (c.stopDate >= startDate && c.stopDate <= stopDate) && c.actualFlag.toString() == actualFlag.toString()))
-                        var consumptionList = consumptionListUnFiltered.filter(con => con.planningUnit.id == planningUnitId && con.region.id == region && ((con.startDate >= startDate && con.startDate <= stopDate) || (con.stopDate >= startDate && con.stopDate <= stopDate)) && con.actualFlag.toString() == actualFlag.toString());
-                        var consumptionListTest = [];
-                        for (var con = 0; con < consumptionListUnFiltered.length; con++) {
-                            if (consumptionListUnFiltered[con].planningUnit.id == planningUnitId) {
-                                consumptionListTest.push(consumptionListUnFiltered[con]);
-                            }
-                        }
-                        console.log("Consumption List check for-------------->", consumptionListTest);
-                        console.log("Consumption List check-------------->", consumptionList);
+                        var consumptionList = consumptionListUnFiltered.filter(con => con.planningUnit.id == planningUnitId && con.region.id == region && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)) && con.actualFlag.toString() == actualFlag.toString());
                         this.el = jexcel(document.getElementById("consumptionDetailsTable"), '');
                         this.el.destroy();
                         var data = [];
@@ -569,8 +565,12 @@ export default class SupplyPlanComponent extends React.Component {
                             data[2] = consumptionList[j].dataSource.id;
                             data[3] = consumptionList[j].consumptionQty;
                             data[4] = consumptionList[j].dayOfStockOut;
-                            data[5] = consumptionList[j].notes;
-                            data[6] = consumptionListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == region && c.startDate == consumptionList[j].startDate && c.stopDate == consumptionList[j].stopDate && c.actualFlag.toString() == actualFlag.toString());
+                            if (consumptionList[j].notes===null || ((consumptionList[j].notes).trim() == "NULL")) {
+                                data[5] = "";
+                            } else {
+                                data[5] = consumptionList[j].notes;
+                            }
+                            data[6] = consumptionListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == region && c.consumptionDate == consumptionList[j].consumptionDate && c.actualFlag.toString() == actualFlag.toString());
                             consumptionDataArr[j] = data;
                         }
                         var options = {
@@ -691,7 +691,11 @@ export default class SupplyPlanComponent extends React.Component {
                                 data[9] = inventoryList[j].actualQty;
                                 data[10] = `=E${j + 1}*J${j + 1}`;
 
-                                data[11] = "";
+                                if (inventoryList[j].notes === null || ((inventoryList[j].notes).trim() == "NULL")) {
+                                    data[11] = "";
+                                } else {
+                                    data[11] = inventoryList[j].notes;
+                                }
                                 data[12] = inventoryListUnFiltered.findIndex(c => c.planningUnit.id == planningUnitId && c.region.id == region && moment(c.inventoryDate).format("MMM YY") == month && c.inventoryDate == inventoryList[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryList[j].realmCountryPlanningUnit.id);
                                 inventoryDataArr[j] = data;
                             }
@@ -1060,7 +1064,7 @@ export default class SupplyPlanComponent extends React.Component {
                         inventoryDataList[parseInt(map.get("12"))].notes = parseInt(map.get("11"));
 
 
-                        var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3"));
+                        var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
                         for (var j = 0; j < inventoryDataListFiltered.length; j++) {
                             var inventoryId = inventoryDataListFiltered[j].inventoryId;
                             var index;
@@ -1089,7 +1093,7 @@ export default class SupplyPlanComponent extends React.Component {
                         this.toggleLarge('Adjustments');
                         this.setState({
                             message: `Inventory Data Saved`,
-                            consumptionChangedFlag: 0
+                            inventoryChangedFlag: 0
                         })
                         this.formSubmit(this.state.monthCount);
                     }.bind(this)
@@ -1219,7 +1223,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
                                         </div>
                                     </Row>
-                                    <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
                                                 <th></th>
@@ -1255,6 +1259,22 @@ export default class SupplyPlanComponent extends React.Component {
                                                     ))
                                                 }
                                             </tr>
+                                            <tr>
+                                                <td>Min stock</td>
+                                                {
+                                                    this.state.minStockArray.map(item1 => (
+                                                        <td>{item1}</td>
+                                                    ))
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td>Max stock</td>
+                                                {
+                                                    this.state.maxStockArray.map(item1 => (
+                                                        <td>{item1}</td>
+                                                    ))
+                                                }
+                                            </tr>
                                         </tbody>
                                     </Table>
                                 </div>
@@ -1272,7 +1292,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
                                             <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
                                         </div>
-                                        <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
                                                     <th></th>
@@ -1324,7 +1344,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     </ModalBody>
                                     <ModalFooter>
-                                        {this.state.consumptionChangedFlag == 1 && <Button type="submit"  size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                        {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
                                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
                                     </ModalFooter>
                                 </Modal>
@@ -1337,7 +1357,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
                                             <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
                                         </div>
-                                        <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
                                                     <th></th>
