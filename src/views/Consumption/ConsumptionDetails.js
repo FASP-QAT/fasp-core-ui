@@ -803,69 +803,84 @@ export default class ConsumptionDetails extends React.Component {
                     var consumptionDataList = (programJson.consumptionList).filter(c => c.planningUnit.id == plannigUnitId);
                     var consumptionDataListNotFiltered = programJson.consumptionList;
 
-                    // console.log("000000000000000   ", consumptionDataList)
-                    // var count = 0;
-                    for (var i = 0; i < consumptionDataList.length; i++) {
-                        // if (consumptionDataList[count] != undefined) {
-                        // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
-                        // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId && consumptionDataList[count].planningUnit.id == consumptionDataListNotFiltered[i].planningUnit.id) {
-                        var map = new Map(Object.entries(tableJson[i]));
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].dataSource.id = map.get("0");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionQty = map.get("2");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].dayOfStockOut = parseInt(map.get("3"));
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = moment(map.get("4")).format("YYYY-MM-DD");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = moment(map.get("5")).format("YYYY-MM-DD");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].actualFlag = map.get("6");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
+                    var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                    var planningUnitOs = planningUnitTransaction.objectStore('planningUnit');
+                    var planningUnitRequest = planningUnitOs.getAll();
+                    var productCategoryId = 0;
 
-                        // if (consumptionDataList.length >= count) {
-                        //     count++;
-                        // }
-                        // }
-
-                        // }
-
-                    }
-                    for (var i = consumptionDataList.length; i < tableJson.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
-                        var json = {
-                            consumptionId: 0,
-                            dataSource: {
-                                id: map.get("0")
-                            },
-                            region: {
-                                id: map.get("1")
-                            },
-                            consumptionQty: map.get("2"),
-                            dayOfStockOut: parseInt(map.get("3")),
-                            startDate: moment(map.get("4")).format("YYYY-MM-DD"),
-                            stopDate: moment(map.get("5")).format("YYYY-MM-DD"),
-                            actualFlag: map.get("6"),
-                            active: map.get("7"),
-
-                            planningUnit: {
-                                id: plannigUnitId
-                            }
+                    
+                    planningUnitRequest.onsuccess = function (event) {
+                        var planningUnitResult = [];
+                        planningUnitResult = planningUnitRequest.result;
+                        for (var k = 0; k < planningUnitResult.length; k++) {
+                            
                         }
-                        consumptionDataList.push(json);
-                        consumptionDataListNotFiltered.push(json);
-                    }
-                    console.log("1111111111111111111   ", consumptionDataList)
-                    programJson.consumptionList = consumptionDataListNotFiltered;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
 
-                    putRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    putRequest.onsuccess = function (event) {
-                        // $("#saveButtonDiv").hide();
-                        this.setState({
-                            message: 'static.message.consumptionSaved',
-                            changedFlag: 0
-                        })
-                        this.props.history.push(`/dashboard/` + i18n.t('static.message.consumptionSuccess'))
+
+                        // console.log("000000000000000   ", consumptionDataList)
+                        // var count = 0;
+                        for (var i = 0; i < consumptionDataList.length; i++) {
+                            // if (consumptionDataList[count] != undefined) {
+                            // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
+                            // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId && consumptionDataList[count].planningUnit.id == consumptionDataListNotFiltered[i].planningUnit.id) {
+                            var map = new Map(Object.entries(tableJson[i]));
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].dataSource.id = map.get("0");
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionQty = map.get("2");
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].dayOfStockOut = parseInt(map.get("3"));
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = moment(map.get("4")).format("YYYY-MM-DD");
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = moment(map.get("5")).format("YYYY-MM-DD");
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].actualFlag = map.get("6");
+                            consumptionDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
+
+                            // if (consumptionDataList.length >= count) {
+                            //     count++;
+                            // }
+                            // }
+
+                            // }
+
+                        }
+                        for (var i = consumptionDataList.length; i < tableJson.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]))
+                            var json = {
+                                consumptionId: '',
+                                dataSource: {
+                                    id: map.get("0")
+                                },
+                                region: {
+                                    id: map.get("1")
+                                },
+                                consumptionQty: map.get("2"),
+                                dayOfStockOut: parseInt(map.get("3")),
+                                startDate: moment(map.get("4")).format("YYYY-MM-DD"),
+                                stopDate: moment(map.get("5")).format("YYYY-MM-DD"),
+                                actualFlag: map.get("6"),
+                                active: map.get("7"),
+
+                                planningUnit: {
+                                    id: plannigUnitId
+                                }
+                            }
+                            consumptionDataList.push(json);
+                            consumptionDataListNotFiltered.push(json);
+                        }
+                        console.log("1111111111111111111   ", consumptionDataList)
+                        programJson.consumptionList = consumptionDataListNotFiltered;
+                        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        var putRequest = programTransaction.put(programRequest.result);
+
+                        putRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        putRequest.onsuccess = function (event) {
+                            // $("#saveButtonDiv").hide();
+                            this.setState({
+                                message: 'static.message.consumptionSaved',
+                                changedFlag: 0
+                            })
+                            this.props.history.push(`/dashboard/` + i18n.t('static.message.consumptionSuccess'))
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)

@@ -636,7 +636,7 @@ export default class AddInventory extends Component {
                             expiryDate = ""
                         }
                         var json = {
-                            inventoryId: 0,
+                            inventoryId: '',
                             dataSource: {
                                 id: map.get("0")
                             },
