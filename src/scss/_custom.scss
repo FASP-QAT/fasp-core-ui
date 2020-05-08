@@ -564,6 +564,11 @@ label.arrow_label:after {
   background-clip: padding-box;
   border: 1px solid #e4e7ea;
 }
+
+.jexcel
+{
+  width:100%!important;
+}
 // :first-child.jexcel_filter{position: absolute; bottom: 0px;}
 .jexcel_pagination_dropdown option {
   position: absolute;
@@ -1551,10 +1556,6 @@ input::placeholder {
     left: 92.95%;
   }
 }
-.chartjs-tooltip {
-  left: 388px !important;
-  top: 222px !important;
-}
 
 .react-confirm-alert-body {
   width: 100% !important;
@@ -1599,4 +1600,12 @@ input::placeholder {
   color: #20a8d8;
   font-size: 13px;
   // margin-right: 9%;
+}
+
+.legend-supplypln {
+  margin-bottom: 0px;
+}
+.modal-title-sp
+{
+  font-weight: 600;;
 }

@@ -1101,7 +1101,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                             {regions}
                                                                         </Input>
                                                                         <InputGroupAddon addonType="append">
-                                                                            &nbsp;<Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                                                            &nbsp;&nbsp;<Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                 </div>
@@ -1160,12 +1160,12 @@ export default class SupplyPlanComponent extends React.Component {
                                     <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
                                     <ModalBody>
                                         <Card>
-                                            <ul className="legend">
+                                            <ul className="legend legend-supplypln">
                                                 <li><span className="purplelegend"></span> Forecasted consumption</li>
                                                 <li><span className="blacklegend"></span> Actual consumption</li>
                                             </ul>
                                         </Card>
-                                        <Table bordered responsive size="sm" options={this.options}>
+                                        <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
                                                     <th></th>
@@ -1217,8 +1217,8 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     </ModalBody>
                                     <ModalFooter>
-                                        {this.state.consumptionChangedFlag == 1 && <Button type="submit" color="primary" onClick={this.saveConsumption}>Save</Button>}{' '}
-                                        <Button color="secondary" onClick={() => this.toggleLarge('Consumption')}>Cancel</Button>
+                                        {this.state.consumptionChangedFlag == 1 && <Button type="submit"  size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
                                     </ModalFooter>
                                 </Modal>
 
@@ -1226,7 +1226,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                                     <ModalHeader toggle={() => this.toggleLarge('Adjustments')}>Adjustments Details</ModalHeader>
                                     <ModalBody>
-                                        <Table bordered responsive size="sm" options={this.options}>
+                                        <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
                                                     <th></th>
@@ -1272,8 +1272,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         </div>
                                     </ModalBody>
                                     <ModalFooter>
-                                        {this.state.inventoryChangedFlag == 1 && <Button color="primary" onClick={this.saveInventory}>Save</Button>}{' '}
-                                        <Button color="secondary" onClick={() => this.toggleLarge('Adjustments')}>Cancel</Button>
+                                        {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
                                     </ModalFooter>
                                 </Modal>
                             </CardBody>
