@@ -194,7 +194,7 @@ const routes = [
   { path: '/program/programOnboarding', name: 'Program Onboarding', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
-  { path: '/', exact: true, name: 'Home' },
+  { path: '/', exact: true, name: i18n.t('static.home') },
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
   { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.dimension') }), component: AddDimension },
   { path: '/diamension/diamensionlist', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.dimension') }), component: DimensionList },
@@ -228,7 +228,7 @@ const routes = [
   { path: '/budget/listBudget/:message', component: ListBudgetComponent },
   { path: '/budget/editBudget/:budgetId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.budget') }), component: EditBudgetComponent },
 
-  { path: '/', exact: true, name: 'Home' },
+  { path: '/', exact: true, name: i18n.t('static.home') },
 
   { path: '/healthArea/addHealthArea', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.healtharea') }), component: AddHealthArea },
   { path: '/healthArea/listHealthArea/:message', component: HealthAreaList },

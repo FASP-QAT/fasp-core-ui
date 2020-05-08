@@ -21,6 +21,8 @@ import routes from '../../routes';
 import LogoutService from "../../api/LogoutService";
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 import i18n from '../../i18n'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
@@ -36,7 +38,21 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    this.props.history.push(`/logout/static.logoutSuccess`)
+    confirmAlert({
+      message: i18n.t('static.logout.confirmLogout'),
+      buttons: [
+        {
+          label: i18n.t('static.program.yes'),
+          onClick: () => {
+            this.props.history.push(`/logout/static.logoutSuccess`)
+          }
+        },
+        {
+          label: i18n.t('static.program.no')
+        }
+      ]
+    });
+
   }
 
   render() {
@@ -370,7 +386,7 @@ class DefaultLayout extends Component {
                       //     }
                       //   ]
                       // },
-                      ,{
+                      , {
                         name: 'Program Onboarding',
                         url: '/program/programOnboarding',
                         icon: 'icon-graph'
@@ -412,7 +428,7 @@ class DefaultLayout extends Component {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
                         children: [
-                           {
+                          {
                             name: i18n.t('static.dashboard.consumption'),
                             url: '/report/consumption',
                             icon: 'fa fa-exchange'
@@ -422,11 +438,11 @@ class DefaultLayout extends Component {
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
                           },
-                         /* {
-                            name: i18n.t('static.dashboard.stockstatus'),
-                            url: '/report/stockStatus',
-                            icon: 'fa fa-exchange'
-                          }*/
+                          /* {
+                             name: i18n.t('static.dashboard.stockstatus'),
+                             url: '/report/stockStatus',
+                             icon: 'fa fa-exchange'
+                           }*/
                         ]
                       }
                     ]
