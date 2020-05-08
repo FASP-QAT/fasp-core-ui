@@ -505,7 +505,7 @@ export default class ProductCategoryTree extends Component {
                                                                 <FormFeedback className="red">{errors.productCategory}</FormFeedback>
                                                             </Col>
                                                             <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                <Button  className="text-white" type="submit" size="sm" color="info" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i>Add</Button>
+                                                                <Button  className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
                                                             </Col>
                                                         </Row>
                                                     </FormGroup>
@@ -568,7 +568,7 @@ export default class ProductCategoryTree extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="reset" size="md" onClick={this.reSetTree} color="danger" className="float-right mr-1"><i className="fa fa-ban"></i> Reset</Button>
+                                    <Button type="reset" size="md" onClick={this.reSetTree} color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 </ FormGroup>
                             </CardFooter>

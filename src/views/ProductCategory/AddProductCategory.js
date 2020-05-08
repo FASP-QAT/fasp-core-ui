@@ -254,7 +254,7 @@ export default class AddProductCategory extends React.Component {
                                             <Input type="text" value={this.state.nodename} onChange={this.dataChange} name="newNode" />
                                         </Col>
                                         <Col md={2} style={{ paddingTop: '29px' }}>
-                                            <Button type="button" size="sm" color="info" onClick={this.addNewNode}><i className="fa fa-plus"></i>Add</Button>
+                                            <Button type="button" size="sm" color="success" onClick={this.addNewNode}><i className="fa fa-plus"></i> Add</Button>
                                         </Col>
                                     </Row>
                                 </FormGroup>

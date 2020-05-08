@@ -848,7 +848,7 @@ export default class ConsumptionDetails extends React.Component {
                                 id: plannigUnitId
                             }
                         }
-                        // consumptionDataList[i] = json;
+                        consumptionDataList.push(json);
                         consumptionDataListNotFiltered.push(json);
                     }
                     console.log("1111111111111111111   ", consumptionDataList)

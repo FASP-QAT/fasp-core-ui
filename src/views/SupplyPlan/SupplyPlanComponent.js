@@ -39,7 +39,10 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryTotalData: [],
             inventoryFilteredArray: [],
             inventoryTotalMonthWise: [],
-            inventoryChangedFlag: 0
+            inventoryChangedFlag: 0,
+            monthCount: 0,
+            monthCountConsumption: 0,
+            monthCountAdjustments: 0
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -54,14 +57,24 @@ export default class SupplyPlanComponent extends React.Component {
         this.checkValidationInventory = this.checkValidationInventory.bind(this);
         this.inventoryOnedit = this.inventoryOnedit.bind(this);
         this.saveInventory = this.saveInventory.bind(this);
+        this.leftClicked = this.leftClicked.bind(this);
+        this.rightClicked = this.rightClicked.bind(this);
+        this.leftClickedConsumption = this.leftClickedConsumption.bind(this);
+        this.rightClickedConsumption = this.rightClickedConsumption.bind(this);
+
+        this.leftClickedAdjustments = this.leftClickedAdjustments.bind(this);
+        this.rightClickedAdjustments = this.rightClickedAdjustments.bind(this);
     }
 
     toggleLarge(supplyPlanType, month, quantity) {
         var supplyPlanType = supplyPlanType;
         if (supplyPlanType == 'Consumption') {
+            var monthCountConsumption = this.state.monthCount;
             this.setState({
                 consumption: !this.state.consumption,
+                monthCountConsumption: monthCountConsumption
             });
+            this.formSubmit(monthCountConsumption);
         } else if (supplyPlanType == 'Actual QAT Orders') {
             this.setState({
                 actualQATOrders: !this.state.actualQATOrders,
@@ -73,9 +86,12 @@ export default class SupplyPlanComponent extends React.Component {
                 qty: quantity
             });
         } else if (supplyPlanType == 'Adjustments') {
+            var monthCountAdjustments = this.state.monthCount;
             this.setState({
                 adjustments: !this.state.adjustments,
+                monthCountAdjustments: monthCountAdjustments
             });
+            this.formSubmit(monthCountAdjustments);
         } else if (supplyPlanType == 'QAT Recommended Order Qty') {
             this.setState({
                 QATRecommendedOrderQty: !this.state.QATRecommendedOrderQty,
@@ -140,6 +156,60 @@ export default class SupplyPlanComponent extends React.Component {
             monthsArray: month
         })
         return month;
+    }
+
+    leftClicked() {
+        var monthCount = (this.state.monthCount) - 1;
+        console.log("MonthCount---------->", monthCount);
+        this.setState({
+            monthCount: monthCount
+        })
+        this.formSubmit(monthCount)
+    }
+
+    rightClicked() {
+        var monthCount = (this.state.monthCount) + 1;
+        console.log("MonthCount---------->", monthCount);
+        this.setState({
+            monthCount: monthCount
+        })
+        this.formSubmit(monthCount)
+    }
+
+    leftClickedConsumption() {
+        var monthCountConsumption = (this.state.monthCountConsumption) - 1;
+        console.log("MonthCount---------->", monthCountConsumption);
+        this.setState({
+            monthCountConsumption: monthCountConsumption
+        })
+        this.formSubmit(monthCountConsumption)
+    }
+
+    rightClickedConsumption() {
+        var monthCountConsumption = (this.state.monthCountConsumption) + 1;
+        console.log("MonthCount---------->", monthCountConsumption);
+        this.setState({
+            monthCountConsumption: monthCountConsumption
+        })
+        this.formSubmit(monthCountConsumption);
+    }
+
+    leftClickedAdjustments() {
+        var monthCountAdjustments = (this.state.monthCountAdjustments) - 1;
+        console.log("MonthCount---------->", monthCountAdjustments);
+        this.setState({
+            monthCountAdjustments: monthCountAdjustments
+        })
+        this.formSubmit(monthCountAdjustments)
+    }
+
+    rightClickedAdjustments() {
+        var monthCountAdjustments = (this.state.monthCountAdjustments) + 1;
+        console.log("MonthCount---------->", monthCountAdjustments);
+        this.setState({
+            monthCountAdjustments: monthCountAdjustments
+        })
+        this.formSubmit(monthCountAdjustments);
     }
 
     componentDidMount() {
@@ -237,9 +307,10 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
 
-    formSubmit() {
+    formSubmit(monthCount) {
         document.getElementById("supplyPlanTableId").style.display = 'block';
-        var m = this.getMonthArray(moment(Date.now()).utcOffset('-0500'));
+        var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
+        console.log("M----------------->", m);
         var programId = document.getElementById("programId").value;
         var regionId = document.getElementById("regionId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
@@ -883,7 +954,7 @@ export default class SupplyPlanComponent extends React.Component {
                             message: `Consumption Data Saved`,
                             consumptionChangedFlag: 0
                         })
-                        this.formSubmit();
+                        this.formSubmit(this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -990,7 +1061,7 @@ export default class SupplyPlanComponent extends React.Component {
                             message: `Inventory Data Saved`,
                             consumptionChangedFlag: 0
                         })
-                        this.formSubmit();
+                        this.formSubmit(this.state.monthCount);
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -1101,7 +1172,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                             {regions}
                                                                         </Input>
                                                                         <InputGroupAddon addonType="append">
-                                                                            &nbsp;&nbsp;<Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                                                            &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
                                                                         </InputGroupAddon>
                                                                     </InputGroup>
                                                                 </div>
@@ -1111,50 +1182,52 @@ export default class SupplyPlanComponent extends React.Component {
                                                 </Form>
 
                                             )} />
-                                <Row>
-                                    <div className="col-md-12">
-                                        <span className="supplyplan-larrow"> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
-                                        <span className="supplyplan-rarrow"> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
-                                    </div>
-                                </Row>
-                                <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options} id="supplyPlanTableId" style={{ display: 'none' }}>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            {
-                                                this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                    <th>{item.month}</th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Consumption', '', '')}>
-                                            <td>Consumption</td>
-                                            {
-                                                this.state.consumptionTotalData.map(item1 => (
-                                                    <td>{item1}</td>
-                                                ))
-                                            }
-                                        </tr>
-                                        <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Adjustments', '', '')}>
-                                            <td>Adjustments</td>
-                                            {
-                                                this.state.inventoryTotalData.map(item1 => (
-                                                    <td>{item1}</td>
-                                                ))
-                                            }
-                                        </tr>
-                                        <tr>
-                                            <td>AMC</td>
-                                            {
-                                                this.state.amcTotalData.map(item1 => (
-                                                    <td>{item1}</td>
-                                                ))
-                                            }
-                                        </tr>
-                                    </tbody>
-                                </Table>
+                                <div id="supplyPlanTableId" style={{ display: 'none' }}>
+                                    <Row>
+                                        <div className="col-md-12">
+                                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                        </div>
+                                    </Row>
+                                    <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                {
+                                                    this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                        <th>{item.month}</th>
+                                                    ))
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Consumption', '', '')}>
+                                                <td>Consumption</td>
+                                                {
+                                                    this.state.consumptionTotalData.map(item1 => (
+                                                        <td>{item1}</td>
+                                                    ))
+                                                }
+                                            </tr>
+                                            <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                                <td>Adjustments</td>
+                                                {
+                                                    this.state.inventoryTotalData.map(item1 => (
+                                                        <td>{item1}</td>
+                                                    ))
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <td>AMC</td>
+                                                {
+                                                    this.state.amcTotalData.map(item1 => (
+                                                        <td>{item1}</td>
+                                                    ))
+                                                }
+                                            </tr>
+                                        </tbody>
+                                    </Table>
+                                </div>
                                 <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
                                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                                     <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
@@ -1165,6 +1238,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                 <li><span className="blacklegend"></span> Actual consumption</li>
                                             </ul>
                                         </Card>
+                                        <div className="col-md-12">
+                                            <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                            <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                        </div>
                                         <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
@@ -1226,6 +1303,10 @@ export default class SupplyPlanComponent extends React.Component {
                                     className={'modal-lg ' + this.props.className, "modalWidth"}>
                                     <ModalHeader toggle={() => this.toggleLarge('Adjustments')}>Adjustments Details</ModalHeader>
                                     <ModalBody>
+                                        <div className="col-md-12">
+                                            <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                            <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                        </div>
                                         <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>

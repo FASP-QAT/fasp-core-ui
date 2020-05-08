@@ -509,6 +509,7 @@ label.arrow_label:after {
 }
 .jexcel > tbody > tr > td {
   padding: 6px !important;
+  line-height: 15px;
 }
 .jexcel > thead > tr > td {
   padding: 6px !important;
@@ -1609,3 +1610,4 @@ input::placeholder {
 {
   font-weight: 600;;
 }
+
