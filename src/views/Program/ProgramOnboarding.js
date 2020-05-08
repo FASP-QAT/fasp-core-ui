@@ -572,7 +572,7 @@ export default class ProgramOnboarding extends Component {
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realms}
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-right mr-1 nextbtn" type="button" name="planningPrevious" id="planningPrevious" onClick={this.finishedStepOne} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
                                 </div>
@@ -588,7 +588,7 @@ export default class ProgramOnboarding extends Component {
                                             {realmCountries}
                                         </Input>
                                     </FormGroup>
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="countrySub" id="countrySub" onClick={this.finishedStepTwo} >Next <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-right mr-1 nextbtn" type="button" name="countrySub" id="countrySub" onClick={this.finishedStepTwo} >Next <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                     <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                     &nbsp;
@@ -608,7 +608,7 @@ export default class ProgramOnboarding extends Component {
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {realmHealthArea}
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthAreaSub" id="healthAreaSub" onClick={this.finishedStepThree} >Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-right mr-1 nextbtn" type="button" name="healthAreaSub" id="healthAreaSub" onClick={this.finishedStepThree} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
@@ -630,7 +630,7 @@ export default class ProgramOnboarding extends Component {
                                             {realmOrganisation}
 
                                         </Input>
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationSub" id="organizationSub" onClick={this.finishedStepFour} >Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-right mr-1 nextbtn" type="button" name="organizationSub" id="organizationSub" onClick={this.finishedStepFour} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
@@ -650,7 +650,7 @@ export default class ProgramOnboarding extends Component {
                                             options={this.state.regionList}
                                             value={this.state.regionId}
                                         />
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-right mr-1 nextbtn" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                         <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
@@ -779,7 +779,7 @@ export default class ProgramOnboarding extends Component {
                                             name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSix}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                    <Button color="info" size="md" className="float-right mr-1 nextbtn" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSix}>Next <i className="fa fa-angle-double-right"></i></Button>
                                     &nbsp;
                                     <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                     </FormGroup>
