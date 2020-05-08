@@ -1219,7 +1219,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
                                         </div>
                                     </Row>
-                                    <Table bordered responsive size="sm" options={this.options}>
+                                    <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
                                                 <th></th>
@@ -1263,7 +1263,7 @@ export default class SupplyPlanComponent extends React.Component {
                                     <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
                                     <ModalBody>
                                         <Card>
-                                            <ul className="legend">
+                                            <ul className="legend legend-supplypln">
                                                 <li><span className="purplelegend"></span> Forecasted consumption</li>
                                                 <li><span className="blacklegend"></span> Actual consumption</li>
                                             </ul>
@@ -1272,7 +1272,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
                                             <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
                                         </div>
-                                        <Table bordered responsive size="sm" options={this.options}>
+                                        <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
                                                     <th></th>
@@ -1324,8 +1324,8 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     </ModalBody>
                                     <ModalFooter>
-                                        {this.state.consumptionChangedFlag == 1 && <Button type="submit" color="primary" onClick={this.saveConsumption}>Save</Button>}{' '}
-                                        <Button color="secondary" onClick={() => this.toggleLarge('Consumption')}>Cancel</Button>
+                                        {this.state.consumptionChangedFlag == 1 && <Button type="submit"  size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
                                     </ModalFooter>
                                 </Modal>
 
@@ -1337,7 +1337,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
                                             <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
                                         </div>
-                                        <Table bordered responsive size="sm" options={this.options}>
+                                        <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                             <thead>
                                                 <tr>
                                                     <th></th>
@@ -1383,8 +1383,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         </div>
                                     </ModalBody>
                                     <ModalFooter>
-                                        {this.state.inventoryChangedFlag == 1 && <Button color="primary" onClick={this.saveInventory}>Save</Button>}{' '}
-                                        <Button color="secondary" onClick={() => this.toggleLarge('Adjustments')}>Cancel</Button>
+                                        {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
                                     </ModalFooter>
                                 </Modal>
                             </CardBody>
