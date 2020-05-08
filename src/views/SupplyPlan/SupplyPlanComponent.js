@@ -42,7 +42,11 @@ export default class SupplyPlanComponent extends React.Component {
             inventoryChangedFlag: 0,
             monthCount: 0,
             monthCountConsumption: 0,
-            monthCountAdjustments: 0
+            monthCountAdjustments: 0,
+            minStockArray: [],
+            maxStockArray: [],
+            minMonthOfStock: 0,
+            reorderFrequency: 0
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -314,12 +318,16 @@ export default class SupplyPlanComponent extends React.Component {
         var programId = document.getElementById("programId").value;
         var regionId = document.getElementById("regionId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
+        var programPlanningUnit = ((this.state.planningUnitList).filter(p => p.planningUnitId = planningUnitId))[0]
+        var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
+        var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
         var regionListFiltered = [];
         if (regionId != -1) {
             regionListFiltered = (this.state.regionList).filter(r => r.id == regionId);
         } else {
             regionListFiltered = this.state.regionList
         }
+
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
@@ -333,6 +341,8 @@ export default class SupplyPlanComponent extends React.Component {
             var amcTotalData = [];
             var consumptionTotalMonthWise = [];
             var filteredArray = [];
+            var minStockArray = [];
+            var maxStockArray = [];
 
             var inventoryTotalData = [];
             var inventoryTotalMonthWise = [];
@@ -378,11 +388,29 @@ export default class SupplyPlanComponent extends React.Component {
 
                 for (var i = 0; i < 24; i++) {
                     if (i >= 2 && i < 20) {
-                        var amcCalcualted = parseFloat((parseInt(amcDataMonth[i - 2]) + parseInt(amcDataMonth[i - 1])
+                        var amcCalcualted = Math.floor((parseInt(amcDataMonth[i - 2]) + parseInt(amcDataMonth[i - 1])
                             + parseInt(amcDataMonth[i])
                             + parseInt(amcDataMonth[i + 1]) + parseInt(amcDataMonth[i + 2])
-                            + parseInt(amcDataMonth[i + 3]) + parseInt(amcDataMonth[i + 4])) / 7).toFixed(2);
+                            + parseInt(amcDataMonth[i + 3]) + parseInt(amcDataMonth[i + 4])) / 7);
                         amcTotalData.push(amcCalcualted);
+                        var minStock = parseInt(parseInt(amcCalcualted) * parseInt(minMonthsOfStock));
+                        minStockArray.push(minStock);
+                        var maxForMonths = 0;
+                        if (3 > minMonthsOfStock) {
+                            maxForMonths = 3
+                        } else {
+                            maxForMonths = minMonthsOfStock
+                        }
+
+                        var minForMonths = 0;
+                        if (18 < (maxForMonths + reorderFrequencyInMonths)) {
+                            minForMonths = 18
+                        } else {
+                            minForMonths = (maxForMonths + reorderFrequencyInMonths);
+                        }
+                        var maxStock = parseInt(parseInt(amcCalcualted) * parseInt(minForMonths));;
+                        maxStockArray.push(maxStock);
+
                     }
                 }
 
@@ -418,7 +446,9 @@ export default class SupplyPlanComponent extends React.Component {
                     consumptionFilteredArray: filteredArray,
                     regionListFiltered: regionListFiltered,
                     consumptionTotalMonthWise: consumptionTotalMonthWise,
-                    amcTotalData: amcTotalData
+                    amcTotalData: amcTotalData,
+                    minStockArray: minStockArray,
+                    maxStockArray: maxStockArray
                 })
 
 
