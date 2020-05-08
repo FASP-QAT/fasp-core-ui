@@ -31,6 +31,9 @@ export default class ConsumptionDetails extends React.Component {
             changedFlag: 0,
             planningUnitList: [],
             shipmentStatusList: [],
+            procurementUnitList: [],
+            supplierList: [],
+            allowShipmentStatusList: [],
             message: '',
         }
 
@@ -448,8 +451,8 @@ export default class ConsumptionDetails extends React.Component {
                             data[17] = '';
                             data[18] = '7.83';
                             data[19] = '';
-                            data[20] = 'dgre43';
-                            data[21] = false;
+                            data[20] = '';
+                            data[21] = '';
                             data[22] = '';
                             data[23] = '1500';
                             data[24] = '30000';
@@ -612,7 +615,7 @@ export default class ConsumptionDetails extends React.Component {
                     }
 
                     if (shipmentStatusId == 3) {
-                        document.getElementById("addButton").style.display = "block";
+                        document.getElementById("addButton").style.display = "none";
 
                         // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId && c.shipmentStatus.id == 2);
                         var shipmentList = '';
@@ -807,11 +810,274 @@ export default class ConsumptionDetails extends React.Component {
 
                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
+                    }
+
+                    if (shipmentStatusId == 4) {
+                        document.getElementById("addButton").style.display = "none";
+                        var paList = [];
+                        var supList = [];
+                        var allowShipStatusList = [];
+                        var currentShipmentId = 3;
+                        var nextShipmentAllowedList = [];
+
+                        var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                        var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
+                        var procurementUnitRequest = procurementUnitOs.getAll();
+                        procurementUnitRequest.onsuccess = function (event) {
+
+                            var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
+                            var supplierOs = supplierTransaction.objectStore('supplier');
+                            var supplierRequest = supplierOs.getAll();
+                            supplierRequest.onsuccess = function (event) {
+
+                                var procurementUnitResult = [];
+                                procurementUnitResult = procurementUnitRequest.result;
+                                for (var k = 0; k < procurementUnitResult.length; k++) {
+                                    var paJson = {
+                                        name: procurementUnitResult[k].label.label_en,
+                                        id: procurementUnitResult[k].procurementUnitId
+                                    }
+                                    paList[k] = paJson;
+                                }
+
+                                var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                                var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
+                                var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
 
 
+                                allowShipmentStatusRequest.onsuccess = function (event) {
+
+                                    var allowShipmentStatusResult = [];
+                                    allowShipmentStatusResult = allowShipmentStatusRequest.result;
+
+                                    for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                        if (currentShipmentId == allowShipmentStatusResult[k].shipmentStatusId) {
+                                            nextShipmentAllowedList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
+                                        }
+                                    }
+
+                                    var count = 0;
+                                    for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                        if (nextShipmentAllowedList[count] == allowShipmentStatusResult[k].shipmentStatusId) {
+                                            var allowShipStatusJson = {
+                                                name: allowShipmentStatusResult[k].label.label_en,
+                                                id: allowShipmentStatusResult[k].shipmentStatusId
+                                            }
+                                            allowShipStatusList[count] = allowShipStatusJson;
+                                            count++;
+                                        }
+                                    }
+                                    
+                                    this.setState({
+                                        allowShipmentStatusList: allowShipStatusList
+                                    });
+
+                                    this.setState({
+                                        procurementAgentList: paList
+                                    });
+
+                                    var supplierResult = [];
+                                    supplierResult = supplierRequest.result;
+                                    for (var k = 0; k < supplierResult.length; k++) {
+                                        var supplierJson = {
+                                            name: supplierResult[k].label.label_en,
+                                            id: supplierResult[k].supplierId
+                                        }
+                                        supList[k] = supplierJson;
+                                    }
+
+                                    this.setState({
+                                        supplierList: supList
+                                    });
+
+                                    // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId && c.shipmentStatus.id == 2);
+                                    var shipmentList = '';
+
+                                    this.setState({
+                                        shipmentList: shipmentList
+                                    });
+
+                                    var data = [];
+                                    var shipmentDataArr = [];
 
 
+                                    // for (var j = 0; j < shipmentList.length; j++) {
+                                    //     if (shipmentList[j].shipmentId == 0 && shipmentList[j].shipmentStatusId == 1) {
+                                    //         data = [];
+                                    //         data[0] = shipmentList[j].dataSource.id;
+                                    //         data[1] = shipmentList[j].region.id;
+                                    //         data[2] = shipmentList[j].consumptionQty;
+                                    //         data[3] = shipmentList[j].dayOfStockOut;
+                                    //         data[4] = shipmentList[j].startDate;
+                                    //         data[5] = shipmentList[j].stopDate;
+                                    //         data[6] = shipmentList[j].actualFlag;
+                                    //     }
 
+                                    //     shipmentDataArr[j] = data;
+                                    // }
+
+                                    data = [];
+                                    data[0] = '';
+                                    data[1] = '10-09-2020';
+                                    data[2] = '';
+                                    data[3] = 'PSM';
+                                    data[4] = 'USAID';
+                                    data[5] = 'Kenya - 2020 budget';
+                                    data[6] = planningUnitText;
+                                    data[7] = '44773';
+                                    data[8] = '45000'; //moq
+                                    data[9] = '';
+                                    data[10] = '60000';
+                                    data[11] = '40000';
+                                    data[12] = '2';
+                                    data[13] = '';
+                                    data[14] = '';
+                                    data[15] = '';
+                                    data[16] = '7.83';
+                                    data[17] = '670000';
+                                    data[18] = 'dgre43';
+                                    data[19] = '';
+
+
+                                    shipmentDataArr[0] = data;
+
+                                    this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                    this.el.destroy();
+                                    var json = [];
+                                    var data = shipmentDataArr;
+                                    // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                                    // json[0] = data;
+                                    var options = {
+                                        data: data,
+                                        columnDrag: true,
+                                        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                        columns: [
+                                            // { title: 'Month', type: 'text', readOnly: true },
+                                            {
+                                                title: 'Qat Order No',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Expected Delivery date',
+                                                // type: 'calendar',
+                                                type: 'text',
+                                                readOnly: true
+
+                                            },
+                                            {
+                                                title: 'Shipment Status',
+                                                type: 'dropdown',
+                                                // source: ['Approved', 'Shipped', 'Delivered']
+                                                source: allowShipStatusList
+                                                // readOnly: true
+                                            },
+                                            {
+                                                title: 'Procurement Agent',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Funding Source',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Budget',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Planning Unit',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Suggested Order Qty',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'MoQ',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'User Qty',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Adjusted Order Qty',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Adjusted Pallets',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Adjusted Containers',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Manual Price per Planning Unit',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Procurement Unit',
+                                                type: 'dropdown',
+                                                source: paList
+                                            },
+                                            {
+                                                title: 'Supplier',
+                                                type: 'dropdown',
+                                                source: supList
+                                            },
+                                            {
+                                                title: 'Price per Planning Unit',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Amt',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'RO Number',
+                                                type: 'text',
+                                                // readOnly: true
+                                            },
+                                            {
+                                                title: 'Notes',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+
+                                        ],
+                                        pagination: 10,
+                                        search: true,
+                                        columnSorting: true,
+                                        tableOverflow: true,
+                                        wordWrap: true,
+                                        allowInsertColumn: false,
+                                        allowManualInsertColumn: false,
+                                        allowDeleteRow: false,
+                                        onchange: this.changed,
+                                        oneditionend: this.onedit,
+                                        copyCompatibility: true,
+                                        paginationOptions: [10, 25, 50, 100],
+                                        position: 'top'
+                                    };
+
+                                    this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                                }.bind(this);
+                            }.bind(this);
+                        }.bind(this);
                     }
                 } else {
                     document.getElementById("addButton").style.display = "none";
