@@ -1463,7 +1463,7 @@ export default class SyncMasterData extends Component {
                     label: i18n.t('static.program.yes'),
                     onClick: () => {
                         this.setState({
-                            totalMasters: 20,
+                            totalMasters: 27,
                             syncedMasters: 0,
                             syncedPercentage: 0,
                             errorMessage: "",

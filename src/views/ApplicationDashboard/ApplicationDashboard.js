@@ -1,5 +1,5 @@
 import React, { Component, lazy, Suspense } from 'react';
-import { Bar, Line,Pie} from 'react-chartjs-2';
+import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
 import {
   Badge,
@@ -53,11 +53,11 @@ const pie = {
     'Realm Name 2',
     'Realm Name 3',
 
-   
+
   ],
   datasets: [
     {
-      data: [60, 40, 100,20,10],
+      data: [60, 40, 100, 20, 10],
       backgroundColor: [
         '#4dbd74',
         '#c8ced3',
@@ -76,10 +76,11 @@ const pie = {
 };
 
 const bar = {
-  labels: ['Realm Name 1', 'Realm Name 2', 'Realm Name 3', 'Realm Name 4'],
+
+  labels: [i18n.t('static.realm.realmName') + "1", i18n.t('static.realm.realmName') + "2", i18n.t('static.realm.realmName') + "3", i18n.t('static.realm.realmName') + "4"],
   datasets: [
     {
-      label: 'Active Programs',
+      label: i18n.t('static.graph.activeProgram'),
       backgroundColor: '#118B70',
       borderColor: 'rgba(179,181,198,1)',
       pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -89,7 +90,7 @@ const bar = {
       data: [65, 59, 90, 81, 56, 55, 40],
     },
     {
-      label: 'Inactive Programs',
+      label: i18n.t('static.graph.inactiveProgram'),
       backgroundColor: '#cfcdc9',
       borderColor: 'rgba(255,99,132,1)',
       pointBackgroundColor: 'rgba(255,99,132,1)',
@@ -99,7 +100,7 @@ const bar = {
       data: [28, 48, 40, 19, 96, 27, 100],
     },
   ],
-  
+
 };
 
 
@@ -186,23 +187,22 @@ class ApplicationDashboard extends Component {
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <Row>
           <Col md="12">
-         
-          <Card>
-            <CardHeader className="text-center">
-              <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;Total Realms Count : <span className="count-clr">4</span></b>
-              <div className="card-header-actions">
-              <a className="card-header-action">
-                  {/* <small className="text-muted">98</small> */}
-                </a>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <div className="chart-wrapper chart-graph">
-                <Bar data={bar} options={options} />
-              </div>
-            </CardBody>
-          </Card>
-          </Col> 
+            <Card>
+              <CardHeader className="text-center">
+                <b className="count-text"> <i className="cui-people icons fa-fw"></i> &nbsp;{i18n.t('static.graph.totalRealmCount')} <span className="count-clr">4</span></b>
+                <div className="card-header-actions">
+                  <a className="card-header-action">
+                    {/* <small className="text-muted">98</small> */}
+                  </a>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div className="chart-wrapper chart-graph">
+                  <Bar data={bar} options={options} />
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
         </Row>
         {/* <Row>
         <Col md="8">
@@ -327,8 +327,8 @@ class ApplicationDashboard extends Component {
                 
         </Row> */}
 
-       
-    </div>
+
+      </div>
     );
   }
 }

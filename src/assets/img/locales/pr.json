@@ -1,6 +1,6 @@
 {
     "static.budget.budgetadd": "Añadir presupuesto",
-    "static.dashboard.applicationdashboard": "Panel de aplicaciones",
+    "static.dashboard.applicationdashboard": "Painel de Aplicação",
     "static.budget.budgetlist": "Lista de presupuesto",
     "static.product.productadd": "Adicionar produto",
     "static.product.productedit": "Atualizar produto",
@@ -99,5 +99,10 @@
     "static.language.english": "Inglês",
     "static.language.french": "Francês",
     "static.language.spanish": "Espanhol",
-    "static.language.portuguese": "Português"
+    "static.language.portuguese": "Português",
+    "static.graph.activeProgram": "Programas ativos",
+    "static.graph.inactiveProgram": "Programas inativos",
+    "static.graph.totalRealmCount": "Contagem total de reinos :",
+    "static.logout.confirmLogout": "Tem certeza que deseja sair?",
+    "static.home": "Casa"
 }

@@ -1109,16 +1109,15 @@ export default class SupplyPlanComponent extends React.Component {
                                                         </div>
                                                     </Col>
                                                 </Form>
-                                                
+
                                             )} />
-                                            
-                                    <Row>
-                                     <div className="col-md-12">
+                                <Row>
+                                    <div className="col-md-12">
                                         <span className="supplyplan-larrow"> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
                                         <span className="supplyplan-rarrow"> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
                                     </div>
-                                    </Row>
-                                <Table bordered responsive size="sm" options={this.options} id="supplyPlanTableId" style={{ display: 'none' }}>
+                                </Row>
+                                <Table className="table-striped table-hover table-bordered text-center mt-2" bordered responsive size="sm" options={this.options} id="supplyPlanTableId" style={{ display: 'none' }}>
                                     <thead>
                                         <tr>
                                             <th></th>
