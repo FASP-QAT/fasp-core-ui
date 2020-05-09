@@ -509,6 +509,7 @@ label.arrow_label:after {
 }
 .jexcel > tbody > tr > td {
   padding: 6px !important;
+  line-height: 15px;
 }
 .jexcel > thead > tr > td {
   padding: 6px !important;
@@ -563,6 +564,11 @@ label.arrow_label:after {
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid #e4e7ea;
+}
+
+.jexcel
+{
+  width:100%!important;
 }
 // :first-child.jexcel_filter{position: absolute; bottom: 0px;}
 .jexcel_pagination_dropdown option {
@@ -1498,7 +1504,7 @@ input::placeholder {
   left: 64%;
 }
 .progressbartext6 {
-  left: 78.79%;
+  left: 77.79%;
 }
 .progressbartext7 {
   left: 94.95%;
@@ -1551,10 +1557,6 @@ input::placeholder {
     left: 92.95%;
   }
 }
-.chartjs-tooltip {
-  left: 388px !important;
-  top: 222px !important;
-}
 
 .react-confirm-alert-body {
   width: 100% !important;
@@ -1598,5 +1600,14 @@ input::placeholder {
   float: right;
   color: #20a8d8;
   font-size: 13px;
-  margin-right: 9%;
+  // margin-right: 9%;
 }
+
+.legend-supplypln {
+  margin-bottom: 0px;
+}
+.modal-title-sp
+{
+  font-weight: 600;;
+}
+

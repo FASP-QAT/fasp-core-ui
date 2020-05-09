@@ -371,6 +371,9 @@ export default class ConsumptionDetails extends React.Component {
                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
                                         // var col = ("E").concat(parseInt(0) + 1);
+                                        // ("E").concat(parseInt(0) + 1).addClass('readonly');
+                                        // col.isReadOnly = true;
+                                        // this.el.setConfig(col, "readonly",true);
                                         // this.el.setAttribute(col, "readonly", true);
                                         // this.el.setStyle(col, "readOnly", true);
 
