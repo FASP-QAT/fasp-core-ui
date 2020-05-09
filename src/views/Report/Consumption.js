@@ -704,8 +704,9 @@ class Consumption extends Component {
         <Row>
           <Col lg="12">
             <Card>
-              <CardHeader className="text-center">
-                <b className="count-text">{i18n.t('static.report.consumptionReport')}</b>
+              <CardHeader>
+              <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong>
+                {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                 <Online>
                   {
                     this.state.consumptions.length > 0 &&
