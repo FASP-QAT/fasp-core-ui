@@ -607,14 +607,14 @@ label.arrow_label:after {
   }
 }
 
-.center {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-}
+// .center {
+//   position: absolute;
+//   top: 0;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+//   margin: auto;
+// }
 .RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
