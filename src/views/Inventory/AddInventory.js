@@ -77,10 +77,10 @@ export default class AddInventory extends Component {
         data[3] = `=D${json.length}+E${json.length}`;
         data[4] = "0";
         data[5] = "";
-        data[6] = "";
-        data[7] = "";
-        data[8] = true;
-        data[9] = -1;
+        // data[6] = "";
+        // data[7] = "";
+        data[6] = true;
+        data[7] = -1;
         this.el.insertRow(
             data
         );
@@ -212,10 +212,10 @@ export default class AddInventory extends Component {
                                             data[3] = 0;
                                             data[4] = inventoryList[j].adjustmentQty;
                                             data[5] = inventoryList[j].actualQty;
-                                            data[6] = inventoryList[j].batchNo;
-                                            data[7] = inventoryList[j].expiryDate;
-                                            data[8] = inventoryList[j].active;
-                                            data[9] = j;
+                                            // data[6] = inventoryList[j].batchNo;
+                                            // data[7] = inventoryList[j].expiryDate;
+                                            data[6] = inventoryList[j].active;
+                                            data[7] = j;
                                             inventoryDataArr[count] = data;
                                             count++;
                                         } else {
@@ -226,10 +226,10 @@ export default class AddInventory extends Component {
                                             data[3] = `=D${count}+E${count}`;
                                             data[4] = inventoryList[j].adjustmentQty;
                                             data[5] = inventoryList[j].actualQty;
-                                            data[6] = inventoryList[j].batchNo;
-                                            data[7] = inventoryList[j].expiryDate;
-                                            data[8] = inventoryList[j].active;
-                                            data[9] = j;
+                                            // data[6] = inventoryList[j].batchNo;
+                                            // data[7] = inventoryList[j].expiryDate;
+                                            data[6] = inventoryList[j].active;
+                                            data[7] = j;
                                             inventoryDataArr[count] = data;
                                             // inventoryDataArr[j] = data;
                                             count++;
@@ -241,7 +241,7 @@ export default class AddInventory extends Component {
                             console.log("inventory Data Array-->", inventoryDataArr);
                             if (inventoryDataArr.length == 0) {
                                 data = [];
-                                data[8] = true;
+                                data[6] = true;
                                 inventoryDataArr[0] = data;
                             }
                             this.el = jexcel(document.getElementById("inventorytableDiv"), '');
@@ -253,7 +253,7 @@ export default class AddInventory extends Component {
                             var options = {
                                 data: data,
                                 columnDrag: true,
-                                colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                                colWidths: [100, 100, 100, 130, 130, 130, 130],
                                 columns: [
 
                                     {
@@ -285,15 +285,15 @@ export default class AddInventory extends Component {
                                         title: i18n.t('static.inventory.actualStock'),
                                         type: 'text'
                                     },
-                                    {
-                                        title: i18n.t('static.inventory.batchNumber'),
-                                        type: 'text'
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.expireDate'),
-                                        type: 'calendar'
+                                    // {
+                                    //     title: i18n.t('static.inventory.batchNumber'),
+                                    //     type: 'text'
+                                    // },
+                                    // {
+                                    //     title: i18n.t('static.inventory.expireDate'),
+                                    //     type: 'calendar'
 
-                                    },
+                                    // },
                                     {
                                         title: i18n.t('static.inventory.active'),
                                         type: 'checkbox'
@@ -586,27 +586,27 @@ export default class AddInventory extends Component {
                         //     if (inventoryDataList[count].inventoryId == inventoryDataListNotFiltered[i].inventoryId) {
                         var map = new Map(Object.entries(tableJson[i]));
                         var expBalance = 0
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].dataSource.id = map.get("0");
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].region.id = map.get("1");
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].inventoryDate = moment(map.get("2")).format("YYYY-MM-DD");
+                        inventoryDataListNotFiltered[parseInt(map.get("7"))].dataSource.id = map.get("0");
+                        inventoryDataListNotFiltered[parseInt(map.get("7"))].region.id = map.get("1");
+                        inventoryDataListNotFiltered[parseInt(map.get("7"))].inventoryDate = moment(map.get("2")).format("YYYY-MM-DD");
 
                         if (i == 0) {
                             expBalance = 0;
                         } else {
                             // var previousMap = new Map(Object.entries(tableJson[i - 1]))
-                            expBalance = parseInt(inventoryDataListNotFiltered[parseInt(map.get("9")) - 1].expectedBal) + parseInt(inventoryDataListNotFiltered[parseInt(map.get("9")) - 1].adjustmentQty);
+                            expBalance = parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].expectedBal) + parseInt(inventoryDataListNotFiltered[parseInt(map.get("7")) - 1].adjustmentQty);
                         }
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].expectedBal = expBalance;
+                        inventoryDataListNotFiltered[parseInt(map.get("7"))].expectedBal = expBalance;
                         // console.log("expBaalalance---------->", expBalance);
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].adjustmentQty = parseInt(map.get("4"));
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].actualQty = map.get("5");
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].batchNo = map.get("6");
-                        if (inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != null && inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != "") {
-                            inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = moment(map.get("7")).format("YYYY-MM-DD");
-                        } else {
-                            inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = "";
-                        }
-                        inventoryDataListNotFiltered[parseInt(map.get("9"))].active = map.get("8");
+                        inventoryDataListNotFiltered[parseInt(map.get("7"))].adjustmentQty = parseInt(map.get("4"));
+                        inventoryDataListNotFiltered[parseInt(map.get("7"))].actualQty = map.get("5");
+                        // inventoryDataListNotFiltered[parseInt(map.get("9"))].batchNo = map.get("6");
+                        // if (inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != null && inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate != "") {
+                        //     inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = moment(map.get("7")).format("YYYY-MM-DD");
+                        // } else {
+                        //     inventoryDataListNotFiltered[parseInt(map.get("9"))].expiryDate = "";
+                        // }
+                        inventoryDataListNotFiltered[parseInt(map.get("7"))].active = map.get("6");
                         // if (inventoryDataList.length >= count) {
                         //     count++;
                         // }
@@ -629,14 +629,14 @@ export default class AddInventory extends Component {
                             expBalance = parseInt(inventoryDataList[i - 1].expectedBal) + parseInt(inventoryDataList[i - 1].adjustmentQty);
                             // console.log("expected bal--->", expBalance);
                         }
-                        var expiryDate = "";
-                        if (map.get("7") != null && map.get("7") != "") {
-                            expiryDate = moment(map.get("7")).format("YYYY-MM-DD")
-                        } else {
-                            expiryDate = ""
-                        }
+                        // var expiryDate = "";
+                        // if (map.get("7") != null && map.get("7") != "") {
+                        //     expiryDate = moment(map.get("7")).format("YYYY-MM-DD")
+                        // } else {
+                        //     expiryDate = ""
+                        // }
                         var json = {
-                            inventoryId: '',
+                            inventoryId: 0,
                             dataSource: {
                                 id: map.get("0")
                             },
@@ -647,9 +647,9 @@ export default class AddInventory extends Component {
                             expectedBal: expBalance,
                             adjustmentQty: map.get("4"),
                             actualQty: map.get("5"),
-                            batchNo: map.get("6"),
-                            expiryDate: expiryDate,
-                            active: map.get("8"),
+                            // batchNo: map.get("6"),
+                            // expiryDate: expiryDate,
+                            active: map.get("6"),
 
                             realmCountryPlanningUnit: {
                                 id: countrySKU

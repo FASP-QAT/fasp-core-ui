@@ -832,30 +832,55 @@ export default class ConsumptionDetails extends React.Component {
                         // }
 
                     }
-                    for (var i = consumptionDataList.length; i < tableJson.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
-                        var json = {
-                            consumptionId: 0,
-                            dataSource: {
-                                id: map.get("0")
-                            },
-                            region: {
-                                id: map.get("1")
-                            },
-                            consumptionQty: map.get("2"),
-                            dayOfStockOut: parseInt(map.get("3")),
-                            consumptionDate: moment(map.get("4")).format("YYYY-MM-DD"),
-                            notes: map.get("5"),
-                            actualFlag: map.get("6"),
-                            active: map.get("7"),
+                    var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                    var planningUnitOs = planningUnitTransaction.objectStore('planningUnit');
+                    var planningUnitRequest = planningUnitOs.getAll();
+                    var productCategoryId = 0;
 
-                            planningUnit: {
-                                id: plannigUnitId
+                    var e = document.getElementById("planningUnitId");
+                    var selectedPlanningUnit = e.options[e.selectedIndex].value;
+                    planningUnitRequest.onsuccess = function (event) {
+                        var planningUnitResult = [];
+                        planningUnitResult = planningUnitRequest.result;
+                        for (var k = 0; k < planningUnitResult.length; k++) {
+                            if (selectedPlanningUnit == planningUnitResult[k].planningUnitId) {
+                                productCategoryId = planningUnitResult[k].forecastingUnit.productCategory.id;
+                                console.log("productCategoryId----------- ", productCategoryId);
                             }
                         }
-                        consumptionDataList.push(json);
-                        consumptionDataListNotFiltered.push(json);
-                    }
+                        for (var i = consumptionDataList.length; i < tableJson.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]))
+                            var json = {
+                                consumptionId: 0,
+                                dataSource: {
+                                    id: map.get("0")
+                                },
+                                region: {
+                                    id: map.get("1")
+                                },
+                                consumptionQty: map.get("2"),
+                                dayOfStockOut: parseInt(map.get("3")),
+                                consumptionDate: moment(map.get("4")).format("YYYY-MM-DD"),
+                                notes: map.get("5"),
+                                actualFlag: map.get("6"),
+                                active: map.get("7"),
+
+                                // planningUnit: {
+                                //     id: plannigUnitId
+                                // }
+                                planningUnit: {
+                                    id: plannigUnitId,
+                                    forecastingUnit: {
+                                        productCategory: {
+                                            id: productCategoryId
+                                        }
+                                    }
+                                }
+                            }
+                            consumptionDataList.push(json);
+                            consumptionDataListNotFiltered.push(json);
+                        }
+                    }.bind(this);
                     console.log("1111111111111111111   ", consumptionDataList)
                     programJson.consumptionList = consumptionDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
