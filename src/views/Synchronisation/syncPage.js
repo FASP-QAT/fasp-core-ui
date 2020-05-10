@@ -13,7 +13,9 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
+const entityname = "Commit Version"
 export default class syncPage extends Component {
 
   constructor(props) {
@@ -36,13 +38,13 @@ export default class syncPage extends Component {
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
     this.loadedFunctionForMerge = this.loadedFunctionForMerge.bind(this);
-    this.loadedFunction = this.loadedFunction.bind(this)
+    // this.loadedFunction = this.loadedFunction.bind(this)
 
     this.loadedFunctionForMergeInventory = this.loadedFunctionForMergeInventory.bind(this);
-    this.loadedFunctionInventory = this.loadedFunctionInventory.bind(this)
+    // this.loadedFunctionInventory = this.loadedFunctionInventory.bind(this)
 
-    this.loadedFunctionLatestInventory = this.loadedFunctionLatestInventory.bind(this);
-    this.loadedFunctionLatest = this.loadedFunctionLatest.bind(this);
+    // this.loadedFunctionLatestInventory = this.loadedFunctionLatestInventory.bind(this);
+    // this.loadedFunctionLatest = this.loadedFunctionLatest.bind(this);
     this.cancelClicked = this.cancelClicked.bind(this);
     this.synchronize = this.synchronize.bind(this);
   }
@@ -134,8 +136,8 @@ export default class syncPage extends Component {
           data[3] = consumptionList[j].region.id;
           data[4] = consumptionList[j].consumptionQty;
           data[5] = consumptionList[j].dayOfStockOut;
-          data[6] = consumptionList[j].startDate;
-          data[7] = consumptionList[j].stopDate;
+          data[6] = consumptionList[j].consumptionDate;
+          data[7] = consumptionList[j].notes;
           data[8] = consumptionList[j].active;
           data[9] = consumptionList[j].actualFlag;
           consumptionDataArr[j] = data;
@@ -161,9 +163,8 @@ export default class syncPage extends Component {
           data[5] = inventoryList[j].expectedBal;
           data[6] = inventoryList[j].adjustmentQty;
           data[7] = inventoryList[j].actualQty;
-          data[8] = inventoryList[j].batchNo;
-          data[9] = inventoryList[j].expiryDate;
-          data[10] = inventoryList[j].active;
+          data[8] = inventoryList[j].notes;
+          data[9] = inventoryList[j].active;
           inventoryDataArr[j] = data;
         }
         latestDataJsonInventory = inventoryDataArr;
@@ -250,7 +251,7 @@ export default class syncPage extends Component {
                       consumptionList: consumptionList
                     });
                     var inventoryList = (programJson.inventoryList);
-                    console.log("Inventory List",inventoryList);
+                    console.log("Inventory List", inventoryList);
                     this.setState({
                       inventoryList: inventoryList
                     });
@@ -268,83 +269,83 @@ export default class syncPage extends Component {
                       data[3] = consumptionList[j].region.id;
                       data[4] = consumptionList[j].consumptionQty;
                       data[5] = consumptionList[j].dayOfStockOut;
-                      data[6] = consumptionList[j].startDate;
-                      data[7] = consumptionList[j].stopDate;
+                      data[6] = consumptionList[j].consumptionDate;
+                      data[7] = consumptionList[j].notes;
                       data[8] = consumptionList[j].active;
                       data[9] = consumptionList[j].actualFlag;
                       consumptionDataArr[j] = data;
                     }
 
-                    this.el = jexcel(document.getElementById("oldVersionConsumption"), '');
-                    this.el.destroy();
+                    // this.el = jexcel(document.getElementById("oldVersionConsumption"), '');
+                    // this.el.destroy();
                     oldDataJsonConsumption = consumptionDataArr;
-                    this.setState({
-                      oldDataJsonConsumption: oldDataJsonConsumption
-                    })
-                    var options = {
-                      data: oldDataJsonConsumption,
-                      columnDrag: true,
-                      colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
-                      columns: [
-                        {
-                          title: 'Consumption Id',
-                          type: 'hidden'
-                        },
-                        {
-                          title: 'Planning unit',
-                          type: 'dropdown',
-                          source: planningUnitList
-                        },
-                        {
-                          title: 'Data source',
-                          type: 'dropdown',
-                          source: dataSourceList
-                        },
-                        {
-                          title: 'Region',
-                          type: 'dropdown',
-                          source: regionList
-                        },
-                        {
-                          title: 'Consumption Quantity',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Days of Stock out',
-                          type: 'text'
-                        },
-                        {
-                          title: 'StartDate',
-                          type: 'calendar'
-                        },
-                        {
-                          title: 'StopDate',
-                          type: 'calendar'
-                        },
-                        {
-                          title: 'Active',
-                          type: 'hidden',
-                        },
-                        {
-                          title: 'Actual Flag',
-                          type: 'dropdown',
-                          source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
-                        }
-                      ],
-                      pagination: 10,
-                      search: true,
-                      columnSorting: true,
-                      tableOverflow: true,
-                      wordWrap: true,
-                      allowInsertColumn: false,
-                      allowManualInsertColumn: false,
-                      allowDeleteRow: false,
-                      onchange: this.changed,
-                      editable: false,
-                      onload: this.loadedFunction
-                    };
+                    // this.setState({
+                    //   oldDataJsonConsumption: oldDataJsonConsumption
+                    // })
+                    // var options = {
+                    //   data: oldDataJsonConsumption,
+                    //   columnDrag: true,
+                    //   colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
+                    //   columns: [
+                    //     {
+                    //       title: 'Consumption Id',
+                    //       type: 'hidden'
+                    //     },
+                    //     {
+                    //       title: 'Planning unit',
+                    //       type: 'dropdown',
+                    //       source: planningUnitList
+                    //     },
+                    //     {
+                    //       title: 'Data source',
+                    //       type: 'dropdown',
+                    //       source: dataSourceList
+                    //     },
+                    //     {
+                    //       title: 'Region',
+                    //       type: 'dropdown',
+                    //       source: regionList
+                    //     },
+                    //     {
+                    //       title: 'Consumption Quantity',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Days of Stock out',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'StartDate',
+                    //       type: 'calendar'
+                    //     },
+                    //     {
+                    //       title: 'StopDate',
+                    //       type: 'calendar'
+                    //     },
+                    //     {
+                    //       title: 'Active',
+                    //       type: 'hidden',
+                    //     },
+                    //     {
+                    //       title: 'Actual Flag',
+                    //       type: 'dropdown',
+                    //       source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                    //     }
+                    //   ],
+                    //   pagination: 10,
+                    //   search: true,
+                    //   columnSorting: true,
+                    //   tableOverflow: true,
+                    //   wordWrap: true,
+                    //   allowInsertColumn: false,
+                    //   allowManualInsertColumn: false,
+                    //   allowDeleteRow: false,
+                    //   onchange: this.changed,
+                    //   editable: false,
+                    //   onload: this.loadedFunction
+                    // };
 
-                    this.el = jexcel(document.getElementById("oldVersionConsumption"), options);
+                    // this.el = jexcel(document.getElementById("oldVersionConsumption"), options);
 
 
                     var data = [];
@@ -364,232 +365,231 @@ export default class syncPage extends Component {
                       data[5] = inventoryList[j].expectedBal;
                       data[6] = inventoryList[j].adjustmentQty;
                       data[7] = inventoryList[j].actualQty;
-                      data[8] = inventoryList[j].batchNo;
-                      data[9] = inventoryList[j].expiryDate;
-                      data[10] = inventoryList[j].active;
+                      data[8] = inventoryList[j].notes;
+                      data[9] = inventoryList[j].active;
                       inventoryDataArr[j] = data;
 
                     }
-                    this.el = jexcel(document.getElementById("oldVersionInventory"), '');
-                    this.el.destroy();
+                    // this.el = jexcel(document.getElementById("oldVersionInventory"), '');
+                    // this.el.destroy();
                     oldDataJsonInventory = inventoryDataArr;
-                    this.setState({
-                      oldDataJsonInventory: oldDataJsonInventory
-                    })
-                    var options = {
-                      data: oldDataJsonInventory,
-                      columnDrag: true,
-                      colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
-                      columns: [
-                        {
-                          title: 'Inventory Id',
-                          type: 'hidden'
-                        },
-                        {
-                          title: 'Country SKU',
-                          type: 'dropdown',
-                          source: countrySkuList
-                        },
-                        {
-                          title: 'Data source',
-                          type: 'dropdown',
-                          source: dataSourceList
-                        },
-                        {
-                          title: 'Region',
-                          type: 'dropdown',
-                          source: regionList
-                        },
-                        {
-                          title: 'Inventory Date',
-                          type: 'calendar'
+                    // this.setState({
+                    //   oldDataJsonInventory: oldDataJsonInventory
+                    // })
+                    // var options = {
+                    //   data: oldDataJsonInventory,
+                    //   columnDrag: true,
+                    //   colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                    //   columns: [
+                    //     {
+                    //       title: 'Inventory Id',
+                    //       type: 'hidden'
+                    //     },
+                    //     {
+                    //       title: 'Country SKU',
+                    //       type: 'dropdown',
+                    //       source: countrySkuList
+                    //     },
+                    //     {
+                    //       title: 'Data source',
+                    //       type: 'dropdown',
+                    //       source: dataSourceList
+                    //     },
+                    //     {
+                    //       title: 'Region',
+                    //       type: 'dropdown',
+                    //       source: regionList
+                    //     },
+                    //     {
+                    //       title: 'Inventory Date',
+                    //       type: 'calendar'
 
-                        },
-                        {
-                          title: 'Expected Stock',
-                          type: 'text',
-                          readOnly: true
-                        },
-                        {
-                          title: 'Manual Adjustment',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Actual Stock',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Batch Number',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Expire Date',
-                          type: 'calendar'
+                    //     },
+                    //     {
+                    //       title: 'Expected Stock',
+                    //       type: 'text',
+                    //       readOnly: true
+                    //     },
+                    //     {
+                    //       title: 'Manual Adjustment',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Actual Stock',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Batch Number',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Expire Date',
+                    //       type: 'calendar'
 
-                        },
-                        {
-                          title: 'Active',
-                          type: 'hidden'
-                        }
+                    //     },
+                    //     {
+                    //       title: 'Active',
+                    //       type: 'hidden'
+                    //     }
 
-                      ],
-                      pagination: 10,
-                      search: true,
-                      columnSorting: true,
-                      tableOverflow: true,
-                      wordWrap: true,
-                      allowInsertColumn: false,
-                      allowManualInsertColumn: false,
-                      allowDeleteRow: false,
-                      onchange: this.changed,
-                      oneditionend: this.onedit,
-                      editable: false,
-                      onload: this.loadedFunctionInventory
-                    };
+                    //   ],
+                    //   pagination: 10,
+                    //   search: true,
+                    //   columnSorting: true,
+                    //   tableOverflow: true,
+                    //   wordWrap: true,
+                    //   allowInsertColumn: false,
+                    //   allowManualInsertColumn: false,
+                    //   allowDeleteRow: false,
+                    //   onchange: this.changed,
+                    //   oneditionend: this.onedit,
+                    //   editable: false,
+                    //   onload: this.loadedFunctionInventory
+                    // };
 
-                    this.el = jexcel(document.getElementById("oldVersionInventory"), options);
+                    // this.el = jexcel(document.getElementById("oldVersionInventory"), options);
 
-                    this.el = jexcel(document.getElementById("latestVersionConsumption"), '');
-                    this.el.destroy();
-                    var options = {
-                      data: latestDataJsonConsumption,
-                      columnDrag: true,
-                      colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
-                      columns: [
-                        {
-                          title: 'Consumption Id',
-                          type: 'hidden',
-                        },
-                        {
-                          title: 'Planning unit',
-                          type: 'dropdown',
-                          source: planningUnitList
-                        },
-                        {
-                          title: 'Data source',
-                          type: 'dropdown',
-                          source: dataSourceList
-                        },
-                        {
-                          title: 'Region',
-                          type: 'dropdown',
-                          source: regionList
-                        },
-                        {
-                          title: 'Consumption Quantity',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Days of Stock out',
-                          type: 'text'
-                        },
-                        {
-                          title: 'StartDate',
-                          type: 'calendar'
-                        },
-                        {
-                          title: 'StopDate',
-                          type: 'calendar'
-                        },
-                        {
-                          title: 'Active',
-                          type: 'hidden'
-                        },
-                        {
-                          title: 'Actual Flag',
-                          type: 'dropdown',
-                          source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
-                        }
-                      ],
-                      pagination: 10,
-                      search: true,
-                      columnSorting: true,
-                      tableOverflow: true,
-                      wordWrap: true,
-                      allowInsertColumn: false,
-                      allowManualInsertColumn: false,
-                      allowDeleteRow: false,
-                      onchange: this.changed,
-                      editable: false,
-                      onload: this.loadedFunctionLatest
-                    };
+                    // this.el = jexcel(document.getElementById("latestVersionConsumption"), '');
+                    // this.el.destroy();
+                    // var options = {
+                    //   data: latestDataJsonConsumption,
+                    //   columnDrag: true,
+                    //   colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
+                    //   columns: [
+                    //     {
+                    //       title: 'Consumption Id',
+                    //       type: 'hidden',
+                    //     },
+                    //     {
+                    //       title: 'Planning unit',
+                    //       type: 'dropdown',
+                    //       source: planningUnitList
+                    //     },
+                    //     {
+                    //       title: 'Data source',
+                    //       type: 'dropdown',
+                    //       source: dataSourceList
+                    //     },
+                    //     {
+                    //       title: 'Region',
+                    //       type: 'dropdown',
+                    //       source: regionList
+                    //     },
+                    //     {
+                    //       title: 'Consumption Quantity',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Days of Stock out',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'StartDate',
+                    //       type: 'calendar'
+                    //     },
+                    //     {
+                    //       title: 'StopDate',
+                    //       type: 'calendar'
+                    //     },
+                    //     {
+                    //       title: 'Active',
+                    //       type: 'hidden'
+                    //     },
+                    //     {
+                    //       title: 'Actual Flag',
+                    //       type: 'dropdown',
+                    //       source: [{ id: true, name: 'Actual' }, { id: false, name: 'Forecast' }]
+                    //     }
+                    //   ],
+                    //   pagination: 10,
+                    //   search: true,
+                    //   columnSorting: true,
+                    //   tableOverflow: true,
+                    //   wordWrap: true,
+                    //   allowInsertColumn: false,
+                    //   allowManualInsertColumn: false,
+                    //   allowDeleteRow: false,
+                    //   onchange: this.changed,
+                    //   editable: false,
+                    //   onload: this.loadedFunctionLatest
+                    // };
 
-                    this.el = jexcel(document.getElementById("latestVersionConsumption"), options);
+                    // this.el = jexcel(document.getElementById("latestVersionConsumption"), options);
 
-                    this.el = jexcel(document.getElementById("latestVersionInventory"), '');
-                    this.el.destroy();
-                    var options = {
-                      data: latestDataJsonInventory,
-                      columnDrag: true,
-                      colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
-                      columns: [
-                        {
-                          title: 'Inventory Id',
-                          type: 'hidden'
-                        },
-                        {
-                          title: 'Country SKU',
-                          type: 'dropdown',
-                          source: countrySkuList
-                        },
-                        {
-                          title: 'Data source',
-                          type: 'dropdown',
-                          source: dataSourceList
-                        },
-                        {
-                          title: 'Region',
-                          type: 'dropdown',
-                          source: regionList
-                        },
-                        {
-                          title: 'Inventory Date',
-                          type: 'calendar'
+                    // this.el = jexcel(document.getElementById("latestVersionInventory"), '');
+                    // this.el.destroy();
+                    // var options = {
+                    //   data: latestDataJsonInventory,
+                    //   columnDrag: true,
+                    //   colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                    //   columns: [
+                    //     {
+                    //       title: 'Inventory Id',
+                    //       type: 'hidden'
+                    //     },
+                    //     {
+                    //       title: 'Country SKU',
+                    //       type: 'dropdown',
+                    //       source: countrySkuList
+                    //     },
+                    //     {
+                    //       title: 'Data source',
+                    //       type: 'dropdown',
+                    //       source: dataSourceList
+                    //     },
+                    //     {
+                    //       title: 'Region',
+                    //       type: 'dropdown',
+                    //       source: regionList
+                    //     },
+                    //     {
+                    //       title: 'Inventory Date',
+                    //       type: 'calendar'
 
-                        },
-                        {
-                          title: 'Expected Stock',
-                          type: 'text',
-                          readOnly: true
-                        },
-                        {
-                          title: 'Manual Adjustment',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Actual Stock',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Batch Number',
-                          type: 'text'
-                        },
-                        {
-                          title: 'Expire Date',
-                          type: 'calendar'
+                    //     },
+                    //     {
+                    //       title: 'Expected Stock',
+                    //       type: 'text',
+                    //       readOnly: true
+                    //     },
+                    //     {
+                    //       title: 'Manual Adjustment',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Actual Stock',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Batch Number',
+                    //       type: 'text'
+                    //     },
+                    //     {
+                    //       title: 'Expire Date',
+                    //       type: 'calendar'
 
-                        },
-                        {
-                          title: 'Active',
-                          type: 'hidden'
-                        }
+                    //     },
+                    //     {
+                    //       title: 'Active',
+                    //       type: 'hidden'
+                    //     }
 
-                      ],
-                      pagination: 10,
-                      search: true,
-                      columnSorting: true,
-                      tableOverflow: true,
-                      wordWrap: true,
-                      allowInsertColumn: false,
-                      allowManualInsertColumn: false,
-                      allowDeleteRow: false,
-                      onchange: this.changed,
-                      oneditionend: this.onedit,
-                      editable: false,
-                      onload: this.loadedFunctionLatestInventory
-                    };
+                    //   ],
+                    //   pagination: 10,
+                    //   search: true,
+                    //   columnSorting: true,
+                    //   tableOverflow: true,
+                    //   wordWrap: true,
+                    //   allowInsertColumn: false,
+                    //   allowManualInsertColumn: false,
+                    //   allowDeleteRow: false,
+                    //   onchange: this.changed,
+                    //   oneditionend: this.onedit,
+                    //   editable: false,
+                    //   onload: this.loadedFunctionLatestInventory
+                    // };
 
-                    this.el = jexcel(document.getElementById("latestVersionInventory"), options);
+                    // this.el = jexcel(document.getElementById("latestVersionInventory"), options);
 
                     var mergedDataConsumption = [];
                     var consumptionIdArray = [];
@@ -656,12 +656,12 @@ export default class syncPage extends Component {
                           type: 'text'
                         },
                         {
-                          title: 'StartDate',
+                          title: 'Consumption date',
                           type: 'calendar'
                         },
                         {
-                          title: 'StopDate',
-                          type: 'calendar'
+                          title: 'Notes',
+                          type: 'text'
                         },
                         {
                           title: 'Active',
@@ -759,13 +759,8 @@ export default class syncPage extends Component {
                           type: 'text'
                         },
                         {
-                          title: 'Batch Number',
+                          title: 'Notes',
                           type: 'text'
-                        },
-                        {
-                          title: 'Expire Date',
-                          type: 'calendar'
-
                         },
                         {
                           title: 'Active',
@@ -817,43 +812,43 @@ export default class syncPage extends Component {
   }
 
 
-  loadedFunction = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-    var elInstance = instance.jexcel;
-    var latestDataJsonConsumption = this.state.latestDataJsonConsumption
-    var jsonData = elInstance.getJson();
-    for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[8] == true) {
-        if ((jsonData[y])[0] != 0) {
-          var latestFilteredData = (latestDataJsonConsumption[y])[0];
-          var col = ("A").concat(parseInt(y) + 1);
-          var value = elInstance.getValueFromCoords(0, y);
-          if (value == latestFilteredData) {
-            for (var j = 1; j < colArr.length; j++) {
-              var col = (colArr[j]).concat(parseInt(y) + 1);
-              var valueToCompare = elInstance.getValueFromCoords(j, y);
-              var valueToCompareWith = (latestDataJsonConsumption[y])[j];
-              if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-                elInstance.setStyle(col, "background-color", "transparent");
-              } else {
-                elInstance.setStyle(col, "background-color", "#FFCCCB");
-              }
-            }
-          }
-        } else {
-          for (var j = 0; j < colArr.length; j++) {
-            var col = (colArr[j]).concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "#98FB98");
-          }
-        }
-      } else {
-        for (var j = 0; j < colArr.length; j++) {
-          var col = (colArr[j]).concat(parseInt(y) + 1);
-          elInstance.setStyle(col, "background-color", "#FF8686");
-        }
-      }
-    }
-  }
+  // loadedFunction = function (instance) {
+  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+  //   var elInstance = instance.jexcel;
+  //   var latestDataJsonConsumption = this.state.latestDataJsonConsumption
+  //   var jsonData = elInstance.getJson();
+  //   for (var y = 0; y < jsonData.length; y++) {
+  //     if ((jsonData[y])[8] == true) {
+  //       if ((jsonData[y])[0] != 0) {
+  //         var latestFilteredData = (latestDataJsonConsumption[y])[0];
+  //         var col = ("A").concat(parseInt(y) + 1);
+  //         var value = elInstance.getValueFromCoords(0, y);
+  //         if (value == latestFilteredData) {
+  //           for (var j = 1; j < colArr.length; j++) {
+  //             var col = (colArr[j]).concat(parseInt(y) + 1);
+  //             var valueToCompare = elInstance.getValueFromCoords(j, y);
+  //             var valueToCompareWith = (latestDataJsonConsumption[y])[j];
+  //             if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+  //               elInstance.setStyle(col, "background-color", "transparent");
+  //             } else {
+  //               elInstance.setStyle(col, "background-color", "#FFCCCB");
+  //             }
+  //           }
+  //         }
+  //       } else {
+  //         for (var j = 0; j < colArr.length; j++) {
+  //           var col = (colArr[j]).concat(parseInt(y) + 1);
+  //           elInstance.setStyle(col, "background-color", "#98FB98");
+  //         }
+  //       }
+  //     } else {
+  //       for (var j = 0; j < colArr.length; j++) {
+  //         var col = (colArr[j]).concat(parseInt(y) + 1);
+  //         elInstance.setStyle(col, "background-color", "#FF8686");
+  //       }
+  //     }
+  //   }
+  // }
 
   loadedFunctionForMerge = function (instance) {
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
@@ -874,7 +869,7 @@ export default class syncPage extends Component {
                   if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
                     elInstance.setStyle(col, "background-color", "transparent");
                   } else {
-                    elInstance.setStyle(col, "background-color", "#FFCCCB");
+                    elInstance.setStyle(col, "background-color", "yellow");
                   }
                 }
                 z = latestDataJson.length
@@ -892,7 +887,7 @@ export default class syncPage extends Component {
           // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "#98FB98");
+            elInstance.setStyle(col, "background-color", "green");
           }
         }
       } else {
@@ -900,49 +895,49 @@ export default class syncPage extends Component {
         // Else part for inactive colour
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(y) + 1);
-          elInstance.setStyle(col, "background-color", "#FF8686");
+          elInstance.setStyle(col, "background-color", "red");
         }
       }
     }
   }
 
-  loadedFunctionInventory = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-    var elInstance = instance.jexcel;
-    var latestDataJsonInventory = this.state.latestDataJsonInventory
-    var jsonData = elInstance.getJson();
-    for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[10] == true) {
-        if ((jsonData[y])[0] != 0) {
-          var latestFilteredData = (latestDataJsonInventory[y])[0];
-          var col = ("A").concat(parseInt(y) + 1);
-          var value = elInstance.getValueFromCoords(0, y);
-          if (value == latestFilteredData) {
-            for (var j = 1; j < colArr.length; j++) {
-              var col = (colArr[j]).concat(parseInt(y) + 1);
-              var valueToCompare = elInstance.getValueFromCoords(j, y);
-              var valueToCompareWith = (latestDataJsonInventory[y])[j];
-              if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
-                elInstance.setStyle(col, "background-color", "transparent");
-              } else {
-                elInstance.setStyle(col, "background-color", "#FFCCCB");
-              }
-            }
-          }
-        } else {
-          for (var j = 0; j < colArr.length; j++) {
-            var col = (colArr[j]).concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "#98FB98");
-          }
-        }
-      } else {
-        for (var j = 0; j < colArr.length; j++) {
-          var col = (colArr[j]).concat(parseInt(y) + 1);
-          elInstance.setStyle(col, "background-color", "#FF8686");
-        }
-      }
-    }
-  }
+  // loadedFunctionInventory = function (instance) {
+  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+  //   var elInstance = instance.jexcel;
+  //   var latestDataJsonInventory = this.state.latestDataJsonInventory
+  //   var jsonData = elInstance.getJson();
+  //   for (var y = 0; y < jsonData.length; y++) {
+  //     if ((jsonData[y])[10] == true) {
+  //       if ((jsonData[y])[0] != 0) {
+  //         var latestFilteredData = (latestDataJsonInventory[y])[0];
+  //         var col = ("A").concat(parseInt(y) + 1);
+  //         var value = elInstance.getValueFromCoords(0, y);
+  //         if (value == latestFilteredData) {
+  //           for (var j = 1; j < colArr.length; j++) {
+  //             var col = (colArr[j]).concat(parseInt(y) + 1);
+  //             var valueToCompare = elInstance.getValueFromCoords(j, y);
+  //             var valueToCompareWith = (latestDataJsonInventory[y])[j];
+  //             if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
+  //               elInstance.setStyle(col, "background-color", "transparent");
+  //             } else {
+  //               elInstance.setStyle(col, "background-color", "#FFCCCB");
+  //             }
+  //           }
+  //         }
+  //       } else {
+  //         for (var j = 0; j < colArr.length; j++) {
+  //           var col = (colArr[j]).concat(parseInt(y) + 1);
+  //           elInstance.setStyle(col, "background-color", "#98FB98");
+  //         }
+  //       }
+  //     } else {
+  //       for (var j = 0; j < colArr.length; j++) {
+  //         var col = (colArr[j]).concat(parseInt(y) + 1);
+  //         elInstance.setStyle(col, "background-color", "#FF8686");
+  //       }
+  //     }
+  //   }
+  // }
 
   loadedFunctionForMergeInventory = function (instance) {
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
@@ -951,7 +946,7 @@ export default class syncPage extends Component {
     var latestDataJson = this.state.latestDataJsonInventory
     var inventoryIdArray = this.state.inventoryIdArray;
     for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[10] == true) {
+      if ((jsonData[y])[9] == true) {
         if ((jsonData[y])[0] != 0) {
           if (inventoryIdArray.includes((jsonData[y])[0])) {
             for (var z = 0; z < latestDataJson.length; z++) {
@@ -963,7 +958,7 @@ export default class syncPage extends Component {
                   if ((valueToCompare == valueToCompareWith) || (valueToCompare == "" && valueToCompareWith == null) || (valueToCompare == null && valueToCompareWith == "")) {
                     elInstance.setStyle(col, "background-color", "transparent");
                   } else {
-                    elInstance.setStyle(col, "background-color", "#FFCCCB");
+                    elInstance.setStyle(col, "background-color", "yellow");
                   }
                 }
                 z = latestDataJson.length
@@ -977,58 +972,57 @@ export default class syncPage extends Component {
             }
           }
         } else {
-
           // Else part for new entries in current version
           for (var j = 0; j < colArr.length; j++) {
             var col = (colArr[j]).concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "#98FB98");
+            elInstance.setStyle(col, "background-color", "green");
           }
         }
       } else {
         // Else part for inactive colour
         for (var j = 0; j < colArr.length; j++) {
           var col = (colArr[j]).concat(parseInt(y) + 1);
-          elInstance.setStyle(col, "background-color", "#FF8686");
+          elInstance.setStyle(col, "background-color", "red");
         }
       }
     }
   }
 
-  loadedFunctionLatest = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
-    var elInstance = instance.jexcel;
-    var jsonData = elInstance.getJson();
-    for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[8] == true) {
-      } else {
-        for (var j = 0; j < colArr.length; j++) {
-          var col = (colArr[j]).concat(parseInt(y) + 1);
-          elInstance.setStyle(col, "background-color", "#FF8686");
-        }
-      }
-    }
-  }
+  // loadedFunctionLatest = function (instance) {
+  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+  //   var elInstance = instance.jexcel;
+  //   var jsonData = elInstance.getJson();
+  //   for (var y = 0; y < jsonData.length; y++) {
+  //     if ((jsonData[y])[8] == true) {
+  //     } else {
+  //       for (var j = 0; j < colArr.length; j++) {
+  //         var col = (colArr[j]).concat(parseInt(y) + 1);
+  //         elInstance.setStyle(col, "background-color", "#FF8686");
+  //       }
+  //     }
+  //   }
+  // }
 
-  loadedFunctionLatestInventory = function (instance) {
-    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
-    var elInstance = instance.jexcel;
-    var jsonData = elInstance.getJson();
-    for (var y = 0; y < jsonData.length; y++) {
-      if ((jsonData[y])[10] == true) {
-      } else {
-        for (var j = 0; j < colArr.length; j++) {
-          var col = (colArr[j]).concat(parseInt(y) + 1);
-          elInstance.setStyle(col, "background-color", "#FF8686");
-        }
-      }
-    }
-  }
+  // loadedFunctionLatestInventory = function (instance) {
+  //   var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
+  //   var elInstance = instance.jexcel;
+  //   var jsonData = elInstance.getJson();
+  //   for (var y = 0; y < jsonData.length; y++) {
+  //     if ((jsonData[y])[10] == true) {
+  //     } else {
+  //       for (var j = 0; j < colArr.length; j++) {
+  //         var col = (colArr[j]).concat(parseInt(y) + 1);
+  //         elInstance.setStyle(col, "background-color", "#FF8686");
+  //       }
+  //     }
+  //   }
+  // }
 
   tabPane() {
     return (
       <>
         <TabPane tabId="1">
-          <Row>
+          {/* <Row>
             <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
               <Card>
                 <CardHeader>
@@ -1057,7 +1051,7 @@ export default class syncPage extends Component {
                 </CardBody>
               </Card>
             </Col>
-          </Row>
+          </Row> */}
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Card>
@@ -1076,7 +1070,7 @@ export default class syncPage extends Component {
           </Row>
         </TabPane>
         <TabPane tabId="2">
-          <Row>
+          {/* <Row>
             <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
               <Card>
                 <CardHeader>
@@ -1105,7 +1099,7 @@ export default class syncPage extends Component {
                 </CardBody>
               </Card>
             </Col>
-          </Row>
+          </Row> */}
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
               <Card>
@@ -1137,12 +1131,16 @@ export default class syncPage extends Component {
       }, this);
 
     return (
-      <div>
+      <div className="animated fadeIn">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
+        <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
             <Card>
               <CardHeader>
-                <strong>Synchronisation</strong>
+                <strong>Commit Version</strong>
               </CardHeader>
               <CardBody>
                 <Form name='simpleForm'>
@@ -1229,27 +1227,41 @@ export default class syncPage extends Component {
   };
 
   synchronize() {
-    document.getElementById("detailsDiv").style.display = "block";
-    var programId = document.getElementById('programId').value;
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open('fasp', 1);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(['programData'], 'readwrite');
-      var programTransaction = transaction.objectStore('programData');
-      var programRequest = programTransaction.get(programId);
-      programRequest.onsuccess = function (event) {
-        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-        var programJson = JSON.parse(programData);
-        ProgramService.saveProgramData(programJson);
-        console.log("Program json", programJson);
-      }
+    if (navigator.onLine) {
+      document.getElementById("detailsDiv").style.display = "block";
+      var programId = document.getElementById('programId').value;
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open('fasp', 1);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var programTransaction = transaction.objectStore('programData');
+        var programRequest = programTransaction.get(programId);
+        programRequest.onsuccess = function (event) {
+          var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+          var programJson = JSON.parse(programData);
+          ProgramService.saveProgramData(programJson).then(response => {
+            if (response.status == 200) {
+              this.props.history.push(`/dashboard/` + i18n.t('static.message.commitSuccess', { entityname }))
+            } else {
+              this.setState({
+                message: response.data.messageCode
+              })
+            }
+          })
+          console.log("Program json", programJson);
+        }.bind(this)
+      }.bind(this)
+    } else {
+      this.setState({
+        message: 'static.common.onlinealerttext'
+      })
     }
   }
 
   cancelClicked() {
-    this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+    this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled', { entityname }))
   }
 }

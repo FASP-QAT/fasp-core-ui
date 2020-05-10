@@ -19,6 +19,9 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import ConsumptionDetails from "../Consumption/ConsumptionDetails";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+
+const entityname = "Supply plan"
 
 export default class SupplyPlanComponent extends React.Component {
 
@@ -69,6 +72,23 @@ export default class SupplyPlanComponent extends React.Component {
 
         this.leftClickedAdjustments = this.leftClickedAdjustments.bind(this);
         this.rightClickedAdjustments = this.rightClickedAdjustments.bind(this);
+        this.actionCanceledConsumption = this.actionCanceledConsumption.bind(this);
+        this.actionCanceledAdjustments = this.actionCanceledAdjustments.bind(this);
+
+    }
+
+    actionCanceledConsumption() {
+        this.toggleLarge('Consumption');
+        this.setState({
+            message: i18n.t('static.message.cancelled')
+        })
+    }
+
+    actionCanceledAdjustments() {
+        this.toggleLarge('Adjustments');
+        this.setState({
+            message: i18n.t('static.message.cancelled')
+        })
     }
 
     toggleLarge(supplyPlanType, month, quantity) {
@@ -565,7 +585,7 @@ export default class SupplyPlanComponent extends React.Component {
                             data[2] = consumptionList[j].dataSource.id;
                             data[3] = consumptionList[j].consumptionQty;
                             data[4] = consumptionList[j].dayOfStockOut;
-                            if (consumptionList[j].notes===null || ((consumptionList[j].notes).trim() == "NULL")) {
+                            if (consumptionList[j].notes === null || ((consumptionList[j].notes).trim() == "NULL")) {
                                 data[5] = "";
                             } else {
                                 data[5] = consumptionList[j].notes;
@@ -1144,85 +1164,218 @@ export default class SupplyPlanComponent extends React.Component {
                 )
             }, this);
         return (
-            <>
-                <div className="animated fadeIn">
-                    <Col xs="12" sm="12">
-                        <Card>
+            <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Col xs="12" sm="12">
+                    <Card>
+                        <CardHeader>
+                            <strong>Supply plan</strong>
+                        </CardHeader>
+                        <CardBody>
+                            <Formik
+                                render={
+                                    ({
+                                    }) => (
+                                            <Form name='simpleForm'>
+                                                <Col md="9 pl-0">
+                                                    <div className="d-md-flex">
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        value={this.state.programId}
+                                                                        name="programId" id="programId"
+                                                                        onChange={this.getPlanningUnitList}
+                                                                    >
+                                                                        <option value="0">Please select</option>
+                                                                        {programs}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="planningUnitId"
+                                                                        id="planningUnitId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.planningUnitId}
+                                                                    >
+                                                                        <option value="0">Please Select</option>
+                                                                        {planningUnits}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Region</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        value={this.state.regionId}
+                                                                        name="regionId" id="regionId"
+                                                                    >
+                                                                        <option value="-1">All</option>
+                                                                        {regions}
+                                                                    </Input>
+                                                                    <InputGroupAddon addonType="append">
+                                                                        &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
+                                                                    </InputGroupAddon>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </div>
+                                                </Col>
+                                            </Form>
 
-                            <CardHeader>
-                                <strong>Supply plan</strong>
-                            </CardHeader>
-                            <CardBody>
-                                <Formik
-                                    render={
-                                        ({
-                                        }) => (
-                                                <Form name='simpleForm'>
-                                                    <Col md="9 pl-0">
-                                                        <div className="d-md-flex">
-                                                            <FormGroup className="tab-ml-1">
-                                                                <Label htmlFor="appendedInputButton">Program</Label>
-                                                                <div className="controls SelectGo">
-                                                                    <InputGroup>
-                                                                        <Input type="select"
-                                                                            bsSize="sm"
-                                                                            value={this.state.programId}
-                                                                            name="programId" id="programId"
-                                                                            onChange={this.getPlanningUnitList}
-                                                                        >
-                                                                            <option value="0">Please select</option>
-                                                                            {programs}
-                                                                        </Input>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>
-                                                            <FormGroup className="tab-ml-1">
-                                                                <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                                                <div className="controls SelectGo">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="planningUnitId"
-                                                                            id="planningUnitId"
-                                                                            bsSize="sm"
-                                                                            value={this.state.planningUnitId}
-                                                                        >
-                                                                            <option value="0">Please Select</option>
-                                                                            {planningUnits}
-                                                                        </Input>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>
-                                                            <FormGroup className="tab-ml-1">
-                                                                <Label htmlFor="appendedInputButton">Region</Label>
-                                                                <div className="controls SelectGo">
-                                                                    <InputGroup>
-                                                                        <Input type="select"
-                                                                            bsSize="sm"
-                                                                            value={this.state.regionId}
-                                                                            name="regionId" id="regionId"
-                                                                        >
-                                                                            <option value="-1">All</option>
-                                                                            {regions}
-                                                                        </Input>
-                                                                        <InputGroupAddon addonType="append">
-                                                                            &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
-                                                                        </InputGroupAddon>
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>
-                                                        </div>
-                                                    </Col>
-                                                </Form>
+                                        )} />
+                            <div id="supplyPlanTableId" style={{ display: 'none' }}>
+                                <Row>
+                                    <div className="col-md-12">
+                                        <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                        <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                    </div>
+                                </Row>
+                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            {
+                                                this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                    <th>{item.month}</th>
+                                                ))
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Consumption', '', '')}>
+                                            <td>Consumption</td>
+                                            {
+                                                this.state.consumptionTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                            <td>Adjustments</td>
+                                            {
+                                                this.state.inventoryTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>AMC</td>
+                                            {
+                                                this.state.amcTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Min stock</td>
+                                            {
+                                                this.state.minStockArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Max stock</td>
+                                            {
+                                                this.state.maxStockArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </Table>
+                            </div>
+                            <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
+                                <ModalBody>
+                                    <Card>
+                                        <ul className="legend legend-supplypln">
+                                            <li><span className="purplelegend"></span> Forecasted consumption</li>
+                                            <li><span className="blacklegend"></span> Actual consumption</li>
+                                        </ul>
+                                    </Card>
+                                    <div className="col-md-12">
+                                        <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                        <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                    </div>
+                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                {
+                                                    this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                        <th>{item.month}</th>
+                                                    ))
+                                                }
+                                            </tr>
 
-                                            )} />
-                                <div id="supplyPlanTableId" style={{ display: 'none' }}>
-                                    <Row>
-                                        <div className="col-md-12">
-                                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
-                                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
-                                        </div>
-                                    </Row>
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                this.state.regionListFiltered.map(item => (
+                                                    <tr>
+                                                        <td>{item.name}</td>
+                                                        {
+                                                            this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                                if (item1.consumptionQty.toString() != '') {
+                                                                    if (item1.actualFlag.toString() == 'true') {
+                                                                        return (<td className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
+                                                                    } else {
+                                                                        return (<td style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
+                                                                    }
+                                                                } else {
+                                                                    return (<td></td>)
+                                                                }
+                                                            })
+                                                        }
+                                                    </tr>
+                                                )
+                                                )
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Total</th>
+                                                {
+                                                    this.state.consumptionTotalMonthWise.map(item => (
+                                                        <th>{item}</th>
+                                                    ))
+                                                }
+                                            </tr>
+                                        </tfoot>
+                                    </Table>
+                                    <div className="table-responsive">
+                                        <div id="consumptionDetailsTable" />
+                                    </div>
+
+                                </ModalBody>
+                                <ModalFooter>
+                                    {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={this.actionCanceledConsumption}> <i className="fa fa-times"></i> Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+
+                            <Modal isOpen={this.state.adjustments} toggle={() => this.toggleLarge('Adjustments')}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <ModalHeader toggle={() => this.toggleLarge('Adjustments')}>Adjustments Details</ModalHeader>
+                                <ModalBody>
+                                    <div className="col-md-12">
+                                        <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                        <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                    </div>
                                     <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
                                             <tr>
@@ -1235,183 +1388,48 @@ export default class SupplyPlanComponent extends React.Component {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Consumption', '', '')}>
-                                                <td>Consumption</td>
-                                                {
-                                                    this.state.consumptionTotalData.map(item1 => (
-                                                        <td>{item1}</td>
-                                                    ))
-                                                }
-                                            </tr>
-                                            <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Adjustments', '', '')}>
-                                                <td>Adjustments</td>
-                                                {
-                                                    this.state.inventoryTotalData.map(item1 => (
-                                                        <td>{item1}</td>
-                                                    ))
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <td>AMC</td>
-                                                {
-                                                    this.state.amcTotalData.map(item1 => (
-                                                        <td>{item1}</td>
-                                                    ))
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <td>Min stock</td>
-                                                {
-                                                    this.state.minStockArray.map(item1 => (
-                                                        <td>{item1}</td>
-                                                    ))
-                                                }
-                                            </tr>
-                                            <tr>
-                                                <td>Max stock</td>
-                                                {
-                                                    this.state.maxStockArray.map(item1 => (
-                                                        <td>{item1}</td>
-                                                    ))
-                                                }
-                                            </tr>
+                                            {
+                                                this.state.regionListFiltered.map(item => (
+                                                    <tr>
+                                                        <td>{item.name}</td>
+                                                        {
+                                                            this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                                if (item1.adjustmentQty.toString() != '') {
+                                                                    return (<td className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.inventoryDate}`, `${item1.region.id}`, `${item1.month.month}`)}>{item1.adjustmentQty}</td>)
+                                                                } else {
+                                                                    return (<td></td>)
+                                                                }
+                                                            })
+                                                        }
+                                                    </tr>
+                                                )
+                                                )
+                                            }
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Total</th>
+                                                {
+                                                    this.state.inventoryTotalMonthWise.map(item => (
+                                                        <th>{item}</th>
+                                                    ))
+                                                }
+                                            </tr>
+                                        </tfoot>
                                     </Table>
-                                </div>
-                                <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
-                                    className={'modal-lg ' + this.props.className, "modalWidth"}>
-                                    <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
-                                    <ModalBody>
-                                        <Card>
-                                            <ul className="legend legend-supplypln">
-                                                <li><span className="purplelegend"></span> Forecasted consumption</li>
-                                                <li><span className="blacklegend"></span> Actual consumption</li>
-                                            </ul>
-                                        </Card>
-                                        <div className="col-md-12">
-                                            <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
-                                            <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
-                                        </div>
-                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                            <thead>
-                                                <tr>
-                                                    <th></th>
-                                                    {
-                                                        this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                            <th>{item.month}</th>
-                                                        ))
-                                                    }
-                                                </tr>
-
-                                            </thead>
-                                            <tbody>
-                                                {
-                                                    this.state.regionListFiltered.map(item => (
-                                                        <tr>
-                                                            <td>{item.name}</td>
-                                                            {
-                                                                this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                                    if (item1.consumptionQty.toString() != '') {
-                                                                        if (item1.actualFlag.toString() == 'true') {
-                                                                            return (<td className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
-                                                                        } else {
-                                                                            return (<td style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
-                                                                        }
-                                                                    } else {
-                                                                        return (<td></td>)
-                                                                    }
-                                                                })
-                                                            }
-                                                        </tr>
-                                                    )
-                                                    )
-                                                }
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <th>Total</th>
-                                                    {
-                                                        this.state.consumptionTotalMonthWise.map(item => (
-                                                            <th>{item}</th>
-                                                        ))
-                                                    }
-                                                </tr>
-                                            </tfoot>
-                                        </Table>
-                                        <div className="table-responsive">
-                                            <div id="consumptionDetailsTable" />
-                                        </div>
-
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
-                                    </ModalFooter>
-                                </Modal>
-
-                                <Modal isOpen={this.state.adjustments} toggle={() => this.toggleLarge('Adjustments')}
-                                    className={'modal-lg ' + this.props.className, "modalWidth"}>
-                                    <ModalHeader toggle={() => this.toggleLarge('Adjustments')}>Adjustments Details</ModalHeader>
-                                    <ModalBody>
-                                        <div className="col-md-12">
-                                            <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
-                                            <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
-                                        </div>
-                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                            <thead>
-                                                <tr>
-                                                    <th></th>
-                                                    {
-                                                        this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                            <th>{item.month}</th>
-                                                        ))
-                                                    }
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {
-                                                    this.state.regionListFiltered.map(item => (
-                                                        <tr>
-                                                            <td>{item.name}</td>
-                                                            {
-                                                                this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                                    if (item1.adjustmentQty.toString() != '') {
-                                                                        return (<td className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.inventoryDate}`, `${item1.region.id}`, `${item1.month.month}`)}>{item1.adjustmentQty}</td>)
-                                                                    } else {
-                                                                        return (<td></td>)
-                                                                    }
-                                                                })
-                                                            }
-                                                        </tr>
-                                                    )
-                                                    )
-                                                }
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <th>Total</th>
-                                                    {
-                                                        this.state.inventoryTotalMonthWise.map(item => (
-                                                            <th>{item}</th>
-                                                        ))
-                                                    }
-                                                </tr>
-                                            </tfoot>
-                                        </Table>
-                                        <div className="table-responsive">
-                                            <div id="adjustmentsTable" className="table-responsive" />
-                                        </div>
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.toggleLarge('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
-                                    </ModalFooter>
-                                </Modal>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </div>
-            </>
+                                    <div className="table-responsive">
+                                        <div id="adjustmentsTable" className="table-responsive" />
+                                    </div>
+                                </ModalBody>
+                                <ModalFooter>
+                                    {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={this.actionCanceledAdjustments}> <i className="fa fa-times"></i> Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+                        </CardBody>
+                    </Card>
+                </Col>
+            </div>
         )
     }
 
