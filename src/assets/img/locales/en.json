@@ -651,5 +651,6 @@
     "static.month.oct": "Oct",
     "static.month.nov": "Nov",
     "static.month.dec": "Dec",
-    "static.shipment.shipment": "Shipment"
+    "static.shipment.shipment": "Shipment",
+    "static.message.commitSuccess": "Version committed successfully."
 }

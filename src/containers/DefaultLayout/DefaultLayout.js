@@ -294,7 +294,7 @@ class DefaultLayout extends Component {
                           // },
 
                           {
-                            name: 'Synchronisation',
+                            name: 'Commit Version',
                             url: '/program/syncPage',
                             icon: 'fa fa-download',
                           },
@@ -437,12 +437,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.consumption'),
                             url: '/report/consumption',
                             icon: 'fa fa-exchange'
-                          },
-                          {
-                            name: i18n.t('static.dashboard.stockstatusmatrix'),
-                            url: '/report/stockStatusMatrix',
-                            icon: 'fa fa-exchange'
-                          },
+                          }
+                          // {
+                          //   name: i18n.t('static.dashboard.stockstatusmatrix'),
+                          //   url: '/report/stockStatusMatrix',
+                          //   icon: 'fa fa-exchange'
+                          // },
                           /* {
                              name: i18n.t('static.dashboard.stockstatus'),
                              url: '/report/stockStatus',
