@@ -303,7 +303,7 @@ const routes = [
   { path: '/dashboard/:message', component: Dashboard },
 
   { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: ProgramTree },
-  { path: '/program/syncPage', name: "Synchronisation", component: syncPage },
+  { path: '/program/syncPage', name: "Commit Version", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: i18n.t('static.dashboard.exportprogram'), component: ExportProgram },
   { path: '/program/importProgram', name: i18n.t('static.dashboard.importprogram'), component: ImportProgram },

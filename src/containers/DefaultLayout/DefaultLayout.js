@@ -294,7 +294,7 @@ class DefaultLayout extends Component {
                           // },
 
                           {
-                            name: 'Synchronisation',
+                            name: 'Commit Version',
                             url: '/program/syncPage',
                             icon: 'fa fa-download',
                           },

@@ -69,7 +69,7 @@ export default class SyncMasterData extends Component {
 
                             <CardFooter id="retryButtonDiv">
                                 <FormGroup>
-                                    <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => this.retryClicked()}><i className="fa fa-refresh"></i> {i18n.t('static.common.retry')}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.retryClicked()}><i className="fa fa-refresh"></i> {i18n.t('static.common.retry')}</Button>
                                     &nbsp;
                             </FormGroup>
                             </CardFooter>
