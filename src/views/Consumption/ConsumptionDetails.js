@@ -324,8 +324,13 @@ export default class ConsumptionDetails extends React.Component {
                                 data[1] = consumptionList[j].region.id;
                                 data[2] = consumptionList[j].consumptionQty;
                                 data[3] = consumptionList[j].dayOfStockOut;
-                                data[4] = consumptionList[j].startDate;
-                                data[5] = consumptionList[j].stopDate;
+                                data[4] = consumptionList[j].consumptionDate;
+                                // data[5] = consumptionList[j].notes;
+                                if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
+                                    data[5] = '';
+                                } else {
+                                    data[5] = consumptionList[j].notes;
+                                }
                                 data[6] = consumptionList[j].actualFlag;
                                 data[7] = consumptionList[j].active;
                                 data[8] = j;
@@ -371,12 +376,12 @@ export default class ConsumptionDetails extends React.Component {
                                     type: 'numeric'
                                 },
                                 {
-                                    title: i18n.t('static.common.startdate'),
+                                    title: 'Consumption Date',
                                     type: 'calendar'
                                 },
                                 {
-                                    title: i18n.t('static.common.stopdate'),
-                                    type: 'calendar'
+                                    title: 'Notes',
+                                    type: 'text'
                                 },
                                 {
                                     title: i18n.t('static.consumption.actualflag'),
@@ -814,8 +819,8 @@ export default class ConsumptionDetails extends React.Component {
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionQty = map.get("2");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].dayOfStockOut = parseInt(map.get("3"));
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].startDate = moment(map.get("4")).format("YYYY-MM-DD");
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].stopDate = moment(map.get("5")).format("YYYY-MM-DD");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionDate = moment(map.get("4")).format("YYYY-MM-DD");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].notes = map.get("5");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].actualFlag = map.get("6");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
 
@@ -827,30 +832,55 @@ export default class ConsumptionDetails extends React.Component {
                         // }
 
                     }
-                    for (var i = consumptionDataList.length; i < tableJson.length; i++) {
-                        var map = new Map(Object.entries(tableJson[i]))
-                        var json = {
-                            consumptionId: 0,
-                            dataSource: {
-                                id: map.get("0")
-                            },
-                            region: {
-                                id: map.get("1")
-                            },
-                            consumptionQty: parseInt(map.get("2")),
-                            dayOfStockOut: parseInt(map.get("3")),
-                            startDate: moment(map.get("4")).format("YYYY-MM-DD"),
-                            stopDate: moment(map.get("5")).format("YYYY-MM-DD"),
-                            actualFlag: map.get("6"),
-                            active: map.get("7"),
+                    var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                    var planningUnitOs = planningUnitTransaction.objectStore('planningUnit');
+                    var planningUnitRequest = planningUnitOs.getAll();
+                    var productCategoryId = 0;
 
-                            planningUnit: {
-                                id: plannigUnitId
+                    var e = document.getElementById("planningUnitId");
+                    var selectedPlanningUnit = e.options[e.selectedIndex].value;
+                    planningUnitRequest.onsuccess = function (event) {
+                        var planningUnitResult = [];
+                        planningUnitResult = planningUnitRequest.result;
+                        for (var k = 0; k < planningUnitResult.length; k++) {
+                            if (selectedPlanningUnit == planningUnitResult[k].planningUnitId) {
+                                productCategoryId = planningUnitResult[k].forecastingUnit.productCategory.id;
+                                console.log("productCategoryId----------- ", productCategoryId);
                             }
                         }
-                        // consumptionDataList[i] = json;
-                        consumptionDataListNotFiltered.push(json);
-                    }
+                        for (var i = consumptionDataList.length; i < tableJson.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]))
+                            var json = {
+                                consumptionId: 0,
+                                dataSource: {
+                                    id: map.get("0")
+                                },
+                                region: {
+                                    id: map.get("1")
+                                },
+                                consumptionQty: map.get("2"),
+                                dayOfStockOut: parseInt(map.get("3")),
+                                consumptionDate: moment(map.get("4")).format("YYYY-MM-DD"),
+                                notes: map.get("5"),
+                                actualFlag: map.get("6"),
+                                active: map.get("7"),
+
+                                // planningUnit: {
+                                //     id: plannigUnitId
+                                // }
+                                planningUnit: {
+                                    id: plannigUnitId,
+                                    forecastingUnit: {
+                                        productCategory: {
+                                            id: productCategoryId
+                                        }
+                                    }
+                                }
+                            }
+                            consumptionDataList.push(json);
+                            consumptionDataListNotFiltered.push(json);
+                        }
+                    }.bind(this);
                     console.log("1111111111111111111   ", consumptionDataList)
                     programJson.consumptionList = consumptionDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
@@ -1884,23 +1914,23 @@ export default class ConsumptionDetails extends React.Component {
                 }
             }
         }
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            if (value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
-            }
-        }
+        // if (x == 5) {
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     if (value == "") {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+        //     } else {
+        //         if (isNaN(Date.parse(value))) {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setStyle(col, "background-color", "yellow");
+        //             this.el.setComments(col, i18n.t('static.message.invaliddate'));
+        //         } else {
+        //             this.el.setStyle(col, "background-color", "transparent");
+        //             this.el.setComments(col, "");
+        //         }
+        //     }
+        // }
 
         if (x == 6) {
             var col = ("G").concat(parseInt(y) + 1);
@@ -2052,24 +2082,24 @@ export default class ConsumptionDetails extends React.Component {
                 // }
             }
 
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = this.el.getValueFromCoords(5, y);
-            if (value == "Invalid date" || value == "") {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                // if (isNaN(Date.parse(value))) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     this.el.setComments(col, "In valid Date.");
-                //     valid = false;
-                // } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-                // }
-            }
+            // var col = ("F").concat(parseInt(y) + 1);
+            // var value = this.el.getValueFromCoords(5, y);
+            // if (value == "Invalid date" || value == "") {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setStyle(col, "background-color", "yellow");
+            //     this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            //     valid = false;
+            // } else {
+            //     // if (isNaN(Date.parse(value))) {
+            //     //     this.el.setStyle(col, "background-color", "transparent");
+            //     //     this.el.setStyle(col, "background-color", "yellow");
+            //     //     this.el.setComments(col, "In valid Date.");
+            //     //     valid = false;
+            //     // } else {
+            //     this.el.setStyle(col, "background-color", "transparent");
+            //     this.el.setComments(col, "");
+            //     // }
+            // }
 
             var col = ("G").concat(parseInt(y) + 1);
             var value = this.el.getValueFromCoords(6, y);
@@ -2116,4 +2146,3 @@ export default class ConsumptionDetails extends React.Component {
         this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
     }
 }
-
