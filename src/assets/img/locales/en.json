@@ -650,5 +650,6 @@
     "static.month.sep": "Sep",
     "static.month.oct": "Oct",
     "static.month.nov": "Nov",
-    "static.month.dec": "Dec"
+    "static.month.dec": "Dec",
+    "static.shipment.shipment": "Shipment"
 }

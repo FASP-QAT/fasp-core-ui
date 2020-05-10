@@ -338,6 +338,11 @@ class DefaultLayout extends Component {
                             name: 'Shipment Details',
                             url: '/shipment/addShipment',
                             icon: 'fa fa-list',
+                          },
+                          {
+                            name: 'Shipment List',
+                            url: '/shipment/shipmentList',
+                            icon: 'fa fa-list',
                           }
                         ]
                       }, {
