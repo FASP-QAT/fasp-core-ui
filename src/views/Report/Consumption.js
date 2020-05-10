@@ -210,11 +210,11 @@ class Consumption extends Component {
           const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
 
           // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-          const dateFilter = productCategoryFilter.filter(c => moment(c.startDate).isBetween(startDate, endDate, null, '[)') && moment(c.stopDate).isBetween(startDate, endDate, null, '[)'))
+          const dateFilter = productCategoryFilter.filter(c => moment(c.consumptionDate).isBetween(startDate, endDate, null, '[)'))
 
           const sorted = dateFilter.sort((a, b) => {
-            var dateA = new Date(a.startDate).getTime();
-            var dateB = new Date(b.stopDate).getTime();
+            var dateA = new Date(a.consumptionDate).getTime();
+            var dateB = new Date(b.consumptionDate).getTime();
             return dateA > dateB ? 1 : -1;
           });
           let previousDate = "";
@@ -225,10 +225,10 @@ class Consumption extends Component {
             let forcast = 0;
             let actual = 0;
             if (sorted[i] != null && sorted[i] != "") {
-              previousDate = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
+              previousDate = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
               for (let j = 0; j <= sorted.length; j++) {
                 if (sorted[j] != null && sorted[j] != "") {
-                  if (previousDate == moment(sorted[j].startDate, 'YYYY-MM-DD').format('MM-YYYY')) {
+                  if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
                     if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
                       forcast = forcast + sorted[j].consumptionQty;
                     }
@@ -239,7 +239,7 @@ class Consumption extends Component {
                 }
               }
 
-              let date = moment(sorted[i].startDate, 'YYYY-MM-DD').format('MM-YYYY');
+              let date = moment(sorted[i].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY');
               json = {
                 consumption_date: date,
                 Actual: actual,
@@ -254,7 +254,7 @@ class Consumption extends Component {
 
             }
           }
-
+          console.log("final consumption---", finalOfflineConsumption);
           this.setState({
             offlineConsumptionList: finalOfflineConsumption
           });
@@ -705,7 +705,7 @@ class Consumption extends Component {
           <Col lg="12">
             <Card>
               <CardHeader>
-              <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong>
+                <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong>
                 {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                 <Online>
                   {
@@ -746,7 +746,7 @@ class Consumption extends Component {
                     <Form >
                       <Col>
                         <div className="row">
-                          <FormGroup  className="col-md-3">
+                          <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                             <div className="controls edit">
 
