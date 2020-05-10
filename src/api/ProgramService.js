@@ -86,5 +86,10 @@ class ProgramService {
         return axios.get(`${API_URL}/api/program/${programId}/${ProductCategoryId}/planningUnit/all/`, {}
         );
     }
+
+    programInitialize(json) {
+        return axios.post(`${API_URL}/api/program/initialize/`, json, {}
+        );
+    }
 }
 export default new ProgramService()

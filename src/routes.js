@@ -188,6 +188,7 @@ const StockStatusReport = React.lazy(() => import('./views/Report/StockStatus'))
 const GlobalConsumptionReport = React.lazy(() => import('./views/Report/GlobalConsumption'));
 const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
+const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentList'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -303,7 +304,7 @@ const routes = [
   { path: '/dashboard/:message', component: Dashboard },
 
   { path: '/program/downloadProgram', name: i18n.t('static.dashboard.downloadprogram'), component: ProgramTree },
-  { path: '/program/syncPage', name: "Synchronisation", component: syncPage },
+  { path: '/program/syncPage', name: "Commit Version", component: syncPage },
   { path: '/program/downloadProgram/:message', component: ProgramTree },
   { path: '/program/exportProgram', name: i18n.t('static.dashboard.exportprogram'), component: ExportProgram },
   { path: '/program/importProgram', name: i18n.t('static.dashboard.importprogram'), component: ImportProgram },
@@ -439,7 +440,7 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
-
+  { path: '/shipment/ShipmentList', name: 'Shipment / List Shipment', component: ShipmentList },
 
 ];
 export default routes;

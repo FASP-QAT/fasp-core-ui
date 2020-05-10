@@ -650,7 +650,7 @@ export default class StockStatusMatrix extends React.Component {
                         <Col md="12 pl-0">
                             <div className="row">
                             <FormGroup className="col-md-3" title="click here to select period">
-                            <Label htmlFor="appendedInputButton">Select Period <span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                            <Label htmlFor="appendedInputButton">Select Period <span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                             <div className="controls edit">
 
                               <Picker
@@ -689,7 +689,7 @@ export default class StockStatusMatrix extends React.Component {
                                 </FormGroup>
                                 <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                            <div className="controls SelectGo">
+                            <div className="controls ">
                               <InputGroup>
                                 <Input
                                   type="select"
