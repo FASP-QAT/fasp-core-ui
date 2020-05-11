@@ -1301,12 +1301,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
                                 <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
                                 <ModalBody>
-                                    <Card>
-                                        <ul className="legend legend-supplypln">
-                                            <li><span className="purplelegend"></span> Forecasted consumption</li>
-                                            <li><span className="blacklegend"></span> Actual consumption</li>
-                                        </ul>
-                                    </Card>
+                                    
                                     <div className="col-md-12">
                                         <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
                                         <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>

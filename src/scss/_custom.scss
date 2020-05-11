@@ -1559,7 +1559,7 @@ input::placeholder {
 }
 
 .react-confirm-alert-body {
-  width: 100% !important;
+  width: 500px !important;
   font-weight: 600;
   font-size: 17px !important;
   padding: 30px;
@@ -1587,7 +1587,8 @@ input::placeholder {
 // .planning-text{    margin-left: 0px;}
 
 .background-red {
-  background-color: red;
+  // background-color: red;
+  background-color: #fac8c8;
 }
 
 .supplyplan-larrow {
@@ -1595,11 +1596,13 @@ input::placeholder {
   margin-left: 9%;
   color: #20a8d8;
   font-size: 13px;
+
 }
 .supplyplan-rarrow {
   float: right;
   color: #20a8d8;
   font-size: 13px;
+ 
   // margin-right: 9%;
 }
 

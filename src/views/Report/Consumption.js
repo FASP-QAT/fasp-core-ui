@@ -959,7 +959,7 @@ class Consumption extends Component {
                       {
                         this.state.consumptions.length > 0
                         &&
-                        <div className="chart-wrapper chart-graph">
+                        <div className="col-md-12 chart-wrapper chart-graph">
                           <Bar data={bar} options={options} />
                         </div>}
                     </Online>
@@ -967,7 +967,7 @@ class Consumption extends Component {
                       {
                         this.state.offlineConsumptionList.length > 0
                         &&
-                        <div className="chart-wrapper chart-graph">
+                        <div className="col-md-12 chart-wrapper chart-graph">
                           <Bar data={bar} options={options} />
                         </div>}
                     </Offline>
