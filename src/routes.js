@@ -191,7 +191,7 @@ const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboar
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/program/programOnboarding', name: 'Program Onboarding', component: ProgramOnboarding },
+  { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/', exact: true, name: i18n.t('static.home') },
@@ -374,7 +374,7 @@ const routes = [
   { path: '/report/stockStatusMatrix', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusmatrix'), component: StockStatusMatrixReport },
   { path: '/report/stockStatus', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
   { path: '/report/globalConsumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.consumption'), component: GlobalConsumptionReport },
-  
+
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
