@@ -651,7 +651,7 @@ class RealmCountry extends Component {
                                             </Input>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.dashboard.country')}</Label>
+                                            <Label htmlFor="select">{i18n.t('static.dashboard.country')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="countryId" id="countryId" bsSize="sm"
                                                 valid={!errors.countryId}
                                                 invalid={touched.countryId && !!errors.countryId}
@@ -663,7 +663,7 @@ class RealmCountry extends Component {
                                             </Input> <FormFeedback className="red">{errors.countryId}</FormFeedback>
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.dashboard.currency')}</Label>
+                                            <Label htmlFor="select">{i18n.t('static.dashboard.currency')}<span class="red Reqasterisk">*</span></Label>
                                             <Input type="select" name="currencyId" id="currencyId" bsSize="sm"
                                                 valid={!errors.currencyId}
                                                 invalid={touched.currencyId && !!errors.currencyId}
