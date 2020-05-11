@@ -230,10 +230,10 @@ class Consumption extends Component {
                 if (sorted[j] != null && sorted[j] != "") {
                   if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
                     if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
-                      forcast = forcast + sorted[j].consumptionQty;
+                      forcast = forcast + parseFloat(sorted[j].consumptionQty);
                     }
                     if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
-                      actual = actual + sorted[j].consumptionQty;
+                      actual = actual + parseFloat(sorted[j].consumptionQty);
                     }
                   }
                 }
