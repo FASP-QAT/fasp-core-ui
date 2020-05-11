@@ -1054,18 +1054,18 @@ export default class syncPage extends Component {
           </Row> */}
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   <strong>Merged Version</strong>
-                </CardHeader>
-                <CardBody>
-                  <Col md="12 pl-0" id="realmDiv">
-                    <div className="table-responsive RemoveStriped">
-                      <div id="mergedVersionConsumption" />
-                    </div>
-                  </Col>
-                </CardBody>
-              </Card>
+                </CardHeader> */}
+              {/* <CardBody> */}
+              <Col md="12 pl-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped">
+                  <div id="mergedVersionConsumption" />
+                </div>
+              </Col>
+              {/* </CardBody> */}
+              {/* </Card> */}
             </Col>
           </Row>
         </TabPane>
@@ -1102,18 +1102,13 @@ export default class syncPage extends Component {
           </Row> */}
           <Row>
             <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-              <Card>
-                <CardHeader>
-                  <strong>Merged Version</strong>
-                </CardHeader>
-                <CardBody>
-                  <Col md="12 pl-0" id="realmDiv">
-                    <div className="table-responsive RemoveStriped">
-                      <div id="mergedVersionInventory" />
-                    </div>
-                  </Col>
-                </CardBody>
-              </Card>
+              {/* <CardBody> */}
+              <Col md="12 pl-0" id="realmDiv">
+                <div className="table-responsive RemoveStriped">
+                  <div id="mergedVersionInventory" />
+                </div>
+              </Col>
+              {/* </CardBody> */}
             </Col>
           </Row>
         </TabPane>
@@ -1144,11 +1139,11 @@ export default class syncPage extends Component {
               </CardHeader>
               <CardBody>
                 <Form name='simpleForm'>
-                  <Col md="9 pl-0">
+                  <Col md="12 pl-0">
                     <div className="d-md-flex">
                       <FormGroup className="tab-ml-1">
                         <Label htmlFor="appendedInputButton">Program</Label>
-                        <div className="controls SelectGo">
+                        <div className="controls SelectGo col-md-4">
                           <InputGroup>
                             <Input type="select"
                               bsSize="sm"
@@ -1163,26 +1158,19 @@ export default class syncPage extends Component {
                             </InputGroupAddon>
                           </InputGroup>
                         </div>
+                        <div className="col-md-8">
+                          <ul className="legend">
+                            <li><span className="lightpinklegend"></span> <span className="legendText">Difference between versions</span></li>
+                            <li><span className="greenlegend"></span><span className="legendText"> New data from current version</span></li>
+                            <li><span className="notawesome"></span><span className="legendText">  New data from latest version</span></li>
+                            <li><span className="redlegend"></span><span className="legendText"> Inactive Data</span></li>
+                          </ul>
+                        </div>
                       </FormGroup>
                     </div>
                   </Col>
                 </Form>
                 <div id="detailsDiv">
-                  <Row>
-                    <Col md="12">
-                      <Card>
-                        <CardBody>
-                          <ul className="legend">
-                            <li><span className="lightpinklegend"></span> Difference between versions</li>
-                            <li><span className="greenlegend"></span> New data from current version</li>
-                            <li><span className="redlegend"></span> Inactive Data</li>
-                            <li><span className="notawesome"></span>  New data from latest version</li>
-                          </ul>
-                        </CardBody>
-                      </Card>
-
-                    </Col>
-                  </Row>
                   <div className="animated fadeIn">
                     <Row>
                       <Col xs="12" md="12" className="mb-4">

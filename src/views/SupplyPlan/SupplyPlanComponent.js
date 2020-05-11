@@ -487,7 +487,9 @@ export default class SupplyPlanComponent extends React.Component {
                     var adjustmentQty = 0;
                     var filteredJsonInventory = { adjustmentQty: '', region: { id: 0 } };
                     for (var j = 0; j < c.length; j++) {
-                        adjustmentQty += parseInt((c[j].adjustmentQty));
+                        console.log("c[j].multiplier",c[j].multiplier)
+                        console.log("(c[j].adjustmentQty*c[j].multiplier)",parseFloat(c[j].adjustmentQty*c[j].multiplier));
+                        adjustmentQty += parseFloat((c[j].adjustmentQty*c[j].multiplier));
                         filteredJsonInventory = { month: m[i], region: c[j].region, adjustmentQty: adjustmentQty, inventoryId: c[j].inventoryId, inventoryDate: c[j].inventoryDate };
                     }
                     inventoryTotalData.push(adjustmentQty);
@@ -615,7 +617,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 { type: 'hidden' }
                             ],
                             pagination: false,
-                            search: true,
+                            search: false,
                             columnSorting: true,
                             tableOverflow: true,
                             wordWrap: true,
@@ -1299,14 +1301,14 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
                             <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
-                                <ModalHeader toggle={() => this.toggleLarge('Consumption')}>Consumption Details</ModalHeader>
+                                <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
+                                    <strong>Consumption Details</strong>
+                                    <ul className="legend legend-supplypln">
+                                        <li><span className="purplelegend"></span> <span className="legendText">Forecasted consumption</span></li>
+                                        <li><span className="blacklegend"></span> <span className="legendText">Actual consumption</span></li>
+                                    </ul>
+                                </ModalHeader>
                                 <ModalBody>
-                                    <Card>
-                                        <ul className="legend legend-supplypln">
-                                            <li><span className="purplelegend"></span> Forecasted consumption</li>
-                                            <li><span className="blacklegend"></span> Actual consumption</li>
-                                        </ul>
-                                    </Card>
                                     <div className="col-md-12">
                                         <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
                                         <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
@@ -1370,7 +1372,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                             <Modal isOpen={this.state.adjustments} toggle={() => this.toggleLarge('Adjustments')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
-                                <ModalHeader toggle={() => this.toggleLarge('Adjustments')}>Adjustments Details</ModalHeader>
+                                <ModalHeader toggle={() => this.toggleLarge('Adjustments')}  className="modalHeaderSupplyPlan">Adjustments Details</ModalHeader>
                                 <ModalBody>
                                     <div className="col-md-12">
                                         <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>

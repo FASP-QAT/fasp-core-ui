@@ -1304,7 +1304,8 @@ h5,
 /* basic positioning */
 .legend {
   list-style: none;
-  margin-top: 6px;
+  float: right;
+
 }
 .legend li {
   float: left;
@@ -1314,8 +1315,16 @@ h5,
 .legend span {
   float: left;
   width: 55px;
-  height: 25px;
-  margin: -4px 11px 0px 0px;
+  height: 15px;
+  margin: 0px 11px 0px 0px;
+  border-radius: 3px;
+}
+
+.legendText {
+  float: left;
+  width: 200px !important;
+  height: 15px;
+  margin: -4px 0px 0px 0px !important;
   border-radius: 3px;
 }
 /* your colors */
@@ -1595,19 +1604,25 @@ input::placeholder {
   margin-left: 9%;
   color: #20a8d8;
   font-size: 13px;
+  cursor: pointer;
 }
 .supplyplan-rarrow {
   float: right;
   color: #20a8d8;
   font-size: 13px;
+  cursor: pointer;
   // margin-right: 9%;
 }
 
 .legend-supplypln {
   margin-bottom: 0px;
+  margin-top: -4px;
 }
 .modal-title-sp
 {
   font-weight: 600;;
 }
 
+.modalHeaderSupplyPlan{
+  padding: 10px 10px 10px 10px!important;
+}
