@@ -637,7 +637,7 @@ class Consumption extends Component {
             data: this.state.consumptions.map((item, index) => (item.Actual)),
           }, {
             type: "line",
-            label: i18n.t('static.report.forcastConsumption'),
+            label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
             borderStyle: 'dotted',

@@ -73,7 +73,7 @@ export default class StockStatusMatrix extends React.Component {
         let planningUnitId = document.getElementById("planningUnitId").value;
         let view = document.getElementById("view").value;
         AuthenticationService.setupAxiosInterceptors();
-        ProductService.getStockStatusMatrixData(realmId, productCategoryId, planningUnitId,view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate())
+        ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId,view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate())
             .then(response => {
                 console.log(JSON.stringify(response.data))
                 this.setState({
