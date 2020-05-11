@@ -641,10 +641,10 @@ export default class StockStatusMatrix extends React.Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
-                        <div className="card-header-actions">
+                        {  this.state.data.length > 0 &&<div className="card-header-actions">
                         <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
                         <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
-                        </div>
+                        </div>}
                     </CardHeader>
                     <CardBody className="pb-md-3">
                         <Col md="12 pl-0">
