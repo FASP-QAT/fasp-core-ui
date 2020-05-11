@@ -338,6 +338,11 @@ class DefaultLayout extends Component {
                             name: 'Shipment Details',
                             url: '/shipment/addShipment',
                             icon: 'fa fa-list',
+                          },
+                          {
+                            name: 'Shipment List',
+                            url: '/shipment/shipmentList',
+                            icon: 'fa fa-list',
                           }
                         ]
                       }, {
@@ -432,12 +437,12 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.consumption'),
                             url: '/report/consumption',
                             icon: 'fa fa-exchange'
-                          },
-                          {
-                            name: i18n.t('static.dashboard.stockstatusmatrix'),
-                            url: '/report/stockStatusMatrix',
-                            icon: 'fa fa-exchange'
-                          },
+                          }
+                          // {
+                          //   name: i18n.t('static.dashboard.stockstatusmatrix'),
+                          //   url: '/report/stockStatusMatrix',
+                          //   icon: 'fa fa-exchange'
+                          // },
                           /* {
                              name: i18n.t('static.dashboard.stockstatus'),
                              url: '/report/stockStatus',

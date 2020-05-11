@@ -73,7 +73,7 @@ export default class StockStatusMatrix extends React.Component {
         let planningUnitId = document.getElementById("planningUnitId").value;
         let view = document.getElementById("view").value;
         AuthenticationService.setupAxiosInterceptors();
-        ProductService.getStockStatusMatrixData(realmId, productCategoryId, planningUnitId,view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate())
+        ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId,view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate())
             .then(response => {
                 console.log(JSON.stringify(response.data))
                 this.setState({
@@ -641,10 +641,10 @@ export default class StockStatusMatrix extends React.Component {
                 <Card>
                     <CardHeader>
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
-                        <div className="card-header-actions">
+                        {  this.state.data.length > 0 &&<div className="card-header-actions">
                         <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
                         <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
-                        </div>
+                        </div>}
                     </CardHeader>
                     <CardBody className="pb-md-3">
                         <Col md="12 pl-0">

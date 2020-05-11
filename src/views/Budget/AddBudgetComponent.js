@@ -548,21 +548,26 @@ class AddBudgetComponent extends Component {
                                                         <DatePicker
                                                             id="startDate"
                                                             name="startDate"
+                                                            bsSize="sm"
                                                             minDate={new Date()}
                                                             selected={this.state.budget.startDate}
                                                             onChange={(date) => { this.dataChangeDate(date) }}
                                                             placeholderText="mm-dd-yyy"
+                                                            className="form-control-sm form-control"
                                                         />
                                                     </FormGroup>
                                                     <FormGroup>
                                                         <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+
                                                         <DatePicker
                                                             id="stopDate"
                                                             name="stopDate"
+                                                            bsSize="sm"
                                                             minDate={this.state.budget.startDate}
                                                             selected={this.state.budget.stopDate}
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
                                                             placeholderText="mm-dd-yyy"
+                                                            className="form-control-sm form-control"
                                                         />
                                                     </FormGroup>
                                                 </CardBody>

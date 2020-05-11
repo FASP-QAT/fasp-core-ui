@@ -111,7 +111,7 @@ export default class ProductCatalog extends React.Component {
         var re=this.state.data
     
           this.state.data.map(elt =>A.push( [ elt.planningUnit.forecastingUnit.label.label_en.replaceAll(',',' '),elt.planningUnit.forecastingUnit.productCategory.label.label_en,elt.planningUnit.forecastingUnit.tracerCategory.label.label_en
-            ,elt.planningUnit.label.label_en.replaceAll(',',' '),elt.planningUnit.multiplier,elt.planningUnit.unit.label.label_en,elt.label.label_en.replaceAll(',',' '),elt.multiplier,elt.unit.label.label_en,elt.supplier.label.label_en?elt.supplier.label.label_en.replaceAll(',',''):'',elt.labeling? elt.labeling.replaceAll(',',' '):'', elt.active]));
+            ,elt.planningUnit.label.label_en.replaceAll(',',' '),elt.planningUnit.multiplier,elt.planningUnit.unit.label.label_en,elt.label.label_en.replaceAll(',',' '),elt.multiplier,elt.unit.label.label_en,elt.supplier.label.label_en?elt.supplier.label.label_en.replaceAll(',',''):'',elt.labeling? elt.labeling.replaceAll(',',' '):'', elt.active?'Active':'disabled']));
   
        
        for(var i=0;i<A.length;i++){
@@ -144,7 +144,7 @@ export default class ProductCatalog extends React.Component {
           const header=[headers];
          console.log(header);
         const data = this.state.data.map(elt=> [ elt.planningUnit.forecastingUnit.label.label_en,elt.planningUnit.forecastingUnit.productCategory.label.label_en,elt.planningUnit.forecastingUnit.tracerCategory.label.label_en
-            ,elt.planningUnit.label.label_en,elt.planningUnit.multiplier,elt.planningUnit.unit.label.label_en,elt.label.label_en,elt.multiplier,elt.unit.label.label_en,elt.supplier.label.label_en, elt.labeling, elt.active]);
+            ,elt.planningUnit.label.label_en,elt.planningUnit.multiplier,elt.planningUnit.unit.label.label_en,elt.label.label_en,elt.multiplier,elt.unit.label.label_en,elt.supplier.label.label_en, elt.labeling, elt.active?'Active':'disabled']);
     
         let content = {
           startY: 50,
@@ -329,11 +329,11 @@ export default class ProductCatalog extends React.Component {
                 <Card>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
-                        <div className="card-header-actions">
+                        {  this.state.data.length > 0 && <div className="card-header-actions">
                         <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(columns)}/>
                         <img style={{ height: '40px', width: '40px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />                  
                                         
-                        </div>
+                        </div>}
                     </CardHeader>
                     <CardBody  className="pb-md-0">
                         <Col md="3 pl-0">

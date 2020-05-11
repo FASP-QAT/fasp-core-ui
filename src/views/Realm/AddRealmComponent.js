@@ -12,10 +12,11 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 const entityname = i18n.t('static.realm.realm');
 const initialValues = {
     realmCode: '',
-    label: '',
+    label: ''
+    /*,
     monthInPastForAmc: '',
     monthInFutureForAmc: '',
-    orderFrequency: '',
+    orderFrequency: '',*/
 
 }
 
@@ -25,12 +26,12 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
-        monthInPastForAmc: Yup.number()
+        /*monthInPastForAmc: Yup.number()
             .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
         monthInFutureForAmc: Yup.number()
             .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
         orderFrequency: Yup.number()
-            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))
+            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))*/
     })
 }
 
@@ -69,9 +70,9 @@ export default class AddRealmComponent extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-                monthInPastForAmc: '',
+               /* monthInPastForAmc: '',
                 monthInFutureForAmc: '',
-                orderFrequency: '',
+                orderFrequency: '',*/
                 defaultRealm: true
             },
             message: ''
@@ -90,7 +91,7 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "realmCode") {
             realm.realmCode = event.target.value.toUpperCase();
         }
-        if (event.target.name === "monthInPastForAmc") {
+      /*  if (event.target.name === "monthInPastForAmc") {
             realm.monthInPastForAmc = event.target.value
         }
         if (event.target.name === "monthInFutureForAmc") {
@@ -98,7 +99,7 @@ export default class AddRealmComponent extends Component {
         }
         if (event.target.name === "orderFrequency") {
             realm.orderFrequency = event.target.value
-        }
+        }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
@@ -113,9 +114,9 @@ export default class AddRealmComponent extends Component {
         setTouched({
             realmCode: true,
             label: true,
-            monthInPastForAmc: true,
+          /*  monthInPastForAmc: true,
             monthInFutureForAmc: true,
-            orderFrequency: true
+            orderFrequency: true*/
         }
         )
         this.validateForm(errors)
@@ -238,7 +239,7 @@ export default class AddRealmComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                  {/*  <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
                                                             name="monthInPastForAmc"
@@ -279,7 +280,7 @@ export default class AddRealmComponent extends Component {
                                                             value={this.state.realm.orderFrequency}
                                                             required />
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
-                                                    </FormGroup>
+                                                  </FormGroup>*/}
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.realm.default')}</Label>
                                                         <FormGroup check inline>
