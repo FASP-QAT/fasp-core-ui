@@ -626,7 +626,7 @@ export default class syncPage extends Component {
                     var options = {
                       data: mergedDataConsumption,
                       columnDrag: true,
-                      colWidths: [180, 180, 180, 180, 180, 180, 180, 180, 180],
+                      colWidths: [10, 200, 150, 120, 80, 80, 100, 180, 10, 100],
                       columns: [
                         {
                           title: 'Consumption Id',
@@ -719,7 +719,7 @@ export default class syncPage extends Component {
                     var options = {
                       data: mergedDataInventory,
                       columnDrag: true,
-                      colWidths: [100, 100, 100, 130, 130, 130, 130, 130, 130],
+                      colWidths: [10, 200, 100, 100, 100, 80, 80, 80, 200],
                       columns: [
                         {
                           title: 'Inventory Id',
