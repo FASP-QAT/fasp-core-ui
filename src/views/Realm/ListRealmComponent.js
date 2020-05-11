@@ -115,27 +115,6 @@ export default class ReactListComponent extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
-            },
-            {
-                dataField: 'monthInPastForAmc',
-                text: i18n.t('static.realm.monthInPastForAmc'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'monthInFutureForAmc',
-                text: i18n.t('static.realm.monthInFutureForAmc'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'orderFrequency',
-                text: i18n.t('static.realm.orderFrequency'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
             }, {
                 dataField: 'realmId',
                 text: 'Action',
