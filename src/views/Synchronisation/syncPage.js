@@ -251,7 +251,6 @@ export default class syncPage extends Component {
                       consumptionList: consumptionList
                     });
                     var inventoryList = (programJson.inventoryList);
-                    console.log("Inventory List", inventoryList);
                     this.setState({
                       inventoryList: inventoryList
                     });
@@ -594,14 +593,11 @@ export default class syncPage extends Component {
                     var mergedDataConsumption = [];
                     var consumptionIdArray = [];
                     for (var i = 0; i < oldDataJsonConsumption.length; i++) {
-                      console.log("(oldDataJsonConsumption[i])[0]", (oldDataJsonConsumption[i])[0]);
                       if ((oldDataJsonConsumption[i])[0] != 0) {
                         mergedDataConsumption.push(oldDataJsonConsumption[i]);
                         consumptionIdArray.push((oldDataJsonConsumption[i])[0]);
                       }
                     }
-                    console.log("oldDataJsonConsumption.length", oldDataJsonConsumption.length);
-                    console.log("mergedDataConsumption", mergedDataConsumption);
                     for (var i = 0; i < latestDataJsonConsumption.length; i++) {
                       if (consumptionIdArray.includes((latestDataJsonConsumption[i])[0])) {
                       } else {
@@ -609,13 +605,11 @@ export default class syncPage extends Component {
                         // consumptionIdArray.push(latestDataJsonConsumption[i].consumptionId);
                       }
                     }
-                    console.log("mergedDataConsumption 1-------->", mergedDataConsumption);
                     for (var i = 0; i < oldDataJsonConsumption.length; i++) {
                       if ((oldDataJsonConsumption[i])[0] == 0) {
                         mergedDataConsumption.push(oldDataJsonConsumption[i])
                       }
                     }
-                    console.log("mergedDataConsumption 2-------->", mergedDataConsumption);
                     this.el = jexcel(document.getElementById("mergedVersionConsumption"), '');
                     this.el.destroy();
                     mergedDataConsumption = mergedDataConsumption;
@@ -1164,17 +1158,17 @@ export default class syncPage extends Component {
                             </InputGroupAddon>
                           </InputGroup>
                         </div>
-                   
+
                       </FormGroup>
                       <div className="col-md-10 comparebtnlegend">
-                      <ul className="legend legendsync">
-                            <li><span className="lightpinklegend"></span> <span className="legendTextsync">Difference between versions</span></li>
-                            <li><span className="greenlegend"></span><span className="legendTextsync"> New data from current version</span></li>
-                            <li><span className="notawesome"></span><span className="legendTextsync">  New data from latest version</span></li>
-                            <li><span className="redlegend"></span><span className="legendTextsync"> Inactive Data</span></li>
-                          </ul> 
+                        <ul className="legend legendsync">
+                          <li><span className="lightpinklegend"></span> <span className="legendTextsync">Difference between versions</span></li>
+                          <li><span className="greenlegend"></span><span className="legendTextsync"> New data from current version</span></li>
+                          <li><span className="notawesome"></span><span className="legendTextsync">  New data from latest version</span></li>
+                          <li><span className="redlegend"></span><span className="legendTextsync"> Inactive Data</span></li>
+                        </ul>
                       </div>
-                
+
                     </div>
                   </Col>
                 </Form>
