@@ -230,10 +230,10 @@ class Consumption extends Component {
                 if (sorted[j] != null && sorted[j] != "") {
                   if (previousDate == moment(sorted[j].consumptionDate, 'YYYY-MM-DD').format('MM-YYYY')) {
                     if (sorted[j].actualFlag == false || sorted[j].actualFlag == "false") {
-                      forcast = forcast + sorted[j].consumptionQty;
+                      forcast = forcast + parseFloat(sorted[j].consumptionQty);
                     }
                     if (sorted[j].actualFlag == true || sorted[j].actualFlag == "true") {
-                      actual = actual + sorted[j].consumptionQty;
+                      actual = actual + parseFloat(sorted[j].consumptionQty);
                     }
                   }
                 }
@@ -477,7 +477,7 @@ class Consumption extends Component {
               if (count == 0 || i == 0) {
                 offlineProductCategoryList.push({
                   id: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id,
-                  name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en + "-" + offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.id
+                  name: offlineConsumptionList[i].planningUnit.forecastingUnit.productCategory.label.label_en
                 });
               }
             }
@@ -637,7 +637,7 @@ class Consumption extends Component {
             data: this.state.consumptions.map((item, index) => (item.Actual)),
           }, {
             type: "line",
-            label: i18n.t('static.report.forcastConsumption'),
+            label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
             borderStyle: 'dotted',

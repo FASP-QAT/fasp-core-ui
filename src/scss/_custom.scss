@@ -607,14 +607,14 @@ label.arrow_label:after {
   }
 }
 
-.center {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-}
+// .center {
+//   position: absolute;
+//   top: 0;
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+//   margin: auto;
+// }
 .RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
@@ -1304,7 +1304,8 @@ h5,
 /* basic positioning */
 .legend {
   list-style: none;
-  margin-top: 6px;
+  float: right;
+
 }
 .legend li {
   float: left;
@@ -1314,8 +1315,16 @@ h5,
 .legend span {
   float: left;
   width: 55px;
-  height: 25px;
-  margin: -4px 11px 0px 0px;
+  height: 15px;
+  margin: 0px 11px 0px 0px;
+  border-radius: 3px;
+}
+
+.legendText {
+  float: left;
+  width: 200px !important;
+  height: 15px;
+  margin: -4px 0px 0px 0px !important;
   border-radius: 3px;
 }
 /* your colors */
@@ -1559,7 +1568,7 @@ input::placeholder {
 }
 
 .react-confirm-alert-body {
-  width: 100% !important;
+  width: 500px !important;
   font-weight: 600;
   font-size: 17px !important;
   padding: 30px;
@@ -1587,7 +1596,8 @@ input::placeholder {
 // .planning-text{    margin-left: 0px;}
 
 .background-red {
-  background-color: red;
+  // background-color: red;
+  background-color: #fac8c8;
 }
 
 .supplyplan-larrow {
@@ -1595,19 +1605,52 @@ input::placeholder {
   margin-left: 9%;
   color: #20a8d8;
   font-size: 13px;
+  cursor: pointer;
 }
 .supplyplan-rarrow {
   float: right;
   color: #20a8d8;
   font-size: 13px;
+  cursor: pointer;
   // margin-right: 9%;
 }
 
 .legend-supplypln {
   margin-bottom: 0px;
+  margin-top: -4px;
 }
 .modal-title-sp
 {
   font-weight: 600;;
 }
 
+.modalHeaderSupplyPlan{
+  padding: 10px 10px 10px 10px!important;
+}
+.react-datepicker-wrapper {
+  display: block!important;
+  padding: 0;
+  border: 0;
+}
+
+.comparebtntext
+{
+  margin-left: -2%;
+}
+.comparebtnlegend{
+  margin-left: 4%;
+}
+.legendsync {
+  list-style: none;
+  margin-top: 3%!important;
+  float: right;
+  display: inline-flex!important;
+}
+.legendTextsync {
+  float: right!important;
+  width: 200px !important;
+  height: 15px;
+  padding-left: 44%!important;
+  margin: -17px -13px 0px -9px !important;
+  border-radius: 3px;
+}
