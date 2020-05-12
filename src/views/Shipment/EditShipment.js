@@ -40,99 +40,19 @@ export default class ConsumptionDetails extends React.Component {
         // this.getConsumptionData = this.getConsumptionData.bind(this);
         this.saveData = this.saveData.bind(this)
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
-        this.formSubmit = this.formSubmit.bind(this);
+        // this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
     }
 
     componentDidMount = function () {
         document.getElementById("addButton").style.display = "none";
+        console.log("--------------LIST CHECK-------------", this.props.match.params.programId);
 
-        const lan = 'en';
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-            var proList = [];
-            var shipStatusList = []
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = {
-                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                            id: myResult[i].id
-                        }
-                        proList[i] = programJson
-                    }
-                }
-                this.setState({
-                    programList: proList
-                })
-
-                var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
-                var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
-                var shipmentStatusRequest = shipmentStatusOs.getAll();
-
-
-                shipmentStatusRequest.onsuccess = function (event) {
-
-                    // var shipmentStatusResult = [];
-                    // shipmentStatusResult = shipmentStatusRequest.result;
-                    // for (var k = 0; k < shipmentStatusResult.length; k++) {
-                    //     var shipmentStatusJson = {
-                    //         name: shipmentStatusResult[k].label.label_en,
-                    //         id: shipmentStatusResult[k].shipmentStatusId
-                    //     }
-                    //     shipStatusList[k] = shipmentStatusJson;
-                    // }
-
-                    // this.setState({
-                    //     shipmentStatusList: shipStatusList
-                    // })
-
-                }.bind(this);
-            }.bind(this);
-
-            // For Shipment Status hard coded
-            var shipStatusList = [];
-            shipStatusList[0] = { id: 1, name: "Suggested" };
-            shipStatusList[1] = { id: 2, name: "Planned" };
-            shipStatusList[2] = { id: 3, name: "Cancelled" };
-            shipStatusList[3] = { id: 4, name: "Submitted" };
-            shipStatusList[4] = { id: 5, name: "Approved" };
-            shipStatusList[5] = { id: 6, name: "Shipped" };
-            shipStatusList[6] = { id: 7, name: "Arrived" };
-            shipStatusList[7] = { id: 8, name: "Delivered" };
-
-            this.setState({
-                shipmentStatusList: shipStatusList
-            })
-
-        }.bind(this)
-
-
-    };
-
-    formSubmit() {
-        var programId = document.getElementById("programId").value;
-        console.log("IMP ---------> ", programId)
-        var shipmentStatusId = document.getElementById('shipmentId').value;
+        var programId = '1_v3_uId_1';
         this.setState({ programId: programId });
-        this.setState({ shipmentStatusId: shipmentStatusId });
-
+        this.setState({ shipmentStatusId: 1 });
+        console.log("--------------1111111111111111-------------", programId);
         var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
@@ -141,6 +61,7 @@ export default class ConsumptionDetails extends React.Component {
         var fundingSourceList = [];
         var budgetList = [];
         openRequest.onsuccess = function (e) {
+            console.log("--------------22222222222222222222-------------", programId);
             db1 = e.target.result;
 
             var transaction = db1.transaction(['programData'], 'readwrite');
@@ -152,11 +73,10 @@ export default class ConsumptionDetails extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
 
-                var sel = document.getElementById("planningUnitId");
-                var planningUnitText = sel.options[sel.selectedIndex].text;
 
 
-                if (shipmentStatusId != 0) {
+
+                if (this.props.match.params.shipmentStatusId != 0) {
 
                     // var dataSourceResult = [];
                     // dataSourceResult = dataSourceRequest.result;
@@ -171,14 +91,14 @@ export default class ConsumptionDetails extends React.Component {
                     //         }
                     //     }
                     // }
-                    programId = (document.getElementById("programId").value).split("_")[0];
+                    programId = 1;
 
                     var programTransaction1 = db1.transaction(['program'], 'readwrite');
                     var programOs1 = programTransaction1.objectStore('program');
                     var programRequest1 = programOs1.getAll();
+                    console.log("this.props.match.params.shipmentStatusId-----", this.props.match.params.shipmentStatusId);
 
-
-                    if (shipmentStatusId == 1) {
+                    if (this.props.match.params.shipmentStatusId == 1) {
 
                         document.getElementById("addButton").style.display = "block";
 
@@ -245,7 +165,7 @@ export default class ConsumptionDetails extends React.Component {
 
 
                                         // Get inventory data from program
-                                        var plannigUnitId = document.getElementById("planningUnitId").value;
+
                                         // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId && c.shipmentStatus.id == 1);
                                         var shipmentList = '';
                                         this.setState({
@@ -277,7 +197,7 @@ export default class ConsumptionDetails extends React.Component {
                                         // data[1] = expectedDeliveryDate;
                                         data[1] = '10-31-2020';
                                         data[2] = '01-SUGGESTED';
-                                        data[3] = planningUnitText;
+                                        data[3] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
                                         data[4] = '44773';
                                         data[5] = '';
                                         data[6] = '';
@@ -384,7 +304,7 @@ export default class ConsumptionDetails extends React.Component {
                             }.bind(this)
                         }.bind(this)
                     }
-                    if (shipmentStatusId == 2) {
+                    if (this.props.match.params.shipmentStatusId == 2) {
 
                         document.getElementById("addButton").style.display = "none";
 
@@ -441,7 +361,7 @@ export default class ConsumptionDetails extends React.Component {
                             data[3] = 'PSM';
                             data[4] = 'USAID';
                             data[5] = 'Kenya - 2020 budget	';
-                            data[6] = planningUnitText;
+                            data[6] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
                             data[7] = '44773';
                             data[8] = '45000'; //moq
                             data[9] = '30.00';
@@ -618,7 +538,7 @@ export default class ConsumptionDetails extends React.Component {
                         }.bind(this);
                     }
 
-                    if (shipmentStatusId == 3) {
+                    if (this.props.match.params.shipmentStatusId == 3) {
                         document.getElementById("addButton").style.display = "none";
 
                         // var shipmentList = (programJson.shipmentList).filter(c => c.planningUnit.id == plannigUnitId && c.shipmentStatus.id == 2);
@@ -654,7 +574,7 @@ export default class ConsumptionDetails extends React.Component {
                         data[3] = 'PSM';
                         data[4] = 'USAID';
                         data[5] = 'Kenya - 2020 budget';
-                        data[6] = planningUnitText;
+                        data[6] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
                         data[7] = '44773';
                         data[8] = '45000'; //moq
                         data[9] = 'Container';
@@ -816,7 +736,7 @@ export default class ConsumptionDetails extends React.Component {
 
                     }
 
-                    if (shipmentStatusId == 4) {
+                    if (this.props.match.params.shipmentStatusId == 4) {
                         document.getElementById("addButton").style.display = "none";
                         var paList = [];
                         var supList = [];
@@ -927,7 +847,7 @@ export default class ConsumptionDetails extends React.Component {
                                     data[3] = 'PSM';
                                     data[4] = 'USAID';
                                     data[5] = 'Kenya - 2020 budget';
-                                    data[6] = planningUnitText;
+                                    data[6] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
                                     data[7] = '44773';
                                     data[8] = '45000'; //moq
                                     data[9] = '';
@@ -1094,7 +1014,9 @@ export default class ConsumptionDetails extends React.Component {
                 }
             }.bind(this)
         }.bind(this)
-    }
+
+
+    };
 
 
     addRow = function () {
@@ -1103,7 +1025,7 @@ export default class ConsumptionDetails extends React.Component {
         var fundingSourceList = [];
         var budgetList = [];
 
-        var programId = document.getElementById("programId").value;
+        var programId = 1;
 
         var db1;
         getDatabase();
@@ -1111,7 +1033,7 @@ export default class ConsumptionDetails extends React.Component {
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
 
-            programId = (document.getElementById("programId").value).split("_")[0];
+
             var programTransaction1 = db1.transaction(['program'], 'readwrite');
             var programOs1 = programTransaction1.objectStore('program');
             var programRequest1 = programOs1.getAll();
@@ -1129,8 +1051,7 @@ export default class ConsumptionDetails extends React.Component {
                 }
 
                 var expectedDeliveryDate = this.addDays(new Date(), expectedDeliveryInDays);
-                var sel = document.getElementById("planningUnitId");
-                var planningUnitText = sel.options[sel.selectedIndex].text;
+
 
                 var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                 var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
@@ -1184,7 +1105,7 @@ export default class ConsumptionDetails extends React.Component {
                             data[0] = '';
                             data[1] = expectedDeliveryDate;
                             data[2] = '01-SUGGESTED';
-                            data[3] = planningUnitText;
+                            data[3] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
                             data[4] = '';
                             data[5] = '';
                             data[6] = '';
@@ -1289,7 +1210,7 @@ export default class ConsumptionDetails extends React.Component {
                                 id: (document.getElementById("programId").value).split("_")[0]
                             },
                             planningUnit: {
-                                id: document.getElementById("planningUnitId")
+                                id: 1
                             },
                             notes: map.get("6")
 
@@ -1325,33 +1246,6 @@ export default class ConsumptionDetails extends React.Component {
     }.bind(this);
 
     render() {
-        const lan = 'en';
-        const { programList } = this.state;
-        let programs = programList.length > 0
-            && programList.map((item, i) => {
-                return (
-                    //             // {this.getText(dataSource.label,lan)}
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
-        const { planningUnitList } = this.state;
-        let planningUnits = planningUnitList.length > 0
-            && planningUnitList.map((item, i) => {
-                return (
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
-        const { shipmentStatusList } = this.state;
-        let shipmentStatus = shipmentStatusList.length > 0
-            && shipmentStatusList.map((item, i) => {
-                return (
-                    //             // {this.getText(dataSource.label,lan)}
-                    <option key={i} value={item.id}>{item.name}</option>
-                )
-            }, this);
-
 
         return (
 
@@ -1364,71 +1258,6 @@ export default class ConsumptionDetails extends React.Component {
                             <strong>Shipment details</strong>
                         </CardHeader>
                         <CardBody>
-                            <Formik
-                                render={
-                                    ({
-                                    }) => (
-                                            <Form name='simpleForm'>
-
-                                                <Col md="9 pl-0">
-                                                    <div className="d-md-flex">
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Program</Label>
-                                                            <div className="controls SelectGo">
-                                                                <InputGroup>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        value={this.state.programId}
-                                                                        name="programId" id="programId"
-                                                                        onChange={this.getPlanningUnitList}
-                                                                    >
-                                                                        <option value="0">Please select</option>
-                                                                        {programs}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                                            <div className="controls SelectGo">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="planningUnitId"
-                                                                        id="planningUnitId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.planningUnitId}
-                                                                    >
-                                                                        <option value="0">Please Select</option>
-                                                                        {planningUnits}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
-                                                            <Label htmlFor="appendedInputButton">Shipment Status</Label>
-                                                            <div className="controls SelectGo">
-                                                                <InputGroup>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        value={this.state.shipmentId}
-                                                                        name="shipmentId" id="shipmentId"
-                                                                    // onChange={this.displayInsertRowButton}
-                                                                    >
-                                                                        <option value="0">Please select</option>
-                                                                        {shipmentStatus}
-                                                                    </Input>
-                                                                    <InputGroupAddon addonType="append">
-                                                                        <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
-                                                                    </InputGroupAddon>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
-                                        )} />
-
                             <Col xs="12" sm="12">
                                 <div className="table-responsive">
                                     <div id="shipmenttableDiv">
@@ -1508,8 +1337,8 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({
             changedFlag: 1
         })
-        var shipmentStatusId = document.getElementById('shipmentId').value;
-        if (shipmentStatusId == 1) {
+        // var shipmentStatusId = document.getElementById('shipmentId').value;
+        if (this.props.match.params.shipmentStatusId == 1) {
             if (x == 6) {
                 var col = ("G").concat(parseInt(y) + 1);
                 if (value == "") {
@@ -1534,7 +1363,7 @@ export default class ConsumptionDetails extends React.Component {
             }
 
         }
-        if (shipmentStatusId == 2) {
+        if (this.props.match.params.shipmentStatusId == 2) {
             // if (x == 11 || x == 12 || x == 13) {
 
             var isValidForManualPrice = true;
@@ -2782,14 +2611,14 @@ export default class ConsumptionDetails extends React.Component {
 
         // }
 
-        var shipmentStatusId = document.getElementById('shipmentId').value;
-        if (shipmentStatusId == 1) {
-            valid = true;
-        } else {
-            valid = false;
-        }
+        // var shipmentStatusId = document.getElementById('shipmentId').value;
+        // if (shipmentStatusId == 1) {
+        //     valid = true;
+        // } else {
+        //     valid = false;
+        // }
 
-        return valid;
+        return true;
     }
     cancelClicked() {
         this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
