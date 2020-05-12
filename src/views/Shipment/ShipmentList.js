@@ -1,16 +1,28 @@
 import React, { Component } from 'react';
-import LanguageService from '../../api/LanguageService.js'
-import { NavLink } from 'react-router-dom'
-import { Button, Card, CardBody, CardHeader, Col, Row, FormGroup, Input, InputGroup, InputGroupAddon, Label } from 'reactstrap';
+import ReactDOM from 'react-dom';
+import jexcel from 'jexcel';
+// import "./style.css";
+import "../../../node_modules/jexcel/dist/jexcel.css";
+import * as JsStoreFunctions from "../../CommonComponent/JsStoreFunctions.js";
+import {
+    Card, CardBody, CardHeader,
+    Label, Input, FormGroup,
+    CardFooter, Button, Col, Form, InputGroup, InputGroupAddon
+    , FormFeedback, Row
+} from 'reactstrap';
+import { Formik } from 'formik';
+import CryptoJS from 'crypto-js'
+import { SECRET_KEY } from '../../Constants.js'
+import getLabelText from '../../CommonComponent/getLabelText'
+import moment from "moment";
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import i18n from '../../i18n';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
-import AuthenticationService from '../Common/AuthenticationService.js';
-import data from '../Tables/DataTable/_data';
-import getLabelText from '../../CommonComponent/getLabelText';
-import i18n from '../../i18n';
-import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import Picker from 'react-month-picker'
+import MonthBox from '../../CommonComponent/MonthBox.js'
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.shipment.shipment');
@@ -20,35 +32,222 @@ export default class LanguageListComponent extends Component {
         super(props);
 
         this.state = {
-            langaugeList: [],
+            programList: [],
+            categoryList: [],
+            productList: [],
+            consumptionDataList: [],
+            changedFlag: 0,
+            planningUnitList: [],
+            shipmentList: [],
+            procurementUnitList: [],
+            supplierList: [],
+            allowShipmentStatusList: [],
             message: '',
-            selSource: []
+            langaugeList: [],
+            selSource: [],
+            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
         }
-        this.editLanguage = this.editLanguage.bind(this);
+        this.editShipment = this.editShipment.bind(this);
+        this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeChange = this.handleRangeChange.bind(this);
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
 
     }
 
-    editLanguage(language) {
+    editShipment(jsonForShipment) {
+
         this.props.history.push({
-            pathname: `/language/editLanguage/${language.languageId}`,
-            // state: { language }
+            pathname: `/shipment/editShipment/${jsonForShipment.shipmentStatusId}/${jsonForShipment.programId}`,
+            // state: { jsonForShipment }
+
         });
     }
 
-    componentDidMount() {
-        AuthenticationService.setupAxiosInterceptors();
-        LanguageService.getLanguageList()
-            .then(response => {
-                console.log(response.data)
-                if (response.status == 200) {
-                    this.setState({ langaugeList: response.data, selSource: response.data })
-                }
-            })
+    handleRangeChange(value, text, listIndex) {
+        //
+    }
+    handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
 
     }
 
+    _handleClickRangeBox(e) {
+        this.refs.pickRange.show()
+    }
+
+    getPlanningUnitList(event) {
+        // console.log("-------------in planning list-------------")
+        const lan = 'en';
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+                var myResult = [];
+                myResult = planningunitRequest.result;
+                // console.log("myResult", myResult);
+                var programId = (document.getElementById("programId").value).split("_")[0];
+                // console.log('programId----->>>', programId)
+                console.log(myResult);
+                var proList = []
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].program.id == programId) {
+                        var productJson = {
+                            name: getLabelText(myResult[i].planningUnit.label, lan),
+                            id: myResult[i].planningUnit.id
+                        }
+                        proList[i] = productJson
+                    }
+                }
+                this.setState({
+                    planningUnitList: proList
+                })
+            }.bind(this);
+        }.bind(this)
+    }
+
+    componentDidMount() {
+        document.getElementById("TableCust").style.display = "none";
+
+        const lan = 'en';
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var program = transaction.objectStore('programData');
+            var getRequest = program.getAll();
+            var proList = [];
+            var shipStatusList = []
+            getRequest.onerror = function (event) {
+                // Handle errors!
+            };
+            getRequest.onsuccess = function (event) {
+                var myResult = [];
+                myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                for (var i = 0; i < myResult.length; i++) {
+                    if (myResult[i].userId == userId) {
+                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+                        var programJson = {
+                            name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
+                            id: myResult[i].id
+                        }
+                        proList[i] = programJson
+                    }
+                }
+                this.setState({
+                    programList: proList
+                })
+
+
+            }.bind(this);
+        }.bind(this)
+
+    }
+
+    formSubmit = function () {
+        var tempShipmentList = [];
+        var sel = document.getElementById("planningUnitId");
+        var planningUnitText = sel.options[sel.selectedIndex].text;
+        var programIdEncrypt = document.getElementById("programId").value;
+        var programId = (document.getElementById("programId").value).split("_")[0];
+        var jsonForShipment = {
+            qatOrderNo: 1,
+            shipmentStatus: 'Suggested',
+            planningUnit: planningUnitText,
+            programIdEncrypt: programIdEncrypt,
+            programId: programId,
+            shipmentStatusId: 1,
+
+        }
+        tempShipmentList.push(jsonForShipment);
+
+        jsonForShipment = {
+            qatOrderNo: 2,
+            shipmentStatus: 'planned',
+            planningUnit: planningUnitText,
+            programId: programId,
+            shipmentStatusId: 2,
+
+        }
+        tempShipmentList.push(jsonForShipment);
+
+        jsonForShipment = {
+            qatOrderNo: 3,
+            shipmentStatus: 'cancelled',
+            planningUnit: planningUnitText,
+            programId: programId,
+            shipmentStatusId: 3,
+
+        }
+        tempShipmentList.push(jsonForShipment);
+
+        jsonForShipment = {
+            qatOrderNo: 4,
+            shipmentStatus: 'submitted',
+            planningUnit: planningUnitText,
+            programId: programId,
+            shipmentStatusId: 4,
+
+        }
+        tempShipmentList.push(jsonForShipment);
+
+        this.setState({
+            shipmentList: tempShipmentList
+        })
+        this.setState({
+            selSource: tempShipmentList
+        })
+
+        document.getElementById("TableCust").style.display = "block";
+    }.bind(this);
+
 
     render() {
+
+        const lan = 'en';
+        const { programList } = this.state;
+        let programs = programList.length > 0
+            && programList.map((item, i) => {
+                return (
+                    //             // {this.getText(dataSource.label,lan)}
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
+        const { planningUnitList } = this.state;
+        let planningUnits = planningUnitList.length > 0
+            && planningUnitList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+
+        const pickerLang = {
+            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            from: 'From', to: 'To',
+        }
+        const { rangeValue } = this.state
+
+        const makeText = m => {
+            if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+            return '?'
+        }
+
         const { SearchBar, ClearSearchButton } = Search;
         const customTotal = (from, to, size) => (
             <span className="react-bootstrap-table-pagination-total">
@@ -57,29 +256,25 @@ export default class LanguageListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'languageName',
-            text: i18n.t('static.language.language'),
+            dataField: 'qatOrderNo',
+            text: 'QAT No',
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'languageCode',
-            text: i18n.t('static.language.languageCode'),
+            dataField: 'shipmentStatus',
+            text: 'Shipment Status',
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'active',
-            text: i18n.t('static.common.status'),
+            dataField: 'planningUnit',
+            text: 'Planning Unit',
             sort: true,
             align: 'center',
-            headerAlign: 'center',
-            formatter: (cellContent, row) => {
-                return (
-                    (row.active ? i18n.t('static.common.active') : i18n.t('static.common.disabled'))
-                );
-            }
-        }];
+            headerAlign: 'center'
+        }
+        ];
         const options = {
             hidePageListOnlyOnePage: true,
             firstPageText: i18n.t('static.common.first'),
@@ -108,9 +303,6 @@ export default class LanguageListComponent extends Component {
         }
         return (
             <div className="animated">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
@@ -119,77 +311,96 @@ export default class LanguageListComponent extends Component {
                     </CardHeader>
                     <CardBody className="pb-lg-0">
 
-                        <Col md="9 pl-0">
-                            <div className="d-md-flex Selectdiv2">
-                                <FormGroup>
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                        <Col md="12 pl-0">
+                            <div className="d-md-flex">
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">Program</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                value={this.state.programId}
+                                                name="programId" id="programId"
+                                                onChange={this.getPlanningUnitList}
+                                            >
+                                                <option value="0">Please select</option>
+                                                {programs}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">Planning Unit</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
                                             <Input
                                                 type="select"
-                                                name="realmId"
-                                                id="realmId"
+                                                name="planningUnitId"
+                                                id="planningUnitId"
                                                 bsSize="sm"
+                                                value={this.state.planningUnitId}
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {/* {realmList} */}
+                                                <option value="0">Please Select</option>
+                                                {planningUnits}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">Filter By</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                value={this.state.shipmentId}
+                                                name="shipmentId" id="shipmentId"
+                                            // onChange={this.displayInsertRowButton}
+                                            >
+                                                {/* <option value="0">Please select</option> */}
+                                                <option value="1">Created Date</option>
+                                                <option value="2">Delivery Date</option>
+
                                             </Input>
 
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.dataSource.program')}</Label>
+                                    <Label htmlFor="appendedInputButton">Select Period</Label>
                                     <div className="controls SelectGo">
                                         <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="programId"
-                                                id="programId"
-                                                bsSize="sm"
+                                            <Picker
+                                                ref="pickRange"
+                                                years={{ min: 2013 }}
+                                                value={rangeValue}
+                                                lang={pickerLang}
+                                                //theme="light"
+                                                onChange={this.handleRangeChange}
+                                                onDismiss={this.handleRangeDissmis}
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {/* {programList} */}
-                                            </Input>
-
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-                                <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.datasourcetype.datasourcetype')}</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="dataSourceTypeId"
-                                                id="dataSourceTypeId"
-                                                bsSize="sm"
-                                            >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {/* {dataSourceTypeList} */}
-                                            </Input>
+                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                            </Picker>
                                             <InputGroupAddon addonType="append">
-                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
                             </div>
                         </Col>
-
                         <ToolkitProvider
-                            keyField="languageId"
+                            keyField="qatOrderNo"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
                             hover
                             filter={filterFactory()}
-                            
+
                         >
                             {
                                 props => (
 
-                                    <div className="TableCust" style={{ display: "none" }}>
+                                    <div className="TableCust" id="TableCust">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
@@ -198,7 +409,7 @@ export default class LanguageListComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editLanguage(row);
+                                                    this.editShipment(row);
                                                 }
                                             }}
                                             {...props.baseProps}
