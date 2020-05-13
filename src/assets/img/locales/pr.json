@@ -133,5 +133,6 @@
     "static.dashboard.report": "Relatórios",
     "static.dashboard.consumption": "Consumo",
     "static.dashboard.stockstatusmatrix": "Matriz de status de estoque",
-    "static.dashboard.program": "Programa"
+    "static.dashboard.program": "Programa",
+    "static.message.syncExpiresOn": "Você excedeu o número máximo de dias em que pode trabalhar offline. Por favor, fique online para continuar usando o QAT."
 }

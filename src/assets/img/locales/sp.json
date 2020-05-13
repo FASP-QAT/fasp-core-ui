@@ -167,5 +167,6 @@
     "static.planningunit.planningunit": "Unidad de planeamiento",
     "static.dashboard.report": "Informes",
     "static.dashboard.consumption": "Consumo",
-    "static.dashboard.stockstatusmatrix": "Matriz de estado de stock"
+    "static.dashboard.stockstatusmatrix": "Matriz de estado de stock",
+    "static.message.syncExpiresOn": "Ha excedido el número máximo de días que puede trabajar sin conexión. Conéctese en línea para continuar usando QAT."
 }
