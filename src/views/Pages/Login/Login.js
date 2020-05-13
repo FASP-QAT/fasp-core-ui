@@ -112,7 +112,7 @@ class Login extends Component {
     return (
       <div className="main-content flex-row align-items-center">
 
-        <div className="Login-component"  style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
+        <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
           <Container className="container-login">
 
             <Row className="justify-content-center">
@@ -138,13 +138,15 @@ class Login extends Component {
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
+                                decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
+                                // decoded.user.syncExpiresOn = moment("2020-05-11 15:13:19").format("YYYY-MM-DD HH:mm:ss");
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
-                          
+
                                 AuthenticationService.setupAxiosInterceptors();
                                 this.props.history.push(`/ApplicationDashboard`)
                               })
@@ -193,7 +195,11 @@ class Login extends Component {
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.removeItem("tempUser");
-                                  this.props.history.push(`/ApplicationDashboard`)
+                                  if (AuthenticationService.syncExpiresOn() == true) {
+                                    this.props.history.push(`/logout/static.message.syncExpiresOn`)
+                                  } else {
+                                    this.props.history.push(`/ApplicationDashboard`)
+                                  }
                                 } else {
                                   this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
@@ -283,16 +289,16 @@ class Login extends Component {
               <Col xs="12" className="Login-bttom ">
                 <CardBody>
 
-                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply 
-                  Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects 
-                  technical solutions and proven commercial processes to promote efficient and cost-effective 
-                  health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health 
-                  commodities to save lives and create a healthier future for all. The project purchases 
-                  and delivers health commodities, offers comprehensive technical assistance to strengthen 
-                  national supply chain systems, and provides global supply chain leadership. For more 
-                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not 
-                  official U.S. government information and does not represent the views or positions of the 
-                  Agency for International Development or the U.S. government.
+                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply
+                  Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects
+                  technical solutions and proven commercial processes to promote efficient and cost-effective
+                  health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health
+                  commodities to save lives and create a healthier future for all. The project purchases
+                  and delivers health commodities, offers comprehensive technical assistance to strengthen
+                  national supply chain systems, and provides global supply chain leadership. For more
+                  information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
+                            official U.S. government information and does not represent the views or positions of the
+                            Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

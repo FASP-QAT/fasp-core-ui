@@ -652,5 +652,6 @@
     "static.month.nov": "Nov",
     "static.month.dec": "Dec",
     "static.shipment.shipment": "Shipment",
-    "static.message.commitSuccess": "Version committed successfully."
+    "static.message.commitSuccess": "Version committed successfully.",
+    "static.message.syncExpiresOn": "You have exceeded the maximum number of days that you can work offline. Please go online to continue using QAT."
 }
