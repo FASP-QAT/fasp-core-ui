@@ -702,7 +702,7 @@ class Consumption extends Component {
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
         <Row>
-          <Col lg="12">
+          <Col md="12">
             <Card>
               <CardHeader>
                 <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong>
@@ -742,7 +742,9 @@ class Consumption extends Component {
               </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                  <div className=""> <div ref={ref}> <div className="" >
+                  <div className="container"> 
+                  <div ref={ref}> 
+                  <div className="col-md-12" >
                     <Form >
                       <Col>
                         <div className="row">
@@ -971,64 +973,67 @@ class Consumption extends Component {
                           <Bar data={bar} options={options} />
                         </div>}
                     </Offline>
-                  </div></div>
+                  </div>
+                  <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
-                    <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+<thead>
+  <tr>
+    <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
+    <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
+    <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
+  </tr>
+</thead>
+<Online>
+  <tbody>
+    {
+      this.state.consumptions.length > 0
+      &&
+      this.state.consumptions.map((item, idx) =>
 
-                      <thead>
-                        <tr>
-                          <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
-                          <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
-                          <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
-                        </tr>
-                      </thead>
-                      <Online>
-                        <tbody>
-                          {
-                            this.state.consumptions.length > 0
-                            &&
-                            this.state.consumptions.map((item, idx) =>
+        <tr id="addr0" key={idx} >
+          <td>
+            {this.state.consumptions[idx].consumption_date}
+          </td>
+          <td>
 
-                              <tr id="addr0" key={idx} >
-                                <td>
-                                  {this.state.consumptions[idx].consumption_date}
-                                </td>
-                                <td>
+            {this.state.consumptions[idx].forcast}
+          </td>
+          <td>
+            {this.state.consumptions[idx].Actual}
+          </td></tr>)
 
-                                  {this.state.consumptions[idx].forcast}
-                                </td>
-                                <td>
-                                  {this.state.consumptions[idx].Actual}
-                                </td></tr>)
+    }
+  </tbody>
+</Online>
+<Offline>
+  <tbody>
+    {
+      this.state.offlineConsumptionList.length > 0
+      &&
+      this.state.offlineConsumptionList.map((item, idx) =>
 
-                          }
-                        </tbody>
-                      </Online>
-                      <Offline>
-                        <tbody>
-                          {
-                            this.state.offlineConsumptionList.length > 0
-                            &&
-                            this.state.offlineConsumptionList.map((item, idx) =>
+        <tr id="addr0" key={idx} >
+          <td>
+            {this.state.offlineConsumptionList[idx].consumption_date}
+          </td>
+          <td>
 
-                              <tr id="addr0" key={idx} >
-                                <td>
-                                  {this.state.offlineConsumptionList[idx].consumption_date}
-                                </td>
-                                <td>
+            {this.state.offlineConsumptionList[idx].forcast}
+          </td>
+          <td>
+            {this.state.offlineConsumptionList[idx].Actual}
+          </td></tr>)
 
-                                  {this.state.offlineConsumptionList[idx].forcast}
-                                </td>
-                                <td>
-                                  {this.state.offlineConsumptionList[idx].Actual}
-                                </td></tr>)
+    }
+  </tbody>
+</Offline>
+</Table>
+                  </div>
 
-                          }
-                        </tbody>
-                      </Offline>
-                    </Table>
+             
 
-                  </div></div>
+                  </div>
+                  </div>
               </CardBody>
             </Card>
           </Col>
