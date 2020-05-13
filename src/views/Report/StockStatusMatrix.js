@@ -348,20 +348,23 @@ export default class StockStatusMatrix extends React.Component {
       var re=this.state.data
      
       if(this.state.view==1){
-        this.state.data.map(ele =>A.push([ele.PLANNING_UNIT_LABEL_EN.replaceAll(',',' '),ele.YEAR,ele.Jan,ele.Feb,ele.Mar,ele.Apr,ele.May,ele.Jun,ele.Jul,ele.Aug,ele.Sep,ele.Oct,ele.Nov
+        this.state.data.map(ele =>A.push([(ele.PLANNING_UNIT_LABEL_EN.replaceAll(',',' ')).replaceAll(' ','%20'),ele.YEAR,ele.Jan,ele.Feb,ele.Mar,ele.Apr,ele.May,ele.Jun,ele.Jul,ele.Aug,ele.Sep,ele.Oct,ele.Nov
           ,ele.Dec] ));
       }else{
-        this.state.data.map(ele =>A.push([ele.PLANNING_UNIT_LABEL_EN.replaceAll(',',' '),ele.YEAR,ele.Q1,ele.Q2,ele.Q3,ele.Q4] ));
+        this.state.data.map(ele =>A.push([(ele.PLANNING_UNIT_LABEL_EN.replaceAll(',',' ')).replaceAll(' ','%20'),ele.YEAR,ele.Q1,ele.Q2,ele.Q3,ele.Q4] ));
 
       }
      /*for(var item=0;item<re.length;item++){
        A.push([re[item].consumption_date,re[item].forcast,re[item].Actual])
      } */
      for(var i=0;i<A.length;i++){
+       console.log(A[i])
       csvRow.push(A[i].join(","))
+     
     } 
 
     var csvString=csvRow.join("%0A")
+    console.log('csvString'+csvString)
     var a=document.createElement("a")
     a.href='data:attachment/csv,'+csvString
     a.target="_Blank"

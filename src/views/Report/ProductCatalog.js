@@ -108,8 +108,7 @@ export default class ProductCatalog extends React.Component {
             
          
         var A=[headers]
-        var re=this.state.data
-    
+       
           this.state.data.map(elt =>A.push( [ elt.planningUnit.forecastingUnit.label.label_en.replaceAll(',',' '),elt.planningUnit.forecastingUnit.productCategory.label.label_en,elt.planningUnit.forecastingUnit.tracerCategory.label.label_en
             ,elt.planningUnit.label.label_en.replaceAll(',',' '),elt.planningUnit.multiplier,elt.planningUnit.unit.label.label_en,elt.label.label_en.replaceAll(',',' '),elt.multiplier,elt.unit.label.label_en,elt.supplier.label.label_en?elt.supplier.label.label_en.replaceAll(',',''):'',elt.labeling? elt.labeling.replaceAll(',',' '):'', elt.active?'Active':'disabled']));
   

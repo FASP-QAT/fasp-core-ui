@@ -46,7 +46,10 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import { Online, Offline } from "react-detect-offline";
 import csvicon from '../../assets/img/csv.png'
-
+import logoicon from '../../assets/img/logo.svg'
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+//import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
@@ -107,6 +110,7 @@ class Consumption extends Component {
       offlinePlanningUnitList: [],
       productCategories: [],
       offlineProductCategoryList: [],
+      show: false,
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -122,11 +126,19 @@ class Consumption extends Component {
     //this.pickRange = React.createRef()
 
   }
+
+  toggledata = () => this.setState((currentState) => ({show: !currentState.show}));
+
   exportCSV() {
 
     var csvRow = [];
+    csvRow.push((i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year).replaceAll(' ','%20'))
+    csvRow.push(i18n.t('static.program.program')+' : '+ (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ','%20'))
+    csvRow.push(i18n.t('static.planningunit.planningunit')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
+    csvRow.push('')
+    csvRow.push('')
     var re;
-    var A = [[i18n.t('static.report.consumptionDate'), i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption')]]
+    var A = [[(i18n.t('static.report.consumptionDate')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20')]]
     if (navigator.onLine) {
       re = this.state.consumptions
     } else {
@@ -147,6 +159,107 @@ class Consumption extends Component {
     document.body.appendChild(a)
     a.click()
   }
+  
+
+  exportPDF = () => {
+    const addFooters = doc => {
+      const pageCount = doc.internal.getNumberOfPages()
+    
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(8)
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 2, doc.internal.pageSize.height-50, {
+          align: 'center'
+        })
+      }
+    }
+    const addHeaders = doc => {
+      const pageCount = doc.internal.getNumberOfPages()
+    
+      doc.setFont('helvetica', 'bold')
+     
+     //var file = new File('logo.svg','../../assets/img/logo.svg');
+      //var reader = new FileReader();
+     
+  //var data='';
+// Use fs.readFile() method to read the file 
+//fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+//}); 
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setFontSize(18)
+        doc.setPage(i)
+        
+        /*doc.addImage(data, 10, 30, {
+          align: 'justify'
+        });*/
+
+        doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 20, {
+          align: 'center'
+        })
+        if(i==1){
+          doc.setFontSize(12)
+          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 50, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.program.program')+' : '+ document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 70, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+            align: 'left'
+          })
+        }
+       
+      }
+    }
+    const unit = "pt";
+    const size = "A1"; // Use A1, A2, A3 or A4
+    const orientation = "landscape"; // portrait or landscape
+
+    const marginLeft = 10;
+    const doc = new jsPDF(orientation, unit, size);
+
+    doc.setFontSize(15);
+
+    const title = "Consumption Report";
+    var canvas = document.getElementById("cool-canvas");
+    //creates image
+    
+    var canvasImg = canvas.toDataURL("image/png");
+    var width = doc.internal.pageSize.width;    
+    var height = doc.internal.pageSize.height;
+    var h1=50;
+    var aspectwidth1= (width-h1);
+
+    doc.addImage(canvasImg, 'png', 50, 90,aspectwidth1, height*3/4 );
+    const headers =[ [   i18n.t('static.report.consumptionDate'),
+    i18n.t('static.report.forecastConsumption'),
+    i18n.t('static.report.actualConsumption')]];
+    const data =  navigator.onLine? this.state.consumptions.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]):this.state.finalOfflineConsumption.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]);
+    
+    let content = {
+    startY:  height,
+    head: headers,
+    body: data,
+    
+  };
+  
+   
+   
+    //doc.text(title, marginLeft, 40);
+    doc.autoTable(content);
+    addHeaders(doc)
+    addFooters(doc)
+    doc.save("report.pdf")
+    //creates PDF from img
+  /*  var doc = new jsPDF('landscape');
+    doc.setFontSize(20);
+    doc.text(15, 15, "Cool Chart");
+    doc.save('canvas.pdf');*/
+  }
+
+
+
   filterData() {
     let programId = document.getElementById("programId").value;
     let productCategoryId = document.getElementById("productCategoryId").value;
@@ -154,7 +267,7 @@ class Consumption extends Component {
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
     if (navigator.onLine) {
-      let realmId = document.getElementById("realmId").value;
+      let realmId = AuthenticationService.getRealmId();
       AuthenticationService.setupAxiosInterceptors();
       ProductService.getConsumptionData(realmId, programId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
         .then(response => {
@@ -269,7 +382,7 @@ class Consumption extends Component {
   getPrograms() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = document.getElementById("realmId").value;
+      let realmId = AuthenticationService.getRealmId();
       ProgramService.getProgramByRealmId(realmId)
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -496,39 +609,9 @@ class Consumption extends Component {
   }
   componentDidMount() {
     if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      RealmService.getRealmListAll()
-        .then(response => {
-          if (response.status == 200) {
-            this.setState({
-              realms: response.data,
-              realmId: response.data[0].realmId
-            })
             this.getPrograms();
 
-          } else {
-            this.setState({ message: response.data.messageCode })
-          }
-        }).catch(
-          error => {
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: error.response.data.messageCode });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
+    
     } else {
       const lan = 'en';
       var db1;
@@ -602,15 +685,6 @@ class Consumption extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
 
   render() {
-    const { realms } = this.state;
-    let realmList = realms.length > 0
-      && realms.map((item, i) => {
-        return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
     const { planningUnits } = this.state;
     const { offlinePlanningUnitList } = this.state;
 
@@ -712,12 +786,15 @@ class Consumption extends Component {
                     this.state.consumptions.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                        <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                       
+                       {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                       
                           {({ toPdf }) =>
                             <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
                           }
-                        </Pdf>
+                        </Pdf>*/}
                       </a>
                       <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </div>
@@ -728,12 +805,14 @@ class Consumption extends Component {
                     this.state.offlineConsumptionList.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                        <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                     
+                     {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                           {({ toPdf }) =>
                             <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
                           }
-                        </Pdf>
+                        </Pdf>*/}
                       </a>
                       <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </div>
@@ -764,31 +843,7 @@ class Consumption extends Component {
                             </div>
 
                           </FormGroup>
-
-
-
-                          <Online>
-                            <FormGroup className="col-md-3">
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                              <div className="controls ">
-                                <InputGroup>
-                                  <Input
-                                    type="select"
-                                    name="realmId"
-                                    id="realmId"
-                                    bsSize="sm"
-                                    onChange={this.getPrograms}
-                                  >
-                                    {/* <option value="0">{i18n.t('static.common.all')}</option> */}
-
-                                    {realmList}
-                                  </Input>
-
-                                </InputGroup>
-                              </div>
-                            </FormGroup>
-                          </Online>
-                          <Online>
+  <Online>
                             <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls ">
@@ -959,8 +1014,14 @@ class Consumption extends Component {
                       {
                         this.state.consumptions.length > 0
                         &&
-                        <div className="chart-wrapper chart-graph">
-                          <Bar data={bar} options={options} />
+                        <div   className="chart-wrapper chart-graph">
+                          <Bar id="cool-canvas" data={bar} options={options} />
+                          <div>
+        <button className="secondary btn-md" onClick={this.toggledata}>
+          {this.state.show ? 'Hide Data' : 'Show Data'}
+        </button>    
+        
+      </div>
                         </div>}
                     </Online>
                     <Offline>
@@ -968,12 +1029,18 @@ class Consumption extends Component {
                         this.state.offlineConsumptionList.length > 0
                         &&
                         <div className="chart-wrapper chart-graph">
-                          <Bar data={bar} options={options} />
+                          <Bar id="cool-canvas" data={bar} options={options} />
+                          <div>
+        <button className="secondary btn-md" onClick={this.toggledata}>
+          {this.state.show ? 'Hide Data' : 'Show Data'}
+        </button>    
+        
+      </div>
                         </div>}
                     </Offline>
                   </div></div>
 
-                    <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                  {this.state.show &&  <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                       <thead>
                         <tr>
@@ -1026,7 +1093,7 @@ class Consumption extends Component {
                           }
                         </tbody>
                       </Offline>
-                    </Table>
+                    </Table>}
 
                   </div></div>
               </CardBody>
