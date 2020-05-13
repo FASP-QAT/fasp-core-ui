@@ -189,6 +189,7 @@ const GlobalConsumptionReport = React.lazy(() => import('./views/Report/GlobalCo
 const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentList'));
+const EditShipment = React.lazy(() => import('./views/Shipment/EditShipment'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -441,6 +442,7 @@ const routes = [
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
   { path: '/shipment/ShipmentList', name: 'Shipment / List Shipment', component: ShipmentList },
+  { path: '/shipment/editShipment/:shipmentStatusId/:programId', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
 
 ];
 export default routes;
