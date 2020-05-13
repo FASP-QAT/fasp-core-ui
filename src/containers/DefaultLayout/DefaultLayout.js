@@ -334,11 +334,11 @@ class DefaultLayout extends Component {
                             url: '/inventory/addInventory',
                             icon: 'fa fa-list',
                           },
-                          {
-                            name: 'Shipment Details',
-                            url: '/shipment/addShipment',
-                            icon: 'fa fa-list',
-                          },
+                          // {
+                          //   name: 'Shipment Details',
+                          //   url: '/shipment/addShipment',
+                          //   icon: 'fa fa-list',
+                          // },
                           {
                             name: 'Shipment List',
                             url: '/shipment/shipmentList',
