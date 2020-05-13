@@ -483,6 +483,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(date) => { this.dataChangeDate(date) }}
                                                             placeholderText="mm-dd-yyy"
                                                             className="form-control-sm form-control"
+                                                            disabledKeyboardNavigation
 
                                                         />
                                                     </FormGroup>
@@ -497,6 +498,7 @@ class EditBudgetComponent extends Component {
                                                             onChange={(date) => { this.dataChangeEndDate(date) }}
                                                             placeholderText="mm-dd-yyy"
                                                             className="form-control-sm form-control"
+                                                            disabledKeyboardNavigation
 
                                                         />
                                                     </FormGroup>
