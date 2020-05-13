@@ -84,7 +84,7 @@
     "static.message.invaliddate": "Data inválida",
     "static.consumption.consumptionqty": "Quantidade de consumo",
     "static.consumption.daysofstockout": "Dias de estoque esgotado",
-    "static.consumption.actualflag": "Bandeira real",
+    "static.consumption.actualflag": "Bandeira/Previsão real",
     "static.consumption.actual": "Real",
     "static.consumption.forcast": "Previsão",
     "static.common.startdate": "Data de início",
