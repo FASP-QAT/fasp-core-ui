@@ -18,9 +18,14 @@ export default class MapPlanningUnits extends Component {
         this.getRealmId = this.getRealmId.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
+        this.addRow = this.addRow.bind(this);
 
     }
 
+    addRow = function () {
+        this.el.insertRow();
+        var json = this.el.getJson();
+    }
 
     checkValidation() {
         var reg = /^[0-9\b]+$/;
@@ -204,10 +209,23 @@ export default class MapPlanningUnits extends Component {
         ProductCategoryServcie.getProductCategoryListByRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
-
+                    console.log("productCategory response----->", response.data);
                     for (var k = 0; k < (response.data).length; k++) {
+
+                        var spaceCount = response.data[k].sortOrder.split(".").length;
+                        console.log("spaceCOunt--->", spaceCount);
+                        var indendent = "";
+                        for (var p = 1; p <= spaceCount - 1; p++) {
+                            if (p == 1) {
+                                indendent = indendent.concat("|_");
+                            } else {
+                                indendent = indendent.concat("_");
+                            }
+                        }
+                        console.log("ind", indendent);
+                        console.log("indendent.concat(response.data[k].payload.label.label_en)-->", indendent.concat(response.data[k].payload.label.label_en));
                         var productCategoryJson = {
-                            name: response.data[k].payload.label.label_en,
+                            name: indendent.concat(response.data[k].payload.label.label_en),
                             id: response.data[k].payload.productCategoryId
                         }
                         productCategoryList.push(productCategoryJson);
@@ -245,7 +263,7 @@ export default class MapPlanningUnits extends Component {
                                         },
                                         {
                                             title: 'Planning Unit',
-                                            type: 'dropdown',
+                                            type: 'autocomplete',
                                             source: list,
                                             filter: this.dropdownFilter
                                         },

@@ -193,7 +193,7 @@ const EditShipment = React.lazy(() => import('./views/Shipment/EditShipment'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/program/programOnboarding', name: 'Program Onboarding', component: ProgramOnboarding },
+  { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
   { path: '/', exact: true, name: i18n.t('static.home') },
