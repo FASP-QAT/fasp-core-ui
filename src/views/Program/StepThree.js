@@ -131,7 +131,7 @@ export default class StepThree extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.healthAreaId}
+                                            valid={!errors.healthAreaId && this.props.items.program.healthArea.id != ''}
                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
                                             onBlur={handleBlur}
                                             bsSize="sm"

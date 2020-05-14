@@ -493,6 +493,10 @@ export default class ProgramOnboarding extends Component {
 
 
         return (
+
+
+            
+
             <div className="animated fadeIn">
                 <Row>
                     <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
@@ -608,7 +612,7 @@ export default class ProgramOnboarding extends Component {
                                 <br></br>
                                 <div id="stepOne">
 
-                                    <StepOne finishedStepOne={this.finishedStepOne} dataChange={this.dataChange} getDependentLists={this.getDependentLists}></StepOne>
+                                    <StepOne finishedStepOne={this.finishedStepOne} dataChange={this.dataChange} getDependentLists={this.getDependentLists} items={this.state}></StepOne>
                                     {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
@@ -626,7 +630,7 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup> */}
                                 </div>
                                 <div id="stepTwo">
-                                    <StepTwo ref='countryChild' finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} getRegionList={this.getRegionList}></StepTwo>
+                                    <StepTwo ref='countryChild' finishedStepTwo={this.finishedStepTwo} previousToStepOne={this.previousToStepOne} dataChange={this.dataChange} getRegionList={this.getRegionList} items={this.state}></StepTwo>
                                     {/* getRegionList={this.getRegionList}  */}
                                     {/* realmCountryList={this.state.realmCountryList} */}
                                     {/* <FormGroup>
@@ -647,7 +651,7 @@ export default class ProgramOnboarding extends Component {
 
                                 </div>
                                 <div id="stepThree">
-                                    <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange}></StepThree>
+                                    <StepThree ref="healthAreaChild" finishedStepThree={this.finishedStepThree} previousToStepTwo={this.previousToStepTwo} dataChange={this.dataChange} items={this.state}></StepThree>
                                     {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -669,7 +673,7 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup> */}
                                 </div>
                                 <div id="stepFour">
-                                    <StepFour ref='organisationChild' finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} ></StepFour>
+                                    <StepFour ref='organisationChild' finishedStepFour={this.finishedStepFour} previousToStepThree={this.previousToStepThree} dataChange={this.dataChange} items={this.state}></StepFour>
 
                                     {/* <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
@@ -714,7 +718,7 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup>
                                 </div>
                                 <div id="stepSix">
-                                    <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive}></StepSix>
+                                    <StepSix ref='sixChild' dataChange={this.dataChange} Capitalize={this.Capitalize} finishedStepSix={this.finishedStepSix} previousToStepFive={this.previousToStepFive} items={this.state}></StepSix>
                                     {/* <Row>
                                         <FormGroup className="col-md-6">
                                             <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
@@ -844,7 +848,7 @@ export default class ProgramOnboarding extends Component {
                                     </Row> */}
                                 </div>
                                 <div id="stepSeven">
-                                    <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText}></MapPlanningUnits>
+                                    <MapPlanningUnits ref="child" message={this.state.message} removeMessageText={this.removeMessageText} items={this.state}></MapPlanningUnits>
                                     <FormGroup>
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i> Submit</Button>
                                         &nbsp;
@@ -855,6 +859,11 @@ export default class ProgramOnboarding extends Component {
                                     </FormGroup>
                                 </div>
                             </CardBody></Card></Col></Row></div>
+
+
+
+
+
         );
     }
 }

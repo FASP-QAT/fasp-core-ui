@@ -167,5 +167,7 @@
     "static.planningunit.planningunit": "Unidad de planeamiento",
     "static.dashboard.report": "Informes",
     "static.dashboard.consumption": "Consumo",
-    "static.dashboard.stockstatusmatrix": "Matriz de estado de stock"
+    "static.dashboard.stockstatusmatrix": "Matriz de estado de stock",
+    "static.realm.yes": "si",
+    "static.realm.no": "No"
 }

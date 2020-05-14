@@ -133,5 +133,7 @@
     "static.dashboard.report": "Relatórios",
     "static.dashboard.consumption": "Consumo",
     "static.dashboard.stockstatusmatrix": "Matriz de status de estoque",
-    "static.dashboard.program": "Programa"
+    "static.dashboard.program": "Programa",
+    "static.realm.yes": "sim",
+    "static.realm.no": "Não"
 }

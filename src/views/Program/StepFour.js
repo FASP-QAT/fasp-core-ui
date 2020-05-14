@@ -133,7 +133,7 @@ export default class StepFour extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.organisationId}
+                                            valid={!errors.organisationId && this.props.items.program.organisation.id != ''}
                                             invalid={touched.organisationId && !!errors.organisationId}
                                             onBlur={handleBlur}
                                             bsSize="sm"
