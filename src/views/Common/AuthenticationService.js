@@ -33,10 +33,13 @@ class AuthenticationService {
         let syncExpiresOn = moment(decryptedUser.syncExpiresOn);
         console.log("syncExpiresOn---", syncExpiresOn);
         var curDate = moment(new Date());
-        const diff = curDate.diff(syncExpiresOn);
-        const diffDuration = moment.duration(diff);
-        console.log("Days:", diffDuration.days());
-        if (diffDuration.days() < 15) {
+        const diff = curDate.diff(syncExpiresOn, 'days');
+        // const diffDuration = moment.duration(diff);
+        console.log("diff---",diff);
+        // console.log("diffDuration---",diffDuration)
+        // console.log("Days:", diffDuration.days());
+        console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
+        if (diff < 15) {
             return false;
         }
         return true;
