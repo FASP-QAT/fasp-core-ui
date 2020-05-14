@@ -163,24 +163,31 @@ class Consumption extends Component {
 
   exportPDF = () => {
     const addFooters = doc => {
+       
       const pageCount = doc.internal.getNumberOfPages()
     
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(8)
+       doc.setFontSize(8)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
+      
+        doc.text(20, 20, 'Quantification Analytics Tool',
+        {
+          align:'left'
+        } )
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 2, doc.internal.pageSize.height-50, {
-          align: 'center'
+          align: 'left'
         })
+        
       }
     }
     const addHeaders = doc => {
+      
       const pageCount = doc.internal.getNumberOfPages()
-    
-      doc.setFont('helvetica', 'bold')
+     doc.setFont('helvetica', 'bold')
      
-     //var file = new File('logo.svg','../../assets/img/logo.svg');
-      //var reader = new FileReader();
+    //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+      // var reader = new FileReader();
      
   //var data='';
 // Use fs.readFile() method to read the file 
@@ -193,7 +200,7 @@ class Consumption extends Component {
         /*doc.addImage(data, 10, 30, {
           align: 'justify'
         });*/
-
+        doc.setTextColor("#002f6c");
         doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 20, {
           align: 'center'
         })
@@ -786,7 +793,7 @@ class Consumption extends Component {
                     this.state.consumptions.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
                        
                        {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                        
@@ -796,7 +803,7 @@ class Consumption extends Component {
                           }
                         </Pdf>*/}
                       </a>
-                      <img style={{ height: '40px', width: '40px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </div>
                   }
                 </Online>
@@ -805,7 +812,7 @@ class Consumption extends Component {
                     this.state.offlineConsumptionList.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
                      
                      {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                           {({ toPdf }) =>
@@ -814,7 +821,7 @@ class Consumption extends Component {
                           }
                         </Pdf>*/}
                       </a>
-                      <img style={{ height: '40px', width: '40px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </div>
                   }
                 </Offline>
@@ -827,7 +834,7 @@ class Consumption extends Component {
                     <Form >
                       <Col>
                         <div className="row">
-                          <FormGroup className="col-md-3">
+                          <FormGroup className="col-sm-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                             <div className="controls edit">
 
@@ -845,8 +852,8 @@ class Consumption extends Component {
                             </div>
 
                           </FormGroup>
-  <Online>
-                            <FormGroup className="col-md-3">
+                      <Online>
+                            <FormGroup className="col-sm-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls ">
                                 <InputGroup>
@@ -874,7 +881,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="col-md-3">
+                            <FormGroup className="col-sm-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                               <div className="controls">
                                 <InputGroup>
@@ -902,7 +909,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="col-md-3">
+                            <FormGroup className="col-sm-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls ">
                                 <InputGroup>
@@ -928,7 +935,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="col-md-3">
+                            <FormGroup className="col-sm-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                               <div className="controls">
                                 <InputGroup>
@@ -954,7 +961,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Offline>
                           <Online>
-                            <FormGroup className="col-md-3">
+                            <FormGroup className="col-sm-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls">
                                 <InputGroup>
@@ -983,7 +990,7 @@ class Consumption extends Component {
                             </FormGroup>
                           </Online>
                           <Offline>
-                            <FormGroup className="col-md-3">
+                            <FormGroup className="col-sm-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                               <div className="controls ">
                                 <InputGroup>
@@ -1012,36 +1019,53 @@ class Consumption extends Component {
                         </div>
                       </Col>
                     </Form>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-12">
                     <Online>
                       {
                         this.state.consumptions.length > 0
                         &&
+                        <div className="col-md-12">
+                        <div className="col-md-8">
                         <div   className="chart-wrapper chart-graph">
                           <Bar id="cool-canvas" data={bar} options={options} />
-                          <div>
-        <button className="secondary btn-md" onClick={this.toggledata}>
-          {this.state.show ? 'Hide Data' : 'Show Data'}
-        </button>    
+                     
+                        </div>
+                        </div>
+                        <div className="col-md-12">
+                            <button className="mr-1 float-right btn btn-info btn-md"  onClick={this.toggledata}>
+                            {this.state.show ? 'Hide Data' : 'Show Data'}
+                         </button>    
         
-      </div>
-                        </div>}
+                       </div>
+                       </div>}
+                        <br></br>
                     </Online>
                     <Offline>
                       {
                         this.state.offlineConsumptionList.length > 0
                         &&
+                        <div className="col-md-12">
+                        <div className="col-md-8">
                         <div className="chart-wrapper chart-graph">
                           <Bar id="cool-canvas" data={bar} options={options} />
-                          <div>
-        <button className="secondary btn-md" onClick={this.toggledata}>
-          {this.state.show ? 'Hide Data' : 'Show Data'}
-        </button>    
-        
-      </div>
+                        
+                        </div>
+                        </div>
+                        <div className="col-md-12">
+                             <button className="mr-1 float-right btn btn-info btn-md" onClick={this.toggledata}>
+                             {this.state.show ? 'Hide Data' : 'Show Data'}
+                             </button>    
+                        </div>
                         </div>}
+                        <br></br>
                     </Offline>
-                  </div></div>
-
+                  </div>
+                </div>
+              </div>
+                <div className="row">
+                  <div className="col-md-12">
                   {this.state.show &&  <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                       <thead>
@@ -1070,32 +1094,35 @@ class Consumption extends Component {
                                   {this.state.consumptions[idx].Actual}
                                 </td></tr>)
 
-    }
-  </tbody>
-</Online>
-<Offline>
-  <tbody>
-    {
-      this.state.offlineConsumptionList.length > 0
-      &&
-      this.state.offlineConsumptionList.map((item, idx) =>
+                                 }
+                         </tbody>
+                      </Online>
+                      <Offline>
+                          <tbody>
+                                {
+                          this.state.offlineConsumptionList.length > 0
+                            &&
+                            this.state.offlineConsumptionList.map((item, idx) =>
 
-        <tr id="addr0" key={idx} >
-          <td>
-            {this.state.offlineConsumptionList[idx].consumption_date}
-          </td>
-          <td>
+                         <tr id="addr0" key={idx} >
+                            <td>
+                               {this.state.offlineConsumptionList[idx].consumption_date}
+                             </td>
+                            <td>
 
-            {this.state.offlineConsumptionList[idx].forcast}
-          </td>
-          <td>
-            {this.state.offlineConsumptionList[idx].Actual}
-          </td></tr>)
+                              {this.state.offlineConsumptionList[idx].forcast}
+                             </td>
+                            <td>
+                               {this.state.offlineConsumptionList[idx].Actual}
+                             </td>
+                          </tr>)
 
                           }
                         </tbody>
                       </Offline>
                     </Table>}
+                    </div>
+                    </div>
 
                   </div>
                   </div>
