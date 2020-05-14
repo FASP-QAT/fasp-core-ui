@@ -33,13 +33,15 @@ export default class SupplyPlanComponent extends React.Component {
             planningUnitList: [],
             regionList: [],
             consumptionTotalData: [],
-            amcDataMonth: [],
+            consumptionDataForAllMonths: [],
             amcTotalData: [],
             consumptionFilteredArray: [],
             regionListFiltered: [],
             consumptionTotalMonthWise: [],
             consumptionChangedFlag: 0,
             inventoryTotalData: [],
+            expectedBalTotalData: [],
+            suggestedShipmentsTotalData: [],
             inventoryFilteredArray: [],
             inventoryTotalMonthWise: [],
             inventoryChangedFlag: 0,
@@ -50,7 +52,10 @@ export default class SupplyPlanComponent extends React.Component {
             maxStockArray: [],
             minMonthOfStock: 0,
             reorderFrequency: 0,
-            programPlanningUnitList: []
+            programPlanningUnitList: [],
+            openingBalanceArray: [],
+            closingBalanceArray: [],
+            monthsOfStockArray: []
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -72,20 +77,11 @@ export default class SupplyPlanComponent extends React.Component {
 
         this.leftClickedAdjustments = this.leftClickedAdjustments.bind(this);
         this.rightClickedAdjustments = this.rightClickedAdjustments.bind(this);
-        this.actionCanceledConsumption = this.actionCanceledConsumption.bind(this);
-        this.actionCanceledAdjustments = this.actionCanceledAdjustments.bind(this);
-
+        this.actionCanceled = this.actionCanceled.bind(this);
     }
 
-    actionCanceledConsumption() {
-        this.toggleLarge('Consumption');
-        this.setState({
-            message: i18n.t('static.message.cancelled')
-        })
-    }
-
-    actionCanceledAdjustments() {
-        this.toggleLarge('Adjustments');
+    actionCanceled(supplyPlanType) {
+        this.toggleLarge(supplyPlanType);
         this.setState({
             message: i18n.t('static.message.cancelled')
         })
@@ -128,55 +124,16 @@ export default class SupplyPlanComponent extends React.Component {
 
     getMonthArray(currentDate) {
         var month = [];
-        var curDate = currentDate.subtract(7, 'months');
+        var curDate = currentDate.subtract(8, 'months');
         month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 1 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
-        var curDate = currentDate.add(1, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
-        // this.state.monthsArray=month;
+        for (var i = 0; i < 22; i++) {
+            var display = 1;
+            if (i < 2 || i >= 20) {
+                display = 0;
+            }
+            var curDate = currentDate.add(1, 'months');
+            month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: display })
+        }
         this.setState({
             monthsArray: month
         })
@@ -185,7 +142,6 @@ export default class SupplyPlanComponent extends React.Component {
 
     leftClicked() {
         var monthCount = (this.state.monthCount) - 1;
-        console.log("MonthCount---------->", monthCount);
         this.setState({
             monthCount: monthCount
         })
@@ -194,7 +150,6 @@ export default class SupplyPlanComponent extends React.Component {
 
     rightClicked() {
         var monthCount = (this.state.monthCount) + 1;
-        console.log("MonthCount---------->", monthCount);
         this.setState({
             monthCount: monthCount
         })
@@ -203,7 +158,6 @@ export default class SupplyPlanComponent extends React.Component {
 
     leftClickedConsumption() {
         var monthCountConsumption = (this.state.monthCountConsumption) - 1;
-        console.log("MonthCount---------->", monthCountConsumption);
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
@@ -212,7 +166,6 @@ export default class SupplyPlanComponent extends React.Component {
 
     rightClickedConsumption() {
         var monthCountConsumption = (this.state.monthCountConsumption) + 1;
-        console.log("MonthCount---------->", monthCountConsumption);
         this.setState({
             monthCountConsumption: monthCountConsumption
         })
@@ -221,7 +174,6 @@ export default class SupplyPlanComponent extends React.Component {
 
     leftClickedAdjustments() {
         var monthCountAdjustments = (this.state.monthCountAdjustments) - 1;
-        console.log("MonthCount---------->", monthCountAdjustments);
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
@@ -230,7 +182,6 @@ export default class SupplyPlanComponent extends React.Component {
 
     rightClickedAdjustments() {
         var monthCountAdjustments = (this.state.monthCountAdjustments) + 1;
-        console.log("MonthCount---------->", monthCountAdjustments);
         this.setState({
             monthCountAdjustments: monthCountAdjustments
         })
@@ -335,8 +286,9 @@ export default class SupplyPlanComponent extends React.Component {
 
     formSubmit(monthCount) {
         document.getElementById("supplyPlanTableId").style.display = 'block';
+
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
-        console.log("M----------------->", m);
+
         var programId = document.getElementById("programId").value;
         var regionId = document.getElementById("regionId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
@@ -344,6 +296,7 @@ export default class SupplyPlanComponent extends React.Component {
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id = planningUnitId))[0];
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
         var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
+
         var regionListFiltered = [];
         if (regionId != -1) {
             regionListFiltered = (this.state.regionList).filter(r => r.id == regionId);
@@ -360,26 +313,35 @@ export default class SupplyPlanComponent extends React.Component {
             var programTransaction = transaction.objectStore('programData');
             var programRequest = programTransaction.get(programId);
             var consumptionTotalData = [];
-            var amcDataMonth = [];
+
+            var consumptionDataForAllMonths = [];
             var amcTotalData = [];
+
             var consumptionTotalMonthWise = [];
             var filteredArray = [];
             var minStockArray = [];
             var maxStockArray = [];
 
             var inventoryTotalData = [];
+            var expectedBalTotalData = [];
+            var suggestedShipmentsTotalData = [];
             var inventoryTotalMonthWise = [];
             var filteredArrayInventory = [];
+            var openingBalanceArray = [];
+            var closingBalanceArray = [];
+
+            var monthsOfStockArray = [];
             programRequest.onsuccess = function (event) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
+
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
                 if (regionId != -1) {
                     consumptionList = consumptionList.filter(c => c.region.id == regionId)
                 }
 
-                for (var i = 0; i < 24; i++) {
+                for (var i = 0; i < 23; i++) {
                     var c = consumptionList.filter(c => (c.consumptionDate >= m[i].startDate && c.consumptionDate <= m[i].endDate))
                     var consumptionQty = 0;
                     var filteredJson = { consumptionQty: '', region: { id: 0 } };
@@ -402,31 +364,76 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                         }
                     }
-                    amcDataMonth.push(consumptionQty);
-                    if (i >= 2 && i < 20) {
-                        consumptionTotalData.push(consumptionQty);
+
+                    // Logic for consumption data for all months
+                    if (c.length == 0) {
+                        consumptionDataForAllMonths.push('');
+                    } else {
+                        consumptionDataForAllMonths.push(consumptionQty);
+                    }
+
+                    // Consumption details
+                    if (i >= 3 && i < 21) {
+                        if (c.length == 0) {
+                            consumptionTotalData.push("");
+                        } else {
+                            consumptionTotalData.push(consumptionQty);
+                        }
                         filteredArray.push(filteredJson);
                     }
                 }
 
-                for (var i = 0; i < 24; i++) {
-                    if (i >= 2 && i < 20) {
-                        var amcCalcualted = Math.floor((parseInt(amcDataMonth[i - 2]) + parseInt(amcDataMonth[i - 1])
-                            + parseInt(amcDataMonth[i])
-                            + parseInt(amcDataMonth[i + 1]) + parseInt(amcDataMonth[i + 2])
-                            + parseInt(amcDataMonth[i + 3]) + parseInt(amcDataMonth[i + 4])) / 7);
+                // Calculations for AMC
+                for (var i = 3; i < 21; i++) {
+                    var amcM1 = 0;
+                    var amcM2 = 0;
+                    var amcM3 = 0;
+                    var amcM4 = 0;
+                    var amcM5 = 0;
+                    var amcM6 = 0;
+                    var countAMC = 0;
+                    if (consumptionDataForAllMonths[i - 3] != '') {
+                        amcM1 = consumptionDataForAllMonths[i - 3]
+                        countAMC++;
+                    }
+                    if (consumptionDataForAllMonths[i - 2] != '') {
+                        amcM2 = consumptionDataForAllMonths[i - 2]
+                        countAMC++;
+                    }
+                    if (consumptionDataForAllMonths[i - 1] != '') {
+                        amcM3 = consumptionDataForAllMonths[i - 1]
+                        countAMC++;
+                    }
+                    if (consumptionDataForAllMonths[i] != '') {
+                        amcM4 = consumptionDataForAllMonths[i]
+                        countAMC++;
+                    }
+                    if (consumptionDataForAllMonths[i + 1] != '') {
+                        amcM5 = consumptionDataForAllMonths[i + 1]
+                        countAMC++;
+                    }
+                    if (consumptionDataForAllMonths[i + 2] != '') {
+                        amcM6 = consumptionDataForAllMonths[i + 2]
+                        countAMC++;
+                    }
+                    if (countAMC != 0) {
+                        var amcCalcualted = Math.floor((parseInt(amcM1) + parseInt(amcM2) + parseInt(amcM3)
+                            + parseInt(amcM4)
+                            + parseInt(amcM5) + parseInt(amcM6)) / countAMC);
                         amcTotalData.push(amcCalcualted);
-                        console.log(parseInt(minMonthsOfStock))
-                        var minStock = parseInt(parseInt(amcCalcualted) * parseInt(minMonthsOfStock));
-                        console.log("MinStock", minStock);
-                        minStockArray.push(minStock);
+
+                        // Calculations for Min stock
                         var maxForMonths = 0;
                         if (3 > minMonthsOfStock) {
                             maxForMonths = 3
                         } else {
                             maxForMonths = minMonthsOfStock
                         }
+                        var minStock = parseInt(parseInt(amcCalcualted) * parseInt(maxForMonths));
+                        minStockArray.push(minStock);
 
+
+                        // Calculations for Max Stock
                         var minForMonths = 0;
                         if (18 < (maxForMonths + reorderFrequencyInMonths)) {
                             minForMonths = 18
@@ -435,10 +442,14 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                         var maxStock = parseInt(parseInt(amcCalcualted) * parseInt(minForMonths));;
                         maxStockArray.push(maxStock);
-
+                    } else {
+                        amcTotalData.push("");
+                        minStockArray.push("");
+                        maxStockArray.push("");
                     }
                 }
 
+                // Region wise calculations for consumption
                 for (var i = 0; i < regionListFiltered.length; i++) {
                     var regionCount = 0;
                     var f = filteredArray.length
@@ -466,35 +477,29 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                     consumptionTotalMonthWise.push(monthWiseCount);
                 }
-                this.setState({
-                    consumptionTotalData: consumptionTotalData,
-                    consumptionFilteredArray: filteredArray,
-                    regionListFiltered: regionListFiltered,
-                    consumptionTotalMonthWise: consumptionTotalMonthWise,
-                    amcTotalData: amcTotalData,
-                    minStockArray: minStockArray,
-                    maxStockArray: maxStockArray
-                })
-
 
                 // Inventory part
                 var inventoryList = (programJson.inventoryList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
                 if (regionId != -1) {
                     inventoryList = inventoryList.filter(c => c.region.id == regionId)
                 }
-                for (var i = 2; i < 20; i++) {
+                for (var i = 3; i < 21; i++) {
                     var c = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate))
                     var adjustmentQty = 0;
                     var filteredJsonInventory = { adjustmentQty: '', region: { id: 0 } };
                     for (var j = 0; j < c.length; j++) {
-                        console.log("c[j].multiplier",c[j].multiplier)
-                        console.log("(c[j].adjustmentQty*c[j].multiplier)",parseFloat(c[j].adjustmentQty*c[j].multiplier));
-                        adjustmentQty += parseFloat((c[j].adjustmentQty*c[j].multiplier));
+                        adjustmentQty += parseFloat((c[j].adjustmentQty * c[j].multiplier));
                         filteredJsonInventory = { month: m[i], region: c[j].region, adjustmentQty: adjustmentQty, inventoryId: c[j].inventoryId, inventoryDate: c[j].inventoryDate };
                     }
-                    inventoryTotalData.push(adjustmentQty);
+                    if (c.length == 0) {
+                        inventoryTotalData.push("");
+                    } else {
+                        inventoryTotalData.push(adjustmentQty);
+                    }
                     filteredArrayInventory.push(filteredJsonInventory);
                 }
+
+                // Region wise calculations for inventory
                 for (var i = 0; i < regionListFiltered.length; i++) {
                     var regionCount = 0;
                     var f = filteredArrayInventory.length
@@ -522,11 +527,98 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                     inventoryTotalMonthWise.push(monthWiseCount);
                 }
+
+                // Calculation of opening and closing balance
+                var openingBalance = 0;
+                var totalConsumption = 0;
+                var totalAdjustments = 0;
+
+                var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < m[3].startDate);
+                console.log("Consumption remaining list",consumptionRemainingList);
+                for (var j = 0; j < consumptionRemainingList.length; j++) {
+                    var count = 0;
+                    for (var k = 0; k < consumptionRemainingList.length; k++) {
+                        if (consumptionRemainingList[j].consumptionDate == consumptionRemainingList[k].consumptionDate && consumptionRemainingList[j].region.id == consumptionRemainingList[k].region.id && j != k) {
+                            count++;
+                        } else {
+
+                        }
+                    }
+                    if (count == 0) {
+                        totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                    } else {
+                        if (consumptionRemainingList[j].actualFlag.toString() == 'true') {
+                            totalConsumption += parseInt((consumptionRemainingList[j].consumptionQty));
+                        }
+                    }
+                }
+                console.log("Total Consumption", totalConsumption);
+
+                var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < m[3].startDate);
+                console.log("Adjustments Remaining list",adjustmentsRemainingList);
+                for (var j = 0; j < adjustmentsRemainingList.length; j++) {
+                    totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
+                }
+
+                console.log("Total Adjustments", totalAdjustments);
+                openingBalance = totalAdjustments - totalConsumption;
+                console.log("Opening balance", openingBalance);
+                openingBalanceArray.push(openingBalance);
+                for (var i = 1; i <= 18; i++) {
+                    var consumptionQtyForCB = 0;
+                    if (consumptionTotalData[i - 1] != "") {
+                        consumptionQtyForCB = consumptionTotalData[i - 1];
+                    }
+                    var inventoryQtyForCB = 0;
+                    if (inventoryTotalData[i - 1] != "") {
+                        inventoryQtyForCB = inventoryTotalData[i - 1];
+                    }
+                    var closingBalance = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB;
+                    closingBalanceArray.push(closingBalance);
+                    if (i != 18) {
+                        openingBalanceArray.push(closingBalance);
+                    }
+                }
+
+                // Calculations for monthsOfStock
+                for (var s = 0; s < 18; s++) {
+                    if (closingBalanceArray[s] != 0 && amcTotalData[s] != 0 && closingBalanceArray[s] != "" && amcTotalData[s] != "") {
+                        var mos = parseFloat(closingBalanceArray[s] / amcTotalData[s]).toFixed(2);
+                        monthsOfStockArray.push(mos);
+                    } else {
+                        monthsOfStockArray.push("");
+                    }
+                }
+
+
+                // Suggested shipments part
+                for (var s = 0; s < 18; s++) {
+                    if (parseInt(openingBalanceArray[s]) <= parseInt(minStockArray[s])) {
+                        var suggestedOrd = parseInt(maxStockArray[s] - minStockArray[s]);
+                        if (suggestedOrd == 0) {
+                            suggestedShipmentsTotalData.push("");
+                        } else {
+                            suggestedShipmentsTotalData.push(suggestedOrd);
+                        }
+                    } else {
+                        suggestedShipmentsTotalData.push("");
+                    }
+                }
                 this.setState({
+                    suggestedShipmentsTotalData: suggestedShipmentsTotalData,
                     inventoryTotalData: inventoryTotalData,
                     inventoryFilteredArray: filteredArrayInventory,
                     regionListFiltered: regionListFiltered,
-                    inventoryTotalMonthWise: inventoryTotalMonthWise
+                    inventoryTotalMonthWise: inventoryTotalMonthWise,
+                    openingBalanceArray: openingBalanceArray,
+                    closingBalanceArray: closingBalanceArray,
+                    consumptionTotalData: consumptionTotalData,
+                    consumptionFilteredArray: filteredArray,
+                    consumptionTotalMonthWise: consumptionTotalMonthWise,
+                    amcTotalData: amcTotalData,
+                    minStockArray: minStockArray,
+                    maxStockArray: maxStockArray,
+                    monthsOfStockArray: monthsOfStockArray
                 })
             }.bind(this)
         }.bind(this)
@@ -573,7 +665,6 @@ export default class SupplyPlanComponent extends React.Component {
                         }
 
                         var consumptionListUnFiltered = (programJson.consumptionList);
-                        console.log("Planning Unit Id", planningUnitId);
                         var consumptionList = consumptionListUnFiltered.filter(con => con.planningUnit.id == planningUnitId && con.region.id == region && ((con.consumptionDate >= startDate && con.consumptionDate <= endDate)) && con.actualFlag.toString() == actualFlag.toString());
                         this.el = jexcel(document.getElementById("consumptionDetailsTable"), '');
                         this.el.destroy();
@@ -1103,7 +1194,6 @@ export default class SupplyPlanComponent extends React.Component {
 
                         }
                     }
-                    console.log("inventoryDataListFiltered----------------> ", inventoryDataList);
                     programJson.inventoryList = inventoryDataList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
@@ -1256,7 +1346,15 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Consumption', '', '')}>
+                                        <tr>
+                                            <td>Opening Balance</td>
+                                            {
+                                                this.state.openingBalanceArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
                                             <td>Consumption</td>
                                             {
                                                 this.state.consumptionTotalData.map(item1 => (
@@ -1264,7 +1362,15 @@ export default class SupplyPlanComponent extends React.Component {
                                                 ))
                                             }
                                         </tr>
-                                        <tr className="hoverTd" onDoubleClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                        <tr>
+                                            <td>Suggested Shipments</td>
+                                            {
+                                                this.state.suggestedShipmentsTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
                                             <td>Adjustments</td>
                                             {
                                                 this.state.inventoryTotalData.map(item1 => (
@@ -1273,9 +1379,25 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
                                         <tr>
+                                            <td>Ending Balance</td>
+                                            {
+                                                this.state.closingBalanceArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
                                             <td>AMC</td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Months of Stock</td>
+                                            {
+                                                this.state.monthsOfStockArray.map(item1 => (
                                                     <td>{item1}</td>
                                                 ))
                                             }
@@ -1366,13 +1488,13 @@ export default class SupplyPlanComponent extends React.Component {
                                 </ModalBody>
                                 <ModalFooter>
                                     {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                    <Button size="md" color="danger" className="float-right mr-1" onClick={this.actionCanceledConsumption}> <i className="fa fa-times"></i> Cancel</Button>
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
 
                             <Modal isOpen={this.state.adjustments} toggle={() => this.toggleLarge('Adjustments')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
-                                <ModalHeader toggle={() => this.toggleLarge('Adjustments')}  className="modalHeaderSupplyPlan">Adjustments Details</ModalHeader>
+                                <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">Adjustments Details</ModalHeader>
                                 <ModalBody>
                                     <div className="col-md-12">
                                         <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
@@ -1425,7 +1547,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </ModalBody>
                                 <ModalFooter>
                                     {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                    <Button size="md" color="danger" className="float-right mr-1" onClick={this.actionCanceledAdjustments}> <i className="fa fa-times"></i> Cancel</Button>
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
                         </CardBody>

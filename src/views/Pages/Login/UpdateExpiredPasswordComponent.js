@@ -147,7 +147,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('lang', decoded.user.language.languageCode);
-                                                        this.props.history.push(`/ApplicationDashboard/static.message.user.passwordSuccess`)
+                                                        this.props.history.push(`/masterDataSync/static.message.user.passwordSuccess`)
                                                     })
                                                     .catch(
                                                         error => {

@@ -146,7 +146,7 @@ class Login extends Component {
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                           
                                 AuthenticationService.setupAxiosInterceptors();
-                                this.props.history.push(`/ApplicationDashboard`)
+                                this.props.history.push(`/masterDataSync`)
                               })
                               .catch(
                                 error => {

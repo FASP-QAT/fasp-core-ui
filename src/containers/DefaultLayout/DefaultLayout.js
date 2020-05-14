@@ -319,11 +319,11 @@ class DefaultLayout extends Component {
                               }
                             ]
                           },
-                          {
-                            name: i18n.t('static.dashboard.datasync'),
-                            url: '/masterDataSync',
-                            icon: 'fa fa-list',
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.datasync'),
+                          //   url: '/masterDataSync',
+                          //   icon: 'fa fa-list',
+                          // },
                           {
                             name: i18n.t('static.dashboard.consumptiondetails'),
                             url: '/consumptionDetails',
