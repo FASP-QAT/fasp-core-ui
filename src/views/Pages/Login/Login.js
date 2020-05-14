@@ -139,7 +139,7 @@ class Login extends Component {
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                 decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
-                                // decoded.user.syncExpiresOn = moment("2020-03-11 15:13:19").format("YYYY-MM-DD HH:mm:ss");
+                                // decoded.user.syncExpiresOn = moment("2020-04-29 13:13:19").format("YYYY-MM-DD HH:mm:ss");
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
