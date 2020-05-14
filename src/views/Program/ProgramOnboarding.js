@@ -106,6 +106,8 @@ export default class ProgramOnboarding extends Component {
         this.previousToStepSix = this.previousToStepSix.bind(this);
 
         this.removeMessageText = this.removeMessageText.bind(this);
+
+        this.addRowInJexcel = this.addRowInJexcel.bind(this);
     }
     componentDidMount() {
         document.getElementById('stepOne').style.display = 'block';
@@ -191,7 +193,7 @@ export default class ProgramOnboarding extends Component {
         document.getElementById('stepSeven').style.display = 'block';
     }
 
-    h4
+
     removeMessageText() {
         this.setState({ message: '' });
     }
@@ -223,6 +225,10 @@ export default class ProgramOnboarding extends Component {
         } else {
             this.setState({ message: "Please Enter Valid Data." });
         }
+    }
+
+    addRowInJexcel() {
+        this.refs.child.addRow();
     }
 
     previousToStepOne() {
@@ -842,7 +848,10 @@ export default class ProgramOnboarding extends Component {
                                     <FormGroup>
                                         <Button color="success" size="md" className="float-right mr-1" type="button" name="regionSub" id="regionSub" onClick={this.finishedStepSeven}> <i className="fa fa-check"></i> Submit</Button>
                                         &nbsp;
-                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i> Add Row</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.previousToStepSix} > <i className="fa fa-angle-double-left "></i> Previous</Button>
+                                        &nbsp;
                                     </FormGroup>
                                 </div>
                             </CardBody></Card></Col></Row></div>

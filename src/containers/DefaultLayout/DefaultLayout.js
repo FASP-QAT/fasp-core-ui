@@ -392,7 +392,7 @@ class DefaultLayout extends Component {
                       //   ]
                       // },
                       , {
-                        name: 'Program Onboarding',
+                        name: 'Setup Program',
                         url: '/program/programOnboarding',
                         icon: 'icon-graph'
                       },

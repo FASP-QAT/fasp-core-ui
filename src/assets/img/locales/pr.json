@@ -84,7 +84,7 @@
     "static.message.invaliddate": "Data inválida",
     "static.consumption.consumptionqty": "Quantidade de consumo",
     "static.consumption.daysofstockout": "Dias de estoque esgotado",
-    "static.consumption.actualflag": "Bandeira real",
+    "static.consumption.actualflag": "Bandeira/Previsão real",
     "static.consumption.actual": "Real",
     "static.consumption.forcast": "Previsão",
     "static.common.startdate": "Data de início",
@@ -133,5 +133,6 @@
     "static.dashboard.report": "Relatórios",
     "static.dashboard.consumption": "Consumo",
     "static.dashboard.stockstatusmatrix": "Matriz de status de estoque",
-    "static.dashboard.program": "Programa"
+    "static.dashboard.program": "Programa",
+    "static.message.syncExpiresOn": "Você excedeu o número máximo de dias em que pode trabalhar offline. Por favor, fique online para continuar usando o QAT."
 }

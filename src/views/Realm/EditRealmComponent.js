@@ -27,12 +27,12 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
-     /*   monthInPastForAmc: Yup.number()
-            .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-        monthInFutureForAmc: Yup.number()
-            .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-        orderFrequency: Yup.number()
-            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))*/
+        /*   monthInPastForAmc: Yup.number()
+               .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
+           monthInFutureForAmc: Yup.number()
+               .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
+           orderFrequency: Yup.number()
+               .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))*/
     })
 }
 
@@ -72,9 +72,9 @@ export default class UpdateDataSourceComponent extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-              /*  monthInPastForAmc: '',
-                monthInFutureForAmc: '',
-                orderFrequency: '',*/
+                /*  monthInPastForAmc: '',
+                  monthInFutureForAmc: '',
+                  orderFrequency: '',*/
                 defaultRealm: ''
             },
             lang: localStorage.getItem('lang'),
@@ -98,15 +98,15 @@ export default class UpdateDataSourceComponent extends Component {
         if (event.target.name === "realmCode") {
             realm.realmCode = event.target.value.toUpperCase();
         }
-       /* if (event.target.name === "monthInPastForAmc") {
-            realm.monthInPastForAmc = event.target.value
-        }
-        if (event.target.name === "monthInFutureForAmc") {
-            realm.monthInFutureForAmc = event.target.value
-        }
-        if (event.target.name === "orderFrequency") {
-            realm.orderFrequency = event.target.value
-        }*/
+        /* if (event.target.name === "monthInPastForAmc") {
+             realm.monthInPastForAmc = event.target.value
+         }
+         if (event.target.name === "monthInFutureForAmc") {
+             realm.monthInFutureForAmc = event.target.value
+         }
+         if (event.target.name === "orderFrequency") {
+             realm.orderFrequency = event.target.value
+         }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
@@ -122,9 +122,9 @@ export default class UpdateDataSourceComponent extends Component {
         setTouched({
             realmCode: true,
             label: true,
-         /*   monthInPastForAmc: true,
-            monthInFutureForAmc: true,
-            orderFrequency: true*/
+            /*   monthInPastForAmc: true,
+               monthInFutureForAmc: true,
+               orderFrequency: true*/
         }
         )
         this.validateForm(errors)
@@ -179,9 +179,9 @@ export default class UpdateDataSourceComponent extends Component {
                                 initialValues={{
                                     realmCode: this.state.realm.realmCode,
                                     label: getLabelText(this.state.realm.label, this.state.lang),
-                                   /* monthInPastForAmc: this.state.realm.monthInPastForAmc,
-                                    monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
-                                    orderFrequency: this.state.realm.orderFrequency,*/
+                                    /* monthInPastForAmc: this.state.realm.monthInPastForAmc,
+                                     monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
+                                     orderFrequency: this.state.realm.orderFrequency,*/
                                     defaultRealm: this.state.realm.defaultRealm,
                                 }}
 
@@ -244,7 +244,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
-                                                {/*    <FormGroup>
+                                                    {/*    <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
                                                             name="monthInPastForAmc"
@@ -287,7 +287,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
                                                 </FormGroup>*/}
                                                     <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"

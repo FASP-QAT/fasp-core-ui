@@ -28,14 +28,14 @@ const validationSchema = function (values) {
             .matches(/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/, i18n.t('static.message.newPasswordSpecialChar'))
             .matches(/^(?=.*\d).*$/, i18n.t('static.message.newPasswordNumber'))
             .matches(/^(?=.*[A-Z]).*$/, i18n.t('static.message.newPasswordUppercase'))
-            .matches(/^[a-zA-Z]/i,  i18n.t('static.message.newPasswordStartAlphabet'))
-            .test('username',i18n.t('static.message.newPasswordNotSameAsUsername'),
+            .matches(/^[a-zA-Z]/i, i18n.t('static.message.newPasswordStartAlphabet'))
+            .test('username', i18n.t('static.message.newPasswordNotSameAsUsername'),
                 function (value) {
                     if ((values.username != value)) {
                         return true;
                     }
                 })
-            .test('oldPassword',i18n.t('static.message.newPasswordNotSameAsOldPassword'),
+            .test('oldPassword', i18n.t('static.message.newPasswordNotSameAsOldPassword'),
                 function (value) {
                     if (values.oldPassword != value) {
                         return true;
@@ -80,7 +80,7 @@ class UpdateExpiredPasswordComponent extends Component {
     }
 
     logoutClicked() {
-        this.props.history.push(`/login/`+ i18n.t('static.logoutSuccess'))
+        this.props.history.push(`/login/` + i18n.t('static.logoutSuccess'))
     }
 
     touchAll(setTouched, errors) {
@@ -111,7 +111,7 @@ class UpdateExpiredPasswordComponent extends Component {
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
+                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center">
                             <Col md="12">
@@ -141,6 +141,8 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                                         keysToRemove.forEach(k => localStorage.removeItem(k))
 
+                                                        decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
+                                                        // decoded.user.syncExpiresOn = moment("2020-05-12 15:13:19").format("YYYY-MM-DD HH:mm:ss");
                                                         localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                                         localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                                         localStorage.setItem('typeOfSession', "Online");
