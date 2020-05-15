@@ -393,10 +393,6 @@ class DefaultLayout extends Component {
                       //       url: '/supplyPlan',
                       //       icon: 'fa fa-list-alt'
                       , {
-                      //     }
-                      //   ]
-                      // },
-                      , {
                         name: 'Setup Program',
                         url: '/program/programOnboarding',
                         icon: 'icon-graph'
