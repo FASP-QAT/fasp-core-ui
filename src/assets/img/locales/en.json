@@ -654,5 +654,7 @@
     "static.shipment.shipment": "Shipment",
     "static.message.commitSuccess": "Version committed successfully.",
     "static.realm.yes": "Yes",
-    "static.realm.no": "No"
+    "static.realm.no": "No",
+    "static.message.syncExpiresOn": "You have exceeded the maximum number of days that you can work offline. Please go online to continue using QAT.",
+    "static.region.glnvalue": "GLN No must be digits"
 }

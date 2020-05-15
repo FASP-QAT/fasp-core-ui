@@ -778,7 +778,7 @@ class Consumption extends Component {
         <Row>
           <Col lg="12">
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-1">
                 <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong>
                 {/* <b className="count-text">{i18n.t('static.report.consumptionReport')}</b> */}
                 <Online>
@@ -791,12 +791,12 @@ class Consumption extends Component {
                        {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                        
                           {({ toPdf }) =>
-                            <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
+                            <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
                           }
                         </Pdf>*/}
                       </a>
-                      <img style={{ height: '40px', width: '40px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </div>
                   }
                 </Online>
@@ -809,12 +809,12 @@ class Consumption extends Component {
                      
                      {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                           {({ toPdf }) =>
-                            <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
+                            <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
                           }
                         </Pdf>*/}
                       </a>
-                      <img style={{ height: '40px', width: '40px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      <img style={{ height: '25px', width: '25px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </div>
                   }
                 </Offline>
