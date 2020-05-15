@@ -786,7 +786,7 @@ class Consumption extends Component {
                     this.state.consumptions.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="{i18n.t('static.report.exportPdf')}"  onClick={() => this.exportPDF()}/>
                        
                        {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                        
@@ -805,7 +805,7 @@ class Consumption extends Component {
                     this.state.offlineConsumptionList.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}  onClick={() => this.exportPDF()}/>
                      
                      {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                           {({ toPdf }) =>
