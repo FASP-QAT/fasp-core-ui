@@ -65,7 +65,14 @@ const options = {
     enabled: false,
     custom: CustomTooltips
   },
-  maintainAspectRatio: false
+  maintainAspectRatio: false,
+  legend:{
+    display: true,
+    position: 'bottom',
+    labels: {
+      usePointStyle: true,
+    }
+  }
 }
 
 
@@ -222,11 +229,11 @@ class Consumption extends Component {
       }
     }
     const unit = "pt";
-    const size = "A1"; // Use A1, A2, A3 or A4
+    const size = "A4"; // Use A1, A2, A3 or A4
     const orientation = "landscape"; // portrait or landscape
 
     const marginLeft = 10;
-    const doc = new jsPDF(orientation, unit, size);
+    const doc = new jsPDF(orientation, unit, size,true);
 
     doc.setFontSize(15);
 
@@ -234,7 +241,7 @@ class Consumption extends Component {
     var canvas = document.getElementById("cool-canvas");
     //creates image
     
-    var canvasImg = canvas.toDataURL("image/png");
+    var canvasImg = canvas.toDataURL("image/png",1.0);
     var width = doc.internal.pageSize.width;    
     var height = doc.internal.pageSize.height;
     var h1=50;
@@ -725,12 +732,13 @@ class Consumption extends Component {
             label: i18n.t('static.report.forecastConsumption'),
             backgroundColor: 'transparent',
             borderColor: 'rgba(179,181,158,1)',
-            borderStyle: 'dotted',
+            borderDash: [10,10],
             ticks: {
               fontSize: 2,
               fontColor: 'transparent',
             },
             showInLegend: true,
+            pointStyle: 'line',
             yValueFormatString: "$#,##0",
             data: this.state.consumptions.map((item, index) => (item.forcast))
           }

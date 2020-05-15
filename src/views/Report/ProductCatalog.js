@@ -214,12 +214,12 @@ export default class ProductCatalog extends React.Component {
 
     exportPDF = (columns) => {
         const unit = "pt";
-        const size = "A1"; // Use A1, A2, A3 or A4
+        const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "landscape"; // portrait or landscape
 
         const marginLeft = 10;
-        const doc = new jsPDF(orientation, unit, size);
-
+        const doc = new jsPDF(orientation, unit, size,true);
+    
         doc.setFontSize(15);
 
         const title = "Product Catalog";

@@ -653,5 +653,9 @@
     "static.month.dec": "Dec",
     "static.shipment.shipment": "Shipment",
     "static.message.commitSuccess": "Version committed successfully.",
-    "static.message.syncExpiresOn": "You have exceeded the maximum number of days that you can work offline. Please go online to continue using QAT."
+    "static.message.syncExpiresOn": "You have exceeded the maximum number of days that you can work offline. Please go online to continue using QAT.",
+    "static.dashboard.globalconsumption":"Consumption (Global View)",
+    "static.report.forecasterrorovertime":"Forecast Error Over Time",
+    "static.report.month":"Month",
+    "static.report.errorperc":"Forecast Error Percentage"
 }
