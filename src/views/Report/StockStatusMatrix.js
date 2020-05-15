@@ -298,7 +298,9 @@ export default class StockStatusMatrix extends React.Component {
     
     
       }
-      
+      componentDidUpdate(){
+        setTimeout(() => this.setState({message:''}), 3000);
+        }
 
 
     componentDidMount() {
@@ -629,7 +631,7 @@ export default class StockStatusMatrix extends React.Component {
             return (
               <div>
             
-  <img style ={{height:'40px',width:'40px'}}src={csvicon} title="Export CSV" onClick={() => handleClick()} />
+  <img style ={{height:'25px',width:'25px'}}src={csvicon} title="Export CSV" onClick={() => handleClick()} />
          
 
               </div>
@@ -645,8 +647,8 @@ export default class StockStatusMatrix extends React.Component {
                     <CardHeader className="pb-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
                         {  this.state.data.length > 0 &&<div className="card-header-actions">
-                        <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
-                        <img style={{ height: '25px', width: '25px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
                         </div>}
                     </CardHeader>
                     <CardBody className="pb-md-3">
@@ -720,7 +722,7 @@ export default class StockStatusMatrix extends React.Component {
                                                 bsSize="sm"
                                                 onChange={this.getPlanningUnit}
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                 {productCategoryList}
                                             </Input>
 
@@ -757,7 +759,7 @@ export default class StockStatusMatrix extends React.Component {
                                                 id="planningUnitId"
                                                 bsSize="sm"
                                             >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
+                                                <option value="0">{i18n.t('static.common.select')}</option>
                                                 {planningUnitList}
                                             </Input>
                                             <InputGroupAddon addonType="append">
@@ -786,7 +788,8 @@ export default class StockStatusMatrix extends React.Component {
                                       
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
-                                             <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                    
+                                             <BootstrapTable className="stock-status-table" hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
 
                                             {...props.baseProps}

@@ -156,11 +156,11 @@ export default class StepOne extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                         {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        &nbsp;
+                                       
                                     </FormGroup>
 
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
                                     </FormGroup>
 
                                 </Form>

@@ -117,7 +117,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.user'),
                             url: '/user/listUser',
-                            icon: 'fa fa-user'
+                            icon: 'fa fa-users'
                           },
                           {
                             name: i18n.t('static.dashboard.language'),
@@ -196,17 +196,17 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.budget'),
                             url: '/budget/listBudget',
-                            icon: 'fa fa-line-chart'
+                            icon: 'fa fa-dollar'
                           },
                           {
                             name: i18n.t('static.dashboard.supplier'),
                             url: '/supplier/listSupplier',
-                            icon: 'fa fa-industry'
+                            icon: 'fa fa-user-circle-o'
                           },
                           {
                             name: i18n.t('static.dashboard.region'),
                             url: '/region/listRegion',
-                            icon: 'fa fa-pie-chart'
+                            icon: 'fa fa-globe'
                           },
                           {
                             name: i18n.t('static.healtharea.healtharea'),
@@ -363,21 +363,25 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.consumption'),
                             url: '/report/consumption',
                             icon: 'fa fa-exchange'
+                          },{
+                            name: i18n.t('static.dashboard.globalconsumption'),
+                            url: '/report/globalConsumption',
+                            icon: 'fa fa-exchange'
+                          },{
+                            name: i18n.t('static.report.forecasterrorovertime'),
+                            url: '/report/forecastOverTheTime',
+                            icon: 'fa fa-exchange'
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
                           },
-                          /*{
+                          {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
-                          },{
-                            name: i18n.t('static.dashboard.consumption'),
-                            url: '/report/globalConsumption',
-                            icon: 'fa fa-exchange'
-                          }*/
+                          }
                         ]
                       }
                       // {
@@ -388,9 +392,6 @@ class DefaultLayout extends Component {
                       //       name: "Supply Plan",
                       //       url: '/supplyPlan',
                       //       icon: 'fa fa-list-alt'
-                      //     }
-                      //   ]
-                      // },
                       , {
                         name: 'Setup Program',
                         url: '/program/programOnboarding',

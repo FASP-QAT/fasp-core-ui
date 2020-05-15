@@ -334,9 +334,10 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
-                                        <Button color="info" size="md" className="float-right mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                  <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        
                                     </FormGroup>
                                 </Row>
                             </Form>

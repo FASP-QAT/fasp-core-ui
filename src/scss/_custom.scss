@@ -672,10 +672,11 @@ label.arrow_label:after {
 
 
   // stock status matrix
+.stock-status-table{margin-top:2%;}
 .stock-status-search{position: absolute;
   // left: -75px;
   left: -35px;
-  top: 155px;}
+  top: 161px;}
   // stock status matrix calender box
   .box{height: calc(1.5em + 0.5rem + 2px);
     padding: 0.25rem 0.5rem;
@@ -1653,4 +1654,7 @@ input::placeholder {
   padding-left: 44%!important;
   margin: -17px -13px 0px -9px !important;
   border-radius: 3px;
+}
+.showdatabtn{
+  margin-top:-3%;
 }
