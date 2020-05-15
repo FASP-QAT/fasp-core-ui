@@ -45,7 +45,11 @@ import { SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
+import csvicon from '../../assets/img/csv.png'
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import { LOGO }  from '../../CommonComponent/Logo.js'
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -63,11 +67,13 @@ const options = {
     text: i18n.t('static.dashboard.globalconsumption')
   },
   scales: {yAxes: [{
+    scaleLabel: {
+      display: true,
+      labelString: i18n.t('static.dashboard.consumption')
+    },
     stacked: true,
     ticks: {
-      beginAtZero: true,
-      min: 0,
-      max: 100
+      beginAtZero: true
     }
   }]},
   tooltips: {
@@ -122,7 +128,7 @@ class Consumption extends Component {
       consumptions: {date :[],
       countryData:[]},
       productCategories: [],
-      currentValues:[],
+      countryValues:[],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -140,11 +146,164 @@ class Consumption extends Component {
     this.getRandomColor=this.getRandomColor.bind(this)
   }
 
-  handleChange(value) {
-    console.log(this.state.currentValues);
-   /* this.setState({
-      currentValues: getToggledOptions(this.state.currentValues, value)
-    })*/
+  exportCSV() {
+
+    var csvRow = [];
+    csvRow.push((i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year).replaceAll(' ','%20'))
+    csvRow.push(i18n.t('static.planningunit.planningunit')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
+    csvRow.push('')
+    csvRow.push('')
+    var re;
+    
+    var A =[[i18n.t('static.dashboard.country')].concat(this.state.consumptions.date)]
+    
+      re = this.state.consumptions.countryData
+    
+    for (var item = 0; item < re.length; item++) {
+      A.push([[re[item].label].concat(re[item].value)])
+    }
+    for (var i = 0; i < A.length; i++) {
+      csvRow.push(A[i].join(","))
+    }
+    var csvString = csvRow.join("%0A")
+    var a = document.createElement("a")
+    a.href = 'data:attachment/csv,' + csvString
+    a.target = "_Blank"
+    a.download = i18n.t('static.report.consumption_') + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    document.body.appendChild(a)
+    a.click()
+  }
+  
+
+
+
+
+
+  exportPDF = () => {
+    const addFooters = doc => {
+       
+      const pageCount = doc.internal.getNumberOfPages()
+    
+      doc.setFont('helvetica', 'bold')
+       doc.setFontSize(10)
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+      
+        doc.setPage(i)
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height-30, {
+        align: 'center'
+        })
+        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
+        align: 'center'
+        })
+      
+        
+      }
+    }
+    const addHeaders = doc => {
+      
+      const pageCount = doc.internal.getNumberOfPages()
+      doc.setFont('helvetica', 'bold')
+     
+    //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+      // var reader = new FileReader();
+     
+  //var data='';
+// Use fs.readFile() method to read the file 
+//fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+//}); 
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setFontSize(18)
+        doc.setPage(i)
+        doc.addImage(LOGO,'png',0,10, 200, 50,'FAST');
+        /*doc.addImage(data, 10, 30, {
+          align: 'justify'
+        });*/
+        doc.setTextColor("#002f6c");
+        doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+          align: 'center'
+        })
+        if(i==1){
+          doc.setFontSize(12)
+          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+            align: 'left'
+          })
+         
+          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+        }
+       
+      }
+    }
+    const unit = "pt";
+    const size = "A4"; // Use A1, A2, A3 or A4
+    const orientation = "landscape"; // portrait or landscape
+
+    const marginLeft = 10;
+    const doc = new jsPDF(orientation, unit, size,true);
+
+    doc.setFontSize(15);
+
+    const title = "Consumption Report";
+    var canvas = document.getElementById("cool-canvas");
+    //creates image
+    
+    var canvasImg = canvas.toDataURL("image/png",1.0);
+    var width = doc.internal.pageSize.width;    
+    var height = doc.internal.pageSize.height;
+    var h1=50;
+    var aspectwidth1= (width-h1);
+
+    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*2/3 );
+  /*  
+    const headers =[ [   i18n.t('static.report.consumptionDate'),
+    i18n.t('static.report.forecastConsumption'),
+    i18n.t('static.report.actualConsumption')]];
+    const data =  navigator.onLine? this.state.consumptions.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]):this.state.finalOfflineConsumption.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]);
+    
+    let content = {
+    margin: {top: 80},
+    startY:  height,
+    head: headers,
+    body: data,
+    
+  };
+  
+   
+    //doc.text(title, marginLeft, 40);
+    doc.autoTable(content);*/
+    addHeaders(doc)
+    addFooters(doc)
+    doc.save("report.pdf")
+    //creates PDF from img
+  /*  var doc = new jsPDF('landscape');
+    doc.setFontSize(20);
+    doc.text(15, 15, "Cool Chart");
+    doc.save('canvas.pdf');*/
+  }
+
+
+  
+ 
+
+
+
+
+
+
+  handleChange(countrysId) {
+  //  console.log(this.state.currentValues);
+
+    var countryIdArray = [];
+    for (var i = 0; i < countrysId.length; i++) {
+      countryIdArray[i] = countrysId[i].value;
+        
+    }
+    console.log(countryIdArray);
+    this.setState({
+      countryValues: countryIdArray
+    })
   }
   filterData() {
     this.setState({
@@ -159,7 +318,7 @@ class Consumption extends Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     console.log(CountryId)
     AuthenticationService.setupAxiosInterceptors();
-    ProductService.getConsumptionData(productCategoryId, CountryId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
+    ProductService.getConsumptionData({CountryIds:this.state.countryValues,productCategoryId:productCategoryId,planningUnitId:planningUnitId,date: this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate()})
       .then(response => { 
         console.log(JSON.stringify(response.data));
         this.setState({
@@ -446,11 +605,17 @@ class Consumption extends Component {
               )
           }, this);
          
-
+const  backgroundColor= [
+  '#4dbd74',
+  '#c8ced3',
+  '#000',
+  '#ffc107',
+  '#f86c6b',
+]
     const bar = {
 
       labels: this.state.consumptions.date,
-      datasets: this.state.consumptions.countryData.map((item, index) => ({stack:1,label:item.label,data:item.value,backgroundColor : this.getRandomColor()}))
+      datasets: this.state.consumptions.countryData.map((item, index) => ({stack:1,label:item.label,data:item.value,backgroundColor : backgroundColor[index]}))
      /* datasets: [
         {
           label: 'Actual Cconsumptionsonsuconsumptionsmption',
@@ -499,12 +664,9 @@ class Consumption extends Component {
               <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong>
                 <div className="card-header-actions">
                   <a className="card-header-action">
-                    <Pdf targetRef={ref} filename="consumption.pdf">
-                      {({ toPdf }) =>
-                        <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
-
-                      }
-                    </Pdf>
+                  <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                  <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      
                   </a>
                 </div>
               </CardHeader>
@@ -539,7 +701,7 @@ class Consumption extends Component {
                                                             bsSize="md"
                                                             name="countrysId"
                                                             id="countrysId"
-                                                            onChange={this.handleChange}
+                                                            onChange={(e) => { this.handleChange(e) }}
                                                             options={countryList}
                                                            />
                                                         {!!this.props.error &&
@@ -594,45 +756,15 @@ class Consumption extends Component {
                         </div>
                       </Col>
                     </Form>
-                    
+                    {
+                        this.state.consumptions.countryData.length > 0
+                        &&
                     
                     <div className="chart-wrapper chart-graph">
-                      <Bar data={bar} options={options} />
-                    </div> <br /><br />
+                      <Bar  id="cool-canvas" data={bar} options={options} />
+                    </div> }
                   </div></div>
 
-                    <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
-
-                      <thead>
-                        <tr>
-                          <th className="text-center"> Consumption Date </th>
-                          <th className="text-center"> Forecast </th>
-                          <th className="text-center">Actual</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {
-                          this.state.consumptions.length > 0
-                          &&
-                          this.state.consumptions.map((item, idx) =>
-
-                            <tr id="addr0" key={idx} >
-                              <td>
-                                {this.state.consumptions[idx].consumption_date}
-                              </td>
-                              <td>
-
-                                {this.state.consumptions[idx].forcast}
-                              </td>
-                              <td>
-                                {this.state.consumptions[idx].Actual}
-                              </td></tr>)
-
-                        }
-                      </tbody>
-
-                    </Table>
-                   
                   </div></div>
               </CardBody>
             </Card>
