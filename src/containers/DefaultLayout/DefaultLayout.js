@@ -363,21 +363,25 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.consumption'),
                             url: '/report/consumption',
                             icon: 'fa fa-exchange'
+                          },{
+                            name: i18n.t('static.dashboard.globalconsumption'),
+                            url: '/report/globalConsumption',
+                            icon: 'fa fa-exchange'
+                          },{
+                            name: i18n.t('static.report.forecasterrorovertime'),
+                            url: '/report/forecastOverTheTime',
+                            icon: 'fa fa-exchange'
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'
                           },
-                          /*{
+                          {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
-                          },{
-                            name: i18n.t('static.dashboard.consumption'),
-                            url: '/report/globalConsumption',
-                            icon: 'fa fa-exchange'
-                          }*/
+                          }
                         ]
                       }
                       // {
@@ -388,6 +392,7 @@ class DefaultLayout extends Component {
                       //       name: "Supply Plan",
                       //       url: '/supplyPlan',
                       //       icon: 'fa fa-list-alt'
+                      , {
                       //     }
                       //   ]
                       // },

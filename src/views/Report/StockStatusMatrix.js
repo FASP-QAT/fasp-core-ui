@@ -298,7 +298,9 @@ export default class StockStatusMatrix extends React.Component {
     
     
       }
-      
+      componentDidUpdate(){
+        setTimeout(() => this.setState({message:''}), 3000);
+        }
 
 
     componentDidMount() {
