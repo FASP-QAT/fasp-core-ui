@@ -303,27 +303,29 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                             children: [
                               {
+                                name: i18n.t('static.dashboard.datasync'),
+                                url: '/masterDataSync',
+                                icon: 'fa fa-list',
+                              },
+                              {
                                 name: i18n.t('static.dashboard.downloadprogram'),
                                 url: '/program/downloadProgram',
                                 icon: 'fa fa-download',
                               },
                               {
-                                name: i18n.t('static.dashboard.exportprogram'),
-                                url: '/program/exportProgram',
-                                icon: 'fa fa-sign-in',
-                              },
-                              {
                                 name: i18n.t('static.dashboard.importprogram'),
                                 url: '/program/importProgram',
                                 icon: 'fa fa-cloud-download',
+                              },
+                              {
+                                name: i18n.t('static.dashboard.exportprogram'),
+                                url: '/program/exportProgram',
+                                icon: 'fa fa-sign-in',
                               }
+                              
                             ]
                           },
-                          {
-                            name: i18n.t('static.dashboard.datasync'),
-                            url: '/masterDataSync',
-                            icon: 'fa fa-list',
-                          },
+                     
                           {
                             name: i18n.t('static.dashboard.consumptiondetails'),
                             url: '/consumptionDetails',

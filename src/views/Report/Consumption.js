@@ -247,7 +247,7 @@ class Consumption extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*2/3 );
+    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4 );
     
     const headers =[ [   i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecastConsumption'),
