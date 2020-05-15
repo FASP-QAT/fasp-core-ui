@@ -39,12 +39,14 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ProductService from '../../api/ProductService';
 import Picker from 'react-month-picker'
 import MonthBox from '../../CommonComponent/MonthBox.js'
-import CountryService from '../../api/CountryService';
+import RealmCountryService from '../../api/RealmCountryService';
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+// const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
@@ -56,13 +58,32 @@ const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
 
 const options = {
+  title: {
+    display: true,
+    text: i18n.t('static.dashboard.globalconsumption')
+  },
+  scales: {yAxes: [{
+    stacked: true,
+    ticks: {
+      beginAtZero: true,
+      min: 0,
+      max: 100
+    }
+  }]},
   tooltips: {
     enabled: false,
     custom: CustomTooltips
   },
   maintainAspectRatio: false
+  ,
+  legend:{
+    display: true,
+    position: 'bottom',
+    labels: {
+      usePointStyle: true,
+    }
+  }
 }
-
 
 
 
@@ -95,11 +116,13 @@ class Consumption extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      realms: [],
-      countrys: [],
+      lang:localStorage.getItem('lang'),
+     countrys: [],
       planningUnits: [],
-      consumptions: [],
+      consumptions: {date :[],
+      countryData:[]},
       productCategories: [],
+      currentValues:[],
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -113,15 +136,31 @@ class Consumption extends Component {
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
     this.getProductCategories=this.getProductCategories.bind(this)
     //this.pickRange = React.createRef()
+    this.handleChange=this.handleChange.bind(this)
+    this.getRandomColor=this.getRandomColor.bind(this)
+  }
 
+  handleChange(value) {
+    console.log(this.state.currentValues);
+   /* this.setState({
+      currentValues: getToggledOptions(this.state.currentValues, value)
+    })*/
   }
   filterData() {
-    let realmId = document.getElementById("realmId").value;
-    let CountryId = document.getElementById("CountryId").value;
+    this.setState({
+      consumptions: {date:["04-2019","05-2019","06-2019","07-2019"],countryData:[{label:"c1",value:[10,4,5,7]},
+      {label:"c2",value:[13,2,8,7]},
+      {label:"c3",value:[9,1,0,7]},
+      {label:"c4",value:[5,4,3,7]}]}
+    })
+    /*
+    let productCategoryId = document.getElementById("productCategoryId").value;
+    let CountryId = document.getElementById("CountrysId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
+    console.log(CountryId)
     AuthenticationService.setupAxiosInterceptors();
-    ProductService.getConsumptionData(realmId, CountryId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
-      .then(response => {
+    ProductService.getConsumptionData(productCategoryId, CountryId, planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
+      .then(response => { 
         console.log(JSON.stringify(response.data));
         this.setState({
           consumptions: response.data
@@ -150,16 +189,15 @@ class Consumption extends Component {
           }
         }
       );
-
+*/
   }
 
   getCountrys() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = document.getElementById("realmId").value;
-      CountryService.getCountryByRealmId(realmId)
+      let realmId = AuthenticationService.getRealmId();
+      RealmCountryService.getRealmCountryrealmIdById(realmId)
         .then(response => {
-          console.log(JSON.stringify(response.data))
           this.setState({
             countrys: response.data
           })
@@ -177,9 +215,9 @@ class Consumption extends Component {
                 case 404:
                 case 406:
                 case 412:
+                  default:
                   this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                   break;
-                default:
                   this.setState({ message: 'static.unkownError' });
                   break;
               }
@@ -233,9 +271,8 @@ class Consumption extends Component {
     if (navigator.onLine) {
       console.log('changed')
       AuthenticationService.setupAxiosInterceptors();
-      let CountryId = document.getElementById("CountryId").value;
-      CountryService.getCountryPlaningUnitListByCountryId(CountryId).then(response => {
-        console.log('**' + JSON.stringify(response.data))
+      let productCategoryId = document.getElementById("productCategoryId").value;
+      PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
         this.setState({
           planningUnits: response.data,
         })
@@ -281,10 +318,7 @@ class Consumption extends Component {
         planningunitRequest.onsuccess = function (e) {
           var myResult = [];
           myResult = planningunitRequest.result;
-          console.log("myResult", myResult);
           var CountryId = (document.getElementById("CountryId").value).split("_")[0];
-          console.log('CountryId----->>>', CountryId)
-          console.log(myResult);
           var proList = []
           for (var i = 0; i < myResult.length; i++) {
             if (myResult[i].Country.id == CountryId) {
@@ -295,7 +329,6 @@ class Consumption extends Component {
               proList[i] = productJson
             }
           }
-          console.log("proList---" + proList);
           this.setState({
             planningUnitList: proList
           })
@@ -308,10 +341,9 @@ class Consumption extends Component {
 
   getProductCategories() {
     AuthenticationService.setupAxiosInterceptors();
-    let CountryId = document.getElementById("CountryId").value;
-    ProductService.getProductCategoryListByCountry(CountryId)
+    let realmId = AuthenticationService.getRealmId();
+    ProductService.getProductCategoryList(realmId)
         .then(response => {
-            console.log(JSON.stringify(response.data))
             this.setState({
                 productCategories: response.data
             })
@@ -342,79 +374,10 @@ class Consumption extends Component {
         
 }
   componentDidMount() {
-    if (navigator.onLine) {
     AuthenticationService.setupAxiosInterceptors();
-    RealmService.getRealmListAll()
-      .then(response => {
-        if (response.status == 200) {
-          this.setState({
-            realms: response.data,
-            realmId: response.data[0].realmId
-          })
           this.getCountrys();
-
-        } else {
-          this.setState({ message: response.data.messageCode })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );}else{
-
-        console.log("In component did mount", new Date())
-        const lan = 'en';
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['CountryData'], 'readwrite');
-            var Country = transaction.objectStore('CountryData');
-            var getRequest = Country.getAll();
-            var proList = []
-            getRequest.onerror = function (event) {
-                // Handle errors!
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
-                        var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var CountryJson = {
-                            name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
-                            id: myResult[i].id
-                        }
-                        proList[i] = CountryJson
-                    }
-                }
-                this.setState({
-                    CountryList: proList
-                })
-
-            }.bind(this);
-      }
-
-  }
+           this.getProductCategories()
+ 
   }
 
   toggle() {
@@ -448,27 +411,31 @@ class Consumption extends Component {
   }
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
+   getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+        }
   render() {
-    const { realms } = this.state;
-    let realmList = realms.length > 0
-      && realms.map((item, i) => {
-        return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnit.id}>
-            {getLabelText(item.planningUnit.label, this.state.lang)}
+          <option key={i} value={item.planningUnitId}>
+            {getLabelText(item.label, this.state.lang)}
           </option>
         )
       }, this);
     const { countrys } = this.state;
-  
+   // console.log(JSON.stringify(countrys))
+   let countryList = countrys.length > 0 && countrys.map((item, i) => {
+     console.log(JSON.stringify(item))
+    return({ label: getLabelText(item.country.label, this.state.lang), value:item.country.countryId })
+  }, this);
+    console.log(JSON.stringify(countryList))
       const { productCategories } = this.state;
       let productCategoryList = productCategories.length > 0
           && productCategories.map((item, i) => {
@@ -478,12 +445,15 @@ class Consumption extends Component {
                   </option>
               )
           }, this);
+         
+
     const bar = {
 
-      labels: this.state.consumptions.map((item, index) => (item.consumption_date)),
-      datasets: [
+      labels: this.state.consumptions.date,
+      datasets: this.state.consumptions.countryData.map((item, index) => ({stack:1,label:item.label,data:item.value,backgroundColor : this.getRandomColor()}))
+     /* datasets: [
         {
-          label: 'Actual Consumption',
+          label: 'Actual Cconsumptionsonsuconsumptionsmption',
           backgroundColor: '#86CD99',
           borderColor: 'rgba(179,181,198,1)',
           pointBackgroundColor: 'rgba(179,181,198,1)',
@@ -505,7 +475,7 @@ class Consumption extends Component {
           yValueFormatString: "$#,##0",
           data: this.state.consumptions.map((item, index) => (item.forcast))
         }
-      ],
+      ],*/
 
     };
     const pickerLang = {
@@ -525,8 +495,8 @@ class Consumption extends Component {
         <Row>
           <Col lg="12">
             <Card>
-              <CardHeader className="text-center">
-                <b className="count-text">Consumption Report</b>
+              <CardHeader>
+              <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong>
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <Pdf targetRef={ref} filename="consumption.pdf">
@@ -540,13 +510,13 @@ class Consumption extends Component {
               </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                  <div className="col-md-12 pr-0"> <div ref={ref}> <div className="col-md-9 pr-0" >
-                    <Form >
-                      <Col md="9 pl-0">
-                        <div className="d-md-flex">
-                          <FormGroup>
-                            <Label htmlFor="appendedInputButton">Select Period</Label>
-                            <div className="controls SelectGo edit">
+                  <div > <div ref={ref}> <div >
+                  <Form >
+                      <Col>
+                        <div className="row">
+                          <FormGroup className="col-md-3">
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                            <div className="controls edit">
 
                               <Picker
                                 ref="pickRange"
@@ -562,91 +532,70 @@ class Consumption extends Component {
                             </div>
 
                           </FormGroup>
-
-
-                          <FormGroup>
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                            <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="realmId"
-                                  id="realmId"
-                                  bsSize="sm"
-                                  onChange={this.getCountrys}
-                                >
-                                  {/* <option value="0">{i18n.t('static.common.all')}</option> */}
-
-                                  {realmList}
-                                </Input>
-
-                              </InputGroup>
-                            </div>
-                          </FormGroup>
-                         
-                          <FormGroup>
-                                                        <Label htmlFor="countrysId">{i18n.t('static.country.country')}<span class="red Reqasterisk">*</span></Label>
-                                                        <Select
-                                                            bsSize="sm"
+ 
+                            <FormGroup className="col-md-3">
+                            <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                                                        <ReactMultiSelectCheckboxes
+                                                            bsSize="md"
                                                             name="countrysId"
                                                             id="countrysId"
-                                                            multi
-                                                            required
-                                                            min={1}
-                                                            options={this.state.countrys}
-                                                            value={this.state.countrysId}
+                                                            onChange={this.handleChange}
+                                                            options={countryList}
                                                            />
                                                         {!!this.props.error &&
                                                             this.props.touched && (
                                                                 <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                            )}
-                                                      
-                                                    </FormGroup>
-                                                    
-
-                          <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="productCategoryId"
-                                                id="productCategoryId"
-                                                bsSize="sm"
-                                                onChange={this.getPlanningUnit}
-                                            >
-                                                <option value="0">{i18n.t('static.common.all')}</option>
-                                                {productCategoryList}
-                                            </Input>
-
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
+                                                            )}</FormGroup>
                          
-                          <FormGroup className="tab-ml-1">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                            <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="planningUnitId"
-                                  id="planningUnitId"
-                                  bsSize="sm"
-                                  onChange={this.filterData}
-                                >
-                                  <option value="0">{i18n.t('static.common.select')}</option>
-                                  {planningUnitList}
-                                </Input>
-                                <InputGroupAddon addonType="append">
-                                  <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                </InputGroupAddon>
-                              </InputGroup>
-                            </div>
-                          </FormGroup>
+                            <FormGroup className="col-md-3">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                              <div className="controls ">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="productCategoryId"
+                                    id="productCategoryId"
+                                    bsSize="sm"
+                                    onChange={this.getPlanningUnit}
+                                  >
+                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                    {productCategories.length > 0
+                                      && productCategories.map((item, i) => {
+                                        return (
+                                          <option key={i} value={item.payload.productCategoryId}>
+                                            {getLabelText(item.payload.label, this.state.lang)}
+                                          </option>
+                                        )
+                                      }, this)}
+                                  </Input>
+                                </InputGroup></div>
+
+                            </FormGroup>
+                            <FormGroup className="col-md-3">
+                              <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                              <div className="controls">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="planningUnitId"
+                                    id="planningUnitId"
+                                    bsSize="sm"
+                                    onChange={this.filterData}
+                                  >
+                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                    {planningUnitList}
+                                  </Input>
+                                  <InputGroupAddon addonType="append">
+                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                  </InputGroupAddon>
+                                </InputGroup>
+                              </div>
+                            </FormGroup>
                         </div>
                       </Col>
                     </Form>
-
+                    
+                    
                     <div className="chart-wrapper chart-graph">
                       <Bar data={bar} options={options} />
                     </div> <br /><br />
