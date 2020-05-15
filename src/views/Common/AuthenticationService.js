@@ -27,6 +27,24 @@ class AuthenticationService {
         return decryptedPassword;
     }
 
+    syncExpiresOn() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        let syncExpiresOn = moment(decryptedUser.syncExpiresOn);
+        console.log("syncExpiresOn---", syncExpiresOn);
+        var curDate = moment(new Date());
+        const diff = curDate.diff(syncExpiresOn, 'days');
+        // const diffDuration = moment.duration(diff);
+        console.log("diff---",diff);
+        // console.log("diffDuration---",diffDuration)
+        // console.log("Days:", diffDuration.days());
+        console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
+        if (diff < 15) {
+            return false;
+        }
+        return true;
+    }
+
     getLoggedInUsername() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));

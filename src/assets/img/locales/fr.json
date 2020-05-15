@@ -81,7 +81,7 @@
     "static.message.invaliddate": "Date invalide",
     "static.consumption.consumptionqty": "Quantité de consommation",
     "static.consumption.daysofstockout": "Jours de rupture de stock",
-    "static.consumption.actualflag": "Drapeau réel",
+    "static.consumption.actualflag": "Drapeau/Prévoir réel",
     "static.consumption.actual": "Réel",
     "static.consumption.forcast": "Prévoir",
     "static.common.startdate": "Date de début",
@@ -132,5 +132,6 @@
     "static.dashboard.report": "Rapports",
     "static.dashboard.consumption": "Consommation",
     "static.dashboard.stockstatusmatrix": "Matrice de l'état des stocks",
-    "static.dashboard.program": "Programme"
+    "static.dashboard.program": "Programme",
+    "static.message.syncExpiresOn": "Vous avez dépassé le nombre maximal de jours pendant lesquels vous pouvez travailler hors ligne. Veuillez vous connecter pour continuer à utiliser QAT."
 }

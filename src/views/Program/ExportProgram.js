@@ -26,7 +26,7 @@ const initialValues = {
 const validationSchema = function (values) {
     return Yup.object().shape({
         programId: Yup.string()
-        .required(i18n.t('static.program.validselectprogramtext'))
+            .required(i18n.t('static.program.validselectprogramtext'))
     })
 }
 
@@ -63,6 +63,7 @@ export default class ExportProgram extends Component {
         }
         this.formSubmit = this.formSubmit.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     componentDidMount() {
@@ -107,7 +108,7 @@ export default class ExportProgram extends Component {
     formSubmit() {
         var zip = new JSZip();
         var programId = this.state.programId;
-        console.log("ProgramId",programId)
+        console.log("ProgramId", programId)
         var db1;
         var storeOS;
         getDatabase();
@@ -127,7 +128,7 @@ export default class ExportProgram extends Component {
                     for (var j = 0; j < programId.length; j++) {
                         if (myResult[i].id == programId[j].value) {
                             var txt = JSON.stringify(myResult[i]);
-                            var labelName=(programId[j].label).replace("/","-")
+                            var labelName = (programId[j].label).replace("/", "-")
                             zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt);
                         }
                     }
@@ -210,7 +211,7 @@ export default class ExportProgram extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="reset" size="md" color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     &nbsp;
@@ -225,7 +226,13 @@ export default class ExportProgram extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/dashboard/` +  i18n.t('static.program.actioncancelled'))
+        this.props.history.push(`/dashboard/` + i18n.t('static.program.actioncancelled'))
+    }
+
+    resetClicked() {
+        this.state.programId = '';
+        // this.setState({ programId }, () => { });
+        this.setState({ programId: '' });
     }
 
 }

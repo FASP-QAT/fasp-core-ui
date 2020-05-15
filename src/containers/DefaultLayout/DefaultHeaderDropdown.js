@@ -102,10 +102,10 @@ class DefaultHeaderDropdown extends Component {
           <div className="avatar">
             <img src={image6} className="img-avatar" alt="admin@bootstrapmaster.com" />
             <Online>
-              <span className="avatar-status badge-success"></span>
+              <span className="avatar-status badge-success" title="Online"></span>
             </Online>
             <Offline>
-              <span className="avatar-status badge-danger"></span>
+              <span className="avatar-status badge-danger" title="Offline"></span>
             </Offline>
           </div>
 
