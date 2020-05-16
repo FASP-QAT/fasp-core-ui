@@ -168,5 +168,8 @@
     "static.dashboard.report": "Informes",
     "static.dashboard.consumption": "Consumo",
     "static.dashboard.stockstatusmatrix": "Matriz de estado de stock",
-    "static.message.syncExpiresOn": "Ha excedido el número máximo de días que puede trabajar sin conexión. Conéctese en línea para continuar usando QAT."
+    "static.realm.yes": "si",
+    "static.realm.no": "No",
+    "static.message.syncExpiresOn": "Ha excedido el número máximo de días que puede trabajar sin conexión. Conéctese en línea para continuar usando QAT.",
+    "static.region.glnvalue": "GLN No debe tener dígitos"
 }

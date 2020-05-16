@@ -58,6 +58,7 @@ export default class StepOne extends Component {
         super(props);
         this.state = {
             realmList: [],
+            realmId: '',
         }
 
     }
@@ -85,6 +86,8 @@ export default class StepOne extends Component {
     }
 
     componentDidMount() {
+
+        console.log("-----------------------------------FIRST STEP-------->", this.props.items);
         AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
@@ -139,12 +142,13 @@ export default class StepOne extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.realmId}
+                                            valid={!errors.realmId && this.props.items.program.realm.realmId != ''}
                                             invalid={touched.realmId && !!errors.realmId}
                                             bsSize="sm"
                                             className="col-md-6"
                                             onBlur={handleBlur}
                                             type="select" name="realmId" id="realmId"
+                                            // value={this.props.program.realm.realmId}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getDependentLists(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>

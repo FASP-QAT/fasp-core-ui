@@ -134,5 +134,8 @@
     "static.dashboard.consumption": "Consumo",
     "static.dashboard.stockstatusmatrix": "Matriz de status de estoque",
     "static.dashboard.program": "Programa",
-    "static.message.syncExpiresOn": "Você excedeu o número máximo de dias em que pode trabalhar offline. Por favor, fique online para continuar usando o QAT."
+    "static.realm.yes": "sim",
+    "static.realm.no": "Não",
+    "static.message.syncExpiresOn": "Você excedeu o número máximo de dias em que pode trabalhar offline. Por favor, fique online para continuar usando o QAT.",
+    "static.region.glnvalue": "GLN Não deve ter dígitos"
 }

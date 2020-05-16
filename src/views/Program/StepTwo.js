@@ -130,7 +130,7 @@ export default class Steptwo extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.realmCountryId}
+                                            valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                             bsSize="sm"

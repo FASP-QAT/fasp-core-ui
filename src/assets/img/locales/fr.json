@@ -133,5 +133,8 @@
     "static.dashboard.consumption": "Consommation",
     "static.dashboard.stockstatusmatrix": "Matrice de l'état des stocks",
     "static.dashboard.program": "Programme",
-    "static.message.syncExpiresOn": "Vous avez dépassé le nombre maximal de jours pendant lesquels vous pouvez travailler hors ligne. Veuillez vous connecter pour continuer à utiliser QAT."
+    "static.realm.yes": "Oui",
+    "static.realm.no": "Non",
+    "static.message.syncExpiresOn": "Vous avez dépassé le nombre maximal de jours pendant lesquels vous pouvez travailler hors ligne. Veuillez vous connecter pour continuer à utiliser QAT.",
+    "static.region.glnvalue": "GLN Non doit être composé de chiffres"
 }
