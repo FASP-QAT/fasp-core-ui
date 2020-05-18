@@ -270,7 +270,8 @@ export default class AddInventory extends Component {
                                     },
                                     {
                                         title: i18n.t('static.inventory.inventoryDate'),
-                                        type: 'calendar'
+                                        type: 'calendar',
+                                        options: { format: 'MM-YYYY' }
 
                                     },
                                     {
@@ -714,9 +715,6 @@ export default class AddInventory extends Component {
         return (
 
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Col xs="12" sm="12">

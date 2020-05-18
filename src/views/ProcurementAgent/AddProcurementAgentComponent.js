@@ -67,10 +67,14 @@ class AddProcurementAgentComponent extends Component {
             realms: [],
             procurementAgent: {
                 realm: {
+                    id: ''
                 },
                 label: {
+                    label_en: ''
 
-                }
+                },
+                procurementAgentCode: '',
+                submittedToApprovedLeadTime: ''
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -201,9 +205,10 @@ class AddProcurementAgentComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='procurementAgentForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='procurementAgentForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realmName')}<span className="red Reqasterisk">*</span></Label>
@@ -214,7 +219,7 @@ class AddProcurementAgentComponent extends Component {
                                                             bsSize="sm"
                                                             name="realmId"
                                                             id="realmId"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.procurementAgent.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -235,7 +240,7 @@ class AddProcurementAgentComponent extends Component {
                                                             bsSize="sm"
                                                             name="procurementAgentCode"
                                                             id="procurementAgentCode"
-                                                            valid={!errors.procurementAgentCode}
+                                                            valid={!errors.procurementAgentCode && this.state.procurementAgent.procurementAgentCode != ''}
                                                             invalid={touched.procurementAgentCode && !!errors.procurementAgentCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -254,7 +259,7 @@ class AddProcurementAgentComponent extends Component {
                                                             bsSize="sm"
                                                             name="procurementAgentName"
                                                             id="procurementAgentName"
-                                                            valid={!errors.procurementAgentName}
+                                                            valid={!errors.procurementAgentName && this.state.procurementAgent.label.label_en != ''}
                                                             invalid={touched.procurementAgentName && !!errors.procurementAgentName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -272,7 +277,7 @@ class AddProcurementAgentComponent extends Component {
                                                             bsSize="sm"
                                                             name="submittedToApprovedLeadTime"
                                                             id="submittedToApprovedLeadTime"
-                                                            valid={!errors.submittedToApprovedLeadTime}
+                                                            valid={!errors.submittedToApprovedLeadTime && this.state.procurementAgent.submittedToApprovedLeadTime != ''}
                                                             invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

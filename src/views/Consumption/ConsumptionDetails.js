@@ -385,7 +385,10 @@ export default class ConsumptionDetails extends React.Component {
                                 // { title: 'Month', type: 'text', readOnly: true },
                                 {
                                     title: 'Consumption Date',
-                                    type: 'calendar'
+                                    type: 'calendar',
+                                    options: {
+                                        format: 'MM-YYYY'
+                                    }
                                 },
                                 {
                                     title: i18n.t('static.inventory.region'),
@@ -1063,9 +1066,6 @@ export default class ConsumptionDetails extends React.Component {
 
 
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                    this.setState({ message: message })
-                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Col xs="12" sm="12">

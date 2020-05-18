@@ -42,7 +42,7 @@ let initialValues = {
     shippedToArrivedAirLeadTime: '0',
     shippedToArrivedSeaLeadTime: '0',
     arrivedToDeliveredLeadTime: '0',
-    
+
 
 }
 const entityname = i18n.t('static.dashboard.realmcountry')
@@ -127,16 +127,16 @@ class RealmCountry extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.handleRemoveSpecificRow = this.handleRemoveSpecificRow.bind(this)
         this.updateRow = this.updateRow.bind(this);
-        
+
     }
 
     updateRow(idx) {
         if (this.state.updateRowStatus == 1) {
             this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
         } else {
-        console.log(JSON.stringify(this.state.rows[idx]))
+            console.log(JSON.stringify(this.state.rows[idx]))
             initialValues = {
-                realmId:this.state.rows[idx].realmId,
+                realmId: this.state.rows[idx].realmId,
                 countryId: this.state.rows[idx].country.countryId,
                 country: {
                     countryId: this.state.rows[idx].country.countryId,
@@ -148,22 +148,22 @@ class RealmCountry extends Component {
                     label: {
                         label_en: this.state.rows[idx].defaultCurrency.label.label_en
                     }
-                },    currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
+                }, currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
                     // unitId: this.state.rows[idx].palletUnit.unitId,
                     label: {
                         label_en: this.state.rows[idx].palletUnit.label.label_en
                     }
-                },unitId: this.state.rows[idx].palletUnit.unitId,
+                }, unitId: this.state.rows[idx].palletUnit.unitId,
                 airFreightPercentage: this.state.rows[idx].airFreightPercentage,
                 seaFreightPercentage: this.state.rows[idx].seaFreightPercentage,
                 shippedToArrivedAirLeadTime: this.state.rows[idx].shippedToArrivedAirLeadTime,
                 shippedToArrivedSeaLeadTime: this.state.rows[idx].shippedToArrivedSeaLeadTime,
                 arrivedToDeliveredLeadTime: this.state.rows[idx].arrivedToDeliveredLeadTime
-                
+
             }
             const rows = [...this.state.rows]
             this.setState({
-                realmId:this.state.rows[idx].realmId,
+                realmId: this.state.rows[idx].realmId,
                 countryId: this.state.rows[idx].country.countryId,
                 country: {
                     countryId: this.state.rows[idx].country.countryId,
@@ -175,7 +175,7 @@ class RealmCountry extends Component {
                     label: {
                         label_en: this.state.rows[idx].defaultCurrency.label.label_en
                     }
-                },    currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
+                }, currencyId: this.state.rows[idx].defaultCurrency.currencyId, palletUnit: {
                     unitId: this.state.rows[idx].palletUnit.unitId,
                     label: {
                         label_en: this.state.rows[idx].palletUnit.label.label_en
@@ -307,7 +307,7 @@ class RealmCountry extends Component {
         RealmCountryService.addRealmCountry(realmCountry)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/realm/realmlist/` + i18n.t(response.data.messageCode,{entityname}))
+                    this.props.history.push(`/realm/realmlist/` + i18n.t(response.data.messageCode, { entityname }))
 
                 } else {
                     this.setState({
@@ -520,10 +520,11 @@ class RealmCountry extends Component {
                                 enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors,resetForm }) => {
-                                    if (this.state.country.countryId != "" && this.state.defaultCurrency.currencyId != "" ) {
+                                onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+                                    if (this.state.country.countryId != "" && this.state.defaultCurrency.currencyId != "") {
                                         var json =
-                                        { realmCountryId:this.state.realmCountryId,
+                                        {
+                                            realmCountryId: this.state.realmCountryId,
                                             realm: {
                                                 realmId: this.props.match.params.realmId
                                             }
@@ -558,37 +559,38 @@ class RealmCountry extends Component {
                                         }
                                         this.state.rows.push(json)
                                         this.setState({ rows: this.state.rows })
-                                        this.setState({realmCountryId:this.state.realmCountryId,
-                                        
-                                        country: {
-                                            countryId: '',
-                                            label: {
-                                                label_en: ''
+                                        this.setState({
+                                            realmCountryId: this.state.realmCountryId,
+
+                                            country: {
+                                                countryId: '',
+                                                label: {
+                                                    label_en: ''
+                                                }
                                             }
-                                        }
-                                        , defaultCurrency: {
-                                            currencyId: '',
-                                            label: {
-                                                label_en: ''
+                                            , defaultCurrency: {
+                                                currencyId: '',
+                                                label: {
+                                                    label_en: ''
+                                                }
                                             }
-                                        }
-                                        // , palletUnit: {
-                                        //     unitId: '',
-                                        //     label: {
-                                        //         label_en:''
-                                        //     }
-                                        // }
-                                        ,
-                                        airFreightPercentage: '0.0',
-                                        seaFreightPercentage: '0.0',
-                                        shippedToArrivedAirLeadTime: '0',
-                                        shippedToArrivedSeaLeadTime: '0',
-                                        arrivedToDeliveredLeadTime: '0',
-                                        active: true
-})
+                                            // , palletUnit: {
+                                            //     unitId: '',
+                                            //     label: {
+                                            //         label_en:''
+                                            //     }
+                                            // }
+                                            ,
+                                            airFreightPercentage: '0.0',
+                                            seaFreightPercentage: '0.0',
+                                            shippedToArrivedAirLeadTime: '0',
+                                            shippedToArrivedSeaLeadTime: '0',
+                                            arrivedToDeliveredLeadTime: '0',
+                                            active: true
+                                        })
                                     }
                                     resetForm({
-                                        realmCountryId:this.state.realmCountryId,
+                                        realmCountryId: this.state.realmCountryId,
                                         realm: {
                                             realmId: this.props.match.params.realmId
                                         }
@@ -633,48 +635,48 @@ class RealmCountry extends Component {
                                         setTouched
                                     }) => (<Form onSubmit={handleSubmit} noValidate name='capacityForm'>
                                         <Row>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.realm.realm')}</Label>
-                                            <Input
-                                                type="text"
-                                                name="realmId"
-                                                id="progrealmIdramId"
-                                                bsSize="sm"
-                                                readOnly
-                                                valid={!errors.realmId}
-                                                invalid={touched.realmId && !!errors.realmId}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                onBlur={handleBlur}
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="select">{i18n.t('static.realm.realm')}</Label>
+                                                <Input
+                                                    type="text"
+                                                    name="realmId"
+                                                    id="progrealmIdramId"
+                                                    bsSize="sm"
+                                                    readOnly
+                                                    valid={!errors.realmId && this.state.realm.label != ''}
+                                                    invalid={touched.realmId && !!errors.realmId}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    onBlur={handleBlur}
 
-                                                value={getLabelText(this.state.realm.label, this.state.lang)}
-                                            >
-                                            </Input>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.dashboard.country')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="countryId" id="countryId" bsSize="sm"
-                                                valid={!errors.countryId}
-                                                invalid={touched.countryId && !!errors.countryId}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                value={this.state.country.countryId} required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {countryList}
-                                            </Input> <FormFeedback className="red">{errors.countryId}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.dashboard.currency')}<span class="red Reqasterisk">*</span></Label>
-                                            <Input type="select" name="currencyId" id="currencyId" bsSize="sm"
-                                                valid={!errors.currencyId}
-                                                invalid={touched.currencyId && !!errors.currencyId}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                value={this.state.defaultCurrency.currencyId} required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {currencyList}
-                                            </Input> <FormFeedback className="red">{errors.currencyId}</FormFeedback>
-                                        </FormGroup>
-                                        {/* <FormGroup className="col-md-6">
+                                                    value={getLabelText(this.state.realm.label, this.state.lang)}
+                                                >
+                                                </Input>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="select">{i18n.t('static.dashboard.country')}<span class="red Reqasterisk">*</span></Label>
+                                                <Input type="select" name="countryId" id="countryId" bsSize="sm"
+                                                    valid={!errors.countryId && this.state.country.countryId != ''}
+                                                    invalid={touched.countryId && !!errors.countryId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    value={this.state.country.countryId} required>
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {countryList}
+                                                </Input> <FormFeedback className="red">{errors.countryId}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="select">{i18n.t('static.dashboard.currency')}<span class="red Reqasterisk">*</span></Label>
+                                                <Input type="select" name="currencyId" id="currencyId" bsSize="sm"
+                                                    valid={!errors.currencyId && this.state.defaultCurrency.currencyId != ''}
+                                                    invalid={touched.currencyId && !!errors.currencyId}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    value={this.state.defaultCurrency.currencyId} required>
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {currencyList}
+                                                </Input> <FormFeedback className="red">{errors.currencyId}</FormFeedback>
+                                            </FormGroup>
+                                            {/* <FormGroup className="col-md-6">
                                             <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
                                             <Input
                                                 type="select"
@@ -693,104 +695,104 @@ class RealmCountry extends Component {
                                             <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                         </FormGroup> */}
 
-                                        <FormGroup className="col-md-6">
-                                            <Label for="airFreightPercentage">{i18n.t('static.realmcountry.airFreightPercentage')}</Label>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                name="airFreightPercentage"
-                                                id="airFreightPercentage"
-                                                bsSize="sm"
-                                                valid={!errors.airFreightPercentage}
-                                                invalid={touched.airFreightPercentage && !!errors.airFreightPercentage}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                type="number"
-                                                value={this.state.airFreightPercentage}
-                                                placeholder={i18n.t('static.realmcountry.airFreightPercentagetext')}
-                                                 />
-                                            <FormFeedback className="red">{errors.airFreightPercentage}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="seaFreightPercentage">{i18n.t('static.realmcountry.seaFreightPercentage')}</Label>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                name="seaFreightPercentage"
-                                                id="seaFreightPercentage"
-                                                bsSize="sm"
-                                                valid={!errors.seaFreightPercentage}
-                                                invalid={touched.seaFreightPercentage && !!errors.seaFreightPercentage}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                type="number"
-                                                value={this.state.seaFreightPercentage}
-                                                placeholder={i18n.t('static.realmcountry.seaFreightPercentagetext')}
-                                                 />
-                                            <FormFeedback className="red">{errors.seaFreightPercentage}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="shippedToArrivedAirLeadTime">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}</Label>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                name="shippedToArrivedAirLeadTime"
-                                                id="shippedToArrivedAirLeadTime"
-                                                bsSize="sm"
-                                                valid={!errors.shippedToArrivedAirLeadTime}
-                                                invalid={touched.shippedToArrivedAirLeadTime && !!errors.shippedToArrivedAirLeadTime}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                type="number"
-                                                value={this.state.shippedToArrivedAirLeadTime}
-                                                placeholder={i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext')}
-                                                 />
-                                            <FormFeedback className="red">{errors.shippedToArrivedAirLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="shippedToArrivedSeaLeadTime">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}</Label>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                name="shippedToArrivedSeaLeadTime"
-                                                id="shippedToArrivedSeaLeadTime"
-                                                bsSize="sm"
-                                                valid={!errors.shippedToArrivedSeaLeadTime}
-                                                invalid={touched.shippedToArrivedSeaLeadTime && !!errors.shippedToArrivedSeaLeadTime}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                type="number"
-                                                value={this.state.shippedToArrivedSeaLeadTime}
-                                                placeholder={i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext')}
-                                                 />
-                                            <FormFeedback className="red">{errors.shippedToArrivedSeaLeadTime}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="arrivedToDeliveredLeadTime">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}</Label>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                name="arrivedToDeliveredLeadTime"
-                                                id="arrivedToDeliveredLeadTime"
-                                                bsSize="sm"
-                                                valid={!errors.arrivedToDeliveredLeadTime}
-                                                invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                type="number"
-                                                value={this.state.arrivedToDeliveredLeadTime}
-                                                placeholder={i18n.t('static.realmcountry.arrivedToDeliveredLeadTimetext')}
-                                                 />
-                                            <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
-                                        </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="airFreightPercentage">{i18n.t('static.realmcountry.airFreightPercentage')}</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    name="airFreightPercentage"
+                                                    id="airFreightPercentage"
+                                                    bsSize="sm"
+                                                    valid={!errors.airFreightPercentage && this.state.airFreightPercentage != '0.0' && this.state.airFreightPercentage != ''}
+                                                    invalid={touched.airFreightPercentage && !!errors.airFreightPercentage}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    type="number"
+                                                    value={this.state.airFreightPercentage}
+                                                    placeholder={i18n.t('static.realmcountry.airFreightPercentagetext')}
+                                                />
+                                                <FormFeedback className="red">{errors.airFreightPercentage}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="seaFreightPercentage">{i18n.t('static.realmcountry.seaFreightPercentage')}</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    name="seaFreightPercentage"
+                                                    id="seaFreightPercentage"
+                                                    bsSize="sm"
+                                                    valid={!errors.seaFreightPercentage && this.state.seaFreightPercentage != '0.0' && this.state.seaFreightPercentage != ''}
+                                                    invalid={touched.seaFreightPercentage && !!errors.seaFreightPercentage}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    type="number"
+                                                    value={this.state.seaFreightPercentage}
+                                                    placeholder={i18n.t('static.realmcountry.seaFreightPercentagetext')}
+                                                />
+                                                <FormFeedback className="red">{errors.seaFreightPercentage}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="shippedToArrivedAirLeadTime">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    name="shippedToArrivedAirLeadTime"
+                                                    id="shippedToArrivedAirLeadTime"
+                                                    bsSize="sm"
+                                                    valid={!errors.shippedToArrivedAirLeadTime && this.state.shippedToArrivedAirLeadTime != '0' && this.state.shippedToArrivedAirLeadTime != ''}
+                                                    invalid={touched.shippedToArrivedAirLeadTime && !!errors.shippedToArrivedAirLeadTime}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    type="number"
+                                                    value={this.state.shippedToArrivedAirLeadTime}
+                                                    placeholder={i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext')}
+                                                />
+                                                <FormFeedback className="red">{errors.shippedToArrivedAirLeadTime}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="shippedToArrivedSeaLeadTime">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    name="shippedToArrivedSeaLeadTime"
+                                                    id="shippedToArrivedSeaLeadTime"
+                                                    bsSize="sm"
+                                                    valid={!errors.shippedToArrivedSeaLeadTime && this.state.shippedToArrivedSeaLeadTime != '0' && this.state.shippedToArrivedSeaLeadTime != ''}
+                                                    invalid={touched.shippedToArrivedSeaLeadTime && !!errors.shippedToArrivedSeaLeadTime}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    type="number"
+                                                    value={this.state.shippedToArrivedSeaLeadTime}
+                                                    placeholder={i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext')}
+                                                />
+                                                <FormFeedback className="red">{errors.shippedToArrivedSeaLeadTime}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="arrivedToDeliveredLeadTime">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    name="arrivedToDeliveredLeadTime"
+                                                    id="arrivedToDeliveredLeadTime"
+                                                    bsSize="sm"
+                                                    valid={!errors.arrivedToDeliveredLeadTime && this.state.arrivedToDeliveredLeadTime != '0' && this.state.arrivedToDeliveredLeadTime != ''}
+                                                    invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    type="number"
+                                                    value={this.state.arrivedToDeliveredLeadTime}
+                                                    placeholder={i18n.t('static.realmcountry.arrivedToDeliveredLeadTimetext')}
+                                                />
+                                                <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
+                                            </FormGroup>
 
-                                        <FormGroup className="col-md-12 mt-md-4">
-                                            {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)}  className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                            &nbsp;
+                                            <FormGroup className="col-md-12 mt-md-4">
+                                                {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
+                                                <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                &nbsp;
                                         </FormGroup>
-                </Row></Form>)} />
-                <h5 className="red">{this.state.rowErrorMessage}</h5>
+                                        </Row></Form>)} />
+                            <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>
@@ -809,8 +811,8 @@ class RealmCountry extends Component {
                                 </thead>
                                 <tbody>
                                     {
-                                        this.state.rows.length > 0  
-                                        &&  
+                                        this.state.rows.length > 0
+                                        &&
                                         this.state.rows.map((item, idx) =>
 
                                             <tr id="addr0" key={idx}>
@@ -842,10 +844,10 @@ class RealmCountry extends Component {
                                                 </td>
                                                 <td>
                                                     {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
-                                                    <div  className="forInlinebtnMapping">
-                                                    <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
+                                                    <div className="forInlinebtnMapping">
+                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
 
-                                                    <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                     </div>
                                                 </td>
                                             </tr>)
