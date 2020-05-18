@@ -30,6 +30,25 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 
 class DefaultLayout extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      businessFunctions: []
+    }
+  }
+
+  componentDidMount() {
+    var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
+    console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
+    var bfunction = [];
+    for (let i = 0; i < curUserBusinessFunctions.length; i++) {
+      bfunction.push(curUserBusinessFunctions[i].authority);
+    }
+    this.setState({ businessFunctions: bfunction });
+
+  }
+
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
     e.preventDefault();
@@ -55,6 +74,7 @@ class DefaultLayout extends Component {
 
   }
 
+
   render() {
     return (
       <div className="app">
@@ -67,13 +87,14 @@ class DefaultLayout extends Component {
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
-
             <Suspense>
 
               <Online>
+
                 <AppSidebarNav navConfig={{
                   items:
                     [
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationdashboard'),
                         url: '/ApplicationDashboard',
@@ -84,11 +105,13 @@ class DefaultLayout extends Component {
                       //   url: '/RealmDashboard',
                       //   icon: 'cui-dashboard icons',
                       // },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
                         icon: 'cui-dashboard icons',
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
@@ -105,6 +128,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
@@ -164,6 +188,7 @@ class DefaultLayout extends Component {
                           },
                         ]
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.realmlevelmaster'),
                         icon: 'fa fa-list',
@@ -220,6 +245,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programmaster'),
                         url: '/program',
@@ -347,7 +373,9 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-list',
                           }
                         ]
-                      }, {
+                      },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
                         children: [
@@ -394,11 +422,23 @@ class DefaultLayout extends Component {
                       //       name: "Supply Plan",
                       //       url: '/supplyPlan',
                       //       icon: 'fa fa-list-alt'
-                      , {
+                      //     }
+                      //   ]
+                      // },
+                      ,
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
                         name: 'Setup Program',
                         url: '/program/programOnboarding',
                         icon: 'icon-graph'
                       },
+                      // this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
+                        name: 'Pipeline Program Import',
+                        url: '/pipeline/pipelineProgramImport',
+                        icon: 'icon-graph'
+                      }
+
                     ]
 
                 }} {...this.props} />
