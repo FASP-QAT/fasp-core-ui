@@ -1043,7 +1043,7 @@ export default class StockStatusMatrix extends React.Component {
                           bsSize="sm"
                           onChange={this.getPlanningUnit}
                         >
-                          <option value="0">{i18n.t('static.common.all')}</option>
+                          <option value="0">{i18n.t('static.common.select')}</option>
                           {productCategoryList}
                         </Input>
 
@@ -1065,7 +1065,7 @@ export default class StockStatusMatrix extends React.Component {
                         >
                           {offlineProductCategoryList.length > 0
                             &&
-                            <option value="0">{i18n.t('static.common.all')}</option>}
+                            <option value="0">{i18n.t('static.common.select')}</option>}
                           {offlineProductCategoryList.length < 1
                             &&
                             <option value="0">{i18n.t('static.common.selectProgram')}</option>}
@@ -1097,7 +1097,7 @@ export default class StockStatusMatrix extends React.Component {
                         >
                           {offlinePlanningUnitList.length > 0
                             &&
-                            <option value="0">{i18n.t('static.common.all')}</option>}
+                            <option value="0">{i18n.t('static.common.select')}</option>}
                           {offlinePlanningUnitList.length < 1
                             &&
                             <option value="0">{i18n.t('static.common.selectProgram')}</option>}
@@ -1150,7 +1150,7 @@ export default class StockStatusMatrix extends React.Component {
                           bsSize="sm"
                         >
 
-                          <option value="0">{i18n.t('static.common.all')}</option>
+                          <option value="0">{i18n.t('static.common.select')}</option>
                           {planningUnitList}
                         </Input>
                         <InputGroupAddon addonType="append">
