@@ -67,7 +67,7 @@ export default class StockStatusMatrix extends React.Component {
       }
      
     filterData() {
-        let realmId = document.getElementById("realmId").value;
+        let realmId = AuthenticationService.getRealmId();
         let programId = document.getElementById("programId").value;
         let productCategoryId = document.getElementById("productCategoryId").value;
         let planningUnitId = document.getElementById("planningUnitId").value;
@@ -83,7 +83,7 @@ export default class StockStatusMatrix extends React.Component {
             }).catch(
                 error => {
                     this.setState({
-                        consumptions: []
+                      data: []
                     })
 
                     if (error.message === "Network Error") {
@@ -108,8 +108,9 @@ export default class StockStatusMatrix extends React.Component {
     }
 
     getProductCategories() {
+      let programId = document.getElementById("programId").value;
         AuthenticationService.setupAxiosInterceptors();
-        let programId = document.getElementById("programId").value;
+      
         ProductService.getProductCategoryListByProgram(programId)
             .then(response => {
                 console.log(JSON.stringify(response.data))
@@ -140,12 +141,11 @@ export default class StockStatusMatrix extends React.Component {
                 }
             );
             this.getPlanningUnit();
-            this.filterData();
+           
 
     }
     getPlanningUnit() {
         if (navigator.onLine) {
-          console.log('changed')
           AuthenticationService.setupAxiosInterceptors();
           let programId = document.getElementById("programId").value;
           let productCategoryId = document.getElementById("productCategoryId").value;
@@ -177,8 +177,7 @@ export default class StockStatusMatrix extends React.Component {
                   }
                 }
               }
-            );
-        } else {
+            ); } else {
           const lan = 'en';
           var db1;
           var storeOS;
@@ -225,7 +224,7 @@ export default class StockStatusMatrix extends React.Component {
     getPrograms() {
         if (navigator.onLine) {
           AuthenticationService.setupAxiosInterceptors();
-          let realmId = document.getElementById("realmId").value;
+          let realmId = AuthenticationService.getRealmId();
           ProgramService.getProgramByRealmId(realmId)
             .then(response => {
               console.log(JSON.stringify(response.data))
@@ -298,46 +297,14 @@ export default class StockStatusMatrix extends React.Component {
     
     
       }
-      componentDidUpdate(){
+   /*   componentDidUpdate(){
         setTimeout(() => this.setState({message:''}), 3000);
         }
-
+*/
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-
-                    this.setState({
-                        realms: response.data
-                    })
-                    this.getPrograms();
-
-                } else {
-                    this.setState({ message: response.data.messageCode })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
+        this.getPrograms();
     }
     exportCSV(columns){
 
@@ -412,15 +379,7 @@ export default class StockStatusMatrix extends React.Component {
     }
 
     render() {
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
+       
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
@@ -434,8 +393,8 @@ export default class StockStatusMatrix extends React.Component {
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.payload.productCategoryId}>
-                        {getLabelText(item.payload.label, this.state.lang)}
+                    <option key={i} value={item.productCategoryId}>
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -673,25 +632,7 @@ export default class StockStatusMatrix extends React.Component {
 
                           </FormGroup>
 
-                                <FormGroup className="col-md-3">
-                                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                    <div className="controls">
-                                        <InputGroup>
-                                            <Input
-                                                type="select"
-                                                name="realmId"
-                                                id="realmId"
-                                                bsSize="sm"
-                                                onChange={this.getPrograms}
-                                            >
-                                                {/* <option value="0">{i18n.t('static.common.all')}</option> */}
-
-                                                {realmList}
-                                            </Input>
-
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
+                               
                                 <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                             <div className="controls ">
@@ -782,11 +723,11 @@ export default class StockStatusMatrix extends React.Component {
                         >
                             {
                                 props => (
-                                    <div className="TableCust">
+                                   this.state.data.length>0 && <div className="TableCust">
                                            
                                         <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
                                       
-                                            <SearchBar {...props.searchProps} />
+ <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} /></div>
                                     
                                              <BootstrapTable className="stock-status-table" hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
