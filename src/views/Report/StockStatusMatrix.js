@@ -1221,7 +1221,7 @@ export default class StockStatusMatrix extends React.Component {
                         >
                           {offlineProductCategoryList.length > 0
                             &&
-                            <option value="0">{i18n.t('static.common.all')}</option>}
+                            <option value="0">{i18n.t('static.common.selectProductCategory')}</option>}
                           {offlineProductCategoryList.length < 1
                             &&
                             <option value="0">{i18n.t('static.common.selectProgram')}</option>}
@@ -1253,7 +1253,7 @@ export default class StockStatusMatrix extends React.Component {
                         >
                           {offlinePlanningUnitList.length > 0
                             &&
-                            <option value="0">{i18n.t('static.common.all')}</option>}
+                            <option value="0">{i18n.t('static.common.selectPlanningUnit')}</option>}
                           {offlinePlanningUnitList.length < 1
                             &&
                             <option value="0">{i18n.t('static.common.selectProgram')}</option>}

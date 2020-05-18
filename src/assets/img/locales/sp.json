@@ -177,6 +177,8 @@
     "static.common.all": "Todas",
     "static.realm.yes": "si",
     "static.realm.no": "No",
+    "static.common.selectPlanningUnit": "Por favor seleccione la unidad de planificación",
+    "static.common.selectProductCategory": "Por favor seleccione categoría de producto",
     "static.region.glnvalue": "GLN No debe tener 13 dígitos."
 
 }
