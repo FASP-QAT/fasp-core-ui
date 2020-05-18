@@ -1967,7 +1967,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
 
-                                        <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
+                                        {/* <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
                                             <td>PSM Shipments from ARTMIS</td>
                                             {
                                                 this.state.artmisShipmentsTotalData.map(item1 => {
@@ -1991,7 +1991,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 })
                                             }
-                                        </tr>
+                                        </tr> */}
 
                                         <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
                                             <td>Adjustments</td>
