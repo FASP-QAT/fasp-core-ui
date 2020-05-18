@@ -271,6 +271,7 @@ class ListBudgetComponent extends Component {
 
 
           var cell1 = row.budgetAmt - row.usedAmt
+          var currencyCode = row.currency.currencyCode;
           cell1 += '';
           var x = cell1.split('.');
           var x1 = x[0];
@@ -279,7 +280,7 @@ class ListBudgetComponent extends Component {
           while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
           }
-          return x1 + x2;
+          return currencyCode+" "+x1 + x2;
         }
       }
       ,

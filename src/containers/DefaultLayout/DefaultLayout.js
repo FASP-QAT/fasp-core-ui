@@ -403,6 +403,11 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-exchange'
                           },
                           {
+                            name: i18n.t('static.dashboard.stockstatusovertime'),
+                            url: '/report/stockStatusOverTime',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
                             icon: 'fa fa-exchange'

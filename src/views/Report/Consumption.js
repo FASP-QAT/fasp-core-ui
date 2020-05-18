@@ -488,10 +488,12 @@ class Consumption extends Component {
 
   }
   getPlanningUnit() {
+    alert('changed')
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
-      ProgramService.getProgramPlaningUnitListByProgramId(programId).then(response => {
+      let productCategoryId = document.getElementById("productCategoryId").value;
+      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
         console.log('**' + JSON.stringify(response.data))
         this.setState({
           planningUnits: response.data,
@@ -880,7 +882,6 @@ class Consumption extends Component {
                                   <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                 </Picker>
                               </div>
-
                             </FormGroup>
                             <Online>
                               <FormGroup className="col-sm-3">
