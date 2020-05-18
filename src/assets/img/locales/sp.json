@@ -168,5 +168,14 @@
     "static.dashboard.report": "Informes",
     "static.dashboard.consumption": "Consumo",
     "static.dashboard.stockstatusmatrix": "Matriz de estado de stock",
-    "static.message.syncExpiresOn": "Ha excedido el número máximo de días que puede trabajar sin conexión. Conéctese en línea para continuar usando QAT."
+    "static.message.syncExpiresOn": "Ha excedido el número máximo de días que puede trabajar sin conexión. Conéctese en línea para continuar usando QAT.",
+    "static.common.year": "Año",
+    "static.common.display": "Monitor",
+    "static.common.monthly": "Mensual",
+    "static.common.quarterly": "Trimestral",
+    "static.common.selectProgram": "Por favor seleccione el programa",
+    "static.common.all": "Todas",
+    "static.realm.yes": "si",
+    "static.realm.no": "No",
+    "static.region.glnvalue": "GLN No debe tener dígitos"
 }

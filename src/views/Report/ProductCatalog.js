@@ -28,21 +28,40 @@ export default class ProductCatalog extends React.Component {
             data: [],
             tracerCategories: [],
             planningUnits: [],
+            selSource: [],
+
 
         }
         this.filterData = this.filterData.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.callFunction = this.callFunction.bind(this);
     }
+
+    callFunction() {
+
+        this.setState({
+            data: this.state.selSource
+        },
+            () => {
+                this.filterData();
+            });
+    }
+
     filterDataForRealm() {
-        let realmId = document.getElementById("realmId").value;
+        console.log("IN filterDataForRealm-----------------------------------");
+        // let realmId = document.getElementById("realmId").value;
+
+        let realmId = AuthenticationService.getRealmId();
+
         AuthenticationService.setupAxiosInterceptors();
         ProcurementUnitService.getProcurementUnitByRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
-                    console.log(JSON.stringify(response.data))
+                    console.log("JSON----->", JSON.stringify(response.data))
                     this.setState({
-                        data: response.data
+                        data: response.data,
+                        selSource: response.data
                     })
                 } else {
                     this.setState({ message: response.data.messageCode })
@@ -71,25 +90,30 @@ export default class ProductCatalog extends React.Component {
     }
 
     filterData() {
+
         let planningUnitId = document.getElementById("planningUnitId").value;
         let tracerCategoryId = document.getElementById("tracerCategoryId").value;
 
         if (planningUnitId != 0 && tracerCategoryId != 0) {
+            console.log("1");
             const data = this.state.data.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tracerCategoryId && c.planningUnit.planningUnitId == planningUnitId)
             this.setState({
                 data
             });
         } else if (planningUnitId != 0) {
+            console.log("2");
             const data = this.state.data.filter(c => c.planningUnit.planningUnitId == planningUnitId)
             this.setState({
                 data
             });
         } else if (tracerCategoryId != 0) {
+            console.log("3");
             const data = this.state.data.filter(c => c.planningUnit.forecastingUnit.tracerCategory.id == tracerCategoryId)
             this.setState({
                 data
             });
-        } else {
+        }
+        else {
             this.filterDataForRealm();
         }
 
@@ -97,38 +121,10 @@ export default class ProductCatalog extends React.Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        RealmService.getRealmListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        realms: response.data
+        this.filterDataForRealm();
 
-                    }); this.filterDataForRealm()
-                } else {
-                    this.setState({ message: response.data.messageCode })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-
-        TracerCategoryService.getTracerCategoryListAll()
+        let realmId = AuthenticationService.getRealmId();
+        TracerCategoryService.getTracerCategoryByRealmId(realmId)
             .then(response => {
                 this.setState({
                     tracerCategories: response.data
@@ -154,7 +150,7 @@ export default class ProductCatalog extends React.Component {
                 }
             );
 
-        PlanningUnitService.getAllPlanningUnitList().then(response => {
+        PlanningUnitService.getPlanningUnitByRealmId(realmId).then(response => {
             console.log(response.data)
             this.setState({
                 planningUnits: response.data,
@@ -214,12 +210,12 @@ export default class ProductCatalog extends React.Component {
 
     exportPDF = (columns) => {
         const unit = "pt";
-        const size = "A1"; // Use A1, A2, A3 or A4
+        const size = "A4"; // Use A1, A2, A3 or A4
         const orientation = "landscape"; // portrait or landscape
 
         const marginLeft = 10;
-        const doc = new jsPDF(orientation, unit, size);
-
+        const doc = new jsPDF(orientation, unit, size,true);
+    
         doc.setFontSize(15);
 
         const title = "Product Catalog";
@@ -258,15 +254,6 @@ export default class ProductCatalog extends React.Component {
 
 
     render() {
-        const { realms } = this.state;
-        let realmList = realms.length > 0
-            && realms.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
 
         const { tracerCategories } = this.state;
         let tracercategoryList = tracerCategories.length > 0
@@ -444,9 +431,9 @@ export default class ProductCatalog extends React.Component {
                     </CardHeader>
                     <CardBody className="pb-lg-0">
                         <Form >
-                            <Col md="9 pl-0">
+                            <Col md="6 pl-0">
                                 <div className="d-md-flex Selectdiv2">
-                                    <FormGroup>
+                                    {/* <FormGroup>
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                         <div className="controls SelectGo">
                                             <InputGroup>
@@ -463,8 +450,8 @@ export default class ProductCatalog extends React.Component {
                                                 </InputGroupAddon>
                                             </InputGroup>
                                         </div>
-                                    </FormGroup>
-                                    &nbsp;
+                                    </FormGroup> */}
+                                    {/* &nbsp; */}
                                     <FormGroup className="tab-ml-1">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                         <div className="controls SelectGo">
@@ -474,6 +461,7 @@ export default class ProductCatalog extends React.Component {
                                                     name="planningUnitId"
                                                     id="planningUnitId"
                                                     bsSize="sm"
+                                                    onChange={this.callFunction}
                                                 >
                                                     <option value="0">{i18n.t('static.common.all')}</option>
                                                     {planningUnitList}
@@ -491,13 +479,12 @@ export default class ProductCatalog extends React.Component {
                                                     name="tracerCategoryId"
                                                     id="tracerCategoryId"
                                                     bsSize="sm"
+                                                    onChange={this.callFunction}
+                                                // onChange={this.filterData}
                                                 >
                                                     <option value="0">{i18n.t('static.common.all')}</option>
                                                     {tracercategoryList}
                                                 </Input>
-                                                <InputGroupAddon addonType="append">
-                                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                                </InputGroupAddon>
                                             </InputGroup>
                                         </div>
                                     </FormGroup>

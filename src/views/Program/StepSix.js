@@ -52,8 +52,8 @@ const validationSchemaSix = function (values) {
             .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
         // healthAreaId: Yup.string()
         //     .required(i18n.t('static.program.validhealthareatext')),
-        programNotes: Yup.string()
-            .required(i18n.t('static.program.validnotestext')),
+        // programNotes: Yup.string()
+        //     .required(i18n.t('static.program.validnotestext')),
 
     })
 }
@@ -104,7 +104,7 @@ export default class StepSix extends Component {
             monthsInFutureForAmc: true,
             monthsInPastForAmc: true,
             // healthAreaId: true,
-            programNotes: true,
+            // programNotes: true,
 
         }
         )
@@ -182,7 +182,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.programName}
+                                            valid={!errors.programName && this.props.items.program.label.label_en != ''}
                                             invalid={touched.programName && !!errors.programName}
                                             type="text" name="programName"
                                             bsSize="sm"
@@ -195,7 +195,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.userId}
+                                            valid={!errors.userId && this.props.items.program.programManager.userId != ''}
                                             invalid={touched.userId && !!errors.userId}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -206,10 +206,10 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.userId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="select">{i18n.t('static.program.notes')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.programNotes}
+                                            valid={!errors.programNotes && this.props.items.program.programNotes != ''}
                                             invalid={touched.programNotes && !!errors.programNotes}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -220,7 +220,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.airFreightPerc}
+                                            valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
                                             invalid={touched.airFreightPerc && !!errors.airFreightPerc}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -233,7 +233,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.seaFreightPerc}
+                                            valid={!errors.seaFreightPerc && this.props.items.program.seaFreightPerc != ''}
                                             invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -246,7 +246,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.plannedToDraftLeadTime}
+                                            valid={!errors.plannedToDraftLeadTime && this.props.items.program.plannedToDraftLeadTime != ''}
                                             invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -259,7 +259,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.draftToSubmittedLeadTime}
+                                            valid={!errors.draftToSubmittedLeadTime && this.props.items.program.draftToSubmittedLeadTime != ''}
                                             invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -272,7 +272,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.submittedToApprovedLeadTime}
+                                            valid={!errors.submittedToApprovedLeadTime && this.props.items.program.submittedToApprovedLeadTime != ''}
                                             invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -285,7 +285,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.approvedToShippedLeadTime}
+                                            valid={!errors.approvedToShippedLeadTime && this.props.items.program.approvedToShippedLeadTime != ''}
                                             invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -298,7 +298,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.deliveredToReceivedLeadTime}
+                                            valid={!errors.deliveredToReceivedLeadTime && this.props.items.program.deliveredToReceivedLeadTime != ''}
                                             invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -311,7 +311,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.monthsInPastForAmc}
+                                            valid={!errors.monthsInPastForAmc && this.props.items.program.monthsInPastForAmc != ''}
                                             invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -324,7 +324,7 @@ export default class StepSix extends Component {
                                         <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
-                                            valid={!errors.monthsInFutureForAmc}
+                                            valid={!errors.monthsInFutureForAmc && this.props.items.program.monthsInFutureForAmc != ''}
                                             invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
@@ -334,9 +334,10 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
-                                        <Button color="info" size="md" className="float-right mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                  <Button color="info" size="md" className="float-right mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.previousToStepFive} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                         <Button color="info" size="md" className="float-left mr-1" type="submit" name="regionSub" id="regionSub" onClick={() => this.touchAllSix(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        
                                     </FormGroup>
                                 </Row>
                             </Form>

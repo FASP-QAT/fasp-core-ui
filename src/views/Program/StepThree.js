@@ -131,7 +131,7 @@ export default class StepThree extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.healthAreaId}
+                                            valid={!errors.healthAreaId && this.props.items.program.healthArea.id != ''}
                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
                                             onBlur={handleBlur}
                                             bsSize="sm"
@@ -147,9 +147,10 @@ export default class StepThree extends Component {
                                         <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-right mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepTwo} ><i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="healthAreaSub" id="healthAreaSub" onClick={() => this.touchAllThree(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
                                 </Form>
