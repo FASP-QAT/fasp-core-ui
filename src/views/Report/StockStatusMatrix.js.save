@@ -51,7 +51,65 @@ export default class StockStatusMatrix extends React.Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit=this.getPlanningUnit.bind(this);
+    
+    }
+    show() {
+        /* if (!this.state.showed) {
+             setTimeout(() => {this.state.closeable = true}, 250)
+             this.setState({ showed: true })
+         }*/
+      }
+      handleRangeChange(value, text, listIndex) {
+        //
+      }
+      handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
+    
+      }
+    
+      _handleClickRangeBox(e) {
+        this.refs.pickRange.show()
+      }
+     
+    filterData() {
+        let realmId = AuthenticationService.getRealmId();
+        let programId = document.getElementById("programId").value;
+        let productCategoryId = document.getElementById("productCategoryId").value;
+        let planningUnitId = document.getElementById("planningUnitId").value;
+        let view = document.getElementById("view").value;
+        AuthenticationService.setupAxiosInterceptors();
+        ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId,view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate())
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    data: response.data,
+                    view:view
+                })
+            }).catch(
+                error => {
+                    this.setState({
+                      data: []
+                    })
+
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+>>>>>>> stock status over time
 
   }
   show() {
@@ -68,12 +126,12 @@ export default class StockStatusMatrix extends React.Component {
     this.filterData();
   }
 
+<<<<<<< HEAD
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
   }
 
   filterData() {
-    console.log('In filter data')
     let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
     let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
     let programId = document.getElementById("programId").value;
@@ -81,7 +139,7 @@ export default class StockStatusMatrix extends React.Component {
     let planningUnitId = document.getElementById("planningUnitId").value;
     let view = document.getElementById("view").value;
     if (navigator.onLine) {
-      let realmId = AuthenticationService.getRealmId();
+      let realmId = document.getElementById("realmId").value;
       AuthenticationService.setupAxiosInterceptors();
       ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId, view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
         .then(response => {
@@ -92,6 +150,52 @@ export default class StockStatusMatrix extends React.Component {
           })
         }).catch(
           error => {
+=======
+    getProductCategories() {
+      let programId = document.getElementById("programId").value;
+        AuthenticationService.setupAxiosInterceptors();
+      
+        ProductService.getProductCategoryListByProgram(programId)
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    productCategories: response.data
+                })
+            }).catch(
+                error => {
+                    this.setState({
+                        productCategories: []
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+            this.getPlanningUnit();
+           
+
+    }
+    getPlanningUnit() {
+        if (navigator.onLine) {
+          AuthenticationService.setupAxiosInterceptors();
+          let programId = document.getElementById("programId").value;
+          let productCategoryId = document.getElementById("productCategoryId").value;
+          ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
+            console.log('**' + JSON.stringify(response.data))
+>>>>>>> stock status over time
             this.setState({
               consumptions: []
             })
@@ -111,6 +215,7 @@ export default class StockStatusMatrix extends React.Component {
                   this.setState({ message: 'static.unkownError' });
                   break;
               }
+<<<<<<< HEAD
             }
           }
         );
@@ -205,6 +310,36 @@ export default class StockStatusMatrix extends React.Component {
                   }
                   if (month == "12" || month == 12) {
                     dec = dec + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
+=======
+            ); } else {
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open('fasp', 1);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+              // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+              var myResult = [];
+              myResult = planningunitRequest.result;
+              console.log("myResult", myResult);
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              console.log('programId----->>>', programId)
+              console.log(myResult);
+              var proList = []
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+                  var productJson = {
+                    name: getLabelText(myResult[i].planningUnit.label, lan),
+                    id: myResult[i].planningUnit.id
+>>>>>>> stock status over time
                   }
                 }
               }
@@ -281,6 +416,7 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this)
 
       }
+<<<<<<< HEAD
     }
   }
 
@@ -314,6 +450,41 @@ export default class StockStatusMatrix extends React.Component {
                 default:
                   this.setState({ message: 'static.unkownError' });
                   break;
+=======
+    
+
+    getPrograms() {
+        if (navigator.onLine) {
+          AuthenticationService.setupAxiosInterceptors();
+          let realmId = AuthenticationService.getRealmId();
+          ProgramService.getProgramByRealmId(realmId)
+            .then(response => {
+              console.log(JSON.stringify(response.data))
+              this.setState({
+                programs: response.data
+              })
+            }).catch(
+              error => {
+                this.setState({
+                  programs: []
+                })
+                if (error.message === "Network Error") {
+                  this.setState({ message: error.message });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                      break;
+                    default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+                  }
+                }
+>>>>>>> stock status over time
               }
             }
           }
@@ -363,22 +534,28 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
     }
     this.getPlanningUnit();
-   
+    this.filterData();
 
   }
   getPlanningUnit() {
+    let programId = document.getElementById("programId").value;
     if (navigator.onLine) {
+      console.log('changed')
       AuthenticationService.setupAxiosInterceptors();
-      let programId = document.getElementById("programId").value;
       let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
+      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
         console.log('**' + JSON.stringify(response.data))
-        this.setState({  planningUnits: response.data});
+        this.setState({
+          planningUnits: response.data,
+        })
       })
         .catch(
           error => {
+            this.setState({
+              planningUnits: [],
+            })
             if (error.message === "Network Error") {
-              this.setState({ message: error.message , planningUnits: []});
+              this.setState({ message: error.message });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -386,10 +563,10 @@ export default class StockStatusMatrix extends React.Component {
                 case 404:
                 case 406:
                 case 412:
-                  this.setState({ message: error.response.data.messageCode, planningUnits: [] });
+                  this.setState({ message: error.response.data.messageCode });
                   break;
                 default:
-                  this.setState({ message: 'static.unkownError', planningUnits: [] });
+                  this.setState({ message: 'static.unkownError' });
                   break;
               }
             }
@@ -431,14 +608,14 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
 
     }
-    
+    this.filterData();
   }
 
 
   getPrograms() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
+      let realmId = document.getElementById("realmId").value;
       ProgramService.getProgramByRealmId(realmId)
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -506,6 +683,7 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this);
 
       }
+<<<<<<< HEAD
 
 
     }
@@ -520,9 +698,39 @@ export default class StockStatusMatrix extends React.Component {
   componentDidMount() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
+      RealmService.getRealmListAll()
+        .then(response => {
+          if (response.status == 200) {
+
+            this.setState({
+              realms: response.data
+            })
             this.getPrograms();
 
-     } else {
+          } else {
+            this.setState({ message: response.data.messageCode })
+          }
+        }).catch(
+          error => {
+            if (error.message === "Network Error") {
+              this.setState({ message: error.message });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: error.response.data.messageCode });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
+            }
+          }
+        );
+    } else {
       const lan = 'en';
       var db1;
       getDatabase();
@@ -561,6 +769,16 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this);
 
       }.bind(this);
+=======
+   /*   componentDidUpdate(){
+        setTimeout(() => this.setState({message:''}), 3000);
+        }
+*/
+
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        this.getPrograms();
+>>>>>>> stock status over time
     }
   }
   exportCSV(columns) {
@@ -636,6 +854,7 @@ export default class StockStatusMatrix extends React.Component {
         , ele.Dec]);
     }
 
+<<<<<<< HEAD
     console.log(data1);
     let content = {
       startY: 50,
@@ -654,7 +873,15 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   render() {
-    
+    const { realms } = this.state;
+    let realmList = realms.length > 0
+      && realms.map((item, i) => {
+        return (
+          <option key={i} value={item.realmId}>
+            {getLabelText(item.label, this.state.lang)}
+          </option>
+        )
+      }, this);
 
     const { offlinePrograms } = this.state;
     const { offlineProductCategoryList } = this.state;
@@ -662,6 +889,12 @@ export default class StockStatusMatrix extends React.Component {
 
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
+=======
+    render() {
+       
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0
+>>>>>>> stock status over time
       && planningUnits.map((item, i) => {
         return (
           <option key={i} value={item.planningUnit.id}>
@@ -669,12 +902,13 @@ export default class StockStatusMatrix extends React.Component {
           </option>
         )
       }, this);
+<<<<<<< HEAD
     const { productCategories } = this.state;
     let productCategoryList = productCategories.length > 0
       && productCategories.map((item, i) => {
         return (
-          <option key={i} value={item.productCategoryId}>
-            {getLabelText(item.label, this.state.lang)}
+          <option key={i} value={item.payload.productCategoryId}>
+            {getLabelText(item.payload.label, this.state.lang)}
           </option>
         )
       }, this);
@@ -683,6 +917,35 @@ export default class StockStatusMatrix extends React.Component {
       from: 'From', to: 'To',
     }
     const { rangeValue } = this.state
+=======
+        const { productCategories } = this.state;
+        let productCategoryList = productCategories.length > 0
+            && productCategories.map((item, i) => {
+                return (
+                    <option key={i} value={item.productCategoryId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+            const pickerLang = {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                from: 'From', to: 'To',
+              }
+              const { rangeValue } = this.state
+          
+              const makeText = m => {
+                if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+                return '?'
+              }
+          
+          
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
+>>>>>>> stock status over time
 
     const makeText = m => {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -1077,6 +1340,27 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
                 <Online>
                   <FormGroup className="col-md-3">
+                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                    <div className="controls">
+                      <InputGroup>
+                        <Input
+                          type="select"
+                          name="realmId"
+                          id="realmId"
+                          bsSize="sm"
+                          onChange={this.getPrograms}
+                        >
+                          {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+
+                          {realmList}
+                        </Input>
+
+                      </InputGroup>
+                    </div>
+                  </FormGroup>
+                </Online>
+                <Online>
+                  <FormGroup className="col-md-3">
                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                     <div className="controls ">
                       <InputGroup>
@@ -1228,6 +1512,7 @@ export default class StockStatusMatrix extends React.Component {
 
                       </Input>
 
+<<<<<<< HEAD
                     </InputGroup>
                   </div>
                 </FormGroup>
@@ -1289,4 +1574,153 @@ export default class StockStatusMatrix extends React.Component {
 
       </div>)
   }
+=======
+            <div className="animated">
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
+                    <CardHeader className="pb-1">
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
+                        {  this.state.data.length > 0 &&<div className="card-header-actions">
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
+                        </div>}
+                    </CardHeader>
+                    <CardBody className="pb-md-3">
+                        <Col md="12 pl-0">
+                            <div className="row">
+                            <FormGroup className="col-md-3" title="click here to select period">
+                            <Label htmlFor="appendedInputButton">Select Period <span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                            <div className="controls edit">
+
+                              <Picker
+                                ref="pickRange"
+                                years={{ min: 2013 }}
+                                value={rangeValue}
+                                lang={pickerLang}
+                                //theme="light"
+                                onChange={this.handleRangeChange}
+                                onDismiss={this.handleRangeDissmis}
+                              >
+                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                              </Picker>
+                            </div>
+
+                          </FormGroup>
+
+                               
+                                <FormGroup className="col-md-3">
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                            <div className="controls ">
+                              <InputGroup>
+                                <Input
+                                  type="select"
+                                  name="programId"
+                                  id="programId"
+                                  bsSize="sm"
+                                  onChange={this.getProductCategories}
+
+                                >
+                                  <option value="0">{i18n.t('static.common.select')}</option>
+                                  {programList}
+                                </Input>
+
+                              </InputGroup>
+                            </div>
+                          </FormGroup>
+                                    <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                    <div className="controls ">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.getPlanningUnit}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {productCategoryList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                </div>
+                                <div className="row">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="view"
+                                                id="view"
+                                                bsSize="sm"
+                                            >
+                                                <option value="1">{i18n.t('static.common.monthly')}</option>
+                                                <option value="2">{i18n.t('static.common.quarterly')}</option>
+                                               
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="planningUnitId"
+                                                id="planningUnitId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {planningUnitList}
+                                            </Input>
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+                        </Col>
+
+                        <ToolkitProvider
+                            keyField="procurementUnitId"
+                            data={this.state.data}
+                            columns={this.state.view==1?columns:columns1}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                           
+                        >
+                            {
+                                props => (
+                                   this.state.data.length>0 && <div className="TableCust">
+                                           
+                                        <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
+                                      
+ <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} /></div>
+                                    
+                                             <BootstrapTable className="stock-status-table" hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                            pagination={paginationFactory(options)}
+
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
+
+                    </CardBody>
+                </Card>
+
+
+            </div>)
+    }
+>>>>>>> stock status over time
 }
