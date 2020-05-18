@@ -76,6 +76,7 @@ export default class AddPlanningUnit extends Component {
                 forecastingUnit: {
                     forecastingUnitId: ''
                 },
+                multiplier: ''
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
@@ -221,9 +222,10 @@ export default class AddPlanningUnit extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='planningUnitForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='planningUnitForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
@@ -232,7 +234,7 @@ export default class AddPlanningUnit extends Component {
                                                             name="forecastingUnitId"
                                                             id="forecastingUnitId"
                                                             bsSize="sm"
-                                                            valid={!errors.forecastingUnitId}
+                                                            valid={!errors.forecastingUnitId && this.state.planningUnit.forecastingUnit.forecastingUnitId != ''}
                                                             invalid={touched.forecastingUnitId && !!errors.forecastingUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -251,7 +253,7 @@ export default class AddPlanningUnit extends Component {
                                                             name="unitId"
                                                             id="unitId"
                                                             bsSize="sm"
-                                                            valid={!errors.unitId}
+                                                            valid={!errors.unitId && this.state.planningUnit.unit.id != ''}
                                                             invalid={touched.unitId && !!errors.unitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -268,7 +270,7 @@ export default class AddPlanningUnit extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.planningUnit.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -282,7 +284,7 @@ export default class AddPlanningUnit extends Component {
                                                             name="multiplier"
                                                             id="multiplier"
                                                             bsSize="sm"
-                                                            valid={!errors.multiplier}
+                                                            valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
                                                             invalid={touched.multiplier && !!errors.multiplier}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
@@ -295,8 +297,8 @@ export default class AddPlanningUnit extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 

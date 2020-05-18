@@ -58,6 +58,7 @@ class AddTracerCategoryComponent extends Component {
             realms: [],
             tracerCategory: {
                 realm: {
+                    id: '',
                     label: {
                         label_en: '',
                         label_fr: '',
@@ -199,9 +200,10 @@ class AddTracerCategoryComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='tracerCategoryForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span className="red Reqasterisk">*</span></Label>
@@ -212,7 +214,7 @@ class AddTracerCategoryComponent extends Component {
                                                             bsSize="sm"
                                                             name="realmId"
                                                             id="realmId"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.tracerCategory.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -233,7 +235,7 @@ class AddTracerCategoryComponent extends Component {
                                                             bsSize="sm"
                                                             name="tracerCategoryName"
                                                             id="tracerCategoryName"
-                                                            valid={!errors.tracerCategoryName}
+                                                            valid={!errors.tracerCategoryName && this.state.tracerCategory.label.label_en != ''}
                                                             invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -248,7 +250,7 @@ class AddTracerCategoryComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
