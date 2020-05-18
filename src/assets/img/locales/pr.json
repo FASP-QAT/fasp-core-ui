@@ -143,7 +143,8 @@
     "static.common.all": "Todos",
     "static.realm.yes": "sim",
     "static.realm.no": "Não",
-    "static.region.glnvalue": "GLN Não deve ter dígitos",
     "static.common.selectPlanningUnit": "Selecione a unidade de planejamento",
-    "static.common.selectProductCategory": "Selecione a categoria do produto"
+    "static.common.selectProductCategory": "Selecione a categoria do produto",
+    "static.region.glnvalue": "GLN Não deve ter 13 dígitos."
+
 }
