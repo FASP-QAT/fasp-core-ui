@@ -91,5 +91,11 @@ class ProgramService {
         return axios.post(`${API_URL}/api/program/initialize/`, json, {}
         );
     }
+
+    pipelineProgramDataImport() {
+        return axios.post(`${API_URL}/api/pipeline/programsetup`, {}
+        );
+    }
+
 }
 export default new ProgramService()

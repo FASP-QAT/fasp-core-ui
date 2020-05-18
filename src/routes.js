@@ -190,9 +190,13 @@ const AddShipment = React.lazy(() => import('./views/Shipment/AddShipment'));
 const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboarding'));
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentList'));
 const EditShipment = React.lazy(() => import('./views/Shipment/EditShipment'));
+const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
+const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineProgramSetup'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  { path: '/pipeline/pieplineProgramSetup', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
+  { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
