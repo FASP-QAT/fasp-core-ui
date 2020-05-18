@@ -215,7 +215,7 @@ class Consumption extends Component {
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(18)
         doc.setPage(i)
-        doc.addImage(LOGO,'png',0,10, 200, 50,'FAST');
+        doc.addImage(LOGO,'png',0,10, 180, 50,'FAST');
         /*doc.addImage(data, 10, 30, {
           align: 'justify'
         });*/
@@ -229,7 +229,7 @@ class Consumption extends Component {
             align: 'left'
           })
          
-          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
         }
@@ -671,12 +671,14 @@ const  backgroundColor= [
                 </div>
               </CardHeader>
               <CardBody>
-                <div className="TableCust" >
-                  <div > <div ref={ref}> <div >
+                <div className="" >
+                  <div className="container" > 
+                    <div ref={ref}> 
+                    <div className="col-md-12">
                   <Form >
                       <Col>
                         <div className="row">
-                          <FormGroup className="col-md-3">
+                          <FormGroup className="col-sm-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                             <div className="controls edit">
 
@@ -695,19 +697,23 @@ const  backgroundColor= [
 
                           </FormGroup>
  
-                            <FormGroup className="col-md-3">
+                            <FormGroup className="col-sm-3">
                             <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                                                        <ReactMultiSelectCheckboxes
-                                                            bsSize="md"
-                                                            name="countrysId"
-                                                            id="countrysId"
-                                                            onChange={(e) => { this.handleChange(e) }}
-                                                            options={countryList}
-                                                           />
-                                                        {!!this.props.error &&
-                                                            this.props.touched && (
-                                                                <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                            )}</FormGroup>
+                            <InputGroup>
+                                  <ReactMultiSelectCheckboxes
+                                       
+                                         bsSize="sm"
+                                         name="countrysId"
+                                        id="countrysId"
+                                        onChange={(e) => { this.handleChange(e) }}
+                                         options={countryList}
+                                   />
+                                         {!!this.props.error &&
+                                             this.props.touched && (
+                                         <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                            )}
+                                                            </InputGroup>
+                            </FormGroup>
                          
                             <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
@@ -730,7 +736,8 @@ const  backgroundColor= [
                                         )
                                       }, this)}
                                   </Input>
-                                </InputGroup></div>
+                                </InputGroup>
+                                </div>
 
                             </FormGroup>
                             <FormGroup className="col-md-3">
@@ -747,25 +754,33 @@ const  backgroundColor= [
                                     <option value="0">{i18n.t('static.common.select')}</option>
                                     {planningUnitList}
                                   </Input>
-                                  <InputGroupAddon addonType="append">
+                                  {/* <InputGroupAddon addonType="append">
                                     <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon>
+                                  </InputGroupAddon> */}
                                 </InputGroup>
                               </div>
                             </FormGroup>
                         </div>
                       </Col>
                     </Form>
+                    <div className="row">
+                      <div className="col-md-12">
                     {
                         this.state.consumptions.countryData.length > 0
                         &&
-                    
+                    <div className="col-md-9">
                     <div className="chart-wrapper chart-graph">
                       <Bar  id="cool-canvas" data={bar} options={options} />
+                    </div>
                     </div> }
-                  </div></div>
+                    </div>
+                    </div>
 
-                  </div></div>
+                  </div>
+                  </div>
+
+                  </div>
+                  </div>
               </CardBody>
             </Card>
           </Col>
