@@ -1053,898 +1053,897 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
-}
 
-dropdownFilter = function (instance, cell, c, r, source) {
-    var mylist = [];
-    var value = (instance.jexcel.getJson()[r])[c - 1];
-    console.log(this.state.budgetList);
-    var bList = (this.state.budgetList).filter(c => c.fundingSource.fundingSourceId == value);
-    return bList;
-}
-
-consumptionChanged = function (instance, cell, x, y, value) {
-    var elInstance = this.state.consumptionEl;
-    if (x == 2) {
-        var col = ("C").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
+    dropdownFilter = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var value = (instance.jexcel.getJson()[r])[c - 1];
+        console.log(this.state.budgetList);
+        var bList = (this.state.budgetList).filter(c => c.fundingSource.fundingSourceId == value);
+        return bList;
     }
-    if (x == 3) {
-        var col = ("D").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            if (isNaN(Number.parseInt(value))) {
+
+    consumptionChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.consumptionEl;
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "In valid number.");
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-        }
-    }
-    if (x == 4) {
-        var col = ("E").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            if (isNaN(Number.parseInt(value))) {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "In valid number.");
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-        }
-    }
-    this.setState({
-        consumptionChangedFlag: 1
-    })
-
-}
-
-inventoryChanged = function (instance, cell, x, y, value) {
-    var elInstance = this.state.inventoryEl;
-    if (x == 2) {
-        var col = ("C").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-    }
-    if (x == 7) {
-        var col = ("H").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            if (isNaN(parseInt(value))) {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "In valid number.");
+                elInstance.setComments(col, "This field is required.");
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
             }
         }
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+        }
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+        }
+        this.setState({
+            consumptionChangedFlag: 1
+        })
+
     }
 
-    if (x == 9) {
-        if (elInstance.getValueFromCoords(9, y) != "") {
-            if (isNaN(parseInt(value))) {
+    inventoryChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.inventoryEl;
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        if (x == 7) {
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(parseInt(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+        if (x == 9) {
+            if (elInstance.getValueFromCoords(9, y) != "") {
+                if (isNaN(parseInt(value))) {
+                    var col = ("J").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    var col = ("J").concat(parseInt(y) + 1);
+                    var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
+                    elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else {
                 var col = ("J").concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "In valid number.");
-            } else {
-                var col = ("J").concat(parseInt(y) + 1);
+                elInstance.setComments(col, "");
+            }
+        }
+        if (x == 5) {
+            if (elInstance.getValueFromCoords(9, y) != "") {
                 var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
                 elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
+            }
+        }
+
+        this.setState({
+            inventoryChangedFlag: 1
+        })
+    }
+
+    inventoryOnedit = function (instance, cell, x, y, value) {
+        var elInstance = this.state.inventoryEl;
+        if (x == 7) {
+            elInstance.setValueFromCoords(9, y, "", true);
+        }
+    }.bind(this);
+
+    suggestedShipmentChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.suggestedShipmentsEl;
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
             }
-        } else {
-            var col = ("J").concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-    }
-    if (x == 5) {
-        if (elInstance.getValueFromCoords(9, y) != "") {
-            var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
-            elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
-        }
-    }
-
-    this.setState({
-        inventoryChangedFlag: 1
-    })
-}
-
-inventoryOnedit = function (instance, cell, x, y, value) {
-    var elInstance = this.state.inventoryEl;
-    if (x == 7) {
-        elInstance.setValueFromCoords(9, y, "", true);
-    }
-}.bind(this);
-
-suggestedShipmentChanged = function (instance, cell, x, y, value) {
-    var elInstance = this.state.suggestedShipmentsEl;
-    if (x == 5) {
-        var col = ("F").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-    }
-
-    if (x == 6) {
-        var col = ("G").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-    }
-
-    if (x == 7) {
-        var col = ("H").concat(parseInt(y) + 1);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-    }
-
-    this.setState({
-        suggestedShipmentChangedFlag: 1
-    })
-}
-
-checkValidationConsumption() {
-    var valid = true;
-    var elInstance = this.state.consumptionEl;
-    var json = elInstance.getJson();
-    for (var y = 0; y < json.length; y++) {
-        var col = ("C").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(2, y);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-            valid = false;
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
         }
 
-        var col = ("D").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(3, y);
-        if (value === "" || isNaN(Number.parseInt(value))) {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            valid = false;
-            if (isNaN(Number.parseInt(value))) {
-                elInstance.setComments(col, "in valid number.");
-            } else {
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, "This field is required.");
-            }
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-
-        var col = ("E").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(4, y);
-        if (value === "" || isNaN(Number.parseInt(value))) {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            valid = false;
-            if (isNaN(Number.parseInt(value))) {
-                elInstance.setComments(col, "in valid number.");
             } else {
-                elInstance.setComments(col, "This field is required.");
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
             }
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
         }
+
+        if (x == 7) {
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        this.setState({
+            suggestedShipmentChangedFlag: 1
+        });
     }
-    return valid;
 
-}
-
-saveConsumption() {
-    var validation = this.checkValidationConsumption();
-    if (validation == true) {
+    checkValidationConsumption() {
+        var valid = true;
         var elInstance = this.state.consumptionEl;
         var json = elInstance.getJson();
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
+        for (var y = 0; y < json.length; y++) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(2, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
 
-            var programId = (document.getElementById("programId").value);
-
-            var programRequest = programTransaction.get(programId);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var consumptionDataList = (programJson.consumptionList);
-                for (var i = 0; i < json.length; i++) {
-                    var map = new Map(Object.entries(json[i]));
-                    consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
-                    consumptionDataList[parseInt(map.get("6"))].consumptionQty = map.get("3");
-                    consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = parseInt(map.get("4"));
-                    consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(3, y);
+            if (value === "" || isNaN(Number.parseInt(value))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                valid = false;
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setComments(col, "in valid number.");
+                } else {
+                    elInstance.setComments(col, "This field is required.");
                 }
-                programJson.consumptionList = consumptionDataList;
-                programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                var putRequest = programTransaction.put(programRequest.result);
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
 
-                putRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                putRequest.onsuccess = function (event) {
-                    this.toggleLarge('Consumption');
-                    this.setState({
-                        message: `Consumption Data Saved`,
-                        consumptionChangedFlag: 0
-                    })
-                    this.formSubmit(this.state.monthCount);
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(4, y);
+            if (value === "" || isNaN(Number.parseInt(value))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                valid = false;
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setComments(col, "in valid number.");
+                } else {
+                    elInstance.setComments(col, "This field is required.");
+                }
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        return valid;
+
+    }
+
+    saveConsumption() {
+        var validation = this.checkValidationConsumption();
+        if (validation == true) {
+            var elInstance = this.state.consumptionEl;
+            var json = elInstance.getJson();
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var consumptionDataList = (programJson.consumptionList);
+                    for (var i = 0; i < json.length; i++) {
+                        var map = new Map(Object.entries(json[i]));
+                        consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
+                        consumptionDataList[parseInt(map.get("6"))].consumptionQty = map.get("3");
+                        consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = parseInt(map.get("4"));
+                        consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
+                    }
+                    programJson.consumptionList = consumptionDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        this.toggleLarge('Consumption');
+                        this.setState({
+                            message: `Consumption Data Saved`,
+                            consumptionChangedFlag: 0
+                        })
+                        this.formSubmit(this.state.monthCount);
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
-        }.bind(this)
-    } else {
-        alert("Validation failed");
-    }
-}
-
-checkValidationInventory() {
-    var valid = true;
-    var elInstance = this.state.inventoryEl;
-    var json = elInstance.getJson();
-    for (var y = 0; y < json.length; y++) {
-        var col = ("C").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(2, y);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-            valid = false;
         } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-
-        var col = ("H").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(7, y);
-        if (value === "" || isNaN(Number.parseInt(value))) {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            valid = false;
-            if (isNaN(Number.parseInt(value))) {
-                elInstance.setComments(col, "in valid number.");
-            } else {
-                elInstance.setComments(col, "This field is required.");
-            }
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
+            alert("Validation failed");
         }
     }
-    return valid;
-}
 
-saveInventory() {
-    var validation = this.checkValidationInventory();
-    if (validation == true) {
+    checkValidationInventory() {
+        var valid = true;
         var elInstance = this.state.inventoryEl;
         var json = elInstance.getJson();
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
+        for (var y = 0; y < json.length; y++) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(2, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
 
-            var programId = (document.getElementById("programId").value);
-
-            var programRequest = programTransaction.get(programId);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var inventoryDataList = (programJson.inventoryList);
-                for (var i = 0; i < json.length; i++) {
-                    var map = new Map(Object.entries(json[i]));
-                    inventoryDataList[parseInt(map.get("12"))].dataSource.id = map.get("2");
-                    inventoryDataList[parseInt(map.get("12"))].expectedBal = parseInt(map.get("5"));
-                    inventoryDataList[parseInt(map.get("12"))].adjustmentQty = parseInt(map.get("7"));
-                    inventoryDataList[parseInt(map.get("12"))].actualQty = parseInt(map.get("9"));
-                    inventoryDataList[parseInt(map.get("12"))].notes = parseInt(map.get("11"));
-
-
-                    var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
-                    for (var j = 0; j < inventoryDataListFiltered.length; j++) {
-                        var inventoryId = inventoryDataListFiltered[j].inventoryId;
-                        var index;
-                        if (inventoryId != 0) {
-                            index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
-                        } else {
-                            index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
-                        }
-                        if (j == 0) {
-                            inventoryDataList[index].expectedBal = 0
-                        } else {
-                            inventoryDataList[index].expectedBal = parseInt(inventoryDataListFiltered[j - 1].expectedBal) + parseInt(inventoryDataListFiltered[j - 1].adjustmentQty);
-                        }
-
-                    }
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(7, y);
+            if (value === "" || isNaN(Number.parseInt(value))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                valid = false;
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setComments(col, "in valid number.");
+                } else {
+                    elInstance.setComments(col, "This field is required.");
                 }
-                programJson.inventoryList = inventoryDataList;
-                programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                var putRequest = programTransaction.put(programRequest.result);
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        return valid;
+    }
 
-                putRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                putRequest.onsuccess = function (event) {
-                    this.toggleLarge('Adjustments');
-                    this.setState({
-                        message: `Inventory Data Saved`,
-                        inventoryChangedFlag: 0
-                    })
-                    this.formSubmit(this.state.monthCount);
+    saveInventory() {
+        var validation = this.checkValidationInventory();
+        if (validation == true) {
+            var elInstance = this.state.inventoryEl;
+            var json = elInstance.getJson();
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var inventoryDataList = (programJson.inventoryList);
+                    for (var i = 0; i < json.length; i++) {
+                        var map = new Map(Object.entries(json[i]));
+                        inventoryDataList[parseInt(map.get("12"))].dataSource.id = map.get("2");
+                        inventoryDataList[parseInt(map.get("12"))].expectedBal = parseInt(map.get("5"));
+                        inventoryDataList[parseInt(map.get("12"))].adjustmentQty = parseInt(map.get("7"));
+                        inventoryDataList[parseInt(map.get("12"))].actualQty = parseInt(map.get("9"));
+                        inventoryDataList[parseInt(map.get("12"))].notes = parseInt(map.get("11"));
+
+
+                        var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
+                        for (var j = 0; j < inventoryDataListFiltered.length; j++) {
+                            var inventoryId = inventoryDataListFiltered[j].inventoryId;
+                            var index;
+                            if (inventoryId != 0) {
+                                index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
+                            } else {
+                                index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
+                            }
+                            if (j == 0) {
+                                inventoryDataList[index].expectedBal = 0
+                            } else {
+                                inventoryDataList[index].expectedBal = parseInt(inventoryDataListFiltered[j - 1].expectedBal) + parseInt(inventoryDataListFiltered[j - 1].adjustmentQty);
+                            }
+
+                        }
+                    }
+                    programJson.inventoryList = inventoryDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        this.toggleLarge('Adjustments');
+                        this.setState({
+                            message: `Inventory Data Saved`,
+                            inventoryChangedFlag: 0
+                        })
+                        this.formSubmit(this.state.monthCount);
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
-        }.bind(this)
-    } else {
-        alert("Validation failed");
+        } else {
+            alert("Validation failed");
+        }
     }
-}
 
-checkValidationSuggestedShipments() {
-    var valid = true;
-    var elInstance = this.state.suggestedShipmentsEl;
-    var json = elInstance.getJson();
-    for (var y = 0; y < json.length; y++) {
-        var col = ("F").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(5, y);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-            valid = false;
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-
-        var col = ("G").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(6, y);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-            valid = false;
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-
-        var col = ("H").concat(parseInt(y) + 1);
-        var value = elInstance.getValueFromCoords(7, y);
-        if (value == "") {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setStyle(col, "background-color", "yellow");
-            elInstance.setComments(col, "This field is required.");
-            valid = false;
-        } else {
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-
-
-    }
-    return valid;
-
-}
-
-saveSuggestedShipments() {
-    var validation = this.checkValidationSuggestedShipments();
-    if (validation == true) {
+    checkValidationSuggestedShipments() {
+        var valid = true;
         var elInstance = this.state.suggestedShipmentsEl;
         var json = elInstance.getJson();
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
+        for (var y = 0; y < json.length; y++) {
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(5, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
 
-            var programId = (document.getElementById("programId").value);
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(6, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
 
-            var programRequest = programTransaction.get(programId);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var shipmentDataList = (programJson.shipmentList);
-                console.log("Shipment data list", shipmentDataList);
-                var map = new Map(Object.entries(json[0]));
-                // "Expected delivery date",
-                // "Shipment status",
-                // "Planning unit",
-                // "Suggested order qty",
-                // "Adjusted order qty",
-                // "Procurement agent",
-                // "Funding source",
-                // "Budget",
-                // "Notes",
-                var shipmentJson = {
-                    accountFlag: true,
-                    active: true,
-                    dataSource: {
-                        id: 0
-                    },
-                    erpFlag: false,
-                    expectedDeliveryDate: map.get("0"),
-                    freightCost: 0,
-                    notes: map.get("8"),
-                    orderedDate: new Date(),
-                    planningUnit: {
-                        id: planningUnitId
-                    },
-                    procurementAgent: {
-                        id: map.get("5")
-                    },
-                    procurementUnit: {
-                        id: 0
-                    },
-                    productCost: 0,
-                    quantity: map.get("3"),
-                    rate: 0,
-                    receivedDate: "",
-                    shipmentId: 0,
-                    shipmentMode: "",
-                    shipmentStatus: {
-                        id: 1
-                    },
-                    shippedDate: "",
-                    suggestedQty: map.get("3"),
-                    supplier: {
-                        id: 0
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(7, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+
+        }
+        return valid;
+
+    }
+
+    saveSuggestedShipments() {
+        var validation = this.checkValidationSuggestedShipments();
+        if (validation == true) {
+            var elInstance = this.state.suggestedShipmentsEl;
+            var json = elInstance.getJson();
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var shipmentDataList = (programJson.shipmentList);
+                    console.log("Shipment data list", shipmentDataList);
+                    var map = new Map(Object.entries(json[0]));
+                    // "Expected delivery date",
+                    // "Shipment status",
+                    // "Planning unit",
+                    // "Suggested order qty",
+                    // "Adjusted order qty",
+                    // "Procurement agent",
+                    // "Funding source",
+                    // "Budget",
+                    // "Notes",
+                    var shipmentJson = {
+                        accountFlag: true,
+                        active: true,
+                        dataSource: {
+                            id: 0
+                        },
+                        erpFlag: false,
+                        expectedDeliveryDate: map.get("0"),
+                        freightCost: 0,
+                        notes: map.get("8"),
+                        orderedDate: new Date(),
+                        planningUnit: {
+                            id: planningUnitId
+                        },
+                        procurementAgent: {
+                            id: map.get("5")
+                        },
+                        procurementUnit: {
+                            id: 0
+                        },
+                        productCost: 0,
+                        quantity: map.get("3"),
+                        rate: 0,
+                        receivedDate: "",
+                        shipmentId: 0,
+                        shipmentMode: "",
+                        shipmentStatus: {
+                            id: 1
+                        },
+                        shippedDate: "",
+                        suggestedQty: map.get("3"),
+                        supplier: {
+                            id: 0
+                        }
                     }
-                }
 
-                shipmentDataList.push(shipmentJson);
-                programJson.shipmentList = shipmentDataList;
-                programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                var putRequest = programTransaction.put(programRequest.result);
+                    shipmentDataList.push(shipmentJson);
+                    programJson.shipmentList = shipmentDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
 
-                putRequest.onerror = function (event) {
-                    // Handle errors!
-                };
-                putRequest.onsuccess = function (event) {
-                    this.toggleLarge('SuggestedShipments');
-                    this.setState({
-                        message: `Suggested shipments Data Saved`,
-                        suggestedShipmentChangedFlag: 0
-                    })
-                    this.formSubmit(this.state.monthCount);
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        this.toggleLarge('SuggestedShipments');
+                        this.setState({
+                            message: `Suggested shipments Data Saved`,
+                            suggestedShipmentChangedFlag: 0
+                        })
+                        this.formSubmit(this.state.monthCount);
+                    }.bind(this)
                 }.bind(this)
             }.bind(this)
-        }.bind(this)
-    } else {
-        alert("Validation failed");
+        } else {
+            alert("Validation failed");
+        }
     }
-}
 
-render() {
-    const MyMenu = () => (
-        <Menu id='menu_id'>
-            <Item disabled>Yes-Account</Item>
-            <Item>No-Skip</Item>
-        </Menu>
-    );
+    render() {
+        const MyMenu = () => (
+            <Menu id='menu_id'>
+                <Item disabled>Yes-Account</Item>
+                <Item>No-Skip</Item>
+            </Menu>
+        );
 
-    const NoSkip = () => (
-        <Menu id='no_skip'>
-            <Item>Yes-Account</Item>
-            <Item disabled>No-Skip</Item>
-        </Menu>
-    );
+        const NoSkip = () => (
+            <Menu id='no_skip'>
+                <Item>Yes-Account</Item>
+                <Item disabled>No-Skip</Item>
+            </Menu>
+        );
 
-    const lan = 'en';
-    const { programList } = this.state;
-    let programs = programList.length > 0
-        && programList.map((item, i) => {
-            return (
-                <option key={i} value={item.id}>{item.name}</option>
-            )
-        }, this);
+        const lan = 'en';
+        const { programList } = this.state;
+        let programs = programList.length > 0
+            && programList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
 
-    const { planningUnitList } = this.state;
-    let planningUnits = planningUnitList.length > 0
-        && planningUnitList.map((item, i) => {
-            return (
-                <option key={i} value={item.id}>{item.name}</option>
-            )
-        }, this);
+        const { planningUnitList } = this.state;
+        let planningUnits = planningUnitList.length > 0
+            && planningUnitList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
 
-    const { regionList } = this.state;
-    let regions = regionList.length > 0
-        && regionList.map((item, i) => {
-            return (
-                <option key={i} value={item.id}>{item.name}</option>
-            )
-        }, this);
-    return (
-        <div className="animated fadeIn">
-            <h5>{i18n.t(this.state.message, { entityname })}</h5>
-            <Col xs="12" sm="12">
-                <Card>
-                    <CardHeader>
-                        <strong>Supply plan</strong>
-                    </CardHeader>
-                    <CardBody>
-                        <Formik
-                            render={
-                                ({
-                                }) => (
-                                        <Form name='simpleForm'>
-                                            <Col md="9 pl-0">
-                                                <div className="d-md-flex">
-                                                    <FormGroup className="tab-ml-1">
-                                                        <Label htmlFor="appendedInputButton">Program</Label>
-                                                        <div className="controls SelectGo">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    value={this.state.programId}
-                                                                    name="programId" id="programId"
-                                                                    onChange={this.getPlanningUnitList}
-                                                                >
-                                                                    <option value="0">Please select</option>
-                                                                    {programs}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="tab-ml-1">
-                                                        <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                                        <div className="controls SelectGo">
-                                                            <InputGroup>
-                                                                <Input
-                                                                    type="select"
-                                                                    name="planningUnitId"
-                                                                    id="planningUnitId"
-                                                                    bsSize="sm"
-                                                                    value={this.state.planningUnitId}
-                                                                >
-                                                                    <option value="0">Please Select</option>
-                                                                    {planningUnits}
-                                                                </Input>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="tab-ml-1">
-                                                        <Label htmlFor="appendedInputButton">Region</Label>
-                                                        <div className="controls SelectGo">
-                                                            <InputGroup>
-                                                                <Input type="select"
-                                                                    bsSize="sm"
-                                                                    value={this.state.regionId}
-                                                                    name="regionId" id="regionId"
-                                                                >
-                                                                    <option value="-1">All</option>
-                                                                    {regions}
-                                                                </Input>
-                                                                <InputGroupAddon addonType="append">
-                                                                    &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
-                                                                </InputGroupAddon>
-                                                            </InputGroup>
-                                                        </div>
-                                                    </FormGroup>
-                                                </div>
-                                            </Col>
-                                        </Form>
+        const { regionList } = this.state;
+        let regions = regionList.length > 0
+            && regionList.map((item, i) => {
+                return (
+                    <option key={i} value={item.id}>{item.name}</option>
+                )
+            }, this);
+        return (
+            <div className="animated fadeIn">
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Col xs="12" sm="12">
+                    <Card>
+                        <CardHeader>
+                            <strong>Supply plan</strong>
+                        </CardHeader>
+                        <CardBody>
+                            <Formik
+                                render={
+                                    ({
+                                    }) => (
+                                            <Form name='simpleForm'>
+                                                <Col md="9 pl-0">
+                                                    <div className="d-md-flex">
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Program</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        value={this.state.programId}
+                                                                        name="programId" id="programId"
+                                                                        onChange={this.getPlanningUnitList}
+                                                                    >
+                                                                        <option value="0">Please select</option>
+                                                                        {programs}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Planning Unit</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input
+                                                                        type="select"
+                                                                        name="planningUnitId"
+                                                                        id="planningUnitId"
+                                                                        bsSize="sm"
+                                                                        value={this.state.planningUnitId}
+                                                                    >
+                                                                        <option value="0">Please Select</option>
+                                                                        {planningUnits}
+                                                                    </Input>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                        <FormGroup className="tab-ml-1">
+                                                            <Label htmlFor="appendedInputButton">Region</Label>
+                                                            <div className="controls SelectGo">
+                                                                <InputGroup>
+                                                                    <Input type="select"
+                                                                        bsSize="sm"
+                                                                        value={this.state.regionId}
+                                                                        name="regionId" id="regionId"
+                                                                    >
+                                                                        <option value="-1">All</option>
+                                                                        {regions}
+                                                                    </Input>
+                                                                    <InputGroupAddon addonType="append">
+                                                                        &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
+                                                                    </InputGroupAddon>
+                                                                </InputGroup>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </div>
+                                                </Col>
+                                            </Form>
 
-                                    )} />
-                        <div id="supplyPlanTableId" style={{ display: 'none' }}>
-                            <Row>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                            </Row>
-                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        {
-                                            this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                <th>{item.month}</th>
-                                            ))
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Opening Balance</td>
-                                        {
-                                            this.state.openingBalanceArray.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
-                                        <td>Consumption</td>
-                                        {
-                                            this.state.consumptionTotalData.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
-                                        <td>Suggested Shipments</td>
-                                        {
-                                            this.state.suggestedShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    return (<td className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`)}>{item1.suggestedOrderQty}</td>)
-                                                } else {
-                                                    return (<td>{item1}</td>)
+                                        )} />
+                            <div id="supplyPlanTableId" style={{ display: 'none' }}>
+                                <Row>
+                                    <div className="col-md-12">
+                                        <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                        <span className="supplyplan-rarrow" onClick={this.rightClicked}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                    </div>
+                                </Row>
+                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            {
+                                                this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                    <th>{item.month}</th>
+                                                ))
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Opening Balance</td>
+                                            {
+                                                this.state.openingBalanceArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
+                                            <td>Consumption</td>
+                                            {
+                                                this.state.consumptionTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
+                                            <td>Suggested Shipments</td>
+                                            {
+                                                this.state.suggestedShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`)}>{item1.suggestedOrderQty}</td>)
+                                                    } else {
+                                                        return (<td>{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                            <td>Adjustments</td>
+                                            {
+                                                this.state.inventoryTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
+                                            <td>Ending Balance</td>
+                                            {
+                                                this.state.closingBalanceArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>AMC</td>
+                                            {
+                                                this.state.amcTotalData.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Months of Stock</td>
+                                            {
+                                                this.state.monthsOfStockArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Min stock</td>
+                                            {
+                                                this.state.minStockArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td>Max stock</td>
+                                            {
+                                                this.state.maxStockArray.map(item1 => (
+                                                    <td>{item1}</td>
+                                                ))
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </Table>
+                            </div>
+                            <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
+                                    <strong>Consumption Details</strong>
+                                    <ul className="legend legend-supplypln">
+                                        <li><span className="purplelegend"></span> <span className="legendText">Forecasted consumption</span></li>
+                                        <li><span className="blacklegend"></span> <span className="legendText">Actual consumption</span></li>
+                                    </ul>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div className="col-md-12">
+                                        <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                        <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                    </div>
+                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                {
+                                                    this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                        <th>{item.month}</th>
+                                                    ))
                                                 }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
-                                        <td>Adjustments</td>
-                                        {
-                                            this.state.inventoryTotalData.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
-                                        <td>Ending Balance</td>
-                                        {
-                                            this.state.closingBalanceArray.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td>AMC</td>
-                                        {
-                                            this.state.amcTotalData.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td>Months of Stock</td>
-                                        {
-                                            this.state.monthsOfStockArray.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td>Min stock</td>
-                                        {
-                                            this.state.minStockArray.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td>Max stock</td>
-                                        {
-                                            this.state.maxStockArray.map(item1 => (
-                                                <td>{item1}</td>
-                                            ))
-                                        }
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </div>
-                        <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
-                                <strong>Consumption Details</strong>
-                                <ul className="legend legend-supplypln">
-                                    <li><span className="purplelegend"></span> <span className="legendText">Forecasted consumption</span></li>
-                                    <li><span className="blacklegend"></span> <span className="legendText">Actual consumption</span></li>
-                                </ul>
-                            </ModalHeader>
-                            <ModalBody>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            {
-                                                this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                    <th>{item.month}</th>
-                                                ))
-                                            }
-                                        </tr>
+                                            </tr>
 
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.regionListFiltered.map(item => (
-                                                <tr>
-                                                    <td>{item.name}</td>
-                                                    {
-                                                        this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                            if (item1.consumptionQty.toString() != '') {
-                                                                if (item1.actualFlag.toString() == 'true') {
-                                                                    return (<td className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
+                                        </thead>
+                                        <tbody>
+                                            {
+                                                this.state.regionListFiltered.map(item => (
+                                                    <tr>
+                                                        <td>{item.name}</td>
+                                                        {
+                                                            this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                                if (item1.consumptionQty.toString() != '') {
+                                                                    if (item1.actualFlag.toString() == 'true') {
+                                                                        return (<td className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
+                                                                    } else {
+                                                                        return (<td style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
+                                                                    }
                                                                 } else {
-                                                                    return (<td style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}>{item1.consumptionQty}</td>)
+                                                                    return (<td></td>)
                                                                 }
-                                                            } else {
-                                                                return (<td></td>)
-                                                            }
-                                                        })
-                                                    }
-                                                </tr>
-                                            )
-                                            )
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Total</th>
-                                            {
-                                                this.state.consumptionTotalMonthWise.map(item => (
-                                                    <th>{item}</th>
-                                                ))
+                                                            })
+                                                        }
+                                                    </tr>
+                                                )
+                                                )
                                             }
-                                        </tr>
-                                    </tfoot>
-                                </Table>
-                                <div className="table-responsive">
-                                    <div id="consumptionDetailsTable" />
-                                </div>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Total</th>
+                                                {
+                                                    this.state.consumptionTotalMonthWise.map(item => (
+                                                        <th>{item}</th>
+                                                    ))
+                                                }
+                                            </tr>
+                                        </tfoot>
+                                    </Table>
+                                    <div className="table-responsive">
+                                        <div id="consumptionDetailsTable" />
+                                    </div>
 
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
-                            </ModalFooter>
-                        </Modal>
+                                </ModalBody>
+                                <ModalFooter>
+                                    {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
 
-                        <Modal isOpen={this.state.adjustments} toggle={() => this.toggleLarge('Adjustments')}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">Adjustments Details</ModalHeader>
-                            <ModalBody>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
+                            <Modal isOpen={this.state.adjustments} toggle={() => this.toggleLarge('Adjustments')}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">Adjustments Details</ModalHeader>
+                                <ModalBody>
+                                    <div className="col-md-12">
+                                        <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
+                                        <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> Scroll to right <i class="cui-arrow-right icons" ></i> </span>
+                                    </div>
+                                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                {
+                                                    this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                                        <th>{item.month}</th>
+                                                    ))
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             {
-                                                this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                    <th>{item.month}</th>
-                                                ))
+                                                this.state.regionListFiltered.map(item => (
+                                                    <tr>
+                                                        <td>{item.name}</td>
+                                                        {
+                                                            this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                                if (item1.adjustmentQty.toString() != '') {
+                                                                    return (<td className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.inventoryDate}`, `${item1.region.id}`, `${item1.month.month}`)}>{item1.adjustmentQty}</td>)
+                                                                } else {
+                                                                    return (<td></td>)
+                                                                }
+                                                            })
+                                                        }
+                                                    </tr>
+                                                )
+                                                )
                                             }
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.regionListFiltered.map(item => (
-                                                <tr>
-                                                    <td>{item.name}</td>
-                                                    {
-                                                        this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                            if (item1.adjustmentQty.toString() != '') {
-                                                                return (<td className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.inventoryDate}`, `${item1.region.id}`, `${item1.month.month}`)}>{item1.adjustmentQty}</td>)
-                                                            } else {
-                                                                return (<td></td>)
-                                                            }
-                                                        })
-                                                    }
-                                                </tr>
-                                            )
-                                            )
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>Total</th>
-                                            {
-                                                this.state.inventoryTotalMonthWise.map(item => (
-                                                    <th>{item}</th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </tfoot>
-                                </Table>
-                                <div className="table-responsive">
-                                    <div id="adjustmentsTable" className="table-responsive" />
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
-                            </ModalFooter>
-                        </Modal>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Total</th>
+                                                {
+                                                    this.state.inventoryTotalMonthWise.map(item => (
+                                                        <th>{item}</th>
+                                                    ))
+                                                }
+                                            </tr>
+                                        </tfoot>
+                                    </Table>
+                                    <div className="table-responsive">
+                                        <div id="adjustmentsTable" className="table-responsive" />
+                                    </div>
+                                </ModalBody>
+                                <ModalFooter>
+                                    {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
 
-                        <Modal isOpen={this.state.suggestedShipments} toggle={() => this.toggleLarge('SuggestedShipments')}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
-                                <strong>Shipment Details</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <div className="table-responsive">
-                                    <div id="suggestedShipmentsDetailsTable" />
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.suggestedShipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSuggestedShipments}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> Cancel</Button>
-                            </ModalFooter>
-                        </Modal>
-                    </CardBody>
-                </Card>
-            </Col>
-        </div>
-    )
-}
+                            <Modal isOpen={this.state.suggestedShipments} toggle={() => this.toggleLarge('SuggestedShipments')}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
+                                    <strong>Shipment Details</strong>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div className="table-responsive">
+                                        <div id="suggestedShipmentsDetailsTable" />
+                                    </div>
+                                </ModalBody>
+                                <ModalFooter>
+                                    {this.state.suggestedShipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSuggestedShipments}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+                        </CardBody>
+                    </Card>
+                </Col>
+            </div>
+        )
+    }
 
-cancelClicked() {
-    // this.props.history.push(`/dashboard/${i18n.t('static.actionCancelled')}`)
-}
+    cancelClicked() {
+        // this.props.history.push(`/dashboard/${i18n.t('static.actionCancelled')}`)
+    }
 
 
 }

@@ -122,7 +122,7 @@ export default class AddDimensionComponent extends Component {
                             </CardHeader>
                             <CardBody>
                                 <Formik
-
+                                    initialValues={initialValues}
                                     validate={validate(validationSchema)}
 
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -174,9 +174,10 @@ export default class AddDimensionComponent extends Component {
                                             handleSubmit,
                                             isSubmitting,
                                             isValid,
-                                            setTouched
+                                            setTouched,
+                                            handleReset
                                         }) => (
-                                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
+                                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
 
 
                                                     <FormGroup>
@@ -185,7 +186,7 @@ export default class AddDimensionComponent extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.dimension.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -196,8 +197,8 @@ export default class AddDimensionComponent extends Component {
 
                                                     <FormGroup>
 
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
