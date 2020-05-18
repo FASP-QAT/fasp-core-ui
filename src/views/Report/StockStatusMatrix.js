@@ -753,87 +753,87 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'PLANNING_UNIT_LABEL_EN',
         text: i18n.t('static.planningunit.planningunit'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'left',
+        headerAlign: 'left'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       },
       {
         dataField: 'Jan',
         text: i18n.t('static.month.jan'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Feb',
         text: i18n.t('static.month.feb'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Mar',
         text: i18n.t('static.month.mar'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Apr',
         text: i18n.t('static.month.apr'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'May',
         text: i18n.t('static.month.may'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Jun',
         text: i18n.t('static.month.jun'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Jul',
         text: i18n.t('static.month.jul'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Aug',
         text: i18n.t('static.month.aug'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Sep',
         text: i18n.t('static.month.sep'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Oct',
         text: i18n.t('static.month.oct'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Nov',
         text: i18n.t('static.month.nov'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Dec',
         text: i18n.t('static.month.dec'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }
 
 
@@ -844,39 +844,39 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'PLANNING_UNIT_LABEL_EN',
         text: i18n.t('static.procurementUnit.planningUnit'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'left',
+        headerAlign: 'left'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       },
       {
         dataField: 'Q1',
         text: i18n.t('static.common.quarter1'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Q2',
         text: i18n.t('static.common.quarter2'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Q3',
         text: i18n.t('static.common.quarter3'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }, {
         dataField: 'Q4',
         text: i18n.t('static.common.quarter4'),
         sort: true,
-        align: 'center',
-        headerAlign: 'center'
+        align: 'right',
+        headerAlign: 'right'
       }]
 
     const options = {
