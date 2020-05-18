@@ -555,7 +555,7 @@
 .jexcel_filter > div
 {
     padding:8px;
-    align-items:center;
+    align-items:bottom;
 }
 
 .jexcel_pagination
