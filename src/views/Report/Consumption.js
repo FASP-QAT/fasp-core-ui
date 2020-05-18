@@ -882,8 +882,8 @@ class Consumption extends Component {
                                   <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                 </Picker>
                               </div>
-
                             </FormGroup>
+                          </Online>
                             <Online>
                               <FormGroup className="col-sm-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
