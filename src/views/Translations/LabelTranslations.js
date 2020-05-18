@@ -25,6 +25,7 @@ export default class DatabaseTranslations extends React.Component {
         }
         this.saveData = this.saveData.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.loaded = this.loaded.bind(this);
     }
 
     componentDidMount() {
@@ -74,7 +75,8 @@ export default class DatabaseTranslations extends React.Component {
                     onchange: this.changed,
                     oneditionstart: this.editStart,
                     allowDeleteRow: false,
-                    tableOverflow: false
+                    tableOverflow: false,
+                    onload: this.loaded
                     // tableHeight: '500px',
                 };
                 this.el = jexcel(document.getElementById("labelTranslationTable"), options);
@@ -104,6 +106,11 @@ export default class DatabaseTranslations extends React.Component {
             }
         )
     };
+
+    loaded = function (instance, cell, x, y, value) {
+        var elInstance=instance.jexcel;
+        console.log("In loaded function")
+    }
 
     saveData = function () {
         var labelList = this.state.labelList;
@@ -165,11 +172,11 @@ export default class DatabaseTranslations extends React.Component {
                     <Col xs="12" sm="12">
                         <Card>
                             <CardHeader>
-                            
+
                                 <strong>{i18n.t('static.label.labelTranslations')}</strong>
                             </CardHeader>
                             <CardBody className="table-responsive pt-md-1 pb-md-1">
-                            {/* <div id="loader" className="center"></div> */}
+                                {/* <div id="loader" className="center"></div> */}
                                 <div id="labelTranslationTable"></div>
                             </CardBody>
                             <CardFooter>
