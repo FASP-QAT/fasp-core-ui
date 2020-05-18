@@ -40,7 +40,7 @@ class PlanningUnitService {
         );
     }
     getPlanningUnitByProductCategoryId(json) {
-        return axios.get(`${API_URL}/api/planningUnit/realmId/${json}`, {}
+        return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/all`, {}
         );
     }
 }
