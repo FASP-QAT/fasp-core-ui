@@ -282,7 +282,7 @@ export default class AddRealmComponent extends Component {
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
                                                   </FormGroup>*/}
                                                     <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -296,7 +296,7 @@ export default class AddRealmComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
+                                                                {i18n.t('static.realm.yes')}
                                                             </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -312,7 +312,7 @@ export default class AddRealmComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
+                                                                {i18n.t('static.realm.no')}
                                                             </Label>
                                                         </FormGroup>
                                                     </FormGroup>

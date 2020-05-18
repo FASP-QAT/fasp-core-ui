@@ -130,7 +130,7 @@ export default class Steptwo extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.realmCountryId}
+                                            valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                             bsSize="sm"
@@ -144,9 +144,10 @@ export default class Steptwo extends Component {
                                     </FormGroup>
 
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
 

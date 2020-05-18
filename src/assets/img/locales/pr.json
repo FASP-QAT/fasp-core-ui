@@ -140,5 +140,8 @@
     "static.common.monthly": "Por mês",
     "static.common.quarterly": "Trimestral",
     "static.common.selectProgram": "Por favor, selecione o programa",
-    "static.common.all": "Todos"
+    "static.common.all": "Todos",
+    "static.realm.yes": "sim",
+    "static.realm.no": "Não",
+    "static.region.glnvalue": "GLN Não deve ter dígitos"
 }

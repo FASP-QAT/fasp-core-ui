@@ -511,11 +511,14 @@ export default class StockStatusMatrix extends React.Component {
 
       }
 
+
     }
 
 
   }
-
+  componentDidUpdate() {
+    setTimeout(() => this.setState({ message: '' }), 3000);
+  }
 
 
   componentDidMount() {
@@ -1080,28 +1083,6 @@ export default class StockStatusMatrix extends React.Component {
                     </div>
                   </FormGroup>
                 </Offline>
-                <Online>
-                  <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                    <div className="controls">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="sm"
-                        >
-
-                          <option value="0">{i18n.t('static.common.all')}</option>
-                          {planningUnitList}
-                        </Input>
-                        <InputGroupAddon addonType="append">
-                          <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </div>
-                  </FormGroup>
-                </Online>
                 <Offline>
                   <FormGroup className="col-md-3">
                     <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
@@ -1157,7 +1138,28 @@ export default class StockStatusMatrix extends React.Component {
                     </InputGroup>
                   </div>
                 </FormGroup>
+                <Online>
+                  <FormGroup className="col-md-3">
+                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                    <div className="controls">
+                      <InputGroup>
+                        <Input
+                          type="select"
+                          name="planningUnitId"
+                          id="planningUnitId"
+                          bsSize="sm"
+                        >
 
+                          <option value="0">{i18n.t('static.common.all')}</option>
+                          {planningUnitList}
+                        </Input>
+                        <InputGroupAddon addonType="append">
+                          <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </div>
+                  </FormGroup>
+                </Online>
               </div>
             </Col>
 

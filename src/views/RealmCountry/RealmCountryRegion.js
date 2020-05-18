@@ -17,8 +17,10 @@ import RegionService from "../../api/RegionService";
 import StatusUpdateButtonFeature from "../../CommonComponent/StatusUpdateButtonFeature";
 import UpdateButtonFeature from '../../CommonComponent/UpdateButtonFeature'
 let initialValues = {
-region:'',
-capacityCBM:''
+    region: '',
+    capacityCBM: '',
+    label: '',
+    gln: '',
 
 }
 const entityname = i18n.t('static.dashboad.regioncountry')
@@ -26,9 +28,12 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         label: Yup.string()
             .required(i18n.t('static.region.validregion')),
-        capacityCBM: Yup.number()
+        capacityCBM: Yup.number().typeError("Must be a number")
             .min(0, i18n.t('static.program.validvaluetext')),
-       
+        gln: Yup.string().matches(/^[0-9]+$/, i18n.t('static.region.glnvalue'))
+            .min(13, i18n.t('static.region.glnvalue'))
+            .max(13, i18n.t('static.region.glnvalue'))
+
     })
 }
 
@@ -62,7 +67,7 @@ class RealmCountryRegion extends Component {
             lang: localStorage.getItem('lang'),
             regionCountry: {},
             regions: [],
-            regionId:'',
+            regionId: '',
             realmCountry: {
                 realmCountryId: '',
                 country: {
@@ -78,14 +83,14 @@ class RealmCountryRegion extends Component {
                     }
                 }
             },
-             label: {
+            label: {
                 label_en: ''
             },
-            capacityCbm:'',
-            gln:'',
+            capacityCbm: '',
+            gln: '',
             rows: [], isNew: true,
             updateRowStatus: 0
-           
+
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.disableRow = this.disableRow.bind(this);
@@ -97,24 +102,24 @@ class RealmCountryRegion extends Component {
         this.CapitalizeFull = this.CapitalizeFull.bind(this);
         this.updateRow = this.updateRow.bind(this);
     }
-  
+
     updateRow(idx) {
         if (this.state.updateRowStatus == 1) {
             this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
         } else {
-         //   document.getElementById('planningUnitId').disabled = true;
-         console.log(JSON.stringify(this.state.rows[idx]))
+            //   document.getElementById('planningUnitId').disabled = true;
+            console.log(JSON.stringify(this.state.rows[idx]))
             initialValues = {
-                regionId:this.state.rows[idx].regionId,
-               label: this.state.rows[idx].label.label_en,
+                regionId: this.state.rows[idx].regionId,
+                label: this.state.rows[idx].label.label_en,
                 gln: this.state.rows[idx].gln,
                 capacityCbm: this.state.rows[idx].capacityCbm,
                 active: this.state.rows[idx].active
             }
             const rows = [...this.state.rows]
             this.setState({
-                regionId:this.state.rows[idx].regionId,
-               label: { label_en: this.state.rows[idx].label.label_en },
+                regionId: this.state.rows[idx].regionId,
+                label: { label_en: this.state.rows[idx].label.label_en },
                 gln: this.state.rows[idx].gln,
                 capacityCbm: this.state.rows[idx].capacityCbm,
                 isNew: false,
@@ -132,8 +137,9 @@ class RealmCountryRegion extends Component {
     touchAll(setTouched, errors) {
         setTouched({
             label: true,
-            capacityCBM:true
-           
+            capacityCBM: true,
+            gln: true,
+
         }
         )
         this.validateForm(errors)
@@ -156,11 +162,11 @@ class RealmCountryRegion extends Component {
 
     setTextAndValue = (event) => {
         // let { budget } = this.state;
-       
+
         if (event.target.name === "label") {
             this.state.label.label_en = event.target.value;
         }
-        
+
         if (event.target.name === "capacityCBM") {
             this.state.capacityCbm = event.target.value;
 
@@ -179,10 +185,10 @@ class RealmCountryRegion extends Component {
     }
     CapitalizeFull(str) {
         if (str != null && str != "") {
-        return str.toUpperCase() 
-    } else {
-        return "";
-    }
+            return str.toUpperCase()
+        } else {
+            return "";
+        }
     }
 
 
@@ -249,7 +255,7 @@ class RealmCountryRegion extends Component {
     }
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-            RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
+        RealmCountryService.getRealmCountryById(this.props.match.params.realmCountryId).then(response => {
             console.log(JSON.stringify(response.data))
             this.setState({
                 realmCountry: response.data,
@@ -304,7 +310,7 @@ class RealmCountryRegion extends Component {
                 }
             }
         );
-        
+
     }
     render() {
         const { units } = this.state;
@@ -316,7 +322,7 @@ class RealmCountryRegion extends Component {
                     </option>
                 )
             }, this);
-        
+
 
         return (<div className="animated fadeIn">
             <h5>{i18n.t(this.state.message)}</h5>
@@ -331,16 +337,16 @@ class RealmCountryRegion extends Component {
                                 enableReinitialize={true}
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors,resetForm }) => {
-                                    if ( this.state.label.label_en != "" ) {
+                                onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
+                                    if (this.state.label.label_en != "") {
                                         var json =
                                         {
-                                            regionId:this.state.regionId,
+                                            regionId: this.state.regionId,
                                             realmCountry: {
                                                 realmCountryId: this.props.match.params.realmCountryId
                                             }
                                             , label: { label_en: this.state.label.label_en },
-                                            
+
                                             capacityCbm: this.state.capacityCbm,
 
                                             gln: this.state.gln,
@@ -349,25 +355,28 @@ class RealmCountryRegion extends Component {
 
                                         }
                                         this.state.rows.push(json)
-                                        this.setState({ rows: this.state.rows,updateRowStatus:0  })
-                                        this.setState({ regionId:'',
+                                        this.setState({ rows: this.state.rows, updateRowStatus: 0 })
+                                        this.setState({
+                                            regionId: '',
                                             label: { label_en: '' },
-                                            
+
                                             capacityCbm: '',
 
                                             gln: '',
-                                            active: true});
+                                            active: true
+                                        });
                                     }
                                     resetForm({
                                         realmCountry: {
                                             id: this.props.match.params.realmCountryId
                                         }
                                         , label: { label_en: '' },
-                                            
+
                                         capacityCbm: '',
 
                                         gln: '',
-                                        active: true});
+                                        active: true
+                                    });
                                 }}
                                 render={
                                     ({
@@ -382,75 +391,75 @@ class RealmCountryRegion extends Component {
                                         setTouched
                                     }) => (<Form onSubmit={handleSubmit} noValidate name='countryForm'>
                                         <Row>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.dashboard.realmcountry')}</Label>
-                                            <Input
-                                                type="text"
-                                                name="realmCountry"
-                                                id="realmCountry"
-                                                bsSize="sm"
-                                                readOnly
-                                                valid={!errors.realmCountry}
-                                                invalid={touched.realmCountry && !!errors.realmCountry}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                onBlur={handleBlur}
-                                                value={getLabelText(this.state.realmCountry.realm.label, this.state.lang) + "-" + getLabelText(this.state.realmCountry.country.label, this.state.lang)}
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="select">{i18n.t('static.dashboard.realmcountry')}</Label>
+                                                <Input
+                                                    type="text"
+                                                    name="realmCountry"
+                                                    id="realmCountry"
+                                                    bsSize="sm"
+                                                    readOnly
+                                                    valid={!errors.realmCountry}
+                                                    invalid={touched.realmCountry && !!errors.realmCountry}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    onBlur={handleBlur}
+                                                    value={getLabelText(this.state.realmCountry.realm.label, this.state.lang) + "-" + getLabelText(this.state.realmCountry.country.label, this.state.lang)}
                                                 >
-                                            </Input>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="label">{i18n.t('static.region.region')}</Label>
-                                            <Input type="text"
-                                                name="label"
-                                                id="label"
-                                                bsSize="sm"
-                                                valid={!errors.label}
-                                                invalid={touched.label && !!errors.label}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                onBlur={handleBlur}
-                                                value={ this.Capitalize(this.state.label.label_en)}
-                                                required />
-                                            <FormFeedback className="red">{errors.label}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}</Label>
-                                            <Input type="number"
-                                                name="capacityCBM"
-                                                id="capacityCBM"
-                                                bsSize="sm"
-                                                valid={!errors.capacityCBM}
-                                                invalid={touched.capacityCBM && !!errors.capacityCBM}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
-                                                value={this.state.capacityCbm}
-                                                onBlur={handleBlur}
-                                                placeholder={i18n.t('static.region.capacitycbmtext')}
+                                                </Input>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="label">{i18n.t('static.region.region')}</Label>
+                                                <Input type="text"
+                                                    name="label"
+                                                    id="label"
+                                                    bsSize="sm"
+                                                    valid={!errors.label}
+                                                    invalid={touched.label && !!errors.label}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
+                                                    onBlur={handleBlur}
+                                                    value={this.Capitalize(this.state.label.label_en)}
+                                                    required />
+                                                <FormFeedback className="red">{errors.label}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="capacityCBM">{i18n.t('static.region.capacitycbm')}</Label>
+                                                <Input type="number"
+                                                    name="capacityCBM"
+                                                    id="capacityCBM"
+                                                    bsSize="sm"
+                                                    valid={!errors.capacityCBM}
+                                                    invalid={touched.capacityCBM && !!errors.capacityCBM}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
+                                                    value={this.state.capacityCbm}
+                                                    onBlur={handleBlur}
+                                                    placeholder={i18n.t('static.region.capacitycbmtext')}
                                                 />
-                                            <FormFeedback className="red">{errors.capacityCBM}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="gln">{i18n.t('static.region.gln')}</Label>
-                                            <Input
-                                                type="text"
-                                                min="0"
-                                                name="gln"
-                                                id="gln"
-                                                bsSize="sm"
-                                                valid={!errors.gln}
-                                                invalid={touched.gln && !!errors.gln}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e);  }}
-                                                value={this.CapitalizeFull(this.state.gln)}
-                                                placeholder={i18n.t('static.region.glntext')}
-                                            />
-                                            <FormFeedback className="red">{errors.gln}</FormFeedback>
-                                        </FormGroup>
+                                                <FormFeedback className="red">{errors.capacityCBM}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="gln">{i18n.t('static.region.gln')}</Label>
+                                                <Input
+                                                    type="text"
+                                                    maxlength="13"
+                                                    name="gln"
+                                                    id="gln"
+                                                    bsSize="sm"
+                                                    valid={!errors.gln}
+                                                    invalid={touched.gln && !!errors.gln}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
+                                                    value={this.CapitalizeFull(this.state.gln)}
+                                                    placeholder={i18n.t('static.region.glntext')}
+                                                />
+                                                <FormFeedback className="red">{errors.gln}</FormFeedback>
+                                            </FormGroup>
 
-                                        <FormGroup className="col-md-12">
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                            &nbsp;
+                                            <FormGroup className="col-md-12">
+                                                <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                &nbsp;
 
                 </FormGroup></Row></Form>)} />
-                 <h5 className="red">{this.state.rowErrorMessage}</h5>
+                            <h5 className="red">{this.state.rowErrorMessage}</h5>
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                                 <thead>
@@ -485,12 +494,12 @@ class RealmCountryRegion extends Component {
                                                 <td>
                                                     {/* <DeleteSpecificRow handleRemoveSpecificRow={this.handleRemoveSpecificRow} rowId={idx} /> */}
                                                     <div className="forInlinebtnMapping">
-                                                    <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
-                                            
-                                                    <UpdateButtonFeature  updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
+                                                        <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />
+
+                                                        <UpdateButtonFeature updateRow={this.updateRow} rowId={idx} isRowNew={this.state.rows[idx].isNew} />
                                                     </div>
                                                 </td>
-                                           
+
                                             </tr>)
 
                                     }
@@ -501,7 +510,7 @@ class RealmCountryRegion extends Component {
                         <CardFooter>
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                { <Button  type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                {<Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                                 &nbsp;
                         </FormGroup>
 
