@@ -883,7 +883,6 @@ class Consumption extends Component {
                                 </Picker>
                               </div>
                             </FormGroup>
-                          </Online>
                             <Online>
                               <FormGroup className="col-sm-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
