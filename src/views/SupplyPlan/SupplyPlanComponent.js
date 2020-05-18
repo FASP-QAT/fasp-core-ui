@@ -31,6 +31,7 @@ export default class SupplyPlanComponent extends React.Component {
             monthsArray: [],
             programList: [],
             planningUnitList: [],
+            planningUnitName: [],
             regionList: [],
             consumptionTotalData: [],
             consumptionDataForAllMonths: [],
@@ -55,7 +56,8 @@ export default class SupplyPlanComponent extends React.Component {
             programPlanningUnitList: [],
             openingBalanceArray: [],
             closingBalanceArray: [],
-            monthsOfStockArray: []
+            monthsOfStockArray: [],
+            filteredArraySuggestedShipments: [],
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -78,6 +80,9 @@ export default class SupplyPlanComponent extends React.Component {
         this.leftClickedAdjustments = this.leftClickedAdjustments.bind(this);
         this.rightClickedAdjustments = this.rightClickedAdjustments.bind(this);
         this.actionCanceled = this.actionCanceled.bind(this);
+
+        this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
+        this.dropdownFilter = this.dropdownFilter.bind(this);
     }
 
     actionCanceled(supplyPlanType) {
@@ -96,6 +101,14 @@ export default class SupplyPlanComponent extends React.Component {
                 monthCountConsumption: monthCountConsumption
             });
             this.formSubmit(monthCountConsumption);
+        } else if (supplyPlanType == 'SuggestedShipments') {
+            this.setState({
+                suggestedShipments: !this.state.suggestedShipments,
+            });
+
+            this.suggestedShipmentsDetailsClicked(month, quantity);
+            console.log("Month-------->", month);
+            console.log("Quantity----->", quantity);
         } else if (supplyPlanType == 'Actual QAT Orders') {
             this.setState({
                 actualQATOrders: !this.state.actualQATOrders,
@@ -293,6 +306,9 @@ export default class SupplyPlanComponent extends React.Component {
         var regionId = document.getElementById("regionId").value;
         var planningUnitId = document.getElementById("planningUnitId").value;
 
+        var planningUnit = document.getElementById("planningUnitId");
+        var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
+
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id = planningUnitId))[0];
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
         var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
@@ -329,6 +345,8 @@ export default class SupplyPlanComponent extends React.Component {
             var filteredArrayInventory = [];
             var openingBalanceArray = [];
             var closingBalanceArray = [];
+
+            var filteredArraySuggestedShipments = [];
 
             var monthsOfStockArray = [];
             programRequest.onsuccess = function (event) {
@@ -534,7 +552,6 @@ export default class SupplyPlanComponent extends React.Component {
                 var totalAdjustments = 0;
 
                 var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < m[3].startDate);
-                console.log("Consumption remaining list",consumptionRemainingList);
                 for (var j = 0; j < consumptionRemainingList.length; j++) {
                     var count = 0;
                     for (var k = 0; k < consumptionRemainingList.length; k++) {
@@ -552,17 +569,13 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     }
                 }
-                console.log("Total Consumption", totalConsumption);
 
                 var adjustmentsRemainingList = inventoryList.filter(c => c.inventoryDate < m[3].startDate);
-                console.log("Adjustments Remaining list",adjustmentsRemainingList);
                 for (var j = 0; j < adjustmentsRemainingList.length; j++) {
                     totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
                 }
 
-                console.log("Total Adjustments", totalAdjustments);
                 openingBalance = totalAdjustments - totalConsumption;
-                console.log("Opening balance", openingBalance);
                 openingBalanceArray.push(openingBalance);
                 for (var i = 1; i <= 18; i++) {
                     var consumptionQtyForCB = 0;
@@ -593,12 +606,16 @@ export default class SupplyPlanComponent extends React.Component {
 
                 // Suggested shipments part
                 for (var s = 0; s < 18; s++) {
-                    if (parseInt(openingBalanceArray[s]) <= parseInt(minStockArray[s])) {
+                    var month = m[s + 3].startDate;
+                    var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                    var compare = (month >= currentMonth);
+                    if (compare && parseInt(openingBalanceArray[s]) <= parseInt(minStockArray[s])) {
                         var suggestedOrd = parseInt(maxStockArray[s] - minStockArray[s]);
                         if (suggestedOrd == 0) {
                             suggestedShipmentsTotalData.push("");
                         } else {
-                            suggestedShipmentsTotalData.push(suggestedOrd);
+                            suggestedShipmentsTotalData.push({ "suggestedOrderQty": suggestedOrd, "month": m[s + 3].startDate });
+                            filteredArraySuggestedShipments.push({ "suggestedOrderQty": suggestedOrd, "month": m[s + 3].startDate, "type": "suggestedNew" })
                         }
                     } else {
                         suggestedShipmentsTotalData.push("");
@@ -618,7 +635,9 @@ export default class SupplyPlanComponent extends React.Component {
                     amcTotalData: amcTotalData,
                     minStockArray: minStockArray,
                     maxStockArray: maxStockArray,
-                    monthsOfStockArray: monthsOfStockArray
+                    monthsOfStockArray: monthsOfStockArray,
+                    planningUnitName: planningUnitName,
+                    filteredArraySuggestedShipments: filteredArraySuggestedShipments
                 })
             }.bind(this)
         }.bind(this)
@@ -879,6 +898,168 @@ export default class SupplyPlanComponent extends React.Component {
         } else {
             alert("You need to save the data first.");
         }
+    }
+
+    suggestedShipmentsDetailsClicked(month, quantity) {
+        var planningUnitId = document.getElementById("planningUnitId").value;
+        var programId = document.getElementById("programId").value;
+        var db1;
+        var procurementAgentList = [];
+        var fundingSourceList = [];
+        var budgetList = [];
+        var myVar = '';
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+            var consumptionTotalData = [];
+            var filteredArray = [];
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                console.log("Program Json",programJson);
+                console.log("parseFloat(programData.plannedToDraftLeadTime)", programJson.plannedToDraftLeadTime);
+                console.log("parseFloat(programJson.draftToSubmittedLeadTime)",parseFloat(programJson.draftToSubmittedLeadTime));
+                console.log("parseFloat(programJson.submittedToApprovedLeadTime)",parseFloat(programJson.submittedToApprovedLeadTime));
+                console.log("parseFloat(programJson.approvedToShippedLeadTime)",parseFloat(programJson.approvedToShippedLeadTime));
+                console.log("parseFloat(programJson.deliveredToReceivedLeadTime)",parseFloat(programJson.deliveredToReceivedLeadTime));
+                var addLeadTimes = Math.floor(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
+                    parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
+                    parseFloat(programJson.deliveredToReceivedLeadTime));
+                console.log("addLeadTome", addLeadTimes);
+                var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes,'months').format("YYYY-MM-DD");
+                console.log("Expected delivery date after date add",expectedDeliveryDate);
+                var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                var papuRequest = papuOs.getAll();
+                papuRequest.onsuccess = function (event) {
+                    var papuResult = [];
+                    papuResult = papuRequest.result;
+                    for (var k = 0; k < papuResult.length; k++) {
+                        if (papuResult[k].planningUnit.id == planningUnitId) {
+                            var papuJson = {
+                                name: papuResult[k].procurementAgent.label.label_en,
+                                id: papuResult[k].procurementAgent.id
+                            }
+                            procurementAgentList.push(papuJson);
+                        }
+                    }
+
+                    var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                    var fsOs = fsTransaction.objectStore('fundingSource');
+                    var fsRequest = fsOs.getAll();
+                    fsRequest.onsuccess = function (event) {
+                        var fsResult = [];
+                        fsResult = fsRequest.result;
+                        for (var k = 0; k < fsResult.length; k++) {
+                            if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                var fsJson = {
+                                    name: fsResult[k].label.label_en,
+                                    id: fsResult[k].fundingSourceId
+                                }
+                                fundingSourceList.push(fsJson);
+                            }
+                        }
+
+                        var bTransaction = db1.transaction(['budget'], 'readwrite');
+                        var bOs = bTransaction.objectStore('budget');
+                        var bRequest = bOs.getAll();
+                        var budgetListAll = []
+                        bRequest.onsuccess = function (event) {
+                            var bResult = [];
+                            bResult = bRequest.result;
+                            for (var k = 0; k < bResult.length; k++) {
+                                var bJson = {
+                                    name: bResult[k].label.label_en,
+                                    id: bResult[k].budgetId
+                                }
+                                budgetList.push(bJson);
+                                budgetListAll.push({
+                                    name: bResult[k].label.label_en,
+                                    id: bResult[k].budgetId, fundingSource: bResult[k].fundingSource
+                                })
+
+                            }
+                            this.setState({
+                                budgetList: budgetListAll
+                            })
+                            var suggestedShipmentList = this.state.filteredArraySuggestedShipments.filter(c => c.month == month);
+                            this.el = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), '');
+                            this.el.destroy();
+                            var data = [];
+                            var suggestedShipmentsArr = []
+                            for (var j = 0; j < suggestedShipmentList.length; j++) {
+                                data = [];
+                                data[0] = expectedDeliveryDate;
+                                data[1] = "SUGGESTED";
+                                data[2] = this.state.planningUnitName;
+                                data[3] = suggestedShipmentList[j].suggestedOrderQty;
+                                data[4] = suggestedShipmentList[j].suggestedOrderQty;
+                                data[5] = "";
+                                data[6] = "";
+                                data[7] = "";
+                                data[8] = "";
+                                suggestedShipmentsArr[j] = data;
+                            }
+                            var options = {
+                                data: suggestedShipmentsArr,
+                                colHeaders: [
+                                    "Expected delivery date",
+                                    "Shipment status",
+                                    "Planning unit",
+                                    "Suggested order qty",
+                                    "Adjusted order qty",
+                                    "Procurement agent",
+                                    "Funding source",
+                                    "Budget",
+                                    "Notes",
+                                ],
+                                colWidths: [80, 150, 200, 80, 80, 350, 80, 80, 80],
+                                columns: [
+                                    { type: 'text', readOnly: true },
+                                    { type: 'text', readOnly: true },
+                                    { type: 'text', readOnly: true },
+                                    { type: 'numeric', readOnly: true },
+                                    { type: 'numeric', readOnly: true },
+                                    { type: 'dropdown', source: procurementAgentList },
+                                    { type: 'dropdown', source: fundingSourceList },
+                                    { type: 'dropdown', source: budgetList, filter: this.dropdownFilter },
+                                    { type: 'text' },
+                                ],
+                                pagination: false,
+                                search: false,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                allowInsertRow: false,
+                                allowManualInsertRow: false,
+                                onchange: this.consumptionChanged,
+                            };
+                            myVar = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), options);
+                            this.el = myVar;
+                            this.setState({
+                                suggestedShipmentsEl: myVar
+                            })
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
+    dropdownFilter = function (instance, cell, c, r, source) {
+        var mylist = [];
+        var value = (instance.jexcel.getJson()[r])[c - 1];
+        console.log(this.state.budgetList);
+        var bList = (this.state.budgetList).filter(c => c.fundingSource.fundingSourceId == value);
+        return bList;
     }
 
     consumptionChanged = function (instance, cell, x, y, value) {
@@ -1362,12 +1543,16 @@ export default class SupplyPlanComponent extends React.Component {
                                                 ))
                                             }
                                         </tr>
-                                        <tr>
+                                        <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
                                             <td>Suggested Shipments</td>
                                             {
-                                                this.state.suggestedShipmentsTotalData.map(item1 => (
-                                                    <td>{item1}</td>
-                                                ))
+                                                this.state.suggestedShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`)}>{item1.suggestedOrderQty}</td>)
+                                                    } else {
+                                                        return (<td>{item1}</td>)
+                                                    }
+                                                })
                                             }
                                         </tr>
                                         <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
@@ -1378,7 +1563,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 ))
                                             }
                                         </tr>
-                                        <tr>
+                                        <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
                                             <td>Ending Balance</td>
                                             {
                                                 this.state.closingBalanceArray.map(item1 => (
@@ -1548,6 +1733,22 @@ export default class SupplyPlanComponent extends React.Component {
                                 <ModalFooter>
                                     {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> Save</Button>}{' '}
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+
+                            <Modal isOpen={this.state.suggestedShipments} toggle={() => this.toggleLarge('SuggestedShipments')}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
+                                    <strong>Shipment Details</strong>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div className="table-responsive">
+                                        <div id="suggestedShipmentsDetailsTable" />
+                                    </div>
+                                </ModalBody>
+                                <ModalFooter>
+                                    {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
                         </CardBody>
