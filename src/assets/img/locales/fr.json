@@ -133,8 +133,15 @@
     "static.dashboard.consumption": "Consommation",
     "static.dashboard.stockstatusmatrix": "Matrice de l'état des stocks",
     "static.dashboard.program": "Programme",
+    "static.message.syncExpiresOn": "Vous avez dépassé le nombre maximal de jours pendant lesquels vous pouvez travailler hors ligne. Veuillez vous connecter pour continuer à utiliser QAT.",
+    "static.common.year": "An",
+    "static.common.display": "Afficher",
+    "static.common.monthly": "Mensuel",
+    "static.common.quarterly": "Trimestriel",
+    "static.common.selectProgram": "Veuillez sélectionner le programme",
+    "static.common.all": "Tout",
     "static.realm.yes": "Oui",
     "static.realm.no": "Non",
-    "static.message.syncExpiresOn": "Vous avez dépassé le nombre maximal de jours pendant lesquels vous pouvez travailler hors ligne. Veuillez vous connecter pour continuer à utiliser QAT.",
     "static.region.glnvalue": "Le numéro GLN ne doit pas être composé de 13 chiffres."
+
 }
