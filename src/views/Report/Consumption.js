@@ -217,7 +217,7 @@ class Consumption extends Component {
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(18)
         doc.setPage(i)
-        doc.addImage(LOGO,'png',0,10, 200, 50,'FAST');
+        doc.addImage(LOGO,'png',0,10, 180, 50,'FAST');
         /*doc.addImage(data, 10, 30, {
           align: 'justify'
         });*/
@@ -259,7 +259,7 @@ class Consumption extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*2/3 );
+    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4 );
     
     const headers =[ [   i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecastConsumption'),
@@ -817,7 +817,7 @@ class Consumption extends Component {
                     this.state.consumptions.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}  onClick={() => this.exportPDF()}/>
                        
                        {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                        
@@ -836,7 +836,7 @@ class Consumption extends Component {
                     this.state.offlineConsumptionList.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}  onClick={() => this.exportPDF()}/>
                      
                      {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
                           {({ toPdf }) =>
@@ -1006,9 +1006,9 @@ class Consumption extends Component {
                                         )
                                       }, this)}
                                   </Input>
-                                  <InputGroupAddon addonType="append">
+                                  {/* <InputGroupAddon addonType="append">
                                     <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon>
+                                  </InputGroupAddon> */}
                                 </InputGroup>
                               </div>
                             </FormGroup>
@@ -1033,9 +1033,9 @@ class Consumption extends Component {
                                         )
                                       }, this)}
                                   </Input>
-                                  <InputGroupAddon addonType="append">
+                                  {/* <InputGroupAddon addonType="append">
                                     <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon>
+                                  </InputGroupAddon> */}
                                 </InputGroup>
                               </div>
                             </FormGroup>

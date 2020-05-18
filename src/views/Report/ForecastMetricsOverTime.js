@@ -193,15 +193,19 @@ class ForcastMatrixOverTime extends Component {
       const pageCount = doc.internal.getNumberOfPages()
     
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(8)
+      doc.setFontSize(10)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
-        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width *3/ 4, doc.internal.pageSize.height-50, {
-          align: 'center'
+      
+        doc.setPage(i)
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height-30, {
+        align: 'center'
         })
-        doc.text('Quantification Anatics Tool', doc.internal.pageSize.width / 4, doc.internal.pageSize.height-50, {
-          align: 'center'
+        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
+        align: 'center'
         })
+      
+        
       }
     }
     const addHeaders = doc => {
@@ -213,20 +217,21 @@ class ForcastMatrixOverTime extends Component {
         doc.setFontSize(18)
         doc.setPage(i)
         
-        doc.addImage(LOGO,'png', 10, 30,50,50,'','FAST');
+        doc.addImage(LOGO,'png', 0, 10,180,50,'','FAST');
 
-        doc.text(i18n.t('static.report.forecasterrorovertime'), doc.internal.pageSize.width / 2, 20, {
+        doc.setTextColor("#002f6c");
+        doc.text(i18n.t('static.report.forecasterrorovertime'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if(i==1){
           doc.setFontSize(12)
-          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 50, {
+          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country')+' : '+ document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 70, {
+          doc.text(i18n.t('static.dashboard.country')+' : '+ document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
         }
@@ -251,12 +256,13 @@ class ForcastMatrixOverTime extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png', 50, 90,aspectwidth1, height*3/4,'','FAST' );
+    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4,'','FAST' );
     const headers =[ [   i18n.t('static.report.month'),
     i18n.t('static.report.errorperc')]];
     const data =   this.state.matricsList.map( elt =>[ elt.consupmtion_date,elt.errorperc]);
     
     let content = {
+    margin: {top: 80},
     startY:  height,
     head: headers,
     body: data,
@@ -542,15 +548,17 @@ this.fetchData();
                     this.state.matricsList.length > 0 &&
                     <div className="card-header-actions">
                       <a className="card-header-action">
-                      <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
-                      <img style={{ height: '40px', width: '40px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
+                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                       </a> </div>
                   }
               
                 </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                  <div className=""> <div ref={ref}> <div className="" >
+                  <div className="container">
+                     <div ref={ref}>
+                        <div className="col-md-12" >
                     <Form >
                       <Col>
                         <div className="row">
@@ -594,7 +602,7 @@ this.fetchData();
                             </FormGroup>
                             <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls ">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -625,25 +633,37 @@ this.fetchData();
                                     <option value="0">{i18n.t('static.common.select')}</option>
                                     {planningUnitList}
                                   </Input>
-                                  <InputGroupAddon addonType="append">
+                                  {/* <InputGroupAddon addonType="append">
                                     <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon>
+                                  </InputGroupAddon> */}
                                 </InputGroup>
                               </div>
                             </FormGroup>
                            </div>
                       </Col>
                     </Form>
+                    <div className="row">
+                      <div className="col-md-12">
                     {
                         this.state.matricsList.length > 0
                         &&
+                       
+                          <div className="col-md-9">
                         <div   className="chart-wrapper chart-graph">
                           <Bar id="cool-canvas" data={bar} options={options} />
-                         </div>}
-                   </div></div>
+                         </div>
+                         </div>
+                         }
+                         </div>
+                         </div>
+
+
+                   </div>
+                   </div>
 
                  
-                  </div></div>
+                  </div>
+                  </div>
               </CardBody>
             </Card>
           </Col>
