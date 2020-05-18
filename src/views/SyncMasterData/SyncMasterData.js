@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     Card, CardBody, CardHeader,
-    CardFooter, Button, Col, Progress, FormGroup, Row
+    CardFooter, Button, Col, Progress, FormGroup, Row, Container
 } from 'reactstrap';
 import '../Forms/ValidationForms/ValidationForms.css';
 import 'react-select/dist/react-select.min.css';
@@ -13,6 +13,8 @@ import i18n from '../../i18n';
 import i18next from 'i18next';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import InnerBgImg from '../../../src/assets/img/bg-image/bg-login.jpg';
+import image1 from '../../assets/img/QAT-logo.png';
 
 export default class SyncMasterData extends Component {
 
@@ -29,36 +31,50 @@ export default class SyncMasterData extends Component {
 
     componentDidMount() {
         document.getElementById("retryButtonDiv").style.display = "none";
-        confirmAlert({
-            // title: i18n.t('static.masterDataSync.masterDataSync'),
-            message: i18n.t('static.masterDataSync.confirmSyncMessage'),
-            buttons: [
-                {
-                    label: i18n.t('static.program.yes'),
-                    onClick: () => {
-                        this.syncMasters();
-                    }
-                },
-                {
-                    label: i18n.t('static.program.no'),
-                    onClick: () => {
-                        document.getElementById("retryButtonDiv").style.display = "block";
-                        this.setState({
-                            message: i18n.t('static.actionCancelled')
-                        })
-                    }
-                }
-            ]
-        });
+        this.syncMasters();
+        // confirmAlert({
+        //     // title: i18n.t('static.masterDataSync.masterDataSync'),
+        //     message: i18n.t('static.masterDataSync.confirmSyncMessage'),
+        //     buttons: [
+        //         {
+        //             label: i18n.t('static.program.yes'),
+        //             onClick: () => {
+        // this.syncMasters();
+        //             }
+        //         },
+        //         {
+        //             label: i18n.t('static.program.no'),
+        //             onClick: () => {
+        //                 document.getElementById("retryButtonDiv").style.display = "block";
+        //                 this.setState({
+        //                     message: i18n.t('static.actionCancelled')
+        //                 })
+        //             }
+        //         }
+        //     ]
+        // });
     }
 
     render() {
         return (
             <div className="animated fadeIn">
+                <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5>{i18n.t(this.state.message)}</h5>
                 <Row>
                     <Col xs="12" sm="12">
                         <Card>
+                            {/* // <div className="app flex-row align-items-center">
+            //     <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
+            //         <Container className="container-login">
+            //             <Row className="justify-content-center ">
+            //                 <Col md="12">
+            //                     <div className="upper-logo mt-1">
+            //                         <img src={image1} className="img-fluid " />
+            //                     </div>
+            //                 </Col>
+            //                 <Col md="9" lg="7" xl="6" className="mt-4">
+            //                     <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
+            //                     <Card className="mx-4 "> */}
                             <CardHeader>
                                 <strong>{i18n.t('static.masterDataSync.masterDataSync')}</strong>
                             </CardHeader>
@@ -76,6 +92,8 @@ export default class SyncMasterData extends Component {
                         </Card>
                     </Col>
                 </Row>
+                {/* </Container>
+                </div> */}
             </div>
         )
 
@@ -291,7 +309,11 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                             .then(response => {
                                                                                                                                                                                                 if (response.status == 200) {
                                                                                                                                                                                                     console.log("Product category Response", response.data)
-                                                                                                                                                                                                    var json = (response.data).flatList;
+                                                                                                                                                                                                    var json = []
+                                                                                                                                                                                                    if ((response.data).length > 0) {
+                                                                                                                                                                                                        json = (response.data).flatList;
+                                                                                                                                                                                                    }
+
                                                                                                                                                                                                     var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
                                                                                                                                                                                                     var productCategoryObjectStore = productCategoryTransaction.objectStore('productCategory');
                                                                                                                                                                                                     for (var i = 0; i < json.length; i++) {
@@ -595,7 +617,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                         var updateLastSyncDate = lastSyncDateTransaction.put(updatedLastSyncDateJson1)
                                                                                                                                                                                                                                                                                                                                                                                                                                                                         updateLastSyncDate.onsuccess = function (event) {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                             document.getElementById("retryButtonDiv").style.display = "none";
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            this.props.history.push(`/dashboard/` + i18n.t('static.masterDataSync.success'))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            this.props.history.push(`/ApplicationDashboard/` + i18n.t('static.masterDataSync.success'))
                                                                                                                                                                                                                                                                                                                                                                                                                                                                         }.bind(this)
                                                                                                                                                                                                                                                                                                                                                                                                                                                                     } else {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                         document.getElementById("retryButtonDiv").style.display = "block";
@@ -1455,34 +1477,42 @@ export default class SyncMasterData extends Component {
 
 
     retryClicked() {
-        confirmAlert({
-            // title: i18n.t('static.masterDataSync.masterDataSync'),
-            message: i18n.t('static.masterDataSync.confirmRetrySyncMessage'),
-            buttons: [
-                {
-                    label: i18n.t('static.program.yes'),
-                    onClick: () => {
-                        this.setState({
-                            totalMasters: 27,
-                            syncedMasters: 0,
-                            syncedPercentage: 0,
-                            errorMessage: "",
-                            successMessage: ""
-                        })
-                        this.syncMasters();
-                    }
-                },
-                {
-                    label: i18n.t('static.program.no'),
-                    onClick: () => {
-                        // document.getElementById("retryButtonDiv").style.display = "block";
-                        this.setState({
-                            message: i18n.t('static.actionCancelled')
-                        })
-                    }
-                }
-            ]
-        });
+        this.setState({
+            totalMasters: 27,
+            syncedMasters: 0,
+            syncedPercentage: 0,
+            errorMessage: "",
+            successMessage: ""
+        })
+        this.syncMasters();
+        // confirmAlert({
+        //     // title: i18n.t('static.masterDataSync.masterDataSync'),
+        //     message: i18n.t('static.masterDataSync.confirmRetrySyncMessage'),
+        //     buttons: [
+        //         {
+        //             label: i18n.t('static.program.yes'),
+        //             onClick: () => {
+        //                 this.setState({
+        //                     totalMasters: 27,
+        //                     syncedMasters: 0,
+        //                     syncedPercentage: 0,
+        //                     errorMessage: "",
+        //                     successMessage: ""
+        //                 })
+        //                 this.syncMasters();
+        //             }
+        //         },
+        //         {
+        //             label: i18n.t('static.program.no'),
+        //             onClick: () => {
+        //                 // document.getElementById("retryButtonDiv").style.display = "block";
+        //                 this.setState({
+        //                     message: i18n.t('static.actionCancelled')
+        //                 })
+        //             }
+        //         }
+        //     ]
+        // });
 
 
 

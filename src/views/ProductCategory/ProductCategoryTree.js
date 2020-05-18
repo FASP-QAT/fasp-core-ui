@@ -497,7 +497,7 @@ export default class ProductCategoryTree extends Component {
                                                                     type="text"
                                                                     value={this.state.nodename}
                                                                     bsSize="sm"
-                                                                    valid={!errors.productCategory}
+                                                                    valid={!errors.productCategory && this.state.nodename != ''}
                                                                     invalid={touched.productCategory && !!errors.productCategory}
                                                                     onChange={event => { handleChange(event); this.nodeNameChange(event) }}
                                                                     onBlur={handleBlur}
@@ -505,7 +505,7 @@ export default class ProductCategoryTree extends Component {
                                                                 <FormFeedback className="red">{errors.productCategory}</FormFeedback>
                                                             </Col>
                                                             <Col className="pl-lg-0" md={2} style={{ paddingTop: '27px' }}>
-                                                                <Button  className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
+                                                                <Button className="text-white" type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)}><i className="fa fa-plus"></i> Add</Button>
                                                             </Col>
                                                         </Row>
                                                     </FormGroup>

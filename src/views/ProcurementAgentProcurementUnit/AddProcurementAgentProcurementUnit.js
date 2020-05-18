@@ -466,94 +466,94 @@ export default class AddProcurementAgentProcurementUnit extends Component {
                                         }) => (
                                                 <Form onSubmit={handleSubmit} noValidate name='procurementAgentPlanningUnitForm'>
                                                     <Row>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
-                                                            {procurementAgents}
-                                                        </Input>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="select">{i18n.t('static.procurementUnit.procurementUnit')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="procurementUnitId"
-                                                            id="procurementUnitId"
-                                                            bsSize="sm"
-                                                            valid={!errors.procurementUnitId}
-                                                            invalid={touched.procurementUnitId && !!errors.procurementUnitId}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.procurementUnitId}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }}>
-                                                            <option value="">{i18n.t('static.common.select')}</option>
-                                                            {procurementUnits}
-                                                        </Input>
-                                                        <FormFeedback className="red">{errors.procurementUnitId}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="skuCode"
-                                                            id="skuCode"
-                                                            value={this.state.skuCode}
-                                                            bsSize="sm"
-                                                            valid={!errors.skuCode}
-                                                            invalid={touched.skuCode && !!errors.skuCode}
-                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
-                                                            onBlur={handleBlur}
-                                                            onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
-                                                        <FormFeedback className="red">{errors.skuCode}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6"> 
-                                                        <Label htmlFor="vendorPrice">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            name="vendorPrice"
-                                                            id="vendorPrice"
-                                                            bsSize="sm"
-                                                            valid={!errors.vendorPrice}
-                                                            invalid={touched.vendorPrice && !!errors.vendorPrice}
-                                                            value={this.state.vendorPrice}
-                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')}
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                        <FormFeedback className="red">{errors.vendorPrice}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="leadTime">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            name="approvedToShippedLeadTime"
-                                                            id="approvedToShippedLeadTime"
-                                                            bsSize="sm"
-                                                            valid={!errors.approvedToShippedLeadTime}
-                                                            invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
-                                                            value={this.state.approvedToShippedLeadTime}
-                                                            placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')}
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
-                                                        <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span className="red Reqasterisk">*</span></Label>
-                                                        <Input
-                                                            type="text"
-                                                            name="gtin"
-                                                            id="gtin"
-                                                            bsSize="sm"
-                                                            valid={!errors.gtin}
-                                                            invalid={touched.gtin && !!errors.gtin}
-                                                            value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
-                                                            onBlur={handleBlur}
-                                                            onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
-                                                        <FormFeedback className="red">{errors.gtin}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-12 md-mt-4">
-                                                        {/* <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button> */}
-                                                        <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                                        &nbsp;
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="select">{i18n.t('static.procurementagent.procurementagent')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Input type="select" value={this.state.procurementAgentId} name="procurementAgentId" id="procurementAgentId" disabled>
+                                                                {procurementAgents}
+                                                            </Input>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="select">{i18n.t('static.procurementUnit.procurementUnit')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="select"
+                                                                name="procurementUnitId"
+                                                                id="procurementUnitId"
+                                                                bsSize="sm"
+                                                                valid={!errors.procurementUnitId && this.state.procurementUnitId != ''}
+                                                                invalid={touched.procurementUnitId && !!errors.procurementUnitId}
+                                                                onBlur={handleBlur}
+                                                                value={this.state.procurementUnitId}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}>
+                                                                <option value="">{i18n.t('static.common.select')}</option>
+                                                                {procurementUnits}
+                                                            </Input>
+                                                            <FormFeedback className="red">{errors.procurementUnitId}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="skuCode">{i18n.t('static.procurementAgentProcurementUnit.skuCode')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="text"
+                                                                name="skuCode"
+                                                                id="skuCode"
+                                                                value={this.state.skuCode}
+                                                                bsSize="sm"
+                                                                valid={!errors.skuCode && this.state.skuCode != ''}
+                                                                invalid={touched.skuCode && !!errors.skuCode}
+                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.skuCodeText')}
+                                                                onBlur={handleBlur}
+                                                                onChange={(event) => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
+                                                            <FormFeedback className="red">{errors.skuCode}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="vendorPrice">{i18n.t('static.procurementAgentProcurementUnit.vendorPrice')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="number"
+                                                                min="0"
+                                                                name="vendorPrice"
+                                                                id="vendorPrice"
+                                                                bsSize="sm"
+                                                                valid={!errors.vendorPrice && this.state.vendorPrice != ''}
+                                                                invalid={touched.vendorPrice && !!errors.vendorPrice}
+                                                                value={this.state.vendorPrice}
+                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.vendorPriceText')}
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                            <FormFeedback className="red">{errors.vendorPrice}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="leadTime">{i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTime')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="number"
+                                                                min="0"
+                                                                name="approvedToShippedLeadTime"
+                                                                id="approvedToShippedLeadTime"
+                                                                bsSize="sm"
+                                                                valid={!errors.approvedToShippedLeadTime && this.state.approvedToShippedLeadTime != ''}
+                                                                invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
+                                                                value={this.state.approvedToShippedLeadTime}
+                                                                placeholder={i18n.t('static.procurementAgentProcurementUnit.approvedToShippedLeadTimeText')}
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }} />
+                                                            <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="gtin">{i18n.t('static.procurementAgentProcurementUnit.gtin')}<span className="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="text"
+                                                                name="gtin"
+                                                                id="gtin"
+                                                                bsSize="sm"
+                                                                valid={!errors.gtin && this.state.gtin != ''}
+                                                                invalid={touched.gtin && !!errors.gtin}
+                                                                value={this.state.gtin} placeholder={i18n.t('static.procurementAgentProcurementUnit.gtinText')}
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event); this.capitalize(event) }} />
+                                                            <FormFeedback className="red">{errors.gtin}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-12 md-mt-4">
+                                                            {/* <Button type="button" size="md" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button> */}
+                                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                            &nbsp;
 
                         </FormGroup></Row>
                                                 </Form>

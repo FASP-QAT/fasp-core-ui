@@ -57,10 +57,12 @@ class AddUnitComponent extends Component {
         this.state = {
             unit: {
                 dimension: {
+                    id: ''
                 },
                 label: {
-
-                }
+                    label_en: ''
+                },
+                unitCode: ''
             },
             message: '',
             dimensions: []
@@ -166,6 +168,7 @@ class AddUnitComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     UnitService.addUnit(this.state.unit).then(response => {
@@ -188,9 +191,10 @@ class AddUnitComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
+                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="dimensionId">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
@@ -201,7 +205,7 @@ class AddUnitComponent extends Component {
                                                             bsSize="sm"
                                                             name="dimensionId"
                                                             id="dimensionId"
-                                                            valid={!errors.dimensionId}
+                                                            valid={!errors.dimensionId && this.state.unit.dimension.id != ''}
                                                             invalid={touched.dimensionId && !!errors.dimensionId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -221,7 +225,7 @@ class AddUnitComponent extends Component {
                                                             name="unitName"
                                                             id="unitName"
                                                             bsSize="sm"
-                                                            valid={!errors.unitName}
+                                                            valid={!errors.unitName && this.state.unit.label.label_en != ''}
                                                             invalid={touched.unitName && !!errors.unitName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
@@ -236,7 +240,7 @@ class AddUnitComponent extends Component {
                                                             name="unitCode"
                                                             id="unitCode"
                                                             bsSize="sm"
-                                                            valid={!errors.unitCpde}
+                                                            valid={!errors.unitCode && this.state.unit.unitCode != ''}
                                                             invalid={touched.unitCode && !!errors.unitCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
@@ -248,7 +252,7 @@ class AddUnitComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;

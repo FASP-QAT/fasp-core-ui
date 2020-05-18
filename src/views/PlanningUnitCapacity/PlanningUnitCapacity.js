@@ -23,7 +23,7 @@ let initialValues = {
     capacity: ''
 
 }
-const entityname=i18n.t('static.dashboad.planningunitcapacity')
+const entityname = i18n.t('static.dashboad.planningunitcapacity')
 const validationSchema = function (values, t) {
     return Yup.object().shape({
         supplier: Yup.string()
@@ -65,7 +65,7 @@ class PlanningUnitCapacity extends Component {
         this.state = {
             lang: localStorage.getItem('lang'),
             planningUnitCapacity: {},
-            planningUnitCapacityId:'',
+            planningUnitCapacityId: '',
             suppliers: [],
             supplier: {
                 supplierId: '',
@@ -78,7 +78,7 @@ class PlanningUnitCapacity extends Component {
             stopDate: '',
             rows: [],
             planningUnit: {
-                planningUnitId:'',
+                planningUnitId: '',
                 label: {
                     label_en: ''
                 }
@@ -100,9 +100,9 @@ class PlanningUnitCapacity extends Component {
         if (this.state.updateRowStatus == 1) {
             this.setState({ rowErrorMessage: 'One Of the mapped row is already in update.' })
         } else {
-        console.log(JSON.stringify(this.state.rows[idx]))
+            console.log(JSON.stringify(this.state.rows[idx]))
             initialValues = {
-                planningUnitCapacityId:this.state.rows[idx].planningUnitCapacityId,
+                planningUnitCapacityId: this.state.rows[idx].planningUnitCapacityId,
                 supplierId: this.state.rows[idx].supplier.id,
                 supplier: {
                     supplierId: this.state.rows[idx].supplier.id,
@@ -111,13 +111,13 @@ class PlanningUnitCapacity extends Component {
                     }
                 },
                 startDate: this.state.rows[idx].startDate,
-                 stopDate: this.state.rows[idx].stopDate,
+                stopDate: this.state.rows[idx].stopDate,
                 gtin: this.state.rows[idx].gtin,
                 capacity: this.state.rows[idx].capacity
             }
             const rows = [...this.state.rows]
             this.setState({
-                planningUnitCapacityId:this.state.rows[idx].planningUnitCapacityId,
+                planningUnitCapacityId: this.state.rows[idx].planningUnitCapacityId,
                 supplierId: this.state.rows[idx].supplier.id,
                 supplier: {
                     supplierId: this.state.rows[idx].supplier.id,
@@ -126,7 +126,7 @@ class PlanningUnitCapacity extends Component {
                     }
                 },
                 startDate: this.state.rows[idx].startDate,
-                 stopDate: this.state.rows[idx].stopDate,
+                stopDate: this.state.rows[idx].stopDate,
                 gtin: this.state.rows[idx].gtin,
                 capacity: this.state.rows[idx].capacity,
                 isNew: false,
@@ -202,12 +202,12 @@ class PlanningUnitCapacity extends Component {
 
     }
 
-   
+
     deleteLastRow() {
         const rows = [...this.state.rows]
-     /*  rows[this.state.rows.length - 1].active=false
-       var row=   rows.slice(-1).pop();
-       rows.push(row);*/
+        /*  rows[this.state.rows.length - 1].active=false
+          var row=   rows.slice(-1).pop();
+          rows.push(row);*/
         this.setState({
             rows
         });
@@ -220,7 +220,7 @@ class PlanningUnitCapacity extends Component {
     }
     handleRemoveSpecificRow(idx) {
         const rows = [...this.state.rows]
-         rows.splice(idx, 1);
+        rows.splice(idx, 1);
         this.setState({ rows })
     }
     enableRow(idx) {
@@ -239,7 +239,7 @@ class PlanningUnitCapacity extends Component {
         PlanningUnitService.editPlanningUnitCapacity(planningUnitCapacity)
             .then(response => {
                 if (response.status == 200) {
-                    this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode,{entityname}))
+                    this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t(response.data.messageCode, { entityname }))
 
                 } else {
                     this.setState({
@@ -365,29 +365,30 @@ class PlanningUnitCapacity extends Component {
                 </option>
             )
         }, this);
-        return ( <div className="animated fadeIn">
-        <h5>{i18n.t(this.state.message)}</h5>
-        <Row>
-            <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                <Card>
-                    <CardHeader>
+        return (<div className="animated fadeIn">
+            <h5>{i18n.t(this.state.message)}</h5>
+            <Row>
+                <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                    <Card>
+                        <CardHeader>
                             <strong>{i18n.t('static.dashboad.planningunitcapacity')}</strong>
                         </CardHeader>
                         <CardBody>
                             <Formik
-                                 enableReinitialize={true}
-                                 initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={initialValues}
                                 validate={validate(validationSchema)}
-                                onSubmit={(values, { setSubmitting, setErrors,resetForm }) => {
+                                onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                     if (this.state.supplier.supplierId != "" && this.state.startDate != "" && this.state.stopDate != "" && this.state.capacity != "") {
                                         var json =
-                                        {planningUnitCapacityId:this.state.planningUnitCapacityId,
+                                        {
+                                            planningUnitCapacityId: this.state.planningUnitCapacityId,
                                             planningUnit: {
                                                 id: this.props.match.params.planningUnitId
                                             }
                                             ,
                                             supplier: {
-                                                id: this.state.supplier.supplierId,
+                                                supplierId: this.state.supplier.supplierId,
                                                 label: {
                                                     label_en: this.state.supplier.label.label_en
                                                 }
@@ -403,35 +404,12 @@ class PlanningUnitCapacity extends Component {
 
                                         }
                                         this.state.rows.push(json)
-                                        this.setState({ rows: this.state.rows ,updateRowStatus:0 })
+                                        this.setState({ rows: this.state.rows, updateRowStatus: 0 })
                                         this.setState({
-                                            planningUnitCapacityId:'',
-                                                
-                                                supplier: {
-                                                    id: '',
-                                                    label: {
-                                                        label_en: ''
-                                                    }
-                                                }
-                                                ,
-                                                startDate: '',
-    
-                                                stopDate: '',
-    
-                                                capacity: '',
-                                                active: true
-    
-    
-                                        });
-                                    }
-                                    resetForm({
-                                        planningUnitCapacityId:'',
-                                        planningUnit: {
-                                            id: this.props.match.params.planningUnitId
-                                        }
-                                            ,
+                                            planningUnitCapacityId: '',
+
                                             supplier: {
-                                                id: '',
+                                                supplierId: '',
                                                 label: {
                                                     label_en: ''
                                                 }
@@ -445,8 +423,31 @@ class PlanningUnitCapacity extends Component {
                                             active: true
 
 
+                                        });
+                                    }
+                                    resetForm({
+                                        planningUnitCapacityId: '',
+                                        planningUnit: {
+                                            id: this.props.match.params.planningUnitId
+                                        }
+                                        ,
+                                        supplier: {
+                                            supplierId: '',
+                                            label: {
+                                                label_en: ''
+                                            }
+                                        }
+                                        ,
+                                        startDate: '',
+
+                                        stopDate: '',
+
+                                        capacity: '',
+                                        active: true
+
+
                                     });
-                                    
+
                                 }}
                                 render={
                                     ({
@@ -461,101 +462,101 @@ class PlanningUnitCapacity extends Component {
                                         setTouched
                                     }) => (<Form onSubmit={handleSubmit} noValidate name='capacityForm'>
                                         <Row>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <Input
-                                            type="text"
-                                            name="planningUnitId"
-                                            id="progplanningUnitIdramId"
-                                            bsSize="sm"
-                                            readOnly
-                                            valid={!errors.planningUnitId}
-                                            invalid={touched.planningUnitId && !!errors.planningUnitId}
-                                            onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                            onBlur={handleBlur}
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                <Input
+                                                    type="text"
+                                                    name="planningUnitId"
+                                                    id="progplanningUnitIdramId"
+                                                    bsSize="sm"
+                                                    readOnly
+                                                    valid={!errors.planningUnitId && this.state.planningUnit.label != ''}
+                                                    invalid={touched.planningUnitId && !!errors.planningUnitId}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    onBlur={handleBlur}
 
-                                            value={getLabelText(this.state.planningUnit.label, this.state.lang)}
-                                     >
-                                            </Input>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label htmlFor="select">{i18n.t('static.supplier.supplier')}</Label>
-                                            <Input type="select" name="supplier" id="supplier" bsSize="sm"
-                                                valid={!errors.supplier}
-                                                invalid={touched.realmId && !!errors.supplier}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }} 
-                                                value={this.state.supplier.supplierId} required>
-                                                <option value="">{i18n.t('static.common.select')}</option>
-                                                {supplierList}
-                                            </Input> <FormFeedback className="red">{errors.supplier}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
-                                            <Input
-                                                className="fa fa-calendar Fa-right"
-                                                name="startDate"
-                                                id="startDate"
-                                                type="date"
-                                                bsSize="sm"
-                                                valid={!errors.startDate}
-                                                invalid={touched.startDate && !!errors.startDate}
-                                                onBlur={handleBlur}
-                                                min={this.currentDate()}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                value={this.state.startDate}
-                                                placeholder={i18n.t('static.budget.budgetstartdate')}
-                                                required />
-                                            <FormFeedback className="red">{errors.startDate}</FormFeedback>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
-                                            <Input
+                                                    value={getLabelText(this.state.planningUnit.label, this.state.lang)}
+                                                >
+                                                </Input>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label htmlFor="select">{i18n.t('static.supplier.supplier')}</Label>
+                                                <Input type="select" name="supplier" id="supplier" bsSize="sm"
+                                                    valid={!errors.supplier && this.state.supplier.supplierId != ''}
+                                                    invalid={touched.realmId && !!errors.supplier}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    value={this.state.supplier.supplierId} required>
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {supplierList}
+                                                </Input> <FormFeedback className="red">{errors.supplier}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                <Input
+                                                    className="fa fa-calendar Fa-right"
+                                                    name="startDate"
+                                                    id="startDate"
+                                                    type="date"
+                                                    bsSize="sm"
+                                                    valid={!errors.startDate && this.state.startDate != ''}
+                                                    invalid={touched.startDate && !!errors.startDate}
+                                                    onBlur={handleBlur}
+                                                    min={this.currentDate()}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    value={this.state.startDate}
+                                                    placeholder={i18n.t('static.budget.budgetstartdate')}
+                                                    required />
+                                                <FormFeedback className="red">{errors.startDate}</FormFeedback>
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                <Input
 
-                                                className="fa fa-calendar Fa-right"
-                                                name="stopDate"
-                                                id="stopDate"
-                                                bsSize="sm"
-                                                type="date"
-                                                valid={!errors.stopDate}
-                                                invalid={touched.stopDate && !!errors.stopDate}
-                                                onBlur={handleBlur}
-                                                min={this.state.startDate}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                value={this.state.stopDate}
-                                                placeholder={i18n.t('static.budget.budgetstopdate')}
-                                                required /> <FormFeedback className="red">{errors.stopDate}</FormFeedback>
+                                                    className="fa fa-calendar Fa-right"
+                                                    name="stopDate"
+                                                    id="stopDate"
+                                                    bsSize="sm"
+                                                    type="date"
+                                                    valid={!errors.stopDate && this.state.stopDate != ''}
+                                                    invalid={touched.stopDate && !!errors.stopDate}
+                                                    onBlur={handleBlur}
+                                                    min={this.state.startDate}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    value={this.state.stopDate}
+                                                    placeholder={i18n.t('static.budget.budgetstopdate')}
+                                                    required /> <FormFeedback className="red">{errors.stopDate}</FormFeedback>
 
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="capacity">{i18n.t('static.planningunit.capacity')}</Label>
-                                            <Input
+                                            </FormGroup>
+                                            <FormGroup className="col-md-6">
+                                                <Label for="capacity">{i18n.t('static.planningunit.capacity')}</Label>
+                                                <Input
 
-                                                type="number"
-                                                min="0"
-                                                name="capacity"
-                                                id="capacity"
-                                                bsSize="sm"
-                                                valid={!errors.capacity}
-                                                invalid={touched.capacity && !!errors.capacity}
-                                                onBlur={handleBlur}
-                                                onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
-                                                value={this.state.capacity}
-                                                type="number"
-                                                placeholder={i18n.t('static.planningunit.capacitytext')}
-                                                required />
-                                            <FormFeedback className="red">{errors.capacity}</FormFeedback>
-                                        </FormGroup>
+                                                    type="number"
+                                                    min="0"
+                                                    name="capacity"
+                                                    id="capacity"
+                                                    bsSize="sm"
+                                                    valid={!errors.capacity && this.state.capacity != ''}
+                                                    invalid={touched.capacity && !!errors.capacity}
+                                                    onBlur={handleBlur}
+                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                    value={this.state.capacity}
+                                                    type="number"
+                                                    placeholder={i18n.t('static.planningunit.capacitytext')}
+                                                    required />
+                                                <FormFeedback className="red">{errors.capacity}</FormFeedback>
+                                            </FormGroup>
 
-                                        <FormGroup className="col-md-6 mt-md-4" >
-                                           {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
-                                            <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
-                                            &nbsp;
+                                            <FormGroup className="col-md-6 mt-md-4" >
+                                                {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> {i18n.t('static.common.rmlastrow')}</Button>*/}
+                                                <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(setTouched, errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
+                                                &nbsp;
 
 
                 </FormGroup></Row></Form>)} />
 
-                <h5 className="red">{this.state.rowErrorMessage}</h5>
+                            <h5 className="red">{this.state.rowErrorMessage}</h5>
 
                             <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
@@ -573,7 +574,7 @@ class PlanningUnitCapacity extends Component {
                                     {
                                         this.state.rows.length > 0
                                         &&
-                                        this.state.rows.map((item, idx) => 
+                                        this.state.rows.map((item, idx) =>
                                             <tr id="addr0" key={idx} >
                                                 <td>
                                                     {this.state.rows[idx].supplier.label.label_en}
