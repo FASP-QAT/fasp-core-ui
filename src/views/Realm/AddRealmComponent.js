@@ -206,9 +206,10 @@ export default class AddRealmComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='realmForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='realmForm'>
                                                 <CardBody>
 
                                                     <FormGroup>
@@ -217,7 +218,7 @@ export default class AddRealmComponent extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.realm.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -231,7 +232,7 @@ export default class AddRealmComponent extends Component {
                                                             name="realmCode"
                                                             id="realmCode"
                                                             bsSize="sm"
-                                                            valid={!errors.realmCode}
+                                                            valid={!errors.realmCode && this.state.realm.realmCode != ''}
                                                             invalid={touched.realmCode && !!errors.realmCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

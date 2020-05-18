@@ -179,9 +179,10 @@ class AddRegionComponent extends Component {
                     handleSubmit,
                     isSubmitting,
                     isValid,
-                    setTouched
+                    setTouched,
+                    handleReset
                   }) => (
-                      <Form onSubmit={handleSubmit} noValidate name='regionForm'>
+                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='regionForm'>
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}<span className="red Reqasterisk">*</span></Label>
@@ -192,7 +193,7 @@ class AddRegionComponent extends Component {
                               name="realmCountryId"
                               id="realmCountryId"
                               bsSize="sm"
-                              valid={!errors.realmCountryId}
+                              valid={!errors.realmCountryId && this.state.region.realmCountry.realmCountryId != ''}
                               invalid={touched.realmCountryId && !!errors.realmCountryId}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
@@ -215,7 +216,7 @@ class AddRegionComponent extends Component {
                               name="region"
                               id="region"
                               bsSize="sm"
-                              valid={!errors.region}
+                              valid={!errors.region && this.state.region.label.label_en != ''}
                               invalid={touched.region && !!errors.region}
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                               onBlur={handleBlur}
@@ -230,7 +231,7 @@ class AddRegionComponent extends Component {
                           <FormGroup>
                             {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             &nbsp;
                           </FormGroup>

@@ -292,9 +292,10 @@ export default class AddCountryComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='countryForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='countryForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.country.countryName')}<span class="red Reqasterisk">*</span></Label>
@@ -304,7 +305,7 @@ export default class AddCountryComponent extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.country.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -322,7 +323,7 @@ export default class AddCountryComponent extends Component {
                                                             name="countryCode"
                                                             id="countryCode"
                                                             bsSize="sm"
-                                                            valid={!errors.countryCode}
+                                                            valid={!errors.countryCode && this.state.country.countryCode != ''}
                                                             invalid={touched.countryCode && !!errors.countryCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -333,9 +334,9 @@ export default class AddCountryComponent extends Component {
                                                     </FormGroup>
                                                     {/* <FormGroup>
                                                         <Label htmlFor="languageId">{i18n.t('static.country.language')}<span class="red Reqasterisk">*</span></Label> */}
-                                                        {/* <InputGroupAddon addonType="prepend"> */}
-                                                        {/* <InputGroupText><i className="fa fa-language"></i></InputGroupText> */}
-                                                        {/* <Input
+                                                    {/* <InputGroupAddon addonType="prepend"> */}
+                                                    {/* <InputGroupText><i className="fa fa-language"></i></InputGroupText> */}
+                                                    {/* <Input
                                                             type="select"
                                                             name="languageId"
                                                             id="languageId"
@@ -350,8 +351,8 @@ export default class AddCountryComponent extends Component {
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {languageItems}
                                                         </Input> */}
-                                                        {/* </InputGroupAddon> */}
-                                                        {/* <FormFeedback className="red">{errors.languageId}</FormFeedback>
+                                                    {/* </InputGroupAddon> */}
+                                                    {/* <FormFeedback className="red">{errors.languageId}</FormFeedback>
                                                     </FormGroup> */}
                                                     <FormGroup>
                                                         <Label htmlFor="currencyId">{i18n.t('static.country.currency')}<span class="red Reqasterisk">*</span></Label>
@@ -362,7 +363,7 @@ export default class AddCountryComponent extends Component {
                                                             name="currencyId"
                                                             id="currencyId"
                                                             bsSize="sm"
-                                                            valid={!errors.currencyId}
+                                                            valid={!errors.currencyId && this.state.country.currency.id != ''}
                                                             invalid={touched.currencyId && !!errors.currencyId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

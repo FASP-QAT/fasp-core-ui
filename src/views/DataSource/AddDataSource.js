@@ -63,12 +63,13 @@ export default class AddDataSource extends Component {
             realms: [],
             message: '',
             realm: {
+                id: ''
             },
             label: {
                 label_en: ''
             },
             dataSourceType: {
-                dataSourceTypeId: ''
+                id: ''
             },
             program: {
                 id: '',
@@ -246,9 +247,10 @@ export default class AddDataSource extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='dataSourceForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='dataSourceForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span class="red Reqasterisk">*</span></Label>
@@ -257,7 +259,7 @@ export default class AddDataSource extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getDataSourceTypeByRealmId(e); this.getProgramByRealmId(e) }}
                                                             onBlur={handleBlur}
@@ -276,7 +278,7 @@ export default class AddDataSource extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -292,7 +294,7 @@ export default class AddDataSource extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            valid={!errors.programId}
+                                                            valid={!errors.programId && this.state.program.id != ''}
                                                             invalid={touched.programId && !!errors.programId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -312,7 +314,7 @@ export default class AddDataSource extends Component {
                                                             name="dataSourceTypeId"
                                                             id="dataSourceTypeId"
                                                             bsSize="sm"
-                                                            valid={!errors.dataSourceTypeId}
+                                                            valid={!errors.dataSourceTypeId && this.state.dataSourceType.id != ''}
                                                             invalid={touched.dataSourceTypeId && !!errors.dataSourceTypeId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

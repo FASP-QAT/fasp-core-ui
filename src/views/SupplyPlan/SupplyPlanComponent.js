@@ -58,6 +58,7 @@ export default class SupplyPlanComponent extends React.Component {
             closingBalanceArray: [],
             monthsOfStockArray: [],
             filteredArraySuggestedShipments: [],
+            suggestedShipmentChangedFlag: 0
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -83,13 +84,19 @@ export default class SupplyPlanComponent extends React.Component {
 
         this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
         this.dropdownFilter = this.dropdownFilter.bind(this);
+        this.suggestedShipmentChanged = this.suggestedShipmentChanged.bind(this);
+        this.saveSuggestedShipments = this.saveSuggestedShipments.bind(this);
+        this.checkValidationSuggestedShipments = this.checkValidationSuggestedShipments.bind(this);
     }
 
     actionCanceled(supplyPlanType) {
-        this.toggleLarge(supplyPlanType);
         this.setState({
-            message: i18n.t('static.message.cancelled')
+            message: i18n.t('static.message.cancelled'),
+            suggestedShipmentChangedFlag: 0,
+            consumptionChangedFlag: 0,
+            inventoryChangedFlag: 0
         })
+        this.toggleLarge(supplyPlanType);
     }
 
     toggleLarge(supplyPlanType, month, quantity) {
@@ -105,7 +112,6 @@ export default class SupplyPlanComponent extends React.Component {
             this.setState({
                 suggestedShipments: !this.state.suggestedShipments,
             });
-
             this.suggestedShipmentsDetailsClicked(month, quantity);
             console.log("Month-------->", month);
             console.log("Quantity----->", quantity);
@@ -480,12 +486,12 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     }
                     if (regionCount == 0) {
-                        for (var k = 2; k < 20; k++) {
+                        for (var k = 3; k < 21; k++) {
                             filteredArray.push({ consumptionQty: '', region: { id: regionListFiltered[i].id } })
                         }
                     }
                 }
-                for (var i = 2; i < 20; i++) {
+                for (var i = 3; i < 21; i++) {
                     var consumptionListFilteredForMonth = filteredArray.filter(c => c.consumptionQty == '' || c.month.month == m[i].month);
                     var monthWiseCount = 0;
                     for (var cL = 0; cL < consumptionListFilteredForMonth.length; cL++) {
@@ -530,12 +536,12 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     }
                     if (regionCount == 0) {
-                        for (var k = 2; k < 20; k++) {
+                        for (var k = 3; k < 21; k++) {
                             filteredArrayInventory.push({ adjustmentQty: '', region: { id: regionListFiltered[i].id } })
                         }
                     }
                 }
-                for (var i = 2; i < 20; i++) {
+                for (var i = 3; i < 21; i++) {
                     var inventoryListFilteredForMonth = filteredArrayInventory.filter(c => c.adjustmentQty == '' || c.month.month == m[i].month);
                     var monthWiseCount = 0;
                     for (var cL = 0; cL < inventoryListFilteredForMonth.length; cL++) {
@@ -921,18 +927,12 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                console.log("Program Json",programJson);
-                console.log("parseFloat(programData.plannedToDraftLeadTime)", programJson.plannedToDraftLeadTime);
-                console.log("parseFloat(programJson.draftToSubmittedLeadTime)",parseFloat(programJson.draftToSubmittedLeadTime));
-                console.log("parseFloat(programJson.submittedToApprovedLeadTime)",parseFloat(programJson.submittedToApprovedLeadTime));
-                console.log("parseFloat(programJson.approvedToShippedLeadTime)",parseFloat(programJson.approvedToShippedLeadTime));
-                console.log("parseFloat(programJson.deliveredToReceivedLeadTime)",parseFloat(programJson.deliveredToReceivedLeadTime));
+                console.log("Program Json", programJson.shipmentList);
+
                 var addLeadTimes = Math.floor(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
                     parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
                     parseFloat(programJson.deliveredToReceivedLeadTime));
-                console.log("addLeadTome", addLeadTimes);
-                var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes,'months').format("YYYY-MM-DD");
-                console.log("Expected delivery date after date add",expectedDeliveryDate);
+                var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("YYYY-MM-DD");
                 var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                 var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
                 var papuRequest = papuOs.getAll();
@@ -1040,7 +1040,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 allowDeleteRow: false,
                                 allowInsertRow: false,
                                 allowManualInsertRow: false,
-                                onchange: this.consumptionChanged,
+                                onchange: this.suggestedShipmentChanged,
                             };
                             myVar = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), options);
                             this.el = myVar;
@@ -1186,6 +1186,49 @@ export default class SupplyPlanComponent extends React.Component {
             elInstance.setValueFromCoords(9, y, "", true);
         }
     }.bind(this);
+
+    suggestedShipmentChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.suggestedShipmentsEl;
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        if (x == 7) {
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        this.setState({
+            suggestedShipmentChangedFlag: 1
+        });
+    }
 
     checkValidationConsumption() {
         var valid = true;
@@ -1387,6 +1430,146 @@ export default class SupplyPlanComponent extends React.Component {
                         this.setState({
                             message: `Inventory Data Saved`,
                             inventoryChangedFlag: 0
+                        })
+                        this.formSubmit(this.state.monthCount);
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        } else {
+            alert("Validation failed");
+        }
+    }
+
+    checkValidationSuggestedShipments() {
+        var valid = true;
+        var elInstance = this.state.suggestedShipmentsEl;
+        var json = elInstance.getJson();
+        for (var y = 0; y < json.length; y++) {
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(5, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(6, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(7, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+
+        }
+        return valid;
+
+    }
+
+    saveSuggestedShipments() {
+        var validation = this.checkValidationSuggestedShipments();
+        if (validation == true) {
+            var elInstance = this.state.suggestedShipmentsEl;
+            var json = elInstance.getJson();
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var shipmentDataList = (programJson.shipmentList);
+                    console.log("Shipment data list", shipmentDataList);
+                    var map = new Map(Object.entries(json[0]));
+                    // "Expected delivery date",
+                    // "Shipment status",
+                    // "Planning unit",
+                    // "Suggested order qty",
+                    // "Adjusted order qty",
+                    // "Procurement agent",
+                    // "Funding source",
+                    // "Budget",
+                    // "Notes",
+                    var shipmentJson = {
+                        accountFlag: true,
+                        active: true,
+                        dataSource: {
+                            id: 0
+                        },
+                        erpFlag: false,
+                        expectedDeliveryDate: map.get("0"),
+                        freightCost: 0,
+                        notes: map.get("8"),
+                        orderedDate: new Date(),
+                        planningUnit: {
+                            id: planningUnitId
+                        },
+                        procurementAgent: {
+                            id: map.get("5")
+                        },
+                        procurementUnit: {
+                            id: 0
+                        },
+                        productCost: 0,
+                        quantity: map.get("3"),
+                        rate: 0,
+                        receivedDate: "",
+                        shipmentId: 0,
+                        shipmentMode: "",
+                        shipmentStatus: {
+                            id: 1
+                        },
+                        shippedDate: "",
+                        suggestedQty: map.get("3"),
+                        supplier: {
+                            id: 0
+                        }
+                    }
+
+                    shipmentDataList.push(shipmentJson);
+                    programJson.shipmentList = shipmentDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        this.toggleLarge('SuggestedShipments');
+                        this.setState({
+                            message: `Suggested shipments Data Saved`,
+                            suggestedShipmentChangedFlag: 0
                         })
                         this.formSubmit(this.state.monthCount);
                     }.bind(this)
@@ -1747,8 +1930,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>
-                                    {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> Save</Button>}{' '}
-                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
+                                    {this.state.suggestedShipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSuggestedShipments}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
                         </CardBody>

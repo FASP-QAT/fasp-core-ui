@@ -55,7 +55,8 @@ class AddLanguageComponent extends Component {
         super(props);
         this.state = {
             language: {
-                languageName: ''
+                languageName: '',
+                languageCode: ''
             },
             message: ''
         }
@@ -140,6 +141,7 @@ class AddLanguageComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     LanguageService.addLanguage(values).then(response => {
@@ -182,9 +184,10 @@ class AddLanguageComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
+                                            <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="languageName">{i18n.t('static.language.language')}<span class="red Reqasterisk">*</span></Label>
@@ -192,7 +195,7 @@ class AddLanguageComponent extends Component {
                                                             name="languageName"
                                                             id="languageName"
                                                             bsSize="sm"
-                                                            valid={!errors.languageName}
+                                                            valid={!errors.languageName && this.state.language.languageName != ''}
                                                             invalid={touched.languageName && !!errors.languageName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -206,7 +209,7 @@ class AddLanguageComponent extends Component {
                                                             name="languageCode"
                                                             id="languageCode"
                                                             bsSize="sm"
-                                                            valid={!errors.languageCpde}
+                                                            valid={!errors.languageCode && this.state.language.languageCode != ''}
                                                             invalid={touched.languageCode && !!errors.languageCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}

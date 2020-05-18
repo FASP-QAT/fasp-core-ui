@@ -52,8 +52,10 @@ class AddFundingSourceComponent extends Component {
       realms: [],
       fundingSource: {
         realm: {
+          id: ''
         },
         label: {
+          label_en: ''
         }
       },
       message: '',
@@ -167,9 +169,10 @@ class AddFundingSourceComponent extends Component {
                     handleSubmit,
                     isSubmitting,
                     isValid,
-                    setTouched
+                    setTouched,
+                    handleReset
                   }) => (
-                      <Form onSubmit={handleSubmit} noValidate name='fundingSourceForm'>
+                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='fundingSourceForm'>
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmId">{i18n.t('static.fundingsource.realm')}<span className="red Reqasterisk">*</span></Label><Input
@@ -177,7 +180,7 @@ class AddFundingSourceComponent extends Component {
                               name="realmId"
                               id="realmId"
                               bsSize="sm"
-                              valid={!errors.realmId}
+                              valid={!errors.realmId && this.state.fundingSource.realm.id != ''}
                               invalid={touched.realmId && !!errors.realmId}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
@@ -195,7 +198,7 @@ class AddFundingSourceComponent extends Component {
                               name="fundingSource"
                               id="fundingSource"
                               bsSize="sm"
-                              valid={!errors.fundingSource}
+                              valid={!errors.fundingSource && this.state.fundingSource.label.label_en != ''}
                               invalid={touched.fundingSource && !!errors.fundingSource}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}

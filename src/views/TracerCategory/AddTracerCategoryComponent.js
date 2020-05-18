@@ -58,6 +58,7 @@ class AddTracerCategoryComponent extends Component {
             realms: [],
             tracerCategory: {
                 realm: {
+                    id: '',
                     label: {
                         label_en: '',
                         label_fr: '',
@@ -199,9 +200,10 @@ class AddTracerCategoryComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='tracerCategoryForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='tracerCategoryForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span className="red Reqasterisk">*</span></Label>
@@ -212,7 +214,7 @@ class AddTracerCategoryComponent extends Component {
                                                             bsSize="sm"
                                                             name="realmId"
                                                             id="realmId"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.tracerCategory.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -233,7 +235,7 @@ class AddTracerCategoryComponent extends Component {
                                                             bsSize="sm"
                                                             name="tracerCategoryName"
                                                             id="tracerCategoryName"
-                                                            valid={!errors.tracerCategoryName}
+                                                            valid={!errors.tracerCategoryName && this.state.tracerCategory.label.label_en != ''}
                                                             invalid={touched.tracerCategoryName && !!errors.tracerCategoryName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

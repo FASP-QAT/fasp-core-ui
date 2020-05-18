@@ -767,73 +767,229 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.jan'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Jan
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Feb',
         text: i18n.t('static.month.feb'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Feb
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Mar',
         text: i18n.t('static.month.mar'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Mar
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Apr',
         text: i18n.t('static.month.apr'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Apr
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'May',
         text: i18n.t('static.month.may'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.May
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Jun',
         text: i18n.t('static.month.jun'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Jun
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Jul',
         text: i18n.t('static.month.jul'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Jul
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Aug',
         text: i18n.t('static.month.aug'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right'
+        align: 'center',
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Aug
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Sep',
         text: i18n.t('static.month.sep'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Sep
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Oct',
         text: i18n.t('static.month.oct'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Oct
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Nov',
         text: i18n.t('static.month.nov'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Nov
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Dec',
         text: i18n.t('static.month.dec'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'right',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Dec
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }
 
 
@@ -1065,7 +1221,7 @@ export default class StockStatusMatrix extends React.Component {
                         >
                           {offlineProductCategoryList.length > 0
                             &&
-                            <option value="0">{i18n.t('static.common.all')}</option>}
+                            <option value="0">{i18n.t('static.common.selectProductCategory')}</option>}
                           {offlineProductCategoryList.length < 1
                             &&
                             <option value="0">{i18n.t('static.common.selectProgram')}</option>}
@@ -1097,7 +1253,7 @@ export default class StockStatusMatrix extends React.Component {
                         >
                           {offlinePlanningUnitList.length > 0
                             &&
-                            <option value="0">{i18n.t('static.common.all')}</option>}
+                            <option value="0">{i18n.t('static.common.selectPlanningUnit')}</option>}
                           {offlinePlanningUnitList.length < 1
                             &&
                             <option value="0">{i18n.t('static.common.selectProgram')}</option>}

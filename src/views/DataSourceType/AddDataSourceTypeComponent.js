@@ -56,6 +56,7 @@ export default class AddDataSourceTypeComponent extends Component {
             {
                 active: '',
                 realm: {
+                    id: ''
                 },
                 label: {
                     label_en: '',
@@ -174,9 +175,10 @@ export default class AddDataSourceTypeComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='dataSourceType'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='dataSourceType'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.datasourcetype.datasourcetype')}<span class="red Reqasterisk">*</span></Label>
@@ -184,7 +186,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.dataSourceType.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -199,7 +201,7 @@ export default class AddDataSourceTypeComponent extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.dataSourceType.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

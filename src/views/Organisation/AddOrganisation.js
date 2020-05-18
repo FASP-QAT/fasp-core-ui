@@ -262,9 +262,10 @@ export default class AddOrganisationComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='organisationForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationForm'>
                                                 <CardBody>
 
                                                     <FormGroup>
@@ -272,7 +273,7 @@ export default class AddOrganisationComponent extends Component {
                                                         <Input
                                                             bsSize="sm"
                                                             value={this.state.organisation.realm.id}
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.organisation.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
                                                             onBlur={handleBlur}
@@ -287,7 +288,7 @@ export default class AddOrganisationComponent extends Component {
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId}
+                                                            valid={!errors.realmCountryId && this.state.realmCountryId != ''}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
                                                             onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
@@ -302,7 +303,7 @@ export default class AddOrganisationComponent extends Component {
                                                         <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="organisationCode" valid={!errors.organisationCode}
+                                                            type="text" name="organisationCode" valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
                                                             invalid={touched.organisationCode && !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -315,7 +316,7 @@ export default class AddOrganisationComponent extends Component {
                                                         <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="organisationName" valid={!errors.organisationName}
+                                                            type="text" name="organisationName" valid={!errors.organisationName && this.state.organisation.label.label_en != ''}
                                                             invalid={touched.organisationName && !!errors.organisationName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}

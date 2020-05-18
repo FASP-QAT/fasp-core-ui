@@ -81,7 +81,7 @@ export default class AddCurrencyComponent extends Component {
         console.log(event.target.name)
         if (event.target.name === "currencyCode") {
             this.state.currencyCode = event.target.value.toUpperCase();
-        } 
+        }
         // if (event.target.name === "currencySymbol") {
         //     this.state.currencySymbol = event.target.value;
         // } 
@@ -166,7 +166,7 @@ export default class AddCurrencyComponent extends Component {
                                                 })
                                             }
                                         })
-                                  
+
                                 }}
 
 
@@ -180,9 +180,10 @@ export default class AddCurrencyComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='currencyForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='currencyForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.currency.currency')}<span class="red Reqasterisk">*</span></Label>
@@ -192,7 +193,7 @@ export default class AddCurrencyComponent extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -209,7 +210,7 @@ export default class AddCurrencyComponent extends Component {
                                                             name="currencyCode"
                                                             id="currencyCode"
                                                             bsSize="sm"
-                                                            valid={!errors.currencyCode}
+                                                            valid={!errors.currencyCode && this.state.currencyCode != ''}
                                                             invalid={touched.currencyCode && !!errors.currencyCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
@@ -239,7 +240,7 @@ export default class AddCurrencyComponent extends Component {
                                                         <Input type="number"
                                                             name="conversionRate"
                                                             id="conversionRate"
-                                                            valid={!errors.conversionRate}
+                                                            valid={!errors.conversionRate && this.state.conversionRateToUsd != ''}
                                                             invalid={touched.conversionRate && !!errors.conversionRate}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
