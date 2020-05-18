@@ -90,6 +90,7 @@ class AddBudgetComponent extends Component {
                     label_fr: ''
                 },
                 program: {
+                    programId: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -98,6 +99,7 @@ class AddBudgetComponent extends Component {
                     }
                 },
                 fundingSource: {
+                    fundingSourceId: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -141,7 +143,7 @@ class AddBudgetComponent extends Component {
     dataChangeDate(date) {
         let { budget } = this.state
         budget.startDate = date;
-        budget.stopDate = '';
+        // budget.stopDate = '';
         this.setState({ budget: budget });
     }
 
@@ -349,9 +351,10 @@ class AddBudgetComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='budgetForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}<span className="red Reqasterisk">*</span></Label>
@@ -362,7 +365,7 @@ class AddBudgetComponent extends Component {
                                                             name="programId"
                                                             id="programId"
                                                             bsSize="sm"
-                                                            valid={!errors.programId}
+                                                            valid={!errors.programId && this.state.budget.program.programId != ''}
                                                             invalid={touched.programId && !!errors.programId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -386,7 +389,7 @@ class AddBudgetComponent extends Component {
                                                             name="fundingSourceId"
                                                             id="fundingSourceId"
                                                             bsSize="sm"
-                                                            valid={!errors.fundingSourceId}
+                                                            valid={!errors.fundingSourceId && this.state.budget.fundingSource.fundingSourceId != ''}
                                                             invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -407,7 +410,7 @@ class AddBudgetComponent extends Component {
                                                             name="budget"
                                                             id="budget"
                                                             bsSize="sm"
-                                                            valid={!errors.budget}
+                                                            valid={!errors.budget && this.state.budget.label.label_en != ''}
                                                             invalid={touched.budget && !!errors.budget}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -427,7 +430,7 @@ class AddBudgetComponent extends Component {
                                                             name="currencyId"
                                                             id="currencyId"
                                                             bsSize="sm"
-                                                            valid={!errors.currencyId}
+                                                            valid={!errors.currencyId && this.state.budget.currency.currencyId != ''}
                                                             invalid={touched.currencyId && !!errors.currencyId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -468,7 +471,7 @@ class AddBudgetComponent extends Component {
                                                             name="budgetAmt"
                                                             id="budgetAmt"
                                                             bsSize="sm"
-                                                            valid={!errors.budgetAmt}
+                                                            valid={!errors.budgetAmt && this.state.budget.budgetAmt != ''}
                                                             invalid={touched.budgetAmt && !!errors.budgetAmt}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -579,7 +582,7 @@ class AddBudgetComponent extends Component {
 
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -610,7 +613,8 @@ class AddBudgetComponent extends Component {
         budget.budgetAmt = ''
         budget.startDate = ''
         budget.stopDate = ''
-        budget.stopDate = ''
+        budget.currency.currencyId = ''
+
 
         this.setState({
             budget

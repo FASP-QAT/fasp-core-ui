@@ -125,7 +125,7 @@ const EditProdct = React.lazy(() => import('./views/Product/EditProduct'));
 const ProgramTree = React.lazy(() => import('./views/Dashboard/ProgramTree'));
 const ExportProgram = React.lazy(() => import('./views/Program/ExportProgram'));
 const ImportProgram = React.lazy(() => import('./views/Program/ImportProgram'));
-const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
+// const MasterDataSync = React.lazy(() => import('./views/SyncMasterData/SyncMasterData'));
 const ConsumptionDetails = React.lazy(() => import('./views/Consumption/ConsumptionDetails'));
 
 const AddLanguage = React.lazy(() => import('./views/Language/AddLanguageComponent'));
@@ -315,7 +315,8 @@ const routes = [
   { path: '/program/exportProgram', name: i18n.t('static.dashboard.exportprogram'), component: ExportProgram },
   { path: '/program/importProgram', name: i18n.t('static.dashboard.importprogram'), component: ImportProgram },
 
-  { path: '/masterDataSync', name: i18n.t('static.dashboard.masterdatasync'), component: MasterDataSync },
+  // { path: '/masterDataSync', name: i18n.t('static.dashboard.masterdatasync'), component: MasterDataSync },
+  // { path: '/masterDataSync/:message',  component: MasterDataSync },
 
   { path: '/consumptionDetails', name: i18n.t('static.dashboard.consumptiondetails'), component: ConsumptionDetails },
 

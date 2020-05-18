@@ -270,7 +270,8 @@ export default class AddInventory extends Component {
                                     },
                                     {
                                         title: i18n.t('static.inventory.inventoryDate'),
-                                        type: 'calendar'
+                                        type: 'calendar',
+                                        options: { format: 'MM-YYYY' }
 
                                     },
                                     {

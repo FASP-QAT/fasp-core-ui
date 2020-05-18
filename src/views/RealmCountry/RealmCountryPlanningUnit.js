@@ -122,7 +122,8 @@ realmCountryPlanningUnitId:'',
                     label_en: ''
                 }
             }, isNew: true,
-            updateRowStatus: 0
+            updateRowStatus: 0,
+            gtin:''
         }
         this.setTextAndValue = this.setTextAndValue.bind(this);
         this.disableRow = this.disableRow.bind(this);
@@ -571,7 +572,7 @@ realmCountryPlanningUnitId:'',
                                                 id="realmCountry"
                                                 bsSize="sm"
                                                 readOnly
-                                                valid={!errors.realmCountry}
+                                                valid={!errors.realmCountry && this.state.realmCountry.realm.label != ''}
                                                 invalid={touched.realmCountry && !!errors.realmCountry}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                 onBlur={handleBlur}
@@ -585,7 +586,7 @@ realmCountryPlanningUnitId:'',
                                        <FormGroup className="col-md-6">
                                             <Label htmlFor="select">{i18n.t('static.planningunit.planningunit')}</Label>
                                             <Input type="select" name="planningUnitId" id="planningUnitId" bsSize="sm"
-                                                valid={!errors.planningUnitId}
+                                                valid={!errors.planningUnitId && this.state.planningUnit.planningUnitId != ''}
                                                 invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
@@ -600,7 +601,7 @@ realmCountryPlanningUnitId:'',
                                                 name="label"
                                                 id="label"
                                                 bsSize="sm"
-                                                valid={!errors.label}
+                                                valid={!errors.label && this.state.label.label_en != ''}
                                                 invalid={touched.label && !!errors.label}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
@@ -613,7 +614,7 @@ realmCountryPlanningUnitId:'',
                                             <Input type="text"
                                                 name="skuCode"
                                                 id="skuCode" bsSize="sm"
-                                                valid={!errors.skuCode}
+                                                valid={!errors.skuCode && this.state.skuCode != ''}
                                                 invalid={touched.skuCode && !!errors.skuCode}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
@@ -631,7 +632,7 @@ realmCountryPlanningUnitId:'',
                                                 id="unitId"
                                                 bsSize="sm"
                                                 value={this.state.unit.unitId}
-                                                valid={!errors.unitId}
+                                                valid={!errors.unitId && this.state.unit.unitId != ''}
                                                 invalid={touched.unitId && !!errors.unitId}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                 onBlur={handleBlur}
@@ -647,7 +648,7 @@ realmCountryPlanningUnitId:'',
                                                 name="multiplier"
                                                 id="multiplier"
                                                 bsSize="sm"
-                                                valid={!errors.multiplier}
+                                                valid={!errors.multiplier && this.state.multiplier != ''}
                                                 invalid={touched.multiplier && !!errors.multiplier}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                 onBlur={handleBlur}
@@ -664,7 +665,7 @@ realmCountryPlanningUnitId:'',
                                                 name="gtin"
                                                 id="gtin"
                                                 bsSize="sm"
-                                                valid={!errors.gtin}
+                                                valid={!errors.gtin && this.state.gtin != ''}
                                                 invalid={touched.gtin && !!errors.gtin}
                                                 onBlur={handleBlur}
                                                 onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}

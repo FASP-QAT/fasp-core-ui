@@ -63,7 +63,7 @@ export default class AddHealthAreaComponent extends Component {
           label_en: ''
         },
         realm: {
-          realmId: ''
+          id: ''
         },
         realmCountryArray: []
 
@@ -251,16 +251,17 @@ export default class AddHealthAreaComponent extends Component {
                     handleSubmit,
                     isSubmitting,
                     isValid,
-                    setTouched
+                    setTouched,
+                    handleReset
                   }) => (
-                      <Form onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='healthAreaForm'>
                         <CardBody>
 
                           <FormGroup>
                             <Label htmlFor="company">{i18n.t('static.healthArea.healthAreaName')}<span class="red Reqasterisk">*</span> </Label>
                             <Input
                               bsSize="sm"
-                              type="text" name="healthAreaName" valid={!errors.healthAreaName}
+                              type="text" name="healthAreaName" valid={!errors.healthAreaName && this.state.healthArea.label.label_en != ''}
                               invalid={touched.healthAreaName && !!errors.healthAreaName}
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                               onBlur={handleBlur}
@@ -274,7 +275,7 @@ export default class AddHealthAreaComponent extends Component {
                             <Input
                               bsSize="sm"
                               value={this.state.healthArea.realm.id}
-                              valid={!errors.realmId}
+                              valid={!errors.realmId && this.state.healthArea.realm.id != ''}
                               invalid={touched.realmId && !!errors.realmId}
                               onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
                               onBlur={handleBlur}
@@ -289,7 +290,7 @@ export default class AddHealthAreaComponent extends Component {
                             <Label htmlFor="select">{i18n.t('static.healtharea.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                             <Select
                               bsSize="sm"
-                              valid={!errors.realmCountryId}
+                              valid={!errors.realmCountryId && this.state.realmCountryId != ''}
                               invalid={touched.realmCountryId && !!errors.realmCountryId}
                               onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
                               onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
@@ -305,7 +306,7 @@ export default class AddHealthAreaComponent extends Component {
                         <CardFooter>
                           <FormGroup>
                             <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                             <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                             &nbsp;

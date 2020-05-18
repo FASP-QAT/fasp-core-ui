@@ -69,8 +69,8 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
-        programNotes: Yup.string()
-            .required(i18n.t('static.program.validnotestext')),
+        // programNotes: Yup.string()
+        //     .required(i18n.t('static.program.validnotestext')),
 
     })
 }
@@ -340,7 +340,7 @@ export default class AddProgram extends Component {
             monthsInFutureForAmc: true,
             monthsInPastForAmc: true,
             healthAreaId: true,
-            programNotes: true,
+            // programNotes: true,
 
         }
         )
@@ -451,10 +451,11 @@ export default class AddProgram extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} noValidate name='programForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm'>
                                                 <CardHeader>
                                                     <strong>{i18n.t('static.program.programadd')}</strong>
                                                 </CardHeader>
@@ -463,7 +464,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            type="text" name="programName" valid={!errors.programName}
+                                                            type="text" name="programName" valid={!errors.programName && this.state.program.label.label_en != ''}
                                                             bsSize="sm"
                                                             invalid={touched.programName && !!errors.programName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
@@ -478,7 +479,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             // value={this.state.program.realm.realmId}
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.program.realm.realmId != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                             onBlur={handleBlur}
@@ -497,7 +498,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.realmCountry.realmCountryId}
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId}
+                                                            valid={!errors.realmCountryId && this.state.program.realmCountry.realmCountryId != ''}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
                                                             onBlur={handleBlur}
@@ -515,7 +516,7 @@ export default class AddProgram extends Component {
                                                         <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
 
                                                         <Select
-                                                            valid={!errors.regionId}
+                                                            valid={!errors.regionId && this.state.regionId != ''}
                                                             bsSize="sm"
                                                             invalid={touched.reagonId && !!errors.regionId}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -533,7 +534,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.organisation.id}
                                                             bsSize="sm"
-                                                            valid={!errors.organisationId}
+                                                            valid={!errors.organisationId && this.state.program.organisation.id != ''}
                                                             invalid={touched.organisationId && !!errors.organisationId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -551,7 +552,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.healthArea.id}
                                                             bsSize="sm"
-                                                            valid={!errors.healthAreaId}
+                                                            valid={!errors.healthAreaId && this.state.program.healthArea.id != ''}
                                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur} type="select" name="healthAreaId" id="healthAreaId">
@@ -569,7 +570,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.programManager.userId}
                                                             bsSize="sm"
-                                                            valid={!errors.userId}
+                                                            valid={!errors.userId && this.state.program.programManager.userId != ''}
                                                             invalid={touched.userId && !!errors.userId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur} type="select" name="userId" id="userId">
@@ -583,12 +584,12 @@ export default class AddProgram extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.notes')} </Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                                         <Input
                                                             value={this.state.program.programNotes}
                                                             bsSize="sm"
-                                                            valid={!errors.programNotes}
-                                                            invalid={touched.programNotes && !!errors.programNotes}
+                                                            // valid={!errors.programNotes}
+                                                            // invalid={touched.programNotes && !!errors.programNotes}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="textarea" name="programNotes" id="programNotes" />
@@ -599,7 +600,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.airFreightPerc}
                                                             bsSize="sm"
-                                                            valid={!errors.airFreightPerc}
+                                                            valid={!errors.airFreightPerc && this.state.program.airFreightPerc != ''}
                                                             invalid={touched.airFreightPerc && !!errors.airFreightPerc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -613,7 +614,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.seaFreightPerc}
                                                             bsSize="sm"
-                                                            valid={!errors.seaFreightPerc}
+                                                            valid={!errors.seaFreightPerc && this.state.program.seaFreightPerc != ''}
                                                             invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -628,7 +629,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.plannedToDraftLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.plannedToDraftLeadTime}
+                                                            valid={!errors.plannedToDraftLeadTime && this.state.program.plannedToDraftLeadTime != ''}
                                                             invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -645,7 +646,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.draftToSubmittedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.draftToSubmittedLeadTime}
+                                                            valid={!errors.draftToSubmittedLeadTime && this.state.program.draftToSubmittedLeadTime != ''}
                                                             invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -663,7 +664,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.submittedToApprovedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.submittedToApprovedLeadTime}
+                                                            valid={!errors.submittedToApprovedLeadTime && this.state.program.submittedToApprovedLeadTime != ''}
                                                             invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -680,7 +681,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.approvedToShippedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.approvedToShippedLeadTime}
+                                                            valid={!errors.approvedToShippedLeadTime && this.state.program.approvedToShippedLeadTime != ''}
                                                             invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -697,7 +698,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.deliveredToReceivedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.deliveredToReceivedLeadTime}
+                                                            valid={!errors.deliveredToReceivedLeadTime && this.state.program.deliveredToReceivedLeadTime != ''}
                                                             invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -714,7 +715,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.monthsInPastForAmc}
                                                             bsSize="sm"
-                                                            valid={!errors.monthsInPastForAmc}
+                                                            valid={!errors.monthsInPastForAmc && this.state.program.monthsInPastForAmc != ''}
                                                             invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -731,7 +732,7 @@ export default class AddProgram extends Component {
                                                         <Input
                                                             value={this.state.program.monthsInFutureForAmc}
                                                             bsSize="sm"
-                                                            valid={!errors.monthsInFutureForAmc}
+                                                            valid={!errors.monthsInFutureForAmc && this.state.program.monthsInFutureForAmc != ''}
                                                             invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -747,7 +748,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
                                                         &nbsp;

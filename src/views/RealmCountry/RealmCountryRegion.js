@@ -399,7 +399,7 @@ class RealmCountryRegion extends Component {
                                                     id="realmCountry"
                                                     bsSize="sm"
                                                     readOnly
-                                                    valid={!errors.realmCountry}
+                                                    valid={!errors.realmCountry && this.state.realmCountry.realm.label != ''}
                                                     invalid={touched.realmCountry && !!errors.realmCountry}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
                                                     onBlur={handleBlur}
@@ -413,7 +413,7 @@ class RealmCountryRegion extends Component {
                                                     name="label"
                                                     id="label"
                                                     bsSize="sm"
-                                                    valid={!errors.label}
+                                                    valid={!errors.label && this.state.label.label_en != ''}
                                                     invalid={touched.label && !!errors.label}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                     onBlur={handleBlur}
@@ -427,7 +427,7 @@ class RealmCountryRegion extends Component {
                                                     name="capacityCBM"
                                                     id="capacityCBM"
                                                     bsSize="sm"
-                                                    valid={!errors.capacityCBM}
+                                                    valid={!errors.capacityCBM && this.state.capacityCbm != ''}
                                                     invalid={touched.capacityCBM && !!errors.capacityCBM}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}
                                                     value={this.state.capacityCbm}
@@ -444,7 +444,7 @@ class RealmCountryRegion extends Component {
                                                     name="gln"
                                                     id="gln"
                                                     bsSize="sm"
-                                                    valid={!errors.gln}
+                                                    valid={!errors.gln && this.state.gln != ''}
                                                     invalid={touched.gln && !!errors.gln}
                                                     onBlur={handleBlur}
                                                     onChange={(e) => { handleChange(e); this.setTextAndValue(e); }}

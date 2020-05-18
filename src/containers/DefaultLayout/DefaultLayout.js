@@ -328,11 +328,11 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.program'),
                             icon: 'fa fa-list',
                             children: [
-                              {
-                                name: i18n.t('static.dashboard.datasync'),
-                                url: '/masterDataSync',
-                                icon: 'fa fa-list',
-                              },
+                              // {
+                              //   name: i18n.t('static.dashboard.datasync'),
+                              //   url: '/masterDataSync',
+                              //   icon: 'fa fa-list',
+                              // },
                               {
                                 name: i18n.t('static.dashboard.downloadprogram'),
                                 url: '/program/downloadProgram',
