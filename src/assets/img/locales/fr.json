@@ -142,5 +142,7 @@
     "static.common.all": "Tout",
     "static.realm.yes": "Oui",
     "static.realm.no": "Non",
-    "static.region.glnvalue": "GLN Non doit être composé de chiffres"
+    "static.region.glnvalue": "GLN Non doit être composé de chiffres",
+    "static.common.selectPlanningUnit": "Veuillez sélectionner l'unité de planification",
+    "static.common.selectProductCategory": "Veuillez sélectionner une catégorie de produits"
 }
