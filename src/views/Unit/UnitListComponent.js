@@ -88,27 +88,27 @@ export default class UnitListComponent extends Component {
                     this.setState({ message: response.data.messageCode })
                 }
             })
-            // .catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: error.response.data.messageCode });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     console.log("Error code unkown");
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     console.log("Error code unkown");
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
         UnitService.getUnitListAll()
             .then(response => {
@@ -120,26 +120,26 @@ export default class UnitListComponent extends Component {
                 })
 
             })
-            // .catch(
-            //     error => {
-            //         if (error.message === "Network Error") {
-            //             this.setState({ message: error.message });
-            //         } else {
-            //             switch (error.response ? error.response.status : "") {
-            //                 case 500:
-            //                 case 401:
-            //                 case 404:
-            //                 case 406:
-            //                 case 412:
-            //                     this.setState({ message: error.response.data.messageCode });
-            //                     break;
-            //                 default:
-            //                     this.setState({ message: 'static.unkownError' });
-            //                     break;
-            //             }
-            //         }
-            //     }
-            // );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
 
@@ -250,13 +250,14 @@ export default class UnitListComponent extends Component {
                                             name="dimensionId"
                                             id="dimensionId"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {dimensionList}
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>

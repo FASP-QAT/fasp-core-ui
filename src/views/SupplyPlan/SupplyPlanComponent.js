@@ -1875,6 +1875,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                         id="planningUnitId"
                                                                         bsSize="sm"
                                                                         value={this.state.planningUnitId}
+                                                                        onChange={() => this.formSubmit(this.state.monthCount)}
                                                                     >
                                                                         <option value="0">Please Select</option>
                                                                         {planningUnits}
@@ -1890,13 +1891,14 @@ export default class SupplyPlanComponent extends React.Component {
                                                                         bsSize="sm"
                                                                         value={this.state.regionId}
                                                                         name="regionId" id="regionId"
+                                                                        onChange={() => this.formSubmit(this.state.monthCount)}
                                                                     >
                                                                         <option value="-1">All</option>
                                                                         {regions}
                                                                     </Input>
-                                                                    <InputGroupAddon addonType="append">
+                                                                    {/* <InputGroupAddon addonType="append">
                                                                         &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
-                                                                    </InputGroupAddon>
+                                                                    </InputGroupAddon> */}
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>

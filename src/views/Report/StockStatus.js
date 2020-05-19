@@ -640,9 +640,9 @@ class StockStatus extends Component {
                                   <option value="0">{i18n.t('static.common.select')}</option>
                                   {planningUnitList}
                                 </Input>
-                                <InputGroupAddon addonType="append">
+                                {/* <InputGroupAddon addonType="append">
                                   <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                </InputGroupAddon>
+                                </InputGroupAddon> */}
                               </InputGroup>
                             </div>
                           </FormGroup>

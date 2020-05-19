@@ -245,7 +245,7 @@ export default class PlanningUnitListComponent extends Component {
                         </div>
 
                     </CardHeader>
-                    <CardBody className="pb-lg-0"> 
+                    <CardBody className="pb-lg-0">
                         <Col md="9 pl-0">
                             <div className="d-md-flex Selectdiv2">
                                 <FormGroup>
@@ -257,13 +257,14 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="realmId"
                                                 id="realmId"
                                                 bsSize="sm"
+                                                onChange={this.filterDataForRealm}
                                             >
                                                 {/* <option value="0">{i18n.t('static.common.all')}</option> */}
                                                 {realmList}
                                             </Input>
-                                            <InputGroupAddon addonType="append">
+                                            {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterDataForRealm}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
+                                            </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
@@ -277,13 +278,14 @@ export default class PlanningUnitListComponent extends Component {
                                                 name="forecastingUnitId"
                                                 id="forecastingUnitId"
                                                 bsSize="sm"
+                                                onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {forecastingUnitList}
                                             </Input>
-                                            <InputGroupAddon addonType="append">
+                                            {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
+                                            </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
