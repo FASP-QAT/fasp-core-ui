@@ -433,7 +433,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 name="planningUnitId"
                                                                 id="select"
                                                                 bsSize="sm"
-                                                                valid={!errors.planningUnitId}
+                                                                valid={!errors.planningUnitId && this.state.planningUnitId != ''}
                                                                 invalid={touched.planningUnitId && !!errors.planningUnitId}
                                                                 value={this.state.planningUnitId}
                                                                 onBlur={handleBlur}
@@ -453,7 +453,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 name="reorderFrequencyInMonths"
                                                                 id="reorderFrequencyInMonths"
                                                                 bsSize="sm"
-                                                                valid={!errors.reorderFrequencyInMonths}
+                                                                valid={!errors.reorderFrequencyInMonths && this.state.reorderFrequencyInMonths != ''}
                                                                 invalid={touched.reorderFrequencyInMonths && !!errors.reorderFrequencyInMonths}
                                                                 value={this.state.reorderFrequencyInMonths}
                                                                 placeholder={i18n.t('static.program.programPlanningUnit.reorderFrequencyText')}
@@ -470,7 +470,7 @@ class AddprogramPlanningUnit extends Component {
                                                                 name="minMonthsOfStock"
                                                                 id="minMonthsOfStock"
                                                                 bsSize="sm"
-                                                                valid={!errors.minMonthsOfStock}
+                                                                valid={!errors.minMonthsOfStock && this.state.minMonthsOfStock != ''}
                                                                 invalid={touched.minMonthsOfStock && !!errors.minMonthsOfStock}
                                                                 value={this.state.minMonthsOfStock}
                                                                 placeholder='Minimum month of stock'

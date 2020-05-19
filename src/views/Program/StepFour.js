@@ -133,7 +133,7 @@ export default class StepFour extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.organisationId}
+                                            valid={!errors.organisationId && this.props.items.program.organisation.id != ''}
                                             invalid={touched.organisationId && !!errors.organisationId}
                                             onBlur={handleBlur}
                                             bsSize="sm"
@@ -151,9 +151,9 @@ export default class StepFour extends Component {
                                         <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-right mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-right mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)} disabled={!isValid} >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
                                 </Form>

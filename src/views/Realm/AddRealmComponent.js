@@ -70,9 +70,9 @@ export default class AddRealmComponent extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-               /* monthInPastForAmc: '',
-                monthInFutureForAmc: '',
-                orderFrequency: '',*/
+                /* monthInPastForAmc: '',
+                 monthInFutureForAmc: '',
+                 orderFrequency: '',*/
                 defaultRealm: true
             },
             message: ''
@@ -91,15 +91,15 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "realmCode") {
             realm.realmCode = event.target.value.toUpperCase();
         }
-      /*  if (event.target.name === "monthInPastForAmc") {
-            realm.monthInPastForAmc = event.target.value
-        }
-        if (event.target.name === "monthInFutureForAmc") {
-            realm.monthInFutureForAmc = event.target.value
-        }
-        if (event.target.name === "orderFrequency") {
-            realm.orderFrequency = event.target.value
-        }*/
+        /*  if (event.target.name === "monthInPastForAmc") {
+              realm.monthInPastForAmc = event.target.value
+          }
+          if (event.target.name === "monthInFutureForAmc") {
+              realm.monthInFutureForAmc = event.target.value
+          }
+          if (event.target.name === "orderFrequency") {
+              realm.orderFrequency = event.target.value
+          }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
@@ -114,9 +114,9 @@ export default class AddRealmComponent extends Component {
         setTouched({
             realmCode: true,
             label: true,
-          /*  monthInPastForAmc: true,
-            monthInFutureForAmc: true,
-            orderFrequency: true*/
+            /*  monthInPastForAmc: true,
+              monthInFutureForAmc: true,
+              orderFrequency: true*/
         }
         )
         this.validateForm(errors)
@@ -206,9 +206,10 @@ export default class AddRealmComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='realmForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='realmForm'>
                                                 <CardBody>
 
                                                     <FormGroup>
@@ -217,7 +218,7 @@ export default class AddRealmComponent extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.realm.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -231,7 +232,7 @@ export default class AddRealmComponent extends Component {
                                                             name="realmCode"
                                                             id="realmCode"
                                                             bsSize="sm"
-                                                            valid={!errors.realmCode}
+                                                            valid={!errors.realmCode && this.state.realm.realmCode != ''}
                                                             invalid={touched.realmCode && !!errors.realmCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -239,7 +240,7 @@ export default class AddRealmComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
-                                                  {/*  <FormGroup>
+                                                    {/*  <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
                                                             name="monthInPastForAmc"
@@ -282,7 +283,7 @@ export default class AddRealmComponent extends Component {
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
                                                   </FormGroup>*/}
                                                     <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -296,7 +297,7 @@ export default class AddRealmComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
+                                                                {i18n.t('static.realm.yes')}
                                                             </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -312,7 +313,7 @@ export default class AddRealmComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
+                                                                {i18n.t('static.realm.no')}
                                                             </Label>
                                                         </FormGroup>
                                                     </FormGroup>
@@ -321,7 +322,7 @@ export default class AddRealmComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" color="success" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" color="warning" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>

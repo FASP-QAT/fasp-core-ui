@@ -17,6 +17,8 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+const entityname = i18n.t('static.dashboard.consumptiondetails');
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -344,11 +346,11 @@ export default class ConsumptionDetails extends React.Component {
                         for (var j = 0; j < consumptionList.length; j++) {
                             if (consumptionList[j].planningUnit.id == plannigUnitId) {
                                 data = [];
-                                data[0] = consumptionList[j].dataSource.id;
+                                data[0] = consumptionList[j].consumptionDate;
                                 data[1] = consumptionList[j].region.id;
                                 data[2] = consumptionList[j].consumptionQty;
                                 data[3] = consumptionList[j].dayOfStockOut;
-                                data[4] = consumptionList[j].consumptionDate;
+                                data[4] = consumptionList[j].dataSource.id;
                                 // data[5] = consumptionList[j].notes;
                                 if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
                                     data[5] = '';
@@ -382,9 +384,11 @@ export default class ConsumptionDetails extends React.Component {
                             columns: [
                                 // { title: 'Month', type: 'text', readOnly: true },
                                 {
-                                    title: i18n.t('static.inventory.dataSource'),
-                                    type: 'dropdown',
-                                    source: dataSourceList
+                                    title: 'Consumption Date',
+                                    type: 'calendar',
+                                    options: {
+                                        format: 'MM-YYYY'
+                                    }
                                 },
                                 {
                                     title: i18n.t('static.inventory.region'),
@@ -400,8 +404,9 @@ export default class ConsumptionDetails extends React.Component {
                                     type: 'numeric'
                                 },
                                 {
-                                    title: 'Consumption Date',
-                                    type: 'calendar'
+                                    title: i18n.t('static.inventory.dataSource'),
+                                    type: 'dropdown',
+                                    source: dataSourceList
                                 },
                                 {
                                     title: 'Notes',
@@ -839,11 +844,11 @@ export default class ConsumptionDetails extends React.Component {
                         // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId) {
                         // if (consumptionDataList[count].consumptionId == consumptionDataListNotFiltered[i].consumptionId && consumptionDataList[count].planningUnit.id == consumptionDataListNotFiltered[i].planningUnit.id) {
                         var map = new Map(Object.entries(tableJson[i]));
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].dataSource.id = map.get("0");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionDate = moment(map.get("0")).format("YYYY-MM-DD");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].region.id = map.get("1");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionQty = map.get("2");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].dayOfStockOut = parseInt(map.get("3"));
-                        consumptionDataListNotFiltered[parseInt(map.get("8"))].consumptionDate = moment(map.get("4")).format("YYYY-MM-DD");
+                        consumptionDataListNotFiltered[parseInt(map.get("8"))].dataSource.id = map.get("4");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].notes = map.get("5");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].actualFlag = map.get("6");
                         consumptionDataListNotFiltered[parseInt(map.get("8"))].active = map.get("7");
@@ -863,15 +868,15 @@ export default class ConsumptionDetails extends React.Component {
                         var map = new Map(Object.entries(tableJson[i]))
                         var json = {
                             consumptionId: 0,
-                            dataSource: {
-                                id: map.get("0")
-                            },
+                            consumptionDate: moment(map.get("0")).format("YYYY-MM-DD"),
                             region: {
                                 id: map.get("1")
                             },
                             consumptionQty: map.get("2"),
                             dayOfStockOut: parseInt(map.get("3")),
-                            consumptionDate: moment(map.get("4")).format("YYYY-MM-DD"),
+                            dataSource: {
+                                id: map.get("4")
+                            },
                             notes: map.get("5"),
                             actualFlag: map.get("6"),
                             active: map.get("7"),
@@ -907,7 +912,8 @@ export default class ConsumptionDetails extends React.Component {
                             message: 'static.message.consumptionSaved',
                             changedFlag: 0
                         })
-                        this.props.history.push(`/dashboard/` + i18n.t('static.message.consumptionSuccess'))
+                        // this.props.history.push(`/consumptionDetails/${document.getElementById('programId').value}/${document.getElementById("planningUnitId").value}/` + i18n.t('static.message.consumptionSuccess'))
+                        this.props.history.push(`/consumptionDetails/` + i18n.t('static.message.consumptionSuccess'));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -1060,6 +1066,8 @@ export default class ConsumptionDetails extends React.Component {
 
 
             <div className="animated fadeIn">
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Col xs="12" sm="12">
                     <Card>
 
@@ -1848,6 +1856,7 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({
             changedFlag: 1
         })
+
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1855,10 +1864,17 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
+                if (isNaN(Date.parse(value))) {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
             }
         }
+
         if (x == 1) {
             var col = ("B").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1916,14 +1932,8 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setStyle(col, "background-color", "yellow");
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                if (isNaN(Date.parse(value))) {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.invaliddate'));
-                } else {
-                    this.el.setStyle(col, "background-color", "transparent");
-                    this.el.setComments(col, "");
-                }
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
             }
         }
         // if (x == 5) {
@@ -2008,8 +2018,15 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
+                // if (isNaN(Date.parse(value))) {
+                //     this.el.setStyle(col, "background-color", "transparent");
+                //     this.el.setStyle(col, "background-color", "yellow");
+                //     this.el.setComments(col, "In valid Date.");
+                //     valid = false;
+                // } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
+                // }
             }
 
             var col = ("B").concat(parseInt(y) + 1);
@@ -2083,15 +2100,8 @@ export default class ConsumptionDetails extends React.Component {
                 this.el.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
-                // if (isNaN(Date.parse(value))) {
-                //     this.el.setStyle(col, "background-color", "transparent");
-                //     this.el.setStyle(col, "background-color", "yellow");
-                //     this.el.setComments(col, "In valid Date.");
-                //     valid = false;
-                // } else {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
-                // }
             }
 
             // var col = ("F").concat(parseInt(y) + 1);

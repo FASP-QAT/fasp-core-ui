@@ -58,6 +58,7 @@ export default class StepOne extends Component {
         super(props);
         this.state = {
             realmList: [],
+            realmId: '',
         }
 
     }
@@ -85,6 +86,8 @@ export default class StepOne extends Component {
     }
 
     componentDidMount() {
+
+        console.log("-----------------------------------FIRST STEP-------->", this.props.items);
         AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getRealmList()
             .then(response => {
@@ -139,12 +142,13 @@ export default class StepOne extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.realmId}
+                                            valid={!errors.realmId && this.props.items.program.realm.realmId != ''}
                                             invalid={touched.realmId && !!errors.realmId}
                                             bsSize="sm"
                                             className="col-md-6"
                                             onBlur={handleBlur}
                                             type="select" name="realmId" id="realmId"
+                                            // value={this.props.program.realm.realmId}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getDependentLists(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
@@ -152,11 +156,11 @@ export default class StepOne extends Component {
                                         </Input>
                                         <FormFeedback className="red">{errors.realmId}</FormFeedback>
                                         {/* <Button color="info" size="md" className="float-right mr-1" type="button" name="planningPrevious" id="planningPrevious" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button> */}
-                                        &nbsp;
+                                       
                                     </FormGroup>
 
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-right mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}>Next <i className="fa fa-angle-double-right"></i></Button>
                                     </FormGroup>
 
                                 </Form>

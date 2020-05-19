@@ -52,8 +52,10 @@ class AddSupplierComponent extends Component {
       realms: [],
       supplier: {
         realm: {
+          id: ''
         },
         label: {
+          label_en: ''
         }
       },
       message: ''
@@ -167,9 +169,10 @@ class AddSupplierComponent extends Component {
                     handleSubmit,
                     isSubmitting,
                     isValid,
-                    setTouched
+                    setTouched,
+                    handleReset
                   }) => (
-                      <Form onSubmit={handleSubmit} noValidate name='supplierForm'>
+                      <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='supplierForm'>
                         <CardBody>
                           <FormGroup>
                             <Label htmlFor="realmId">{i18n.t('static.supplier.realm')}<span className="red Reqasterisk">*</span></Label>
@@ -178,7 +181,7 @@ class AddSupplierComponent extends Component {
                               name="realmId"
                               id="realmId"
                               bsSize="sm"
-                              valid={!errors.realmId}
+                              valid={!errors.realmId && this.state.supplier.realm.id != ''}
                               invalid={touched.realmId && !!errors.realmId}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
@@ -196,7 +199,7 @@ class AddSupplierComponent extends Component {
                               name="supplier"
                               id="supplier"
                               bsSize="sm"
-                              valid={!errors.supplier}
+                              valid={!errors.supplier && this.state.supplier.label.label_en != ''}
                               invalid={touched.supplier && !!errors.supplier}
                               onChange={(e) => { handleChange(e); this.dataChange(e) }}
                               onBlur={handleBlur}
@@ -209,7 +212,7 @@ class AddSupplierComponent extends Component {
                         <CardFooter>
                           <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                            <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                             <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                             &nbsp;
                           </FormGroup>

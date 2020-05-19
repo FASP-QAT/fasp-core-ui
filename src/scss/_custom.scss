@@ -480,7 +480,7 @@ label.arrow_label:after {
 // table height scroll
 .react-bootstrap-table {
   overflow-y: auto !important;
-  max-height: 440px;
+  max-height: 540px;
 }
 
 .react-bootstrap-table-pagination {
@@ -672,10 +672,11 @@ label.arrow_label:after {
 
 
   // stock status matrix
+.stock-status-table{margin-top:2%;}
 .stock-status-search{position: absolute;
   // left: -75px;
   left: -35px;
-  top: 185px;}
+  top: 155px;}
   // stock status matrix calender box
   .box{height: calc(1.5em + 0.5rem + 2px);
     padding: 0.25rem 0.5rem;
@@ -698,7 +699,20 @@ label.arrow_label:after {
   .month-picker > .rmp-container .rmp-popup .rmp-pad li {
    
     line-height: initial !important;}
-
+    
+    @keyframes fade-out {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+    
+    .fadeOutmessage{
+      display: block;
+      animation: fade-out 8s ease-in-out both;
+    }
 
 
 
@@ -1479,7 +1493,7 @@ input::placeholder {
 // .region-bartext{margin-left: -25px;}
 // .otherfeild-text{margin-left: -37%;}
 // .planning-text{    margin-left: 0px;}
-
+/////setup program
 .progressbar {
   height: 5px;
   margin-top: 20px;
@@ -1518,6 +1532,44 @@ input::placeholder {
 .progressbartext7 {
   left: 94.95%;
 }
+////pipelinesetup progress bar
+
+.progressetuptext1 {
+  left: -11px;
+}
+.progressetuptext2 {
+  left: 22%;
+}
+.progressetuptext3 {
+  left: 46.46%;
+}
+.progressetuptext4 {
+  left: 71.46%;
+}
+.progressetuptext5 {
+  left: 94.95%;
+}
+///data setup
+.progresdatatext1 {
+  left: 7px;
+}
+.progresdatatext2 {
+  left: 19%;
+}
+.progresdatatext3 {
+  left: 37%;
+}
+.progresdatatext4 {
+  left: 55.46%;
+}
+.progresdatatext5 {
+  left: 76%;
+}
+.progresdatatext6 {
+  left: 94.79%;
+}
+
+
 
 @media only screen and (max-width: 1024px) {
   .progressbartext1 {
@@ -1541,6 +1593,43 @@ input::placeholder {
   .progressbartext7 {
     left: 92.95%;
   }
+
+  ///pipeline setup program
+  .progressetuptext1 {
+    left: -11px;
+  }
+  .progressetuptext2 {
+    left: 21%;
+  }
+  .progressetuptext3 {
+    left: 45%;
+  }
+  .progressetuptext4 {
+    left: 70%;
+  }
+  .progressetuptext5 {
+    left: 93%;
+  }
+ ///data setup
+.progresdatatext1 {
+  left: 7px;
+}
+.progresdatatext2 {
+  left: 19%;
+}
+.progresdatatext3 {
+  left: 36%;
+}
+.progresdatatext4 {
+  left: 54.46%;
+}
+.progresdatatext5 {
+  left: 75%;
+}
+.progresdatatext6 {
+  left: 92.79%;
+}
+
 }
 
 @media (max-width: 768px) {
@@ -1565,7 +1654,44 @@ input::placeholder {
   .progressbartext7 {
     left: 92.95%;
   }
+
+  ///pipeline setup program
+  .progressetuptext1 {
+    left: -11px;
+  }
+  .progressetuptext2 {
+    left: 21%;
+  }
+  .progressetuptext3 {
+    left: 44.46%;
+  }
+  .progressetuptext4 {
+    left: 69.46%;
+  }
+  .progressetuptext5 {
+    left: 92%;
+  }
+  ///data setup
+.progresdatatext1 {
+  left: 7px;
 }
+.progresdatatext2 {
+  left: 19%;
+}
+.progresdatatext3 {
+  left: 35%;
+}
+.progresdatatext4 {
+  left: 53.46%;
+}
+.progresdatatext5 {
+  left: 74%;
+}
+.progresdatatext6 {
+  left:91.79%
+}
+}
+
 
 .react-confirm-alert-body {
   width: 500px !important;
@@ -1654,3 +1780,120 @@ input::placeholder {
   margin: -17px -13px 0px -9px !important;
   border-radius: 3px;
 }
+.showdatabtn{
+  margin-top:-3%;
+}
+///////Report Consumption globe
+.css-1r4vtzz {
+padding: 1px 8px 5px 8px !important;
+background-color: #FFF;
+ box-shadow: none !important;
+color: #515151;
+cursor: pointer;
+display: -webkit-inline-box;
+display: -webkit-inline-flex;
+display: -ms-inline-flexbox;
+text-align: left;
+-webkit-text-decoration: none;
+text-decoration: none;
+ max-width: none!important; 
+position: relative!important;
+display: flex!important;
+flex-wrap: wrap!important;
+align-items: stretch!important;
+width: 242%!important;
+height: calc(1.5em + 0.5rem + 2px)!important;
+background-clip: padding-box!important;
+border: 1px solid #e4e7ea!important;
+font-size: 0.76562rem!important;
+line-height: 1.5!important;
+border-radius: 0.2rem!important;
+
+}
+.css-48ayfv
+{
+  padding: 1px 8px 5px 8px !important;
+  background-color: #FFF;
+   box-shadow: none !important;
+  color: #515151;
+  cursor: pointer;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  text-align: left;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+   max-width: none!important; 
+  position: relative!important;
+  display: flex!important;
+  flex-wrap: wrap!important;
+  align-items: stretch!important;
+  width: 242%!important;
+  height: calc(1.5em + 0.5rem + 2px)!important;
+  background-clip: padding-box!important;
+  border: 1px solid #e4e7ea!important;
+  font-size: 0.76562rem!important;
+  line-height: 1.5!important;
+  border-radius: 0.2rem!important;
+  
+}
+@media (max-width: 768px){
+.css-1r4vtzz
+{
+  width: 169%!important;
+}
+.css-48ayfv
+{
+  width: 169%!important;
+}
+.css-1jllj6i-control {
+  min-height: 30px!important;
+  min-width: 163px!important;
+}
+.css-6y1x9t-control {
+  min-height: 30px!important;
+  border-color:1px solid #e4e7ea !important;
+  min-width: 163px!important;
+}
+.css-1pcexqc-container {
+  position: relative;
+  width: 206px!important;
+  box-sizing: border-box;
+}
+
+}
+@media only screen and (max-width: 1024px) {
+  .css-1r4vtzz
+{
+  width: 157%!important;
+}
+.css-48ayfv
+{
+  width: 169%!important;
+}
+}
+.css-1hwfws3
+{
+  height: calc(1.5em + 0.5rem + -1px) !important;
+}
+.css-1jllj6i-control {
+  min-height: 30px!important;
+  min-width: 183px!important;
+}
+.css-6y1x9t-control {
+  min-height: 30px!important;
+  border-color: #e4e7ea !important;
+  min-width: 183px!important;
+}
+.css-6y1x9t-control:hover {
+
+  border-color:#e4e7ea !important;
+}
+.css-1vr111p-option{
+  min-width: 171px!important;
+}
+// .css-1pcexqc-container {
+//   position: relative;
+//   box-sizing: border-box;
+//   width: 206px!important;
+// }

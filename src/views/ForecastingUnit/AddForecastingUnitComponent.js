@@ -68,6 +68,7 @@ export default class AddForecastingUnitComponent extends Component {
             {
                 active: '',
                 realm: {
+                    id: ''
                 },
                 label: {
                     label_en: '',
@@ -76,8 +77,8 @@ export default class AddForecastingUnitComponent extends Component {
                     label_en: '',
                     labelId: 0,
                 },
-                productCategory: {},
-                tracerCategory: {}
+                productCategory: { id: '' },
+                tracerCategory: { id: '' }
             },
             lang: localStorage.getItem('lang')
         }
@@ -238,9 +239,10 @@ export default class AddForecastingUnitComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='forecastingUnit'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='forecastingUnit'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label htmlFor="realmId">{i18n.t('static.realm.realm')}<span className="red Reqasterisk">*</span></Label>
@@ -249,7 +251,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.forecastingUnit.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -268,7 +270,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             name="tracerCategoryId"
                                                             id="tracerCategoryId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.forecastingUnit.tracerCategory.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -287,7 +289,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             name="productCategoryId"
                                                             id="productCategoryId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.forecastingUnit.productCategory.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -304,7 +306,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.forecastingUnit.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -318,7 +320,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             name="genericLabel"
                                                             id="genericLabel"
                                                             bsSize="sm"
-                                                            valid={!errors.genericLabel}
+                                                            valid={!errors.genericLabel && this.state.forecastingUnit.genericLabel.label_en != ''}
                                                             invalid={touched.genericLabel && !!errors.genericLabel}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -333,7 +335,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                     <FormGroup>
 
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>

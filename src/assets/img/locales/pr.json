@@ -84,7 +84,7 @@
     "static.message.invaliddate": "Data inválida",
     "static.consumption.consumptionqty": "Quantidade de consumo",
     "static.consumption.daysofstockout": "Dias de estoque esgotado",
-    "static.consumption.actualflag": "Bandeira real",
+    "static.consumption.actualflag": "Bandeira/Previsão real",
     "static.consumption.actual": "Real",
     "static.consumption.forcast": "Previsão",
     "static.common.startdate": "Data de início",
@@ -133,5 +133,18 @@
     "static.dashboard.report": "Relatórios",
     "static.dashboard.consumption": "Consumo",
     "static.dashboard.stockstatusmatrix": "Matriz de status de estoque",
-    "static.dashboard.program": "Programa"
+    "static.dashboard.program": "Programa",
+    "static.message.syncExpiresOn": "Você excedeu o número máximo de dias em que pode trabalhar offline. Por favor, fique online para continuar usando o QAT.",
+    "static.common.year": "Ano",
+    "static.common.display": "Exibição",
+    "static.common.monthly": "Por mês",
+    "static.common.quarterly": "Trimestral",
+    "static.common.selectProgram": "Por favor, selecione o programa",
+    "static.common.all": "Todos",
+    "static.realm.yes": "sim",
+    "static.realm.no": "Não",
+    "static.common.selectPlanningUnit": "Selecione a unidade de planejamento",
+    "static.common.selectProductCategory": "Selecione a categoria do produto",
+    "static.region.glnvalue": "GLN Não deve ter 13 dígitos."
+
 }

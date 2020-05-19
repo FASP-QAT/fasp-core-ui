@@ -9,6 +9,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { SECRET_KEY } from '../../Constants.js';
 import i18n from '../../i18n';
 import moment from "moment";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const entityname = i18n.t('static.inventory.inventory')
 export default class AddInventory extends Component {
@@ -269,7 +270,8 @@ export default class AddInventory extends Component {
                                     },
                                     {
                                         title: i18n.t('static.inventory.inventoryDate'),
-                                        type: 'calendar'
+                                        type: 'calendar',
+                                        options: { format: 'MM-YYYY' }
 
                                     },
                                     {
@@ -677,7 +679,7 @@ export default class AddInventory extends Component {
                             message: 'static.message.inventorysuccess',
                             changedFlag: 0
                         })
-                        this.props.history.push(`/dashboard/` + i18n.t('static.message.addSuccess', { entityname }))
+                        this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -713,6 +715,10 @@ export default class AddInventory extends Component {
         return (
 
             <div className="animated fadeIn">
+                {/* <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} /> */}
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Col xs="12" sm="12">
                     <Card>
