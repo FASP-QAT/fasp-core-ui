@@ -59,7 +59,7 @@ class AddRoleComponent extends Component {
                 businessFunctions: [],
                 canCreateRole: [],
                 label: {
-
+                    label_en: ''
                 }
             },
             businessFunctionId: '',
@@ -277,7 +277,7 @@ class AddRoleComponent extends Component {
                                                             name="roleName"
                                                             id="roleName"
                                                             bsSize="sm"
-                                                            valid={!errors.roleName}
+                                                            valid={!errors.roleName && this.state.role.label.label_en != ''}
                                                             invalid={touched.roleName && !!errors.roleName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

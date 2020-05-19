@@ -32,6 +32,7 @@ export default class LanguageListComponent extends Component {
         super(props);
 
         this.state = {
+            // programId: '',
             programList: [],
             categoryList: [],
             productList: [],
@@ -45,7 +46,7 @@ export default class LanguageListComponent extends Component {
             message: '',
             langaugeList: [],
             selSource: [],
-            rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
+            rangeValue: { from: { year: new Date().getFullYear(), month: new Date().getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
         }
         this.editShipment = this.editShipment.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this);
@@ -160,60 +161,117 @@ export default class LanguageListComponent extends Component {
     }
 
     formSubmit = function () {
-        var tempShipmentList = [];
-        var sel = document.getElementById("planningUnitId");
-        var planningUnitText = sel.options[sel.selectedIndex].text;
-        var programIdEncrypt = document.getElementById("programId").value;
-        var programId = (document.getElementById("programId").value).split("_")[0];
-        var jsonForShipment = {
-            qatOrderNo: 1,
-            shipmentStatus: 'Suggested',
-            planningUnit: planningUnitText,
-            programIdEncrypt: programIdEncrypt,
-            programId: programId,
-            shipmentStatusId: 1,
+        // var tempShipmentList = [];
+        // var sel = document.getElementById("planningUnitId");
+        // var planningUnitText = sel.options[sel.selectedIndex].text;
+        // var programIdEncrypt = document.getElementById("programId").value;
+        // var programId = (document.getElementById("programId").value).split("_")[0];
+        // var jsonForShipment = {
+        //     qatOrderNo: 1,
+        //     shipmentStatus: 'Suggested',
+        //     planningUnit: planningUnitText,
+        //     programIdEncrypt: programIdEncrypt,
+        //     programId: programId,
+        //     shipmentStatusId: 1,
 
-        }
-        tempShipmentList.push(jsonForShipment);
+        // }
+        // tempShipmentList.push(jsonForShipment);
 
-        jsonForShipment = {
-            qatOrderNo: 2,
-            shipmentStatus: 'planned',
-            planningUnit: planningUnitText,
-            programId: programId,
-            shipmentStatusId: 2,
+        // jsonForShipment = {
+        //     qatOrderNo: 2,
+        //     shipmentStatus: 'planned',
+        //     planningUnit: planningUnitText,
+        //     programId: programId,
+        //     shipmentStatusId: 2,
 
-        }
-        tempShipmentList.push(jsonForShipment);
+        // }
+        // tempShipmentList.push(jsonForShipment);
 
-        jsonForShipment = {
-            qatOrderNo: 3,
-            shipmentStatus: 'cancelled',
-            planningUnit: planningUnitText,
-            programId: programId,
-            shipmentStatusId: 3,
+        // jsonForShipment = {
+        //     qatOrderNo: 3,
+        //     shipmentStatus: 'cancelled',
+        //     planningUnit: planningUnitText,
+        //     programId: programId,
+        //     shipmentStatusId: 3,
 
-        }
-        tempShipmentList.push(jsonForShipment);
+        // }
+        // tempShipmentList.push(jsonForShipment);
 
-        jsonForShipment = {
-            qatOrderNo: 4,
-            shipmentStatus: 'submitted',
-            planningUnit: planningUnitText,
-            programId: programId,
-            shipmentStatusId: 4,
+        // jsonForShipment = {
+        //     qatOrderNo: 4,
+        //     shipmentStatus: 'submitted',
+        //     planningUnit: planningUnitText,
+        //     programId: programId,
+        //     shipmentStatusId: 4,
 
-        }
-        tempShipmentList.push(jsonForShipment);
+        // }
+        // tempShipmentList.push(jsonForShipment);
 
-        this.setState({
-            shipmentList: tempShipmentList
-        })
-        this.setState({
-            selSource: tempShipmentList
-        })
+        // this.setState({
+        //     shipmentList: tempShipmentList
+        // })
+        // this.setState({
+        //     selSource: tempShipmentList
+        // })
 
-        document.getElementById("TableCust").style.display = "block";
+        // document.getElementById("TableCust").style.display = "block";
+
+        //Shipment Data Actual
+        let programId = document.getElementById('programId').value;
+        let planningUnitId = document.getElementById('planningUnitId').value;
+        let filterBy = document.getElementById('filterBy').value;
+        let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+        let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
+
+        this.setState({ programId: programId });
+        this.setState({ planningUnitId: planningUnitId });
+        this.setState({ filterBy: filterBy });
+        this.setState({ startDate: startDate });
+        this.setState({ endDate: endDate });
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                let shipmentListWithoutFilter = (programJson.shipmentList);
+
+                for (var i = 0; i < shipmentListWithoutFilter.length; i++) {
+                    console.log("------> ", shipmentListWithoutFilter[i]);
+                }
+
+                // const programFilterList = shipmentListWithoutFilter.filter(c => c.program.id == programId);
+
+                const planningUnitFilterList = shipmentListWithoutFilter.filter(c => c.planningUnit.id == planningUnitId);
+
+                let dateFilterList = '';
+                if (filterBy == 1) {
+                    //Order Date Filter
+                    dateFilterList = planningUnitFilterList.filter(c => moment(c.orderedDate).isBetween(startDate, endDate, null, '[)'))
+                } else {
+                    //Expected Delivery Date
+                    dateFilterList = planningUnitFilterList.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
+                }
+
+                this.setState({
+                    shipmentList: dateFilterList,
+                    selSource: dateFilterList
+                });
+
+                document.getElementById("TableCust").style.display = "block";
+
+            }.bind(this);
+        }.bind(this);
     }.bind(this);
 
 
@@ -352,13 +410,13 @@ export default class LanguageListComponent extends Component {
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
-                                                value={this.state.shipmentId}
-                                                name="shipmentId" id="shipmentId"
+                                                value={this.state.filterBy}
+                                                name="filterBy" id="filterBy"
                                             // onChange={this.displayInsertRowButton}
                                             >
                                                 {/* <option value="0">Please select</option> */}
-                                                <option value="1">Created Date</option>
-                                                <option value="2">Delivery Date</option>
+                                                <option value="1">Ordered Date</option>
+                                                <option value="2">Expected Delivery Date</option>
 
                                             </Input>
 
@@ -371,7 +429,8 @@ export default class LanguageListComponent extends Component {
                                         <InputGroup>
                                             <Picker
                                                 ref="pickRange"
-                                                years={{ min: 2013 }}
+                                                // years={{ min: 2013 }}
+                                                years={{ min: new Date().getFullYear() - 1 }, { max: new Date().getFullYear() + 1 }}
                                                 value={rangeValue}
                                                 lang={pickerLang}
                                                 //theme="light"
