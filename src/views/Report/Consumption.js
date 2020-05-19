@@ -488,7 +488,6 @@ class Consumption extends Component {
 
   }
   getPlanningUnit() {
-    alert('changed')
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
@@ -955,8 +954,8 @@ class Consumption extends Component {
                                       {productCategories.length > 0
                                         && productCategories.map((item, i) => {
                                           return (
-                                            <option key={i} value={item.payload.productCategoryId}>
-                                              {getLabelText(item.payload.label, this.state.lang)}
+                                            <option key={i} value={item.productCategoryId}>
+                                              {getLabelText(item.label, this.state.lang)}
                                             </option>
                                           )
                                         }, this)}
