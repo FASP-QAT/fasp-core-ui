@@ -94,7 +94,7 @@ class DefaultLayout extends Component {
                 <AppSidebarNav navConfig={{
                   items:
                     [
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationdashboard'),
                         url: '/ApplicationDashboard',
@@ -105,13 +105,13 @@ class DefaultLayout extends Component {
                       //   url: '/RealmDashboard',
                       //   icon: 'cui-dashboard icons',
                       // },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
                         icon: 'cui-dashboard icons',
                       },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
@@ -128,7 +128,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
@@ -188,7 +188,7 @@ class DefaultLayout extends Component {
                           },
                         ]
                       },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.realmlevelmaster'),
                         icon: 'fa fa-list',
@@ -245,7 +245,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programmaster'),
                         url: '/program',
@@ -374,7 +374,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
@@ -431,13 +431,13 @@ class DefaultLayout extends Component {
                       //   ]
                       // },
                       ,
-                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: 'Setup Program',
                         url: '/program/programOnboarding',
                         icon: 'icon-graph'
                       },
-                      // this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: 'Pipeline Program Import',
                         url: '/pipeline/pipelineProgramImport',
