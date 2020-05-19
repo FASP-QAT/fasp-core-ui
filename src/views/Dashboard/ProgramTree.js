@@ -86,6 +86,10 @@ class Program extends Component {
                 );
         } else {
             document.getElementById("realmDiv").style.display = "none"
+            this.setState({
+                realmId: AuthenticationService.getRealmId()
+            })
+            this.getTree();
         }
 
     }
