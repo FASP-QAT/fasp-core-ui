@@ -322,10 +322,10 @@ class DefaultLayout extends Component {
                                 url: '/program/exportProgram',
                                 icon: 'fa fa-sign-in',
                               }
-                              
+
                             ]
                           },
-                     
+
                           {
                             name: i18n.t('static.dashboard.consumptiondetails'),
                             url: '/consumptionDetails',
@@ -342,7 +342,7 @@ class DefaultLayout extends Component {
                           //   icon: 'fa fa-list',
                           // },
                           {
-                            name: 'Shipment List',
+                            name: 'Shipment Details',
                             url: '/shipment/shipmentList',
                             icon: 'fa fa-list',
                           }
@@ -365,11 +365,11 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.consumption'),
                             url: '/report/consumption',
                             icon: 'fa fa-exchange'
-                          },{
+                          }, {
                             name: i18n.t('static.dashboard.globalconsumption'),
                             url: '/report/globalConsumption',
                             icon: 'fa fa-exchange'
-                          },{
+                          }, {
                             name: i18n.t('static.report.forecasterrorovertime'),
                             url: '/report/forecastOverTheTime',
                             icon: 'fa fa-exchange'

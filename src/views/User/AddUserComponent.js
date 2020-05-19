@@ -90,11 +90,16 @@ class AddUserComponent extends Component {
             realms: [],
             languages: [],
             user: {
-                realm: {},
-                language: {
-
+                realm: {
+                    realmId: ''
                 },
-                roles: []
+                language: {
+                    languageId: ''
+                },
+                roles: [],
+                username: '',
+                emailId: '',
+                phoneNumber: '',
             },
             roleId: '',
             roleList: [],
@@ -365,7 +370,7 @@ class AddUserComponent extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.user.realm.realmId != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -383,7 +388,7 @@ class AddUserComponent extends Component {
                                                             name="username"
                                                             id="username"
                                                             bsSize="sm"
-                                                            valid={!errors.username}
+                                                            valid={!errors.username && this.state.user.username != ''}
                                                             invalid={touched.username && !!errors.username}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -397,7 +402,7 @@ class AddUserComponent extends Component {
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"
-                                                            valid={!errors.emailId}
+                                                            valid={!errors.emailId && this.state.user.emailId != ''}
                                                             invalid={touched.emailId && !!errors.emailId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -412,7 +417,7 @@ class AddUserComponent extends Component {
                                                             name="phoneNumber"
                                                             id="phoneNumber"
                                                             bsSize="sm"
-                                                            valid={!errors.phoneNumber}
+                                                            valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
                                                             invalid={touched.phoneNumber && !!errors.phoneNumber}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -467,7 +472,7 @@ class AddUserComponent extends Component {
                                                             name="languageId"
                                                             id="languageId"
                                                             bsSize="sm"
-                                                            valid={!errors.languageId}
+                                                            valid={!errors.languageId && this.state.user.language.languageId != ''}
                                                             invalid={touched.languageId && !!errors.languageId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}

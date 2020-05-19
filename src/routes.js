@@ -379,7 +379,7 @@ const routes = [
   { path: '/report/stockStatus', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
   { path: '/report/globalConsumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.consumption'), component: GlobalConsumptionReport },
   { path: '/report/forecastOverTheTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
- 
+
 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
@@ -444,7 +444,7 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
-  { path: '/shipment/ShipmentList', name: 'Shipment / List Shipment', component: ShipmentList },
+  { path: '/shipment/ShipmentList', name: 'Shipment / Shipment', component: ShipmentList },
   { path: '/shipment/editShipment/:shipmentStatusId/:programId', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
 ];
 export default routes;
