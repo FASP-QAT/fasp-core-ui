@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Row, Col, Card, CardBody, CardHeader, Button, CardFooter } from 'reactstrap';
 import "../../../node_modules/react-step-progress-bar/styles.css"
 import { ProgressBar, Step } from "react-step-progress-bar";
+import PipelineProgramDataStepOne from './PipelineProgramDataStepOne.js';
+import PipelineProgramDataStepTwo from './PipelineProgramDataStepTwo.js';
+import PipelineProgramDataStepThree from './PipelineProgramDataStepThree.js';
 
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
@@ -9,7 +12,7 @@ export default class PipelineProgramSetup extends Component {
         this.state = {
             progressPer: 0,
             pipelineProgramSetupPer: 0,
-            pipelineProgramInfo:
+            program:
             {
                 label: {
                     label_en: '',
@@ -18,7 +21,7 @@ export default class PipelineProgramSetup extends Component {
                     label_fr: ''
                 },
                 realm: {
-                    realmId: ''
+                    realmId: 1
                 },
                 realmCountry: {
                     realmCountryId: ''
@@ -475,23 +478,24 @@ export default class PipelineProgramSetup extends Component {
                                                 </div>
                                                 <br></br>
                                                 <div id="pipelineProgramDataStepOne">
-                                                    <h3>Realm</h3>
-                                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
-
+                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                                    <PipelineProgramDataStepOne realmId={this.state.program.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne}></PipelineProgramDataStepOne>
                                                 </div>
                                                 <div id="pipelineProgramDataStepTwo">
-                                                    <h3>Country</h3>
-                                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                                    {/* <h3>Country</h3> */}
+                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                     &nbsp;
                                                     <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
-                                                    &nbsp;
+                                                    &nbsp; */}
+                                                    <PipelineProgramDataStepTwo realmId={this.state.program.realm.realmId} endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} ></PipelineProgramDataStepTwo>
                                                 </div>
                                                 <div id="pipelineProgramDataStepThree">
-                                                    <h3>Health Area</h3>
-                                                    <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                                    {/* <h3>Health Area</h3> */}
+                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                     &nbsp;
                                                     <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
-                                                    &nbsp;
+                                                    &nbsp; */}
+                                                    <PipelineProgramDataStepThree endProgramInfoStepThree={this.endProgramInfoStepThree} backToprogramInfoStepTwo={this.backToprogramInfoStepTwo}></PipelineProgramDataStepThree>
                                                 </div>
                                                 <div id="pipelineProgramDataStepFour">
                                                     <h3>Organisation</h3>
