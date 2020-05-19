@@ -191,9 +191,14 @@ const ProgramOnboarding = React.lazy(() => import('./views/Program/ProgramOnboar
 const ShipmentList = React.lazy(() => import('./views/Shipment/ShipmentList'));
 const EditShipment = React.lazy(() => import('./views/Shipment/EditShipment'));
 const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/ForecastMetricsOverTime'));
+const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
+const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineProgramSetup'));
+const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusOverTime'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  { path: '/pipeline/pieplineProgramSetup', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
+  { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },
   { path: '/program/programOnboarding', name: 'Setup Program', component: ProgramOnboarding },
   { path: '/inventory/addInventory', name: i18n.t('static.dashboard.inventorydetails'), component: AddInventory },
   { path: '/productCategory/productCategoryTree', name: 'Product Category', component: ProductCategoryTree },
@@ -379,8 +384,7 @@ const routes = [
   { path: '/report/stockStatus', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatus'), component: StockStatusReport },
   { path: '/report/globalConsumption', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.consumption'), component: GlobalConsumptionReport },
   { path: '/report/forecastOverTheTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.forecasterrorovertime'), component: ForecastMetricsOverTime },
-
-
+  { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

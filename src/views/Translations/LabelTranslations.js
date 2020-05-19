@@ -109,7 +109,20 @@ export default class DatabaseTranslations extends React.Component {
 
     loaded = function (instance, cell, x, y, value) {
         var elInstance=instance.jexcel;
-        console.log("In loaded function")
+        console.log("In loaded function");
+        // var searchContainer=document.getElementsByClassName('jexcel_filter')[0];
+        // console.log('searchContainer',searchContainer);
+        // var clearBtn = document.createElement('button');
+        // clearBtn.type = "button";
+        // clearBtn.classList.add('btn-default');
+        // clearBtn.classList.add('btn');
+        // var clarText = document.createTextNode('Clear');
+        // clearBtn.setAttribute("id", "clearBtnID");
+        // clearBtn.appendChild(clarText);
+        // searchContainer.appendChild(clearBtn);
+       
+       
+        // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
     }
 
     saveData = function () {

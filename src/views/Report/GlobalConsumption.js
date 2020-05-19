@@ -429,8 +429,9 @@ class Consumption extends Component {
   getPlanningUnit() {
     if (navigator.onLine) {
       console.log('changed')
-      AuthenticationService.setupAxiosInterceptors();
-      let productCategoryId = document.getElementById("productCategoryId").value;
+     let productCategoryId = document.getElementById("productCategoryId").value;
+     AuthenticationService.setupAxiosInterceptors();
+     
       PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
         this.setState({
           planningUnits: response.data,

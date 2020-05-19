@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import DefaultHeaderDropdown from './DefaultHeaderDropdown'
 import logo from '../../assets/img/brand/logo.svg'
-// import QAT from '../../assets/img/brand/QAT.svg'
+import QAT from '../../assets/img/brand/QAT-minimize.png'
 import i18n from '../../i18n'
 import { Online, Offline } from 'react-detect-offline';
 import AuthenticationService from '../../views/Common/AuthenticationService';
@@ -37,7 +37,7 @@ class DefaultHeader extends Component {
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
         <AppNavbarBrand
           full={{ src: logo, width: 150, height: 50, alt: 'QAT Logo' }}
-        // minimized={{ src: QAT, width: 30, height: 30, alt: 'QAT Logo' }}
+        minimized={{ src: QAT, width: 52, height: 50, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
         <Nav className="d-md-down-none" navbar>
