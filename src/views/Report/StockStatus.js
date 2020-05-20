@@ -112,7 +112,7 @@ class StockStatus extends Component {
 
   }
   filterData() {
-    let realmId = document.getElementById("realmId").value;
+    let realmId = AuthenticationService.getRealmId();
     let programId = document.getElementById("programId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
     AuthenticationService.setupAxiosInterceptors();
@@ -152,7 +152,7 @@ class StockStatus extends Component {
   getPrograms() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = document.getElementById("realmId").value;
+      let realmId = AuthenticationService.getRealmId();
       ProgramService.getProgramByRealmId(realmId)
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -340,38 +340,9 @@ class StockStatus extends Component {
   componentDidMount() {
     if (navigator.onLine) {
     AuthenticationService.setupAxiosInterceptors();
-    RealmService.getRealmListAll()
-      .then(response => {
-        if (response.status == 200) {
-          this.setState({
-            realms: response.data,
-            realmId: response.data[0].realmId
-          })
           this.getPrograms();
 
-        } else {
-          this.setState({ message: response.data.messageCode })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );}else{
+     }else{
 
         console.log("In component did mount", new Date())
         const lan = 'en';
@@ -445,15 +416,7 @@ class StockStatus extends Component {
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
   render() {
-    const { realms } = this.state;
-    let realmList = realms.length > 0
-      && realms.map((item, i) => {
-        return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
+   
     const { planningUnits } = this.state;
     let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
@@ -506,9 +469,9 @@ class StockStatus extends Component {
     let productCategoryList = productCategories.length > 0
         && productCategories.map((item, i) => {
             return (
-                <option key={i} value={item.payload.productCategoryId}>
-                    {getLabelText(item.payload.label, this.state.lang)}
-                </option>
+              <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
+              {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
+            </option>
             )
         }, this);
     const pickerLang = {
@@ -566,27 +529,6 @@ class StockStatus extends Component {
 
                           </FormGroup>
 
-
-                          <FormGroup>
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                            <div className="controls SelectGo">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="realmId"
-                                  id="realmId"
-                                  bsSize="sm"
-                                  onChange={this.getPrograms}
-                                >
-                                  {/* <option value="0">{i18n.t('static.common.all')}</option> */}
-
-                                  {realmList}
-                                </Input>
-
-                              </InputGroup>
-                            </div>
-                          </FormGroup>
-                         
                                     <FormGroup className="tab-ml-1">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                             <div className="controls SelectGo">
