@@ -525,16 +525,15 @@ class StockStatus extends Component {
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-        <Row>
-          <Col lg="12">
+        
             <Card>
-              <CardHeader className="text-center">
-                <b className="count-text">StockStatus Report</b>
+              <CardHeader>
+              <i className="icon-menu"></i><strong>StockStatus Report</strong>
                 <div className="card-header-actions">
                   <a className="card-header-action">
                     <Pdf targetRef={ref} filename="StockStatus.pdf">
                       {({ toPdf }) =>
-                        <img style={{ height: '40px', width: '40px' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
+                        <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
 
                       }
                     </Pdf>
@@ -543,7 +542,8 @@ class StockStatus extends Component {
               </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                  <div className="col-md-12 pr-0"> <div ref={ref}> <div className="col-md-9 pr-0" >
+                  <div ref={ref}>
+                
                     <Form >
                       <Col md="12 pl-0">
                         <div className="d-md-flex">
@@ -567,7 +567,7 @@ class StockStatus extends Component {
                           </FormGroup>
 
 
-                          <FormGroup>
+                          <FormGroup className="tab-ml-1">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                             <div className="controls SelectGo">
                               <InputGroup>
@@ -685,16 +685,15 @@ class StockStatus extends Component {
                         }
                       </tbody>
 
-                      </Table>*/}</div>
+                      </Table>*/}
+                     
                    
-                      </div></div></div>
+                      </div>
+                     
+                      </div>
               </CardBody>
             </Card>
-          </Col>
-        </Row>
-
-
-
+         
       </div>
     );
   }

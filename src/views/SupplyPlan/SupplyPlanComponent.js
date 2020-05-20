@@ -2050,6 +2050,11 @@ export default class SupplyPlanComponent extends React.Component {
                     <Card>
                         <CardHeader>
                             <strong>Supply plan</strong>
+                            <div className="card-header-actions">
+                            <a className="card-header-action">
+                             <small className="supplyplanformulas">Supply Plan Formulas</small>
+                             </a>
+                             </div>
                         </CardHeader>
                         <CardBody>
                             <Formik

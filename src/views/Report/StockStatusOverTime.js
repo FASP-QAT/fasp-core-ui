@@ -450,8 +450,7 @@ class StockStatusOverTime extends Component {
         return (
             <div className="animated fadeIn" >
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <Row>
-                    <Col md="12">
+                
                         <Card>
                             <CardHeader className="pb-1">
                                 <i className="icon-menu"></i><strong>{i18n.t('static.report.stockstatusovertimeReport')}</strong>
@@ -474,14 +473,12 @@ class StockStatusOverTime extends Component {
                                 }
                             </CardHeader>
                             <CardBody>
-                                <div className="TableCust" >
-                                    <div className="container">
-                                        <div >
-                                            <div className="col-md-12" >
+                               
+                                            <div>
                                                 <Form >
-                                                    <Col>
+                                                <Col md="12 pl-0">
                                                         <div className="row">
-                                                            <FormGroup className="col-sm-3">
+                                                            <FormGroup className="col-md-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                                 <div className="controls edit">
 
@@ -499,8 +496,9 @@ class StockStatusOverTime extends Component {
                                                                 </div>
 
                                                             </FormGroup>
-                                                            <FormGroup className="col-sm-3">
+                                                            <FormGroup className="col-md-3">
                                                                 <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                                                                <InputGroup>
                                                                 <ReactMultiSelectCheckboxes
                                                                     bsSize="md"
                                                                     name="countrysId"
@@ -508,12 +506,13 @@ class StockStatusOverTime extends Component {
                                                                     onChange={(e) => { this.handleChange(e); this.fetchData() }}
                                                                     options={countryList}
                                                                 />
+                                                                </InputGroup>
                                                                 {!!this.props.error &&
                                                                     this.props.touched && (
                                                                         <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                                                                     )}</FormGroup>
 
-                                                            <FormGroup className="col-sm-3">
+                                                            <FormGroup className="col-md-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                                                 <div className="controls ">
                                                                     <InputGroup>
@@ -529,7 +528,7 @@ class StockStatusOverTime extends Component {
                                                                         </Input>
                                                                     </InputGroup></div>
                                                             </FormGroup>
-                                                            <FormGroup className="col-sm-3">
+                                                            <FormGroup className="col-md-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                                                 <div className="controls">
                                                                     <InputGroup>
@@ -554,12 +553,12 @@ class StockStatusOverTime extends Component {
                                                     </Col>
                                                 </Form>
                                             </div>
-                                            <div className="row">
-                                                <div className="col-md-12">
+                                            <Col md="12 pl-0">
+                                                <div className="row">
                                                     {
                                                         this.state.matricsList.length > 0
                                                         &&
-                                                        <div className="col-md-12">
+                                                        
                                                             <div className="col-md-9">
                                                                 <div className="chart-wrapper chart-graph">
                                                                     <Line id="cool-canvas" data={bar} options={options} />
@@ -567,21 +566,14 @@ class StockStatusOverTime extends Component {
                                                                 </div>
                                                             </div>
 
-                                                        </div>}
+                                                        }
                                                     <br></br>
                                                 </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
+                                            </Col>
+                                       
                             </CardBody>
                         </Card>
-                    </Col>
-                </Row>
-
-
-
+                   
             </div>
 
         );
