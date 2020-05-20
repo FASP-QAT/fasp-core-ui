@@ -449,6 +449,6 @@ const routes = [
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
   { path: '/shipment/ShipmentList', name: 'Shipment / Shipment', component: ShipmentList },
-  { path: '/shipment/editShipment/:shipmentStatusId/:programId', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
+  { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
 ];
 export default routes;

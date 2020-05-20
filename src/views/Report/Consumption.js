@@ -492,7 +492,7 @@ class Consumption extends Component {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
       let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
+      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
         console.log('**' + JSON.stringify(response.data))
         this.setState({
           planningUnits: response.data,
@@ -842,9 +842,9 @@ class Consumption extends Component {
                     <div className="card-header-actions">
                       <a className="card-header-action">
 
-                      <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}  onClick={() => this.exportPDF()}/>
-                     
-                     {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+
+                        {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
 
                           {({ toPdf }) =>
                             <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
@@ -852,313 +852,313 @@ class Consumption extends Component {
                           }
                         </Pdf>*/}
                       </a>
-                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                      <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </div>
-                }
+                  }
                 </Offline>
               </CardHeader>
-            <CardBody>
-              <div className="TableCust" >
-                <div className="container">
-                  <div ref={ref}>
-                    <div className="col-md-12" >
-                      <Form >
-                        <Col>
-                          <div className="row">
-                            <FormGroup className="col-sm-3">
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                              <div className="controls edit">
-
-                                <Picker
-                                  ref="pickRange"
-                                  years={{ min: 2013 }}
-                                  value={rangeValue}
-                                  lang={pickerLang}
-                                  //theme="light"
-                                  onChange={this.handleRangeChange}
-                                  onDismiss={this.handleRangeDissmis}
-                                >
-                                  <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                </Picker>
-                              </div>
-                            </FormGroup>
-                            <Online>
+              <CardBody>
+                <div className="TableCust" >
+                  <div className="container">
+                    <div ref={ref}>
+                      <div className="col-md-12" >
+                        <Form >
+                          <Col>
+                            <div className="row">
                               <FormGroup className="col-sm-3">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                <div className="controls ">
-                                  <InputGroup>
-                                    <Input
-                                      type="select"
-                                      name="programId"
-                                      id="programId"
-                                      bsSize="sm"
-                                      onChange={this.getProductCategories}
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                <div className="controls edit">
 
-                                    >
-                                      <option value="0">{i18n.t('static.common.select')}</option>
-                                      {programs.length > 0
-                                        && programs.map((item, i) => {
-                                          return (
-                                            <option key={i} value={item.programId}>
-                                              {getLabelText(item.label, this.state.lang)}
-                                            </option>
-                                          )
-                                        }, this)}
-                                    </Input>
-
-                                  </InputGroup>
+                                  <Picker
+                                    ref="pickRange"
+                                    years={{ min: 2013 }}
+                                    value={rangeValue}
+                                    lang={pickerLang}
+                                    //theme="light"
+                                    onChange={this.handleRangeChange}
+                                    onDismiss={this.handleRangeDissmis}
+                                  >
+                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                  </Picker>
                                 </div>
                               </FormGroup>
-                            </Online>
-                            <Offline>
-                              <FormGroup className="col-sm-3">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                <div className="controls">
-                                  <InputGroup>
-                                    <Input
-                                      type="select"
-                                      name="programId"
-                                      id="programId"
-                                      bsSize="sm"
-                                      onChange={this.getProductCategories}
+                              <Online>
+                                <FormGroup className="col-sm-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input
+                                        type="select"
+                                        name="programId"
+                                        id="programId"
+                                        bsSize="sm"
+                                        onChange={this.getProductCategories}
 
-                                    >
-                                      <option value="0">{i18n.t('static.common.select')}</option>
-                                      {offlinePrograms.length > 0
-                                        && offlinePrograms.map((item, i) => {
-                                          return (
-                                            <option key={i} value={item.id}>
-                                              {item.name}
-                                            </option>
-                                          )
-                                        }, this)}
-                                    </Input>
+                                      >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {programs.length > 0
+                                          && programs.map((item, i) => {
+                                            return (
+                                              <option key={i} value={item.programId}>
+                                                {getLabelText(item.label, this.state.lang)}
+                                              </option>
+                                            )
+                                          }, this)}
+                                      </Input>
 
-                                  </InputGroup>
-                                </div>
-                              </FormGroup>
-                            </Offline>
-                            <Online>
-                              <FormGroup className="col-sm-3">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                <div className="controls ">
-                                  <InputGroup>
-                                    <Input
-                                      type="select"
-                                      name="productCategoryId"
-                                      id="productCategoryId"
-                                      bsSize="sm"
-                                      onChange={this.getPlanningUnit}
-                                    >
-                                      <option value="0">{i18n.t('static.common.select')}</option>
-                                      {productCategories.length > 0
-                                        && productCategories.map((item, i) => {
-                                          return (
-                                            <option key={i} value={item.productCategoryId}>
-                                              {getLabelText(item.label, this.state.lang)}
-                                            </option>
-                                          )
-                                        }, this)}
-                                    </Input>
-                                  </InputGroup></div>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                              </Online>
+                              <Offline>
+                                <FormGroup className="col-sm-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                  <div className="controls">
+                                    <InputGroup>
+                                      <Input
+                                        type="select"
+                                        name="programId"
+                                        id="programId"
+                                        bsSize="sm"
+                                        onChange={this.getProductCategories}
 
-                              </FormGroup>
-                            </Online>
-                            <Offline>
-                              <FormGroup className="col-sm-3">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                <div className="controls">
-                                  <InputGroup>
-                                    <Input
-                                      type="select"
-                                      name="productCategoryId"
-                                      id="productCategoryId"
-                                      bsSize="sm"
-                                      onChange={this.getPlanningUnit}
-                                    >
-                                      <option value="0">{i18n.t('static.common.select')}</option>
-                                      {offlineProductCategoryList.length > 0
-                                        && offlineProductCategoryList.map((item, i) => {
-                                          return (
-                                            <option key={i} value={item.id}>
-                                              {item.name}
-                                            </option>
-                                          )
-                                        }, this)}
-                                    </Input>
-                                  </InputGroup></div>
+                                      >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {offlinePrograms.length > 0
+                                          && offlinePrograms.map((item, i) => {
+                                            return (
+                                              <option key={i} value={item.id}>
+                                                {item.name}
+                                              </option>
+                                            )
+                                          }, this)}
+                                      </Input>
 
-                              </FormGroup>
-                            </Offline>
-                            <Online>
-                              <FormGroup className="col-sm-3">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                <div className="controls">
-                                  <InputGroup>
-                                    <Input
-                                      type="select"
-                                      name="planningUnitId"
-                                      id="planningUnitId"
-                                      bsSize="sm"
-                                      onChange={this.filterData}
-                                    >
-                                      <option value="0">{i18n.t('static.common.select')}</option>
-                                      {planningUnits.length > 0
-                                        && planningUnits.map((item, i) => {
-                                          return (
-                                            <option key={i} value={item.planningUnit.id}>
-                                              {getLabelText(item.planningUnit.label, this.state.lang)}
-                                            </option>
-                                          )
-                                        }, this)}
-                                    </Input>
-                                    {/* <InputGroupAddon addonType="append">
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                              </Offline>
+                              <Online>
+                                <FormGroup className="col-sm-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input
+                                        type="select"
+                                        name="productCategoryId"
+                                        id="productCategoryId"
+                                        bsSize="sm"
+                                        onChange={this.getPlanningUnit}
+                                      >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {productCategories.length > 0
+                                          && productCategories.map((item, i) => {
+                                            return (
+                                              <option key={i} value={item.productCategoryId}>
+                                                {getLabelText(item.label, this.state.lang)}
+                                              </option>
+                                            )
+                                          }, this)}
+                                      </Input>
+                                    </InputGroup></div>
+
+                                </FormGroup>
+                              </Online>
+                              <Offline>
+                                <FormGroup className="col-sm-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                  <div className="controls">
+                                    <InputGroup>
+                                      <Input
+                                        type="select"
+                                        name="productCategoryId"
+                                        id="productCategoryId"
+                                        bsSize="sm"
+                                        onChange={this.getPlanningUnit}
+                                      >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {offlineProductCategoryList.length > 0
+                                          && offlineProductCategoryList.map((item, i) => {
+                                            return (
+                                              <option key={i} value={item.id}>
+                                                {item.name}
+                                              </option>
+                                            )
+                                          }, this)}
+                                      </Input>
+                                    </InputGroup></div>
+
+                                </FormGroup>
+                              </Offline>
+                              <Online>
+                                <FormGroup className="col-sm-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                  <div className="controls">
+                                    <InputGroup>
+                                      <Input
+                                        type="select"
+                                        name="planningUnitId"
+                                        id="planningUnitId"
+                                        bsSize="sm"
+                                        onChange={this.filterData}
+                                      >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {planningUnits.length > 0
+                                          && planningUnits.map((item, i) => {
+                                            return (
+                                              <option key={i} value={item.planningUnit.id}>
+                                                {getLabelText(item.planningUnit.label, this.state.lang)}
+                                              </option>
+                                            )
+                                          }, this)}
+                                      </Input>
+                                      {/* <InputGroupAddon addonType="append">
+                                        <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                      </InputGroupAddon> */}
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                              </Online>
+                              <Offline>
+                                <FormGroup className="col-sm-3">
+                                  <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                  <div className="controls ">
+                                    <InputGroup>
+                                      <Input
+                                        type="select"
+                                        name="planningUnitId"
+                                        id="planningUnitId"
+                                        bsSize="sm"
+                                        onChange={this.filterData}
+                                      >
+                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                        {offlinePlanningUnitList.length > 0
+                                          && offlinePlanningUnitList.map((item, i) => {
+                                            return (
+                                              <option key={i} value={item.id}>{item.name}</option>
+                                            )
+                                          }, this)}
+                                      </Input>
+                                      {/* <InputGroupAddon addonType="append">
                                     <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
                                   </InputGroupAddon> */}
-                                  </InputGroup>
-                                </div>
-                              </FormGroup>
-                            </Online>
-                            <Offline>
-                              <FormGroup className="col-sm-3">
-                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                <div className="controls ">
-                                  <InputGroup>
-                                    <Input
-                                      type="select"
-                                      name="planningUnitId"
-                                      id="planningUnitId"
-                                      bsSize="sm"
-                                      onChange={this.filterData}
-                                    >
-                                      <option value="0">{i18n.t('static.common.select')}</option>
-                                      {offlinePlanningUnitList.length > 0
-                                        && offlinePlanningUnitList.map((item, i) => {
-                                          return (
-                                            <option key={i} value={item.id}>{item.name}</option>
-                                          )
-                                        }, this)}
-                                    </Input>
-                                    {/* <InputGroupAddon addonType="append">
-                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon> */}
-                                  </InputGroup>
-                                </div>
-                              </FormGroup>
-                            </Offline>
-                          </div>
-                        </Col>
-                      </Form>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-12">
-                        <Online>
-                          {
-                            this.state.consumptions.length > 0
-                            &&
-                            <div className="col-md-12">
-                              <div className="col-md-9">
-                                <div className="chart-wrapper chart-graph">
-                                  <Bar id="cool-canvas" data={bar} options={options} />
-
-                                </div>
-                              </div>
-                              <div className="col-md-12">
-                                <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                  {this.state.show ? 'Hide Data' : 'Show Data'}
-                                </button>
-
-                              </div>
-                            </div>}
-                          <br></br>
-                        </Online>
-                        <Offline>
-                          {
-                            this.state.offlineConsumptionList.length > 0
-                            &&
-                            <div className="col-md-12">
-                              <div className="col-md-9">
-                                <div className="chart-wrapper chart-graph">
-                                  <Bar id="cool-canvas" data={bar} options={options} />
-
-                                </div>
-                              </div>
-                              <div className="col-md-12">
-                                <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                                  {this.state.show ? 'Hide Data' : 'Show Data'}
-                                </button>
-                              </div>
-                            </div>}
-                          <br></br>
-                        </Offline>
+                                    </InputGroup>
+                                  </div>
+                                </FormGroup>
+                              </Offline>
+                            </div>
+                          </Col>
+                        </Form>
                       </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-md-12">
-                      {this.state.show && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
-
-                        <thead>
-                          <tr>
-                            <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
-                            <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
-                            <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
-                          </tr>
-                        </thead>
-                        <Online>
-                          <tbody>
+                      <div className="row">
+                        <div className="col-md-12">
+                          <Online>
                             {
                               this.state.consumptions.length > 0
                               &&
-                              this.state.consumptions.map((item, idx) =>
+                              <div className="col-md-12">
+                                <div className="col-md-9">
+                                  <div className="chart-wrapper chart-graph">
+                                    <Bar id="cool-canvas" data={bar} options={options} />
 
-                                <tr id="addr0" key={idx} >
-                                  {/* <td>
-                                      {this.state.consumptions[idx].consumption_date}
-                                    </td> */}
-                                  <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
-                                  <td>
+                                  </div>
+                                </div>
+                                <div className="col-md-12">
+                                  <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                    {this.state.show ? 'Hide Data' : 'Show Data'}
+                                  </button>
 
-                                    {this.state.consumptions[idx].forcast}
-                                  </td>
-                                  <td>
-                                    {this.state.consumptions[idx].Actual}
-                                  </td></tr>)
-
-                            }
-                          </tbody>
-                        </Online>
-                        <Offline>
-                          <tbody>
+                                </div>
+                              </div>}
+                            <br></br>
+                          </Online>
+                          <Offline>
                             {
                               this.state.offlineConsumptionList.length > 0
                               &&
-                              this.state.offlineConsumptionList.map((item, idx) =>
+                              <div className="col-md-12">
+                                <div className="col-md-9">
+                                  <div className="chart-wrapper chart-graph">
+                                    <Bar id="cool-canvas" data={bar} options={options} />
 
-                                <tr id="addr0" key={idx} >
-                                  {/* <td>
+                                  </div>
+                                </div>
+                                <div className="col-md-12">
+                                  <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                                    {this.state.show ? 'Hide Data' : 'Show Data'}
+                                  </button>
+                                </div>
+                              </div>}
+                            <br></br>
+                          </Offline>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-md-12">
+                        {this.state.show && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+
+                          <thead>
+                            <tr>
+                              <th className="text-center"> {i18n.t('static.report.consumptionDate')} </th>
+                              <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
+                              <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
+                            </tr>
+                          </thead>
+                          <Online>
+                            <tbody>
+                              {
+                                this.state.consumptions.length > 0
+                                &&
+                                this.state.consumptions.map((item, idx) =>
+
+                                  <tr id="addr0" key={idx} >
+                                    {/* <td>
+                                      {this.state.consumptions[idx].consumption_date}
+                                    </td> */}
+                                    <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
+                                    <td>
+
+                                      {this.state.consumptions[idx].forcast}
+                                    </td>
+                                    <td>
+                                      {this.state.consumptions[idx].Actual}
+                                    </td></tr>)
+
+                              }
+                            </tbody>
+                          </Online>
+                          <Offline>
+                            <tbody>
+                              {
+                                this.state.offlineConsumptionList.length > 0
+                                &&
+                                this.state.offlineConsumptionList.map((item, idx) =>
+
+                                  <tr id="addr0" key={idx} >
+                                    {/* <td>
                                       {this.state.offlineConsumptionList[idx].consumption_date}
                                     </td> */}
-                                  <td>{moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
-                                  <td>
+                                    <td>{moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
+                                    <td>
 
-                                    {this.state.offlineConsumptionList[idx].forcast}
-                                  </td>
-                                  <td>
-                                    {this.state.offlineConsumptionList[idx].Actual}
-                                  </td>
-                                </tr>)
+                                      {this.state.offlineConsumptionList[idx].forcast}
+                                    </td>
+                                    <td>
+                                      {this.state.offlineConsumptionList[idx].Actual}
+                                    </td>
+                                  </tr>)
 
-                            }
-                          </tbody>
-                        </Offline>
-                      </Table>}
+                              }
+                            </tbody>
+                          </Offline>
+                        </Table>}
+                      </div>
                     </div>
-                  </div>
 
+                  </div>
                 </div>
-              </div>
-            </CardBody>
+              </CardBody>
             </Card>
           </Col>
         </Row>
