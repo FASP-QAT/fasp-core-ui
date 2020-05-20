@@ -809,8 +809,7 @@ class Consumption extends Component {
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-        <Row>
-          <Col md="12">
+      
             <Card>
               <CardHeader className="pb-1">
                 <i className="icon-menu"></i><strong>{i18n.t('static.report.consumptionReport')}</strong>
@@ -859,13 +858,11 @@ class Consumption extends Component {
               </CardHeader>
             <CardBody>
               <div className="TableCust" >
-                <div className="container">
                   <div ref={ref}>
-                    <div className="col-md-12" >
                       <Form >
-                        <Col>
+                        <Col  md="12 pl-0">
                           <div className="row">
-                            <FormGroup className="col-sm-3">
+                            <FormGroup className="col-md-3">
                               <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                               <div className="controls edit">
 
@@ -883,7 +880,7 @@ class Consumption extends Component {
                               </div>
                             </FormGroup>
                             <Online>
-                              <FormGroup className="col-sm-3">
+                              <FormGroup className="col-md-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                 <div className="controls ">
                                   <InputGroup>
@@ -911,7 +908,7 @@ class Consumption extends Component {
                               </FormGroup>
                             </Online>
                             <Offline>
-                              <FormGroup className="col-sm-3">
+                              <FormGroup className="col-md-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                                 <div className="controls">
                                   <InputGroup>
@@ -939,7 +936,7 @@ class Consumption extends Component {
                               </FormGroup>
                             </Offline>
                             <Online>
-                              <FormGroup className="col-sm-3">
+                              <FormGroup className="col-md-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                 <div className="controls ">
                                   <InputGroup>
@@ -965,7 +962,7 @@ class Consumption extends Component {
                               </FormGroup>
                             </Online>
                             <Offline>
-                              <FormGroup className="col-sm-3">
+                              <FormGroup className="col-md-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
                                 <div className="controls">
                                   <InputGroup>
@@ -991,7 +988,7 @@ class Consumption extends Component {
                               </FormGroup>
                             </Offline>
                             <Online>
-                              <FormGroup className="col-sm-3">
+                              <FormGroup className="col-md-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                 <div className="controls">
                                   <InputGroup>
@@ -1020,7 +1017,7 @@ class Consumption extends Component {
                               </FormGroup>
                             </Online>
                             <Offline>
-                              <FormGroup className="col-sm-3">
+                              <FormGroup className="col-md-3">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                 <div className="controls ">
                                   <InputGroup>
@@ -1049,9 +1046,9 @@ class Consumption extends Component {
                           </div>
                         </Col>
                       </Form>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-12">
+                    
+                    <Col md="12 pl-0">
+                      <div className="row">
                         <Online>
                           {
                             this.state.consumptions.length > 0
@@ -1092,10 +1089,10 @@ class Consumption extends Component {
                           <br></br>
                         </Offline>
                       </div>
-                    </div>
+                    </Col>
                   </div>
-                  <div className="row">
-                    <div className="col-md-12">
+                  <Col md="12">
+                    <div className="row">
                       {this.state.show && <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
 
                         <thead>
@@ -1154,17 +1151,10 @@ class Consumption extends Component {
                         </Offline>
                       </Table>}
                     </div>
-                  </div>
-
-                </div>
+                  </Col>
               </div>
             </CardBody>
             </Card>
-          </Col>
-        </Row>
-
-
-
       </div >
     );
   }

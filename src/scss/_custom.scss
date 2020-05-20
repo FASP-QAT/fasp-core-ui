@@ -1801,7 +1801,7 @@ position: relative!important;
 display: flex!important;
 flex-wrap: wrap!important;
 align-items: stretch!important;
-width: 242%!important;
+width: 261%!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
 border: 1px solid #e4e7ea!important;
@@ -1828,7 +1828,7 @@ border-radius: 0.2rem!important;
   display: flex!important;
   flex-wrap: wrap!important;
   align-items: stretch!important;
-  width: 242%!important;
+  width: 231%!important;
   height: calc(1.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
   border: 1px solid #e4e7ea!important;
@@ -1837,14 +1837,15 @@ border-radius: 0.2rem!important;
   border-radius: 0.2rem!important;
   
 }
+
 @media (max-width: 768px){
 .css-1r4vtzz
 {
-  width: 169%!important;
+  width: 175%!important;
 }
 .css-48ayfv
 {
-  width: 169%!important;
+  width: 175%!important;
 }
 .css-1jllj6i-control {
   min-height: 30px!important;
@@ -1865,11 +1866,11 @@ border-radius: 0.2rem!important;
 @media only screen and (max-width: 1024px) {
   .css-1r4vtzz
 {
-  width: 157%!important;
+  width: 180%!important;
 }
 .css-48ayfv
 {
-  width: 169%!important;
+  width: 180%!important;
 }
 }
 .css-1hwfws3
@@ -1901,5 +1902,9 @@ border-radius: 0.2rem!important;
 .supplyplanformulas{
   color: #212721 !important;
   font-size: 11px!important;
+  font-weight: bold!important;
+}
+.formulasheading{
+  font-size:14px!important;
   font-weight: bold!important;
 }

@@ -1841,7 +1841,7 @@ export default class SupplyPlanComponent extends React.Component {
                         <CardHeader>
                             <strong>Supply plan</strong>
                             <div className="card-header-actions">
-                            <a href="https://reactstrap.github.io/components/listgroup/" rel="noreferrer noopener" target="_blank" className="card-header-action">
+                            <a className="card-header-action">
                              <small className="supplyplanformulas">Supply Plan Formulas</small>
                              </a>
                              </div>
