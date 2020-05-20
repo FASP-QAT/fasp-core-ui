@@ -107,6 +107,7 @@ class AddUserComponent extends Component {
             validateRealm: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
     }
@@ -354,9 +355,10 @@ class AddUserComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='userForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm'>
                                                 <CardBody>
                                                     <Input
                                                         type="hidden"
@@ -488,6 +490,7 @@ class AddUserComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -504,6 +507,21 @@ class AddUserComponent extends Component {
     cancelClicked() {
 
         this.props.history.push(`/user/listUser/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { user } = this.state;
+        user.username = '';
+        user.emailId = '';
+        user.phoneNumber = '';
+        user.realm.realmId = '';
+        user.language.languageId = '';
+        this.state.roleId = '';
+        this.setState(
+            {
+                user
+            }
+        )
     }
 }
 

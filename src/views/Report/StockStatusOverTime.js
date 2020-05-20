@@ -238,7 +238,7 @@ class StockStatusOverTime extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.stockstatusovertime')+'_' + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+        a.download = i18n.t('static.dashboard.stockstatusovertime') + '_' + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -379,10 +379,10 @@ class StockStatusOverTime extends Component {
             }, this);
         const { countries } = this.state;
         // console.log(JSON.stringify(countrys))
-        let countryList =  countries.length > 0 && countries.map((item, i) => {
+        let countryList = countries.length > 0 && countries.map((item, i) => {
             console.log(JSON.stringify(item))
-           return({ label: getLabelText(item.country.label, this.state.lang), value:item.country.countryId })
-         }, this);
+            return ({ label: getLabelText(item.country.label, this.state.lang), value: item.country.countryId })
+        }, this);
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
@@ -406,7 +406,7 @@ class StockStatusOverTime extends Component {
                     showActualPercentages: true,
                     showInLegend: true,
                     pointStyle: 'line',
-                   
+
                     data: this.state.matricsList.map((item, index) => (item.MOS_pass3))
                 },
                 {
@@ -418,7 +418,7 @@ class StockStatusOverTime extends Component {
                     showActualPercentages: true,
                     showInLegend: true,
                     pointStyle: 'line',
-                   
+
                     data: this.state.matricsList.map((item, index) => (item.MOS_PF))
                 },
                 {
@@ -430,7 +430,7 @@ class StockStatusOverTime extends Component {
                     showActualPercentages: true,
                     showInLegend: true,
                     pointStyle: 'line',
-                   
+
                     data: this.state.matricsList.map((item, index) => (item.MOS_Feature3))
                 }
             ]
@@ -505,7 +505,7 @@ class StockStatusOverTime extends Component {
                                                                     bsSize="md"
                                                                     name="countrysId"
                                                                     id="countrysId"
-                                                                    onChange={(e) => { this.handleChange(e) }}
+                                                                    onChange={(e) => { this.handleChange(e); this.fetchData() }}
                                                                     options={countryList}
                                                                 />
                                                                 {!!this.props.error &&
@@ -530,26 +530,26 @@ class StockStatusOverTime extends Component {
                                                                     </InputGroup></div>
                                                             </FormGroup>
                                                             <FormGroup className="col-sm-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                            <div className="controls">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="planningUnitId"
-                                                                        id="planningUnitId"
-                                                                        bsSize="sm"
-                                                                        onChange={this.fetchData}
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {planningUnitList}
-                                                                    </Input>
-                                                                    <InputGroupAddon addonType="append">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="planningUnitId"
+                                                                            id="planningUnitId"
+                                                                            bsSize="sm"
+                                                                            onChange={this.fetchData}
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {planningUnitList}
+                                                                        </Input>
+                                                                        {/* <InputGroupAddon addonType="append">
                                                                         <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                                                    </InputGroupAddon>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                  
+                                                                    </InputGroupAddon> */}
+                                                                    </InputGroup>
+                                                                </div>
+                                                            </FormGroup>
+
                                                         </div>
                                                     </Col>
                                                 </Form>

@@ -204,15 +204,16 @@ export default class CountryListComponent extends Component {
                                             name="active"
                                             id="active"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="">{i18n.t('static.common.all')}</option>
                                             <option value="true">{i18n.t('static.common.active')}</option>
                                             <option value="false">{i18n.t('static.common.disabled')}</option>
 
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>

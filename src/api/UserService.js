@@ -33,7 +33,7 @@ class UserService {
         });
     }
     getUserByUserId(userId) {
-        return axios.get(`${API_URL}/api/getUserByUserId/${userId}`, {
+        return axios.get(`${API_URL}/api/user/${userId}`, {
         });
     }
     editUser(json) {

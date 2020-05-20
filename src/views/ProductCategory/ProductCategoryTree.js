@@ -448,7 +448,9 @@ export default class ProductCategoryTree extends Component {
                                                 <Input
                                                     bsSize="sm"
                                                     onChange={(e) => { this.dataChange(e) }}
-                                                    type="select" name="realmId" id="realmId">
+                                                    type="select" name="realmId" id="realmId"
+                                                // onChange={this.getProductCategoryListByRealmId}
+                                                >
                                                     <option value="">{i18n.t('static.common.select')}</option>
                                                     {realms}
                                                 </Input>
