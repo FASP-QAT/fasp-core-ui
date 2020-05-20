@@ -236,13 +236,14 @@ export default class ProgramList extends Component {
                       name="countryId"
                       id="countryId"
                       bsSize="sm"
+                      onChange={this.filterData}
                     >
                       <option value="0">{i18n.t('static.common.all')}</option>
                       {countries}
                     </Input>
-                    <InputGroupAddon addonType="append">
+                    {/* <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                    </InputGroupAddon>
+                    </InputGroupAddon> */}
                   </InputGroup>
                 </div>
               </FormGroup>

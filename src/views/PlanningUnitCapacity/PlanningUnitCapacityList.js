@@ -163,7 +163,7 @@ export default class PlanningUnitCapacityList extends Component {
                     </CardHeader>
                     <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup  className="Selectdiv">
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.dashboard.planningunit')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -172,13 +172,14 @@ export default class PlanningUnitCapacityList extends Component {
                                             name="planningUnitId"
                                             id="planningUnitId"
                                             bsSize="sm"
+                                        onChange={this.filterData}
                                         >
                                             <option value="0">{i18n.t('static.common.select')}</option>
                                             {planningUnitList}
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>

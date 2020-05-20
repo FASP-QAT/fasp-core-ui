@@ -70,7 +70,23 @@ class EditUserComponent extends Component {
             realms: [],
             languages: [],
             roles: [],
-            user: this.props.location.state.user,
+            // user: this.props.location.state.user,
+            user: {
+                realm: {
+                    realmId: '',
+                    label: {
+                        label_en: ''
+                    }
+                },
+                language: {
+                    languageId: ''
+                },
+                roles: [],
+                username: '',
+                emailId: '',
+                phoneNumber: '',
+                roleList: []
+            },
             message: '',
             roleId: '',
             roleList: []
@@ -152,6 +168,19 @@ class EditUserComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        // console.log("USERID --> ", this.props.match.params.userId);
+        UserService.getUserByUserId(this.props.match.params.userId).then(response => {
+            this.setState({
+                user: response.data
+
+            }, (
+            ) => {
+                console.log("state after update---", this.state.user);
+                console.log("Role list---", this.state.user.roleList);
+            });
+
+        })
+
         LanguageService.getLanguageList()
             .then(response => {
                 this.setState({
@@ -279,9 +308,9 @@ class EditUserComponent extends Component {
                                     realmId: this.state.user.realm.realmId,
                                     emailId: this.state.user.emailId,
                                     phoneNumber: this.state.user.phoneNumber,
-                                    roles: this.state.user.roles,
+                                    roles: this.state.user.roleList,
                                     languageId: this.state.user.language.languageId,
-                                    roleId: this.state.user.roles
+                                    roleId: this.state.user.roleList
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -342,6 +371,7 @@ class EditUserComponent extends Component {
                                                             bsSize="sm"
                                                             readOnly={true}
                                                             value={this.state.user.realm.label.label_en}
+                                                        // value={this.state.user.roleList}
                                                         ></Input>
                                                     </FormGroup>
                                                     <FormGroup>

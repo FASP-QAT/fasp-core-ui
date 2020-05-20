@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Row, Col, Card, CardBody, CardHeader, Button, CardFooter } from 'reactstrap';
 import "../../../node_modules/react-step-progress-bar/styles.css"
 import { ProgressBar, Step } from "react-step-progress-bar";
+import PipelineProgramDataStepOne from './PipelineProgramDataStepOne.js';
+import PipelineProgramDataStepTwo from './PipelineProgramDataStepTwo.js';
+import PipelineProgramDataStepThree from './PipelineProgramDataStepThree.js';
 
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
@@ -9,7 +12,7 @@ export default class PipelineProgramSetup extends Component {
         this.state = {
             progressPer: 0,
             pipelineProgramSetupPer: 0,
-            pipelineProgramInfo:
+            program:
             {
                 label: {
                     label_en: '',
@@ -18,7 +21,7 @@ export default class PipelineProgramSetup extends Component {
                     label_fr: ''
                 },
                 realm: {
-                    realmId: ''
+                    realmId: 1
                 },
                 realmCountry: {
                     realmCountryId: ''
@@ -475,25 +478,24 @@ export default class PipelineProgramSetup extends Component {
                                                 </div>
                                                 <br></br>
                                                 <div id="pipelineProgramDataStepOne">
-                                                    <h3>Realm</h3>
-                                                    <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
-
+                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button> */}
+                                                    <PipelineProgramDataStepOne realmId={this.state.program.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne}></PipelineProgramDataStepOne>
                                                 </div>
                                                 <div id="pipelineProgramDataStepTwo">
-                                                    <h3>Country</h3>
-                                                    <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                                    {/* <h3>Country</h3> */}
+                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                     &nbsp;
-                                                    <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.endProgramInfoStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
-                                                    &nbsp;
-                                                   
+                                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                                    &nbsp; */}
+                                                    <PipelineProgramDataStepTwo realmId={this.state.program.realm.realmId} endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} ></PipelineProgramDataStepTwo>
                                                 </div>
                                                 <div id="pipelineProgramDataStepThree">
-                                                    <h3>Health Area</h3>
-                                                    <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                                    {/* <h3>Health Area</h3> */}
+                                                    {/* <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.endProgramInfoStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                     &nbsp;
-                                                    <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.endProgramInfoStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
-                                                    &nbsp;
-                                                   
+                                                    <Button color="info" size="md" className="float-right mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                                    &nbsp; */}
+                                                    <PipelineProgramDataStepThree endProgramInfoStepThree={this.endProgramInfoStepThree} backToprogramInfoStepTwo={this.backToprogramInfoStepTwo}></PipelineProgramDataStepThree>
                                                 </div>
                                                 <div id="pipelineProgramDataStepFour">
                                                     <h3>Organisation</h3>
@@ -501,7 +503,7 @@ export default class PipelineProgramSetup extends Component {
                                                     &nbsp;
                                                     <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.endProgramInfoStepFour}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                     &nbsp;
-                                                    
+
                                                 </div>
                                                 <div id="pipelineProgramDataStepFive">
                                                     <h3> Region</h3>
@@ -509,7 +511,7 @@ export default class PipelineProgramSetup extends Component {
                                                     &nbsp;
                                                     <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.endProgramInfoStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                     &nbsp;
-                                                   
+
                                                 </div>
                                                 <div id="pipelineProgramDataStepSix">
                                                     <h3>Program Data</h3>
@@ -517,13 +519,14 @@ export default class PipelineProgramSetup extends Component {
                                                     &nbsp;
                                                     <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.endProgramInfoStepSix}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                     &nbsp;
-                                                  
+
                                                 </div>
                                             </CardBody>
-                                            <CardFooter>
+                                            {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
-                                            </CardFooter>
+                                            </CardFooter> */}
                                         </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
                                     </Col>
                                 </div>
                                 <div id="stepTwo">
@@ -535,14 +538,18 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody>
                                                 <h3>Program Planning Units</h3>
                                             </CardBody>
-                                            <CardFooter>
-                                            <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                            {/* <CardFooter>
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
-                                                 
-                                            </CardFooter>
+
+                                            </CardFooter> */}
                                         </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
                                     </Col>
                                 </div>
                                 <div id="stepThree">
@@ -554,14 +561,18 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody>
                                                 <h3>Consumption</h3>
                                             </CardBody>
-                                            <CardFooter>
-                                            <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                            {/* <CardFooter>
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
-                                                   
-                                            </CardFooter>
+
+                                            </CardFooter> */}
                                         </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepThree}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
                                     </Col>
                                 </div>
                                 <div id="stepFour">
@@ -573,14 +584,18 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody>
                                                 <h3>Inventory</h3>
                                             </CardBody>
-                                            <CardFooter>
-                                            <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                            {/* <CardFooter>
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
-                                                 
-                                            </CardFooter>
+
+                                            </CardFooter> */}
                                         </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        &nbsp;
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFour}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
                                     </Col>
                                 </div>
                                 <div id="stepFive">
@@ -592,14 +607,19 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody>
                                                 <h3>Shipments</h3>
                                             </CardBody>
-                                            <CardFooter>
-                                            <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                            {/* <CardFooter>
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                                 &nbsp;
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
                                                 &nbsp;
-                                                   
-                                            </CardFooter>
-                                        </Card></Col>
+
+                                            </CardFooter> */}
+                                        </Card>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        &nbsp;
+                                                <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp;
+                                        </Col>
                                 </div>
                             </CardBody>
                         </Card>
