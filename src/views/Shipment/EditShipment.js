@@ -2079,11 +2079,6 @@ export default class ConsumptionDetails extends React.Component {
                     }
 
 
-
-
-
-
-
                 }
             }.bind(this)
         }.bind(this)
@@ -2494,11 +2489,6 @@ export default class ConsumptionDetails extends React.Component {
                     //     consumptionDataList.push(json);
                     //     consumptionDataListNotFiltered.push(json);
                     // }
-
-
-
-
-
 
                     //------------------------------------------------------------------------------
                     // console.log("1111111111111111111   ", shipmentDataList)
