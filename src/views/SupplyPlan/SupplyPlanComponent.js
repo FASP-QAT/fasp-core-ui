@@ -90,7 +90,8 @@ export default class SupplyPlanComponent extends React.Component {
         this.saveSuggestedShipments = this.saveSuggestedShipments.bind(this);
         this.checkValidationSuggestedShipments = this.checkValidationSuggestedShipments.bind(this);
 
-        this.noSkipClicked = this.noSkipClicked.bind(this)
+        this.noSkipClicked = this.noSkipClicked.bind(this);
+        this.plannedPsmChanged = this.plannedPsmChanged.bind(this);
     }
 
     actionCanceled(supplyPlanType) {
@@ -1173,14 +1174,14 @@ export default class SupplyPlanComponent extends React.Component {
     psmShipmentsDetailsClicked(startDate, endDate) {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
-        var db1;
         var procurementAgentList = [];
         var procurementAgentListAll = [];
         var fundingSourceList = [];
         var budgetList = [];
         var dataSourceList = [];
-        var shipmentStatusList=[];
+        var shipmentStatusList = [];
         var myVar = '';
+        var db1;
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onsuccess = function (e) {
@@ -1304,45 +1305,44 @@ export default class SupplyPlanComponent extends React.Component {
                                         data[0] = shipmentList[i].expectedDeliveryDate;
                                         data[1] = shipmentList[i].shipmentStatus.id;
                                         data[2] = ""
-                                        data[3]=shipmentList[i].dataSource.id;
+                                        data[3] = shipmentList[i].dataSource.id;
                                         data[4] = shipmentList[i].procurementAgent.id;
-                                        data[5] = "";
-                                        data[6] = "";
-                                        data[7] = this.state.planningUnitName;
-                                        data[8] = shipmentList[i].suggestedQty;
-                                        data[9] = moq;
-                                        data[10] = noOfPallet;
-                                        data[11] = noOfContainer;
+                                        data[5] = this.state.planningUnitName;
+                                        data[6] = shipmentList[i].suggestedQty;
+                                        data[7] = moq;
+                                        data[8] = noOfPallet;
+                                        data[9] = noOfContainer;
+                                        data[10] = "";
+                                        data[11] = "";
                                         data[12] = "";
                                         data[13] = "";
                                         data[14] = "";
                                         data[15] = "";
                                         data[16] = "";
-                                        data[17] = "";
+                                        data[17] = pricePerPlanningUnit;
                                         data[18] = "";
-                                        data[19] = pricePerPlanningUnit;
+                                        data[19] = "";
                                         data[20] = "";
-                                        data[21] = "";
+                                        data[21] = `=S${i + 1}*U${i + 1}`
+                                        data[22]= "";
                                         plannedShipmentsArr[i] = data;
                                     }
                                     var options = {
                                         data: plannedShipmentsArr,
-                                        colWidths: [100, 100, 100, 150, 150, 150, 150, 200, 80, 80,80,80,150,150,80],
+                                        colWidths: [100, 100, 100, 150, 150, 150, 150, 200, 80, 80, 80, 80, 150, 150, 80],
                                         columns: [
                                             { type: 'calendar', options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
-                                            { type: 'dropdown', readOnly: true, title: "Shipment status",source:shipmentStatusList },
+                                            { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatusList },
                                             { type: 'text', title: "Ro No" },
                                             { type: 'dropdown', title: "Data source", source: dataSourceList },
                                             { type: 'dropdown', title: "Procurement Agent", source: procurementAgentList },
-                                            { type: 'dropdown', title: "Funding source", source: fundingSourceList },
-                                            { type: 'dropdown', title: "Budget", source: budgetList, filter: this.dropdownFilter },
                                             { type: 'text', readOnly: true, title: "Planning unit" },
                                             { type: 'text', readOnly: true, title: "Suggested order qty" },
                                             { type: 'text', readOnly: true, title: "MoQ" },
                                             { type: 'text', readOnly: true, title: "No of pallets" },
                                             { type: 'text', readOnly: true, title: "No of containers" },
-                                            { type: 'dropdown', title: "Order based on", source: ["Pallets", "Containers", "MoQ", "Suggested order qty"] },
-                                            { type: 'dropdown', title: "Rounding option", source: ["Round up", "Round down"] },
+                                            { type: 'dropdown', title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
+                                            { type: 'dropdown', title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
                                             { type: 'text', title: "User qty" },
                                             { type: 'text', readOnly: true, title: "Adjusted order qty" },
                                             { type: 'text', readOnly: true, title: "Adjusted pallets" },
@@ -1350,6 +1350,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             { type: 'text', title: "Manual price per planning unit" },
                                             { type: 'text', readOnly: true, title: "Price per planning unit" },
                                             { type: 'text', readOnly: true, title: "Amount" },
+                                            { type: 'dropdown', title: "Shipped method", source: [{ id: 1, name: 'Sea' }, { id: 2, name: 'Air' }] },
+                                            { type: 'text', title: "Freight cost" },
+                                            { type: 'text',readOnly, title: "Total amount" },
                                             { type: 'text', title: "Notes" },
                                         ],
                                         pagination: false,
@@ -1361,8 +1364,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         allowManualInsertColumn: false,
                                         allowDeleteRow: false,
                                         allowInsertRow: false,
-                                        allowManualInsertRow: false
-                                        // onchange: this.suggestedShipmentChanged,
+                                        allowManualInsertRow: false,
+                                        onchange: this.plannedPsmChanged,
                                     };
                                     myVar = jexcel(document.getElementById("plannedPsmShipmentsDetailsTable"), options);
                                     this.el = myVar;
@@ -1566,6 +1569,54 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             suggestedShipmentChangedFlag: 1
         });
+    }
+
+    plannedPsmChanged = function (instance, cell, x, y, value) {
+        var planningUnitId = document.getElementById("planningUnitId").value;
+        var elInstance = this.state.plannedPsmShipmentsEl;
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                    var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                    var papuRequest = papuOs.getAll();
+                    papuRequest.onsuccess = function (event) {
+                        var papuResult = [];
+                        papuResult = papuRequest.result;
+                        var procurementAgentPlanningUnit = papuResult.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
+                        var moq = procurementAgentPlanningUnit.moq;
+                        var quantityForCal = moq;
+                        // console.log("shipmentList[i].suggestedOrderQty", shipmentList[i].suggestedQty);
+                        if (elInstance.getValueFromCoords(6, y) > moq) {
+                            quantityForCal = shipmentList[i].suggestedQty;
+                        }
+                        console.log("quantityForCal", quantityForCal);
+                        var noOfPallet = parseInt(quantityForCal) / parseInt(procurementAgentPlanningUnit.unitsPerPallet);
+                        var noOfContainer = parseInt(quantityForCal) / parseInt(procurementAgentPlanningUnit.unitsPerContainer)
+                        var pricePerPlanningUnit = procurementAgentPlanningUnit.catalogPrice;
+                        elInstance.setValueFromCoords(7, y, moq, true);
+                        elInstance.setValueFromCoords(8, y, noOfPallet, true)
+                        elInstance.setValueFromCoords(9, y, noOfContainer, true)
+                        elInstance.setValueFromCoords(17, y, pricePerPlanningUnit, true);
+                    }.bind(this)
+                }.bind(this)
+            }
+        }
+
+
+
     }
 
     checkValidationConsumption() {
@@ -2051,10 +2102,10 @@ export default class SupplyPlanComponent extends React.Component {
                         <CardHeader>
                             <strong>Supply plan</strong>
                             <div className="card-header-actions">
-                            <a className="card-header-action">
-                             <small className="supplyplanformulas">Supply Plan Formulas</small>
-                             </a>
-                             </div>
+                                <a className="card-header-action">
+                                    <small className="supplyplanformulas">Supply Plan Formulas</small>
+                                </a>
+                            </div>
                         </CardHeader>
                         <CardBody>
                             <Formik
