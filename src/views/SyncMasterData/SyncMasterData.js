@@ -60,7 +60,7 @@ export default class SyncMasterData extends Component {
             <div className="animated fadeIn">
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5>{i18n.t(this.state.message)}</h5>
-                <Row>
+                <div className="col-md-12"> 
                     <Col xs="12" sm="12">
                         <Card>
                             {/* // <div className="app flex-row align-items-center">
@@ -91,7 +91,7 @@ export default class SyncMasterData extends Component {
                             </CardFooter>
                         </Card>
                     </Col>
-                </Row>
+                </div>
                 {/* </Container>
                 </div> */}
             </div>

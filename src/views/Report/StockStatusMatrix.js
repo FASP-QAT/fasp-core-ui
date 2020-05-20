@@ -1332,10 +1332,10 @@ export default class StockStatusMatrix extends React.Component {
                 props => (
                   <div className="TableCust">
 
-                    <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
+                    {/* <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
 
                       <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} /></div>
+                      <ClearSearchButton {...props.searchProps} /></div> */}
                     <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                       pagination={paginationFactory(options)}
 

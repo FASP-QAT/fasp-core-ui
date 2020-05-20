@@ -189,7 +189,7 @@
     "static.login.usernametext": "Please enter username",
     "static.program.draftleadtext": "Enter plan to draft lead time In Months",
     "static.country.countrycode": "Country Code",
-    "static.program.actioncancelled": "{{master.name}} Action Canceled",
+    "static.program.actioncancelled": "{{master.name}} Action Cancelled",
     "static.program.monthfutureamctext": "Enter month in future for AMC",
     "static.program.programtext": "Enter program name",
     "static.dashboard.procurementagent": "Procurement Agent",
