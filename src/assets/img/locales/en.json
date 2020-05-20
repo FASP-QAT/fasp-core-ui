@@ -669,5 +669,6 @@
     "static.report.month":"Month",
     "static.report.errorperc":"Forecast Error Percentage",
     "static.dashboard.stockstatusovertime":"Stock Status Over time",
-    "static.report.stockstatusovertimeReport":"Stock Status Over time Report"
+    "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
+    "static.report.noofmonth":"Number Of Months"
 }

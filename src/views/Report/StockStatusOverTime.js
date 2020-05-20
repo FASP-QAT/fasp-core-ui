@@ -61,11 +61,19 @@ class StockStatusOverTime extends Component {
 
         this.state = {
             matricsList: [],
+            planningUnitMatrix: {
+                date: [],
+                planningUnitData: []
+            },
             dropdownOpen: false,
             radioSelected: 2,
             productCategories: [],
             planningUnits: [],
             countries: [],
+            countryValues: [],
+            countryLabels: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -206,11 +214,21 @@ class StockStatusOverTime extends Component {
 
     }
     fetchData() {
-        this.setState({
-            matricsList: [{ date: '04-2019', MOS_pass3: 3100, MOS_PF: 45000, MOS_Feature3: 20000 },
-            { date: '04-2019', MOS_pass3: 43000, MOS_PF: 47000, MOS_Feature3: 35000 },
-            { date: '04-2019', MOS_pass3: 13000, MOS_PF: 25000, MOS_Feature3: 3000 }]
-        })
+        if (this.state.planningUnitValues.length < 2) {
+            this.setState({
+                matricsList: [{ date: '04-2019', MOS_pass3: 3100, MOS_PF: 45000, MOS_Feature3: 20000 },
+                { date: '05-2019', MOS_pass3: 43000, MOS_PF: 47000, MOS_Feature3: 35000 },
+                { date: '06-2019', MOS_pass3: 13000, MOS_PF: 25000, MOS_Feature3: 3000 }]
+            })
+        } else {
+            this.setState({
+                planningUnitMatrix: {
+                    date: ['04-2019', '05-2019', '06-2019'], planningUnitData: [
+                        { label: 'planningUnit1', value: [43000, 33000, 47000] },
+                        { label: 'planningUnit2', value: [13000, 24000, 43000] }]
+                }
+            })
+        }
     }
 
 
@@ -219,17 +237,31 @@ class StockStatusOverTime extends Component {
 
         var csvRow = [];
         csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year).replaceAll(' ', '%20'))
-        csvRow.push(i18n.t('static.planningunit.planningunit') + ' : ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.dashboard.country') + ' : ' + ((this.state.countryLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push(i18n.t('static.planningunit.planningunit') + ' : ' + ((this.state.planningUnitLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
         csvRow.push('')
         csvRow.push('')
         var re;
+        var A;
 
-        var A = [[i18n.t('static.dashboard.country')].concat(this.state.matricsList.date)]
+        if (this.state.planningUnitValues.length < 2) {
+            A = [[(i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.report.MOS_pass3')).replaceAll(' ', '%20'), (i18n.t('static.report.MOS_PF')).replaceAll(' ', '%20'), (i18n.t('static.report.MOS_Feature3')).replaceAll(' ', '%20')]]
 
-        re = this.state.matricsList.countryData
+            re = this.state.matricsList
 
-        for (var item = 0; item < re.length; item++) {
-            A.push([[re[item].label].concat(re[item].value)])
+
+            for (var item = 0; item < re.length; item++) {
+                A.push([re[item].date, re[item].MOS_pass3, re[item].MOS_PF, re[item].MOS_PF])
+            }
+        } else {
+
+            A = [[i18n.t('static.dashboard.planningUnit')].concat(this.state.consumptions.date)]
+
+            re = this.state.planningUnitMatrix.planningUnitData
+
+            for (var item = 0; item < re.length; item++) {
+                A.push([[re[item].label].concat(re[item].value)])
+            }
         }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -297,8 +329,10 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.stateplanningUnitLabels.toString(), doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                 }
@@ -355,13 +389,31 @@ class StockStatusOverTime extends Component {
     handleChange(countrysId) {
 
         var countryIdArray = [];
+        var countrylabelArray = [];
         for (var i = 0; i < countrysId.length; i++) {
             countryIdArray[i] = countrysId[i].value;
-
+            countrylabelArray[i] = countrysId[i].label;
         }
         console.log(countryIdArray);
         this.setState({
-            countryValues: countryIdArray
+            countryValues: countryIdArray,
+            countryLabels: countrylabelArray
+        })
+    }
+
+    handlePlanningUnitChange(planningUnitIds) {
+
+        var planningUnitIdArray = [];
+        var planningUnitLabel = [];
+        for (var i = 0; i < planningUnitIds.length; i++) {
+            planningUnitIdArray[i] = planningUnitIds[i].value;
+            planningUnitLabel[i] = planningUnitIds[i].label
+
+        }
+        console.log(planningUnitIdArray);
+        this.setState({
+            planningUnitValues: planningUnitIdArray,
+            planningUnitLabels: planningUnitLabel
         })
     }
 
@@ -369,12 +421,13 @@ class StockStatusOverTime extends Component {
 
     render() {
         const { planningUnits } = this.state;
-        let planningUnitList = planningUnits.length > 0
+        let planningUnitList =[];
+        planningUnitList=planningUnits.length > 0
             && planningUnits.map((item, i) => {
                 return (
-                    <option key={i} value={item.planningUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
+
+                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+
                 )
             }, this);
         const { countries } = this.state;
@@ -387,53 +440,68 @@ class StockStatusOverTime extends Component {
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
                 return (
-                    <option key={i} value={item.payload.productCategoryId}>
-                        {getLabelText(item.payload.label, this.state.lang)}
-                    </option>
+                    <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
+                    {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
+                  </option>
                 )
             }, this);
 
+        const backgroundColor = [
+            '#4dbd74',
+            '#c8ced3',
+            '#000',
+            '#ffc107',
+            '#f86c6b',
+        ]
+        let bar = []; if (this.state.planningUnitValues.length < 2) {
+            bar = {
+                labels: this.state.matricsList.map((item, index) => (item.date)),
+                datasets: [
+                    {
+                        type: "line",
+                        label: "MOS pass 3",
+                        backgroundColor: 'transparent',
+                        borderColor: '#ffc107',
+                        lineTension: 0,
+                        showActualPercentages: true,
+                        showInLegend: true,
+                        pointStyle: 'line',
 
-        const bar = {
-            labels: this.state.matricsList.map((item, index) => (item.date)),
-            datasets: [
-                {
-                    type: "line",
-                    label: "MOS pass 3",
-                    backgroundColor: 'transparent',
-                    borderColor: '#ffc107',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
+                        data: this.state.matricsList.map((item, index) => (item.MOS_pass3))
+                    },
+                    {
+                        type: "line",
+                        label: "MOS P+F",
+                        backgroundColor: 'transparent',
+                        borderColor: '#4dbd74',
+                        lineTension: 0,
+                        showActualPercentages: true,
+                        showInLegend: true,
+                        pointStyle: 'line',
 
-                    data: this.state.matricsList.map((item, index) => (item.MOS_pass3))
-                },
-                {
-                    type: "line",
-                    label: "MOS P+F",
-                    backgroundColor: 'transparent',
-                    borderColor: '#4dbd74',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
+                        data: this.state.matricsList.map((item, index) => (item.MOS_PF))
+                    },
+                    {
+                        type: "line",
+                        label: "MOS Feature 3",
+                        backgroundColor: 'transparent',
+                        borderColor: '#f86c6b',
+                        lineTension: 0,
+                        showActualPercentages: true,
+                        showInLegend: true,
+                        pointStyle: 'line',
 
-                    data: this.state.matricsList.map((item, index) => (item.MOS_PF))
-                },
-                {
-                    type: "line",
-                    label: "MOS Feature 3",
-                    backgroundColor: 'transparent',
-                    borderColor: '#ffc107',
-                    lineTension: 0,
-                    showActualPercentages: true,
-                    showInLegend: true,
-                    pointStyle: 'line',
+                        data: this.state.matricsList.map((item, index) => (item.MOS_Feature3))
+                    }
+                ]
+            }
+        }
+        else {
+            bar = {
 
-                    data: this.state.matricsList.map((item, index) => (item.MOS_Feature3))
-                }
-            ]
+                labels: this.state.planningUnitMatrix.date,
+                datasets: this.state.planningUnitMatrix.planningUnitData.map((item, index) => ({ type: "line", label: item.label, data: item.value, backgroundColor: 'transparent', borderColor: backgroundColor[index], pointStyle: 'line' }))
+            }
         }
 
 
@@ -498,19 +566,17 @@ class StockStatusOverTime extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="col-md-3">
                                                                 <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                                                                <InputGroup>
-                                                                <ReactMultiSelectCheckboxes
+                                                                <InputGroup> <ReactMultiSelectCheckboxes
                                                                     bsSize="md"
                                                                     name="countrysId"
                                                                     id="countrysId"
                                                                     onChange={(e) => { this.handleChange(e); this.fetchData() }}
                                                                     options={countryList}
                                                                 />
-                                                                </InputGroup>
-                                                                {!!this.props.error &&
-                                                                    this.props.touched && (
-                                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                                    )}</FormGroup>
+                                                                    {!!this.props.error &&
+                                                                        this.props.touched && (
+                                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                                        )}</InputGroup></FormGroup>
 
                                                             <FormGroup className="col-md-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
@@ -528,35 +594,32 @@ class StockStatusOverTime extends Component {
                                                                         </Input>
                                                                     </InputGroup></div>
                                                             </FormGroup>
-                                                            <FormGroup className="col-md-3">
+                                                            <FormGroup className="col-sm-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
                                                                 <div className="controls">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="planningUnitId"
-                                                                            id="planningUnitId"
-                                                                            bsSize="sm"
-                                                                            onChange={this.fetchData}
-                                                                        >
-                                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                                            {planningUnitList}
-                                                                        </Input>
-                                                                        {/* <InputGroupAddon addonType="append">
-                                                                        <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                                                    </InputGroupAddon> */}
-                                                                    </InputGroup>
-                                                                </div>
+                                                                    <InputGroup>   <ReactMultiSelectCheckboxes
+                                                                        name="planningUnitId"
+                                                                        id="planningUnitId"
+                                                                        bsSize="md"
+                                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                                        options={planningUnitList && planningUnitList.length>0?planningUnitList:[]}
+                                                                    /> </InputGroup>    </div></FormGroup>
+                                                            <FormGroup className="col-sm-3">
+                                                                <InputGroupAddon addonType="append">
+                                                                    <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
+                                                                </InputGroupAddon>
+
+
                                                             </FormGroup>
 
                                                         </div>
                                                     </Col>
                                                 </Form>
                                             </div>
-                                            <Col md="12 pl-0">
-                                                <div className="row">
+                                            <div className="row">
+                                                <div className="col-md-12">{this.state.matricsList.length > 0 || this.state.planningUnitMatrix.planningUnitData.length>0}
                                                     {
-                                                        this.state.matricsList.length > 0
+                                                        (this.state.matricsList.length > 0 || this.state.planningUnitMatrix.planningUnitData.length>0)
                                                         &&
                                                         
                                                             <div className="col-md-9">

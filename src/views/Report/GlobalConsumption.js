@@ -504,6 +504,7 @@ class Consumption extends Component {
     let realmId = AuthenticationService.getRealmId();
     ProductService.getProductCategoryList(realmId)
         .then(response => {
+          console.log(response.data)
             this.setState({
                 productCategories: response.data
             })
@@ -728,8 +729,8 @@ const  backgroundColor= [
                                     {productCategories.length > 0
                                       && productCategories.map((item, i) => {
                                         return (
-                                          <option key={i} value={item.payload.productCategoryId}>
-                                            {getLabelText(item.payload.label, this.state.lang)}
+                                          <option key={i} value={item.payload.productCategoryId } disabled= {item.payload.active?"":"disabled"}>
+                                            {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
                                           </option>
                                         )
                                       }, this)}
