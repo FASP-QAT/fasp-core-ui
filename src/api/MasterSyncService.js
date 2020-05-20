@@ -67,7 +67,7 @@ class MasterSyncService {
     }
 
     getProductCategoryListForSync(lastSyncDate) {
-        return axios.get(`${API_URL}/api/sync/productCategory/${lastSyncDate}`, {
+        return axios.get(`${API_URL}/api/sync/tracerCategory/${lastSyncDate}`, {
         });
     }
 
