@@ -108,6 +108,8 @@ export default class DatabaseTranslations extends React.Component {
     };
 
     loaded = function (instance, cell, x, y, value) {
+        var obj = {};
+        obj.options = {};
         var elInstance=instance.jexcel;
         console.log("In loaded function");
         var searchContainer=document.getElementsByClassName('jexcel_filter')[0];
@@ -123,9 +125,28 @@ export default class DatabaseTranslations extends React.Component {
         clearBtn.setAttribute("id", "clearBtnID");
         clearBtn.appendChild(clarText);
         searchContainer.appendChild(clearBtn);
-
-        // var searchContainer=document.getElementsByClassName('jexcel_content')[0];
+        
+        // var paginationFirst=document.getElementsByClassName('jexcel_pagination')[0];
+        // var paginationInfo = paginationFirst.createElement('span');
+        // paginationInfo.classList.add('bottom_entries');
+        // paginationInfo.classList.add('col-md-7');
+        // paginationInfo.classList.add('order-2');
+        // paginationInfo.classList.add('pl-lg-0');
+        
        
+        // var paginationPages = paginationFirst.createElement('div');
+        // paginationPages.classList.add('col-md-4');
+        // paginationPages.classList.add('order-3');
+        // paginationPages.classList.add('f-End');
+        
+        // obj.pagination.appendChild(paginationInfo);
+        // obj.pagination.appendChild(paginationPages);
+        //  obj.pagination.appendChild(paginationUpdateContainer);
+
+        var jexcel_pagination=document.getElementsByClassName('jexcel_pagination')[0];
+        console.log(jexcel_pagination,'in jexcelpagignation parent div');
+       
+        var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter');
        
         // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
     }
