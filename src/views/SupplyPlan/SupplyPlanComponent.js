@@ -103,7 +103,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.toggleLarge(supplyPlanType);
     }
 
-    toggleLarge(supplyPlanType, month, quantity) {
+    toggleLarge(supplyPlanType, month, quantity, startDate, endDate) {
         var supplyPlanType = supplyPlanType;
         if (supplyPlanType == 'Consumption') {
             var monthCountConsumption = this.state.monthCount;
@@ -119,11 +119,11 @@ export default class SupplyPlanComponent extends React.Component {
             this.suggestedShipmentsDetailsClicked(month, quantity);
             console.log("Month-------->", month);
             console.log("Quantity----->", quantity);
-        } else if (supplyPlanType == 'Actual QAT Orders') {
+        } else if (supplyPlanType == 'psmShipments') {
             this.setState({
-                actualQATOrders: !this.state.actualQATOrders,
-                qty: quantity
+                psmShipments: !this.state.psmShipments
             });
+            this.psmShipmentsDetailsClicked(startDate, endDate);
         } else if (supplyPlanType == 'Shipments ARTMIS') {
             this.setState({
                 shipmentsArtmis: !this.state.shipmentsArtmis,
@@ -1170,6 +1170,215 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this)
     }
 
+    psmShipmentsDetailsClicked(startDate, endDate) {
+        var planningUnitId = document.getElementById("planningUnitId").value;
+        var programId = document.getElementById("programId").value;
+        var db1;
+        var procurementAgentList = [];
+        var procurementAgentListAll = [];
+        var fundingSourceList = [];
+        var budgetList = [];
+        var dataSourceList = [];
+        var shipmentStatusList=[];
+        var myVar = '';
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                console.log("Program Json", programJson.shipmentList);
+                var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                var papuRequest = papuOs.getAll();
+                papuRequest.onsuccess = function (event) {
+                    var papuResult = [];
+                    papuResult = papuRequest.result;
+                    for (var k = 0; k < papuResult.length; k++) {
+                        if (papuResult[k].planningUnit.id == planningUnitId) {
+                            var papuJson = {
+                                name: papuResult[k].procurementAgent.label.label_en,
+                                id: papuResult[k].procurementAgent.id
+                            }
+                            procurementAgentList.push(papuJson);
+                            procurementAgentListAll.push(papuResult[k]);
+                        }
+                    }
+
+                    var fsTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                    var fsOs = fsTransaction.objectStore('fundingSource');
+                    var fsRequest = fsOs.getAll();
+                    fsRequest.onsuccess = function (event) {
+                        var fsResult = [];
+                        fsResult = fsRequest.result;
+                        for (var k = 0; k < fsResult.length; k++) {
+                            if (fsResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                var fsJson = {
+                                    name: fsResult[k].label.label_en,
+                                    id: fsResult[k].fundingSourceId
+                                }
+                                fundingSourceList.push(fsJson);
+                            }
+                        }
+
+                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                        var dataSourceRequest = dataSourceOs.getAll();
+                        dataSourceRequest.onsuccess = function (event) {
+                            var dataSourceResult = [];
+                            dataSourceResult = dataSourceRequest.result;
+                            for (var k = 0; k < dataSourceResult.length; k++) {
+                                if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
+                                    if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                        var dataSourceJson = {
+                                            name: dataSourceResult[k].label.label_en,
+                                            id: dataSourceResult[k].dataSourceId
+                                        }
+                                        dataSourceList[k] = dataSourceJson
+                                    }
+                                }
+                            }
+
+                            var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                            var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
+                            var shipmentStatusRequest = shipmentStatusOs.getAll();
+                            shipmentStatusRequest.onsuccess = function (event) {
+                                var shipmentStatusResult = [];
+                                shipmentStatusResult = shipmentStatusRequest.result;
+                                for (var k = 0; k < shipmentStatusResult.length; k++) {
+
+                                    var shipmentStatusJson = {
+                                        name: shipmentStatusResult[k].label.label_en,
+                                        id: shipmentStatusResult[k].shipmentStatusId
+                                    }
+                                    shipmentStatusList[k] = shipmentStatusJson
+                                }
+
+
+                                var bTransaction = db1.transaction(['budget'], 'readwrite');
+                                var bOs = bTransaction.objectStore('budget');
+                                var bRequest = bOs.getAll();
+                                var budgetListAll = []
+                                bRequest.onsuccess = function (event) {
+                                    var bResult = [];
+                                    bResult = bRequest.result;
+                                    for (var k = 0; k < bResult.length; k++) {
+                                        var bJson = {
+                                            name: bResult[k].label.label_en,
+                                            id: bResult[k].budgetId
+                                        }
+                                        budgetList.push(bJson);
+                                        budgetListAll.push({
+                                            name: bResult[k].label.label_en,
+                                            id: bResult[k].budgetId, fundingSource: bResult[k].fundingSource
+                                        })
+
+                                    }
+                                    this.setState({
+                                        budgetList: budgetListAll
+                                    })
+                                    var shipmentList = programJson.shipmentList.filter(c => c.orderedDate >= startDate && c.orderedDate <= endDate && c.procurementAgent.id == 1 && c.erpFlag == false);
+                                    console.log("shipment List", shipmentList);
+                                    this.el = jexcel(document.getElementById("plannedPsmShipmentsDetailsTable"), '');
+                                    this.el.destroy();
+                                    var data = [];
+                                    var plannedShipmentsArr = []
+                                    for (var i = 0; i < shipmentList.length; i++) {
+                                        var procurementAgentPlanningUnit = procurementAgentListAll.filter(p => p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
+                                        console.log("procurementAgentPlanningUnit", procurementAgentPlanningUnit);
+                                        var moq = procurementAgentPlanningUnit.moq;
+                                        var quantityForCal = moq;
+                                        console.log("shipmentList[i].suggestedOrderQty", shipmentList[i].suggestedQty);
+                                        if (shipmentList[i].suggestedQty > moq) {
+                                            quantityForCal = shipmentList[i].suggestedQty;
+                                        }
+                                        console.log("quantityForCal", quantityForCal);
+                                        var noOfPallet = parseInt(quantityForCal) / parseInt(procurementAgentPlanningUnit.unitsPerPallet);
+                                        var noOfContainer = parseInt(quantityForCal) / parseInt(procurementAgentPlanningUnit.unitsPerContainer)
+                                        var pricePerPlanningUnit = procurementAgentPlanningUnit.catalogPrice;
+                                        data[0] = shipmentList[i].expectedDeliveryDate;
+                                        data[1] = shipmentList[i].shipmentStatus.id;
+                                        data[2] = ""
+                                        data[3]=shipmentList[i].dataSource.id;
+                                        data[4] = shipmentList[i].procurementAgent.id;
+                                        data[5] = "";
+                                        data[6] = "";
+                                        data[7] = this.state.planningUnitName;
+                                        data[8] = shipmentList[i].suggestedQty;
+                                        data[9] = moq;
+                                        data[10] = noOfPallet;
+                                        data[11] = noOfContainer;
+                                        data[12] = "";
+                                        data[13] = "";
+                                        data[14] = "";
+                                        data[15] = "";
+                                        data[16] = "";
+                                        data[17] = "";
+                                        data[18] = "";
+                                        data[19] = pricePerPlanningUnit;
+                                        data[20] = "";
+                                        data[21] = "";
+                                        plannedShipmentsArr[i] = data;
+                                    }
+                                    var options = {
+                                        data: plannedShipmentsArr,
+                                        colWidths: [100, 100, 100, 150, 150, 150, 150, 200, 80, 80,80,80,150,150,80],
+                                        columns: [
+                                            { type: 'calendar', options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                            { type: 'dropdown', readOnly: true, title: "Shipment status",source:shipmentStatusList },
+                                            { type: 'text', title: "Ro No" },
+                                            { type: 'dropdown', title: "Data source", source: dataSourceList },
+                                            { type: 'dropdown', title: "Procurement Agent", source: procurementAgentList },
+                                            { type: 'dropdown', title: "Funding source", source: fundingSourceList },
+                                            { type: 'dropdown', title: "Budget", source: budgetList, filter: this.dropdownFilter },
+                                            { type: 'text', readOnly: true, title: "Planning unit" },
+                                            { type: 'text', readOnly: true, title: "Suggested order qty" },
+                                            { type: 'text', readOnly: true, title: "MoQ" },
+                                            { type: 'text', readOnly: true, title: "No of pallets" },
+                                            { type: 'text', readOnly: true, title: "No of containers" },
+                                            { type: 'dropdown', title: "Order based on", source: ["Pallets", "Containers", "MoQ", "Suggested order qty"] },
+                                            { type: 'dropdown', title: "Rounding option", source: ["Round up", "Round down"] },
+                                            { type: 'text', title: "User qty" },
+                                            
+                                            { type: 'text', readOnly: true, title: "Adjusted order qty" },
+                                            { type: 'text', readOnly: true, title: "Adjusted pallets" },
+                                            { type: 'text', readOnly: true, title: "Adjusted containers" },
+                                            { type: 'text', title: "Manual price per planning unit" },
+                                            { type: 'text', readOnly: true, title: "Price per planning unit" },
+                                            { type: 'text', readOnly: true, title: "Amount" },
+                                            { type: 'text', title: "Notes" },
+                                        ],
+                                        pagination: false,
+                                        search: false,
+                                        columnSorting: true,
+                                        tableOverflow: true,
+                                        wordWrap: true,
+                                        allowInsertColumn: false,
+                                        allowManualInsertColumn: false,
+                                        allowDeleteRow: false,
+                                        allowInsertRow: false,
+                                        allowManualInsertRow: false
+                                        // onchange: this.suggestedShipmentChanged,
+                                    };
+                                    myVar = jexcel(document.getElementById("plannedPsmShipmentsDetailsTable"), options);
+                                    this.el = myVar;
+                                    this.setState({
+                                        plannedPsmShipmentsEl: myVar
+                                    })
+                                }.bind(this)
+                            }.bind(this)
+                        }.bind(this)
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
     dropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[c - 1];
@@ -1177,6 +1386,8 @@ export default class SupplyPlanComponent extends React.Component {
         var bList = (this.state.budgetList).filter(c => c.fundingSource.fundingSourceId == value);
         return bList;
     }
+
+
 
     consumptionChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.consumptionEl;
@@ -1961,7 +2172,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.psmShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}>{item1.qty}</td>)
+                                                        return (<td className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}>{item1.qty}</td>)
                                                     } else {
                                                         return (<td>{item1}</td>)
                                                     }
@@ -1969,7 +2180,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             }
                                         </tr>
 
-                                        {/* <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
+                                        <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
                                             <td>PSM Shipments from ARTMIS</td>
                                             {
                                                 this.state.artmisShipmentsTotalData.map(item1 => {
@@ -1993,7 +2204,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 })
                                             }
-                                        </tr> */}
+                                        </tr>
 
                                         <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
                                             <td>Adjustments</td>
@@ -2175,7 +2386,6 @@ export default class SupplyPlanComponent extends React.Component {
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
-
                             <Modal isOpen={this.state.suggestedShipments} toggle={() => this.toggleLarge('SuggestedShipments')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
                                 <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
@@ -2184,6 +2394,26 @@ export default class SupplyPlanComponent extends React.Component {
                                 <ModalBody>
                                     <div className="table-responsive">
                                         <div id="suggestedShipmentsDetailsTable" />
+                                    </div>
+                                </ModalBody>
+                                <ModalFooter>
+                                    {this.state.suggestedShipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSuggestedShipments}> <i className="fa fa-check"></i> Save</Button>}{' '}
+                                    <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> Cancel</Button>
+                                </ModalFooter>
+                            </Modal>
+
+                            <Modal isOpen={this.state.psmShipments} toggle={() => this.toggleLarge('psmShipments')}
+                                className={'modal-lg ' + this.props.className, "modalWidth"}>
+                                <ModalHeader toggle={() => this.toggleLarge('psmShipments')} className="modalHeaderSupplyPlan">
+                                    <strong>Shipment Details</strong>
+                                </ModalHeader>
+                                <ModalBody>
+                                    <div className="table-responsive">
+                                        <div id="plannedPsmShipmentsDetailsTable" />
+                                    </div>
+
+                                    <div className="table-responsive">
+                                        <div id="submittedPsmShipmentsDetailsTable" />
                                     </div>
                                 </ModalBody>
                                 <ModalFooter>
