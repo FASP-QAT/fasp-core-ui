@@ -538,10 +538,8 @@ this.fetchData();
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-        <Row>
-          <Col lg="12">
-            <Card>
-              <CardHeader>
+      <Card>
+           <CardHeader>
                 <i className="icon-menu"></i><strong>{i18n.t('static.report.forecasterrorovertime')}</strong>
                 
                   {
@@ -556,11 +554,9 @@ this.fetchData();
                 </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                  <div className="container">
                      <div ref={ref}>
-                        <div className="col-md-12" >
                     <Form >
-                      <Col>
+                      <Col md="12 pl-0">
                         <div className="row">
                           <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -642,8 +638,8 @@ this.fetchData();
                            </div>
                       </Col>
                     </Form>
-                    <div className="row">
-                      <div className="col-md-12">
+                    <Col md="12 pl-0">
+                      <div className="row">
                     {
                         this.state.matricsList.length > 0
                         &&
@@ -655,22 +651,15 @@ this.fetchData();
                          </div>
                          }
                          </div>
-                         </div>
+                         </Col>
 
 
                    </div>
-                   </div>
 
-                 
-                  </div>
                   </div>
               </CardBody>
             </Card>
-          </Col>
-        </Row>
-
-
-
+         
       </div>
     );
   }

@@ -1344,7 +1344,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             { type: 'dropdown', title: "Order based on", source: ["Pallets", "Containers", "MoQ", "Suggested order qty"] },
                                             { type: 'dropdown', title: "Rounding option", source: ["Round up", "Round down"] },
                                             { type: 'text', title: "User qty" },
-                                            
                                             { type: 'text', readOnly: true, title: "Adjusted order qty" },
                                             { type: 'text', readOnly: true, title: "Adjusted pallets" },
                                             { type: 'text', readOnly: true, title: "Adjusted containers" },
@@ -2051,6 +2050,11 @@ export default class SupplyPlanComponent extends React.Component {
                     <Card>
                         <CardHeader>
                             <strong>Supply plan</strong>
+                            <div className="card-header-actions">
+                            <a className="card-header-action">
+                             <small className="supplyplanformulas">Supply Plan Formulas</small>
+                             </a>
+                             </div>
                         </CardHeader>
                         <CardBody>
                             <Formik
