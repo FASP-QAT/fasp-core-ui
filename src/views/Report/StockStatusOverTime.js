@@ -474,7 +474,7 @@ class StockStatusOverTime extends Component {
                                 }
                             </CardHeader>
                             <CardBody>
-                                <div className="TableCust" >
+                                <div className="" >
                                     <div className="container">
                                         <div >
                                             <div className="col-md-12" >
@@ -501,6 +501,7 @@ class StockStatusOverTime extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="col-sm-3">
                                                                 <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                                                                <InputGroup>
                                                                 <ReactMultiSelectCheckboxes
                                                                     bsSize="md"
                                                                     name="countrysId"
@@ -508,6 +509,7 @@ class StockStatusOverTime extends Component {
                                                                     onChange={(e) => { this.handleChange(e) }}
                                                                     options={countryList}
                                                                 />
+                                                                </InputGroup>
                                                                 {!!this.props.error &&
                                                                     this.props.touched && (
                                                                         <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
