@@ -87,6 +87,7 @@ export default class AddForecastingUnitComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.getProductCategoryByRealmId = this.getProductCategoryByRealmId.bind(this);
 
     }
 
@@ -157,12 +158,12 @@ export default class AddForecastingUnitComponent extends Component {
                 })
             })
 
-        ProductService.getProductCategoryList()
-            .then(response => {
-                this.setState({
-                    productcategories: response.data
-                })
-            })
+        // ProductService.getProductCategoryList()
+        //     .then(response => {
+        //         this.setState({
+        //             productcategories: response.data
+        //         })
+        //     })
 
     }
 
@@ -170,6 +171,19 @@ export default class AddForecastingUnitComponent extends Component {
         let { forecastingUnit } = this.state
         forecastingUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
     }
+
+    getProductCategoryByRealmId() {
+        let realmId = document.getElementById("realmId").value;
+        console.log("realmId---------------- > ",realmId);
+        ProductService.getProductCategoryList(realmId)
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    productCategories: response.data
+                })
+            })
+    }
+
     render() {
         const { realms } = this.state;
         let realmList = realms.length > 0
@@ -253,7 +267,7 @@ export default class AddForecastingUnitComponent extends Component {
                                                             bsSize="sm"
                                                             valid={!errors.realmId && this.state.forecastingUnit.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.getProductCategoryByRealmId() }}
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.forecastingUnit.realm.id}

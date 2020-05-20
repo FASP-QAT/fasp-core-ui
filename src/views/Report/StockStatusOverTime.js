@@ -274,7 +274,7 @@ class StockStatusOverTime extends Component {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
 
-            //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
             // var reader = new FileReader();
 
             //var data='';
@@ -286,7 +286,7 @@ class StockStatusOverTime extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 200, 50, 'FAST');
                 /*doc.addImage(data, 10, 30, {
-                  align: 'justify'
+                align: 'justify'
                 });*/
                 doc.setTextColor("#002f6c");
                 doc.text(i18n.t('static.report.stockstatusovertimeReport'), doc.internal.pageSize.width / 2, 60, {
@@ -325,31 +325,31 @@ class StockStatusOverTime extends Component {
         var aspectwidth1 = (width - h1);
 
         doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 2 / 3);
-        /*  
-          const headers =[ [   i18n.t('static.report.consumptionDate'),
-          i18n.t('static.report.forecastConsumption'),
-          i18n.t('static.report.actualConsumption')]];
-          const data =  navigator.onLine? this.state.consumptions.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]):this.state.finalOfflineConsumption.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]);
-          
-          let content = {
-          margin: {top: 80},
-          startY:  height,
-          head: headers,
-          body: data,
-          
+        /* 
+        const headers =[ [ i18n.t('static.report.consumptionDate'),
+        i18n.t('static.report.forecastConsumption'),
+        i18n.t('static.report.actualConsumption')]];
+        const data = navigator.onLine? this.state.consumptions.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]):this.state.finalOfflineConsumption.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]);
+        
+        let content = {
+        margin: {top: 80},
+        startY: height,
+        head: headers,
+        body: data,
+        
         };
         
-         
-          //doc.text(title, marginLeft, 40);
-          doc.autoTable(content);*/
+        
+        //doc.text(title, marginLeft, 40);
+        doc.autoTable(content);*/
         addHeaders(doc)
         addFooters(doc)
         doc.save("report.pdf")
         //creates PDF from img
-        /*  var doc = new jsPDF('landscape');
-          doc.setFontSize(20);
-          doc.text(15, 15, "Cool Chart");
-          doc.save('canvas.pdf');*/
+        /* var doc = new jsPDF('landscape');
+        doc.setFontSize(20);
+        doc.text(15, 15, "Cool Chart");
+        doc.save('canvas.pdf');*/
     }
 
     handleChange(countrysId) {
@@ -450,130 +450,130 @@ class StockStatusOverTime extends Component {
         return (
             <div className="animated fadeIn" >
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                
-                        <Card>
-                            <CardHeader className="pb-1">
-                                <i className="icon-menu"></i><strong>{i18n.t('static.report.stockstatusovertimeReport')}</strong>
-                                {
-                                    this.state.matricsList.length > 0 &&
-                                    <div className="card-header-actions">
-                                        <a className="card-header-action">
-                                            <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
 
-                                            {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
-                       
-                          {({ toPdf }) =>
-                            <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
+                <Card>
+                    <CardHeader className="pb-1">
+                        <i className="icon-menu"></i><strong>{i18n.t('static.report.stockstatusovertimeReport')}</strong>
+                        {
+                            this.state.matricsList.length > 0 &&
+                            <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
 
-                          }
-                        </Pdf>*/}
-                                        </a>
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                                    </div>
-                                }
-                            </CardHeader>
-                            <CardBody>
-                               
-                                            <div>
-                                                <Form >
-                                                <Col md="12 pl-0">
-                                                        <div className="row">
-                                                            <FormGroup className="col-md-3">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                                                <div className="controls edit">
+                                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+ 
+ {({ toPdf }) =>
+ <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
-                                                                    <Picker
-                                                                        ref="pickRange"
-                                                                        years={{ min: 2013 }}
-                                                                        value={rangeValue}
-                                                                        lang={pickerLang}
-                                                                        //theme="light"
-                                                                        onChange={this.handleRangeChange}
-                                                                        onDismiss={this.handleRangeDissmis}
-                                                                    >
-                                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                                    </Picker>
-                                                                </div>
+ }
+ </Pdf>*/}
+                                </a>
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </div>
+                        }
+                    </CardHeader>
+                    <CardBody>
 
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-3">
-                                                                <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                                                                <InputGroup>
-                                                                <ReactMultiSelectCheckboxes
-                                                                    bsSize="md"
-                                                                    name="countrysId"
-                                                                    id="countrysId"
-                                                                    onChange={(e) => { this.handleChange(e); this.fetchData() }}
-                                                                    options={countryList}
-                                                                />
-                                                                </InputGroup>
-                                                                {!!this.props.error &&
-                                                                    this.props.touched && (
-                                                                        <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                                    )}</FormGroup>
+                        <div>
+                            <Form >
+                                <Col md="12 pl-0">
+                                    <div className="row">
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                            <div className="controls edit">
 
-                                                            <FormGroup className="col-md-3">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                                                <div className="controls ">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="productCategoryId"
-                                                                            id="productCategoryId"
-                                                                            bsSize="sm"
-                                                                            onChange={this.getPlanningUnit}
-                                                                        >
-                                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                                            {productCategoryList}
-                                                                        </Input>
-                                                                    </InputGroup></div>
-                                                            </FormGroup>
-                                                            <FormGroup className="col-md-3">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                                                <div className="controls">
-                                                                    <InputGroup>
-                                                                        <Input
-                                                                            type="select"
-                                                                            name="planningUnitId"
-                                                                            id="planningUnitId"
-                                                                            bsSize="sm"
-                                                                            onChange={this.fetchData}
-                                                                        >
-                                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                                            {planningUnitList}
-                                                                        </Input>
-                                                                        {/* <InputGroupAddon addonType="append">
-                                                                        <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                                                    </InputGroupAddon> */}
-                                                                    </InputGroup>
-                                                                </div>
-                                                            </FormGroup>
-
-                                                        </div>
-                                                    </Col>
-                                                </Form>
+                                                <Picker
+                                                    ref="pickRange"
+                                                    years={{ min: 2013 }}
+                                                    value={rangeValue}
+                                                    lang={pickerLang}
+                                                    //theme="light"
+                                                    onChange={this.handleRangeChange}
+                                                    onDismiss={this.handleRangeDissmis}
+                                                >
+                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                </Picker>
                                             </div>
-                                            <Col md="12 pl-0">
-                                                <div className="row">
-                                                    {
-                                                        this.state.matricsList.length > 0
-                                                        &&
-                                                        
-                                                            <div className="col-md-9">
-                                                                <div className="chart-wrapper chart-graph">
-                                                                    <Line id="cool-canvas" data={bar} options={options} />
 
-                                                                </div>
-                                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                                            <InputGroup>
+                                                <ReactMultiSelectCheckboxes
+                                                    bsSize="md"
+                                                    name="countrysId"
+                                                    id="countrysId"
+                                                    onChange={(e) => { this.handleChange(e); this.fetchData() }}
+                                                    options={countryList}
+                                                />
+                                            </InputGroup>
+                                            {!!this.props.error &&
+                                                this.props.touched && (
+                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                )}</FormGroup>
 
-                                                        }
-                                                    <br></br>
-                                                </div>
-                                            </Col>
-                                       
-                            </CardBody>
-                        </Card>
-                   
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="productCategoryId"
+                                                        id="productCategoryId"
+                                                        bsSize="sm"
+                                                        onChange={this.getPlanningUnit}
+                                                    >
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {productCategoryList}
+                                                    </Input>
+                                                </InputGroup></div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                            <div className="controls">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="planningUnitId"
+                                                        id="planningUnitId"
+                                                        bsSize="sm"
+                                                        onChange={this.fetchData}
+                                                    >
+                                                        <option value="0">{i18n.t('static.common.select')}</option>
+                                                        {planningUnitList}
+                                                    </Input>
+                                                    {/* <InputGroupAddon addonType="append">
+ <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
+ </InputGroupAddon> */}
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+
+                                    </div>
+                                </Col>
+                            </Form>
+                        </div>
+                        <Col md="12 pl-0">
+                            <div className="row">
+                                {
+                                    this.state.matricsList.length > 0
+                                    &&
+
+                                    <div className="col-md-9">
+                                        <div className="chart-wrapper chart-graph">
+                                            <Line id="cool-canvas" data={bar} options={options} />
+
+                                        </div>
+                                    </div>
+
+                                }
+                                <br></br>
+                            </div>
+                        </Col>
+
+                    </CardBody>
+                </Card>
+
             </div>
 
         );
