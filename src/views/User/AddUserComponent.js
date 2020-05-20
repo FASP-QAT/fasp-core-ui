@@ -90,11 +90,16 @@ class AddUserComponent extends Component {
             realms: [],
             languages: [],
             user: {
-                realm: {},
-                language: {
-
+                realm: {
+                    realmId: ''
                 },
-                roles: []
+                language: {
+                    languageId: ''
+                },
+                roles: [],
+                username: '',
+                emailId: '',
+                phoneNumber: '',
             },
             roleId: '',
             roleList: [],
@@ -102,6 +107,7 @@ class AddUserComponent extends Component {
             validateRealm: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.roleChange = this.roleChange.bind(this);
     }
@@ -349,9 +355,10 @@ class AddUserComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='userForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='userForm'>
                                                 <CardBody>
                                                     <Input
                                                         type="hidden"
@@ -365,7 +372,7 @@ class AddUserComponent extends Component {
                                                             name="realmId"
                                                             id="realmId"
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.user.realm.realmId != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -383,7 +390,7 @@ class AddUserComponent extends Component {
                                                             name="username"
                                                             id="username"
                                                             bsSize="sm"
-                                                            valid={!errors.username}
+                                                            valid={!errors.username && this.state.user.username != ''}
                                                             invalid={touched.username && !!errors.username}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -397,7 +404,7 @@ class AddUserComponent extends Component {
                                                             name="emailId"
                                                             id="emailId"
                                                             bsSize="sm"
-                                                            valid={!errors.emailId}
+                                                            valid={!errors.emailId && this.state.user.emailId != ''}
                                                             invalid={touched.emailId && !!errors.emailId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -412,7 +419,7 @@ class AddUserComponent extends Component {
                                                             name="phoneNumber"
                                                             id="phoneNumber"
                                                             bsSize="sm"
-                                                            valid={!errors.phoneNumber}
+                                                            valid={!errors.phoneNumber && this.state.user.phoneNumber != ''}
                                                             invalid={touched.phoneNumber && !!errors.phoneNumber}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -467,7 +474,7 @@ class AddUserComponent extends Component {
                                                             name="languageId"
                                                             id="languageId"
                                                             bsSize="sm"
-                                                            valid={!errors.languageId}
+                                                            valid={!errors.languageId && this.state.user.language.languageId != ''}
                                                             invalid={touched.languageId && !!errors.languageId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -483,6 +490,7 @@ class AddUserComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -499,6 +507,21 @@ class AddUserComponent extends Component {
     cancelClicked() {
 
         this.props.history.push(`/user/listUser/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { user } = this.state;
+        user.username = '';
+        user.emailId = '';
+        user.phoneNumber = '';
+        user.realm.realmId = '';
+        user.language.languageId = '';
+        this.state.roleId = '';
+        this.setState(
+            {
+                user
+            }
+        )
     }
 }
 

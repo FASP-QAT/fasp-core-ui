@@ -596,7 +596,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
                                                         <Input
                                                             value={this.state.program.airFreightPerc}
                                                             bsSize="sm"
@@ -610,7 +610,7 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
                                                         <Input
                                                             value={this.state.program.seaFreightPerc}
                                                             bsSize="sm"

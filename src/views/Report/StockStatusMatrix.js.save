@@ -51,7 +51,65 @@ export default class StockStatusMatrix extends React.Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit=this.getPlanningUnit.bind(this);
+    
+    }
+    show() {
+        /* if (!this.state.showed) {
+             setTimeout(() => {this.state.closeable = true}, 250)
+             this.setState({ showed: true })
+         }*/
+      }
+      handleRangeChange(value, text, listIndex) {
+        //
+      }
+      handleRangeDissmis(value) {
+        this.setState({ rangeValue: value })
+    
+      }
+    
+      _handleClickRangeBox(e) {
+        this.refs.pickRange.show()
+      }
+     
+    filterData() {
+        let realmId = AuthenticationService.getRealmId();
+        let programId = document.getElementById("programId").value;
+        let productCategoryId = document.getElementById("productCategoryId").value;
+        let planningUnitId = document.getElementById("planningUnitId").value;
+        let view = document.getElementById("view").value;
+        AuthenticationService.setupAxiosInterceptors();
+        ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId,view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month , 0).getDate())
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    data: response.data,
+                    view:view
+                })
+            }).catch(
+                error => {
+                    this.setState({
+                      data: []
+                    })
+
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+>>>>>>> stock status over time
 
   }
   show() {
@@ -68,30 +126,50 @@ export default class StockStatusMatrix extends React.Component {
     this.filterData();
   }
 
-  _handleClickRangeBox(e) {
-    this.refs.pickRange.show()
-  }
+    getProductCategories() {
+      let programId = document.getElementById("programId").value;
+        AuthenticationService.setupAxiosInterceptors();
+      
+        ProductService.getProductCategoryListByProgram(programId)
+            .then(response => {
+                console.log(JSON.stringify(response.data))
+                this.setState({
+                    productCategories: response.data
+                })
+            }).catch(
+                error => {
+                    this.setState({
+                        productCategories: []
+                    })
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+            this.getPlanningUnit();
+           
 
-  filterData() {
-    console.log('In filter data')
-    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-    let programId = document.getElementById("programId").value;
-    let productCategoryId = document.getElementById("productCategoryId").value;
-    let planningUnitId = document.getElementById("planningUnitId").value;
-    let view = document.getElementById("view").value;
-    if (navigator.onLine) {
-      let realmId = AuthenticationService.getRealmId();
-      AuthenticationService.setupAxiosInterceptors();
-      ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId, view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            data: response.data,
-            view: view
-          })
-        }).catch(
-          error => {
+    }
+    getPlanningUnit() {
+        if (navigator.onLine) {
+          AuthenticationService.setupAxiosInterceptors();
+          let programId = document.getElementById("programId").value;
+          let productCategoryId = document.getElementById("productCategoryId").value;
+          ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
+            console.log('**' + JSON.stringify(response.data))
             this.setState({
               consumptions: []
             })
@@ -111,100 +189,34 @@ export default class StockStatusMatrix extends React.Component {
                   this.setState({ message: 'static.unkownError' });
                   break;
               }
-            }
-          }
-        );
-    } else {
-      if (view == 1) {
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var programRequest = programTransaction.get(programId);
-
-
-          programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            var offlineInventoryList = (programJson.inventoryList);
-            console.log("offlineInventoryList---", offlineInventoryList);
-
-            const activeFilter = offlineInventoryList.filter(c => (c.active == true || c.active == "true"));
-            console.log("activeFilter---", activeFilter);
-
-            const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-            console.log("planningUnitFilter---", planningUnitFilter);
-            const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
-            console.log("productCategoryFilter---", productCategoryFilter)
-
-            // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-            const filteredData = productCategoryFilter.filter(c => moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)'))
-            console.log("filteredData---", filteredData);
-            let finalOfflineInventory = [];
-            let previousYear = 0;
-            let json;
-            for (let i = this.state.rangeValue.from.year; i <= this.state.rangeValue.to.year; i++) {
-              let jan = 0;
-              let feb = 0;
-              let mar = 0;
-              let apr = 0;
-              let may = 0;
-              let jun = 0;
-              let jul = 0;
-              let aug = 0;
-              let sep = 0;
-              let oct = 0;
-              let nov = 0;
-              let dec = 0;
-              let monthArray = [];
-              for (let j = 0; j <= filteredData.length; j++) {
-                if (filteredData[j] != null && filteredData[j] != "" && (i == moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('YYYY'))) {
-                  // for (let k = 0; k <= filteredData.length; k++) {
-
-                  // }
-
-                  let month = moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('MM');
-                  if (month == "01" || month == "1" || month == 1) {
-                    jan = jan + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "02" || month == "2" || month == 2) {
-                    feb = feb + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "03" || month == "3" || month == 3) {
-                    mar = mar + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "04" || month == "4" || month == 4) {
-                    apr = apr + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "05" || month == "5" || month == 5) {
-                    may = may + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "06" || month == "6" || month == 6) {
-                    jun = jun + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "07" || month == "7" || month == 7) {
-                    jul = jul + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "08" || month == "8" || month == 8) {
-                    aug = aug + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "09" || month == "9" || month == 9) {
-                    sep = sep + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "10" || month == 10) {
-                    oct = oct + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "11" || month == 11) {
-                    nov = nov + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "12" || month == 12) {
-                    dec = dec + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
+            ); } else {
+          const lan = 'en';
+          var db1;
+          var storeOS;
+          getDatabase();
+          var openRequest = indexedDB.open('fasp', 1);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+            var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
+            var planningunitRequest = planningunitOs.getAll();
+            var planningList = []
+            planningunitRequest.onerror = function (event) {
+              // Handle errors!
+            };
+            planningunitRequest.onsuccess = function (e) {
+              var myResult = [];
+              myResult = planningunitRequest.result;
+              console.log("myResult", myResult);
+              var programId = (document.getElementById("programId").value).split("_")[0];
+              console.log('programId----->>>', programId)
+              console.log(myResult);
+              var proList = []
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].program.id == programId) {
+                  var productJson = {
+                    name: getLabelText(myResult[i].planningUnit.label, lan),
+                    id: myResult[i].planningUnit.id
                   }
                 }
               }
@@ -281,39 +293,39 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this)
 
       }
-    }
-  }
+    
 
-  getProductCategories() {
-    let programId = document.getElementById("programId").value;
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      let programId = document.getElementById("programId").value;
-      ProductService.getProductCategoryListByProgram(programId)
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            productCategories: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              productCategories: []
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
+    getPrograms() {
+        if (navigator.onLine) {
+          AuthenticationService.setupAxiosInterceptors();
+          let realmId = AuthenticationService.getRealmId();
+          ProgramService.getProgramByRealmId(realmId)
+            .then(response => {
+              console.log(JSON.stringify(response.data))
+              this.setState({
+                programs: response.data
+              })
+            }).catch(
+              error => {
+                this.setState({
+                  programs: []
+                })
+                if (error.message === "Network Error") {
+                  this.setState({ message: error.message });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 500:
+                    case 401:
+                    case 404:
+                    case 406:
+                    case 412:
+                      this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                      break;
+                    default:
+                      this.setState({ message: 'static.unkownError' });
+                      break;
+                  }
+                }
               }
             }
           }
@@ -363,22 +375,28 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
     }
     this.getPlanningUnit();
-   
+    this.filterData();
 
   }
   getPlanningUnit() {
+    let programId = document.getElementById("programId").value;
     if (navigator.onLine) {
+      console.log('changed')
       AuthenticationService.setupAxiosInterceptors();
-      let programId = document.getElementById("programId").value;
       let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
+      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
         console.log('**' + JSON.stringify(response.data))
-        this.setState({  planningUnits: response.data});
+        this.setState({
+          planningUnits: response.data,
+        })
       })
         .catch(
           error => {
+            this.setState({
+              planningUnits: [],
+            })
             if (error.message === "Network Error") {
-              this.setState({ message: error.message , planningUnits: []});
+              this.setState({ message: error.message });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -386,10 +404,10 @@ export default class StockStatusMatrix extends React.Component {
                 case 404:
                 case 406:
                 case 412:
-                  this.setState({ message: error.response.data.messageCode, planningUnits: [] });
+                  this.setState({ message: error.response.data.messageCode });
                   break;
                 default:
-                  this.setState({ message: 'static.unkownError', planningUnits: [] });
+                  this.setState({ message: 'static.unkownError' });
                   break;
               }
             }
@@ -431,14 +449,14 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
 
     }
-    
+    this.filterData();
   }
 
 
   getPrograms() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      let realmId = AuthenticationService.getRealmId();
+      let realmId = document.getElementById("realmId").value;
       ProgramService.getProgramByRealmId(realmId)
         .then(response => {
           console.log(JSON.stringify(response.data))
@@ -506,61 +524,14 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this);
 
       }
+   /*   componentDidUpdate(){
+        setTimeout(() => this.setState({message:''}), 3000);
+        }
+*/
 
-
-    }
-
-
-  }
-  componentDidUpdate() {
-    setTimeout(() => this.setState({ message: '' }), 3000);
-  }
-
-
-  componentDidMount() {
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-            this.getPrograms();
-
-     } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
-        var offlinePrograms = []
-        getRequest.onerror = function (event) {
-          // Handle errors!
-        }.bind(this);;
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              console.log("my result---", myResult[i]);
-              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var programJson = {
-                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
-              }
-              offlinePrograms[i] = programJson
-            }
-          }
-          console.log("program list---", offlinePrograms);
-          this.setState({
-            offlinePrograms
-          })
-
-        }.bind(this);
-
-      }.bind(this);
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        this.getPrograms();
     }
   }
   exportCSV(columns) {
@@ -636,32 +607,10 @@ export default class StockStatusMatrix extends React.Component {
         , ele.Dec]);
     }
 
-    console.log(data1);
-    let content = {
-      startY: 50,
-      head: header,
-      body: this.state.view == 1 ? data1 : data2,
-    };
-
-    doc.text(title, marginLeft, 40);
-    doc.autoTable(content);
-    doc.save(i18n.t('static.dashboard.stockstatusmatrix') + ".pdf")
-  }
-
-
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
-
-  render() {
-    
-
-    const { offlinePrograms } = this.state;
-    const { offlineProductCategoryList } = this.state;
-    const { offlinePlanningUnitList } = this.state;
-
-    const { planningUnits } = this.state;
-    let planningUnitList = planningUnits.length > 0
+    render() {
+       
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0
       && planningUnits.map((item, i) => {
         return (
           <option key={i} value={item.planningUnit.id}>
@@ -669,20 +618,33 @@ export default class StockStatusMatrix extends React.Component {
           </option>
         )
       }, this);
-    const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-      && productCategories.map((item, i) => {
-        return (
-          <option key={i} value={item.productCategoryId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
-    const pickerLang = {
-      months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-      from: 'From', to: 'To',
-    }
-    const { rangeValue } = this.state
+        const { productCategories } = this.state;
+        let productCategoryList = productCategories.length > 0
+            && productCategories.map((item, i) => {
+                return (
+                    <option key={i} value={item.productCategoryId}>
+                        {getLabelText(item.label, this.state.lang)}
+                    </option>
+                )
+            }, this);
+            const pickerLang = {
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                from: 'From', to: 'To',
+              }
+              const { rangeValue } = this.state
+          
+              const makeText = m => {
+                if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+                return '?'
+              }
+          
+          
+        const { SearchBar, ClearSearchButton } = Search;
+        const customTotal = (from, to, size) => (
+            <span className="react-bootstrap-table-pagination-total">
+                {i18n.t('static.common.result', { from, to, size })}
+            </span>
+        );
 
     const makeText = m => {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -711,21 +673,21 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'PLANNING_UNIT_LABEL_EN',
         text: i18n.t('static.planningunit.planningunit'),
         sort: true,
-        align: 'left',
-        headerAlign: 'left'
+        align: 'center',
+        headerAlign: 'center'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right'
+        align: 'center',
+        headerAlign: 'center'
       },
       {
         dataField: 'Jan',
         text: i18n.t('static.month.jan'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Jan
@@ -743,8 +705,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Feb',
         text: i18n.t('static.month.feb'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Feb
@@ -762,8 +724,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Mar',
         text: i18n.t('static.month.mar'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Mar
@@ -781,8 +743,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Apr',
         text: i18n.t('static.month.apr'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Apr
@@ -800,8 +762,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'May',
         text: i18n.t('static.month.may'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.May
@@ -819,8 +781,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Jun',
         text: i18n.t('static.month.jun'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Jun
@@ -838,8 +800,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Jul',
         text: i18n.t('static.month.jul'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Jul
@@ -876,8 +838,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Sep',
         text: i18n.t('static.month.sep'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Sep
@@ -895,8 +857,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Oct',
         text: i18n.t('static.month.oct'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Oct
@@ -914,8 +876,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Nov',
         text: i18n.t('static.month.nov'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Nov
@@ -933,8 +895,8 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Dec',
         text: i18n.t('static.month.dec'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right',
+        align: 'center',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Dec
@@ -958,39 +920,39 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'PLANNING_UNIT_LABEL_EN',
         text: i18n.t('static.procurementUnit.planningUnit'),
         sort: true,
-        align: 'left',
-        headerAlign: 'left'
+        align: 'center',
+        headerAlign: 'center'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right'
+        align: 'center',
+        headerAlign: 'center'
       },
       {
         dataField: 'Q1',
         text: i18n.t('static.common.quarter1'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right'
+        align: 'center',
+        headerAlign: 'center'
       }, {
         dataField: 'Q2',
         text: i18n.t('static.common.quarter2'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right'
+        align: 'center',
+        headerAlign: 'center'
       }, {
         dataField: 'Q3',
         text: i18n.t('static.common.quarter3'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right'
+        align: 'center',
+        headerAlign: 'center'
       }, {
         dataField: 'Q4',
         text: i18n.t('static.common.quarter4'),
         sort: true,
-        align: 'right',
-        headerAlign: 'right'
+        align: 'center',
+        headerAlign: 'center'
       }]
 
     const options = {
@@ -1077,6 +1039,27 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
                 <Online>
                   <FormGroup className="col-md-3">
+                    <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                    <div className="controls">
+                      <InputGroup>
+                        <Input
+                          type="select"
+                          name="realmId"
+                          id="realmId"
+                          bsSize="sm"
+                          onChange={this.getPrograms}
+                        >
+                          {/* <option value="0">{i18n.t('static.common.all')}</option> */}
+
+                          {realmList}
+                        </Input>
+
+                      </InputGroup>
+                    </div>
+                  </FormGroup>
+                </Online>
+                <Online>
+                  <FormGroup className="col-md-3">
                     <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                     <div className="controls ">
                       <InputGroup>
@@ -1136,7 +1119,7 @@ export default class StockStatusMatrix extends React.Component {
                           bsSize="sm"
                           onChange={this.getPlanningUnit}
                         >
-                          <option value="0">{i18n.t('static.common.select')}</option>
+                          <option value="0">{i18n.t('static.common.all')}</option>
                           {productCategoryList}
                         </Input>
 
@@ -1228,65 +1211,151 @@ export default class StockStatusMatrix extends React.Component {
 
                       </Input>
 
-                    </InputGroup>
-                  </div>
-                </FormGroup>
-                <Online>
-                  <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                    <div className="controls">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="sm"
+            <div className="animated">
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <Card>
+                    <CardHeader className="pb-1">
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.stockstatusmatrix')}</strong>{' '}
+                        {  this.state.data.length > 0 &&<div className="card-header-actions">
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(this.state.view==1?columns:columns1)}/>
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(this.state.view==1?columns:columns1)} />                  
+                        </div>}
+                    </CardHeader>
+                    <CardBody className="pb-md-3">
+                        <Col md="12 pl-0">
+                            <div className="row">
+                            <FormGroup className="col-md-3" title="click here to select period">
+                            <Label htmlFor="appendedInputButton">Select Period <span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                            <div className="controls edit">
+
+                              <Picker
+                                ref="pickRange"
+                                years={{ min: 2013 }}
+                                value={rangeValue}
+                                lang={pickerLang}
+                                //theme="light"
+                                onChange={this.handleRangeChange}
+                                onDismiss={this.handleRangeDissmis}
+                              >
+                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                              </Picker>
+                            </div>
+
+                          </FormGroup>
+
+                               
+                                <FormGroup className="col-md-3">
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                            <div className="controls ">
+                              <InputGroup>
+                                <Input
+                                  type="select"
+                                  name="programId"
+                                  id="programId"
+                                  bsSize="sm"
+                                  onChange={this.getProductCategories}
+
+                                >
+                                  <option value="0">{i18n.t('static.common.select')}</option>
+                                  {programList}
+                                </Input>
+
+                              </InputGroup>
+                            </div>
+                          </FormGroup>
+                                    <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                    <div className="controls ">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                                onChange={this.getPlanningUnit}
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {productCategoryList}
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                </div>
+                                <div className="row">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="view"
+                                                id="view"
+                                                bsSize="sm"
+                                            >
+                                                <option value="1">{i18n.t('static.common.monthly')}</option>
+                                                <option value="2">{i18n.t('static.common.quarterly')}</option>
+                                               
+                                            </Input>
+
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="planningUnitId"
+                                                id="planningUnitId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="0">{i18n.t('static.common.select')}</option>
+                                                {planningUnitList}
+                                            </Input>
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                            </div>
+                        </Col>
+
+                        <ToolkitProvider
+                            keyField="procurementUnitId"
+                            data={this.state.data}
+                            columns={this.state.view==1?columns:columns1}
+                            search={{ searchFormatted: true }}
+                            hover
+                            filter={filterFactory()}
+                           
                         >
+                            {
+                                props => (
+                                   this.state.data.length>0 && <div className="TableCust">
+                                           
+                                        <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
+                                      
+ <SearchBar {...props.searchProps} />
+                                            <ClearSearchButton {...props.searchProps} /></div>
+                                    
+                                             <BootstrapTable className="stock-status-table" hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                            pagination={paginationFactory(options)}
 
-                          <option value="0">{i18n.t('static.common.select')}</option>
-                          {planningUnitList}
-                        </Input>
-                        <InputGroupAddon addonType="append">
-                          <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </div>
-                  </FormGroup>
-                </Online>
-              </div>
-            </Col>
+                                            {...props.baseProps}
+                                        />
+                                    </div>
+                                )
+                            }
+                        </ToolkitProvider>
 
-            <ToolkitProvider
-              keyField="procurementUnitId"
-              data={navigator.onLine ? this.state.data : this.state.offlineInventoryList}
-              columns={this.state.view == 1 ? columns : columns1}
-              search={{ searchFormatted: true }}
-              hover
-              filter={filterFactory()}
-
-            >
-              {
-                props => (
-                  <div className="TableCust">
-
-                    {/* <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
-
-                      <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} /></div> */}
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                      pagination={paginationFactory(options)}
-
-                      {...props.baseProps}
-                    />
-                  </div>
-                )
-              }
-            </ToolkitProvider>
-
-          </CardBody>
-        </Card>
+                    </CardBody>
+                </Card>
 
 
-      </div>)
-  }
+            </div>)
+    }
 }

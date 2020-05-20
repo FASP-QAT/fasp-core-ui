@@ -271,6 +271,7 @@ class ListBudgetComponent extends Component {
 
 
           var cell1 = row.budgetAmt - row.usedAmt
+          var currencyCode = row.currency.currencyCode;
           cell1 += '';
           var x = cell1.split('.');
           var x1 = x[0];
@@ -279,7 +280,7 @@ class ListBudgetComponent extends Component {
           while (rgx.test(x1)) {
             x1 = x1.replace(rgx, '$1' + ',' + '$2');
           }
-          return x1 + x2;
+          return currencyCode + " " + x1 + x2;
         }
       }
       ,
@@ -374,13 +375,14 @@ class ListBudgetComponent extends Component {
                       name="fundingSourceId"
                       id="fundingSourceId"
                       bsSize="sm"
+                      onChange={this.filterData}
                     >
                       <option value="0">{i18n.t('static.common.all')}</option>
                       {fundingSources}
                     </Input>
-                    <InputGroupAddon addonType="append">
+                    {/* <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                    </InputGroupAddon>
+                    </InputGroupAddon> */}
                   </InputGroup>
                 </div>
               </FormGroup>

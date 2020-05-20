@@ -590,7 +590,7 @@ this.fetchData();
                                     name="countryId"
                                     id="countryId"
                                     bsSize="sm"
-                                    onChange={this.fetchData}
+                                  //  onChange={this.fetchData}
 
                                   >
                                     <option value="0">{i18n.t('static.common.select')}</option>

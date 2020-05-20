@@ -1501,7 +1501,7 @@ input::placeholder {
 // .region-bartext{margin-left: -25px;}
 // .otherfeild-text{margin-left: -37%;}
 // .planning-text{    margin-left: 0px;}
-
+/////setup program
 .progressbar {
   height: 5px;
   margin-top: 20px;
@@ -1540,6 +1540,44 @@ input::placeholder {
 .progressbartext7 {
   left: 94.95%;
 }
+////pipelinesetup progress bar
+
+.progressetuptext1 {
+  left: -11px;
+}
+.progressetuptext2 {
+  left: 22%;
+}
+.progressetuptext3 {
+  left: 46.46%;
+}
+.progressetuptext4 {
+  left: 71.46%;
+}
+.progressetuptext5 {
+  left: 94.95%;
+}
+///data setup
+.progresdatatext1 {
+  left: 7px;
+}
+.progresdatatext2 {
+  left: 19%;
+}
+.progresdatatext3 {
+  left: 37%;
+}
+.progresdatatext4 {
+  left: 55.46%;
+}
+.progresdatatext5 {
+  left: 76%;
+}
+.progresdatatext6 {
+  left: 94.79%;
+}
+
+
 
 @media only screen and (max-width: 1024px) {
   .progressbartext1 {
@@ -1563,6 +1601,43 @@ input::placeholder {
   .progressbartext7 {
     left: 92.95%;
   }
+
+  ///pipeline setup program
+  .progressetuptext1 {
+    left: -11px;
+  }
+  .progressetuptext2 {
+    left: 21%;
+  }
+  .progressetuptext3 {
+    left: 45%;
+  }
+  .progressetuptext4 {
+    left: 70%;
+  }
+  .progressetuptext5 {
+    left: 93%;
+  }
+ ///data setup
+.progresdatatext1 {
+  left: 7px;
+}
+.progresdatatext2 {
+  left: 19%;
+}
+.progresdatatext3 {
+  left: 36%;
+}
+.progresdatatext4 {
+  left: 54.46%;
+}
+.progresdatatext5 {
+  left: 75%;
+}
+.progresdatatext6 {
+  left: 92.79%;
+}
+
 }
 
 @media (max-width: 768px) {
@@ -1587,7 +1662,44 @@ input::placeholder {
   .progressbartext7 {
     left: 92.95%;
   }
+
+  ///pipeline setup program
+  .progressetuptext1 {
+    left: -11px;
+  }
+  .progressetuptext2 {
+    left: 21%;
+  }
+  .progressetuptext3 {
+    left: 44.46%;
+  }
+  .progressetuptext4 {
+    left: 69.46%;
+  }
+  .progressetuptext5 {
+    left: 92%;
+  }
+  ///data setup
+.progresdatatext1 {
+  left: 7px;
 }
+.progresdatatext2 {
+  left: 19%;
+}
+.progresdatatext3 {
+  left: 35%;
+}
+.progresdatatext4 {
+  left: 53.46%;
+}
+.progresdatatext5 {
+  left: 74%;
+}
+.progresdatatext6 {
+  left:91.79%
+}
+}
+
 
 .react-confirm-alert-body {
   width: 500px !important;
@@ -1788,3 +1900,8 @@ border-radius: 0.2rem!important;
 .css-1vr111p-option{
   min-width: 171px!important;
 }
+// .css-1pcexqc-container {
+//   position: relative;
+//   box-sizing: border-box;
+//   width: 206px!important;
+// }

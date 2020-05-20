@@ -38,7 +38,7 @@ class ListRealmCountryComponent extends Component {
         this.filterData = this.filterData.bind(this);
         this.addNewRealmCountry = this.addNewRealmCountry.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
-    
+
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -71,7 +71,7 @@ class ListRealmCountryComponent extends Component {
         this.props.history.push({
             pathname: `/realmCountry/realmCountryPlanningUnit/${row.realmCountryId}`,
             state: { realmCountry: row }
-           
+
 
         })
     }
@@ -81,7 +81,7 @@ class ListRealmCountryComponent extends Component {
         this.props.history.push({
             pathname: `/realmCountry/realmCountryRegion/${row.realmCountryId}`,
             state: { realmCountry: row }
-           
+
 
         })
     }
@@ -118,13 +118,14 @@ class ListRealmCountryComponent extends Component {
             );
 
 
-            RealmCountryService.getRealmCountryListAll()
+        RealmCountryService.getRealmCountryListAll()
             .then(response => {
                 if (response.status == 200) {
-                this.setState({
-                    realmCountryList: response.data,
-                    selRealmCountry: response.data
-                })}else{
+                    this.setState({
+                        realmCountryList: response.data,
+                        selRealmCountry: response.data
+                    })
+                } else {
                     this.setState({ message: response.data.messageCode })
                 }
             }).catch(
@@ -197,14 +198,14 @@ class ListRealmCountryComponent extends Component {
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'country.label',
             text: i18n.t('static.dashboard.country'),
             sort: true,
             align: 'center',
             headerAlign: 'center',
             formatter: this.formatLabel
-        },{
+        }, {
             dataField: 'defaultCurrency.label',
             text: i18n.t('static.dashboard.currency'),
             sort: true,
@@ -220,7 +221,7 @@ class ListRealmCountryComponent extends Component {
         //     headerAlign: 'center',
         //     formatter: this.formatLabel
         // },
-         {
+        {
             dataField: 'airFreightPercentage',
             text: i18n.t('static.realmcountry.airFreightPercentage'),
             sort: true,
@@ -262,7 +263,7 @@ class ListRealmCountryComponent extends Component {
                 );
             }
         },
-         {
+        {
             dataField: 'realmCountryId',
             text: i18n.t('static.common.action'),
             align: 'center',
@@ -270,8 +271,8 @@ class ListRealmCountryComponent extends Component {
             formatter: (cellContent, row) => {
                 return (<div className="forInlinebtnMappinglistRealm">
                     <Button className="mapUnitbtn" type="button" size="sm" color="success" onClick={(event) => this.PlanningUnitCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.planningunit.planningunitupdate')}</Button>
-                <Button className="ml-1 mapRegionbtn" type="button" size="sm" color="success" onClick={(event) => this.RealmCountryRegion(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realmcountry.regionupdate')}</Button>
-               </div> )
+                    <Button className="ml-1 mapRegionbtn" type="button" size="sm" color="success" onClick={(event) => this.RealmCountryRegion(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realmcountry.regionupdate')}</Button>
+                </div>)
             }
         }];
         const options = {
@@ -309,7 +310,7 @@ class ListRealmCountryComponent extends Component {
 
                         <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.realmcountrylist')}</strong>{' '}
                         <div className="card-header-actions">
-                            
+
                         </div>
                     </CardHeader>
                     <CardBody className="pb-lg-0">
@@ -323,13 +324,14 @@ class ListRealmCountryComponent extends Component {
                                             name="realmId"
                                             id="realmId"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>
@@ -351,11 +353,11 @@ class ListRealmCountryComponent extends Component {
                                         </div>
                                         <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
-                                          /*  rowEvents={{
-                                                onClick: (e, row, rowIndex) => {
-                                                    this.editSupplier(row);
-                                                }
-                                            }}*/
+                                            /*  rowEvents={{
+                                                  onClick: (e, row, rowIndex) => {
+                                                      this.editSupplier(row);
+                                                  }
+                                              }}*/
                                             {...props.baseProps}
                                         />
                                     </div>
@@ -367,5 +369,6 @@ class ListRealmCountryComponent extends Component {
                 </Card>
             </div>
         );
-    }}
+    }
+}
 export default ListRealmCountryComponent;

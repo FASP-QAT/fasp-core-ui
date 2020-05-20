@@ -57,8 +57,10 @@ export default class SupplyPlanComponent extends React.Component {
             openingBalanceArray: [],
             closingBalanceArray: [],
             monthsOfStockArray: [],
-            filteredArraySuggestedShipments: [],
-            suggestedShipmentChangedFlag: 0
+            suggestedShipmentChangedFlag: 0,
+            psmShipmentsTotalData: [],
+            nonPsmShipmentsTotalData: [],
+            artmisShipmentsTotalData: []
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -87,6 +89,8 @@ export default class SupplyPlanComponent extends React.Component {
         this.suggestedShipmentChanged = this.suggestedShipmentChanged.bind(this);
         this.saveSuggestedShipments = this.saveSuggestedShipments.bind(this);
         this.checkValidationSuggestedShipments = this.checkValidationSuggestedShipments.bind(this);
+
+        this.noSkipClicked = this.noSkipClicked.bind(this)
     }
 
     actionCanceled(supplyPlanType) {
@@ -352,7 +356,12 @@ export default class SupplyPlanComponent extends React.Component {
             var openingBalanceArray = [];
             var closingBalanceArray = [];
 
-            var filteredArraySuggestedShipments = [];
+            var psmFilteredArray = [];
+            var psmShipmentsTotalData = [];
+            var nonPsmFilteredArray = [];
+            var nonPsmShipmentsTotalData = [];
+            var artmisFilteredArray = [];
+            var artmisShipmentsTotalData = [];
 
             var monthsOfStockArray = [];
             programRequest.onsuccess = function (event) {
@@ -552,10 +561,64 @@ export default class SupplyPlanComponent extends React.Component {
                     inventoryTotalMonthWise.push(monthWiseCount);
                 }
 
+                // Shipments part
+                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+                console.log("Shipment List initial", shipmentList);
+                for (var i = 3; i < 21; i++) {
+                    var psm = shipmentList.filter(c => (c.orderedDate >= m[i].startDate && c.orderedDate <= m[i].endDate) && c.erpFlag == false && c.procurementAgent.id == 1)
+                    console.log("PSM SHipment data", psm);
+                    var nonPsm = shipmentList.filter(c => (c.orderedDate >= m[i].startDate && c.orderedDate <= m[i].endDate) && c.procurementAgent.id != 1)
+                    console.log("Non PSM", nonPsm);
+                    var artmisShipments = shipmentList.filter(c => (c.orderedDate >= m[i].startDate && c.orderedDate <= m[i].endDate) && c.erpFlag == true)
+                    console.log("ARTMIS", artmisShipments)
+                    var psmQty = 0;
+                    var psmToBeAccounted = 0;
+                    var nonPsmQty = 0;
+                    var nonPsmToBeAccounted = 0;
+                    var artmisQty = 0;
+                    var artmisToBeAccounted = 0;
+                    for (var j = 0; j < psm.length; j++) {
+                        psmQty += parseFloat((psm[j].quantity));
+                        if (psm[j].accountFlag == 1) {
+                            psmToBeAccounted = 1;
+                        }
+                    }
+                    if (psm.length == 0) {
+                        psmShipmentsTotalData.push("");
+                    } else {
+                        psmShipmentsTotalData.push({ qty: psmQty, accountFlag: psmToBeAccounted, index: i - 3, month: m[i] });
+                    }
+
+                    for (var np = 0; np < nonPsm.length; np++) {
+                        nonPsmQty += parseFloat((nonPsm[np].quantity));
+                        if (nonPsm[np].accountFlag == 1) {
+                            nonPsmToBeAccounted = 1;
+                        }
+                    }
+                    if (nonPsm.length == 0) {
+                        nonPsmShipmentsTotalData.push("");
+                    } else {
+                        nonPsmShipmentsTotalData.push({ qty: psmQty, accountFlag: nonPsmToBeAccounted, index: i - 3, month: m[i] });
+                    }
+
+                    for (var a = 0; a < artmisShipments.length; a++) {
+                        artmisQty += parseFloat((artmisShipments[a].quantity));
+                        if (artmisShipments[a].accountFlag == 1) {
+                            artmisToBeAccounted = 1;
+                        }
+                    }
+                    if (artmisShipments.length == 0) {
+                        artmisShipmentsTotalData.push("");
+                    } else {
+                        artmisShipmentsTotalData.push({ qty: psmQty, accountFlag: artmisToBeAccounted, index: i - 3, month: m[i] });
+                    }
+                }
+
                 // Calculation of opening and closing balance
                 var openingBalance = 0;
                 var totalConsumption = 0;
                 var totalAdjustments = 0;
+                var totalShipments = 0;
 
                 var consumptionRemainingList = consumptionList.filter(c => c.consumptionDate < m[3].startDate);
                 for (var j = 0; j < consumptionRemainingList.length; j++) {
@@ -581,7 +644,12 @@ export default class SupplyPlanComponent extends React.Component {
                     totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
                 }
 
-                openingBalance = totalAdjustments - totalConsumption;
+                var shipmentsRemainingList = shipmentList.filter(c => c.orderedDate < m[3].startDate && c.accountFlag == true);
+                for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                    totalShipments += parseFloat((shipmentsRemainingList[j].adjustmentQty));
+                }
+
+                openingBalance = totalAdjustments - totalConsumption + totalShipments;
                 openingBalanceArray.push(openingBalance);
                 for (var i = 1; i <= 18; i++) {
                     var consumptionQtyForCB = 0;
@@ -592,7 +660,22 @@ export default class SupplyPlanComponent extends React.Component {
                     if (inventoryTotalData[i - 1] != "") {
                         inventoryQtyForCB = inventoryTotalData[i - 1];
                     }
-                    var closingBalance = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB;
+
+                    var psmShipmentQtyForCB = 0;
+                    if (psmShipmentsTotalData[i - 1] != "" && psmShipmentsTotalData[i - 1].accountFlag == true) {
+                        psmShipmentQtyForCB = psmShipmentsTotalData[i - 1].qty;
+                    }
+
+                    var nonPsmShipmentQtyForCB = 0;
+                    if (nonPsmShipmentsTotalData[i - 1] != "" && nonPsmShipmentsTotalData[i - 1].accountFlag == true) {
+                        nonPsmShipmentQtyForCB = nonPsmShipmentsTotalData[i - 1].qty;
+                    }
+
+                    var artmisShipmentQtyForCB = 0;
+                    if (artmisShipmentsTotalData[i - 1] != "" && artmisShipmentsTotalData[i - 1].accountFlag == true) {
+                        artmisShipmentQtyForCB = artmisShipmentsTotalData[i - 1].qty;
+                    }
+                    var closingBalance = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB + psmShipmentQtyForCB + nonPsmShipmentQtyForCB + artmisShipmentQtyForCB;
                     closingBalanceArray.push(closingBalance);
                     if (i != 18) {
                         openingBalanceArray.push(closingBalance);
@@ -609,7 +692,6 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                 }
 
-
                 // Suggested shipments part
                 for (var s = 0; s < 18; s++) {
                     var month = m[s + 3].startDate;
@@ -621,12 +703,12 @@ export default class SupplyPlanComponent extends React.Component {
                             suggestedShipmentsTotalData.push("");
                         } else {
                             suggestedShipmentsTotalData.push({ "suggestedOrderQty": suggestedOrd, "month": m[s + 3].startDate });
-                            filteredArraySuggestedShipments.push({ "suggestedOrderQty": suggestedOrd, "month": m[s + 3].startDate, "type": "suggestedNew" })
                         }
                     } else {
                         suggestedShipmentsTotalData.push("");
                     }
                 }
+
                 this.setState({
                     suggestedShipmentsTotalData: suggestedShipmentsTotalData,
                     inventoryTotalData: inventoryTotalData,
@@ -643,7 +725,9 @@ export default class SupplyPlanComponent extends React.Component {
                     maxStockArray: maxStockArray,
                     monthsOfStockArray: monthsOfStockArray,
                     planningUnitName: planningUnitName,
-                    filteredArraySuggestedShipments: filteredArraySuggestedShipments
+                    psmShipmentsTotalData: psmShipmentsTotalData,
+                    nonPsmShipmentsTotalData: nonPsmShipmentsTotalData,
+                    artmisShipmentsTotalData: artmisShipmentsTotalData
                 })
             }.bind(this)
         }.bind(this)
@@ -757,7 +841,7 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
 
-    adjustmentsDetailsClicked(inventoryDate, region, month) {
+    adjustmentsDetailsClicked(region, month) {
         if (this.state.inventoryChangedFlag == 0) {
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programId = document.getElementById("programId").value;
@@ -913,6 +997,7 @@ export default class SupplyPlanComponent extends React.Component {
         var procurementAgentList = [];
         var fundingSourceList = [];
         var budgetList = [];
+        var dataSourceList = [];
         var myVar = '';
         getDatabase();
         var openRequest = indexedDB.open('fasp', 1);
@@ -965,88 +1050,119 @@ export default class SupplyPlanComponent extends React.Component {
                             }
                         }
 
-                        var bTransaction = db1.transaction(['budget'], 'readwrite');
-                        var bOs = bTransaction.objectStore('budget');
-                        var bRequest = bOs.getAll();
-                        var budgetListAll = []
-                        bRequest.onsuccess = function (event) {
-                            var bResult = [];
-                            bResult = bRequest.result;
-                            for (var k = 0; k < bResult.length; k++) {
-                                var bJson = {
-                                    name: bResult[k].label.label_en,
-                                    id: bResult[k].budgetId
+                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                        var dataSourceRequest = dataSourceOs.getAll();
+                        dataSourceRequest.onsuccess = function (event) {
+                            var dataSourceResult = [];
+                            dataSourceResult = dataSourceRequest.result;
+                            for (var k = 0; k < dataSourceResult.length; k++) {
+                                if (dataSourceResult[k].program.id == programJson.programId || dataSourceResult[k].program.id == 0) {
+                                    if (dataSourceResult[k].realm.id == programJson.realmCountry.realm.realmId) {
+                                        var dataSourceJson = {
+                                            name: dataSourceResult[k].label.label_en,
+                                            id: dataSourceResult[k].dataSourceId
+                                        }
+                                        dataSourceList[k] = dataSourceJson
+                                    }
                                 }
-                                budgetList.push(bJson);
-                                budgetListAll.push({
-                                    name: bResult[k].label.label_en,
-                                    id: bResult[k].budgetId, fundingSource: bResult[k].fundingSource
-                                })
+                            }
 
-                            }
-                            this.setState({
-                                budgetList: budgetListAll
-                            })
-                            var suggestedShipmentList = this.state.filteredArraySuggestedShipments.filter(c => c.month == month);
-                            this.el = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), '');
-                            this.el.destroy();
-                            var data = [];
-                            var suggestedShipmentsArr = []
-                            for (var j = 0; j < suggestedShipmentList.length; j++) {
-                                data = [];
-                                data[0] = expectedDeliveryDate;
-                                data[1] = "SUGGESTED";
-                                data[2] = this.state.planningUnitName;
-                                data[3] = suggestedShipmentList[j].suggestedOrderQty;
-                                data[4] = suggestedShipmentList[j].suggestedOrderQty;
-                                data[5] = "";
-                                data[6] = "";
-                                data[7] = "";
-                                data[8] = "";
-                                suggestedShipmentsArr[j] = data;
-                            }
-                            var options = {
-                                data: suggestedShipmentsArr,
-                                colHeaders: [
-                                    "Expected delivery date",
-                                    "Shipment status",
-                                    "Planning unit",
-                                    "Suggested order qty",
-                                    "Adjusted order qty",
-                                    "Procurement agent",
-                                    "Funding source",
-                                    "Budget",
-                                    "Notes",
-                                ],
-                                colWidths: [80, 150, 200, 80, 80, 350, 80, 80, 80],
-                                columns: [
-                                    { type: 'text', readOnly: true },
-                                    { type: 'text', readOnly: true },
-                                    { type: 'text', readOnly: true },
-                                    { type: 'numeric', readOnly: true },
-                                    { type: 'numeric', readOnly: true },
-                                    { type: 'dropdown', source: procurementAgentList },
-                                    { type: 'dropdown', source: fundingSourceList },
-                                    { type: 'dropdown', source: budgetList, filter: this.dropdownFilter },
-                                    { type: 'text' },
-                                ],
-                                pagination: false,
-                                search: false,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                allowInsertRow: false,
-                                allowManualInsertRow: false,
-                                onchange: this.suggestedShipmentChanged,
-                            };
-                            myVar = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), options);
-                            this.el = myVar;
-                            this.setState({
-                                suggestedShipmentsEl: myVar
-                            })
+                            var bTransaction = db1.transaction(['budget'], 'readwrite');
+                            var bOs = bTransaction.objectStore('budget');
+                            var bRequest = bOs.getAll();
+                            var budgetListAll = []
+                            bRequest.onsuccess = function (event) {
+                                var bResult = [];
+                                bResult = bRequest.result;
+                                for (var k = 0; k < bResult.length; k++) {
+                                    var bJson = {
+                                        name: bResult[k].label.label_en,
+                                        id: bResult[k].budgetId
+                                    }
+                                    budgetList.push(bJson);
+                                    budgetListAll.push({
+                                        name: bResult[k].label.label_en,
+                                        id: bResult[k].budgetId, fundingSource: bResult[k].fundingSource
+                                    })
+
+                                }
+                                this.setState({
+                                    budgetList: budgetListAll
+                                })
+                                var suggestedShipmentList = this.state.suggestedShipmentsTotalData.filter(c => c.month == month);
+                                this.el = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), '');
+                                this.el.destroy();
+                                var data = [];
+                                var suggestedShipmentsArr = []
+                                var orderedDate = moment(Date.now()).format("YYYY-MM-DD");
+                                if (month > orderedDate) {
+                                    orderedDate = month;
+                                } else {
+                                    orderedDate = orderedDate;
+                                }
+                                for (var j = 0; j < suggestedShipmentList.length; j++) {
+                                    data = [];
+                                    data[0] = expectedDeliveryDate;
+                                    data[1] = "SUGGESTED";
+                                    data[2] = this.state.planningUnitName;
+                                    data[3] = suggestedShipmentList[j].suggestedOrderQty;
+                                    data[4] = suggestedShipmentList[j].suggestedOrderQty;
+                                    data[5] = "";
+                                    data[6] = "";
+                                    data[7] = "";
+                                    data[8] = "";
+                                    data[9] = "";
+                                    data[10] = orderedDate;
+                                    suggestedShipmentsArr[j] = data;
+                                }
+                                var options = {
+                                    data: suggestedShipmentsArr,
+                                    colHeaders: [
+                                        "Expected delivery date",
+                                        "Shipment status",
+                                        "Planning unit",
+                                        "Suggested order qty",
+                                        "Adjusted order qty",
+                                        "Data Source",
+                                        "Procurement agent",
+                                        "Funding source",
+                                        "Budget",
+                                        "Notes",
+                                        "Ordered Date"
+                                    ],
+                                    colWidths: [80, 150, 200, 80, 80, 150, 350, 80, 80, 80],
+                                    columns: [
+                                        { type: 'text', readOnly: true },
+                                        { type: 'text', readOnly: true },
+                                        { type: 'text', readOnly: true },
+                                        { type: 'numeric', readOnly: true },
+                                        { type: 'numeric', readOnly: true },
+                                        { type: 'dropdown', source: dataSourceList },
+                                        { type: 'dropdown', source: procurementAgentList },
+                                        { type: 'dropdown', source: fundingSourceList },
+                                        { type: 'dropdown', source: budgetList, filter: this.dropdownFilter },
+                                        { type: 'text' },
+                                        { type: 'hidden' }
+                                    ],
+                                    pagination: false,
+                                    search: false,
+                                    columnSorting: true,
+                                    tableOverflow: true,
+                                    wordWrap: true,
+                                    allowInsertColumn: false,
+                                    allowManualInsertColumn: false,
+                                    allowDeleteRow: false,
+                                    allowInsertRow: false,
+                                    allowManualInsertRow: false,
+                                    onchange: this.suggestedShipmentChanged,
+                                };
+                                myVar = jexcel(document.getElementById("suggestedShipmentsDetailsTable"), options);
+                                this.el = myVar;
+                                this.setState({
+                                    suggestedShipmentsEl: myVar
+                                })
+                            }.bind(this)
                         }.bind(this)
                     }.bind(this)
                 }.bind(this)
@@ -1215,6 +1331,18 @@ export default class SupplyPlanComponent extends React.Component {
 
         if (x == 7) {
             var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        if (x == 8) {
+            var col = ("I").concat(parseInt(y) + 1);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
@@ -1481,6 +1609,18 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setComments(col, "");
             }
 
+            var col = ("I").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(8, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
 
         }
         return valid;
@@ -1525,18 +1665,18 @@ export default class SupplyPlanComponent extends React.Component {
                         accountFlag: true,
                         active: true,
                         dataSource: {
-                            id: 0
+                            id: map.get("5")
                         },
                         erpFlag: false,
                         expectedDeliveryDate: map.get("0"),
                         freightCost: 0,
-                        notes: map.get("8"),
-                        orderedDate: new Date(),
+                        notes: map.get("9"),
+                        orderedDate: map.get("10"),
                         planningUnit: {
                             id: planningUnitId
                         },
                         procurementAgent: {
-                            id: map.get("5")
+                            id: map.get("6")
                         },
                         procurementUnit: {
                             id: 0
@@ -1580,17 +1720,91 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
 
+    handleEvent(e, toBeAccounted, startDate, endDate, type) {
+        e.preventDefault();
+        if (toBeAccounted == true) {
+            contextMenu.show({
+                id: 'menu_id',
+                event: e,
+                props: {
+                    type: type,
+                    startDate: startDate,
+                    endDate: endDate
+                }
+            });
+        } else {
+            contextMenu.show({
+                id: 'no_skip',
+                event: e,
+                props: {
+                    type: type,
+                    startDate: startDate,
+                    endDate: endDate
+                }
+            });
+        }
+    }
+
+    noSkipClicked(toBeAccounted) {
+        console.log(toBeAccounted);
+    }
+
+    onClick = ({ event, props }) => {
+        var db1;
+        var storeOS;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+
+            var programId = (document.getElementById("programId").value);
+
+            var programRequest = programTransaction.get(programId);
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                var shipmentDataList = (programJson.shipmentList);
+                for (var i = 0; i < shipmentDataList.length; i++) {
+                    if (props.type == 'psm' && shipmentDataList[i].orderedDate >= props.startDate && shipmentDataList[i].orderedDate <= props.endDate && shipmentDataList[i].erpFlag == false && shipmentDataList[i].procurementAgent.id == 1) {
+                        shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
+                    } else if (props.type == 'nonPsm' && shipmentDataList[i].orderedDate >= props.startDate && shipmentDataList[i].orderedDate <= props.endDate && shipmentDataList[i].procurementAgent.id != 1) {
+                        shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
+                    } else if (props.type == 'psm' && shipmentDataList[i].orderedDate >= props.startDate && shipmentDataList[i].orderedDate <= props.endDate && shipmentDataList[i].erpFlag == true) {
+                        shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
+                    }
+                }
+
+                programJson.shipmentList = shipmentDataList;
+                programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                var putRequest = programTransaction.put(programRequest.result);
+
+                putRequest.onerror = function (event) {
+                    // Handle errors!
+                };
+                putRequest.onsuccess = function (event) {
+                    this.setState({
+                        message: `Account flag changed`
+                    })
+                    this.formSubmit(this.state.monthCount);
+                }.bind(this)
+            }.bind(this)
+        }.bind(this)
+    }
+
     render() {
-        const MyMenu = () => (
+        const MyMenu = (props) => (
             <Menu id='menu_id'>
                 <Item disabled>Yes-Account</Item>
-                <Item>No-Skip</Item>
+                <Item onClick={this.onClick}>No-Skip</Item>
             </Menu>
         );
 
         const NoSkip = () => (
             <Menu id='no_skip'>
-                <Item>Yes-Account</Item>
+                <Item onClick={this.onClick}>Yes-Account</Item>
                 <Item disabled>No-Skip</Item>
             </Menu>
         );
@@ -1661,6 +1875,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                         id="planningUnitId"
                                                                         bsSize="sm"
                                                                         value={this.state.planningUnitId}
+                                                                        onChange={() => this.formSubmit(this.state.monthCount)}
                                                                     >
                                                                         <option value="0">Please Select</option>
                                                                         {planningUnits}
@@ -1676,13 +1891,14 @@ export default class SupplyPlanComponent extends React.Component {
                                                                         bsSize="sm"
                                                                         value={this.state.regionId}
                                                                         name="regionId" id="regionId"
+                                                                        onChange={() => this.formSubmit(this.state.monthCount)}
                                                                     >
                                                                         <option value="-1">All</option>
                                                                         {regions}
                                                                     </Input>
-                                                                    <InputGroupAddon addonType="append">
+                                                                    {/* <InputGroupAddon addonType="append">
                                                                         &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
-                                                                    </InputGroupAddon>
+                                                                    </InputGroupAddon> */}
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
@@ -1710,6 +1926,8 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <MyMenu props />
+                                        <NoSkip props />
                                         <tr>
                                             <td>Opening Balance</td>
                                             {
@@ -1738,6 +1956,45 @@ export default class SupplyPlanComponent extends React.Component {
                                                 })
                                             }
                                         </tr>
+                                        <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
+                                            <td>PSM Shipments in QAT</td>
+                                            {
+                                                this.state.psmShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}>{item1.qty}</td>)
+                                                    } else {
+                                                        return (<td>{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+
+                                        {/* <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
+                                            <td>PSM Shipments from ARTMIS</td>
+                                            {
+                                                this.state.artmisShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}>{item1.qty}</td>)
+                                                    } else {
+                                                        return (<td>{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+
+                                        <tr style={{ "backgroundColor": "rgb(207, 226, 243)" }}>
+                                            <td>Non PSM Shipment</td>
+                                            {
+                                                this.state.nonPsmShipmentsTotalData.map(item1 => {
+                                                    if (item1.toString() != "") {
+                                                        return (<td className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}>{item1.qty}</td>)
+                                                    } else {
+                                                        return (<td>{item1}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr> */}
+
                                         <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
                                             <td>Adjustments</td>
                                             {
@@ -1887,7 +2144,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         {
                                                             this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
                                                                 if (item1.adjustmentQty.toString() != '') {
-                                                                    return (<td className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.inventoryDate}`, `${item1.region.id}`, `${item1.month.month}`)}>{item1.adjustmentQty}</td>)
+                                                                    return (<td className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`)}>{item1.adjustmentQty}</td>)
                                                                 } else {
                                                                     return (<td></td>)
                                                                 }

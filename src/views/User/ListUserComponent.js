@@ -72,8 +72,9 @@ class ListUserComponent extends Component {
     }
     editUser(user) {
         this.props.history.push({
-            pathname: "/user/editUser",
-            state: { user }
+            pathname: `/user/editUser/${user.userId}`,
+            // pathname: `/language/editLanguage/${language.languageId}`,
+            // state: { user }
         });
     }
 
@@ -298,13 +299,14 @@ class ListUserComponent extends Component {
                                             name="realmId"
                                             id="realmId"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>
@@ -329,7 +331,7 @@ class ListUserComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                   // row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
+                                                    // row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
                                                     this.editUser(row);
                                                 }
                                             }}
