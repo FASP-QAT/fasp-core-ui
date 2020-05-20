@@ -685,7 +685,7 @@ this.fetchData();
 
                       </div> </div>}
                          </div>
-                         </div>
+                        
                          <div className="row">
                     <div className="col-md-12">
                       {this.state.show && this.state.matricsList.length > 0 &&
@@ -729,10 +729,9 @@ this.fetchData();
                  </Table>}
 
                    </div>
-                   </div>
-</div>
+                   </div></Col>
+
                  
-                  </div>
                   
                   </div>
               </div></CardBody>
