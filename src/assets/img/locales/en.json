@@ -664,10 +664,6 @@
     "static.report.errorperc": "Forecast Error Percentage",
     "static.common.selectPlanningUnit": "Please select planning unit",
     "static.common.selectProductCategory": "Please select product category",
-    "static.dashboard.globalconsumption":"Consumption (Global View)",
-    "static.report.forecasterrorovertime":"Forecast Error Over Time",
-    "static.report.month":"Month",
-    "static.report.errorperc":"Forecast Error Percentage",
     "static.dashboard.stockstatusovertime":"Stock Status Over time",
     "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
     "static.report.noofmonth":"Number Of Months"
