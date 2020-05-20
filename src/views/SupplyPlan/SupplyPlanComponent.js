@@ -1344,7 +1344,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             { type: 'dropdown', title: "Order based on", source: ["Pallets", "Containers", "MoQ", "Suggested order qty"] },
                                             { type: 'dropdown', title: "Rounding option", source: ["Round up", "Round down"] },
                                             { type: 'text', title: "User qty" },
-                                            
                                             { type: 'text', readOnly: true, title: "Adjusted order qty" },
                                             { type: 'text', readOnly: true, title: "Adjusted pallets" },
                                             { type: 'text', readOnly: true, title: "Adjusted containers" },
