@@ -615,43 +615,47 @@ label.arrow_label:after {
 //   right: 0;
 //   margin: auto;
 // }
-// .RemoveStriped .jexcel_content .jexcel .draggable {
-//   tr:nth-of-type(odd) {
-//     background-color: #fff !important;
-//   }
+// .order-1 :first-child {
+//  display: none;
 // }
 
-// .forInlinebtnMapping{ display: flex;}
-// .forInlinebtnMapping .btn-info {
-//   color: #fff !important;
-//   margin-left: 0.2rem;
-// }
-// .forInlinebtnMapping {
-//   display: flex;
-//   justify-content: center;
-// }
-// .forInlinebtnMappinglistRealm {
-//   display: flex;
-//   justify-content: center;
-//   width: 235px;
-// }
-// .updateTextwhitebtn .btn-info {
-//   color: #fff !important;
-// }
-// // .jexcel_filter div {
-// //   margin-left: auto;
-// // }
-// .f-End {
-//   padding-right: 18px !important;
-// }
+.RemoveStriped .jexcel_content .jexcel .draggable {
+  tr:nth-of-type(odd) {
+    background-color: #fff !important;
+  }
+}
 
-// .jexcel_content {
-//   overflow-y: auto !important;
-//   max-height: 440px;
-// }
-// .jexcel > tbody > tr > td.readonly {
-//   color: #212721 !important;
-// }
+.forInlinebtnMapping{ display: flex;}
+.forInlinebtnMapping .btn-info {
+  color: #fff !important;
+  margin-left: 0.2rem;
+}
+.forInlinebtnMapping {
+  display: flex;
+  justify-content: center;
+}
+.forInlinebtnMappinglistRealm {
+  display: flex;
+  justify-content: center;
+  width: 235px;
+}
+.updateTextwhitebtn .btn-info {
+  color: #fff !important;
+}
+.jexcel_filter div {
+  margin-left: auto;
+}
+.f-End {
+  padding-right: 18px !important;
+}
+
+.jexcel_content {
+  overflow-y: auto !important;
+  max-height: 440px;
+}
+.jexcel > tbody > tr > td.readonly {
+  color: #212721 !important;
+}
 
 .whitebtnColor .btn-info {
   color: #fff !important;

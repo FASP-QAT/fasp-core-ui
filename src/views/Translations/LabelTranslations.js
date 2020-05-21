@@ -144,10 +144,21 @@ export default class DatabaseTranslations extends React.Component {
         //  obj.pagination.appendChild(paginationUpdateContainer);
 
         var jexcel_pagination=document.getElementsByClassName('jexcel_pagination')[0];
-        console.log(jexcel_pagination,'in jexcelpagignation parent div');
+        jexcel_pagination.lastChild.classList.add('order-3');
+        console.log(obj.show,'....................in show');
+        jexcel_pagination.firstChild.classList.add('order-2');
+        jexcel_pagination.firstChild.classList.add('mr-auto');
        
-        var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter');
+        
+        var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[0];
+        var filter = jexcel_filterFirstdiv.firstChild;
+        filter.classList.add('order-1');
+        jexcel_pagination.appendChild(filter);
+
+        
        
+       
+
         // document.getElementById("clearBtnID").onclick= function(){alert("ok");}
     }
 
