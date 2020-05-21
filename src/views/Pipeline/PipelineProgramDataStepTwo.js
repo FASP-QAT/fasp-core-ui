@@ -97,7 +97,6 @@ export default class PipelineProgramDataStepTwo extends Component {
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getRealmCountryList(1)
             .then(response => {
-                console.log("response---->", response);
                 if (response.status == 200) {
                     this.setState({
                         realmCountryList: response.data
@@ -122,11 +121,13 @@ export default class PipelineProgramDataStepTwo extends Component {
 
         return (
             <>
+                {/* <h3 className="red">{this.props.items.validationFailedMessage}</h3> */}
                 <Formik
-                    initialValues={initialValuesTwo}
+                    enableReinitialize={true}
+                    initialValues={{ realmCountryId: this.props.items.program.realmCountry.realmCountryId }}
                     validate={validateTwo(validationSchemaTwo)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        this.props.finishedStepTwo && this.props.finishedStepTwo();
+                        this.props.endProgramInfoStepOne && this.props.endProgramInfoStepOne();
 
                     }}
                     render={
@@ -145,25 +146,26 @@ export default class PipelineProgramDataStepTwo extends Component {
                                     <FormGroup>
                                         <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.realmCountryId}
+                                            valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                             // onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
-                                            onChange={(e) => { handleChange(e) }}
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                             bsSize="sm"
                                             className="col-md-6"
                                             onBlur={handleBlur}
+                                            value={this.props.items.program.realmCountry.realmCountryId}
                                             type="select" name="realmCountryId" id="realmCountryId">
-                                            {/* <option value="">{i18n.t('static.common.select')}</option> */}
+                                            <option value="">{i18n.t('static.common.select')}</option>
                                             {realmCountries}
                                         </Input>
                                         <FormFeedback className="red">{errors.realmCountryId}</FormFeedback>
+                                        <span className="red">{this.props.items.validationFailedMessage}</span>
                                     </FormGroup>
 
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepTwo}>Next <i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllTwo(setTouched, errors)}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        {/* <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.props.endProgramInfoStepOne}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        &nbsp; */}
                                     </FormGroup>
                                 </Form>
                             )} />
