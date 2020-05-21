@@ -286,10 +286,11 @@ export default class StockStatusMatrix extends React.Component {
 
   getProductCategories() {
     let programId = document.getElementById("programId").value;
+    let realmId = AuthenticationService.getRealmId();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
-      ProductService.getProductCategoryListByProgram(programId)
+      ProductService.getProductCategoryListByProgram(realmId,programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -673,9 +674,9 @@ export default class StockStatusMatrix extends React.Component {
     let productCategoryList = productCategories.length > 0
       && productCategories.map((item, i) => {
         return (
-          <option key={i} value={item.productCategoryId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
+          <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
+          {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
+        </option>
         )
       }, this);
     const pickerLang = {

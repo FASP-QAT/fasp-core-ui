@@ -31,7 +31,7 @@ const validationSchema = function (values) {
         //     matches(/^([^0-9]*)$/, i18n.t('static.currency.numbernotallowedtext')),
         label: Yup.string()
             .required(i18n.t('static.currency.currencytext')),
-        conversionRate: Yup.number()
+        conversionRate: Yup.string()
             .required(i18n.t('static.currency.conversionrateNumber')).min(0, i18n.t('static.currency.conversionrateMin'))
     })
 }
