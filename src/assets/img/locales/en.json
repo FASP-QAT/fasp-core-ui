@@ -666,5 +666,15 @@
     "static.common.selectProductCategory": "Please select product category",
     "static.dashboard.stockstatusovertime":"Stock Status Over time",
     "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
-    "static.report.noofmonth":"Number Of Months"
+    "static.report.noofmonth":"Number Of Months",
+    "static.shipment.edd":"Expected Delivery Date",
+    "static.shipment.suggestedQty":"Suggested Quantity",
+    "static.shipment.qty":"Quantity",
+    "static.shipment.rate":"Rate",
+    "static.shipment.mode":"Shipping Mode",
+    "static.shipment.freightcost":"Freight Cost",
+    "static.shipment.ordereddate":"Orderd Date",
+    "static.shipment.shipdate":"Shipped Date",
+    "static.shipment.receiveddate":"Received Date"
+
 }
