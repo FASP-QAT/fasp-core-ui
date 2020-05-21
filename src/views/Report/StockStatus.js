@@ -509,10 +509,10 @@ class StockStatus extends Component {
                 
                     <Form >
                       <Col md="12 pl-0">
-                        <div className="d-md-flex">
-                          <FormGroup>
+                        <div className="row">
+                          <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">Select Period</Label>
-                            <div className="controls SelectGo edit">
+                            <div className="controls  edit">
 
                               <Picker
                                 ref="pickRange"
@@ -529,9 +529,9 @@ class StockStatus extends Component {
 
                           </FormGroup>
 
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                            <div className="controls SelectGo">
+                            <div className="controls ">
                               <InputGroup>
                                 <Input
                                   type="select"
@@ -549,9 +549,9 @@ class StockStatus extends Component {
                             </div>
                           </FormGroup>
                         
-                                    <FormGroup className="tab-ml-1">
+                                    <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
@@ -568,9 +568,9 @@ class StockStatus extends Component {
                                     </div>
                                 </FormGroup>
                          
-                          <FormGroup className="tab-ml-1">
+                          <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                            <div className="controls SelectGo">
+                            <div className="controls ">
                               <InputGroup>
                                 <Input
                                   type="select"
