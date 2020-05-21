@@ -768,8 +768,8 @@ const  backgroundColor= [
                     {
                         this.state.consumptions.countryData.length > 0
                         &&
-                    <div className="col-md-9">
-                    <div className="chart-wrapper chart-graph">
+                    <div className="col-md-12">
+                    <div className="chart-wrapper chart-graph-report">
                       <Bar  id="cool-canvas" data={bar} options={options} />
                     </div>
                     </div> }

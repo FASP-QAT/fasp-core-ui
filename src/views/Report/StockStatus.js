@@ -496,7 +496,7 @@ class StockStatus extends Component {
                   <a className="card-header-action">
                     <Pdf targetRef={ref} filename="StockStatus.pdf">
                       {({ toPdf }) =>
-                        <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => toPdf()} />
 
                       }
                     </Pdf>

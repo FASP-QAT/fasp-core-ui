@@ -534,7 +534,7 @@ this.fetchData();
             type: "line",
             label: i18n.t('static.report.forecasterrorovertime'),
             backgroundColor: 'transparent',
-            borderColor: 'rgba(179,181,158,1)',
+            borderColor: '#ffc107',
             lineTension:0,
             showActualPercentages: true,
             showInLegend: true,
@@ -673,8 +673,8 @@ this.fetchData();
                         this.state.matricsList.length > 0
                         &&
                         <div className="col-md-12">
-                          <div className="col-md-9">
-                        <div   className="chart-wrapper chart-graph">
+                          <div className="col-md-12">
+                        <div   className="chart-wrapper chart-graph-report">
                           <Bar id="cool-canvas" data={bar} options={options} />
                          </div>
                          </div>
