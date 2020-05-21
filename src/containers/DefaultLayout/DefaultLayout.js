@@ -437,10 +437,11 @@ class DefaultLayout extends Component {
                         url: '/program/programOnboarding',
                         icon: 'icon-graph'
                       },
-                      this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: 'Pipeline Program Import',
-                        url: '/pipeline/pipelineProgramImport',
+                        // url: '/pipeline/pipelineProgramImport',
+                        url: '/pipeline/pieplineProgramList',
                         icon: 'icon-graph'
                       }
 
