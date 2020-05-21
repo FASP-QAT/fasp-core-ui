@@ -366,6 +366,7 @@ export default class ConsumptionDetails extends React.Component {
                         }
                         if (consumptionDataArr.length == 0) {
                             data = [];
+                            data[6] = true;
                             data[7] = true;
                             consumptionDataArr[0] = data;
                         }
@@ -414,8 +415,8 @@ export default class ConsumptionDetails extends React.Component {
                                 },
                                 {
                                     title: i18n.t('static.consumption.actualflag'),
-                                    type: 'dropdown',
-                                    source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
+                                    type: 'checkbox',
+                                    // source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                 },
                                 {
                                     title: i18n.t('static.common.active'),
@@ -474,7 +475,7 @@ export default class ConsumptionDetails extends React.Component {
         data[3] = "";
         data[4] = "";
         data[5] = "";
-        data[6] = "";
+        data[6] = true;
         data[7] = true;
         data[8] = -1;
         this.el.insertRow(
