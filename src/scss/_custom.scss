@@ -615,13 +615,17 @@ label.arrow_label:after {
 //   right: 0;
 //   margin: auto;
 // }
+// .order-1 :first-child {
+//  display: none;
+// }
+
 .RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
     background-color: #fff !important;
   }
 }
 
-// .forInlinebtnMapping{ display: flex;}
+.forInlinebtnMapping{ display: flex;}
 .forInlinebtnMapping .btn-info {
   color: #fff !important;
   margin-left: 0.2rem;
@@ -638,8 +642,6 @@ label.arrow_label:after {
 .updateTextwhitebtn .btn-info {
   color: #fff !important;
 }
-// .select_sorting{position: absolute;bottom: 79px;}
-// .bottom_entries{margin-left: 4rem;}
 .jexcel_filter div {
   margin-left: auto;
 }
@@ -1317,6 +1319,16 @@ h5,
   white-space: pre-wrap !important;
 }
 
+.jexcel_clear_btn{color: #fff !important;
+  background-color: #20a8d8 !important;
+  border-color: #20a8d8 !important;
+  margin-left: 5px;
+  margin-top: 7px;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;}
 ///legend sync
 /* basic positioning */
 .legend {
