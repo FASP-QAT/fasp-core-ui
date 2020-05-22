@@ -92,131 +92,12 @@ export default class SupplyPlanComponent extends React.Component {
         this.saveSuggestedShipments = this.saveSuggestedShipments.bind(this);
         this.checkValidationSuggestedShipments = this.checkValidationSuggestedShipments.bind(this);
 
-        this.noSkipClicked = this.noSkipClicked.bind(this);
         this.plannedPsmChanged = this.plannedPsmChanged.bind(this);
         this.checkValidationForPlannedPsmShipments = this.checkValidationForPlannedPsmShipments.bind(this);
         this.savePlannedPsmShipments = this.savePlannedPsmShipments.bind(this);
         this.budgetChanged = this.budgetChanged.bind(this);
         this.checkBudgetValidation = this.checkBudgetValidation.bind(this);
         this.artmisShipmentsDetailsClicked = this.artmisShipmentsDetailsClicked.bind(this);
-    }
-
-    actionCanceled(supplyPlanType) {
-        this.setState({
-            message: i18n.t('static.message.cancelled')
-        })
-        this.toggleLarge(supplyPlanType);
-    }
-
-    toggleLarge(supplyPlanType, month, quantity, startDate, endDate) {
-        var supplyPlanType = supplyPlanType;
-        this.setState({
-            budgetError:""
-        })
-        if (supplyPlanType == 'Consumption') {
-            var monthCountConsumption = this.state.monthCount;
-            this.setState({
-                consumption: !this.state.consumption,
-                monthCountConsumption: monthCountConsumption,
-            });
-            this.formSubmit(monthCountConsumption);
-        } else if (supplyPlanType == 'SuggestedShipments') {
-            this.setState({
-                suggestedShipments: !this.state.suggestedShipments,
-            });
-            this.suggestedShipmentsDetailsClicked(month, quantity);
-            console.log("Month-------->", month);
-            console.log("Quantity----->", quantity);
-        } else if (supplyPlanType == 'psmShipments') {
-            this.setState({
-                psmShipments: !this.state.psmShipments
-            });
-            this.psmShipmentsDetailsClicked(startDate, endDate);
-        } else if (supplyPlanType == 'artmisShipments') {
-            this.setState({
-                artmisShipments: !this.state.artmisShipments,
-            });
-            this.artmisShipmentsDetailsClicked(startDate, endDate);
-        } else if (supplyPlanType == 'Adjustments') {
-            var monthCountAdjustments = this.state.monthCount;
-            this.setState({
-                adjustments: !this.state.adjustments,
-                monthCountAdjustments: monthCountAdjustments
-            });
-            this.formSubmit(monthCountAdjustments);
-        } else if (supplyPlanType == 'QAT Recommended Order Qty') {
-            this.setState({
-                QATRecommendedOrderQty: !this.state.QATRecommendedOrderQty,
-                qty: quantity
-            });
-        }
-
-    }
-
-    getMonthArray(currentDate) {
-        var month = [];
-        var curDate = currentDate.subtract(8, 'months');
-        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
-        for (var i = 0; i < 22; i++) {
-            var display = 1;
-            if (i < 2 || i >= 20) {
-                display = 0;
-            }
-            var curDate = currentDate.add(1, 'months');
-            month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: display })
-        }
-        this.setState({
-            monthsArray: month
-        })
-        return month;
-    }
-
-    leftClicked() {
-        var monthCount = (this.state.monthCount) - 1;
-        this.setState({
-            monthCount: monthCount
-        })
-        this.formSubmit(monthCount)
-    }
-
-    rightClicked() {
-        var monthCount = (this.state.monthCount) + 1;
-        this.setState({
-            monthCount: monthCount
-        })
-        this.formSubmit(monthCount)
-    }
-
-    leftClickedConsumption() {
-        var monthCountConsumption = (this.state.monthCountConsumption) - 1;
-        this.setState({
-            monthCountConsumption: monthCountConsumption
-        })
-        this.formSubmit(monthCountConsumption)
-    }
-
-    rightClickedConsumption() {
-        var monthCountConsumption = (this.state.monthCountConsumption) + 1;
-        this.setState({
-            monthCountConsumption: monthCountConsumption
-        })
-        this.formSubmit(monthCountConsumption);
-    }
-
-    leftClickedAdjustments() {
-        var monthCountAdjustments = (this.state.monthCountAdjustments) - 1;
-        this.setState({
-            monthCountAdjustments: monthCountAdjustments
-        })
-        this.formSubmit(monthCountAdjustments)
-    }
-
-    rightClickedAdjustments() {
-        var monthCountAdjustments = (this.state.monthCountAdjustments) + 1;
-        this.setState({
-            monthCountAdjustments: monthCountAdjustments
-        })
-        this.formSubmit(monthCountAdjustments);
     }
 
     componentDidMount() {
@@ -314,6 +195,23 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this)
     }
 
+    getMonthArray(currentDate) {
+        var month = [];
+        var curDate = currentDate.subtract(8, 'months');
+        month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: 0 })
+        for (var i = 0; i < 22; i++) {
+            var display = 1;
+            if (i < 2 || i >= 20) {
+                display = 0;
+            }
+            var curDate = currentDate.add(1, 'months');
+            month.push({ startDate: curDate.startOf('month').format('YYYY-MM-DD'), endDate: curDate.endOf('month').format('YYYY-MM-DD'), month: (curDate.format('MMM YY')), display: display })
+        }
+        this.setState({
+            monthsArray: month
+        })
+        return month;
+    }
 
     formSubmit(monthCount) {
         document.getElementById("supplyPlanTableId").style.display = 'block';
@@ -321,7 +219,7 @@ export default class SupplyPlanComponent extends React.Component {
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
 
         var programId = document.getElementById("programId").value;
-        var regionId = document.getElementById("regionId").value;
+        var regionId = -1;
         var planningUnitId = document.getElementById("planningUnitId").value;
 
         var planningUnit = document.getElementById("planningUnitId");
@@ -742,7 +640,109 @@ export default class SupplyPlanComponent extends React.Component {
 
     }
 
+    toggleLarge(supplyPlanType, month, quantity, startDate, endDate) {
+        var supplyPlanType = supplyPlanType;
+        this.setState({
+            budgetError: ""
+        })
+        if (supplyPlanType == 'Consumption') {
+            var monthCountConsumption = this.state.monthCount;
+            this.setState({
+                consumption: !this.state.consumption,
+                monthCountConsumption: monthCountConsumption,
+            });
+            this.formSubmit(monthCountConsumption);
+        } else if (supplyPlanType == 'SuggestedShipments') {
+            this.setState({
+                suggestedShipments: !this.state.suggestedShipments,
+            });
+            this.suggestedShipmentsDetailsClicked(month, quantity);
+            console.log("Month-------->", month);
+            console.log("Quantity----->", quantity);
+        } else if (supplyPlanType == 'psmShipments') {
+            this.setState({
+                psmShipments: !this.state.psmShipments
+            });
+            this.psmShipmentsDetailsClicked(startDate, endDate);
+        } else if (supplyPlanType == 'artmisShipments') {
+            this.setState({
+                artmisShipments: !this.state.artmisShipments,
+            });
+            this.artmisShipmentsDetailsClicked(startDate, endDate);
+        } else if (supplyPlanType == 'Adjustments') {
+            var monthCountAdjustments = this.state.monthCount;
+            this.setState({
+                adjustments: !this.state.adjustments,
+                monthCountAdjustments: monthCountAdjustments
+            });
+            this.formSubmit(monthCountAdjustments);
+        } else if (supplyPlanType == 'QAT Recommended Order Qty') {
+            this.setState({
+                QATRecommendedOrderQty: !this.state.QATRecommendedOrderQty,
+                qty: quantity
+            });
+        }
 
+    }
+
+    actionCanceled(supplyPlanType) {
+        this.setState({
+            message: i18n.t('static.message.cancelled')
+        })
+        this.toggleLarge(supplyPlanType);
+    }
+
+    leftClicked() {
+        var monthCount = (this.state.monthCount) - 1;
+        this.setState({
+            monthCount: monthCount
+        })
+        this.formSubmit(monthCount)
+    }
+
+    rightClicked() {
+        var monthCount = (this.state.monthCount) + 1;
+        this.setState({
+            monthCount: monthCount
+        })
+        this.formSubmit(monthCount)
+    }
+
+    leftClickedConsumption() {
+        var monthCountConsumption = (this.state.monthCountConsumption) - 1;
+        this.setState({
+            monthCountConsumption: monthCountConsumption
+        })
+        this.formSubmit(monthCountConsumption)
+    }
+
+    rightClickedConsumption() {
+        var monthCountConsumption = (this.state.monthCountConsumption) + 1;
+        this.setState({
+            monthCountConsumption: monthCountConsumption
+        })
+        this.formSubmit(monthCountConsumption);
+    }
+
+    leftClickedAdjustments() {
+        var monthCountAdjustments = (this.state.monthCountAdjustments) - 1;
+        this.setState({
+            monthCountAdjustments: monthCountAdjustments
+        })
+        this.formSubmit(monthCountAdjustments)
+    }
+
+    rightClickedAdjustments() {
+        var monthCountAdjustments = (this.state.monthCountAdjustments) + 1;
+        this.setState({
+            monthCountAdjustments: monthCountAdjustments
+        })
+        this.formSubmit(monthCountAdjustments);
+    }
+
+    // Consumption Functionality
+
+    // Show consumption details
     consumptionDetailsClicked(startDate, endDate, region, actualFlag, month) {
         if (this.state.consumptionChangedFlag == 0) {
             var planningUnitId = document.getElementById("planningUnitId").value;
@@ -849,6 +849,172 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
 
+    // Consumption changed
+    consumptionChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.consumptionEl;
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+        }
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+        }
+        this.setState({
+            consumptionChangedFlag: 1
+        })
+    }
+
+    // consumption final validations
+    checkValidationConsumption() {
+        var valid = true;
+        var elInstance = this.state.consumptionEl;
+        var json = elInstance.getJson();
+        for (var y = 0; y < json.length; y++) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(2, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(3, y);
+            if (value === "" || isNaN(Number.parseInt(value))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                valid = false;
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setComments(col, "in valid number.");
+                } else {
+                    elInstance.setComments(col, "This field is required.");
+                }
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(4, y);
+            if (value === "" || isNaN(Number.parseInt(value))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                valid = false;
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setComments(col, "in valid number.");
+                } else {
+                    elInstance.setComments(col, "This field is required.");
+                }
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        return valid;
+
+    }
+
+    // Save consumption
+    saveConsumption() {
+        var validation = this.checkValidationConsumption();
+        if (validation == true) {
+            var elInstance = this.state.consumptionEl;
+            var json = elInstance.getJson();
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var consumptionDataList = (programJson.consumptionList);
+                    for (var i = 0; i < json.length; i++) {
+                        var map = new Map(Object.entries(json[i]));
+                        consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
+                        consumptionDataList[parseInt(map.get("6"))].consumptionQty = map.get("3");
+                        consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = parseInt(map.get("4"));
+                        consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
+                    }
+                    programJson.consumptionList = consumptionDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        this.toggleLarge('Consumption');
+                        this.setState({
+                            message: `Consumption Data Saved`,
+                            consumptionChangedFlag: 0
+                        })
+                        this.formSubmit(this.state.monthCount);
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        } else {
+            alert("Validation failed");
+        }
+    }
+
+
+    // Consumption Functionality
+
+    // Adjustments Functionality
+    // Show adjustments details
     adjustmentsDetailsClicked(region, month) {
         if (this.state.inventoryChangedFlag == 0) {
             var planningUnitId = document.getElementById("planningUnitId").value;
@@ -998,6 +1164,192 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
 
+    // Adjustments changed
+    inventoryChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.inventoryEl;
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        if (x == 7) {
+            var col = ("H").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(parseInt(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+        }
+
+        if (x == 9) {
+            if (elInstance.getValueFromCoords(9, y) != "") {
+                if (isNaN(parseInt(value))) {
+                    var col = ("J").concat(parseInt(y) + 1);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, "In valid number.");
+                } else {
+                    var col = ("J").concat(parseInt(y) + 1);
+                    var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
+                    elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            } else {
+                var col = ("J").concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        if (x == 5) {
+            if (elInstance.getValueFromCoords(9, y) != "") {
+                var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
+                elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
+            }
+        }
+
+        this.setState({
+            inventoryChangedFlag: 1
+        })
+    }
+
+    // Adjustments edit
+    inventoryOnedit = function (instance, cell, x, y, value) {
+        var elInstance = this.state.inventoryEl;
+        if (x == 7) {
+            elInstance.setValueFromCoords(9, y, "", true);
+        }
+    }.bind(this);
+
+    // Adjustments final validation
+    checkValidationInventory() {
+        var valid = true;
+        var elInstance = this.state.inventoryEl;
+        var json = elInstance.getJson();
+        for (var y = 0; y < json.length; y++) {
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(2, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("H").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(7, y);
+            if (value === "" || isNaN(Number.parseInt(value))) {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                valid = false;
+                if (isNaN(Number.parseInt(value))) {
+                    elInstance.setComments(col, "in valid number.");
+                } else {
+                    elInstance.setComments(col, "This field is required.");
+                }
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        return valid;
+    }
+
+    // Save adjustments
+    saveInventory() {
+        var validation = this.checkValidationInventory();
+        if (validation == true) {
+            var elInstance = this.state.inventoryEl;
+            var json = elInstance.getJson();
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var inventoryDataList = (programJson.inventoryList);
+                    for (var i = 0; i < json.length; i++) {
+                        var map = new Map(Object.entries(json[i]));
+                        inventoryDataList[parseInt(map.get("12"))].dataSource.id = map.get("2");
+                        inventoryDataList[parseInt(map.get("12"))].expectedBal = parseInt(map.get("5"));
+                        inventoryDataList[parseInt(map.get("12"))].adjustmentQty = parseInt(map.get("7"));
+                        inventoryDataList[parseInt(map.get("12"))].actualQty = parseInt(map.get("9"));
+                        inventoryDataList[parseInt(map.get("12"))].notes = parseInt(map.get("11"));
+
+
+                        var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
+                        for (var j = 0; j < inventoryDataListFiltered.length; j++) {
+                            var inventoryId = inventoryDataListFiltered[j].inventoryId;
+                            var index;
+                            if (inventoryId != 0) {
+                                index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
+                            } else {
+                                index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
+                            }
+                            if (j == 0) {
+                                inventoryDataList[index].expectedBal = 0
+                            } else {
+                                inventoryDataList[index].expectedBal = parseInt(inventoryDataListFiltered[j - 1].expectedBal) + parseInt(inventoryDataListFiltered[j - 1].adjustmentQty);
+                            }
+
+                        }
+                    }
+                    programJson.inventoryList = inventoryDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        this.toggleLarge('Adjustments');
+                        this.setState({
+                            message: `Inventory Data Saved`,
+                            inventoryChangedFlag: 0
+                        })
+                        this.formSubmit(this.state.monthCount);
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        } else {
+            alert("Validation failed");
+        }
+    }
+
+    // Adjustments Functionality
+
+    // Shipments functionality
+    // Suggested shipments
+
+    //Show Suggested shipments details
     suggestedShipmentsDetailsClicked(month, quantity) {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -1136,6 +1488,161 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this)
     }
 
+    // Suggested shipment changed 
+    suggestedShipmentChanged = function (instance, cell, x, y, value) {
+        var elInstance = this.state.suggestedShipmentsEl;
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        if (x == 6) {
+            var col = ("G").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        this.setState({
+            suggestedShipmentChangedFlag: 1
+        });
+    }
+
+    // Suggested shipments final validations
+    checkValidationSuggestedShipments() {
+        var valid = true;
+        var elInstance = this.state.suggestedShipmentsEl;
+        var json = elInstance.getJson();
+        for (var y = 0; y < json.length; y++) {
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(5, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("G").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(6, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        return valid;
+
+    }
+
+    // Save suggested shipments
+    saveSuggestedShipments() {
+        var validation = this.checkValidationSuggestedShipments();
+        if (validation == true) {
+            var elInstance = this.state.suggestedShipmentsEl;
+            var json = elInstance.getJson();
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            var db1;
+            var storeOS;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+
+                var programId = (document.getElementById("programId").value);
+
+                var programRequest = programTransaction.get(programId);
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+                    var shipmentDataList = (programJson.shipmentList);
+                    console.log("Shipment data list", shipmentDataList);
+                    var map = new Map(Object.entries(json[0]));
+                    var shipmentJson = {
+                        accountFlag: true,
+                        active: true,
+                        dataSource: {
+                            id: map.get("5")
+                        },
+                        erpFlag: false,
+                        expectedDeliveryDate: map.get("9"),
+                        freightCost: 0,
+                        notes: map.get("7"),
+                        orderedDate: map.get("8"),
+                        planningUnit: {
+                            id: planningUnitId
+                        },
+                        procurementAgent: {
+                            id: map.get("6")
+                        },
+                        procurementUnit: {
+                            id: 0
+                        },
+                        productCost: 0,
+                        quantity: map.get("3"),
+                        rate: 0,
+                        receivedDate: "",
+                        shipmentId: 0,
+                        shipmentMode: "",
+                        shipmentStatus: {
+                            id: 1
+                        },
+                        shippedDate: "",
+                        suggestedQty: map.get("3"),
+                        supplier: {
+                            id: 0
+                        },
+                        shipmentBudgetList: []
+                    }
+
+                    shipmentDataList.push(shipmentJson);
+                    programJson.shipmentList = shipmentDataList;
+                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                    var putRequest = programTransaction.put(programRequest.result);
+
+                    putRequest.onerror = function (event) {
+                        // Handle errors!
+                    };
+                    putRequest.onsuccess = function (event) {
+                        this.toggleLarge('SuggestedShipments');
+                        this.setState({
+                            message: `Suggested shipments Data Saved`,
+                            suggestedShipmentChangedFlag: 0
+                        })
+                        this.formSubmit(this.state.monthCount);
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        } else {
+            alert("Validation failed");
+        }
+    }
+
+    // Suggested shipments
+
+    // Artmis shipments
     artmisShipmentsDetailsClicked(startDate, endDate) {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -1634,6 +2141,9 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+    // Artmis shipments
+
+    // Psm shipments
 
     psmShipmentsDetailsClicked(startDate, endDate) {
         var planningUnitId = document.getElementById("planningUnitId").value;
@@ -2409,7 +2919,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     // submitted shipments
                                     this.setState({
                                         plannedPsmShipmentsEl: myVar,
-                                        shipmentBudgetTableEl: elVar
+                                        shipmentBudgetTableEl: elVar,
+                                        plannedPsmChangedFlag: 0,
+                                        budgetChangedFlag: 0
                                     })
                                 }.bind(this)
                             }.bind(this)
@@ -2420,217 +2932,7 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this)
     }
 
-    consumptionChanged = function (instance, cell, x, y, value) {
-        var elInstance = this.state.consumptionEl;
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 3) {
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(Number.parseInt(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, "In valid number.");
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(Number.parseInt(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, "In valid number.");
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-        this.setState({
-            consumptionChangedFlag: 1
-        })
-
-    }
-
-    inventoryChanged = function (instance, cell, x, y, value) {
-        var elInstance = this.state.inventoryEl;
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(parseInt(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, "In valid number.");
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-        }
-
-        if (x == 9) {
-            if (elInstance.getValueFromCoords(9, y) != "") {
-                if (isNaN(parseInt(value))) {
-                    var col = ("J").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, "In valid number.");
-                } else {
-                    var col = ("J").concat(parseInt(y) + 1);
-                    var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
-                    elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            } else {
-                var col = ("J").concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 5) {
-            if (elInstance.getValueFromCoords(9, y) != "") {
-                var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
-                elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
-            }
-        }
-
-        this.setState({
-            inventoryChangedFlag: 1
-        })
-    }
-
-    inventoryOnedit = function (instance, cell, x, y, value) {
-        var elInstance = this.state.inventoryEl;
-        if (x == 7) {
-            elInstance.setValueFromCoords(9, y, "", true);
-        }
-    }.bind(this);
-
-    suggestedShipmentChanged = function (instance, cell, x, y, value) {
-        var elInstance = this.state.suggestedShipmentsEl;
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-
-        if (x == 6) {
-            var col = ("G").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-
-        this.setState({
-            suggestedShipmentChangedFlag: 1
-        });
-    }
-
-    budgetChanged = function (instance, cell, x, y, value) {
-        this.setState({
-            budgetChangedFlag: 1
-        })
-        var elInstance = instance.jexcel;
-        if (x == 1) {
-            var col = ("B").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-
-        if (x == 3) {
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-    }
-
+    // Psm shipment changed
     plannedPsmChanged = function (instance, cell, x, y, value) {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var elInstance = this.state.plannedPsmShipmentsEl;
@@ -2754,34 +3056,49 @@ export default class SupplyPlanComponent extends React.Component {
         });
     }
 
-    checkValidationConsumption() {
+    //  Final validations for psm shipments
+    checkValidationForPlannedPsmShipments() {
         var valid = true;
-        var elInstance = this.state.consumptionEl;
+        var elInstance = this.state.plannedPsmShipmentsEl;
         var json = elInstance.getJson();
         for (var y = 0; y < json.length; y++) {
-            var col = ("C").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(2, y);
+            var col = ("A").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(0, y);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, "This field is required.");
+            } else {
+                if (isNaN(Date.parse(value))) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invaliddate'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+            }
+
+
+            var col = ("U").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(20, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
             }
 
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(3, y);
-            if (value === "" || isNaN(Number.parseInt(value))) {
+            var col = ("F").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(5, y);
+            if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
-                if (isNaN(Number.parseInt(value))) {
-                    elInstance.setComments(col, "in valid number.");
-                } else {
-                    elInstance.setComments(col, "This field is required.");
-                }
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
@@ -2789,219 +3106,41 @@ export default class SupplyPlanComponent extends React.Component {
 
             var col = ("E").concat(parseInt(y) + 1);
             var value = elInstance.getValueFromCoords(4, y);
-            if (value === "" || isNaN(Number.parseInt(value))) {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                valid = false;
-                if (isNaN(Number.parseInt(value))) {
-                    elInstance.setComments(col, "in valid number.");
-                } else {
-                    elInstance.setComments(col, "This field is required.");
-                }
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        return valid;
-
-    }
-
-    saveConsumption() {
-        var validation = this.checkValidationConsumption();
-        if (validation == true) {
-            var elInstance = this.state.consumptionEl;
-            var json = elInstance.getJson();
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var consumptionDataList = (programJson.consumptionList);
-                    for (var i = 0; i < json.length; i++) {
-                        var map = new Map(Object.entries(json[i]));
-                        consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
-                        consumptionDataList[parseInt(map.get("6"))].consumptionQty = map.get("3");
-                        consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = parseInt(map.get("4"));
-                        consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
-                    }
-                    programJson.consumptionList = consumptionDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge('Consumption');
-                        this.setState({
-                            message: `Consumption Data Saved`,
-                            consumptionChangedFlag: 0
-                        })
-                        this.formSubmit(this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        } else {
-            alert("Validation failed");
-        }
-    }
-
-    checkValidationInventory() {
-        var valid = true;
-        var elInstance = this.state.inventoryEl;
-        var json = elInstance.getJson();
-        for (var y = 0; y < json.length; y++) {
-            var col = ("C").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(2, y);
             if (value == "") {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false;
             } else {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setComments(col, "");
             }
 
-            var col = ("H").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(7, y);
-            if (value === "" || isNaN(Number.parseInt(value))) {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
+            var budgetAmount = (elInstance.getValueFromCoords(29, y));
+            budgetAmount = parseFloat(budgetAmount).toFixed(2);
+            var totalAmount = (elInstance.getCell(`X${y}`)).innerHTML;
+            console.log("BudgetAmount", budgetAmount);
+            console.log("Total AMount", totalAmount);
+            if (budgetAmount != totalAmount) {
+                this.setState({
+                    budgetError: "Budget amount does not match required amount."
+                })
                 valid = false;
-                if (isNaN(Number.parseInt(value))) {
-                    elInstance.setComments(col, "in valid number.");
-                } else {
-                    elInstance.setComments(col, "This field is required.");
-                }
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
             }
         }
         return valid;
     }
 
-    saveInventory() {
-        var validation = this.checkValidationInventory();
+    // Save psm shipments
+    savePlannedPsmShipments() {
+        var validation = this.checkValidationForPlannedPsmShipments();
         if (validation == true) {
-            var elInstance = this.state.inventoryEl;
+            this.setState({
+                budgetError: ""
+            })
+            var elInstance = this.state.plannedPsmShipmentsEl;
             var json = elInstance.getJson();
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var inventoryDataList = (programJson.inventoryList);
-                    for (var i = 0; i < json.length; i++) {
-                        var map = new Map(Object.entries(json[i]));
-                        inventoryDataList[parseInt(map.get("12"))].dataSource.id = map.get("2");
-                        inventoryDataList[parseInt(map.get("12"))].expectedBal = parseInt(map.get("5"));
-                        inventoryDataList[parseInt(map.get("12"))].adjustmentQty = parseInt(map.get("7"));
-                        inventoryDataList[parseInt(map.get("12"))].actualQty = parseInt(map.get("9"));
-                        inventoryDataList[parseInt(map.get("12"))].notes = parseInt(map.get("11"));
-
-
-                        var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
-                        for (var j = 0; j < inventoryDataListFiltered.length; j++) {
-                            var inventoryId = inventoryDataListFiltered[j].inventoryId;
-                            var index;
-                            if (inventoryId != 0) {
-                                index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
-                            } else {
-                                index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
-                            }
-                            if (j == 0) {
-                                inventoryDataList[index].expectedBal = 0
-                            } else {
-                                inventoryDataList[index].expectedBal = parseInt(inventoryDataListFiltered[j - 1].expectedBal) + parseInt(inventoryDataListFiltered[j - 1].adjustmentQty);
-                            }
-
-                        }
-                    }
-                    programJson.inventoryList = inventoryDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge('Adjustments');
-                        this.setState({
-                            message: `Inventory Data Saved`,
-                            inventoryChangedFlag: 0
-                        })
-                        this.formSubmit(this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        } else {
-            alert("Validation failed");
-        }
-    }
-
-    checkValidationSuggestedShipments() {
-        var valid = true;
-        var elInstance = this.state.suggestedShipmentsEl;
-        var json = elInstance.getJson();
-        for (var y = 0; y < json.length; y++) {
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(5, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-            var col = ("G").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(6, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        return valid;
-
-    }
-
-    saveSuggestedShipments() {
-        var validation = this.checkValidationSuggestedShipments();
-        if (validation == true) {
-            var elInstance = this.state.suggestedShipmentsEl;
-            var json = elInstance.getJson();
+            console.log("Json", json);
             var planningUnitId = document.getElementById("planningUnitId").value;
             var db1;
             var storeOS;
@@ -3020,46 +3159,34 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
-                    console.log("Shipment data list", shipmentDataList);
-                    var map = new Map(Object.entries(json[0]));
-                    var shipmentJson = {
-                        accountFlag: true,
-                        active: true,
-                        dataSource: {
-                            id: map.get("5")
-                        },
-                        erpFlag: false,
-                        expectedDeliveryDate: map.get("9"),
-                        freightCost: 0,
-                        notes: map.get("7"),
-                        orderedDate: map.get("8"),
-                        planningUnit: {
-                            id: planningUnitId
-                        },
-                        procurementAgent: {
-                            id: map.get("6")
-                        },
-                        procurementUnit: {
-                            id: 0
-                        },
-                        productCost: 0,
-                        quantity: map.get("3"),
-                        rate: 0,
-                        receivedDate: "",
-                        shipmentId: 0,
-                        shipmentMode: "",
-                        shipmentStatus: {
-                            id: 1
-                        },
-                        shippedDate: "",
-                        suggestedQty: map.get("3"),
-                        supplier: {
-                            id: 0
-                        },
-                        shipmentBudgetList: []
-                    }
+                    console.log("Json", json);
 
-                    shipmentDataList.push(shipmentJson);
+                    for (var j = 0; j < json.length; j++) {
+                        console.log(json[j]);
+                        var map = new Map(Object.entries(json[j]));
+                        var shipmentStatusId = 1;
+                        if (map.get("2").length != 0 && map.get("3").length != 0) {
+                            shipmentStatusId = 3;
+                        }
+                        var quantity = (elInstance.getCell(`O${j}`)).innerHTML;
+                        var productCost = (elInstance.getCell(`T${j}`)).innerHTML;
+                        var rate = (elInstance.getCell(`S${j}`)).innerHTML;
+                        var freightCost = (elInstance.getCell(`W${j}`)).innerHTML;
+                        shipmentDataList[parseInt(map.get("31"))].shipmentStatus.id = shipmentStatusId;
+                        shipmentDataList[parseInt(map.get("31"))].expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
+                        shipmentDataList[parseInt(map.get("31"))].orderNo = map.get("2");
+                        shipmentDataList[parseInt(map.get("31"))].primeLineNo = map.get("3");
+                        shipmentDataList[parseInt(map.get("31"))].dataSource.id = map.get("4");
+                        shipmentDataList[parseInt(map.get("31"))].procurementAgent.id = map.get("5");
+                        shipmentDataList[parseInt(map.get("31"))].primeLineNo = map.get("3");
+                        shipmentDataList[parseInt(map.get("31"))].quantity = quantity;
+                        shipmentDataList[parseInt(map.get("31"))].rate = rate;
+                        shipmentDataList[parseInt(map.get("31"))].productCost = productCost;
+                        shipmentDataList[parseInt(map.get("31"))].shipmentMode = map.get("20");
+                        shipmentDataList[parseInt(map.get("31"))].freightCost = freightCost;
+                        shipmentDataList[parseInt(map.get("31"))].notes = map.get("24");
+                        shipmentDataList[parseInt(map.get("31"))].shipmentBudgetList = map.get("30");
+                    }
                     programJson.shipmentList = shipmentDataList;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
@@ -3068,10 +3195,10 @@ export default class SupplyPlanComponent extends React.Component {
                         // Handle errors!
                     };
                     putRequest.onsuccess = function (event) {
-                        this.toggleLarge('SuggestedShipments');
+                        this.toggleLarge('psmShipments');
                         this.setState({
-                            message: `Suggested shipments Data Saved`,
-                            suggestedShipmentChangedFlag: 0
+                            message: `PSM shipments Data Saved`,
+                            plannedPsmChangedFlag: 0
                         })
                         this.formSubmit(this.state.monthCount);
                     }.bind(this)
@@ -3081,7 +3208,168 @@ export default class SupplyPlanComponent extends React.Component {
             alert("Validation failed");
         }
     }
+    // Psm shipments
 
+    // Shipment budget
+    // Budget changed
+    budgetChanged = function (instance, cell, x, y, value) {
+        this.setState({
+            budgetChangedFlag: 1
+        })
+        var elInstance = instance.jexcel;
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        if (x == 2) {
+            var col = ("C").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+        }
+
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+        }
+    }
+
+    // Final validations for Budget
+    checkBudgetValidation() {
+        var valid = true;
+        var elInstance = this.state.shipmentBudgetTableEl;
+        var json = elInstance.getJson();
+        for (var y = 0; y < json.length; y++) {
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(1, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+            var col = ("C").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(2, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+
+            var col = ("D").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(3, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+
+        }
+        return valid;
+    }
+
+    // Budget Save
+    saveBudget() {
+        var validation = this.checkBudgetValidation()
+        if (validation == true) {
+            var elInstance = this.state.shipmentBudgetTableEl;
+            console.log(elInstance);
+            var json = elInstance.getJson();
+            var budgetArray = [];
+            var rowNumber = 0;
+            var totalBudget = 0;
+            for (var i = 0; i < json.length; i++) {
+                var map = new Map(Object.entries(json[i]));
+                var budgetJson = {
+                    shipmentBudgetId: map.get("0"),
+                    budget: {
+                        budgetId: map.get("1")
+                    },
+                    active: true,
+                    budgetAmt: map.get('2'),
+                    conversionRateToUsd: map.get("3"),
+                }
+                budgetArray.push(budgetJson);
+                totalBudget += map.get('2') * map.get("3");
+                if (i == 0) {
+                    rowNumber = map.get("4");
+                }
+            }
+            var shipmentInstance = this.state.plannedPsmShipmentsEl;
+            shipmentInstance.setValueFromCoords(29, rowNumber, totalBudget, true)
+            shipmentInstance.setValueFromCoords(30, rowNumber, budgetArray, true)
+            this.setState({
+                plannedPsmChangedFlag: 1,
+                budgetChangedFlag: 0
+            })
+            document.getElementById("showButtonsDiv").style.display = 'none';
+            elInstance.destroy();
+        } else {
+            alert("Validation failed");
+        }
+    }
+
+    // To be accounted funtionality for shipments
     handleEvent(e, toBeAccounted, startDate, endDate, type) {
         e.preventDefault();
         if (toBeAccounted == true) {
@@ -3107,10 +3395,7 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
 
-    noSkipClicked(toBeAccounted) {
-        console.log(toBeAccounted);
-    }
-
+    // On click of context menu
     onClick = ({ event, props }) => {
         var db1;
         var storeOS;
@@ -3155,6 +3440,9 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
+
+    // Shipments Functionality
+
 
     render() {
         const MyMenu = (props) => (
@@ -3250,7 +3538,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
+                                                        {/* <FormGroup className="tab-ml-1">
                                                             <Label htmlFor="appendedInputButton">Region</Label>
                                                             <div className="controls SelectGo">
                                                                 <InputGroup>
@@ -3266,9 +3554,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     {/* <InputGroupAddon addonType="append">
                                                                         &nbsp;<Button color="secondary Gobtn btn-sm" onClick={() => this.formSubmit(this.state.monthCount)}>{i18n.t('static.common.go')}</Button>
                                                                     </InputGroupAddon> */}
-                                                                </InputGroup>
+                                                                {/* </InputGroup>
                                                             </div>
-                                                        </FormGroup>
+                                                        </FormGroup> */} 
                                                     </div>
                                                 </Col>
                                             </Form>
@@ -3425,6 +3713,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     </tbody>
                                 </Table>
                             </div>
+
+                            {/* Consumption modal */}
                             <Modal isOpen={this.state.consumption} toggle={() => this.toggleLarge('Consumption')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
                                 <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
@@ -3495,7 +3785,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
-
+                            {/* Consumption modal */}
+                            {/* Adjustments modal */}
                             <Modal isOpen={this.state.adjustments} toggle={() => this.toggleLarge('Adjustments')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
                                 <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">Adjustments Details</ModalHeader>
@@ -3554,6 +3845,9 @@ export default class SupplyPlanComponent extends React.Component {
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
+                            {/* adjustments modal */}
+
+                            {/* Suggested shipments modal */}
                             <Modal isOpen={this.state.suggestedShipments} toggle={() => this.toggleLarge('SuggestedShipments')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
                                 <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
@@ -3598,7 +3892,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('psmShipments')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
-
+                            {/* Suggested shipments modal */}
+                            {/* artmis shipments modal */}
                             <Modal isOpen={this.state.artmisShipments} toggle={() => this.toggleLarge('artmisShipments')}
                                 className={'modal-lg ' + this.props.className, "modalWidth"}>
                                 <ModalHeader toggle={() => this.toggleLarge('artmisShipments')} className="modalHeaderSupplyPlan">
@@ -3621,266 +3916,11 @@ export default class SupplyPlanComponent extends React.Component {
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('artmisShipments')}> <i className="fa fa-times"></i> Cancel</Button>
                                 </ModalFooter>
                             </Modal>
+                            {/* artmis shipments modal */}
                         </CardBody>
                     </Card>
                 </Col>
             </div>
         )
-    }
-
-    cancelClicked() {
-        // this.props.history.push(`/dashboard/${i18n.t('static.actionCancelled')}`)
-    }
-
-    saveBudget() {
-        var validation = this.checkBudgetValidation()
-        if (validation == true) {
-            var elInstance = this.state.shipmentBudgetTableEl;
-            console.log(elInstance);
-            var json = elInstance.getJson();
-            var budgetArray = [];
-            var rowNumber = 0;
-            var totalBudget = 0;
-            for (var i = 0; i < json.length; i++) {
-                var map = new Map(Object.entries(json[i]));
-                var budgetJson = {
-                    shipmentBudgetId: map.get("0"),
-                    budget: {
-                        budgetId: map.get("1")
-                    },
-                    active: true,
-                    budgetAmt: map.get('2'),
-                    conversionRateToUsd: map.get("3"),
-                }
-                budgetArray.push(budgetJson);
-                totalBudget += map.get('2') * map.get("3");
-                if (i == 0) {
-                    rowNumber = map.get("4");
-                }
-            }
-            var shipmentInstance = this.state.plannedPsmShipmentsEl;
-            shipmentInstance.setValueFromCoords(29, rowNumber, totalBudget, true)
-            shipmentInstance.setValueFromCoords(30, rowNumber, budgetArray, true)
-            this.setState({
-                plannedPsmChangedFlag: 1,
-                budgetChangedFlag: 0
-            })
-            document.getElementById("showButtonsDiv").style.display = 'none';
-            elInstance.destroy();
-        } else {
-            alert("Validation failed");
-        }
-    }
-
-
-    checkValidationForPlannedPsmShipments() {
-        var valid = true;
-        var elInstance = this.state.plannedPsmShipmentsEl;
-        var json = elInstance.getJson();
-        for (var y = 0; y < json.length; y++) {
-            var col = ("A").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(0, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, "This field is required.");
-            } else {
-                if (isNaN(Date.parse(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-
-
-            var col = ("U").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(20, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-            var col = ("F").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(5, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-            var col = ("E").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(4, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-
-            var budgetAmount = (elInstance.getValueFromCoords(29, y));
-            budgetAmount = parseFloat(budgetAmount).toFixed(2);
-            var totalAmount = (elInstance.getCell(`X${y}`)).innerHTML;
-            console.log("BudgetAmount", budgetAmount);
-            console.log("Total AMount", totalAmount);
-            if (budgetAmount != totalAmount) {
-                this.setState({
-                    budgetError: "Budget amount does not match required amount."
-                })
-                valid = false;
-            }
-        }
-        return valid;
-    }
-
-    savePlannedPsmShipments() {
-        var validation = this.checkValidationForPlannedPsmShipments();
-        if (validation == true) {
-            this.setState({
-                budgetError: ""
-            })
-            var elInstance = this.state.plannedPsmShipmentsEl;
-            var json = elInstance.getJson();
-            console.log("Json", json);
-            var planningUnitId = document.getElementById("planningUnitId").value;
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var shipmentDataList = (programJson.shipmentList);
-                    console.log("Json", json);
-
-                    for (var j = 0; j < json.length; j++) {
-                        console.log(json[j]);
-                        var map = new Map(Object.entries(json[j]));
-                        var shipmentStatusId = 1;
-                        if (map.get("2").length != 0 && map.get("3").length != 0) {
-                            shipmentStatusId = 3;
-                        }
-                        var quantity = (elInstance.getCell(`O${j}`)).innerHTML;
-                        var productCost = (elInstance.getCell(`T${j}`)).innerHTML;
-                        var rate = (elInstance.getCell(`S${j}`)).innerHTML;
-                        var freightCost = (elInstance.getCell(`W${j}`)).innerHTML;
-                        shipmentDataList[parseInt(map.get("31"))].shipmentStatus.id = shipmentStatusId;
-                        shipmentDataList[parseInt(map.get("31"))].expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
-                        shipmentDataList[parseInt(map.get("31"))].orderNo = map.get("2");
-                        shipmentDataList[parseInt(map.get("31"))].primeLineNo = map.get("3");
-                        shipmentDataList[parseInt(map.get("31"))].dataSource.id = map.get("4");
-                        shipmentDataList[parseInt(map.get("31"))].procurementAgent.id = map.get("5");
-                        shipmentDataList[parseInt(map.get("31"))].primeLineNo = map.get("3");
-                        shipmentDataList[parseInt(map.get("31"))].quantity = quantity;
-                        shipmentDataList[parseInt(map.get("31"))].rate = rate;
-                        shipmentDataList[parseInt(map.get("31"))].productCost = productCost;
-                        shipmentDataList[parseInt(map.get("31"))].shipmentMode = map.get("20");
-                        shipmentDataList[parseInt(map.get("31"))].freightCost = freightCost;
-                        shipmentDataList[parseInt(map.get("31"))].notes = map.get("24");
-                        shipmentDataList[parseInt(map.get("31"))].shipmentBudgetList = map.get("30");
-                    }
-                    programJson.shipmentList = shipmentDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge('psmShipments');
-                        this.setState({
-                            message: `PSM shipments Data Saved`,
-                            plannedPsmChangedFlag: 0
-                        })
-                        this.formSubmit(this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        } else {
-            alert("Validation failed");
-        }
-    }
-
-    checkBudgetValidation() {
-        var valid = true;
-        var elInstance = this.state.shipmentBudgetTableEl;
-        var json = elInstance.getJson();
-        for (var y = 0; y < json.length; y++) {
-            var col = ("B").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(1, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-            var col = ("C").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(2, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false;
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-
-            var col = ("D").concat(parseInt(y) + 1);
-            var value = elInstance.getValueFromCoords(3, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                valid = false
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-
-        }
-        return valid;
     }
 }
