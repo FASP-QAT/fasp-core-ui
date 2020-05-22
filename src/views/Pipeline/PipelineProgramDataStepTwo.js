@@ -144,7 +144,7 @@ export default class PipelineProgramDataStepTwo extends Component {
                         }) => (
                                 <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='realmCountryForm'>
                                     <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
                                         <Input
                                             valid={!errors.realmCountryId && this.props.items.program.realmCountry.realmCountryId != ''}
                                             invalid={touched.realmCountryId && !!errors.realmCountryId}

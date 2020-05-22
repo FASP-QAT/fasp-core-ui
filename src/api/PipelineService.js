@@ -16,7 +16,20 @@ class PipelineService {
         );
     }
     getShipmentDataById(json) {
-        return axios.get(`${API_URL}/api/pipeline/shipment/${json}`, {}
+        return axios.get(`${API_URL}/api/pipeline/shipment/${json}`, {});
+}
+    addProgramToQatTempTable(json, pipelineId) {
+        return axios.post(`${API_URL}/api/qatTemp/program/${pipelineId}`, json, {}
+        );
+    }
+
+    getQatTempPorgramByPipelineId(json) {
+        return axios.get(`${API_URL}/api/qatTemp/program/${json}`, {}
+        );
+    }
+
+    getPipelineProductListById(json){
+        return axios.get(`${API_URL}/api/pipeline/product/${json}`, {}
         );
     }
 }

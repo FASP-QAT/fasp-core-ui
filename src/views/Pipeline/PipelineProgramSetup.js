@@ -31,11 +31,13 @@ export default class PipelineProgramSetup extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-                realm: {
-                    realmId: 1
-                },
+
                 realmCountry: {
-                    realmCountryId: ''
+                    realmCountryId: '',
+                    realm: {
+                        realmId: 1
+                    }
+
                 },
                 organisation: {
                     id: ''
@@ -74,7 +76,8 @@ export default class PipelineProgramSetup extends Component {
             programManagerList: [],
             regionList: [],
             message: '',
-            validationFailedMessage: ''
+            validationFailedMessage: '',
+            planningUnitList: []
         }
         this.endProgramInfoStepOne = this.endProgramInfoStepOne.bind(this);
         this.endProgramInfoStepTwo = this.endProgramInfoStepTwo.bind(this);
@@ -141,15 +144,25 @@ export default class PipelineProgramSetup extends Component {
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'block';
     }
     endProgramInfoStepFive() {
+        // console.log("program Data--->", this.state.program);
+        AuthenticationService.setupAxiosInterceptors();
+        PipelineService.addProgramToQatTempTable(this.state.program, this.props.match.params.pipelineId).then(response => {
+            if (response.status == "200") {
+                this.setState({ pipelineProgramSetupPer: 25 });
+                document.getElementById('stepOne').style.display = 'none';
+                document.getElementById('stepTwo').style.display = 'block';
+                document.getElementById('stepThree').style.display = 'none';
+                document.getElementById('stepFour').style.display = 'none';
+                document.getElementById('stepFive').style.display = 'none';
+            } else {
+                this.setState({
+                    message: response.data.messageCode
+                })
+            }
+        }
+        )
 
-        console.log("program Data--->", this.state.program);
 
-        this.setState({ pipelineProgramSetupPer: 25 });
-        document.getElementById('stepOne').style.display = 'none';
-        document.getElementById('stepTwo').style.display = 'block';
-        document.getElementById('stepThree').style.display = 'none';
-        document.getElementById('stepFour').style.display = 'none';
-        document.getElementById('stepFive').style.display = 'none';
     }
 
     finishedStepOne() {
@@ -361,19 +374,14 @@ export default class PipelineProgramSetup extends Component {
     componentDidMount() {
         // console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
         AuthenticationService.setupAxiosInterceptors();
-        PipelineService.getPipelineProgramDataById(this.props.match.params.pipelineId)
+        PipelineService.getQatTempPorgramByPipelineId(this.props.match.params.pipelineId)
             .then(response => {
+                // console.log("my resp---", response);
                 if (response.status == 200) {
-                    console.log("prgramInfobj-------->", response.data);
-                    let { program } = this.state
-                    if (isNaN(parseInt(response.data.countryname))) {
-                        program.realmCountry.realmCountryId = '';
-                        this.setState({ validationFailedMessage: `Country ${response.data.countryname} does not exist please create ticket.` })
-                    } else {
-                        program.realmCountry.realmCountryId = response.data.countryname;
-                        this.setState({ validationFailedMessage: '' })
-
-                        ProgramService.getRegionList(response.data.countryname)
+                    if (response.data != "") {
+                        // console.log("in if----->");
+                        this.setState({ program: response.data });
+                        ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                             .then(response => {
                                 if (response.status == 200) {
                                     var json = response.data;
@@ -391,17 +399,79 @@ export default class PipelineProgramSetup extends Component {
                                     })
                                 }
                             })
+                    } else {
+                        // console.log("in else------->");
+                        PipelineService.getPipelineProgramDataById(this.props.match.params.pipelineId)
+                            .then(response => {
+                                if (response.status == 200) {
+                                    let { program } = this.state
+                                    if (isNaN(parseInt(response.data.countryname))) {
+                                        program.realmCountry.realmCountryId = '';
+                                        this.setState({ validationFailedMessage: `Country ${response.data.countryname} does not exist please create ticket.` })
+                                    } else {
+                                        program.realmCountry.realmCountryId = response.data.countryname;
+                                        this.setState({ validationFailedMessage: '' })
+                                        ProgramService.getRegionList(response.data.countryname)
+                                            .then(response => {
+                                                if (response.status == 200) {
+                                                    var json = response.data;
+                                                    var regList = [];
+                                                    for (var i = 0; i < json.length; i++) {
+                                                        regList[i] = { value: json[i].regionId, label: getLabelText(json[i].label, this.state.lang) }
+                                                    }
+                                                    this.setState({
+                                                        regionId: '',
+                                                        regionList: regList
+                                                    })
+                                                } else {
+                                                    this.setState({
+                                                        message: response.data.messageCode
+                                                    })
+                                                }
+                                            })
+
+                                    }
+
+                                    program.programNotes = response.data.note;
+                                    program.label.label_en = response.data.programname;
+                                    this.setState({ program: program });
+                                } else {
+                                    this.setState({
+                                        message: response.data.messageCode
+                                    })
+                                }
+                            }).catch(
+                                error => {
+                                    if (error.message === "Network Error") {
+                                        this.setState({ message: error.message });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                                            case 500:
+                                            case 401:
+                                            case 404:
+                                            case 406:
+                                            case 412:
+                                                this.setState({ message: error.response.data.messageCode });
+                                                break;
+                                            default:
+                                                this.setState({ message: 'static.unkownError' });
+                                                break;
+                                        }
+                                    }
+                                }
+                            );
+
 
                     }
 
-                    program.programNotes = response.data.note;
-                    program.label.label_en = response.data.programname;
-                    this.setState({ program: program });
                 } else {
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
+
+                
+
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -423,14 +493,12 @@ export default class PipelineProgramSetup extends Component {
                 }
             );
 
-
         document.getElementById('pipelineProgramDataStepOne').style.display = 'block';
         document.getElementById('pipelineProgramDataStepTwo').style.display = 'none';
         document.getElementById('pipelineProgramDataStepThree').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFour').style.display = 'none';
         document.getElementById('pipelineProgramDataStepFive').style.display = 'none';
         // document.getElementById('pipelineProgramDataStepSix').style.display = 'none';
-
 
         document.getElementById('stepOne').style.display = 'block';
         document.getElementById('stepTwo').style.display = 'none';
@@ -636,7 +704,7 @@ export default class PipelineProgramSetup extends Component {
                                                     <PipelineProgramDataStepOne realmId={this.state.program.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne}></PipelineProgramDataStepOne>
                                                 </div> */}
                                                 <div id="pipelineProgramDataStepOne">
-                                                    <PipelineProgramDataStepTwo realmId={this.state.program.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne} items={this.state} dataChange={this.dataChange} getRegionList={this.getRegionList}></PipelineProgramDataStepTwo>
+                                                    <PipelineProgramDataStepTwo realmId={this.state.program.realmCountry.realm.realmId} endProgramInfoStepOne={this.endProgramInfoStepOne} items={this.state} dataChange={this.dataChange} getRegionList={this.getRegionList}></PipelineProgramDataStepTwo>
                                                 </div>
                                                 <div id="pipelineProgramDataStepTwo">
                                                     <PipelineProgramDataStepThree endProgramInfoStepTwo={this.endProgramInfoStepTwo} backToprogramInfoStepOne={this.backToprogramInfoStepOne} items={this.state} dataChange={this.dataChange}></PipelineProgramDataStepThree>
@@ -672,7 +740,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/* <h3>Program Planning Units</h3> */}
-                                                <PipelineProgramPlanningUnits></PipelineProgramPlanningUnits>
+                                                <PipelineProgramPlanningUnits pipelineId={this.props.match.params.pipelineId}></PipelineProgramPlanningUnits>
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
@@ -745,7 +813,6 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody>
                                                 {/*<h3>Shipments</h3>*/}
                                                 <PipelineProgramShipment  {...this.props}></PipelineProgramShipment>
-                                                
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>

@@ -233,7 +233,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             bsSize="sm"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="select" name="userId" id="userId"
-                                            
+                                            value={this.props.items.program.programManager.userId}
                                             >
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {programManagers}
@@ -264,7 +264,9 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
-                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} />
+                                            value={this.props.items.program.airFreightPerc}
+                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} 
+                                            />
                                         <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -277,6 +279,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.seaFreightPerc}
                                             name="seaFreightPerc" id="seaFreightPerc" placeholder={i18n.t('static.program.seafreightperc')} />
                                         <FormFeedback className="red">{errors.seaFreightPerc}</FormFeedback>
                                     </FormGroup>
@@ -290,6 +293,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.plannedToDraftLeadTime}
                                             name="plannedToDraftLeadTime" id="plannedToDraftLeadTime" placeholder={i18n.t('static.program.draftleadtext')} />
                                         <FormFeedback className="red">{errors.plannedToDraftLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -303,6 +307,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.draftToSubmittedLeadTime}
                                             name="draftToSubmittedLeadTime" id="draftToSubmittedLeadTime" placeholder={i18n.t('static.program.drafttosubmittext')} />
                                         <FormFeedback className="red">{errors.draftToSubmittedLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -316,6 +321,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.submittedToApprovedLeadTime}
                                             name="submittedToApprovedLeadTime" id="submittedToApprovedLeadTime" placeholder={i18n.t('static.program.submittoapprovetext')} />
                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -329,6 +335,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.approvedToShippedLeadTime}
                                             name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -342,6 +349,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.deliveredToReceivedLeadTime}
                                             name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                         <FormFeedback className="red">{errors.deliveredToReceivedLeadTime}</FormFeedback>
                                     </FormGroup>
@@ -355,6 +363,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.monthsInPastForAmc}
                                             name="monthsInPastForAmc" id="monthsInPastForAmc" placeholder={i18n.t('static.program.monthpastamctext')} />
                                         <FormFeedback className="red">{errors.monthsInPastForAmc}</FormFeedback>
                                     </FormGroup>
@@ -368,6 +377,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="number"
                                             min="0"
+                                            value={this.props.items.program.monthsInFutureForAmc}
                                             name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
                                         <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
                                     </FormGroup>
