@@ -134,9 +134,9 @@ class Login extends Component {
   }
 
   logoutMessagehide() {
-    console.log("incorrectpass message hide");
+    console.log("logout");
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
-    setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 8000);
+    setTimeout(function () {var div2= document.getElementById('div2').style.display = 'none';}, 8000);
     this.setState({
       message: ''
     },
