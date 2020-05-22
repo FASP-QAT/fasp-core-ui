@@ -25,7 +25,7 @@ class SupplyPlanFormulas extends Component {
       <div className="animated fadeIn">
 
         <Row>
-          <Col sm="12" xl="6">
+          <Col sm="12" xl="12">
             <Card>
               <CardHeader>
                 <i className="fa fa-align-justify"></i><strong>Supply Plan Formulas</strong>
@@ -34,25 +34,25 @@ class SupplyPlanFormulas extends Component {
                 <ListGroup>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">AMC</ListGroupItemHeading>
-                    <ListGroupItemText>
+                    <ListGroupItemText className="formulastext">
                     AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program)
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Min Stock</ListGroupItemHeading>
-                    <ListGroupItemText>
+                    <ListGroupItemText className="formulastext">
                     Min = AMC * MAX(MIN_MONTHS_OF_STOCK,3)
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
-                    <ListGroupItemText>
+                    <ListGroupItemText className="formulastext">
                     Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18)
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Suggested Order</ListGroupItemHeading>
-                    <ListGroupItemText>
+                    <ListGroupItemText className="formulastext">
                     Suggested Order = MAX - MIN
                     When to suggest an order = Inventory  MIN
                     </ListGroupItemText>

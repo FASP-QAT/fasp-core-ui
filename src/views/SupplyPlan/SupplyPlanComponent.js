@@ -3204,7 +3204,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <strong>Supply plan</strong>
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">Supply Plan Formulas</small></Link>
+                                    <Link to='/supplyPlanFormulas'><small className="supplyplanformulas">Supply Plan Formulas</small></Link>
                                 </a>
                             </div>
                         </CardHeader>
@@ -3287,7 +3287,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <th></th>
                                             {
                                                 this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                    <th>{item.month}</th>
+                                                    <th style={{width:'45%'}}>{item.month}</th>
                                                 ))
                                             }
                                         </tr>
@@ -3296,10 +3296,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         <MyMenu props />
                                         <NoSkip props />
                                         <tr>
-                                            <td>Opening Balance</td>
+                                            <td align="left">Opening Balance</td>
                                             {
                                                 this.state.openingBalanceArray.map(item1 => (
-                                                    <td>{item1}</td>
+                                                    <td align="right">{item1}</td>
                                                 ))
                                             }
                                         </tr>
