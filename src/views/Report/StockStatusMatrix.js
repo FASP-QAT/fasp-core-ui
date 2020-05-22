@@ -23,6 +23,7 @@ import Pdf from "react-to-pdf"
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Online, Offline } from "react-detect-offline";
+import { LOGO }  from '../../CommonComponent/Logo.js'
 
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t('static.dashboard.productCatalog');
@@ -567,6 +568,13 @@ export default class StockStatusMatrix extends React.Component {
   exportCSV(columns) {
 
     var csvRow = [];
+    csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.productcategory.productcategory') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.planningunit.planningunit') + ' : ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push('')
+    csvRow.push('')
+
     const headers = [];
     columns.map((item, idx) => { headers[idx] = item.text });
 
@@ -613,6 +621,68 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   exportPDF = (columns) => {
+    const addFooters = doc => {
+       
+      const pageCount = doc.internal.getNumberOfPages()
+    
+      doc.setFont('helvetica', 'bold')
+       doc.setFontSize(10)
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setPage(i)
+      
+        doc.setPage(i)
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height-30, {
+        align: 'center'
+        })
+        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
+        align: 'center'
+        })
+      
+        
+      }
+    }
+    const addHeaders = doc => {
+      
+      const pageCount = doc.internal.getNumberOfPages()
+      doc.setFont('helvetica', 'bold')
+     
+    //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+      // var reader = new FileReader();
+     
+  //var data='';
+// Use fs.readFile() method to read the file 
+//fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+//}); 
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setFontSize(18)
+        doc.setPage(i)
+        doc.addImage(LOGO,'png',0,10, 180, 50,'FAST');
+        /*doc.addImage(data, 10, 30, {
+          align: 'justify'
+        });*/
+        doc.setTextColor("#002f6c");
+        doc.text(i18n.t('static.dashboard.stockstatusmatrix'), doc.internal.pageSize.width / 2, 60, {
+          align: 'center'
+        })
+        if(i==1){
+          doc.setFontSize(12)
+          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.program.program')+' : '+ document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.productcategory.productcategory')+' : '+ document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+            align: 'left'
+          })
+        }
+       
+      }
+    }
+
     const unit = "pt";
     const size = "A1"; // Use A1, A2, A3 or A4
     const orientation = "landscape"; // portrait or landscape
@@ -622,7 +692,7 @@ export default class StockStatusMatrix extends React.Component {
 
     doc.setFontSize(15);
 
-    const title = i18n.t('static.dashboard.stockstatusmatrix');
+    // const title = i18n.t('static.dashboard.stockstatusmatrix');
     const headers = [];
     columns.map((item, idx) => { headers[idx] = item.text });
     const header = [headers];
@@ -637,15 +707,26 @@ export default class StockStatusMatrix extends React.Component {
         , ele.Dec]);
     }
 
-    console.log(data1);
+    // console.log(data1);
     let content = {
-      startY: 50,
+      margin: { top: 40 },
+      startY: 180,
       head: header,
       body: this.state.view == 1 ? data1 : data2,
     };
 
-    doc.text(title, marginLeft, 40);
+    // let content = {
+    //   margin: { top: 80 },
+    //   startY: height,
+    //   head: headers,
+    //   body: data,
+
+    // };
+
+    // doc.text(title, marginLeft, 40);
     doc.autoTable(content);
+    addHeaders(doc)
+    addFooters(doc)
     doc.save(i18n.t('static.dashboard.stockstatusmatrix') + ".pdf")
   }
 

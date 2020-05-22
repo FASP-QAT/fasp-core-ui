@@ -84,7 +84,7 @@
     "static.message.invaliddate": "Data inválida",
     "static.consumption.consumptionqty": "Quantidade de consumo",
     "static.consumption.daysofstockout": "Dias de estoque esgotado",
-    "static.consumption.actualflag": "Bandeira/Previsão real",
+    "static.consumption.actualflag": "Bandeira real",
     "static.consumption.actual": "Real",
     "static.consumption.forcast": "Previsão",
     "static.common.startdate": "Data de início",
@@ -145,6 +145,6 @@
     "static.realm.no": "Não",
     "static.common.selectPlanningUnit": "Selecione a unidade de planejamento",
     "static.common.selectProductCategory": "Selecione a categoria do produto",
-    "static.region.glnvalue": "GLN Não deve ter 13 dígitos."
-
+    "static.region.glnvalue": "GLN Não deve ter 13 dígitos.",
+    "static.message.shipmentSaved": "Dados da remessa salvos"
 }

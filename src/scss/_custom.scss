@@ -940,6 +940,9 @@ label.arrow_label:after {
 .chart-graph {
   height: 280px;
 }
+.chart-graph-report {
+  height: 100%;
+}
 a {
   color: #205493;
   text-decoration: none;
@@ -1813,7 +1816,7 @@ position: relative!important;
 display: flex!important;
 flex-wrap: wrap!important;
 align-items: stretch!important;
-width: 261%!important;
+width: 238%!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
 border: 1px solid #e4e7ea!important;
@@ -1840,7 +1843,7 @@ border-radius: 0.2rem!important;
   display: flex!important;
   flex-wrap: wrap!important;
   align-items: stretch!important;
-  width: 231%!important;
+  width: 238%!important;
   height: calc(1.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
   border: 1px solid #e4e7ea!important;

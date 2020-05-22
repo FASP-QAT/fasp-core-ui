@@ -9,6 +9,7 @@ import ForecastingUnitService from '../../api/ForecastingUnitService.js'
 import RealmService from "../../api/RealmService";
 import ProductService from '../../api/ProductService';
 import TracerCategoryService from '../../api/TracerCategoryService';
+import UnitService from "../../api/UnitService";
 import { stringify } from 'querystring';
 import getLabelText from '../../CommonComponent/getLabelText';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
@@ -17,6 +18,7 @@ const initialValues = {
     realmId: [],
     productCategoryId: [],
     tracerCategoryId: [],
+    unitId: [],
     label: ''
 }
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
@@ -29,7 +31,9 @@ const validationSchema = function (values) {
         productCategoryId: Yup.string()
             .required(i18n.t('static.productcategory.productcategorytext')),
         label: Yup.string()
-            .required(i18n.t('static.forecastingunit.forecastingunittext'))
+            .required(i18n.t('static.forecastingunit.forecastingunittext')),
+        unitId: Yup.string()
+            .required(i18n.t('static.product.productunittext')),
     })
 }
 
@@ -62,6 +66,7 @@ export default class AddForecastingUnitComponent extends Component {
         super(props);
         this.state = {
             realms: [],
+            units: [],
             productcategories: [],
             tracerCategories: [],
             forecastingUnit:
@@ -77,6 +82,7 @@ export default class AddForecastingUnitComponent extends Component {
                     label_en: '',
                     labelId: 0,
                 },
+                unit: { id: '' },
                 productCategory: { id: '' },
                 tracerCategory: { id: '' }
             },
@@ -108,6 +114,9 @@ export default class AddForecastingUnitComponent extends Component {
         if (event.target.name == "genericLabel") {
             forecastingUnit.genericLabel.label_en = event.target.value;
         }
+        if (event.target.name == "unitId") {
+            forecastingUnit.unit.id = event.target.value;
+        }
 
         this.setState(
             {
@@ -122,7 +131,8 @@ export default class AddForecastingUnitComponent extends Component {
             realmId: true,
             label: true,
             productCategoryId: true,
-            tracerCategoryId: true
+            tracerCategoryId: true,
+            unitId: true
         }
         )
         this.validateForm(errors)
@@ -144,6 +154,31 @@ export default class AddForecastingUnitComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        UnitService.getUnitListAll()
+            .then(response => {
+                this.setState({
+                    units: response.data
+                })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response.status) {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
         RealmService.getRealmListAll()
             .then(response => {
                 this.setState({
@@ -174,7 +209,7 @@ export default class AddForecastingUnitComponent extends Component {
 
     getProductCategoryByRealmId() {
         let realmId = document.getElementById("realmId").value;
-        console.log("realmId---------------- > ",realmId);
+        console.log("realmId---------------- > ", realmId);
         ProductService.getProductCategoryList(realmId)
             .then(response => {
                 console.log(JSON.stringify(response.data))
@@ -185,6 +220,15 @@ export default class AddForecastingUnitComponent extends Component {
     }
 
     render() {
+        const { units } = this.state;
+        let unitList = units.length > 0
+            && units.map((item, i) => {
+                return (
+                    <option key={i} value={item.unitId}>
+                        {item.label.label_en}
+                    </option>
+                )
+            }, this);
         const { realms } = this.state;
         let realmList = realms.length > 0
             && realms.map((item, i) => {
@@ -342,6 +386,24 @@ export default class AddForecastingUnitComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
 
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span class="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="unitId"
+                                                            id="unitId"
+                                                            bsSize="sm"
+                                                            value={this.state.forecastingUnit.unit.id}
+                                                            valid={!errors.unitId && this.state.forecastingUnit.unit.id != ''}
+                                                            invalid={touched.unitId && !!errors.unitId}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            required>
+                                                            <option value="">{i18n.t('static.common.select')}</option>
+                                                            {unitList}
+                                                        </Input>
+                                                        <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
 

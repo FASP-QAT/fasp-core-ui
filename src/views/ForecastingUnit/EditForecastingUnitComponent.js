@@ -93,7 +93,16 @@ export default class EditForecastingUnitComponent extends Component {
                         label_pr: '',
                         label_fr: ''
                     }
-                }
+                },
+                unit: {
+                    id: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
             },
             lang: localStorage.getItem('lang')
         }
@@ -172,7 +181,7 @@ export default class EditForecastingUnitComponent extends Component {
             });
 
         })
-        
+
     }
 
     Capitalize(str) {
@@ -316,6 +325,18 @@ export default class EditForecastingUnitComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="unitId"
+                                                            id="unitId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={getLabelText(this.state.forecastingUnit.unit.label, this.state.lang)}
+                                                        >
+                                                        </Input>
+                                                    </FormGroup>
 
                                                     <FormGroup>
                                                         <Label>{i18n.t('static.common.status')}  </Label>
@@ -390,7 +411,7 @@ export default class EditForecastingUnitComponent extends Component {
             });
 
         })
-        
+
     }
 }
 
