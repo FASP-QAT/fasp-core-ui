@@ -36,7 +36,7 @@ export default class ConsumptionDetails extends React.Component {
             allowShipmentStatusList: [],
             message: '',
             countVar: 1,
-            planningUnitId: '',
+            planningUnitId: 0,
         }
 
         // this.getConsumptionData = this.getConsumptionData.bind(this);
@@ -68,7 +68,6 @@ export default class ConsumptionDetails extends React.Component {
         let rowIndex = this.props.match.params.rowIndex;
         this.setState({ programId: programId });
         this.setState({ planningUnitId: planningUnitId });
-        document.getElementById('planningUnitId').value = planningUnitId;
 
         if (shipmentId == 0 || typeof shipmentId == "undefined") {
             var procurementAgentPlanningList = [];
@@ -1004,13 +1003,6 @@ export default class ConsumptionDetails extends React.Component {
                                                     }
 
                                                 }
-
-
-
-
-
-
-
 
                                                 var procurementAgentPlanningUnit = procurementAgentPlanningList.filter(p => p.procurementAgentId == shipmentList[0].procurementAgent.id && p.planningUnitId == shipmentList[0].planningUnit.id)[0];
 
@@ -3709,7 +3701,7 @@ export default class ConsumptionDetails extends React.Component {
                         </CardHeader>
                         <CardBody>
                             <Col xs="12" sm="12">
-                                <input type="hidden" name="planningUnitId" id="planningUnitId" value="" />
+
                                 <div className="table-responsive">
                                     <div id="shipmenttableDiv">
                                     </div>
@@ -3786,10 +3778,10 @@ export default class ConsumptionDetails extends React.Component {
 
 
     plannedPsmChanged = function (instance, cell, x, y, value) {
-        var planningUnitId = document.getElementById("planningUnitId").value;
+        var planningUnitId = this.state.planningUnitId;
         var elInstance = instance.jexcel;
         console.log("elInstance========== ", this.state.planningUnitId);
-        console.log("elInstance========== ", this.props.match.params.planningUnitId);
+
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             if (value == "") {
@@ -3810,7 +3802,11 @@ export default class ConsumptionDetails extends React.Component {
                     papuRequest.onsuccess = function (event) {
                         var papuResult = [];
                         papuResult = papuRequest.result;
+                        console.log("----------1111------", papuResult)
+                        console.log("value-----", value);
+                        console.log("planningUnitId----", planningUnitId)
                         var procurementAgentPlanningUnit = papuResult.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
+                        console.log("--------2222--------", procurementAgentPlanningUnit)
                         elInstance.setValueFromCoords(8, y, procurementAgentPlanningUnit.moq, true);
                         elInstance.setValueFromCoords(18, y, procurementAgentPlanningUnit.pricePerPlanningUnit, true);
                         elInstance.setValueFromCoords(25, y, procurementAgentPlanningUnit.unitsPerPallet, true);
@@ -3859,7 +3855,7 @@ export default class ConsumptionDetails extends React.Component {
 
             }
         }
-    }
+    }.bind(this);
 
 
 
