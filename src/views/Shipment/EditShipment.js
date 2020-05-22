@@ -43,10 +43,17 @@ export default class ConsumptionDetails extends React.Component {
         // this.formSubmit = this.formSubmit.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        this.temp = this.temp.bind(this)
+        this.backClicked = this.backClicked.bind(this);
+        this.temp = this.temp.bind(this);
+        this.getProcurementAgentById = this.getProcurementAgentById.bind(this);
+        this.getProcurementUnitById = this.getProcurementUnitById.bind(this);
+        this.getSupplierById = this.getSupplierById.bind(this);
     }
 
     componentDidMount = function () {
+        this.getProcurementAgentById();
+        this.getProcurementUnitById();
+        this.getSupplierById();
         document.getElementById("addButton").style.display = "none";
         let programId = this.props.match.params.programId;
         let shipmentId = this.props.match.params.shipmentId;
@@ -58,6 +65,792 @@ export default class ConsumptionDetails extends React.Component {
         this.setState({ programId: programId });
 
         if (shipmentId == 0 || typeof shipmentId == "undefined") {
+            var procurementAgentPlanningList = [];
+
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+
+                db1 = e.target.result;
+
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
+
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
+
+                    let shipmentListWithoutFilter = (programJson.shipmentList);
+
+                    const planningUnitFilterList = shipmentListWithoutFilter.filter(c => c.planningUnit.id == planningUnitId);
+
+                    let dateFilterList = '';
+                    if (filterBy == 1) {
+                        //Order Date Filter
+                        dateFilterList = planningUnitFilterList.filter(c => moment(c.orderedDate).isBetween(startDate, endDate, null, '[)'))
+                    } else {
+                        //Expected Delivery Date
+                        dateFilterList = planningUnitFilterList.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
+                    }
+
+                    let rowIndexFilterList = [];
+                    for (var y = 0; y < dateFilterList.length; y++) {
+                        if (y == rowIndex) {
+                            rowIndexFilterList[0] = dateFilterList[y];
+                        }
+                    }
+
+                    var shipmentList = rowIndexFilterList[0];
+
+                    this.setState({
+                        shipmentList: shipmentList
+                    },
+                        () => {
+                            console.log("UD PRIME  --> ", shipmentList);
+                        });
+
+                    var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                    var procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
+                    var procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
+
+                    procurementAgentPlanningUnitRequest.onsuccess = function (event) {
+
+                        var procurementAgentPlanningUnitResult = [];
+                        procurementAgentPlanningUnitResult = procurementAgentPlanningUnitRequest.result;
+                        for (var k = 0; k < procurementAgentPlanningUnitResult.length; k++) {
+                            if (procurementAgentPlanningUnitResult[k].planningUnit.id == planningUnitId) {
+                                var procurementAgentJson = {
+                                    id: procurementAgentPlanningUnitResult[k].procurementAgentPlanningUnitId,
+                                    catalogPrice: procurementAgentPlanningUnitResult[k].catalogPrice,
+                                    moq: procurementAgentPlanningUnitResult[k].moq,
+                                    unitsPerPallet: procurementAgentPlanningUnitResult[k].unitsPerPallet,
+                                    unitsPerContainer: procurementAgentPlanningUnitResult[k].unitsPerContainer
+                                }
+                                procurementAgentPlanningList[0] = procurementAgentJson
+                                // console.log("JSON--- ", procurementAgentJson);
+                                // console.log("procurementAgentPlanningList111 ", procurementAgentPlanningList[0]);
+                            }
+                        }
+
+                        console.log("shipmentList----- ", shipmentList);
+                        if (shipmentList.shipmentStatus.id == 2) {
+
+                            document.getElementById("addButton").style.display = "block";
+                            var procurementAgentList = [];
+                            var fundingSourceList = [];
+                            var budgetList = [];
+
+                            var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                            var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+                            var procurementAgentRequest = procurementAgentOs.getAll();
+
+                            procurementAgentRequest.onsuccess = function (event) {
+                                var procurementAgentResult = [];
+                                procurementAgentResult = procurementAgentRequest.result;
+                                for (var k = 0; k < procurementAgentResult.length; k++) {
+                                    var procurementAgentJson = {
+                                        name: procurementAgentResult[k].label.label_en,
+                                        id: procurementAgentResult[k].procurementAgentId
+                                    }
+                                    procurementAgentList[k] = procurementAgentJson
+                                }
+
+
+                                var fundingSourceTransaction = db1.transaction(['fundingSource'], 'readwrite');
+                                var fundingSourceOs = fundingSourceTransaction.objectStore('fundingSource');
+                                var fundingSourceRequest = fundingSourceOs.getAll();
+
+                                fundingSourceRequest.onsuccess = function (event) {
+                                    var fundingSourceResult = [];
+                                    fundingSourceResult = fundingSourceRequest.result;
+                                    for (var k = 0; k < fundingSourceResult.length; k++) {
+                                        var fundingSourceJson = {
+                                            name: fundingSourceResult[k].label.label_en,
+                                            id: fundingSourceResult[k].fundingSourceId
+                                        }
+                                        fundingSourceList[k] = fundingSourceJson
+                                    }
+
+
+                                    var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+                                    var budgetOs = budgetTransaction.objectStore('budget');
+                                    var budgetRequest = budgetOs.getAll();
+
+                                    budgetRequest.onsuccess = function (event) {
+                                        var budgetResult = [];
+                                        budgetResult = budgetRequest.result;
+                                        for (var k = 0; k < budgetResult.length; k++) {
+                                            var budgetJson = {
+                                                name: budgetResult[k].label.label_en,
+                                                id: budgetResult[k].budgetId
+                                            }
+                                            budgetList[k] = budgetJson
+                                        }
+
+                                        var data = [];
+                                        var shipmentDataArr = [];
+
+                                        data[0] = shipmentList.shipmentId;
+                                        data[1] = shipmentList.expectedDeliveryDate;
+                                        data[2] = shipmentList.shipmentStatus.label.label_en;
+                                        data[3] = shipmentList.procurementAgent.label.label_en;
+                                        data[4] = '';//funding source
+                                        data[5] = '';//budget
+                                        data[6] = shipmentList.planningUnit.label.label_en;
+                                        data[7] = shipmentList.suggestedQty;
+                                        data[8] = procurementAgentPlanningList[0].moq;
+                                        data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
+                                        data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
+                                        data[11] = '';
+                                        data[12] = '';
+                                        data[13] = '';
+                                        data[14] = '';
+                                        data[15] = '';
+                                        data[16] = '';
+                                        data[17] = '';
+                                        data[18] = procurementAgentPlanningList[0].catalogPrice;
+                                        data[19] = '';
+                                        data[20] = '';
+                                        data[21] = shipmentList.notes;
+                                        data[22] = '';
+                                        data[23] = procurementAgentPlanningList[0].unitsPerPallet;
+                                        data[24] = procurementAgentPlanningList[0].unitsPerContainer;
+                                        data[25] = 0;
+
+                                        shipmentDataArr[0] = data;
+
+                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                        this.el.destroy();
+                                        var json = [];
+                                        var data = shipmentDataArr;
+                                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                                        // json[0] = data;
+                                        var options = {
+                                            data: data,
+                                            columnDrag: true,
+                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                            columns: [
+                                                // { title: 'Month', type: 'text', readOnly: true },
+                                                {
+                                                    title: 'Shipment Id',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Expected Delivery date',
+                                                    // type: 'calendar',
+                                                    type: 'text',
+                                                    readOnly: true
+
+                                                },
+                                                {
+                                                    title: 'Shipment Status',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Procurement Agent',
+                                                    type: 'dropdown',
+                                                    source: procurementAgentList,
+                                                },
+                                                {
+                                                    title: 'Funding Source',
+                                                    type: 'dropdown',
+                                                    source: fundingSourceList,
+                                                },
+                                                {
+                                                    title: 'Budget',
+                                                    type: 'dropdown',
+                                                    source: budgetList,
+                                                },
+                                                {
+                                                    title: 'Planning Unit',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Suggested Order Qty',
+                                                    type: 'numeric',
+                                                    // readOnly: true
+                                                },
+                                                {
+                                                    title: 'MoQ',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'No of Pallets',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'No of Containers',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Order based on',
+                                                    type: 'dropdown',
+                                                    source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }]
+
+                                                },
+                                                {
+                                                    title: 'Rounding option',
+                                                    type: 'dropdown',
+                                                    source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }]
+                                                },
+                                                {
+                                                    title: 'User Qty',
+                                                    type: 'text',
+                                                },
+                                                {
+                                                    title: 'Adjusted Order Qty',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Adjusted Pallets',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Adjusted Containers',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Manual Price per Planning Unit',
+                                                    type: 'text',
+                                                },
+                                                {
+                                                    title: 'Price per Planning Unit',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Amt',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'RO Number',
+                                                    type: 'text'
+                                                },
+                                                {
+                                                    title: 'Notes',
+                                                    type: 'text'
+                                                },
+                                                {
+                                                    title: 'Cancelled Order',
+                                                    type: 'checkbox'
+                                                },
+                                                {
+                                                    title: 'Unit/Pallet',
+                                                    type: 'hidden'
+                                                },
+                                                {
+                                                    title: 'Unit/Container',
+                                                    type: 'hidden'
+                                                },
+                                                {
+                                                    title: 'Index',
+                                                    type: 'hidden'
+                                                }
+
+                                            ],
+                                            pagination: 10,
+                                            search: true,
+                                            columnSorting: true,
+                                            tableOverflow: true,
+                                            wordWrap: true,
+                                            allowInsertColumn: false,
+                                            allowManualInsertColumn: false,
+                                            allowDeleteRow: false,
+                                            onchange: this.changed,
+                                            oneditionend: this.onedit,
+                                            copyCompatibility: true,
+                                            paginationOptions: [10, 25, 50, 100],
+                                            position: 'top'
+                                        };
+
+                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+
+                                    }.bind(this);
+                                }.bind(this);
+                            }.bind(this);
+
+                        } else if (shipmentList.shipmentStatus.id == 3 || shipmentList.shipmentStatus.id == 4 || shipmentList.shipmentStatus.id == 5 || shipmentList.shipmentStatus.id == 6) {
+
+                            document.getElementById("addButton").style.display = "none";
+
+                            var paList = [];
+                            var supList = [];
+                            var allowShipStatusList = [];
+                            var currentShipmentId = shipmentList.shipmentStatus.id;
+                            var nextShipmentAllowedList = [];
+
+                            var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                            var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
+                            var procurementUnitRequest = procurementUnitOs.getAll();
+                            procurementUnitRequest.onsuccess = function (event) {
+
+                                var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
+                                var supplierOs = supplierTransaction.objectStore('supplier');
+                                var supplierRequest = supplierOs.getAll();
+                                supplierRequest.onsuccess = function (event) {
+
+                                    var procurementUnitResult = [];
+                                    procurementUnitResult = procurementUnitRequest.result;
+                                    for (var k = 0; k < procurementUnitResult.length; k++) {
+                                        var paJson = {
+                                            name: procurementUnitResult[k].label.label_en,
+                                            id: procurementUnitResult[k].procurementUnitId
+                                        }
+                                        paList[k] = paJson;
+                                    }
+
+                                    this.setState({
+                                        procurementAgentList: paList
+                                    });
+
+                                    var supplierResult = [];
+                                    supplierResult = supplierRequest.result;
+                                    for (var k = 0; k < supplierResult.length; k++) {
+                                        var supplierJson = {
+                                            name: supplierResult[k].label.label_en,
+                                            id: supplierResult[k].supplierId
+                                        }
+                                        supList[k] = supplierJson;
+                                    }
+
+                                    this.setState({
+                                        supplierList: supList
+                                    });
+
+                                    var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                                    var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
+                                    var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
+                                    allowShipmentStatusRequest.onsuccess = function (event) {
+
+                                        var allowShipmentStatusResult = [];
+                                        allowShipmentStatusResult = allowShipmentStatusRequest.result;
+                                        for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                            if (currentShipmentId == allowShipmentStatusResult[k].shipmentStatusId) {
+                                                nextShipmentAllowedList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
+                                            }
+                                        }
+
+                                        var count = 0;
+                                        for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                            if (nextShipmentAllowedList[count] == allowShipmentStatusResult[k].shipmentStatusId) {
+                                                var allowShipStatusJson = {
+                                                    name: allowShipmentStatusResult[k].label.label_en,
+                                                    id: allowShipmentStatusResult[k].shipmentStatusId
+                                                }
+                                                allowShipStatusList[count] = allowShipStatusJson;
+                                                count++;
+                                            }
+                                        }
+
+                                        this.setState({
+                                            allowShipmentStatusList: allowShipStatusList
+                                        });
+
+
+                                        var data = [];
+                                        var shipmentDataArr = [];
+
+                                        data[0] = shipmentList.shipmentId;
+                                        data[1] = shipmentList.expectedDeliveryDate;
+                                        data[2] = shipmentList.shipmentStatus.label.label_en;
+                                        data[3] = shipmentList.procurementAgent.label.label_en;
+                                        data[4] = '';//funding source
+                                        data[5] = '';//budget
+                                        data[6] = shipmentList.planningUnit.label.label_en;
+                                        data[7] = shipmentList.suggestedQty;
+                                        data[8] = procurementAgentPlanningList[0].moq;
+                                        data[9] = '';
+                                        data[10] = '';
+                                        data[11] = '';
+                                        data[12] = '';
+                                        data[13] = '';
+                                        data[14] = '';
+                                        data[15] = '';
+                                        data[16] = procurementAgentPlanningList[0].catalogPrice;
+                                        data[17] = '';
+                                        data[18] = '';
+                                        data[19] = shipmentList.notes;
+
+                                        shipmentDataArr[0] = data;
+
+                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                        this.el.destroy();
+                                        var json = [];
+                                        var data = shipmentDataArr;
+                                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                                        // json[0] = data;
+                                        var options = {
+                                            data: data,
+                                            columnDrag: true,
+                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                            columns: [
+                                                // { title: 'Month', type: 'text', readOnly: true },
+                                                {
+                                                    title: 'Shipment Id',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Expected Delivery date',
+                                                    // type: 'calendar',
+                                                    type: 'text',
+                                                    readOnly: true
+
+                                                },
+                                                {
+                                                    title: 'Shipment Status',
+                                                    type: 'dropdown',
+                                                    // source: ['Approved', 'Shipped', 'Delivered']
+                                                    source: allowShipStatusList
+                                                    // readOnly: true
+                                                },
+                                                {
+                                                    title: 'Procurement Agent',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Funding Source',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Budget',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Planning Unit',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Suggested Order Qty',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'MoQ',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'User Qty',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Adjusted Order Qty',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Adjusted Pallets',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Adjusted Containers',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Manual Price per Planning Unit',
+                                                    type: 'text',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Procurement Unit',
+                                                    type: 'dropdown',
+                                                    source: paList
+                                                },
+                                                {
+                                                    title: 'Supplier',
+                                                    type: 'dropdown',
+                                                    source: supList
+                                                },
+                                                {
+                                                    title: 'Price per Planning Unit',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'Amt',
+                                                    type: 'numeric',
+                                                    readOnly: true
+                                                },
+                                                {
+                                                    title: 'RO Number',
+                                                    type: 'text',
+                                                    // readOnly: true
+                                                },
+                                                {
+                                                    title: 'Notes',
+                                                    type: 'text',
+                                                    // readOnly: true
+                                                },
+
+                                            ],
+                                            pagination: 10,
+                                            search: true,
+                                            columnSorting: true,
+                                            tableOverflow: true,
+                                            wordWrap: true,
+                                            allowInsertColumn: false,
+                                            allowManualInsertColumn: false,
+                                            allowDeleteRow: false,
+                                            onchange: this.changed,
+                                            oneditionend: this.onedit,
+                                            copyCompatibility: true,
+                                            paginationOptions: [10, 25, 50, 100],
+                                            position: 'top'
+                                        };
+
+                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                                    }.bind(this);
+
+                                }.bind(this);
+                            }.bind(this);
+
+                        } else if (shipmentList.shipmentStatus.id == 7) {
+
+                            document.getElementById("addButton").style.display = "none";
+
+                            var data = [];
+                            var shipmentDataArr = [];
+
+                            data[0] = shipmentList.shipmentId;
+                            data[1] = shipmentList.expectedDeliveryDate;
+                            data[2] = shipmentList.shipmentStatus.label.label_en;
+                            data[3] = shipmentList.procurementAgent.label.label_en;
+                            data[4] = '';//funding source
+                            data[5] = '';//budget
+                            data[6] = shipmentList.planningUnit.label.label_en;
+                            data[7] = shipmentList.suggestedQty;
+                            data[8] = procurementAgentPlanningList[0].moq;
+                            data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
+                            data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
+                            data[11] = '';
+                            data[12] = '';
+                            data[13] = '';
+                            data[14] = shipmentList.quantity;
+                            data[15] = '';
+                            data[16] = '';
+                            data[17] = shipmentList.rate;
+                            data[18] = procurementAgentPlanningList[0].catalogPrice;
+                            data[19] = (shipmentList.rate == null || shipmentList.rate == 0) ? (shipmentList.quantity * procurementAgentPlanningList[0].catalogPrice).toFixed(2) : (shipmentList.quantity * shipmentList.rate).toFixed(2);
+                            data[20] = '';
+                            data[21] = shipmentList.notes;
+                            data[22] = true;
+                            data[23] = procurementAgentPlanningList[0].unitsPerPallet;
+                            data[24] = procurementAgentPlanningList[0].unitsPerContainer;
+
+                            shipmentDataArr[0] = data;
+
+                            // data = [];
+                            // data[0] = '';
+                            // data[1] = '10-09-2020';
+                            // data[2] = '02-PLANNED';
+                            // data[3] = 'PSM';
+                            // data[4] = 'USAID';
+                            // data[5] = 'Kenya - 2020 budget	';
+                            // data[6] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
+                            // data[7] = '44773';
+                            // data[8] = '45000'; //moq
+                            // data[9] = '30.00';
+                            // data[10] = '1.50';
+                            // data[11] = '';
+                            // data[12] = '';
+                            // data[13] = '';
+                            // data[14] = '';
+                            // data[15] = '';
+                            // data[16] = '';
+                            // data[17] = '';
+                            // data[18] = '7.83';
+                            // data[19] = '';
+                            // data[20] = '';
+                            // data[21] = '';
+                            // data[22] = '';
+                            // data[23] = '1500';
+                            // data[24] = '30000';
+                            // shipmentDataArr[0] = data;
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                            this.el.destroy();
+                            var json = [];
+                            var data = shipmentDataArr;
+                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                            // json[0] = data;
+                            var options = {
+                                data: data,
+                                columnDrag: true,
+                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                columns: [
+                                    // { title: 'Month', type: 'text', readOnly: true },
+                                    {
+                                        title: 'Shipment Id',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Expected Delivery date',
+                                        // type: 'calendar',
+                                        type: 'text',
+                                        readOnly: true
+
+                                    },
+                                    {
+                                        title: 'Shipment Status',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Procurement Agent',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Funding Source',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Budget',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Planning Unit',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Suggested Order Qty',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'MoQ',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'No of Pallets',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'No of Containers',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Order based on',
+                                        type: 'text',
+                                        readOnly: true
+
+                                    },
+                                    {
+                                        title: 'Rounding option',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'User Qty',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Order Qty',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Pallets',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Adjusted Containers',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Manual Price per Planning Unit',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Price per Planning Unit',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Amt',
+                                        type: 'numeric',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'RO Number',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Notes',
+                                        type: 'text',
+                                        readOnly: true
+                                    },
+                                    {
+                                        title: 'Cancelled Order',
+                                        type: 'checkbox'
+                                    },
+                                    {
+                                        title: 'Unit/Pallet',
+                                        type: 'hidden'
+                                    },
+                                    {
+                                        title: 'Unit/Container',
+                                        type: 'hidden'
+                                    }
+
+                                ],
+                                pagination: 10,
+                                search: true,
+                                columnSorting: true,
+                                tableOverflow: true,
+                                wordWrap: true,
+                                allowInsertColumn: false,
+                                allowManualInsertColumn: false,
+                                allowDeleteRow: false,
+                                onchange: this.changed,
+                                oneditionend: this.onedit,
+                                copyCompatibility: true,
+                                paginationOptions: [10, 25, 50, 100],
+                                position: 'top'
+                            };
+
+                            this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+                        }
+
+                    }.bind(this);
+                }.bind(this);
+            }.bind(this);
+
 
         } else {
             //start else
@@ -2079,11 +2872,6 @@ export default class ConsumptionDetails extends React.Component {
                     }
 
 
-
-
-
-
-
                 }
             }.bind(this)
         }.bind(this)
@@ -2196,6 +2984,8 @@ export default class ConsumptionDetails extends React.Component {
                                     }
                                 }
 
+                                this.setState({ planningUnitList: planningUnitList });
+
                                 let procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                                 let procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
                                 let procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
@@ -2280,7 +3070,7 @@ export default class ConsumptionDetails extends React.Component {
                 }
             );
             console.log("all good...", this.el.getJson());
-            let shipmentId = this.props.match.params.shipmentId;
+
             var tableJson = this.el.getJson();
             var db1;
             var storeOS;
@@ -2293,18 +3083,221 @@ export default class ConsumptionDetails extends React.Component {
 
                 var programId = this.props.match.params.programId;
 
+
                 var programRequest = programTransaction.get(programId);
                 programRequest.onsuccess = function (event) {
                     // console.log("(programRequest.result)----", (programRequest.result))
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
-                    var plannigUnitId = this.props.match.params.planningUnitId;
+
+                    let shipmentId = this.props.match.params.shipmentId;
+                    var planningUnitId = this.props.match.params.planningUnitId;
+                    let filterBy = this.props.match.params.filterBy;
+                    let startDate = this.props.match.params.startDate;
+                    let endDate = this.props.match.params.endDate;
+                    let rowIndex = this.props.match.params.rowIndex;
 
 
                     if (shipmentId == 0 || typeof shipmentId == "undefined") {
 
+                        const planningUnitFilterList = (programJson.shipmentList).filter(c => c.planningUnit.id == planningUnitId);
 
+                        let dateFilterList = '';
+                        if (filterBy == 1) {
+                            //Order Date Filter
+                            dateFilterList = planningUnitFilterList.filter(c => moment(c.orderedDate).isBetween(startDate, endDate, null, '[)'))
+                        } else {
+                            //Expected Delivery Date
+                            dateFilterList = planningUnitFilterList.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
+                        }
+
+                        let rowIndexFilterList = [];
+                        for (var y = 0; y < dateFilterList.length; y++) {
+                            if (y == rowIndex) {
+                                rowIndexFilterList[0] = dateFilterList[y];
+                            }
+                        }
+
+                        let shipmentDataList = [];
+                        shipmentDataList[0] = rowIndexFilterList[0];
+                        let shipmentDataListNotFiltered = (programJson.shipmentList);
+
+
+                        if (shipmentDataList[0].shipmentStatus.id == 2) {
+
+                            for (var i = 0; i < shipmentDataList.length; i++) {
+                                var map = new Map(Object.entries(tableJson[i]));
+
+                                let tempProcurementAgentList = this.state.procurementAgentObjList;
+                                let procurementAgentLabel = '';
+                                for (var i = 0; i < tempProcurementAgentList.length; i++) {
+                                    if (tempProcurementAgentList[i].id == map.get("3")) {
+                                        procurementAgentLabel = tempProcurementAgentList[i].name;
+                                    }
+                                }
+
+
+
+                                shipmentDataListNotFiltered[parseInt(map.get("25"))].procurementAgent.id = map.get("3");
+                                shipmentDataListNotFiltered[parseInt(map.get("25"))].procurementAgent.label.label_en = procurementAgentLabel;
+                                // shipmentDataListNotFiltered[parseInt(map.get("25"))].fundingSource.id = parseInt(map.get("4"));
+                                // shipmentDataListNotFiltered[parseInt(map.get("25"))].budget.id = parseInt(map.get("5"));
+                                // shipmentDataListNotFiltered[parseInt(map.get("25"))].orderBasedOn = map.get("11");
+                                // shipmentDataListNotFiltered[parseInt(map.get("25"))].roundingOption = map.get("12");
+                                shipmentDataListNotFiltered[parseInt(map.get("25"))].userQty = map.get("13");
+                                shipmentDataListNotFiltered[parseInt(map.get("25"))].quantity = map.get("14");
+                                shipmentDataListNotFiltered[parseInt(map.get("25"))].rate = map.get("17");
+                                // shipmentDataListNotFiltered[parseInt(map.get("25"))].RONumber = map.get("7");                        
+                                shipmentDataListNotFiltered[parseInt(map.get("25"))].notes = map.get("21");
+                                if (map.get("22") == true || map.get("22") === 'true') {
+                                    shipmentDataListNotFiltered[parseInt(map.get("25"))].shipmentStatus.id = 7;
+                                    shipmentDataListNotFiltered[parseInt(map.get("25"))].shipmentStatus.label.label_en = 'Cancelled';
+                                } else {
+                                    shipmentDataListNotFiltered[parseInt(map.get("25"))].shipmentStatus.id = 3;
+                                    shipmentDataListNotFiltered[parseInt(map.get("25"))].shipmentStatus.label.label_en = 'Submitted';
+                                }
+
+                            }
+
+                            for (var i = shipmentDataList.length; i < tableJson.length; i++) {
+                                let shipId = 0;
+                                let shipLabel = '';
+                                var map = new Map(Object.entries(tableJson[i]))
+
+                                if (map.get("22") == true || map.get("22") === 'true') {
+                                    shipId = 7;
+                                    shipLabel = 'Cancelled';
+                                } else {
+                                    shipId = 3;
+                                    shipLabel = 'Submitted';
+                                }
+
+                                let tempProcurementAgentList = this.state.procurementAgentObjList;
+                                let procurementAgentLabel = '';
+                                for (var i = 0; i < tempProcurementAgentList.length; i++) {
+                                    if (tempProcurementAgentList[i].id == map.get("3")) {
+                                        procurementAgentLabel = tempProcurementAgentList[i].name;
+                                    }
+                                }
+
+                                var json = {
+                                    shipmentId: 0,
+                                    planningUnit: {
+                                        id: planningUnitId,
+                                        label: {
+                                            label_en: this.state.planningUnitList[0].name
+                                        }
+                                    },
+                                    expectedDeliveryDate: moment(map.get("1")).format("YYYY-MM-DD"),
+                                    suggestedQty: map.get("7"),
+                                    procurementAgent: {
+                                        id: map.get("3"),
+                                        label: {
+                                            label_en: procurementAgentLabel
+                                        }
+                                    },
+                                    procurementUnit: {
+                                        id: 0,
+                                        label: {
+                                            label_en: ''
+                                        }
+                                    },
+                                    supplier: {
+                                        id: 0,
+                                        label: {
+                                            label_en: ''
+                                        }
+                                    },
+                                    quantity: map.get("14"),
+                                    rate: map.get("17"),
+                                    productCost: 0,
+                                    shipmentMode: '',
+                                    freightCost: 0,
+                                    orderedDate: moment(new Date()).format("YYYY-MM-DD"),
+                                    shippedDate: '',
+                                    receivedDate: '',
+                                    shipmentStatus: {
+                                        id: shipId,
+                                        label: {
+                                            label_en: shipLabel
+                                        }
+                                    },
+                                    notes: map.get("21"),
+                                    dataSource: {
+                                        id: 0
+                                    },
+                                    accountFlag: '',
+                                    erpFlag: '',
+                                    versionId: 0
+                                }
+                                shipmentDataList.push(json);
+                                shipmentDataListNotFiltered.push(json);
+                                console.log("JSON---- ", json);
+                            }
+
+
+
+
+                        } else if (shipmentDataList[0].shipmentStatus.id == 7) {
+
+                            for (var i = 0; i < shipmentDataList.length; i++) {
+                                var map = new Map(Object.entries(tableJson[i]));
+                                shipmentDataListNotFiltered[parseInt(map.get("23"))].notes = map.get("21");
+                                if (map.get("22") == true || map.get("22") === 'true') {
+                                    shipmentDataListNotFiltered[parseInt(map.get("23"))].shipmentStatus.id = 7;
+                                    shipmentDataListNotFiltered[parseInt(map.get("23"))].shipmentStatus.label.label_en = 'Cancelled';
+                                } else {
+                                    shipmentDataListNotFiltered[parseInt(map.get("23"))].shipmentStatus.id = 2;
+                                    shipmentDataListNotFiltered[parseInt(map.get("23"))].shipmentStatus.label.label_en = 'Cancelled';
+                                }
+                            }
+
+
+                        } else if (shipmentDataList[0].shipmentStatus.id == 3 || shipmentDataList[0].shipmentStatus.id == 4 || shipmentDataList[0].shipmentStatus.id == 5 || shipmentDataList[0].shipmentStatus.id == 6) {
+                            for (var i = 0; i < shipmentDataList.length; i++) {
+                                let shipLabel = '';
+                                var map = new Map(Object.entries(tableJson[i]));
+
+                                if (map.get("2") == 3) {
+                                    shipLabel = 'Submitted';
+                                } else if (map.get("2") == 4) {
+                                    shipLabel = 'Approved';
+                                } else if (map.get("2") == 5) {
+                                    shipLabel = 'Shipped';
+                                } else if (map.get("2") == 6) {
+                                    shipLabel = 'Delivered';
+                                }
+
+                                let tempProcurementUnitList = this.state.procurementUnitObjList;
+                                let procurementUnitLabel = '';
+                                for (var i = 0; i < tempProcurementUnitList.length; i++) {
+                                    if (tempProcurementUnitList[i].id == map.get("14")) {
+                                        procurementUnitLabel = tempProcurementUnitList[i].name;
+                                    }
+                                }
+
+                                let tempSupplierList = this.state.supplierObjList;
+                                let supplierLabel = '';
+                                for (var i = 0; i < tempSupplierList.length; i++) {
+                                    if (tempSupplierList[i].id == map.get("15")) {
+                                        supplierLabel = tempSupplierList[i].name;
+                                    }
+                                }
+
+
+
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].shipmentStatus.id = map.get("2");
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].shipmentStatus.label.label_en = shipLabel;
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].procurementUnit.id = map.get("14");
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].procurementUnit.label.label_en = procurementUnitLabel;
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].supplier.id = map.get("15");
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].supplier.label.label_en = supplierLabel;
+                                // shipmentDataListNotFiltered[parseInt(map.get("23"))].RONumber = map.get("18");
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].notes = map.get("19");
+
+                            }
+                        }
 
 
                     } else {
@@ -2314,9 +3307,18 @@ export default class ConsumptionDetails extends React.Component {
                             var shipmentDataListNotFiltered = programJson.shipmentList;
                             // console.log("programJson.shipmentList-- ",programJson.shipmentList);
                             for (var i = 0; i < shipmentDataList.length; i++) {
-
                                 var map = new Map(Object.entries(tableJson[i]));
+
+                                let tempProcurementAgentList = this.state.procurementAgentObjList;
+                                let procurementAgentLabel = '';
+                                for (var i = 0; i < tempProcurementAgentList.length; i++) {
+                                    if (tempProcurementAgentList[i].id == map.get("3")) {
+                                        procurementAgentLabel = tempProcurementAgentList[i].name;
+                                    }
+                                }
+
                                 shipmentDataListNotFiltered[parseInt(map.get("25"))].procurementAgent.id = map.get("3");
+                                shipmentDataListNotFiltered[parseInt(map.get("25"))].procurementAgent.label.label_en = procurementAgentLabel;
                                 // shipmentDataListNotFiltered[parseInt(map.get("25"))].fundingSource.id = parseInt(map.get("4"));
                                 // shipmentDataListNotFiltered[parseInt(map.get("25"))].budget.id = parseInt(map.get("5"));
                                 // shipmentDataListNotFiltered[parseInt(map.get("25"))].orderBasedOn = map.get("11");
@@ -2348,21 +3350,41 @@ export default class ConsumptionDetails extends React.Component {
                                     shipLabel = 'Submitted';
                                 }
 
+                                let tempProcurementAgentList = this.state.procurementAgentObjList;
+                                let procurementAgentLabel = '';
+                                for (var i = 0; i < tempProcurementAgentList.length; i++) {
+                                    if (tempProcurementAgentList[i].id == map.get("3")) {
+                                        procurementAgentLabel = tempProcurementAgentList[i].name;
+                                    }
+                                }
+
                                 var json = {
                                     shipmentId: 0,
                                     planningUnit: {
-                                        id: plannigUnitId,
+                                        id: planningUnitId,
+                                        label: {
+                                            label_en: this.state.planningUnitList[0].name
+                                        }
                                     },
                                     expectedDeliveryDate: moment(map.get("1")).format("YYYY-MM-DD"),
                                     suggestedQty: map.get("7"),
                                     procurementAgent: {
-                                        id: map.get("3")
+                                        id: map.get("3"),
+                                        label: {
+                                            label_en: procurementAgentLabel
+                                        }
                                     },
                                     procurementUnit: {
-                                        id: 0
+                                        id: 0,
+                                        label: {
+                                            label_en: ''
+                                        }
                                     },
                                     supplier: {
-                                        id: 0
+                                        id: 0,
+                                        label: {
+                                            label_en: ''
+                                        }
                                     },
                                     quantity: map.get("14"),
                                     rate: map.get("17"),
@@ -2388,6 +3410,7 @@ export default class ConsumptionDetails extends React.Component {
                                 }
                                 shipmentDataList.push(json);
                                 shipmentDataListNotFiltered.push(json);
+                                console.log("JSON---- ", json);
                             }
 
                         } else if (shipmentStatusId == 7) {
@@ -2425,10 +3448,28 @@ export default class ConsumptionDetails extends React.Component {
                                     shipLabel = 'Delivered';
                                 }
 
+                                let tempProcurementUnitList = this.state.procurementUnitObjList;
+                                let procurementUnitLabel = '';
+                                for (var i = 0; i < tempProcurementUnitList.length; i++) {
+                                    if (tempProcurementUnitList[i].id == map.get("14")) {
+                                        procurementUnitLabel = tempProcurementUnitList[i].name;
+                                    }
+                                }
+
+                                let tempSupplierList = this.state.supplierObjList;
+                                let supplierLabel = '';
+                                for (var i = 0; i < tempSupplierList.length; i++) {
+                                    if (tempSupplierList[i].id == map.get("15")) {
+                                        supplierLabel = tempSupplierList[i].name;
+                                    }
+                                }
+
                                 shipmentDataListNotFiltered[parseInt(map.get("20"))].shipmentStatus.id = map.get("2");
                                 shipmentDataListNotFiltered[parseInt(map.get("20"))].shipmentStatus.label.label_en = shipLabel;
                                 shipmentDataListNotFiltered[parseInt(map.get("20"))].procurementUnit.id = map.get("14");
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].procurementUnit.label.label_en = procurementUnitLabel;
                                 shipmentDataListNotFiltered[parseInt(map.get("20"))].supplier.id = map.get("15");
+                                shipmentDataListNotFiltered[parseInt(map.get("20"))].supplier.label.label_en = supplierLabel;
                                 // shipmentDataListNotFiltered[parseInt(map.get("23"))].RONumber = map.get("18");
                                 shipmentDataListNotFiltered[parseInt(map.get("20"))].notes = map.get("19");
 
@@ -2495,13 +3536,8 @@ export default class ConsumptionDetails extends React.Component {
                     //     consumptionDataListNotFiltered.push(json);
                     // }
 
-
-
-
-
-
                     //------------------------------------------------------------------------------
-                    // console.log("1111111111111111111   ", shipmentDataList)
+                    console.log("IMP------------------>   ", shipmentDataListNotFiltered);
                     programJson.shipmentList = shipmentDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
@@ -2512,11 +3548,11 @@ export default class ConsumptionDetails extends React.Component {
                     putRequest.onsuccess = function (event) {
                         // $("#saveButtonDiv").hide();
                         this.setState({
-                            message: 'static.message.consumptionSaved',
+                            message: 'static.message.shipmentSaved',
                             changedFlag: 0
                         })
                         // this.props.history.push(`/consumptionDetails/${document.getElementById('programId').value}/${document.getElementById("planningUnitId").value}/` + i18n.t('static.message.consumptionSuccess'))
-                        this.props.history.push(`/consumptionDetails/` + i18n.t('static.message.consumptionSuccess'));
+                        this.props.history.push(`/shipment/ShipmentList/` + i18n.t('static.message.shipmentSaved'));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -2550,9 +3586,10 @@ export default class ConsumptionDetails extends React.Component {
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
+                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.backClicked}><i className="fa fa-times"></i> {i18n.t('static.common.back')}</Button>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} id="addButton"><i className="fa fa-check"></i>Add Row</Button>
+                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} id="addButton"><i className="fa fa-check"></i>Add Row</Button>
 
                                 &nbsp;
 </FormGroup>
@@ -3908,6 +4945,176 @@ export default class ConsumptionDetails extends React.Component {
     }
     cancelClicked() {
         this.props.history.push(`/dashboard/` + i18n.t('static.message.cancelled'))
+    }
+
+    backClicked() {
+        this.props.history.push(`/shipment/shipmentList/` + i18n.t('static.common.back'))
+    }
+
+    getProcurementAgentById() {
+
+        let programId = this.props.match.params.programId;
+        let shipmentId = this.props.match.params.shipmentId;
+        let planningUnitId = this.props.match.params.planningUnitId;
+        let filterBy = this.props.match.params.filterBy;
+        let startDate = this.props.match.params.startDate;
+        let endDate = this.props.match.params.endDate;
+        let rowIndex = this.props.match.params.rowIndex;
+
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                var procurementAgentObj = '';
+                var procurementAgentObjList = [];
+                var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+                var procurementAgentRequest = procurementAgentOs.getAll();
+
+                procurementAgentRequest.onsuccess = function (event) {
+                    var procurementAgentResult = [];
+                    procurementAgentResult = procurementAgentRequest.result;
+                    for (var k = 0; k < procurementAgentResult.length; k++) {
+
+
+                        procurementAgentObj = {
+                            name: procurementAgentResult[k].label.label_en,
+                            id: procurementAgentResult[k].procurementAgentId
+                        }
+                        procurementAgentObjList[k] = procurementAgentObj;
+                    }
+                    this.setState({
+                        procurementAgentObjList: procurementAgentObjList
+                    })
+
+                    console.log("set procurementAgentObj --- ", procurementAgentObj);
+
+
+
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+
+
+    }
+
+    getProcurementUnitById() {
+
+        let programId = this.props.match.params.programId;
+        let shipmentId = this.props.match.params.shipmentId;
+        let planningUnitId = this.props.match.params.planningUnitId;
+        let filterBy = this.props.match.params.filterBy;
+        let startDate = this.props.match.params.startDate;
+        let endDate = this.props.match.params.endDate;
+        let rowIndex = this.props.match.params.rowIndex;
+
+
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                var procurementUnitJson = '';
+                var procurementUnitObjList = [];
+                var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
+                var procurementUnitRequest = procurementUnitOs.getAll();
+                procurementUnitRequest.onsuccess = function (event) {
+
+                    var procurementUnitResult = [];
+                    procurementUnitResult = procurementUnitRequest.result;
+                    for (var k = 0; k < procurementUnitResult.length; k++) {
+
+                        procurementUnitJson = {
+                            name: procurementUnitResult[k].label.label_en,
+                            id: procurementUnitResult[k].procurementUnitId
+                        }
+
+                        procurementUnitObjList[k] = procurementUnitJson;
+                    }
+
+                    this.setState({
+                        procurementUnitObjList: procurementUnitObjList
+                    })
+
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
+
+    getSupplierById() {
+        let programId = this.props.match.params.programId;
+        let shipmentId = this.props.match.params.shipmentId;
+        let planningUnitId = this.props.match.params.planningUnitId;
+        let filterBy = this.props.match.params.filterBy;
+        let startDate = this.props.match.params.startDate;
+        let endDate = this.props.match.params.endDate;
+        let rowIndex = this.props.match.params.rowIndex;
+
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                var supplierObj = '';
+                var supplierObjList = [];
+                var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
+                var supplierOs = supplierTransaction.objectStore('supplier');
+                var supplierRequest = supplierOs.getAll();
+                supplierRequest.onsuccess = function (event) {
+
+                    var supplierResult = [];
+                    supplierResult = supplierRequest.result;
+                    for (var k = 0; k < supplierResult.length; k++) {
+
+                        supplierObj = {
+                            name: supplierResult[k].label.label_en,
+                            id: supplierResult[k].supplierId
+                        }
+                        supplierObjList[k] = supplierObj;
+                    }
+
+                    this.setState({
+                        supplierObjList: supplierObjList
+                    });
+
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
     }
 }
 

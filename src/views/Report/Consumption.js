@@ -49,7 +49,6 @@ import csvicon from '../../assets/img/csv.png'
 import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { Item } from 'react-contexify';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -210,7 +209,7 @@ class Consumption extends Component {
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
 
-      //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+      // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
       // var reader = new FileReader();
 
       //var data='';
@@ -222,7 +221,7 @@ class Consumption extends Component {
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
-          align: 'justify'
+        align: 'justify'
         });*/
         doc.setTextColor("#002f6c");
         doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
@@ -285,10 +284,10 @@ class Consumption extends Component {
     addFooters(doc)
     doc.save("report.pdf")
     //creates PDF from img
-    /*  var doc = new jsPDF('landscape');
-      doc.setFontSize(20);
-      doc.text(15, 15, "Cool Chart");
-      doc.save('canvas.pdf');*/
+    /* var doc = new jsPDF('landscape');
+    doc.setFontSize(20);
+    doc.text(15, 15, "Cool Chart");
+    doc.save('canvas.pdf');*/
   }
 
 
@@ -562,10 +561,9 @@ class Consumption extends Component {
   }
   getProductCategories() {
     let programId = document.getElementById("programId").value;
-    let realmId = AuthenticationService.getRealmId();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      ProductService.getProductCategoryListByProgram(realmId, programId)
+      ProductService.getProductCategoryListByProgram(programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -702,9 +700,9 @@ class Consumption extends Component {
 
   show() {
     /* if (!this.state.showed) {
-         setTimeout(() => {this.state.closeable = true}, 250)
-         this.setState({ showed: true })
-     }*/
+    setTimeout(() => {this.state.closeable = true}, 250)
+    this.setState({ showed: true })
+    }*/
   }
   handleRangeChange(value, text, listIndex) {
     //
@@ -826,12 +824,12 @@ class Consumption extends Component {
 
                     {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
 
-                       
-                          {({ toPdf }) =>
-                            <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
+ 
+ {({ toPdf }) =>
+ <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
-                          }
-                        </Pdf>*/}
+ }
+ </Pdf>*/}
                   </a>
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
@@ -845,13 +843,13 @@ class Consumption extends Component {
 
                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
 
-                    {/*   <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
+                    {/* <Pdf targetRef={ref} filename={i18n.t('static.report.consumptionpdfname')}>
 
-                          {({ toPdf }) =>
-                            <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
+ {({ toPdf }) =>
+ <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => toPdf()} />
 
-                          }
-                        </Pdf>*/}
+ }
+ </Pdf>*/}
                   </a>
                   <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                 </div>
@@ -865,7 +863,7 @@ class Consumption extends Component {
                   <Col md="12 pl-0">
                     <div className="row">
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
                         <div className="controls edit">
 
                           <Picker
@@ -953,8 +951,8 @@ class Consumption extends Component {
                                 {productCategories.length > 0
                                   && productCategories.map((item, i) => {
                                     return (
-                                      <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                        {Array(item.level).fill('_ _ ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                      <option key={i} value={item.productCategoryId}>
+                                        {getLabelText(item.label, this.state.lang)}
                                       </option>
                                     )
                                   }, this)}
@@ -1012,8 +1010,8 @@ class Consumption extends Component {
                                   }, this)}
                               </Input>
                               {/* <InputGroupAddon addonType="append">
-                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon> */}
+ <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+ </InputGroupAddon> */}
                             </InputGroup>
                           </div>
                         </FormGroup>
@@ -1039,8 +1037,8 @@ class Consumption extends Component {
                                   }, this)}
                               </Input>
                               {/* <InputGroupAddon addonType="append">
-                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon> */}
+ <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+ </InputGroupAddon> */}
                             </InputGroup>
                           </div>
                         </FormGroup>
@@ -1056,8 +1054,8 @@ class Consumption extends Component {
                         this.state.consumptions.length > 0
                         &&
                         <div className="col-md-12">
-                          <div className="col-md-9">
-                            <div className="chart-wrapper chart-graph">
+                          <div className="col-md-12">
+                            <div className="chart-wrapper chart-graph-report">
                               <Bar id="cool-canvas" data={bar} options={options} />
 
                             </div>
@@ -1076,8 +1074,8 @@ class Consumption extends Component {
                         this.state.offlineConsumptionList.length > 0
                         &&
                         <div className="col-md-12">
-                          <div className="col-md-9">
-                            <div className="chart-wrapper chart-graph">
+                          <div className="col-md-12">
+                            <div className="chart-wrapper chart-graph-report">
                               <Bar id="cool-canvas" data={bar} options={options} />
 
                             </div>
@@ -1113,8 +1111,8 @@ class Consumption extends Component {
 
                             <tr id="addr0" key={idx} >
                               {/* <td>
-                                      {this.state.consumptions[idx].consumption_date}
-                                    </td> */}
+ {this.state.consumptions[idx].consumption_date}
+ </td> */}
                               <td>{moment(this.state.consumptions[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
                               <td>
 
@@ -1136,8 +1134,8 @@ class Consumption extends Component {
 
                             <tr id="addr0" key={idx} >
                               {/* <td>
-                                      {this.state.offlineConsumptionList[idx].consumption_date}
-                                    </td> */}
+ {this.state.offlineConsumptionList[idx].consumption_date}
+ </td> */}
                               <td>{moment(this.state.offlineConsumptionList[idx].consumption_date, 'MM-YYYY').format('MMM YYYY')}</td>
                               <td>
 

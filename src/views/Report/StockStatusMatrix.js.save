@@ -126,31 +126,6 @@ export default class StockStatusMatrix extends React.Component {
     this.filterData();
   }
 
-<<<<<<< HEAD
-  _handleClickRangeBox(e) {
-    this.refs.pickRange.show()
-  }
-
-  filterData() {
-    let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-    let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-    let programId = document.getElementById("programId").value;
-    let productCategoryId = document.getElementById("productCategoryId").value;
-    let planningUnitId = document.getElementById("planningUnitId").value;
-    let view = document.getElementById("view").value;
-    if (navigator.onLine) {
-      let realmId = document.getElementById("realmId").value;
-      AuthenticationService.setupAxiosInterceptors();
-      ProductService.getStockStatusMatrixData(realmId, programId, planningUnitId, view, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate())
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            data: response.data,
-            view: view
-          })
-        }).catch(
-          error => {
-=======
     getProductCategories() {
       let programId = document.getElementById("programId").value;
         AuthenticationService.setupAxiosInterceptors();
@@ -195,7 +170,6 @@ export default class StockStatusMatrix extends React.Component {
           let productCategoryId = document.getElementById("productCategoryId").value;
           ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
             console.log('**' + JSON.stringify(response.data))
->>>>>>> stock status over time
             this.setState({
               consumptions: []
             })
@@ -215,102 +189,6 @@ export default class StockStatusMatrix extends React.Component {
                   this.setState({ message: 'static.unkownError' });
                   break;
               }
-<<<<<<< HEAD
-            }
-          }
-        );
-    } else {
-      if (view == 1) {
-
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var programRequest = programTransaction.get(programId);
-
-
-          programRequest.onsuccess = function (event) {
-            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson = JSON.parse(programData);
-            var offlineInventoryList = (programJson.inventoryList);
-            console.log("offlineInventoryList---", offlineInventoryList);
-
-            const activeFilter = offlineInventoryList.filter(c => (c.active == true || c.active == "true"));
-            console.log("activeFilter---", activeFilter);
-
-            const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
-            console.log("planningUnitFilter---", planningUnitFilter);
-            const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
-            console.log("productCategoryFilter---", productCategoryFilter)
-
-            // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
-            const filteredData = productCategoryFilter.filter(c => moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)'))
-            console.log("filteredData---", filteredData);
-            let finalOfflineInventory = [];
-            let previousYear = 0;
-            let json;
-            for (let i = this.state.rangeValue.from.year; i <= this.state.rangeValue.to.year; i++) {
-              let jan = 0;
-              let feb = 0;
-              let mar = 0;
-              let apr = 0;
-              let may = 0;
-              let jun = 0;
-              let jul = 0;
-              let aug = 0;
-              let sep = 0;
-              let oct = 0;
-              let nov = 0;
-              let dec = 0;
-              let monthArray = [];
-              for (let j = 0; j <= filteredData.length; j++) {
-                if (filteredData[j] != null && filteredData[j] != "" && (i == moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('YYYY'))) {
-                  // for (let k = 0; k <= filteredData.length; k++) {
-
-                  // }
-
-                  let month = moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('MM');
-                  if (month == "01" || month == "1" || month == 1) {
-                    jan = jan + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "02" || month == "2" || month == 2) {
-                    feb = feb + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "03" || month == "3" || month == 3) {
-                    mar = mar + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "04" || month == "4" || month == 4) {
-                    apr = apr + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "05" || month == "5" || month == 5) {
-                    may = may + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "06" || month == "6" || month == 6) {
-                    jun = jun + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "07" || month == "7" || month == 7) {
-                    jul = jul + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "08" || month == "8" || month == 8) {
-                    aug = aug + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "09" || month == "9" || month == 9) {
-                    sep = sep + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "10" || month == 10) {
-                    oct = oct + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "11" || month == 11) {
-                    nov = nov + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-                  }
-                  if (month == "12" || month == 12) {
-                    dec = dec + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
-=======
             ); } else {
           const lan = 'en';
           var db1;
@@ -339,7 +217,6 @@ export default class StockStatusMatrix extends React.Component {
                   var productJson = {
                     name: getLabelText(myResult[i].planningUnit.label, lan),
                     id: myResult[i].planningUnit.id
->>>>>>> stock status over time
                   }
                 }
               }
@@ -416,41 +293,6 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this)
 
       }
-<<<<<<< HEAD
-    }
-  }
-
-  getProductCategories() {
-    let programId = document.getElementById("programId").value;
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      let programId = document.getElementById("programId").value;
-      ProductService.getProductCategoryListByProgram(programId)
-        .then(response => {
-          console.log(JSON.stringify(response.data))
-          this.setState({
-            productCategories: response.data
-          })
-        }).catch(
-          error => {
-            this.setState({
-              productCategories: []
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-=======
     
 
     getPrograms() {
@@ -484,7 +326,6 @@ export default class StockStatusMatrix extends React.Component {
                       break;
                   }
                 }
->>>>>>> stock status over time
               }
             }
           }
@@ -683,93 +524,6 @@ export default class StockStatusMatrix extends React.Component {
         }.bind(this);
 
       }
-<<<<<<< HEAD
-
-
-    }
-
-
-  }
-  componentDidUpdate() {
-    setTimeout(() => this.setState({ message: '' }), 3000);
-  }
-
-
-  componentDidMount() {
-    if (navigator.onLine) {
-      AuthenticationService.setupAxiosInterceptors();
-      RealmService.getRealmListAll()
-        .then(response => {
-          if (response.status == 200) {
-
-            this.setState({
-              realms: response.data
-            })
-            this.getPrograms();
-
-          } else {
-            this.setState({ message: response.data.messageCode })
-          }
-        }).catch(
-          error => {
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                  this.setState({ message: error.response.data.messageCode });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
-              }
-            }
-          }
-        );
-    } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open('fasp', 1);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['programData'], 'readwrite');
-        var program = transaction.objectStore('programData');
-        var getRequest = program.getAll();
-        var offlinePrograms = []
-        getRequest.onerror = function (event) {
-          // Handle errors!
-        }.bind(this);;
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              console.log("my result---", myResult[i]);
-              var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-              var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var programJson = {
-                name: getLabelText(JSON.parse(programNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
-              }
-              offlinePrograms[i] = programJson
-            }
-          }
-          console.log("program list---", offlinePrograms);
-          this.setState({
-            offlinePrograms
-          })
-
-        }.bind(this);
-
-      }.bind(this);
-=======
    /*   componentDidUpdate(){
         setTimeout(() => this.setState({message:''}), 3000);
         }
@@ -778,7 +532,6 @@ export default class StockStatusMatrix extends React.Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         this.getPrograms();
->>>>>>> stock status over time
     }
   }
   exportCSV(columns) {
@@ -854,47 +607,10 @@ export default class StockStatusMatrix extends React.Component {
         , ele.Dec]);
     }
 
-<<<<<<< HEAD
-    console.log(data1);
-    let content = {
-      startY: 50,
-      head: header,
-      body: this.state.view == 1 ? data1 : data2,
-    };
-
-    doc.text(title, marginLeft, 40);
-    doc.autoTable(content);
-    doc.save(i18n.t('static.dashboard.stockstatusmatrix') + ".pdf")
-  }
-
-
-  formatLabel(cell, row) {
-    return getLabelText(cell, this.state.lang);
-  }
-
-  render() {
-    const { realms } = this.state;
-    let realmList = realms.length > 0
-      && realms.map((item, i) => {
-        return (
-          <option key={i} value={item.realmId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
-        )
-      }, this);
-
-    const { offlinePrograms } = this.state;
-    const { offlineProductCategoryList } = this.state;
-    const { offlinePlanningUnitList } = this.state;
-
-    const { planningUnits } = this.state;
-    let planningUnitList = planningUnits.length > 0
-=======
     render() {
        
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
->>>>>>> stock status over time
       && planningUnits.map((item, i) => {
         return (
           <option key={i} value={item.planningUnit.id}>
@@ -902,22 +618,6 @@ export default class StockStatusMatrix extends React.Component {
           </option>
         )
       }, this);
-<<<<<<< HEAD
-    const { productCategories } = this.state;
-    let productCategoryList = productCategories.length > 0
-      && productCategories.map((item, i) => {
-        return (
-          <option key={i} value={item.payload.productCategoryId}>
-            {getLabelText(item.payload.label, this.state.lang)}
-          </option>
-        )
-      }, this);
-    const pickerLang = {
-      months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-      from: 'From', to: 'To',
-    }
-    const { rangeValue } = this.state
-=======
         const { productCategories } = this.state;
         let productCategoryList = productCategories.length > 0
             && productCategories.map((item, i) => {
@@ -945,7 +645,6 @@ export default class StockStatusMatrix extends React.Component {
                 {i18n.t('static.common.result', { from, to, size })}
             </span>
         );
->>>>>>> stock status over time
 
     const makeText = m => {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -1512,69 +1211,6 @@ export default class StockStatusMatrix extends React.Component {
 
                       </Input>
 
-<<<<<<< HEAD
-                    </InputGroup>
-                  </div>
-                </FormGroup>
-                <Online>
-                  <FormGroup className="col-md-3">
-                    <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                    <div className="controls">
-                      <InputGroup>
-                        <Input
-                          type="select"
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="sm"
-                        >
-
-                          <option value="0">{i18n.t('static.common.all')}</option>
-                          {planningUnitList}
-                        </Input>
-                        <InputGroupAddon addonType="append">
-                          <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </div>
-                  </FormGroup>
-                </Online>
-              </div>
-            </Col>
-
-            <ToolkitProvider
-              keyField="procurementUnitId"
-              data={navigator.onLine ? this.state.data : this.state.offlineInventoryList}
-              columns={this.state.view == 1 ? columns : columns1}
-              search={{ searchFormatted: true }}
-              hover
-              filter={filterFactory()}
-
-            >
-              {
-                props => (
-                  <div className="TableCust">
-
-                    <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
-
-                      <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} /></div>
-                    <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                      pagination={paginationFactory(options)}
-
-                      {...props.baseProps}
-                    />
-                  </div>
-                )
-              }
-            </ToolkitProvider>
-
-          </CardBody>
-        </Card>
-
-
-      </div>)
-  }
-=======
             <div className="animated">
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
@@ -1722,5 +1358,4 @@ export default class StockStatusMatrix extends React.Component {
 
             </div>)
     }
->>>>>>> stock status over time
 }

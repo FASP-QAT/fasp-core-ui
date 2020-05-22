@@ -298,7 +298,7 @@ class StockStatusOverTime extends Component {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
                 }
@@ -425,7 +425,7 @@ class StockStatusOverTime extends Component {
                     type: "line",
                     label: "MOS Feature 3",
                     backgroundColor: 'transparent',
-                    borderColor: '#ffc107',
+                    borderColor: '#ed5626',
                     lineTension: 0,
                     showActualPercentages: true,
                     showInLegend: true,
@@ -559,8 +559,8 @@ class StockStatusOverTime extends Component {
                                     this.state.matricsList.length > 0
                                     &&
 
-                                    <div className="col-md-9">
-                                        <div className="chart-wrapper chart-graph">
+                                    <div className="col-md-12">
+                                        <div className="chart-wrapper chart-graph-report">
                                             <Line id="cool-canvas" data={bar} options={options} />
 
                                         </div>

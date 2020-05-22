@@ -452,7 +452,8 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
-  { path: '/shipment/ShipmentList', name: 'Shipment / Shipment', component: ShipmentList },
+  { path: '/shipment/ShipmentList', exact: true, name: 'Shipment / Shipment', component: ShipmentList },
+  { path: '/shipment/shipmentList/:message', component: ShipmentList },
   { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
 ];
 export default routes;

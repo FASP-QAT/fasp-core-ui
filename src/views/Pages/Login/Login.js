@@ -69,6 +69,8 @@ class Login extends Component {
       message: ''
     }
     this.forgotPassword = this.forgotPassword.bind(this);
+    this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
+    this.logoutMessagehide = this.logoutMessagehide.bind(this);
   }
 
   touchAll(setTouched, errors) {
@@ -94,6 +96,11 @@ class Login extends Component {
     }
   }
 
+  componentDidMount() {
+    console.log("------componentDidMount------------");
+    this.logoutMessagehide();
+  }
+
   forgotPassword() {
     if (navigator.onLine) {
       this.props.history.push(`/forgotPassword`)
@@ -108,6 +115,37 @@ class Login extends Component {
       });
     }
   }
+
+  incorrectPassmessageHide() {
+    console.log("forgotpass msg");
+    setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
+    setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 8000);
+    this.setState({
+      message: ''
+    },
+      () => {
+        // document.getElementById('div1').style.display = 'block';
+        document.getElementById('div2').style.display = 'block';
+
+
+
+        
+      });
+  }
+
+  logoutMessagehide() {
+    console.log("logout");
+    setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
+    setTimeout(function () {var div2= document.getElementById('div2').style.display = 'none';}, 8000);
+    this.setState({
+      message: ''
+    },
+      () => {
+        document.getElementById('div1').style.display = 'block';
+        document.getElementById('div2').style.display = 'block';
+      });
+  }
+
   render() {
     return (
       <div className="main-content flex-row align-items-center">
@@ -223,8 +261,8 @@ class Login extends Component {
                             setTouched
                           }) => (
                               <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                                <h5 >{i18n.t(this.props.match.params.message)}</h5>
-                                <h5 >{i18n.t(this.state.message)}</h5>
+                                <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
+                                <h5 id="div2">{i18n.t(this.state.message)}</h5>
 
                                 {/* <h1>{i18n.t('static.login.login')}</h1> */}
 
@@ -270,7 +308,7 @@ class Login extends Component {
                                 </InputGroup>
                                 <Row>
                                   <Col xs="6">
-                                    <Button type="submit" color="primary" className="px-4" onClick={() => this.touchAll(setTouched, errors)} >{i18n.t('static.login.login')}</Button>
+                                    <Button type="submit" color="primary" className="px-4" onClick={() => { this.touchAll(setTouched, errors); this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
                                   </Col>
                                   <Col xs="6" className="text-right">
                                     <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
@@ -297,8 +335,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                            official U.S. government information and does not represent the views or positions of the
-                            Agency for International Development or the U.S. government.
+                                        official U.S. government information and does not represent the views or positions of the
+                                        Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
@@ -332,5 +370,9 @@ class Login extends Component {
     );
   }
 }
+
+
+
+// incorrectPassmessageHide();
 
 export default Login;
