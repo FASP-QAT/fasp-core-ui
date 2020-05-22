@@ -239,6 +239,13 @@ export default class ForecastingUnitListComponent extends Component {
             headerAlign: 'center',
             formatter: this.formatLabel
         }, {
+            dataField: 'unit.label',
+            text: i18n.t('static.unit.unit'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
             dataField: 'genericLabel',
             text: i18n.t('static.product.productgenericname'),
             sort: true,

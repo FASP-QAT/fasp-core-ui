@@ -613,7 +613,7 @@
     "static.message.invaliddate": "Invalid date",
     "static.consumption.consumptionqty": "Consumption Quantity",
     "static.consumption.daysofstockout": "Days of Stock out",
-    "static.consumption.actualflag": "Actual/Forecast Flag",
+    "static.consumption.actualflag": "Actual Flag",
     "static.consumption.actual": "Actual",
     "static.consumption.forcast": "Forecast",
     "static.message.inventorysuccess": "Inventory Data Saved",
@@ -666,5 +666,7 @@
     "static.common.selectProductCategory": "Please select product category",
     "static.dashboard.stockstatusovertime":"Stock Status Over time",
     "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
-    "static.report.noofmonth":"Number Of Months"
+    "static.report.noofmonth":"Number Of Months",
+    "static.message.shipmentSaved": "Shipment Data Saved"
+    
 }
