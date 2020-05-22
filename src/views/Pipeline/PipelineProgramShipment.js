@@ -68,7 +68,7 @@ export default class PipelineProgramShipment extends Component {
         );
 
 
-      //   console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
+         console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
         AuthenticationService.setupAxiosInterceptors();
        
         DataSourceService.getAllDataSourceList()
@@ -240,7 +240,7 @@ export default class PipelineProgramShipment extends Component {
                 }
             );
         
-            PipelineService.getShipmentDataById(1)
+            PipelineService.getShipmentDataById(this.props.match.params.pipelineId)
             .then(response => {
                 if (response.status == 200) {
                    // console.log(response.data)
@@ -285,7 +285,7 @@ export default class PipelineProgramShipment extends Component {
 
         if (this.state.pipelineShipmentData.length != 0) {
 
-            shipmentdata = this.state.pipelineShipmentData.map((item, index) => ["", "", "", item.shipamount, "", "", "",  item.shipamount, "", "", item.shipfreightcost, moment(item.shipordereddate).format("MM-DD-YYYY"), moment(item.shipshippeddate).format("MM-DD-YYYY"), moment(item.shipreceiveddate).format("MM-DD-YYYY"), "",item.shipnote, true])
+            shipmentdata = this.state.pipelineShipmentData.map((item, index) => ["", "", "",  "", "",   item.shipamount, "", "", item.shipfreightcost, moment(item.shipordereddate).format("MM/DD/YYYY"), moment(item.shipshippeddate).format("MM/DD/YYYY"), moment(item.shipreceiveddate).format("MM/DD/YYYY"), "",item.shipnote, true])
             console.log(shipmentdata)
         }
 
@@ -300,7 +300,7 @@ export default class PipelineProgramShipment extends Component {
         var options = {
             data: data,
             columnDrag: true,
-            colWidths: [80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80],
+            colWidths: [150, 150, 100, 150,150, 80, 80, 80, 80, 100, 100, 100, 100, 180,80],
             columns: [
 
                 {
@@ -321,18 +321,9 @@ export default class PipelineProgramShipment extends Component {
 
                 },
                 {
-                    title: i18n.t('static.shipment.suggestedQty'),
-                    type: 'text',
-                    // source: regionList
-                    // readOnly: true
-                }, {
                     title: i18n.t('static.dashboard.procurementagent'),
                     type: 'dropdown',
                      source: this.state.procurementAgentList
-                }, {
-                    title: i18n.t('static.dashboard.procurementUnit'),
-                    type: 'dropdown',
-                     source: this.state.procurementUnitList
                 }, {
                     title: i18n.t('static.dashboard.supplier'),
                     type: 'dropdown',

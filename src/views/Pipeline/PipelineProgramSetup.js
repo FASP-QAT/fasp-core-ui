@@ -720,7 +720,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/* <h3>Inventory</h3> */}
-                                                <PipelineProgramInventory {...this.props}></PipelineProgramInventory>
+                                                <PipelineProgramInventory></PipelineProgramInventory>
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
@@ -744,7 +744,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/*<h3>Shipments</h3>*/}
-                                                <PipelineProgramShipment></PipelineProgramShipment>
+                                                <PipelineProgramShipment  {...this.props}></PipelineProgramShipment>
                                                 
                                             </CardBody>
                                             {/* <CardFooter>
