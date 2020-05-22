@@ -69,6 +69,7 @@ class AddRoleComponent extends Component {
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.businessFunctionChange = this.businessFunctionChange.bind(this);
@@ -267,9 +268,10 @@ class AddRoleComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='roleForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='roleForm'>
                                                 <CardBody>
                                                     <FormGroup>
                                                         <Label for="roleName">{i18n.t('static.role.role')}<span className="red Reqasterisk">*</span> </Label>
@@ -330,6 +332,7 @@ class AddRoleComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -345,6 +348,20 @@ class AddRoleComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/role/listRole/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { role } = this.state;
+        role.label.label_en = '';
+        this.state.businessFunctionId = '';
+        this.state.canCreateRoleId = '';
+
+        this.setState(
+            {
+                role
+            }
+        )
+
     }
 }
 

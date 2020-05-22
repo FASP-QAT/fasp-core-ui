@@ -46,6 +46,7 @@ export default class LanguageListComponent extends Component {
             message: '',
             langaugeList: [],
             selSource: [],
+            lang: localStorage.getItem('lang'),
             rangeValue: { from: { year: new Date().getFullYear(), month: new Date().getMonth() }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
         }
         this.editShipment = this.editShipment.bind(this);
@@ -53,13 +54,19 @@ export default class LanguageListComponent extends Component {
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeChange = this.handleRangeChange.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.formatLabel = this.formatLabel.bind(this);
 
     }
 
-    editShipment(jsonForShipment) {
+    editShipment(shipment, rowIndex) {
+
+        // console.log(shipment.shipmentId);
+        // console.log(shipment.planningUnit.id);
+        var programId = document.getElementById("programId").value;
+
 
         this.props.history.push({
-            pathname: `/shipment/editShipment/${jsonForShipment.shipmentStatusId}/${jsonForShipment.programId}`,
+            pathname: `/shipment/editShipment/${programId}/${shipment.shipmentId}/${shipment.planningUnit.id}/${this.state.filterBy}/${this.state.startDate}/${this.state.endDate}/${rowIndex}`,
             // state: { jsonForShipment }
 
         });
@@ -263,10 +270,15 @@ export default class LanguageListComponent extends Component {
                     dateFilterList = planningUnitFilterList.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
                 }
 
+                console.log("d1111111111---> ", dateFilterList);
+
                 this.setState({
                     shipmentList: dateFilterList,
                     selSource: dateFilterList
-                });
+                },
+                    () => {
+                        // console.log("dateFilterList---> ", dateFilterList);
+                    });
 
                 document.getElementById("TableCust").style.display = "block";
 
@@ -274,6 +286,9 @@ export default class LanguageListComponent extends Component {
         }.bind(this);
     }.bind(this);
 
+    formatLabel(cell, row) {
+        return getLabelText(cell, this.state.lang);
+    }
 
     render() {
 
@@ -314,20 +329,29 @@ export default class LanguageListComponent extends Component {
         );
 
         const columns = [{
-            dataField: 'qatOrderNo',
-            text: 'QAT No',
+            dataField: 'shipmentId',
+            text: 'Shipment Id',
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'shipmentStatus',
+            dataField: 'shipmentStatus.label',
             text: 'Shipment Status',
             sort: true,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            formatter: this.formatLabel
         }, {
-            dataField: 'planningUnit',
+            dataField: 'planningUnit.label',
             text: 'Planning Unit',
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        },
+        {
+            dataField: 'suggestedQty',
+            text: 'Suggested Quantity',
             sort: true,
             align: 'center',
             headerAlign: 'center'
@@ -371,6 +395,25 @@ export default class LanguageListComponent extends Component {
 
                         <Col md="12 pl-0">
                             <div className="d-md-flex">
+                            <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">Select Period</Label>
+                                    <div className="controls">
+                                        <InputGroup>
+                                            <Picker
+                                                ref="pickRange"
+                                                years={{ min: 2013 }}
+                                                value={rangeValue}
+                                                lang={pickerLang}
+                                                //theme="light"
+                                                onChange={this.handleRangeChange}
+                                                onDismiss={this.handleRangeDissmis}
+                                            >
+                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                            </Picker>
+                                            
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
                                 <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">Program</Label>
                                     <div className="controls SelectGo">
@@ -419,36 +462,17 @@ export default class LanguageListComponent extends Component {
                                                 <option value="2">Expected Delivery Date</option>
 
                                             </Input>
-
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-                                <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Select Period</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Picker
-                                                ref="pickRange"
-                                                // years={{ min: 2013 }}
-                                                years={{ min: new Date().getFullYear() - 1 }, { max: new Date().getFullYear() + 1 }}
-                                                value={rangeValue}
-                                                lang={pickerLang}
-                                                //theme="light"
-                                                onChange={this.handleRangeChange}
-                                                onDismiss={this.handleRangeDissmis}
-                                            >
-                                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                            </Picker>
-                                            <InputGroupAddon addonType="append">
-                                                <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                            <InputGroupAddon addonType="append" className="ml-1">
+                                                <Button color="secondary btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
                                             </InputGroupAddon>
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+                               
                             </div>
                         </Col>
                         <ToolkitProvider
-                            keyField="qatOrderNo"
+                            keyField="shipmentId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}
@@ -468,7 +492,7 @@ export default class LanguageListComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                    this.editShipment(row);
+                                                    this.editShipment(row, rowIndex);
                                                 }
                                             }}
                                             {...props.baseProps}

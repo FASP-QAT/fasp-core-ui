@@ -161,6 +161,7 @@ const RealmList = React.lazy(() => import('./views/Realm/ListRealmComponent'));
 const EditRealm = React.lazy(() => import('./views/Realm/EditRealmComponent'));
 const SupplyPlan = React.lazy(() => import('./views/SupplyPlan/SupplyPlanComponent'));
 
+
 const AddForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/AddForecastingUnitComponent'));
 const ForecastingUnitList = React.lazy(() => import('./views/ForecastingUnit/ForecastingUnitListComponent'));
 const EditForecastingUnit = React.lazy(() => import('./views/ForecastingUnit/EditForecastingUnitComponent'));
@@ -304,7 +305,7 @@ const routes = [
   { path: '/user/listUser/:message', component: ListUser },
   { path: '/user/listUser', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.user') }), component: ListUser },
   { path: '/user/addUser', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.user') }), component: AddUser },
-  { path: '/user/editUser', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.user') }), component: EditUser },
+  { path: '/user/editUser/:userId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.user') }), component: EditUser },
   { path: '/user/accessControl', exact: true, name: i18n.t('static.dashboard.useraccessctrl'), component: AccessControl },
   { path: '/accessDenied', exact: true, component: AccessDenied },
 
@@ -355,6 +356,7 @@ const routes = [
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
   { path: '/supplyPlan', name: i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
+  
 
   { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: AddForecastingUnit },
   { path: '/forecastingUnit/listForecastingUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: ForecastingUnitList },
@@ -449,6 +451,6 @@ const routes = [
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
   { path: '/shipment/ShipmentList', name: 'Shipment / Shipment', component: ShipmentList },
-  { path: '/shipment/editShipment/:shipmentStatusId/:programId', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
+  { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
 ];
 export default routes;

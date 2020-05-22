@@ -50,6 +50,7 @@ import { LOGO }  from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import RealmCountryService from '../../api/RealmCountryService';
+import ReportService from '../../api/ReportService';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -60,6 +61,11 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+const pickerLang = {
+  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+  from: 'From', to: 'To',
+}
+
 
 const options = {
   title: {
@@ -156,24 +162,31 @@ class ForcastMatrixOverTime extends Component {
 
   }
 
+
+ 
+   makeText = m => {
+    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+    return '?'
+  }
+
   toggledata = () => this.setState((currentState) => ({show: !currentState.show}));
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
     csvRow.push(i18n.t('static.dashboard.country')+' : '+ (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ','%20'))
     csvRow.push(i18n.t('static.planningunit.planningunit')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
     csvRow.push('')
     csvRow.push('')
     var re;
-    var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.errorperc')).replaceAll(' ','%20')]]
+    var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.errorperc')).replaceAll(' ','%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ','%20')]]
    
       re = this.state.matricsList
    
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consupmtion_date, re[item].errorperc])
+      A.push([re[item].ACTUAL_DATE, re[item].FORECASTED_CONSUMPTION, re[item].ACTUAL_CONSUMPTION, re[item].FORECAST_ERROR*100, re[item].MONTHS_COUNT])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -182,7 +195,7 @@ class ForcastMatrixOverTime extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.forecasterrorovertime') + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    a.download = i18n.t('static.report.forecasterrorovertime') +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -225,7 +238,7 @@ class ForcastMatrixOverTime extends Component {
         })
         if(i==1){
           doc.setFontSize(12)
-          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.dashboard.country')+' : '+ document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -258,8 +271,8 @@ class ForcastMatrixOverTime extends Component {
 
     doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4,'','FAST' );
     const headers =[ [   i18n.t('static.report.month'),
-    i18n.t('static.report.errorperc')]];
-    const data =   this.state.matricsList.map( elt =>[ elt.consupmtion_date,elt.errorperc]);
+    i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.errorperc'),i18n.t('static.report.noofmonth')]];
+    const data =   this.state.matricsList.map( elt =>[ elt.ACTUAL_DATE,elt.FORECASTED_CONSUMPTION,elt.ACTUAL_CONSUMPTION,elt.FORECAST_ERROR*100,elt.MONTHS_COUNT]);
     
     let content = {
     margin: {top: 80},
@@ -286,14 +299,17 @@ class ForcastMatrixOverTime extends Component {
 
 
   fetchData() {
-   /* let countryId = document.getElementById("countryId").value;
+   let countryId = document.getElementById("countryId").value;
+   let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
+    if(countryId>0 && planningUnitId>0){
       AuthenticationService.setupAxiosInterceptors();
-      ProductService.getForecastOverTimeData(countryId,planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+      ReportService.getForecastMatricsOverTime(countryId,planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
         .then(response => {
           console.log(JSON.stringify(response.data));
           this.setState({
-            matricsList : response.data
+            matricsList : response.data,
+            message:''
           })
         }).catch(
           error => {
@@ -318,10 +334,20 @@ class ForcastMatrixOverTime extends Component {
               }
             }
           }
-        );*/
-        this.setState({
-          matricsList: [{consupmtion_date:"2019-04",errorperc:30},{consupmtion_date:"2019-05",errorperc:50},{consupmtion_date:"2019-06",errorperc:40},]
-        })
+        );}
+        else if(countryId==0){
+          this.setState({ message: i18n.t('static.program.validcountrytext') });
+                  
+        }else if(productCategoryId==0){
+          this.setState({ message: i18n.t('static.common.selectProductCategory') });
+      
+        }else{
+          this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText') });
+     
+        }
+     /*   this.setState({
+          matricsList: [{ACTUAL_DATE:"2019-04",errorperc:30},{ACTUAL_DATE:"2019-05",errorperc:50},{ACTUAL_DATE:"2019-06",errorperc:40},]
+        })*/
         console.log('matrix list updated'+this.state.matricsList )
      }
 
@@ -359,7 +385,7 @@ class ForcastMatrixOverTime extends Component {
             }
           }
         );
-  
+  this.fetchData();
   }
   getProductCategories() {
     AuthenticationService.setupAxiosInterceptors();
@@ -482,7 +508,7 @@ this.fetchData();
    let countryList = countries.length > 0 && countries.map((item, i) => {
      console.log(JSON.stringify(item))
     return(
-      <option key={i} value={item.country.countryId}>
+      <option key={i} value={item.realmCountryId}>
       {getLabelText(item.country.label, this.state.lang)}
   </option>
     
@@ -492,9 +518,9 @@ this.fetchData();
       let productCategoryList = productCategories.length > 0
           && productCategories.map((item, i) => {
               return (
-                  <option key={i} value={item.payload.productCategoryId}>
-                      {getLabelText(item.payload.label, this.state.lang)}
-                  </option>
+                <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
+                {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
+              </option>
               )
           }, this);
          
@@ -502,20 +528,20 @@ this.fetchData();
     
     const  bar = {
     
-        labels: this.state.matricsList.map((item, index) => (item.consupmtion_date)),
+        labels: this.state.matricsList.map((item, index) => (item.ACTUAL_DATE)),
         datasets: [
            {
             type: "line",
             label: i18n.t('static.report.forecasterrorovertime'),
             backgroundColor: 'transparent',
-            borderColor: 'rgba(179,181,158,1)',
+            borderColor: '#ffc107',
             lineTension:0,
             showActualPercentages: true,
             showInLegend: true,
             pointStyle: 'line',
             yValueFormatString: "$#####%",
             
-            data: this.state.matricsList.map((item, index) => (item.errorperc))
+            data: this.state.matricsList.map((item, index) => (item.FORECAST_ERROR*100))
           }
         ],
 
@@ -538,6 +564,7 @@ this.fetchData();
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
+        <h5>{i18n.t(this.state.message)}</h5>
         <Row>
           <Col lg="12">
             <Card>
@@ -556,11 +583,9 @@ this.fetchData();
                 </CardHeader>
               <CardBody>
                 <div className="TableCust" >
-                  <div className="container">
                      <div ref={ref}>
-                        <div className="col-md-12" >
                     <Form >
-                      <Col>
+                      <Col md="12 pl-0">
                         <div className="row">
                           <FormGroup className="col-md-3">
                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
@@ -590,7 +615,7 @@ this.fetchData();
                                     name="countryId"
                                     id="countryId"
                                     bsSize="sm"
-                                  //  onChange={this.fetchData}
+                                    onChange={this.fetchData}
 
                                   >
                                     <option value="0">{i18n.t('static.common.select')}</option>
@@ -642,33 +667,77 @@ this.fetchData();
                            </div>
                       </Col>
                     </Form>
-                    <div className="row">
-                      <div className="col-md-12">
+                    <Col md="12 pl-0">
+                      <div className="row">
                     {
                         this.state.matricsList.length > 0
                         &&
-                       
-                          <div className="col-md-9">
-                        <div   className="chart-wrapper chart-graph">
+                        <div className="col-md-12">
+                          <div className="col-md-12">
+                        <div   className="chart-wrapper chart-graph-report">
                           <Bar id="cool-canvas" data={bar} options={options} />
                          </div>
                          </div>
-                         }
-                         </div>
-                         </div>
+                        <div className="col-md-12">
+                        <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                          {this.state.show ? 'Hide Data' : 'Show Data'}
+                        </button>
 
+                      </div> </div>}
+                         </div>
+                        
+                         <div className="row">
+                    <div className="col-md-12">
+                      {this.state.show && this.state.matricsList.length > 0 &&
+                       <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+
+                        <thead>
+                          <tr>
+                            <th className="text-center"> {i18n.t('static.report.month')} </th>
+                            <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
+                            <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
+                            <th className="text-center">{i18n.t('static.report.errorperc')}</th>
+                            <th className="text-center">{i18n.t('static.report.noofmonth')}</th>
+                          </tr>
+                        </thead>
+                       
+                          <tbody>
+                            {
+                              this.state.matricsList.length > 0
+                              &&
+                              this.state.matricsList.map((item, idx) =>
+
+                                <tr id="addr0" key={idx} >
+                                
+                                  <td>{this.state.matricsList[idx].ACTUAL_DATE}</td>
+                                  <td>
+
+                                    {this.state.matricsList[idx].FORECASTED_CONSUMPTION}
+                                  </td>
+                                  <td>
+                                    {this.state.matricsList[idx].ACTUAL_CONSUMPTION}
+                                  </td>
+                                  <td>
+                                    {this.state.matricsList[idx].FORECAST_ERROR*100+'%'}
+                                  </td>
+                                  <td>
+                                    {this.state.matricsList[idx].MONTHS_COUNT}
+                                  </td></tr>)
+
+                            }
+                          </tbody>
+                 </Table>}
 
                    </div>
-                   </div>
+                   </div></Col>
 
                  
+                  
                   </div>
-                  </div>
-              </CardBody>
+              </div></CardBody>
             </Card>
           </Col>
         </Row>
-
 
 
       </div>

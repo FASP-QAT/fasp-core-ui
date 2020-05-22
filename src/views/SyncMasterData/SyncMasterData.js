@@ -59,8 +59,8 @@ export default class SyncMasterData extends Component {
         return (
             <div className="animated fadeIn">
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-                <h5>{i18n.t(this.state.message)}</h5>
-                <Row>
+                <h5 className="pl-md-5">{i18n.t(this.state.message)}</h5>
+                <div className="col-md-12"> 
                     <Col xs="12" sm="12">
                         <Card>
                             {/* // <div className="app flex-row align-items-center">
@@ -91,7 +91,7 @@ export default class SyncMasterData extends Component {
                             </CardFooter>
                         </Card>
                     </Col>
-                </Row>
+                </div>
                 {/* </Container>
                 </div> */}
             </div>
@@ -307,11 +307,12 @@ export default class SyncMasterData extends Component {
                                                                                                                                                                                         //Code to Sync ProductCategory list
                                                                                                                                                                                         MasterSyncService.getProductCategoryListForSync(lastSyncDateRealm)
                                                                                                                                                                                             .then(response => {
+                                                                                                                                                                                                console.log("Product category Response", response)
                                                                                                                                                                                                 if (response.status == 200) {
                                                                                                                                                                                                     console.log("Product category Response", response.data)
                                                                                                                                                                                                     var json = []
                                                                                                                                                                                                     if ((response.data).length > 0) {
-                                                                                                                                                                                                        json = (response.data).flatList;
+                                                                                                                                                                                                        json = (response.data);
                                                                                                                                                                                                     }
 
                                                                                                                                                                                                     var productCategoryTransaction = db1.transaction(['productCategory'], 'readwrite');
