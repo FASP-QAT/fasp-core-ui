@@ -425,7 +425,7 @@ class StockStatusOverTime extends Component {
                     type: "line",
                     label: "MOS Feature 3",
                     backgroundColor: 'transparent',
-                    borderColor: '#ffc107',
+                    borderColor: '#ed5626',
                     lineTension: 0,
                     showActualPercentages: true,
                     showInLegend: true,
