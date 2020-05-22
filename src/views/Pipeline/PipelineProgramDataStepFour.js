@@ -156,6 +156,7 @@ export default class PipelineProgramDataStepFour extends Component {
                                             name="organisationId"
                                             id="organisationId"
                                             className="col-md-6"
+                                            value={this.props.items.program.organisation.id}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>

@@ -83,7 +83,7 @@ export default class PipelineProgramDataStepFive extends Component {
                         id="regionId"
                         multi
                         options={this.props.items.regionList}
-                        value={this.props.items.regionId}
+                        value={this.props.items.program.regionArray}
                     />
                 </FormGroup>
                 <br></br>
