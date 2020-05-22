@@ -716,7 +716,9 @@ label.arrow_label:after {
       animation: fade-out 8s ease-in-out both;
     }
 
-
+    .ReportFirstHead>.react-bootstrap-table>.table thead tr th:first-child {
+width: 180px !important;
+    }
 
 
 
