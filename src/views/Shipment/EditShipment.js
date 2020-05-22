@@ -35,6 +35,8 @@ export default class ConsumptionDetails extends React.Component {
             supplierList: [],
             allowShipmentStatusList: [],
             message: '',
+            countVar: 1,
+            planningUnitId: '',
         }
 
         // this.getConsumptionData = this.getConsumptionData.bind(this);
@@ -48,12 +50,14 @@ export default class ConsumptionDetails extends React.Component {
         this.getProcurementAgentById = this.getProcurementAgentById.bind(this);
         this.getProcurementUnitById = this.getProcurementUnitById.bind(this);
         this.getSupplierById = this.getSupplierById.bind(this);
+        this.getBudgetById = this.getBudgetById.bind(this);
     }
 
     componentDidMount = function () {
         this.getProcurementAgentById();
         this.getProcurementUnitById();
         this.getSupplierById();
+        this.getBudgetById();
         document.getElementById("addButton").style.display = "none";
         let programId = this.props.match.params.programId;
         let shipmentId = this.props.match.params.shipmentId;
@@ -63,6 +67,8 @@ export default class ConsumptionDetails extends React.Component {
         let endDate = this.props.match.params.endDate;
         let rowIndex = this.props.match.params.rowIndex;
         this.setState({ programId: programId });
+        this.setState({ planningUnitId: planningUnitId });
+        document.getElementById('planningUnitId').value = planningUnitId;
 
         if (shipmentId == 0 || typeof shipmentId == "undefined") {
             var procurementAgentPlanningList = [];
@@ -123,7 +129,8 @@ export default class ConsumptionDetails extends React.Component {
                         for (var k = 0; k < procurementAgentPlanningUnitResult.length; k++) {
                             if (procurementAgentPlanningUnitResult[k].planningUnit.id == planningUnitId) {
                                 var procurementAgentJson = {
-                                    id: procurementAgentPlanningUnitResult[k].procurementAgentPlanningUnitId,
+                                    procurementAgentId: procurementAgentPlanningUnitResult[k].procurementAgent.id,
+                                    planningUnitId: procurementAgentPlanningUnitResult[k].planningUnit.id,
                                     catalogPrice: procurementAgentPlanningUnitResult[k].catalogPrice,
                                     moq: procurementAgentPlanningUnitResult[k].moq,
                                     unitsPerPallet: procurementAgentPlanningUnitResult[k].unitsPerPallet,
@@ -142,6 +149,8 @@ export default class ConsumptionDetails extends React.Component {
                             var procurementAgentList = [];
                             var fundingSourceList = [];
                             var budgetList = [];
+                            var dataSourceList = [];
+                            var programByteList = '';
 
                             var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
@@ -190,195 +199,191 @@ export default class ConsumptionDetails extends React.Component {
                                             budgetList[k] = budgetJson
                                         }
 
-                                        var data = [];
-                                        var shipmentDataArr = [];
 
-                                        data[0] = shipmentList.shipmentId;
-                                        data[1] = shipmentList.expectedDeliveryDate;
-                                        data[2] = shipmentList.shipmentStatus.label.label_en;
-                                        data[3] = shipmentList.procurementAgent.label.label_en;
-                                        data[4] = '';//funding source
-                                        data[5] = '';//budget
-                                        data[6] = shipmentList.planningUnit.label.label_en;
-                                        data[7] = shipmentList.suggestedQty;
-                                        data[8] = procurementAgentPlanningList[0].moq;
-                                        data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
-                                        data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
-                                        data[11] = '';
-                                        data[12] = '';
-                                        data[13] = '';
-                                        data[14] = '';
-                                        data[15] = '';
-                                        data[16] = '';
-                                        data[17] = '';
-                                        data[18] = procurementAgentPlanningList[0].catalogPrice;
-                                        data[19] = '';
-                                        data[20] = '';
-                                        data[21] = shipmentList.notes;
-                                        data[22] = '';
-                                        data[23] = procurementAgentPlanningList[0].unitsPerPallet;
-                                        data[24] = procurementAgentPlanningList[0].unitsPerContainer;
-                                        data[25] = 0;
+                                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                                        var dataSourceRequest = dataSourceOs.getAll();
 
-                                        shipmentDataArr[0] = data;
+                                        dataSourceRequest.onsuccess = function (event) {
+                                            var dataSourceResult = [];
+                                            dataSourceResult = dataSourceRequest.result;
+                                            for (var k = 0; k < dataSourceResult.length; k++) {
+                                                var dataSourceJson = {
+                                                    name: dataSourceResult[k].label.label_en,
+                                                    id: dataSourceResult[k].dataSourceId
+                                                }
+                                                dataSourceList[k] = dataSourceJson
+                                            }
 
-                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                                        this.el.destroy();
-                                        var json = [];
-                                        var data = shipmentDataArr;
-                                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                                        // json[0] = data;
-                                        var options = {
-                                            data: data,
-                                            columnDrag: true,
-                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                            columns: [
-                                                // { title: 'Month', type: 'text', readOnly: true },
-                                                {
-                                                    title: 'Shipment Id',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Expected Delivery date',
-                                                    // type: 'calendar',
-                                                    type: 'text',
-                                                    readOnly: true
+                                            var programByteTransaction = db1.transaction(['program'], 'readwrite');
+                                            var programByteOs = programByteTransaction.objectStore('program');
+                                            var programByteRequest = programByteOs.getAll();
 
-                                                },
-                                                {
-                                                    title: 'Shipment Status',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Procurement Agent',
-                                                    type: 'dropdown',
-                                                    source: procurementAgentList,
-                                                },
-                                                {
-                                                    title: 'Funding Source',
-                                                    type: 'dropdown',
-                                                    source: fundingSourceList,
-                                                },
-                                                {
-                                                    title: 'Budget',
-                                                    type: 'dropdown',
-                                                    source: budgetList,
-                                                },
-                                                {
-                                                    title: 'Planning Unit',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Suggested Order Qty',
-                                                    type: 'numeric',
-                                                    // readOnly: true
-                                                },
-                                                {
-                                                    title: 'MoQ',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'No of Pallets',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'No of Containers',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Order based on',
-                                                    type: 'dropdown',
-                                                    source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }]
+                                            programByteRequest.onsuccess = function (event) {
+                                                var programByteResult = [];
+                                                programByteResult = programByteRequest.result;
+                                                for (var k = 0; k < programByteResult.length; k++) {
+                                                    if (programByteResult[k].programId == programId.split("_")[0]) {
+                                                        var programByteJson = {
+                                                            airFreightPerc: programByteResult[k].airFreightPerc,
+                                                            seaFreightPerc: programByteResult[k].seaFreightPerc
+                                                        }
+                                                        programByteList = programByteJson
+                                                    }
 
-                                                },
-                                                {
-                                                    title: 'Rounding option',
-                                                    type: 'dropdown',
-                                                    source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }]
-                                                },
-                                                {
-                                                    title: 'User Qty',
-                                                    type: 'text',
-                                                },
-                                                {
-                                                    title: 'Adjusted Order Qty',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Pallets',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Containers',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Manual Price per Planning Unit',
-                                                    type: 'text',
-                                                },
-                                                {
-                                                    title: 'Price per Planning Unit',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Amt',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'RO Number',
-                                                    type: 'text'
-                                                },
-                                                {
-                                                    title: 'Notes',
-                                                    type: 'text'
-                                                },
-                                                {
-                                                    title: 'Cancelled Order',
-                                                    type: 'checkbox'
-                                                },
-                                                {
-                                                    title: 'Unit/Pallet',
-                                                    type: 'hidden'
-                                                },
-                                                {
-                                                    title: 'Unit/Container',
-                                                    type: 'hidden'
-                                                },
-                                                {
-                                                    title: 'Index',
-                                                    type: 'hidden'
                                                 }
 
-                                            ],
-                                            pagination: 10,
-                                            search: true,
-                                            columnSorting: true,
-                                            tableOverflow: true,
-                                            wordWrap: true,
-                                            allowInsertColumn: false,
-                                            allowManualInsertColumn: false,
-                                            allowDeleteRow: false,
-                                            onchange: this.changed,
-                                            oneditionend: this.onedit,
-                                            copyCompatibility: true,
-                                            paginationOptions: [10, 25, 50, 100],
-                                            position: 'top'
-                                        };
+                                                var procurementAgentPlanningUnit = procurementAgentPlanningList.filter(p => p.procurementAgentId == shipmentList.procurementAgent.id && p.planningUnitId == shipmentList.planningUnit.id)[0];
 
-                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                                this.el.destroy();
+
+                                                var data = [];
+                                                var shipmentDataArr = [];
+
+                                                data[0] = shipmentList.expectedDeliveryDate;
+                                                data[1] = shipmentList.shipmentStatus.label.label_en;
+                                                data[2] = shipmentList.orderNo;
+                                                data[3] = shipmentList.primeLineNo;
+                                                data[4] = shipmentList.dataSource.id; // E
+                                                data[5] = shipmentList.procurementAgent.id;
+                                                data[6] = shipmentList.planningUnit.label.label_en;
+                                                data[7] = shipmentList.suggestedQty;
+                                                data[8] = procurementAgentPlanningUnit.moq;
+                                                data[9] = `=IF(H${0 + 1}>I${0 + 1},H${0 + 1}/Z${0 + 1},I${0 + 1}/Z${0 + 1})`;
+                                                data[10] = `=IF(H${0 + 1}>I${0 + 1},H${0 + 1}/AA${0 + 1},I${0 + 1}/AA${0 + 1})`;
+                                                data[11] = '';
+                                                data[12] = '';
+                                                data[13] = '';
+                                                data[14] = `=IF(L${0 + 1}==3,
+       
+                                            IF(M${0 + 1}==1,
+                                                    CEILING(I${0 + 1},1),
+                                                    FLOOR(I${0 + 1},1)
+                                            )
+                                    ,
+                                    IF(L${0 + 1}==4,
+                                            IF(NOT(ISBLANK(N${0 + 1})),
+                                                    IF(M${0 + 1}==1,
+                                                            CEILING(N${0 + 1}/Z${0 + 1},1)*Z${0 + 1},
+                                                            FLOOR(N${0 + 1}/Z${0 + 1},1)*Z${0 + 1}
+                                                    ),
+                                                    IF(M${0 + 1}==1,
+                                                            CEILING(J${0 + 1},1)*Z${0 + 1},
+                                                            FLOOR(J${0 + 1},1)*Z${0 + 1}
+                                                    )
+                                            ),
+                                            IF(L${0 + 1}==1,
+                                                    IF(NOT(ISBLANK(N${0 + 1})),
+                                                            IF(M${0 + 1}==1,
+                                                            CEILING(N${0 + 1}/Z${0 + 1},1)*AA${0 + 1},
+                                                            FLOOR(N${0 + 1}/Z${0 + 1},1)*AA${0 + 1}
+                                                    ),
+                                                            IF(M${0 + 1}==1,
+                                                                    CEILING(K${0 + 1},1)*AA${0 + 1},
+                                                                    FLOOR(K${0 + 1},1)*AA${0 + 1}
+                                                            )
+                                                    ),
+                                                    IF(NOT(ISBLANK(N${0 + 1})),
+                                                            IF(M${0 + 1}==1,
+                                                                    CEILING(N${0 + 1},1),
+                                                                    FLOOR(N${0 + 1},1)
+                                                            ),
+                                                            IF(M${0 + 1}==1,
+                                                                    CEILING(H${0 + 1},1),
+                                                                    FLOOR(H${0 + 1},1)
+                                                            )
+                                                    )
+                                            )
+                                    )
+                             )`;
+                                                data[15] = `=O${0 + 1}/Z${0 + 1}`;
+                                                data[16] = `=O${0 + 1}/AA${0 + 1}`;
+                                                data[17] = "";//Manual price
+                                                data[18] = procurementAgentPlanningUnit.catalogPrice;
+                                                data[19] = `=S${0 + 1}*O${0 + 1}`; //Amount
+                                                data[20] = "";//Shipment method
+                                                data[21] = "";// Freight Cost
+                                                data[22] = `=IF(U${0 + 1}=="Sea",(T${0 + 1}*AC${0 + 1})/100,(T${0 + 1}*AB${0 + 1})/100)`;// Default frieght cost
+                                                data[23] = `=T${0 + 1}+W${0 + 1}`; // Final Amount
+                                                data[24] = "";//Notes
+                                                data[25] = false
+                                                data[25] = procurementAgentPlanningUnit.unitsPerPallet;
+                                                data[26] = procurementAgentPlanningUnit.unitsPerContainer;
+                                                data[27] = programByteList.airFreightPerc;
+                                                data[28] = programByteList.seaFreightPerc;
+                                                data[29] = 0;
+
+                                                shipmentDataArr[0] = data;
 
 
+                                                var json = [];
+                                                var data = shipmentDataArr;
+                                                // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                                                // json[0] = data;
+                                                var options = {
+                                                    data: data,
+                                                    columnDrag: true,
+                                                    colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                    columns: [
+                                                        // { title: 'Month', type: 'text', readOnly: true },
+                                                        { type: 'text', title: "Expected Delivery date" },
+                                                        { type: 'text', readOnly: true, title: "Shipment status" },
+                                                        { type: 'text', title: "Order No" },
+                                                        { type: 'text', title: "Prime line number" },
+                                                        { type: 'dropdown', title: "Data source", source: dataSourceList },
+                                                        { type: 'dropdown', title: "Procurement Agent", source: procurementAgentList },
+                                                        { type: 'text', readOnly: true, title: "Planning unit" },
+                                                        { type: 'numeric', readOnly: true, title: "Suggested order qty" },
+                                                        { type: 'numeric', readOnly: true, title: "MoQ" },
+                                                        { type: 'numeric', readOnly: true, title: "No of pallets" },
+                                                        { type: 'numeric', readOnly: true, title: "No of containers" },
+                                                        { type: 'dropdown', title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
+                                                        { type: 'dropdown', title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
+                                                        { type: 'text', title: "User qty" },
+                                                        { type: 'text', readOnly: true, title: "Adjusted order qty" },
+                                                        { type: 'text', readOnly: true, title: "Adjusted pallets" },
+                                                        { type: 'text', readOnly: true, title: "Adjusted containers" },
+                                                        { type: 'text', title: "Manual price per planning unit" },
+                                                        { type: 'text', readOnly: true, title: "Price per planning unit" },
+                                                        { type: 'text', readOnly: true, title: "Amount" },
+                                                        { type: 'dropdown', title: "Shipped method", source: ['Sea', 'Air'] },
+                                                        { type: 'text', title: "Freight cost amount" },
+                                                        { type: 'text', title: "Default freight cost" },
+                                                        { type: 'text', readOnly: true, title: "Total amount" },
+                                                        { type: 'text', title: "Notes" },
+                                                        { type: 'checkbox', title: "Cancelled Order" },
+                                                        { type: 'hidden', title: "Units/Pallet" },
+                                                        { type: 'hidden', title: "Units/Container" },
+                                                        { type: 'hidden', title: "Air Freight Percentage" },
+                                                        { type: 'hidden', title: "Sea Freight Percentage" },
+                                                        {
+                                                            title: 'Index',
+                                                            type: 'hidden'
+                                                        }
+
+
+                                                    ],
+                                                    pagination: 10,
+                                                    search: true,
+                                                    columnSorting: true,
+                                                    tableOverflow: true,
+                                                    wordWrap: true,
+                                                    allowInsertColumn: false,
+                                                    allowManualInsertColumn: false,
+                                                    allowDeleteRow: false,
+                                                    onchange: this.plannedPsmChanged,
+                                                    oneditionend: this.onedit,
+                                                    copyCompatibility: true,
+                                                    paginationOptions: [10, 25, 50, 100],
+                                                    position: 'top'
+                                                };
+
+                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+
+                                            }.bind(this);
+                                        }.bind(this);
                                     }.bind(this);
                                 }.bind(this);
                             }.bind(this);
@@ -880,38 +885,43 @@ export default class ConsumptionDetails extends React.Component {
                             // console.log("shipmentList11111--> ", shipmentList);
                         });
 
-                    var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                    var procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
-                    var procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
 
-                    procurementAgentPlanningUnitRequest.onsuccess = function (event) {
 
-                        var procurementAgentPlanningUnitResult = [];
-                        procurementAgentPlanningUnitResult = procurementAgentPlanningUnitRequest.result;
-                        for (var k = 0; k < procurementAgentPlanningUnitResult.length; k++) {
-                            if (procurementAgentPlanningUnitResult[k].planningUnit.id == planningUnitId) {
+
+                    // console.log("procurementAgentPlanningList222222222--> ", procurementAgentPlanningList[0]);
+                    if (shipmentList[0].shipmentStatus.id == 2) { //planned
+
+                        document.getElementById("addButton").style.display = "block";
+                        var procurementAgentList = [];
+                        var fundingSourceList = [];
+                        var dataSourceList = [];
+                        var budgetList = [];
+                        var programByteList = '';
+
+
+                        var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                        var procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
+                        var procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
+
+                        procurementAgentPlanningUnitRequest.onsuccess = function (event) {
+
+                            var procurementAgentPlanningUnitResult = [];
+                            procurementAgentPlanningUnitResult = procurementAgentPlanningUnitRequest.result;
+                            for (var k = 0; k < procurementAgentPlanningUnitResult.length; k++) {
+
                                 var procurementAgentJson = {
-                                    id: procurementAgentPlanningUnitResult[k].procurementAgentPlanningUnitId,
+                                    procurementAgentId: procurementAgentPlanningUnitResult[k].procurementAgent.id,
+                                    planningUnitId: procurementAgentPlanningUnitResult[k].planningUnit.id,
                                     catalogPrice: procurementAgentPlanningUnitResult[k].catalogPrice,
                                     moq: procurementAgentPlanningUnitResult[k].moq,
                                     unitsPerPallet: procurementAgentPlanningUnitResult[k].unitsPerPallet,
                                     unitsPerContainer: procurementAgentPlanningUnitResult[k].unitsPerContainer
                                 }
-                                procurementAgentPlanningList[0] = procurementAgentJson
+                                procurementAgentPlanningList[k] = procurementAgentJson
                                 // console.log("JSON--- ", procurementAgentJson);
                                 // console.log("procurementAgentPlanningList111 ", procurementAgentPlanningList[0]);
+
                             }
-                        }
-
-
-
-                        // console.log("procurementAgentPlanningList222222222--> ", procurementAgentPlanningList[0]);
-                        if (shipmentList[0].shipmentStatus.id == 2) { //planned
-
-                            document.getElementById("addButton").style.display = "block";
-                            var procurementAgentList = [];
-                            var fundingSourceList = [];
-                            var budgetList = [];
 
                             var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                             var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
@@ -960,675 +970,679 @@ export default class ConsumptionDetails extends React.Component {
                                             budgetList[k] = budgetJson
                                         }
 
-                                        var data = [];
-                                        var shipmentDataArr = [];
 
-                                        data[0] = shipmentList[0].shipmentId;
-                                        data[1] = shipmentList[0].expectedDeliveryDate;
-                                        data[2] = shipmentList[0].shipmentStatus.label.label_en;
-                                        data[3] = shipmentList[0].procurementAgent.label.label_en;
-                                        data[4] = '';//funding source
-                                        data[5] = '';//budget
-                                        data[6] = shipmentList[0].planningUnit.label.label_en;
-                                        data[7] = shipmentList[0].suggestedQty;
-                                        data[8] = procurementAgentPlanningList[0].moq;
-                                        data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
-                                        data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
-                                        data[11] = '';
-                                        data[12] = '';
-                                        data[13] = '';
-                                        data[14] = '';
-                                        data[15] = '';
-                                        data[16] = '';
-                                        data[17] = '';
-                                        data[18] = procurementAgentPlanningList[0].catalogPrice;
-                                        data[19] = '';
-                                        data[20] = '';
-                                        data[21] = shipmentList[0].notes;
-                                        data[22] = '';
-                                        data[23] = procurementAgentPlanningList[0].unitsPerPallet;
-                                        data[24] = procurementAgentPlanningList[0].unitsPerContainer;
-                                        data[25] = 0;
+                                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                                        var dataSourceRequest = dataSourceOs.getAll();
 
-                                        shipmentDataArr[0] = data;
+                                        dataSourceRequest.onsuccess = function (event) {
+                                            var dataSourceResult = [];
+                                            dataSourceResult = dataSourceRequest.result;
+                                            for (var k = 0; k < dataSourceResult.length; k++) {
+                                                var dataSourceJson = {
+                                                    name: dataSourceResult[k].label.label_en,
+                                                    id: dataSourceResult[k].dataSourceId
+                                                }
+                                                dataSourceList[k] = dataSourceJson
+                                            }
 
-                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                                        this.el.destroy();
-                                        var json = [];
-                                        var data = shipmentDataArr;
-                                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                                        // json[0] = data;
-                                        var options = {
-                                            data: data,
-                                            columnDrag: true,
-                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                            columns: [
-                                                // { title: 'Month', type: 'text', readOnly: true },
-                                                {
-                                                    title: 'Shipment Id',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Expected Delivery date',
-                                                    // type: 'calendar',
-                                                    type: 'text',
-                                                    readOnly: true
 
-                                                },
-                                                {
-                                                    title: 'Shipment Status',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Procurement Agent',
-                                                    type: 'dropdown',
-                                                    source: procurementAgentList,
-                                                },
-                                                {
-                                                    title: 'Funding Source',
-                                                    type: 'dropdown',
-                                                    source: fundingSourceList,
-                                                },
-                                                {
-                                                    title: 'Budget',
-                                                    type: 'dropdown',
-                                                    source: budgetList,
-                                                },
-                                                {
-                                                    title: 'Planning Unit',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Suggested Order Qty',
-                                                    type: 'numeric',
-                                                    // readOnly: true
-                                                },
-                                                {
-                                                    title: 'MoQ',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'No of Pallets',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'No of Containers',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Order based on',
-                                                    type: 'dropdown',
-                                                    source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }]
+                                            var programByteTransaction = db1.transaction(['program'], 'readwrite');
+                                            var programByteOs = programByteTransaction.objectStore('program');
+                                            var programByteRequest = programByteOs.getAll();
 
-                                                },
-                                                {
-                                                    title: 'Rounding option',
-                                                    type: 'dropdown',
-                                                    source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }]
-                                                },
-                                                {
-                                                    title: 'User Qty',
-                                                    type: 'text',
-                                                },
-                                                {
-                                                    title: 'Adjusted Order Qty',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Pallets',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Containers',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Manual Price per Planning Unit',
-                                                    type: 'text',
-                                                },
-                                                {
-                                                    title: 'Price per Planning Unit',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Amt',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'RO Number',
-                                                    type: 'text'
-                                                },
-                                                {
-                                                    title: 'Notes',
-                                                    type: 'text'
-                                                },
-                                                {
-                                                    title: 'Cancelled Order',
-                                                    type: 'checkbox'
-                                                },
-                                                {
-                                                    title: 'Unit/Pallet',
-                                                    type: 'hidden'
-                                                },
-                                                {
-                                                    title: 'Unit/Container',
-                                                    type: 'hidden'
-                                                },
-                                                {
-                                                    title: 'Index',
-                                                    type: 'hidden'
+                                            programByteRequest.onsuccess = function (event) {
+                                                var programByteResult = [];
+                                                programByteResult = programByteRequest.result;
+                                                for (var k = 0; k < programByteResult.length; k++) {
+                                                    if (programByteResult[k].programId == programId.split("_")[0]) {
+                                                        var programByteJson = {
+                                                            airFreightPerc: programByteResult[k].airFreightPerc,
+                                                            seaFreightPerc: programByteResult[k].seaFreightPerc
+                                                        }
+                                                        programByteList = programByteJson
+                                                    }
+
                                                 }
 
-                                            ],
-                                            pagination: 10,
-                                            search: true,
-                                            columnSorting: true,
-                                            tableOverflow: true,
-                                            wordWrap: true,
-                                            allowInsertColumn: false,
-                                            allowManualInsertColumn: false,
-                                            allowDeleteRow: false,
-                                            onchange: this.changed,
-                                            oneditionend: this.onedit,
-                                            copyCompatibility: true,
-                                            paginationOptions: [10, 25, 50, 100],
-                                            position: 'top'
-                                        };
-
-                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
 
+
+
+
+
+
+                                                var procurementAgentPlanningUnit = procurementAgentPlanningList.filter(p => p.procurementAgentId == shipmentList[0].procurementAgent.id && p.planningUnitId == shipmentList[0].planningUnit.id)[0];
+
+                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                                this.el.destroy();
+
+                                                var data = [];
+                                                var shipmentDataArr = [];
+
+
+                                                data[0] = shipmentList[0].expectedDeliveryDate;
+                                                data[1] = shipmentList[0].shipmentStatus.label.label_en;
+                                                data[2] = shipmentList[0].orderNo;
+                                                data[3] = shipmentList[0].primeLineNo;
+                                                data[4] = shipmentList[0].dataSource.id; // E
+                                                data[5] = shipmentList[0].procurementAgent.id;
+                                                data[6] = shipmentList[0].planningUnit.label.label_en;
+                                                data[7] = shipmentList[0].suggestedQty;
+                                                data[8] = procurementAgentPlanningUnit.moq;
+                                                data[9] = `=IF(H${0 + 1}>I${0 + 1},H${0 + 1}/Z${0 + 1},I${0 + 1}/Z${0 + 1})`;
+                                                data[10] = `=IF(H${0 + 1}>I${0 + 1},H${0 + 1}/AA${0 + 1},I${0 + 1}/AA${0 + 1})`;
+                                                data[11] = '';
+                                                data[12] = '';
+                                                data[13] = '';
+                                                data[14] = `=IF(L${0 + 1}==3,
+       
+                                            IF(M${0 + 1}==1,
+                                                    CEILING(I${0 + 1},1),
+                                                    FLOOR(I${0 + 1},1)
+                                            )
+                                    ,
+                                    IF(L${0 + 1}==4,
+                                            IF(NOT(ISBLANK(N${0 + 1})),
+                                                    IF(M${0 + 1}==1,
+                                                            CEILING(N${0 + 1}/Z${0 + 1},1)*Z${0 + 1},
+                                                            FLOOR(N${0 + 1}/Z${0 + 1},1)*Z${0 + 1}
+                                                    ),
+                                                    IF(M${0 + 1}==1,
+                                                            CEILING(J${0 + 1},1)*Z${0 + 1},
+                                                            FLOOR(J${0 + 1},1)*Z${0 + 1}
+                                                    )
+                                            ),
+                                            IF(L${0 + 1}==1,
+                                                    IF(NOT(ISBLANK(N${0 + 1})),
+                                                            IF(M${0 + 1}==1,
+                                                            CEILING(N${0 + 1}/Z${0 + 1},1)*AA${0 + 1},
+                                                            FLOOR(N${0 + 1}/Z${0 + 1},1)*AA${0 + 1}
+                                                    ),
+                                                            IF(M${0 + 1}==1,
+                                                                    CEILING(K${0 + 1},1)*AA${0 + 1},
+                                                                    FLOOR(K${0 + 1},1)*AA${0 + 1}
+                                                            )
+                                                    ),
+                                                    IF(NOT(ISBLANK(N${0 + 1})),
+                                                            IF(M${0 + 1}==1,
+                                                                    CEILING(N${0 + 1},1),
+                                                                    FLOOR(N${0 + 1},1)
+                                                            ),
+                                                            IF(M${0 + 1}==1,
+                                                                    CEILING(H${0 + 1},1),
+                                                                    FLOOR(H${0 + 1},1)
+                                                            )
+                                                    )
+                                            )
+                                    )
+                             )`;
+                                                data[15] = `=O${0 + 1}/Z${0 + 1}`;
+                                                data[16] = `=O${0 + 1}/AA${0 + 1}`;
+                                                data[17] = "";//Manual price
+                                                data[18] = procurementAgentPlanningUnit.catalogPrice;
+                                                data[19] = `=S${0 + 1}*O${0 + 1}`; //Amount
+                                                data[20] = "";//Shipment method
+                                                data[21] = "";// Freight Cost
+                                                data[22] = `=IF(U${0 + 1}=="Sea",(T${0 + 1}*AC${0 + 1})/100,(T${0 + 1}*AB${0 + 1})/100)`;// Default frieght cost
+                                                data[23] = `=T${0 + 1}+W${0 + 1}`; // Final Amount
+                                                data[24] = "";//Notes
+                                                data[25] = false
+                                                data[25] = procurementAgentPlanningUnit.unitsPerPallet;
+                                                data[26] = procurementAgentPlanningUnit.unitsPerContainer;
+                                                data[27] = programByteList.airFreightPerc;
+                                                data[28] = programByteList.seaFreightPerc;
+                                                data[29] = 0;
+
+                                                shipmentDataArr[0] = data;
+
+
+                                                var json = [];
+                                                var data = shipmentDataArr;
+                                                // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                                                // json[0] = data;
+                                                var options = {
+                                                    data: data,
+                                                    columnDrag: true,
+                                                    colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                    columns: [
+                                                        // { title: 'Month', type: 'text', readOnly: true },
+                                                        { type: 'text', title: "Expected Delivery date" },
+                                                        { type: 'text', readOnly: true, title: "Shipment status" },
+                                                        { type: 'text', title: "Order No" },
+                                                        { type: 'text', title: "Prime line number" },
+                                                        { type: 'dropdown', title: "Data source", source: dataSourceList },
+                                                        { type: 'dropdown', title: "Procurement Agent", source: procurementAgentList },
+                                                        { type: 'text', readOnly: true, title: "Planning unit" },
+                                                        { type: 'numeric', readOnly: true, title: "Suggested order qty" },
+                                                        { type: 'numeric', readOnly: true, title: "MoQ" },
+                                                        { type: 'numeric', readOnly: true, title: "No of pallets" },
+                                                        { type: 'numeric', readOnly: true, title: "No of containers" },
+                                                        { type: 'dropdown', title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
+                                                        { type: 'dropdown', title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
+                                                        { type: 'text', title: "User qty" },
+                                                        { type: 'text', readOnly: true, title: "Adjusted order qty" },
+                                                        { type: 'text', readOnly: true, title: "Adjusted pallets" },
+                                                        { type: 'text', readOnly: true, title: "Adjusted containers" },
+                                                        { type: 'text', title: "Manual price per planning unit" },
+                                                        { type: 'text', readOnly: true, title: "Price per planning unit" },
+                                                        { type: 'text', readOnly: true, title: "Amount" },
+                                                        { type: 'dropdown', title: "Shipped method", source: ['Sea', 'Air'] },
+                                                        { type: 'text', title: "Freight cost amount" },
+                                                        { type: 'text', title: "Default freight cost" },
+                                                        { type: 'text', readOnly: true, title: "Total amount" },
+                                                        { type: 'text', title: "Notes" },
+                                                        { type: 'checkbox', title: "Cancelled Order" },
+                                                        { type: 'hidden', title: "Units/Pallet" },
+                                                        { type: 'hidden', title: "Units/Container" },
+                                                        { type: 'hidden', title: "Air Freight Percentage" },
+                                                        { type: 'hidden', title: "Sea Freight Percentage" },
+                                                        {
+                                                            title: 'Index',
+                                                            type: 'hidden'
+                                                        }
+
+                                                    ],
+                                                    pagination: 10,
+                                                    search: true,
+                                                    columnSorting: true,
+                                                    tableOverflow: true,
+                                                    wordWrap: true,
+                                                    allowInsertColumn: false,
+                                                    allowManualInsertColumn: false,
+                                                    allowDeleteRow: false,
+                                                    onchange: this.plannedPsmChanged,
+                                                    oneditionend: this.onedit,
+                                                    copyCompatibility: true,
+                                                    paginationOptions: [10, 25, 50, 100],
+                                                    position: 'top'
+                                                };
+
+                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+                                            }.bind(this);
+                                        }.bind(this);
                                     }.bind(this);
                                 }.bind(this);
                             }.bind(this);
-                        } else if (shipmentList[0].shipmentStatus.id == 3 || shipmentList[0].shipmentStatus.id == 4 || shipmentList[0].shipmentStatus.id == 5 || shipmentList[0].shipmentStatus.id == 6) { //submitted
+                        }.bind(this);
+                    } else if (shipmentList[0].shipmentStatus.id == 3 || shipmentList[0].shipmentStatus.id == 4 || shipmentList[0].shipmentStatus.id == 5 || shipmentList[0].shipmentStatus.id == 6) { //submitted
 
-                            document.getElementById("addButton").style.display = "none";
+                        document.getElementById("addButton").style.display = "none";
 
-                            var paList = [];
-                            var supList = [];
-                            var allowShipStatusList = [];
-                            var currentShipmentId = shipmentList[0].shipmentStatus.id;
-                            var nextShipmentAllowedList = [];
+                        var paList = [];
+                        var supList = [];
+                        var allowShipStatusList = [];
+                        var currentShipmentId = shipmentList[0].shipmentStatus.id;
+                        var nextShipmentAllowedList = [];
 
-                            var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
-                            var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
-                            var procurementUnitRequest = procurementUnitOs.getAll();
-                            procurementUnitRequest.onsuccess = function (event) {
+                        var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                        var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
+                        var procurementUnitRequest = procurementUnitOs.getAll();
+                        procurementUnitRequest.onsuccess = function (event) {
 
-                                var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
-                                var supplierOs = supplierTransaction.objectStore('supplier');
-                                var supplierRequest = supplierOs.getAll();
-                                supplierRequest.onsuccess = function (event) {
+                            var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
+                            var supplierOs = supplierTransaction.objectStore('supplier');
+                            var supplierRequest = supplierOs.getAll();
+                            supplierRequest.onsuccess = function (event) {
 
-                                    var procurementUnitResult = [];
-                                    procurementUnitResult = procurementUnitRequest.result;
-                                    for (var k = 0; k < procurementUnitResult.length; k++) {
-                                        var paJson = {
-                                            name: procurementUnitResult[k].label.label_en,
-                                            id: procurementUnitResult[k].procurementUnitId
+                                var procurementUnitResult = [];
+                                procurementUnitResult = procurementUnitRequest.result;
+                                for (var k = 0; k < procurementUnitResult.length; k++) {
+                                    var paJson = {
+                                        name: procurementUnitResult[k].label.label_en,
+                                        id: procurementUnitResult[k].procurementUnitId
+                                    }
+                                    paList[k] = paJson;
+                                }
+
+                                this.setState({
+                                    procurementAgentList: paList
+                                });
+
+                                var supplierResult = [];
+                                supplierResult = supplierRequest.result;
+                                for (var k = 0; k < supplierResult.length; k++) {
+                                    var supplierJson = {
+                                        name: supplierResult[k].label.label_en,
+                                        id: supplierResult[k].supplierId
+                                    }
+                                    supList[k] = supplierJson;
+                                }
+
+                                this.setState({
+                                    supplierList: supList
+                                });
+
+                                var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                                var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
+                                var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
+                                allowShipmentStatusRequest.onsuccess = function (event) {
+
+                                    var allowShipmentStatusResult = [];
+                                    allowShipmentStatusResult = allowShipmentStatusRequest.result;
+                                    for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                        if (currentShipmentId == allowShipmentStatusResult[k].shipmentStatusId) {
+                                            nextShipmentAllowedList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
                                         }
-                                        paList[k] = paJson;
+                                    }
+
+                                    var count = 0;
+                                    for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                        if (nextShipmentAllowedList[count] == allowShipmentStatusResult[k].shipmentStatusId) {
+                                            var allowShipStatusJson = {
+                                                name: allowShipmentStatusResult[k].label.label_en,
+                                                id: allowShipmentStatusResult[k].shipmentStatusId
+                                            }
+                                            allowShipStatusList[count] = allowShipStatusJson;
+                                            count++;
+                                        }
                                     }
 
                                     this.setState({
-                                        procurementAgentList: paList
+                                        allowShipmentStatusList: allowShipStatusList
                                     });
 
-                                    var supplierResult = [];
-                                    supplierResult = supplierRequest.result;
-                                    for (var k = 0; k < supplierResult.length; k++) {
-                                        var supplierJson = {
-                                            name: supplierResult[k].label.label_en,
-                                            id: supplierResult[k].supplierId
-                                        }
-                                        supList[k] = supplierJson;
-                                    }
 
-                                    this.setState({
-                                        supplierList: supList
-                                    });
+                                    var data = [];
+                                    var shipmentDataArr = [];
 
-                                    var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
-                                    var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
-                                    var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
-                                    allowShipmentStatusRequest.onsuccess = function (event) {
+                                    data[0] = shipmentList[0].shipmentId;
+                                    data[1] = shipmentList[0].expectedDeliveryDate;
+                                    data[2] = shipmentList[0].shipmentStatus.label.label_en;
+                                    data[3] = shipmentList[0].procurementAgent.label.label_en;
+                                    data[4] = '';//funding source
+                                    data[5] = '';//budget
+                                    data[6] = shipmentList[0].planningUnit.label.label_en;
+                                    data[7] = shipmentList[0].suggestedQty;
+                                    data[8] = procurementAgentPlanningList[0].moq;
+                                    data[9] = '';
+                                    data[10] = '';
+                                    data[11] = '';
+                                    data[12] = '';
+                                    data[13] = '';
+                                    data[14] = '';
+                                    data[15] = '';
+                                    data[16] = procurementAgentPlanningList[0].catalogPrice;
+                                    data[17] = '';
+                                    data[18] = '';
+                                    data[19] = shipmentList[0].notes;
 
-                                        var allowShipmentStatusResult = [];
-                                        allowShipmentStatusResult = allowShipmentStatusRequest.result;
-                                        for (var k = 0; k < allowShipmentStatusResult.length; k++) {
-                                            if (currentShipmentId == allowShipmentStatusResult[k].shipmentStatusId) {
-                                                nextShipmentAllowedList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
-                                            }
-                                        }
+                                    shipmentDataArr[0] = data;
 
-                                        var count = 0;
-                                        for (var k = 0; k < allowShipmentStatusResult.length; k++) {
-                                            if (nextShipmentAllowedList[count] == allowShipmentStatusResult[k].shipmentStatusId) {
-                                                var allowShipStatusJson = {
-                                                    name: allowShipmentStatusResult[k].label.label_en,
-                                                    id: allowShipmentStatusResult[k].shipmentStatusId
-                                                }
-                                                allowShipStatusList[count] = allowShipStatusJson;
-                                                count++;
-                                            }
-                                        }
+                                    this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                    this.el.destroy();
+                                    var json = [];
+                                    var data = shipmentDataArr;
+                                    // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                                    // json[0] = data;
+                                    var options = {
+                                        data: data,
+                                        columnDrag: true,
+                                        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                        columns: [
+                                            // { title: 'Month', type: 'text', readOnly: true },
+                                            {
+                                                title: 'Shipment Id',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Expected Delivery date',
+                                                // type: 'calendar',
+                                                type: 'text',
+                                                readOnly: true
 
-                                        this.setState({
-                                            allowShipmentStatusList: allowShipStatusList
-                                        });
+                                            },
+                                            {
+                                                title: 'Shipment Status',
+                                                type: 'dropdown',
+                                                // source: ['Approved', 'Shipped', 'Delivered']
+                                                source: allowShipStatusList
+                                                // readOnly: true
+                                            },
+                                            {
+                                                title: 'Procurement Agent',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Funding Source',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Budget',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Planning Unit',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Suggested Order Qty',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'MoQ',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'User Qty',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Adjusted Order Qty',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Adjusted Pallets',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Adjusted Containers',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Manual Price per Planning Unit',
+                                                type: 'text',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Procurement Unit',
+                                                type: 'dropdown',
+                                                source: paList
+                                            },
+                                            {
+                                                title: 'Supplier',
+                                                type: 'dropdown',
+                                                source: supList
+                                            },
+                                            {
+                                                title: 'Price per Planning Unit',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'Amt',
+                                                type: 'numeric',
+                                                readOnly: true
+                                            },
+                                            {
+                                                title: 'RO Number',
+                                                type: 'text',
+                                                // readOnly: true
+                                            },
+                                            {
+                                                title: 'Notes',
+                                                type: 'text',
+                                                // readOnly: true
+                                            },
 
+                                        ],
+                                        pagination: 10,
+                                        search: true,
+                                        columnSorting: true,
+                                        tableOverflow: true,
+                                        wordWrap: true,
+                                        allowInsertColumn: false,
+                                        allowManualInsertColumn: false,
+                                        allowDeleteRow: false,
+                                        onchange: this.changed,
+                                        oneditionend: this.onedit,
+                                        copyCompatibility: true,
+                                        paginationOptions: [10, 25, 50, 100],
+                                        position: 'top'
+                                    };
 
-                                        var data = [];
-                                        var shipmentDataArr = [];
-
-                                        data[0] = shipmentList[0].shipmentId;
-                                        data[1] = shipmentList[0].expectedDeliveryDate;
-                                        data[2] = shipmentList[0].shipmentStatus.label.label_en;
-                                        data[3] = shipmentList[0].procurementAgent.label.label_en;
-                                        data[4] = '';//funding source
-                                        data[5] = '';//budget
-                                        data[6] = shipmentList[0].planningUnit.label.label_en;
-                                        data[7] = shipmentList[0].suggestedQty;
-                                        data[8] = procurementAgentPlanningList[0].moq;
-                                        data[9] = '';
-                                        data[10] = '';
-                                        data[11] = '';
-                                        data[12] = '';
-                                        data[13] = '';
-                                        data[14] = '';
-                                        data[15] = '';
-                                        data[16] = procurementAgentPlanningList[0].catalogPrice;
-                                        data[17] = '';
-                                        data[18] = '';
-                                        data[19] = shipmentList[0].notes;
-
-                                        shipmentDataArr[0] = data;
-
-                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                                        this.el.destroy();
-                                        var json = [];
-                                        var data = shipmentDataArr;
-                                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                                        // json[0] = data;
-                                        var options = {
-                                            data: data,
-                                            columnDrag: true,
-                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                            columns: [
-                                                // { title: 'Month', type: 'text', readOnly: true },
-                                                {
-                                                    title: 'Shipment Id',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Expected Delivery date',
-                                                    // type: 'calendar',
-                                                    type: 'text',
-                                                    readOnly: true
-
-                                                },
-                                                {
-                                                    title: 'Shipment Status',
-                                                    type: 'dropdown',
-                                                    // source: ['Approved', 'Shipped', 'Delivered']
-                                                    source: allowShipStatusList
-                                                    // readOnly: true
-                                                },
-                                                {
-                                                    title: 'Procurement Agent',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Funding Source',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Budget',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Planning Unit',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Suggested Order Qty',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'MoQ',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'User Qty',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Order Qty',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Pallets',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Adjusted Containers',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Manual Price per Planning Unit',
-                                                    type: 'text',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Procurement Unit',
-                                                    type: 'dropdown',
-                                                    source: paList
-                                                },
-                                                {
-                                                    title: 'Supplier',
-                                                    type: 'dropdown',
-                                                    source: supList
-                                                },
-                                                {
-                                                    title: 'Price per Planning Unit',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'Amt',
-                                                    type: 'numeric',
-                                                    readOnly: true
-                                                },
-                                                {
-                                                    title: 'RO Number',
-                                                    type: 'text',
-                                                    // readOnly: true
-                                                },
-                                                {
-                                                    title: 'Notes',
-                                                    type: 'text',
-                                                    // readOnly: true
-                                                },
-
-                                            ],
-                                            pagination: 10,
-                                            search: true,
-                                            columnSorting: true,
-                                            tableOverflow: true,
-                                            wordWrap: true,
-                                            allowInsertColumn: false,
-                                            allowManualInsertColumn: false,
-                                            allowDeleteRow: false,
-                                            onchange: this.changed,
-                                            oneditionend: this.onedit,
-                                            copyCompatibility: true,
-                                            paginationOptions: [10, 25, 50, 100],
-                                            position: 'top'
-                                        };
-
-                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-                                    }.bind(this);
-
+                                    this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
                                 }.bind(this);
+
                             }.bind(this);
+                        }.bind(this);
 
-                        }
-                        // if (shipmentList[0].shipmentStatus.id == 4) { //approved
+                    }
+                    // if (shipmentList[0].shipmentStatus.id == 4) { //approved
 
-                        // } else if (shipmentList[0].shipmentStatus.id == 5) { //shipped
+                    // } else if (shipmentList[0].shipmentStatus.id == 5) { //shipped
 
-                        // } else if (shipmentList[0].shipmentStatus.id == 6) { //Delivered
+                    // } else if (shipmentList[0].shipmentStatus.id == 6) { //Delivered
 
-                        // } 
-                        else if (shipmentList[0].shipmentStatus.id == 7) { //cancelled
+                    // } 
+                    else if (shipmentList[0].shipmentStatus.id == 7) { //cancelled
 
-                            document.getElementById("addButton").style.display = "none";
+                        document.getElementById("addButton").style.display = "none";
 
-                            var data = [];
-                            var shipmentDataArr = [];
+                        var data = [];
+                        var shipmentDataArr = [];
 
-                            data[0] = shipmentList[0].shipmentId;
-                            data[1] = shipmentList[0].expectedDeliveryDate;
-                            data[2] = shipmentList[0].shipmentStatus.label.label_en;
-                            data[3] = shipmentList[0].procurementAgent.label.label_en;
-                            data[4] = '';//funding source
-                            data[5] = '';//budget
-                            data[6] = shipmentList[0].planningUnit.label.label_en;
-                            data[7] = shipmentList[0].suggestedQty;
-                            data[8] = procurementAgentPlanningList[0].moq;
-                            data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
-                            data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
-                            data[11] = '';
-                            data[12] = '';
-                            data[13] = '';
-                            data[14] = shipmentList[0].quantity;
-                            data[15] = '';
-                            data[16] = '';
-                            data[17] = shipmentList[0].rate;
-                            data[18] = procurementAgentPlanningList[0].catalogPrice;
-                            data[19] = (shipmentList[0].rate == null || shipmentList[0].rate == 0) ? (shipmentList[0].quantity * procurementAgentPlanningList[0].catalogPrice).toFixed(2) : (shipmentList[0].quantity * shipmentList[0].rate).toFixed(2);
-                            data[20] = '';
-                            data[21] = shipmentList[0].notes;
-                            data[22] = true;
-                            data[23] = procurementAgentPlanningList[0].unitsPerPallet;
-                            data[24] = procurementAgentPlanningList[0].unitsPerContainer;
+                        data[0] = shipmentList[0].shipmentId;
+                        data[1] = shipmentList[0].expectedDeliveryDate;
+                        data[2] = shipmentList[0].shipmentStatus.label.label_en;
+                        data[3] = shipmentList[0].procurementAgent.label.label_en;
+                        data[4] = '';//funding source
+                        data[5] = '';//budget
+                        data[6] = shipmentList[0].planningUnit.label.label_en;
+                        data[7] = shipmentList[0].suggestedQty;
+                        data[8] = procurementAgentPlanningList[0].moq;
+                        data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
+                        data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
+                        data[11] = '';
+                        data[12] = '';
+                        data[13] = '';
+                        data[14] = shipmentList[0].quantity;
+                        data[15] = '';
+                        data[16] = '';
+                        data[17] = shipmentList[0].rate;
+                        data[18] = procurementAgentPlanningList[0].catalogPrice;
+                        data[19] = (shipmentList[0].rate == null || shipmentList[0].rate == 0) ? (shipmentList[0].quantity * procurementAgentPlanningList[0].catalogPrice).toFixed(2) : (shipmentList[0].quantity * shipmentList[0].rate).toFixed(2);
+                        data[20] = '';
+                        data[21] = shipmentList[0].notes;
+                        data[22] = true;
+                        data[23] = procurementAgentPlanningList[0].unitsPerPallet;
+                        data[24] = procurementAgentPlanningList[0].unitsPerContainer;
 
-                            shipmentDataArr[0] = data;
+                        shipmentDataArr[0] = data;
 
-                            // data = [];
-                            // data[0] = '';
-                            // data[1] = '10-09-2020';
-                            // data[2] = '02-PLANNED';
-                            // data[3] = 'PSM';
-                            // data[4] = 'USAID';
-                            // data[5] = 'Kenya - 2020 budget	';
-                            // data[6] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
-                            // data[7] = '44773';
-                            // data[8] = '45000'; //moq
-                            // data[9] = '30.00';
-                            // data[10] = '1.50';
-                            // data[11] = '';
-                            // data[12] = '';
-                            // data[13] = '';
-                            // data[14] = '';
-                            // data[15] = '';
-                            // data[16] = '';
-                            // data[17] = '';
-                            // data[18] = '7.83';
-                            // data[19] = '';
-                            // data[20] = '';
-                            // data[21] = '';
-                            // data[22] = '';
-                            // data[23] = '1500';
-                            // data[24] = '30000';
-                            // shipmentDataArr[0] = data;
+                        // data = [];
+                        // data[0] = '';
+                        // data[1] = '10-09-2020';
+                        // data[2] = '02-PLANNED';
+                        // data[3] = 'PSM';
+                        // data[4] = 'USAID';
+                        // data[5] = 'Kenya - 2020 budget	';
+                        // data[6] = 'Ceftriaxone 1 gm Powder Vial, 10 Vials';
+                        // data[7] = '44773';
+                        // data[8] = '45000'; //moq
+                        // data[9] = '30.00';
+                        // data[10] = '1.50';
+                        // data[11] = '';
+                        // data[12] = '';
+                        // data[13] = '';
+                        // data[14] = '';
+                        // data[15] = '';
+                        // data[16] = '';
+                        // data[17] = '';
+                        // data[18] = '7.83';
+                        // data[19] = '';
+                        // data[20] = '';
+                        // data[21] = '';
+                        // data[22] = '';
+                        // data[23] = '1500';
+                        // data[24] = '30000';
+                        // shipmentDataArr[0] = data;
 
-                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                            this.el.destroy();
-                            var json = [];
-                            var data = shipmentDataArr;
-                            // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-                            // json[0] = data;
-                            var options = {
-                                data: data,
-                                columnDrag: true,
-                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                columns: [
-                                    // { title: 'Month', type: 'text', readOnly: true },
-                                    {
-                                        title: 'Shipment Id',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Expected Delivery date',
-                                        // type: 'calendar',
-                                        type: 'text',
-                                        readOnly: true
+                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                        this.el.destroy();
+                        var json = [];
+                        var data = shipmentDataArr;
+                        // var data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+                        // json[0] = data;
+                        var options = {
+                            data: data,
+                            columnDrag: true,
+                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                            columns: [
+                                // { title: 'Month', type: 'text', readOnly: true },
+                                {
+                                    title: 'Shipment Id',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Expected Delivery date',
+                                    // type: 'calendar',
+                                    type: 'text',
+                                    readOnly: true
 
-                                    },
-                                    {
-                                        title: 'Shipment Status',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Procurement Agent',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Funding Source',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Budget',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Planning Unit',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Suggested Order Qty',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'MoQ',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'No of Pallets',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'No of Containers',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Order based on',
-                                        type: 'text',
-                                        readOnly: true
+                                },
+                                {
+                                    title: 'Shipment Status',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Procurement Agent',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Funding Source',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Budget',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Planning Unit',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Suggested Order Qty',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'MoQ',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'No of Pallets',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'No of Containers',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Order based on',
+                                    type: 'text',
+                                    readOnly: true
 
-                                    },
-                                    {
-                                        title: 'Rounding option',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'User Qty',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Adjusted Order Qty',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Adjusted Pallets',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Adjusted Containers',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Manual Price per Planning Unit',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Price per Planning Unit',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Amt',
-                                        type: 'numeric',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'RO Number',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Notes',
-                                        type: 'text',
-                                        readOnly: true
-                                    },
-                                    {
-                                        title: 'Cancelled Order',
-                                        type: 'checkbox'
-                                    },
-                                    {
-                                        title: 'Unit/Pallet',
-                                        type: 'hidden'
-                                    },
-                                    {
-                                        title: 'Unit/Container',
-                                        type: 'hidden'
-                                    }
+                                },
+                                {
+                                    title: 'Rounding option',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'User Qty',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Adjusted Order Qty',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Adjusted Pallets',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Adjusted Containers',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Manual Price per Planning Unit',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Price per Planning Unit',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Amt',
+                                    type: 'numeric',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'RO Number',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Notes',
+                                    type: 'text',
+                                    readOnly: true
+                                },
+                                {
+                                    title: 'Cancelled Order',
+                                    type: 'checkbox'
+                                },
+                                {
+                                    title: 'Unit/Pallet',
+                                    type: 'hidden'
+                                },
+                                {
+                                    title: 'Unit/Container',
+                                    type: 'hidden'
+                                }
 
-                                ],
-                                pagination: 10,
-                                search: true,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                onchange: this.changed,
-                                oneditionend: this.onedit,
-                                copyCompatibility: true,
-                                paginationOptions: [10, 25, 50, 100],
-                                position: 'top'
-                            };
+                            ],
+                            pagination: 10,
+                            search: true,
+                            columnSorting: true,
+                            tableOverflow: true,
+                            wordWrap: true,
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            allowDeleteRow: false,
+                            onchange: this.changed,
+                            oneditionend: this.onedit,
+                            copyCompatibility: true,
+                            paginationOptions: [10, 25, 50, 100],
+                            position: 'top'
+                        };
 
-                            this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
-                        }//end cancelled
+                    }//end cancelled
 
 
 
-                    }.bind(this);
                 }.bind(this);
             }.bind(this);
+
         }//end else
 
 
@@ -2888,6 +2902,8 @@ export default class ConsumptionDetails extends React.Component {
         var shipmentStatusList = [];
         let planningUnitList = [];
         let procurementAgentPlanningList = [];
+        var dataSourceList = [];
+        var programByteList = '';
 
         var programId = (this.props.match.params.programId).split("_")[0];
 
@@ -2911,6 +2927,11 @@ export default class ConsumptionDetails extends React.Component {
                 for (var k = 0; k < programResult.length; k++) {
                     if (programResult[k].programId == programId) {
                         expectedDeliveryInDays = parseInt(programResult[k].plannedToDraftLeadTime) + parseInt(programResult[k].draftToSubmittedLeadTime) + parseInt(programResult[k].submittedToApprovedLeadTime) + parseInt(programResult[k].approvedToShippedLeadTime) + parseInt(programResult[k].deliveredToReceivedLeadTime);
+                        var programByteJson = {
+                            airFreightPerc: programResult[k].airFreightPerc,
+                            seaFreightPerc: programResult[k].seaFreightPerc
+                        }
+                        programByteList = programByteJson
                     }
                 }
 
@@ -2997,7 +3018,8 @@ export default class ConsumptionDetails extends React.Component {
                                     for (var k = 0; k < procurementAgentPlanningUnitResult.length; k++) {
                                         if (procurementAgentPlanningUnitResult[k].planningUnit.id == this.props.match.params.planningUnitId) {
                                             var procurementAgentJson = {
-                                                id: procurementAgentPlanningUnitResult[k].procurementAgentPlanningUnitId,
+                                                procurementAgentId: procurementAgentPlanningUnitResult[k].procurementAgent.id,
+                                                planningUnitId: procurementAgentPlanningUnitResult[k].planningUnit.id,
                                                 catalogPrice: procurementAgentPlanningUnitResult[k].catalogPrice,
                                                 moq: procurementAgentPlanningUnitResult[k].moq,
                                                 unitsPerPallet: procurementAgentPlanningUnitResult[k].unitsPerPallet,
@@ -3007,38 +3029,139 @@ export default class ConsumptionDetails extends React.Component {
                                         }
                                     }
 
-                                    var data = [];
-                                    data[0] = '0';
-                                    data[1] = expectedDeliveryDate;
-                                    data[2] = 'Planned';
-                                    data[3] = procurementAgentList;
-                                    data[4] = fundingSourceList;
-                                    data[5] = budgetList;
-                                    data[6] = planningUnitList[0].name;
-                                    data[7] = '';
-                                    data[8] = procurementAgentPlanningList[0].moq;
-                                    data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
-                                    data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
-                                    data[11] = [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }];
-                                    data[12] = [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }];
-                                    data[13] = '';
-                                    data[14] = '';
-                                    data[15] = '';
-                                    data[16] = '';
-                                    data[17] = '';
-                                    data[18] = procurementAgentPlanningList[0].catalogPrice;
-                                    data[19] = '';
-                                    data[20] = '';
-                                    data[21] = '';
-                                    data[22] = '';
-                                    data[23] = procurementAgentPlanningList[0].unitsPerPallet;
-                                    data[24] = procurementAgentPlanningList[0].unitsPerContainer;
-                                    data[25] = -1;
+                                    var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                    var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                                    var dataSourceRequest = dataSourceOs.getAll();
 
-                                    this.el.insertRow(
-                                        data
-                                    );
+                                    dataSourceRequest.onsuccess = function (event) {
+                                        var dataSourceResult = [];
+                                        dataSourceResult = dataSourceRequest.result;
+                                        for (var k = 0; k < dataSourceResult.length; k++) {
+                                            var dataSourceJson = {
+                                                name: dataSourceResult[k].label.label_en,
+                                                id: dataSourceResult[k].dataSourceId
+                                            }
+                                            dataSourceList[k] = dataSourceJson
+                                        }
 
+
+
+                                        // var data = [];
+                                        // data[0] = '0';
+                                        // data[1] = expectedDeliveryDate;
+                                        // data[2] = 'Planned';
+                                        // data[3] = procurementAgentList;
+                                        // data[4] = fundingSourceList;
+                                        // data[5] = budgetList;
+                                        // data[6] = planningUnitList[0].name;
+                                        // data[7] = '';
+                                        // data[8] = procurementAgentPlanningList[0].moq;
+                                        // data[9] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerPallet).toFixed(1);
+                                        // data[10] = ((procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1) == "NaN") ? '0' : (procurementAgentPlanningList[0].moq / procurementAgentPlanningList[0].unitsPerContainer).toFixed(1);
+                                        // data[11] = [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }];
+                                        // data[12] = [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }];
+                                        // data[13] = '';
+                                        // data[14] = '';
+                                        // data[15] = '';
+                                        // data[16] = '';
+                                        // data[17] = '';
+                                        // data[18] = procurementAgentPlanningList[0].catalogPrice;
+                                        // data[19] = '';
+                                        // data[20] = '';
+                                        // data[21] = '';
+                                        // data[22] = '';
+                                        // data[23] = procurementAgentPlanningList[0].unitsPerPallet;
+                                        // data[24] = procurementAgentPlanningList[0].unitsPerContainer;
+                                        // data[25] = -1;
+
+
+                                        let i = this.state.countVar;
+                                        var data = [];
+                                        data[0] = expectedDeliveryDate;
+                                        data[1] = 'Planned';
+                                        data[2] = '';
+                                        data[3] = '';
+                                        data[4] = '';
+                                        data[5] = '';
+                                        data[6] = '';
+                                        data[7] = '';
+                                        data[8] = '';
+                                        data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
+                                        data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
+                                        data[11] = '';
+                                        data[12] = '';
+                                        data[13] = '';
+                                        data[14] = `=IF(L${i + 1}==3,
+       
+                                                IF(M${i + 1}==1,
+                                                        CEILING(I${i + 1},1),
+                                                        FLOOR(I${i + 1},1)
+                                                )
+                                        ,
+                                        IF(L${i + 1}==4,
+                                                IF(NOT(ISBLANK(N${i + 1})),
+                                                        IF(M${i + 1}==1,
+                                                                CEILING(N${i + 1}/Z${i + 1},1)*Z${i + 1},
+                                                                FLOOR(N${i + 1}/Z${i + 1},1)*Z${i + 1}
+                                                        ),
+                                                        IF(M${i + 1}==1,
+                                                                CEILING(J${i + 1},1)*Z${i + 1},
+                                                                FLOOR(J${i + 1},1)*Z${i + 1}
+                                                        )
+                                                ),
+                                                IF(L${i + 1}==1,
+                                                        IF(NOT(ISBLANK(N${i + 1})),
+                                                                IF(M${i + 1}==1,
+                                                                CEILING(N${i + 1}/Z${i + 1},1)*AA${i + 1},
+                                                                FLOOR(N${i + 1}/Z${i + 1},1)*AA${i + 1}
+                                                        ),
+                                                                IF(M${i + 1}==1,
+                                                                        CEILING(K${i + 1},1)*AA${i + 1},
+                                                                        FLOOR(K${i + 1},1)*AA${i + 1}
+                                                                )
+                                                        ),
+                                                        IF(NOT(ISBLANK(N${i + 1})),
+                                                                IF(M${i + 1}==1,
+                                                                        CEILING(N${i + 1},1),
+                                                                        FLOOR(N${i + 1},1)
+                                                                ),
+                                                                IF(M${i + 1}==1,
+                                                                        CEILING(H${i + 1},1),
+                                                                        FLOOR(H${i + 1},1)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                 )`;
+                                        data[15] = `=O${i + 1}/Z${i + 1}`;
+                                        data[16] = `=O${i + 1}/AA${i + 1}`;
+                                        data[17] = "";//Manual price
+                                        data[18] = '';
+                                        data[19] = `=S${i + 1}*O${i + 1}`; //Amount
+                                        data[20] = "";//Shipment method
+                                        data[21] = "";// Freight Cost
+                                        data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
+                                        data[23] = `=T${i + 1}+W${i + 1}`; // Final Amount
+                                        data[24] = "";//Notes
+                                        data[25] = false
+                                        data[25] = '';
+                                        data[26] = '';
+                                        data[27] = programByteList.airFreightPerc;
+                                        data[28] = programByteList.seaFreightPerc;
+                                        data[29] = -1;
+
+                                        this.setState({
+                                            countVar: i++
+                                        })
+
+
+
+                                        this.el.insertRow(
+                                            data
+                                        );
+
+
+                                    }.bind(this)
                                 }.bind(this)
                             }.bind(this)
                         }.bind(this)
@@ -3054,7 +3177,7 @@ export default class ConsumptionDetails extends React.Component {
         var dd = someDate.getDate();
         var mm = someDate.getMonth() + 1;
         var y = someDate.getFullYear();
-        var someFormattedDate = mm + '-' + dd + '-' + y;
+        var someFormattedDate = y + '-' + dd + '-' + mm;
         return someFormattedDate;
     }.bind(this)
 
@@ -3134,6 +3257,14 @@ export default class ConsumptionDetails extends React.Component {
                                 for (var i = 0; i < tempProcurementAgentList.length; i++) {
                                     if (tempProcurementAgentList[i].id == map.get("3")) {
                                         procurementAgentLabel = tempProcurementAgentList[i].name;
+                                    }
+                                }
+
+                                let tempDataSourceList = this.state.dataSourceObjList;
+                                let dataSourceLabel = '';
+                                for (var i = 0; i < tempDataSourceList.length; i++) {
+                                    if (tempDataSourceList[i].id == map.get("3")) {
+                                        dataSourceLabel = tempDataSourceList[i].name;
                                     }
                                 }
 
@@ -3578,6 +3709,7 @@ export default class ConsumptionDetails extends React.Component {
                         </CardHeader>
                         <CardBody>
                             <Col xs="12" sm="12">
+                                <input type="hidden" name="planningUnitId" id="planningUnitId" value="" />
                                 <div className="table-responsive">
                                     <div id="shipmenttableDiv">
                                     </div>
@@ -3651,6 +3783,100 @@ export default class ConsumptionDetails extends React.Component {
 
 
     }.bind(this);
+
+
+    plannedPsmChanged = function (instance, cell, x, y, value) {
+        var planningUnitId = document.getElementById("planningUnitId").value;
+        var elInstance = instance.jexcel;
+        console.log("elInstance========== ", this.state.planningUnitId);
+        console.log("elInstance========== ", this.props.match.params.planningUnitId);
+        if (x == 5) {
+            var col = ("F").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open('fasp', 1);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                    var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
+                    var papuRequest = papuOs.getAll();
+                    papuRequest.onsuccess = function (event) {
+                        var papuResult = [];
+                        papuResult = papuRequest.result;
+                        var procurementAgentPlanningUnit = papuResult.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
+                        elInstance.setValueFromCoords(8, y, procurementAgentPlanningUnit.moq, true);
+                        elInstance.setValueFromCoords(18, y, procurementAgentPlanningUnit.pricePerPlanningUnit, true);
+                        elInstance.setValueFromCoords(25, y, procurementAgentPlanningUnit.unitsPerPallet, true);
+                        elInstance.setValueFromCoords(26, y, procurementAgentPlanningUnit.unitsPerContainer, true);
+                    }.bind(this)
+                }.bind(this)
+            }
+        }
+
+        if (x == 17) {
+            var col = ("R").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                    elInstance.setValueFromCoords(18, y, value, true);
+                }
+
+            }
+        }
+
+        if (x == 21) {
+            var col = ("R").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                    elInstance.setValueFromCoords(22, y, value, true);
+                }
+
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     changed = function (instance, cell, x, y, value) {
         //---------------------------
@@ -5064,6 +5290,60 @@ export default class ConsumptionDetails extends React.Component {
             }.bind(this);
         }.bind(this);
     }
+
+    getBudgetById() {
+        let programId = this.props.match.params.programId;
+        let shipmentId = this.props.match.params.shipmentId;
+        let planningUnitId = this.props.match.params.planningUnitId;
+        let filterBy = this.props.match.params.filterBy;
+        let startDate = this.props.match.params.startDate;
+        let endDate = this.props.match.params.endDate;
+        let rowIndex = this.props.match.params.rowIndex;
+
+
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var programTransaction = transaction.objectStore('programData');
+            var programRequest = programTransaction.get(programId);
+
+            programRequest.onsuccess = function (event) {
+                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+
+                // var budgetObj = '';
+                var budgetObjList = [];
+
+
+                var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+                var budgetOs = budgetTransaction.objectStore('budget');
+                var budgetRequest = budgetOs.getAll();
+
+                budgetRequest.onsuccess = function (event) {
+                    var budgetResult = [];
+                    budgetResult = budgetRequest.result;
+                    for (var k = 0; k < budgetResult.length; k++) {
+                        var budgetObj = {
+                            name: budgetResult[k].label.label_en,
+                            id: budgetResult[k].budgetId
+                        }
+                        budgetObjList[k] = budgetObj
+                    }
+
+                    this.setState({
+                        budgetObjList: budgetObjList
+                    });
+
+                }.bind(this);
+            }.bind(this);
+        }.bind(this);
+    }
+
 
     getSupplierById() {
         let programId = this.props.match.params.programId;

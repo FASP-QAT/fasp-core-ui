@@ -51,7 +51,7 @@ export default class StockStatusMatrix extends React.Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit=this.getPlanningUnit.bind(this);
+    this.getPlanningUnit = this.getPlanningUnit.bind(this);
 
   }
   show() {
@@ -290,7 +290,7 @@ export default class StockStatusMatrix extends React.Component {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
-      ProductService.getProductCategoryListByProgram(realmId,programId)
+      ProductService.getProductCategoryListByProgram(realmId, programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -364,7 +364,7 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
     }
     this.getPlanningUnit();
-   
+
 
   }
   getPlanningUnit() {
@@ -372,14 +372,14 @@ export default class StockStatusMatrix extends React.Component {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
       let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
+      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
         console.log('**' + JSON.stringify(response.data))
-        this.setState({  planningUnits: response.data});
+        this.setState({ planningUnits: response.data });
       })
         .catch(
           error => {
             if (error.message === "Network Error") {
-              this.setState({ message: error.message , planningUnits: []});
+              this.setState({ message: error.message, planningUnits: [] });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -432,7 +432,7 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
 
     }
-    
+
   }
 
 
@@ -521,9 +521,9 @@ export default class StockStatusMatrix extends React.Component {
   componentDidMount() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-            this.getPrograms();
+      this.getPrograms();
 
-     } else {
+    } else {
       const lan = 'en';
       var db1;
       getDatabase();
@@ -633,7 +633,7 @@ export default class StockStatusMatrix extends React.Component {
         , ele.Dec]);
       data2 = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Q1, ele.Q2, ele.Q3, ele.Q4]);
     } else {
-      data1 = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+      data1 = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
         , ele.Dec]);
     }
 
@@ -655,7 +655,7 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   render() {
-    
+
 
     const { offlinePrograms } = this.state;
     const { offlineProductCategoryList } = this.state;
@@ -674,9 +674,9 @@ export default class StockStatusMatrix extends React.Component {
     let productCategoryList = productCategories.length > 0
       && productCategories.map((item, i) => {
         return (
-          <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
-          {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
-        </option>
+          <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+            {Array(item.level).fill('_ _ ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+          </option>
         )
       }, this);
     const pickerLang = {
