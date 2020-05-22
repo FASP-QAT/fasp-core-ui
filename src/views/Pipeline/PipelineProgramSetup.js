@@ -15,6 +15,7 @@ import PipelineService from '../../api/PipelineService';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from '../../api/ProgramService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import PipelineProgramShipment from './PipelineProgramShipment';
 
 export default class PipelineProgramSetup extends Component {
     constructor(props) {
@@ -787,7 +788,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/* <h3>Inventory</h3> */}
-                                                <PipelineProgramInventory></PipelineProgramInventory>
+                                                <PipelineProgramInventory {...this.props}></PipelineProgramInventory>
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepThree} > <i className="fa fa-angle-double-left"></i> Previous</Button>
@@ -810,8 +811,9 @@ export default class PipelineProgramSetup extends Component {
                                                 <i className="icon-note"></i><strong>Shipment Details</strong>{' '}
                                             </CardHeader>
                                             <CardBody>
-                                                <h3>Shipments</h3>
-
+                                                {/*<h3>Shipments</h3>*/}
+                                                <PipelineProgramShipment></PipelineProgramShipment>
+                                                
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>

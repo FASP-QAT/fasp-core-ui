@@ -30,6 +30,11 @@ class PipelineService {
         return axios.get(`${API_URL}/api/pipeline/product/${json}`, {}
         );
     }
+    
+    getShipmentDataById(json) {
+        return axios.get(`${API_URL}/api/pipeline/shipment/${json}`, {}
+        );
+    }
 }
 
 export default new PipelineService();
