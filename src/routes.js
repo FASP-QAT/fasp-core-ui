@@ -195,6 +195,7 @@ const ForecastMetricsOverTime = React.lazy(() => import('./views/Report/Forecast
 const pipeline = React.lazy(() => import('./views/Pipeline/PipelineProgramImport'));
 const pipelineProgramSetup = React.lazy(() => import('./views/Pipeline/PipelineProgramSetup'));
 const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusOverTime'));
+const SupplyPlanFormulas = React.lazy(() => import('./views/SupplyPlan/SupplyPlanFormulas'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -356,6 +357,7 @@ const routes = [
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
   { path: '/supplyPlan', name: i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
+  { path: '/supplyPlanFormulas', name: i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
   
 
   { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: AddForecastingUnit },
