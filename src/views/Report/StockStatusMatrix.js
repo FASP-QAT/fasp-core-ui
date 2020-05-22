@@ -703,8 +703,8 @@ export default class StockStatusMatrix extends React.Component {
         , ele.Dec]);
       data2 = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Q1, ele.Q2, ele.Q3, ele.Q4]);
     } else {
-      data1 = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
-        , ele.Dec]);
+      data1 = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+      .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
     }
 
     // console.log(data1);
