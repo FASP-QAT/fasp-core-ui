@@ -332,7 +332,7 @@ class StockStatusOverTime extends Component {
                     doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
                         align: 'left'
                     })
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.stateplanningUnitLabels.toString(), doc.internal.pageSize.width / 8, 130, {
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                 }
@@ -631,13 +631,10 @@ class StockStatusOverTime extends Component {
 
                                                         }
                                                     <br></br>
-                                                </div>
-                                            </Col>
-                                       
-                            </CardBody>
-                        </Card>
-                   
-            </div>
+                                                </div></div>
+                                          </CardBody></Card> 
+                        </div>               
+            
 
         );
 

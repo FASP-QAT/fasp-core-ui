@@ -47,9 +47,11 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import pdfIcon from '../../assets/img/pdf.png';
 import csvicon from '../../assets/img/csv.png'
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import { LOGO }  from '../../CommonComponent/Logo.js'
+import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import ReportService from '../../api/ReportService';
+import ProgramService from '../../api/ProgramService';
 // const { getToggledOptions } = utils;
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -60,29 +62,35 @@ const brandSuccess = getStyle('--success')
 const brandInfo = getStyle('--info')
 const brandWarning = getStyle('--warning')
 const brandDanger = getStyle('--danger')
+const pickerLang = {
+  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+  from: 'From', to: 'To',
+}
 
 const options = {
   title: {
     display: true,
     text: i18n.t('static.dashboard.globalconsumption')
   },
-  scales: {yAxes: [{
-    scaleLabel: {
-      display: true,
-      labelString: i18n.t('static.dashboard.consumption')
-    },
-    stacked: true,
-    ticks: {
-      beginAtZero: true
-    }
-  }]},
+  scales: {
+    yAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: i18n.t('static.dashboard.consumption')
+      },
+      stacked: true,
+      ticks: {
+        beginAtZero: true
+      }
+    }]
+  },
   tooltips: {
     enabled: false,
     custom: CustomTooltips
   },
   maintainAspectRatio: false
   ,
-  legend:{
+  legend: {
     display: true,
     position: 'bottom',
     labels: {
@@ -116,19 +124,25 @@ class Consumption extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
+    this.toggledata = this.toggledata.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      lang:localStorage.getItem('lang'),
-     countrys: [],
+      lang: localStorage.getItem('lang'),
+      countrys: [],
       planningUnits: [],
-      consumptions: {date :[],
-      countryData:[]},
+      consumptions: [],
       productCategories: [],
-      countryValues:[],
+      countryValues: [],
+      countryLabels: [],
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      programValues: [],
+      programLabels: [],
+      programs:[],
+      message:'',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -140,27 +154,36 @@ class Consumption extends Component {
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
-    this.getProductCategories=this.getProductCategories.bind(this)
-    //this.pickRange = React.createRef()
-    this.handleChange=this.handleChange.bind(this)
-    this.getRandomColor=this.getRandomColor.bind(this)
+    this.getProductCategories = this.getProductCategories.bind(this)
+    this.getPrograms=this.getPrograms.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+    this.getRandomColor = this.getRandomColor.bind(this)
+    this.handleChangeProgram=this.handleChangeProgram.bind(this)
+    this.handlePlanningUnitChange=this.handlePlanningUnitChange.bind(this)
+  }
+
+  makeText = m => {
+    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+    return '?'
   }
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year).replaceAll(' ','%20'))
-    csvRow.push(i18n.t('static.planningunit.planningunit')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
+    csvRow.push(i18n.t('static.dashboard.country') + ' : ' + ((this.state.countryLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.program.program') + ' : ' + ((this.state.programLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.planningunit.planningunit') + ' : ' + ((this.state.planningUnitLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
     var re;
-    
-    var A =[[i18n.t('static.dashboard.country')].concat(this.state.consumptions.date)]
-    
-      re = this.state.consumptions.countryData
-    
+
+    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ','%20'),(i18n.t('static.report.month')).replaceAll(' ','%20'),(i18n.t('static.consumption.consumptionqty')).replaceAll(' ','%20')]]
+
+    re = this.state.consumptions
+
     for (var item = 0; item < re.length; item++) {
-      A.push([[re[item].label].concat(re[item].value)])
+      A.push([[getLabelText(re[item].realmCountry.label),re[item].consumptionDateString,re[item].planningUnitQty]])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -169,11 +192,11 @@ class Consumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.consumption_') + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
+    a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
-  
+
 
 
 
@@ -181,41 +204,41 @@ class Consumption extends Component {
 
   exportPDF = () => {
     const addFooters = doc => {
-       
+
       const pageCount = doc.internal.getNumberOfPages()
-    
+
       doc.setFont('helvetica', 'bold')
-       doc.setFontSize(10)
+      doc.setFontSize(10)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
-      
+
         doc.setPage(i)
-        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height-30, {
-        align: 'center'
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+          align: 'center'
         })
-        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
-        align: 'center'
+        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+          align: 'center'
         })
-      
-        
+
+
       }
     }
     const addHeaders = doc => {
-      
+
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
-     
-    //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+
+      //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
       // var reader = new FileReader();
-     
-  //var data='';
-// Use fs.readFile() method to read the file 
-//fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-//}); 
+
+      //var data='';
+      // Use fs.readFile() method to read the file 
+      //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+      //}); 
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(18)
         doc.setPage(i)
-        doc.addImage(LOGO,'png',0,10, 180, 50,'FAST');
+        doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
           align: 'justify'
         });*/
@@ -223,17 +246,23 @@ class Consumption extends Component {
         doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
-        if(i==1){
+        if (i == 1) {
           doc.setFontSize(12)
-          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-         
-          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
+            align: 'left'
+        })
+          doc.text(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+        
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
         }
-       
+
       }
     }
     const unit = "pt";
@@ -241,51 +270,49 @@ class Consumption extends Component {
     const orientation = "landscape"; // portrait or landscape
 
     const marginLeft = 10;
-    const doc = new jsPDF(orientation, unit, size,true);
+    const doc = new jsPDF(orientation, unit, size, true);
 
     doc.setFontSize(15);
 
     const title = "Consumption Report";
     var canvas = document.getElementById("cool-canvas");
     //creates image
-    
-    var canvasImg = canvas.toDataURL("image/png",1.0);
-    var width = doc.internal.pageSize.width;    
-    var height = doc.internal.pageSize.height;
-    var h1=50;
-    var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*2/3 );
-  /*  
-    const headers =[ [   i18n.t('static.report.consumptionDate'),
-    i18n.t('static.report.forecastConsumption'),
-    i18n.t('static.report.actualConsumption')]];
-    const data =  navigator.onLine? this.state.consumptions.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]):this.state.finalOfflineConsumption.map( elt =>[ elt.consumption_date,elt.forcast,elt.Actual]);
+    var canvasImg = canvas.toDataURL("image/png", 1.0);
+    var width = doc.internal.pageSize.width;
+    var height = doc.internal.pageSize.height;
+    var h1 = 50;
+    var aspectwidth1 = (width - h1);
+
+    doc.addImage(canvasImg, 'png', 50, 150, aspectwidth1, height * 2 / 3);
+      
+      const headers =[[i18n.t('static.dashboard.country'),i18n.t('static.report.month'),i18n.t('static.consumption.consumptionqty')]]
+      const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),elt.consumptionDateString,elt.planningUnitQty]);
+      
+      let content = {
+      margin: {top: 80},
+      startY:  height,
+      head: headers,
+      body: data,
+      
+    };
     
-    let content = {
-    margin: {top: 80},
-    startY:  height,
-    head: headers,
-    body: data,
-    
-  };
-  
-   
-    //doc.text(title, marginLeft, 40);
-    doc.autoTable(content);*/
+     
+      //doc.text(title, marginLeft, 40);
+      doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
     doc.save("report.pdf")
     //creates PDF from img
-  /*  var doc = new jsPDF('landscape');
-    doc.setFontSize(20);
-    doc.text(15, 15, "Cool Chart");
-    doc.save('canvas.pdf');*/
+    /*  var doc = new jsPDF('landscape');
+      doc.setFontSize(20);
+      doc.text(15, 15, "Cool Chart");
+      doc.save('canvas.pdf');*/
   }
 
 
-  
- 
+
+
 
 
 
@@ -293,36 +320,87 @@ class Consumption extends Component {
 
 
   handleChange(countrysId) {
-  //  console.log(this.state.currentValues);
 
     var countryIdArray = [];
+    var countrylabelArray = [];
     for (var i = 0; i < countrysId.length; i++) {
       countryIdArray[i] = countrysId[i].value;
-        
+      countrylabelArray[i] = countrysId[i].label;
     }
     console.log(countryIdArray);
     this.setState({
-      countryValues: countryIdArray
+      countryValues: countryIdArray,
+      countryLabels: countrylabelArray
     })
+    this.filterData()
   }
-  filterData() {
+  handleChangeProgram(programIds) {
+
+    var programIdArray = [];
+    var programlabelArray = []
+    for (var i = 0; i < programIds.length; i++) {
+      programIdArray[i] = programIds[i].value;
+      programlabelArray = programIds[i].label
+    }
+    console.log(programIdArray);
     this.setState({
+      programValues: programIdArray,
+      programLabels: programlabelArray
+    })
+    this.filterData()
+  }
+
+  handlePlanningUnitChange(planningUnitIds) {
+   
+  
+    var planningUnitIdArray = [];
+    var planningUnitLabel = [];
+    planningUnitIdArray= planningUnitIds.map(ele=>ele.value)
+    planningUnitLabel=planningUnitIds.map(ele=>ele.label)
+   /* for (var i = 0; i < planningUnitIds.length; i++) {
+      planningUnitIdArray[i] = planningUnitIds[i].value;
+      planningUnitLabel[i] = planningUnitIds[i].label
+
+    }*/
+   
+    this.setState({
+      planningUnitValues: planningUnitIds.map(ele=>ele.value),
+      planningUnitLabels: planningUnitIds.map(ele=>ele.label)
+    })
+    console.log(this.state);
+    this.filterData()
+  }
+
+
+  filterData() {
+    /*this.setState({
       consumptions: {date:["04-2019","05-2019","06-2019","07-2019"],countryData:[{label:"c1",value:[10,4,5,7]},
       {label:"c2",value:[13,2,8,7]},
       {label:"c3",value:[9,1,0,7]},
       {label:"c4",value:[5,4,3,7]}]}
     })
-    /*
+    */
+   setTimeout('', 10000);
     let productCategoryId = document.getElementById("productCategoryId").value;
-    let CountryId = document.getElementById("CountrysId").value;
-    let planningUnitId = document.getElementById("planningUnitId").value;
-    console.log(CountryId)
+    let CountryIds = this.state.countryValues;
+    let planningUnitIds = this.state.planningUnitValues;
+    let programIds = this.state.programValues
+    let startDate=this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+    let stopDate=this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+    if(CountryIds.length>0 && planningUnitIds.length>0&&programIds.length>0){
+    
+    var inputjson={
+    "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate,"stopDate":stopDate
+   }
+   console.log(inputjson)
     AuthenticationService.setupAxiosInterceptors();
-    ProductService.getConsumptionData({CountryIds:this.state.countryValues,productCategoryId:productCategoryId,planningUnitId:planningUnitId,date: this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate()})
-      .then(response => { 
+    
+    ReportService.getGlobalConsumptiondata( inputjson )
+      .then(response => {
         console.log(JSON.stringify(response.data));
         this.setState({
-          consumptions: response.data
+          consumptions: response.data,
+          message:''
         })
       }).catch(
         error => {
@@ -348,7 +426,19 @@ class Consumption extends Component {
           }
         }
       );
-*/
+      } else if(CountryIds.length==0){
+        this.setState({ message: i18n.t('static.program.validcountrytext') });
+                
+      }else if(programIds.length==0){
+        this.setState({ message: i18n.t('static.common.selectProgram') });
+                
+      }else if(productCategoryId==0){
+        this.setState({ message: i18n.t('static.common.selectProductCategory') });
+    
+      }else{
+        this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText') });
+   
+      }
   }
 
   getCountrys() {
@@ -374,7 +464,7 @@ class Consumption extends Component {
                 case 404:
                 case 406:
                 case 412:
-                  default:
+                default:
                   this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
                   break;
                   this.setState({ message: 'static.unkownError' });
@@ -429,9 +519,9 @@ class Consumption extends Component {
   getPlanningUnit() {
     if (navigator.onLine) {
       console.log('changed')
-     let productCategoryId = document.getElementById("productCategoryId").value;
-     AuthenticationService.setupAxiosInterceptors();
-     
+      let productCategoryId = document.getElementById("productCategoryId").value;
+      AuthenticationService.setupAxiosInterceptors();
+if(productCategoryId!=-1){
       PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
         this.setState({
           planningUnits: response.data,
@@ -451,7 +541,7 @@ class Consumption extends Component {
                 case 404:
                 case 406:
                 case 412:
-                  this.setState({ message: error.response.data.messageCode });
+                //  this.setState({ message: error.response.data.messageCode });
                   break;
                 default:
                   this.setState({ message: 'static.unkownError' });
@@ -459,7 +549,7 @@ class Consumption extends Component {
               }
             }
           }
-        );
+        );}
     } else {
       const lan = 'en';
       var db1;
@@ -496,56 +586,87 @@ class Consumption extends Component {
       }.bind(this)
 
     }
-   
+
   }
+
+  getPrograms() {
+    AuthenticationService.setupAxiosInterceptors();
+    let realmId = AuthenticationService.getRealmId();
+    ProgramService.getProgramByRealmId(realmId)
+      .then(response => {
+        console.log(JSON.stringify(response.data))
+        this.setState({
+          programs: response.data
+        })
+      }).catch(
+        error => {
+          this.setState({
+            programs: []
+          })
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
+            }
+          }
+        }
+      );
+      }
 
   getProductCategories() {
     AuthenticationService.setupAxiosInterceptors();
     let realmId = AuthenticationService.getRealmId();
     ProductService.getProductCategoryList(realmId)
-        .then(response => {
-          console.log(response.data)
-            this.setState({
-                productCategories: response.data
-            })
-        }).catch(
-            error => {
-                this.setState({
-                    productCategories: []
-                })
-                if (error.message === "Network Error") {
-                    this.setState({ message: error.message });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
-                    }
-                }
+      .then(response => {
+        console.log(response.data)
+        this.setState({
+          productCategories: response.data
+        })
+      }).catch(
+        error => {
+          this.setState({
+            productCategories: []
+          })
+          if (error.message === "Network Error") {
+            this.setState({ message: error.message });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }) });
+                break;
+              default:
+                this.setState({ message: 'static.unkownError' });
+                break;
             }
-        );
-        this.getPlanningUnit();
-        
-}
+          }
+        }
+      );
+    this.getPlanningUnit();
+
+  }
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
-          this.getCountrys();
-           this.getProductCategories()
- 
+    this.getPrograms()
+    this.getCountrys();
+    this.getProductCategories()
+
   }
 
-  toggle() {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
-  }
+  toggledata = () => this.setState((currentState) => ({show: !currentState.show}));
 
   onRadioBtnClick(radioSelected) {
     this.setState({
@@ -572,77 +693,93 @@ class Consumption extends Component {
   }
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
 
-   getRandomColor() {
+  getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
-        }
+  }
   render() {
     const { planningUnits } = this.state;
-    let planningUnitList = planningUnits.length > 0
-      && planningUnits.map((item, i) => {
+        let planningUnitList =[];
+        planningUnitList=planningUnits.length > 0
+            && planningUnits.map((item, i) => {
+                return (
+
+                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+
+                )
+            }, this);
+            const { programs } = this.state;
+            let programList =[];
+            programList=programs.length > 0
+                && programs.map((item, i) => {
+                    return (
+    
+                        { label: getLabelText(item.label, this.state.lang), value: item.programId }
+    
+                    )
+                }, this);
+    const { countrys } = this.state;
+    // console.log(JSON.stringify(countrys))
+    let countryList = countrys.length > 0 && countrys.map((item, i) => {
+      console.log(JSON.stringify(item))
+      return ({ label: getLabelText(item.country.label, this.state.lang), value: item.realmCountryId })
+    }, this);
+    const { productCategories } = this.state;
+    let productCategoryList = productCategories.length > 0
+      && productCategories.map((item, i) => {
         return (
-          <option key={i} value={item.planningUnitId}>
-            {getLabelText(item.label, this.state.lang)}
+          <option key={i} value={item.payload.productCategoryId}>
+            {getLabelText(item.payload.label, this.state.lang)}
           </option>
         )
       }, this);
-    const { countrys } = this.state;
-   // console.log(JSON.stringify(countrys))
-   let countryList = countrys.length > 0 && countrys.map((item, i) => {
-     console.log(JSON.stringify(item))
-    return({ label: getLabelText(item.country.label, this.state.lang), value:item.country.countryId })
-  }, this);
-    console.log(JSON.stringify(countryList))
-      const { productCategories } = this.state;
-      let productCategoryList = productCategories.length > 0
-          && productCategories.map((item, i) => {
-              return (
-                  <option key={i} value={item.payload.productCategoryId}>
-                      {getLabelText(item.payload.label, this.state.lang)}
-                  </option>
-              )
-          }, this);
-         
-const  backgroundColor= [
-  '#4dbd74',
-  '#c8ced3',
-  '#000',
-  '#ffc107',
-  '#f86c6b',
-]
+
+    const backgroundColor = [
+      '#4dbd74',
+      '#c8ced3',
+      '#000',
+      '#ffc107',
+      '#f86c6b',
+    ]
+    let country=[...new Set(this.state.consumptions.map(ele=>(getLabelText(ele.realmCountry.label,this.state.lang))))]
+    let consumptiondata=[];
+    let data=[];
+    for (var i = 0; i < country.length; i++) {
+    data=this.state.consumptions.filter(country=> country[1]=(getLabelText(country.realmCountry.label,this.state.lang))).map(ele=>(ele.planningUnitQty))
+    consumptiondata.push(data)}
     const bar = {
 
-      labels: this.state.consumptions.date,
-      datasets: this.state.consumptions.countryData.map((item, index) => ({stack:1,label:item.label,data:item.value,backgroundColor : backgroundColor[index]}))
-     /* datasets: [
-        {
-          label: 'Actual Cconsumptionsonsuconsumptionsmption',
-          backgroundColor: '#86CD99',
-          borderColor: 'rgba(179,181,198,1)',
-          pointBackgroundColor: 'rgba(179,181,198,1)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgba(179,181,198,1)',
-          data: this.state.consumptions.map((item, index) => (item.Actual)),
-        }, {
-          type: "line",
-          label: "Forecast Consumption",
-          backgroundColor: 'transparent',
-          borderColor: 'rgba(179,181,158,1)',
-          borderStyle: 'dotted',
-          ticks: {
-            fontSize: 2,
-            fontColor: 'transparent',
-          },
-          showInLegend: true,
-          yValueFormatString: "$#,##0",
-          data: this.state.consumptions.map((item, index) => (item.forcast))
-        }
-      ],*/
+      labels: this.state.consumptions.map(ele=>(ele.consumptionDateString)),
+      datasets: consumptiondata.map((item, index) => ({ stack: 1, label: country[index], data: item, backgroundColor: backgroundColor[index] }))
+      /* datasets: [
+         {
+           label: 'Actual Cconsumptionsonsuconsumptionsmption',
+           backgroundColor: '#86CD99',
+           borderColor: 'rgba(179,181,198,1)',
+           pointBackgroundColor: 'rgba(179,181,198,1)',
+           pointBorderColor: '#fff',
+           pointHoverBackgroundColor: '#fff',
+           pointHoverBorderColor: 'rgba(179,181,198,1)',
+           data: this.state.consumptions.map((item, index) => (item.Actual)),
+         }, {
+           type: "line",
+           label: "Forecast Consumption",
+           backgroundColor: 'transparent',
+           borderColor: 'rgba(179,181,158,1)',
+           borderStyle: 'dotted',
+           ticks: {
+             fontSize: 2,
+             fontColor: 'transparent',
+           },
+           showInLegend: true,
+           yValueFormatString: "$#,##0",
+           data: this.state.consumptions.map((item, index) => (item.forcast))
+         }
+       ],*/
 
     };
     const pickerLang = {
@@ -659,128 +796,180 @@ const  backgroundColor= [
     return (
       <div className="animated fadeIn" >
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
-       
-            <Card>
-              <CardHeader>
-              <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong>
-                <div className="card-header-actions">
-                  <a className="card-header-action">
-                  <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF()}/>
-                  <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
-                      
-                  </a>
-                </div>
-              </CardHeader>
-              <CardBody>
-                    <div ref={ref}> 
-                   
-                  <Form >
-                      <Col md="12 pl-0">
-                        <div className="row">
-                          <FormGroup className="col-md-3">
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                            <div className="controls edit">
+        <h5>{i18n.t(this.state.message)}</h5>
 
-                              <Picker
-                                ref="pickRange"
-                                years={{ min: 2013 }}
-                                value={rangeValue}
-                                lang={pickerLang}
-                                //theme="light"
-                                onChange={this.handleRangeChange}
-                                onDismiss={this.handleRangeDissmis}
-                              >
-                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                              </Picker>
-                            </div>
+        <Card>
+          <CardHeader>
+            <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong>
+            <div className="card-header-actions">
+              <a className="card-header-action">
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
 
-                          </FormGroup>
- 
-                            <FormGroup className="col-md-3">
-                            <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                            <InputGroup>
-                                  <ReactMultiSelectCheckboxes
-                                       
-                                         bsSize="sm"
-                                         name="countrysId"
-                                        id="countrysId"
-                                        onChange={(e) => { this.handleChange(e) }}
-                                         options={countryList}
-                                   />
-                                         {!!this.props.error &&
-                                             this.props.touched && (
-                                         <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                            )}
-                                                            </InputGroup>
-                            </FormGroup>
-                         
-                            <FormGroup className="col-md-3">
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                              <div className="controls ">
-                                <InputGroup>
-                                  <Input
-                                    type="select"
-                                    name="productCategoryId"
-                                    id="productCategoryId"
-                                    bsSize="sm"
-                                    onChange={this.getPlanningUnit}
-                                  >
-                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                    {productCategories.length > 0
-                                      && productCategories.map((item, i) => {
-                                        return (
-                                          <option key={i} value={item.payload.productCategoryId } disabled= {item.payload.active?"":"disabled"}>
-                                            {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
-                                          </option>
-                                        )
-                                      }, this)}
-                                  </Input>
-                                </InputGroup>
-                                </div>
+              </a>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <div ref={ref}>
 
-                            </FormGroup>
-                            <FormGroup className="col-md-3">
-                              <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                              <div className="controls">
-                                <InputGroup>
-                                  <Input
-                                    type="select"
-                                    name="planningUnitId"
-                                    id="planningUnitId"
-                                    bsSize="sm"
-                                    onChange={this.filterData}
-                                  >
-                                    <option value="0">{i18n.t('static.common.select')}</option>
-                                    {planningUnitList}
-                                  </Input>
-                                  {/* <InputGroupAddon addonType="append">
-                                    <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                  </InputGroupAddon> */}
-                                </InputGroup>
-                              </div>
-                            </FormGroup>
-                        </div>
-                      </Col>
-                    </Form>
-                    <Col md="12 pl-0">
-                    <div className="row">
-                      
-                    {
-                        this.state.consumptions.countryData.length > 0
-                        &&
-                    <div className="col-md-9">
-                    <div className="chart-wrapper chart-graph">
-                      <Bar  id="cool-canvas" data={bar} options={options} />
-                    </div>
-                    </div> }
-                    
-                    </div>
-                    </Col>
+              <Form >
+                <Col md="12 pl-0">
+                  <div className="row">
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                      <div className="controls edit">
 
+                        <Picker
+                          ref="pickRange"
+                          years={{ min: 2013 }}
+                          value={rangeValue}
+                          lang={pickerLang}
+                          //theme="light"
+                          onChange={this.handleRangeChange}
+                          onDismiss={this.handleRangeDissmis}
+                        >
+                          <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                        </Picker>
+                      </div>
+
+                    </FormGroup>
+
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                      <InputGroup>
+                        <ReactMultiSelectCheckboxes
+
+                          bsSize="sm"
+                          name="countrysId"
+                          id="countrysId"
+                          onChange={(e) => { this.handleChange(e) }}
+                          options={countryList && countryList.length>0?countryList:[]}
+                        />
+                        {!!this.props.error &&
+                          this.props.touched && (
+                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          )}
+                      </InputGroup>
+                    </FormGroup>
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="programIds">{i18n.t('static.program.program')}<span className="red Reqasterisk">*</span></Label>
+                      <InputGroup>
+                        <ReactMultiSelectCheckboxes
+
+                          bsSize="sm"
+                          name="programIds"
+                          id="programIds"
+                          onChange={(e) => { this.handleChangeProgram(e) }}
+                          options={programList && programList.length>0?programList:[]}
+                        />
+                        {!!this.props.error &&
+                          this.props.touched && (
+                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                          )}
+                      </InputGroup>
+                    </FormGroup>
+
+                    <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
+                      <div className="controls ">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="productCategoryId"
+                            id="productCategoryId"
+                            bsSize="sm"
+                            onChange={this.getPlanningUnit}
+                          >
+                            <option value="-1">{i18n.t('static.common.select')}</option>
+                            {productCategories.length > 0
+                              && productCategories.map((item, i) => {
+                                return (
+                                  <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                    {Array(item.level).fill('_ _ ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                  </option>
+                                )
+                              }, this)}
+                          </Input>
+                        </InputGroup>
+                      </div>
+
+                    </FormGroup>
+                    <FormGroup className="col-sm-3">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>   <ReactMultiSelectCheckboxes
+                                                                        name="planningUnitId"
+                                                                        id="planningUnitId"
+                                                                        bsSize="md"
+                                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                                        options={planningUnitList && planningUnitList.length>0?planningUnitList:[]}
+                                                                    /> </InputGroup>    </div></FormGroup>
+                                                           
                   </div>
+                </Col>
+              </Form>
+              <Col md="12 pl-0">
+                <div className="row">
 
-              </CardBody>
-            </Card>
+                  {
+                    this.state.consumptions.length > 0
+                    &&
+                    <div className="col-md-12">
+                    <div className="col-md-9">
+                      <div className="chart-wrapper chart-graph">
+                        <Bar id="cool-canvas" data={bar} options={options} />
+                      </div>
+                    </div>   <div className="col-md-12">
+                        <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
+                          {this.state.show ? 'Hide Data' : 'Show Data'}
+                        </button>
+
+                      </div> </div>}
+
+                </div>
+                <div className="row">
+                    <div className="col-md-12">
+                      {this.state.show && this.state.consumptions.length > 0 &&
+                       <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+
+                        <thead>
+                          <tr>
+                          <th className="text-center"> {i18n.t('static.dashboard.country')} </th>
+                            <th className="text-center"> {i18n.t('static.report.month')} </th>
+                            <th className="text-center">{i18n.t('static.consumption.consumptionqty')}</th>
+                              </tr>
+                        </thead>
+                       
+                          <tbody>
+                            {
+                              this.state.consumptions.length > 0
+                              &&
+                              this.state.consumptions.map((item, idx) =>
+
+                                <tr id="addr0" key={idx} >
+                                
+                                  <td>{getLabelText(this.state.consumptions[idx].realmCountry.label,this.state.lang)}</td>
+                                  <td>
+
+                                    {this.state.consumptions[idx].consumptionDateString}
+                                  </td>
+                                  <td>
+                                    {this.state.consumptions[idx].planningUnitQty}
+                                  </td>
+                                 </tr>)
+
+                            }
+                          </tbody>
+                 </Table>}
+
+                   </div>
+                   </div>
+              </Col>
+
+            </div>
+
+          </CardBody>
+        </Card>
 
       </div>
     );
