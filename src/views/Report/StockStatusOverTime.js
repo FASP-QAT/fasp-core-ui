@@ -66,6 +66,13 @@ class StockStatusOverTime extends Component {
             productCategories: [],
             planningUnits: [],
             countries: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
+            countryValues: [],
+            countryLabels: [],
+            planningUnitMatrix:{
+                date:[],planningUnitData:[]
+            },
             rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -80,7 +87,31 @@ class StockStatusOverTime extends Component {
         this.getProductCategories = this.getProductCategories.bind(this)
         this.getPlanningUnit = this.getPlanningUnit.bind(this);
         this.fetchData = this.fetchData.bind(this);
+        this.handleChange = this.handleChange.bind(this)
+        this.handlePlanningUnitChange=this.handlePlanningUnitChange.bind(this)
     }
+
+    handlePlanningUnitChange(planningUnitIds) {
+   
+  
+        var planningUnitIdArray = [];
+        var planningUnitLabel = [];
+        planningUnitIdArray= planningUnitIds.map(ele=>ele.value)
+        planningUnitLabel=planningUnitIds.map(ele=>ele.label)
+       /* for (var i = 0; i < planningUnitIds.length; i++) {
+          planningUnitIdArray[i] = planningUnitIds[i].value;
+          planningUnitLabel[i] = planningUnitIds[i].label
+    
+        }*/
+       
+        this.setState({
+          planningUnitValues: planningUnitIds.map(ele=>ele.value),
+          planningUnitLabels: planningUnitIds.map(ele=>ele.label)
+        })
+        console.log(this.state);
+        
+      }
+    
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
@@ -206,13 +237,20 @@ class StockStatusOverTime extends Component {
 
     }
     fetchData() {
+        if(this.state.planningUnitValues.length==1){
         this.setState({
             matricsList: [{ date: '04-2019', MOS_pass3: 3100, MOS_PF: 45000, MOS_Feature3: 20000 },
             { date: '04-2019', MOS_pass3: 43000, MOS_PF: 47000, MOS_Feature3: 35000 },
             { date: '04-2019', MOS_pass3: 13000, MOS_PF: 25000, MOS_Feature3: 3000 }]
-        })
+        })}else{
+            {
+                this.setState({ planningUnitMatrix:{  date: ['04-2019', '05-2019', '06-2019'], planningUnitData: [
+                { label: 'planningUnit1', value: [43000, 33000, 47000] },
+                { label: 'planningUnit2', value: [13000, 24000, 43000] }]
+                }})
+        }
     }
-
+    }
 
 
     exportCSV() {
@@ -374,16 +412,12 @@ class StockStatusOverTime extends Component {
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
-                return (
-                    <option key={i} value={item.planningUnitId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
+                return ({ label:getLabelText(item.label, this.state.lang), value: item.planningUnitId })
+                   
             }, this);
         const { countries } = this.state;
         // console.log(JSON.stringify(countrys))
         let countryList = countries.length > 0 && countries.map((item, i) => {
-            console.log(JSON.stringify(item))
             return ({ label: getLabelText(item.country.label, this.state.lang), value: item.country.countryId })
         }, this);
         const { productCategories } = this.state;
@@ -402,7 +436,7 @@ class StockStatusOverTime extends Component {
             datasets: [
                 {
                     type: "line",
-                    label: "MOS pass 3",
+                    label: "MOS past 3",
                     backgroundColor: 'transparent',
                     borderColor: '#ffc107',
                     lineTension: 0,
@@ -426,7 +460,7 @@ class StockStatusOverTime extends Component {
                 },
                 {
                     type: "line",
-                    label: "MOS Feature 3",
+                    label: "MOS Future 3",
                     backgroundColor: 'transparent',
                     borderColor: '#ed5626',
                     lineTension: 0,
@@ -506,7 +540,7 @@ class StockStatusOverTime extends Component {
                                                                     name="countrysId"
                                                                     id="countrysId"
                                                                     onChange={(e) => { this.handleChange(e); this.fetchData() }}
-                                                                    options={countryList}
+                                                                    options={countryList && countryList.length>0?countryList:[]}
                                                                 />
                                                                     {!!this.props.error &&
                                                                         this.props.touched && (
