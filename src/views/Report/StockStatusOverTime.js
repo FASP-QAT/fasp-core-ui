@@ -298,7 +298,10 @@ class StockStatusOverTime extends Component {
                         align: 'left'
                     })
 
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                    doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 130, {
                         align: 'left'
                     })
                 }
@@ -477,104 +480,96 @@ class StockStatusOverTime extends Component {
                         <div>
                             <Form >
                                 <Col md="12 pl-0">
-                                    <div className="row">
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
-                                            <div className="controls edit">
+                                                        <div className="row">
+                                                            <FormGroup className="col-md-3">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                <div className="controls edit">
 
-                                                <Picker
-                                                    ref="pickRange"
-                                                    years={{ min: 2013 }}
-                                                    value={rangeValue}
-                                                    lang={pickerLang}
-                                                    //theme="light"
-                                                    onChange={this.handleRangeChange}
-                                                    onDismiss={this.handleRangeDissmis}
-                                                >
-                                                    <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                                                </Picker>
+                                                                    <Picker
+                                                                        ref="pickRange"
+                                                                        years={{ min: 2013 }}
+                                                                        value={rangeValue}
+                                                                        lang={pickerLang}
+                                                                        //theme="light"
+                                                                        onChange={this.handleRangeChange}
+                                                                        onDismiss={this.handleRangeDissmis}
+                                                                    >
+                                                                        <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                                                                    </Picker>
+                                                                </div>
+
+                                                            </FormGroup>
+                                                            <FormGroup className="col-md-3">
+                                                                <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
+                                                                <InputGroup> <ReactMultiSelectCheckboxes
+                                                                    bsSize="md"
+                                                                    name="countrysId"
+                                                                    id="countrysId"
+                                                                    onChange={(e) => { this.handleChange(e); this.fetchData() }}
+                                                                    options={countryList}
+                                                                />
+                                                                    {!!this.props.error &&
+                                                                        this.props.touched && (
+                                                                            <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
+                                                                        )}</InputGroup></FormGroup>
+
+                                                            <FormGroup className="col-md-3">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                                                <div className="controls ">
+                                                                    <InputGroup>
+                                                                        <Input
+                                                                            type="select"
+                                                                            name="productCategoryId"
+                                                                            id="productCategoryId"
+                                                                            bsSize="sm"
+                                                                            onChange={this.getPlanningUnit}
+                                                                        >
+                                                                            <option value="0">{i18n.t('static.common.select')}</option>
+                                                                            {productCategoryList}
+                                                                        </Input>
+                                                                    </InputGroup></div>
+                                                            </FormGroup>
+                                                            <FormGroup className="col-sm-3">
+                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                                <div className="controls">
+                                                                    <InputGroup>   <ReactMultiSelectCheckboxes
+                                                                        name="planningUnitId"
+                                                                        id="planningUnitId"
+                                                                        bsSize="md"
+                                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                                        options={planningUnitList && planningUnitList.length>0?planningUnitList:[]}
+                                                                    /> </InputGroup>    </div></FormGroup>
+                                                            <FormGroup className="col-sm-3">
+                                                                <InputGroupAddon addonType="append">
+                                                                    <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
+                                                                </InputGroupAddon>
+
+
+                                                            </FormGroup>
+
+                                                        </div>
+                                                    </Col>
+                                                </Form>
                                             </div>
+                                            <div className="row">
+                                                <div className="col-md-12">{this.state.matricsList.length > 0 || this.state.planningUnitMatrix.planningUnitData.length>0}
+                                                    {
+                                                        (this.state.matricsList.length > 0 || this.state.planningUnitMatrix.planningUnitData.length>0)
+                                                        &&
+                                                        
+                                                            <div className="col-md-9">
+                                                                <div className="chart-wrapper chart-graph">
+                                                                    <Line id="cool-canvas" data={bar} options={options} />
 
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
-                                            <InputGroup>
-                                                <ReactMultiSelectCheckboxes
-                                                    bsSize="md"
-                                                    name="countrysId"
-                                                    id="countrysId"
-                                                    onChange={(e) => { this.handleChange(e); this.fetchData() }}
-                                                    options={countryList}
-                                                />
-                                            </InputGroup>
-                                            {!!this.props.error &&
-                                                this.props.touched && (
-                                                    <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
-                                                )}</FormGroup>
+                                                                </div>
+                                                            </div>
 
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="productCategoryId"
-                                                        id="productCategoryId"
-                                                        bsSize="sm"
-                                                        onChange={this.getPlanningUnit}
-                                                    >
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {productCategoryList}
-                                                    </Input>
-                                                </InputGroup></div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <div className="controls">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="planningUnitId"
-                                                        id="planningUnitId"
-                                                        bsSize="sm"
-                                                        onChange={this.fetchData}
-                                                    >
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {planningUnitList}
-                                                    </Input>
-                                                    {/* <InputGroupAddon addonType="append">
- <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
- </InputGroupAddon> */}
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-
-                                    </div>
-                                </Col>
-                            </Form>
-                        </div>
-                        <Col md="12 pl-0">
-                            <div className="row">
-                                {
-                                    this.state.matricsList.length > 0
-                                    &&
-
-                                    <div className="col-md-12">
-                                        <div className="chart-wrapper chart-graph-report">
-                                            <Line id="cool-canvas" data={bar} options={options} />
-
-                                        </div>
-                                    </div>
-
-                                }
-                                <br></br>
-                            </div>
-                        </Col>
-
-                    </CardBody>
-                </Card>
-
-            </div>
+                                                        }
+                                                    <br></br>
+                                                </div></div>
+                                          </CardBody></Card> 
+                        </div>               
+            
 
         );
 

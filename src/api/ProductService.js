@@ -35,10 +35,10 @@ class ProductService {
         );
     }
     getConsumptionData(realmId,programId,productId,startDate,endDate){
-        return axios.get(`${API_URL}/api/consumption/${realmId}/${programId}/${productId}/${startDate}/${endDate}`,{});   
+        return axios.get(`${API_URL}/api/report/consumption/${realmId}/${programId}/${productId}/${startDate}/${endDate}`,{});   
     }
     getStockStatusMatrixData(realmId,productCategoryId,productId,view,startDate,endDate){
-        return axios.get(`${API_URL}/api/stockmatrix/${realmId}/${productCategoryId}/${productId}/${view}/${startDate}/${endDate}`,{});   
+        return axios.get(`${API_URL}/api/report/stockmatrix/${realmId}/${productCategoryId}/${productId}/${view}/${startDate}/${endDate}`,{});   
     }
 
     getProductCategoryListByProgram(realmId,programId) {
