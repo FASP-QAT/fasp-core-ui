@@ -675,6 +675,7 @@
     "static.shipment.freightcost":"Freight Cost",
     "static.shipment.ordereddate":"Orderd Date",
     "static.shipment.shipdate":"Shipped Date",
-    "static.shipment.receiveddate":"Received Date"
+    "static.shipment.receiveddate":"Received Date",
+    "static.shipment.productcost":"Product Cost"
 
 }
