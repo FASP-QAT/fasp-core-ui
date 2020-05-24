@@ -356,8 +356,8 @@ const routes = [
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },
   { path: '/translations/labelTranslations', name: i18n.t('static.label.labelTranslations'), component: LabelTranslation },
 
-  { path: '/supplyPlan', name: i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
-  { path: '/supplyPlanFormulas', name: i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
+  { path: '/supplyPlan', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
+  { path: '/supplyPlanFormulas', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
   
 
   { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: AddForecastingUnit },
