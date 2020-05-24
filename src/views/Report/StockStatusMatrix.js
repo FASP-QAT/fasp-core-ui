@@ -24,7 +24,10 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Online, Offline } from "react-detect-offline";
 import { LOGO } from '../../CommonComponent/Logo.js'
-
+const pickerLang = {
+  months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+  from: 'From', to: 'To',
+}
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t('static.dashboard.productCatalog');
 export default class StockStatusMatrix extends React.Component {
@@ -54,6 +57,11 @@ export default class StockStatusMatrix extends React.Component {
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
 
+  }
+
+  makeText = m => {
+    if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
+    return '?'
   }
   show() {
     /* if (!this.state.showed) {
@@ -568,15 +576,15 @@ export default class StockStatusMatrix extends React.Component {
   exportCSV(columns) {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
     csvRow.push(i18n.t('static.program.program') + ' : ' + (document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.productcategory.productcategory') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.planningunit.planningunit') + ' : ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.productcategory.productcategory').replaceAll(' ', '%20') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(' ', '%20'))
+    csvRow.push(i18n.t('static.planningunit.planningunit').replaceAll(' ', '%20') + ' : ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push('')
     csvRow.push('')
 
     const headers = [];
-    columns.map((item, idx) => { headers[idx] = item.text });
+    columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ','%20')});
 
 
     var A = [headers]
@@ -666,7 +674,7 @@ export default class StockStatusMatrix extends React.Component {
         })
         if (i == 1) {
           doc.setFontSize(12)
-          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
@@ -811,7 +819,7 @@ export default class StockStatusMatrix extends React.Component {
         sort: true,
         align: 'left',
         headerAlign: 'left',
-        width:'180'
+        width: '180'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
@@ -1059,7 +1067,7 @@ export default class StockStatusMatrix extends React.Component {
         sort: true,
         align: 'left',
         headerAlign: 'left',
-        width:'180'
+        width: '180'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
