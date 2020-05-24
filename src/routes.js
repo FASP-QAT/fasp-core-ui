@@ -358,7 +358,7 @@ const routes = [
 
   { path: '/supplyPlan', name: i18n.t('static.supplyplan.supplyplan'), component: SupplyPlan },
   { path: '/supplyPlanFormulas', name: i18n.t('static.supplyplan.supplyplanformula'), component: SupplyPlanFormulas },
-  
+
 
   { path: '/forecastingUnit/addForecastingUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: AddForecastingUnit },
   { path: '/forecastingUnit/listForecastingUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.forecastingunit') }), component: ForecastingUnitList },
@@ -454,6 +454,6 @@ const routes = [
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
   { path: '/shipment/ShipmentList', exact: true, name: 'Shipment / Shipment', component: ShipmentList },
   { path: '/shipment/shipmentList/:message', component: ShipmentList },
-  { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: i18n.t('static.breadcrum.edit', 'Shipment'), component: EditShipment },
+  { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: 'Shipment / Edit Shipment', component: EditShipment },
 ];
 export default routes;
