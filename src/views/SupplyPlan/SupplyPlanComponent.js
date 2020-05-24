@@ -108,6 +108,12 @@ export default class SupplyPlanComponent extends React.Component {
         this.nonPsmBudgetChanged = this.nonPsmBudgetChanged.bind(this);
         this.nonPsmCheckBudgetValidation = this.nonPsmCheckBudgetValidation.bind(this);
         this.nonPsmSaveBudget = this.nonPsmSaveBudget.bind(this);
+
+        this.nonPsmOtherChanged = this.nonPsmOtherChanged.bind(this);
+        this.checkValidationForNonPsmOtherShipments = this.checkValidationForNonPsmOtherShipments.bind(this);
+        this.nonPsmOtherBudgetChanged = this.nonPsmOtherBudgetChanged.bind(this);
+        this.nonPsmOtherCheckBudgetValidation = this.nonPsmOtherCheckBudgetValidation.bind(this);
+        this.nonPsmOtherSaveBudget = this.nonPsmOtherSaveBudget.bind(this);
     }
 
     componentDidMount() {
@@ -2719,7 +2725,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             var budgetAmount = (elInstance.getValueFromCoords(29, y));
             budgetAmount = parseFloat(budgetAmount).toFixed(2);
-            var totalAmount = (elInstance.getCell(`X${y}`)).innerHTML;
+            var totalAmount = parseFloat((elInstance.getCell(`X${y}`)).innerHTML).toFixed(2);
             console.log("BudgetAmount", budgetAmount);
             console.log("Total AMount", totalAmount);
             if (budgetAmount != totalAmount) {
@@ -4078,8 +4084,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                         { type: 'text', readOnly: true, title: "Adjusted pallets" },
                                                         { type: 'text', readOnly: true, title: "Adjusted containers" },
                                                         { type: 'text', title: "Manual price per planning unit", readOnly: true },
-                                                        { type: 'text', title: "Procurement Unit", source: procurementUnitList },
-                                                        { type: 'text', title: 'Supplier', source: supplierList },
+                                                        { type: 'dropdown', title: "Procurement Unit", source: procurementUnitList },
+                                                        { type: 'dropdown', title: 'Supplier', source: supplierList },
                                                         { type: 'text', readOnly: true, title: "Price per planning unit" },
                                                         { type: 'text', readOnly: true, title: "Amount" },
                                                         { type: 'dropdown', title: "Shipped method", source: ['Sea', 'Air'], readOnly: true },
@@ -4429,6 +4435,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var papuResult = [];
                         papuResult = papuRequest.result;
                         var procurementAgentPlanningUnit = papuResult.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
+                        console.log("Procurement Agent planing uinit", procurementAgentPlanningUnit);
                         elInstance.setValueFromCoords(8, y, procurementAgentPlanningUnit.moq, true);
                         elInstance.setValueFromCoords(20, y, procurementAgentPlanningUnit.pricePerPlanningUnit, true);
                         elInstance.setValueFromCoords(27, y, procurementAgentPlanningUnit.unitsPerPallet, true);
@@ -4575,7 +4582,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             var budgetAmount = (elInstance.getValueFromCoords(31, y));
             budgetAmount = parseFloat(budgetAmount).toFixed(2);
-            var totalAmount = (elInstance.getCell(`Z${y}`)).innerHTML;
+            var totalAmount = parseFloat((elInstance.getCell(`Z${y}`)).innerHTML).toFixed(2);
             console.log("BudgetAmount", budgetAmount);
             console.log("Total AMount", totalAmount);
             if (budgetAmount != totalAmount) {
@@ -4951,7 +4958,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             var budgetAmount = (elInstance.getValueFromCoords(31, y));
             budgetAmount = parseFloat(budgetAmount).toFixed(2);
-            var totalAmount = (elInstance.getCell(`Z${y}`)).innerHTML;
+            var totalAmount = parseFloat((elInstance.getCell(`Z${y}`)).innerHTML).toFixed(2);
             console.log("BudgetAmount", budgetAmount);
             console.log("Total AMount", totalAmount);
             if (budgetAmount != totalAmount) {
@@ -5117,17 +5124,29 @@ export default class SupplyPlanComponent extends React.Component {
 
     // Save psm shipments
     saveNonPsmShipments() {
-        var validation = this.checkValidationForPlannedPsmShipments();
-        var otherValidations = this.checkValidationForNonPsmOtherShipments();
+        // var validation = this.checkValidationForNonPsmShipments();
+        var elInstance1 = this.state.nonPsmOtherShipmentEl;
+        var elInstance = this.state.plannedNonPsmShipmentsEl;
+        var otherValidations = true;
+        var json1 = {};
+        var validation = true;
+        var json = {}
+        console.log("elInstance", elInstance);
+        if (elInstance1 != undefined  && elInstance1!="") {
+            console.log("in if 1")
+            otherValidations = this.checkValidationForNonPsmOtherShipments();
+            json1 = elInstance1.getJson();
+        }
+
+        if (elInstance != undefined && elInstance!="") {
+            console.log("in if 2")
+            otherValidations = this.checkValidationForNonPsmShipments();
+            json = elInstance.getJson();
+        }
         if (validation == true && otherValidations == true) {
             this.setState({
                 budgetError: ""
             })
-            var elInstance = this.state.plannedNonPsmShipmentsEl;
-            var elInstance1 = this.state.nonPsmOtherShipmentEl;
-            var json = elInstance.getJson();
-            var json1 = elInstance1.getJson();
-
             console.log("Json", json);
             var planningUnitId = document.getElementById("planningUnitId").value;
             var db1;
@@ -5176,13 +5195,13 @@ export default class SupplyPlanComponent extends React.Component {
                     }
 
                     for (var j = 0; j < json1.length; j++) {
-                        console.log(json[j]);
-                        var map = new Map(Object.entries(json[j]));
+                        console.log(json1[j]);
+                        var map = new Map(Object.entries(json1[j]));
                         var shipmentStatusId = parseInt(map.get("1"));
-                        var quantity = (elInstance.getCell(`O${j}`)).innerHTML;
-                        var productCost = (elInstance.getCell(`V${j}`)).innerHTML;
-                        var rate = (elInstance.getCell(`U${j}`)).innerHTML;
-                        var freightCost = (elInstance.getCell(`Y${j}`)).innerHTML;
+                        var quantity = (elInstance1.getCell(`O${j}`)).innerHTML;
+                        var productCost = (elInstance1.getCell(`V${j}`)).innerHTML;
+                        var rate = (elInstance1.getCell(`U${j}`)).innerHTML;
+                        var freightCost = (elInstance1.getCell(`Y${j}`)).innerHTML;
                         shipmentDataList[parseInt(map.get("33"))].shipmentStatus.id = shipmentStatusId;
                         shipmentDataList[parseInt(map.get("33"))].expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
                         shipmentDataList[parseInt(map.get("33"))].orderNo = map.get("2");
@@ -5266,10 +5285,11 @@ export default class SupplyPlanComponent extends React.Component {
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
                 var shipmentDataList = (programJson.shipmentList);
+                console.log("props.type", props.type);
                 for (var i = 0; i < shipmentDataList.length; i++) {
                     if (props.type == 'psm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == false && shipmentDataList[i].procurementAgent.id == 1) {
                         shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
-                    } else if (props.type == 'nonPsm' && shipmentDataList[i].expectedDeliveryDate >= props.expectedDeliveryDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].procurementAgent.id != 1) {
+                    } else if (props.type == 'nonPsm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].procurementAgent.id != 1) {
                         shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
                     } else if (props.type == 'artmis' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == true) {
                         shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
