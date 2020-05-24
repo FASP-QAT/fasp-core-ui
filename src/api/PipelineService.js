@@ -35,6 +35,10 @@ class PipelineService {
         return axios.get(`${API_URL}/api/pipeline/shipment/${json}`, {}
         );
     }
+    submitShipmentData(pipelineId,json) {
+        return axios.post(`${API_URL}/api/pipeline/shipment/${pipelineId}`, json,{}
+        );
+    }
 }
 
 export default new PipelineService();

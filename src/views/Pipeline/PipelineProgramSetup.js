@@ -812,7 +812,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/*<h3>Shipments</h3>*/}
-                                                <PipelineProgramShipment  {...this.props}></PipelineProgramShipment>
+                                                <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepFour} {...this.props}></PipelineProgramShipment>
                                                 
                                             </CardBody>
                                             {/* <CardFooter>
@@ -823,10 +823,6 @@ export default class PipelineProgramSetup extends Component {
 
                                             </CardFooter> */}
                                         </Card>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
-                                        &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" onClick={this.finishedStepFive}>Save<i className="fa fa-angle-double-right"></i></Button>
-                                        &nbsp;
                                         </Col>
                                 </div>
                             </CardBody>
