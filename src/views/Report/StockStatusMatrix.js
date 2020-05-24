@@ -810,7 +810,8 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.planningunit.planningunit'),
         sort: true,
         align: 'left',
-        headerAlign: 'left'
+        headerAlign: 'left',
+        width:'180'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
@@ -1057,7 +1058,8 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.procurementUnit.planningUnit'),
         sort: true,
         align: 'left',
-        headerAlign: 'left'
+        headerAlign: 'left',
+        width:'180'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
@@ -1365,7 +1367,7 @@ export default class StockStatusMatrix extends React.Component {
             >
               {
                 props => (
-                  <div className="TableCust">
+                  <div className="TableCust ReportFirstHead">
 
                     {/* <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
 
