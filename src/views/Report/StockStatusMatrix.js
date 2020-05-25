@@ -23,7 +23,7 @@ import Pdf from "react-to-pdf"
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Online, Offline } from "react-detect-offline";
-import { LOGO }  from '../../CommonComponent/Logo.js'
+import { LOGO } from '../../CommonComponent/Logo.js'
 
 const { ExportCSVButton } = CSVExport;
 const entityname = i18n.t('static.dashboard.productCatalog');
@@ -52,7 +52,7 @@ export default class StockStatusMatrix extends React.Component {
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeChange = this.handleRangeChange.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit=this.getPlanningUnit.bind(this);
+    this.getPlanningUnit = this.getPlanningUnit.bind(this);
 
   }
   show() {
@@ -291,7 +291,7 @@ export default class StockStatusMatrix extends React.Component {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
-      ProductService.getProductCategoryListByProgram(realmId,programId)
+      ProductService.getProductCategoryListByProgram(realmId, programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -365,7 +365,7 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
     }
     this.getPlanningUnit();
-   
+
 
   }
   getPlanningUnit() {
@@ -373,14 +373,14 @@ export default class StockStatusMatrix extends React.Component {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
       let productCategoryId = document.getElementById("productCategoryId").value;
-      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId,productCategoryId).then(response => {
+      ProgramService.getProgramPlaningUnitListByProgramAndProductCategory(programId, productCategoryId).then(response => {
         console.log('**' + JSON.stringify(response.data))
-        this.setState({  planningUnits: response.data});
+        this.setState({ planningUnits: response.data });
       })
         .catch(
           error => {
             if (error.message === "Network Error") {
-              this.setState({ message: error.message , planningUnits: []});
+              this.setState({ message: error.message, planningUnits: [] });
             } else {
               switch (error.response ? error.response.status : "") {
                 case 500:
@@ -433,7 +433,7 @@ export default class StockStatusMatrix extends React.Component {
       }.bind(this)
 
     }
-    
+
   }
 
 
@@ -522,9 +522,9 @@ export default class StockStatusMatrix extends React.Component {
   componentDidMount() {
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-            this.getPrograms();
+      this.getPrograms();
 
-     } else {
+    } else {
       const lan = 'en';
       var db1;
       getDatabase();
@@ -622,41 +622,41 @@ export default class StockStatusMatrix extends React.Component {
 
   exportPDF = (columns) => {
     const addFooters = doc => {
-       
+
       const pageCount = doc.internal.getNumberOfPages()
-    
+
       doc.setFont('helvetica', 'bold')
-       doc.setFontSize(10)
+      doc.setFontSize(10)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
-      
+
         doc.setPage(i)
-        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height-30, {
-        align: 'center'
+        doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+          align: 'center'
         })
-        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width *6/ 7, doc.internal.pageSize.height-30, {
-        align: 'center'
+        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+          align: 'center'
         })
-      
-        
+
+
       }
     }
     const addHeaders = doc => {
-      
+
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
-     
-    //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+
+      //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
       // var reader = new FileReader();
-     
-  //var data='';
-// Use fs.readFile() method to read the file 
-//fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-//}); 
+
+      //var data='';
+      // Use fs.readFile() method to read the file 
+      //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+      //}); 
       for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(18)
         doc.setPage(i)
-        doc.addImage(LOGO,'png',0,10, 180, 50,'FAST');
+        doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
           align: 'justify'
         });*/
@@ -664,22 +664,22 @@ export default class StockStatusMatrix extends React.Component {
         doc.text(i18n.t('static.dashboard.stockstatusmatrix'), doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
-        if(i==1){
+        if (i == 1) {
           doc.setFontSize(12)
-          doc.text(i18n.t('static.report.dateRange')+' : '+this.state.rangeValue.from.month+'/'+this.state.rangeValue.from.year+' to '+this.state.rangeValue.to.month+'/'+this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.program.program')+' : '+ document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.productcategory.productcategory')+' : '+ document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.productcategory.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
         }
-       
+
       }
     }
 
@@ -704,7 +704,7 @@ export default class StockStatusMatrix extends React.Component {
       data2 = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Q1, ele.Q2, ele.Q3, ele.Q4]);
     } else {
       data1 = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
-      .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
+        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
     }
 
     // console.log(data1);
@@ -713,6 +713,22 @@ export default class StockStatusMatrix extends React.Component {
       startY: 180,
       head: header,
       body: this.state.view == 1 ? data1 : data2,
+      columnStyles: {
+        0: { cellWidth: 120 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 40 },
+        4: { cellWidth: 40 },
+        5: { cellWidth: 40 },
+        6: { cellWidth: 40 },
+        7: { cellWidth: 40 },
+        8: { cellWidth: 40 },
+        9: { cellWidth: 40 },
+        10: { cellWidth: 40 },
+        11: { cellWidth: 40 },
+        12: { cellWidth: 40 },
+        13: { cellWidth: 40 }
+      }
     };
 
     // let content = {
@@ -736,7 +752,7 @@ export default class StockStatusMatrix extends React.Component {
   }
 
   render() {
-    
+
 
     const { offlinePrograms } = this.state;
     const { offlineProductCategoryList } = this.state;
@@ -755,9 +771,9 @@ export default class StockStatusMatrix extends React.Component {
     let productCategoryList = productCategories.length > 0
       && productCategories.map((item, i) => {
         return (
-          <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
-          {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
-        </option>
+          <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+            {Array(item.level).fill('_ _ ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+          </option>
         )
       }, this);
     const pickerLang = {

@@ -176,7 +176,7 @@ class ForcastMatrixOverTime extends Component {
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
     csvRow.push(i18n.t('static.dashboard.country')+' : '+ (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ','%20'))
-    csvRow.push(i18n.t('static.planningunit.planningunit')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ','%20')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
     csvRow.push('')
     csvRow.push('')
     var re;
@@ -186,7 +186,7 @@ class ForcastMatrixOverTime extends Component {
    
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].ACTUAL_DATE, re[item].FORECASTED_CONSUMPTION, re[item].ACTUAL_CONSUMPTION, re[item].FORECAST_ERROR*100, re[item].MONTHS_COUNT])
+      A.push([re[item].consumptionDateString, re[item].forecastedConsumption, re[item].actualConsumption, re[item].forecastError*100, re[item].monthsInCalc])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -272,7 +272,7 @@ class ForcastMatrixOverTime extends Component {
     doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4,'','FAST' );
     const headers =[ [   i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.errorperc'),i18n.t('static.report.noofmonth')]];
-    const data =   this.state.matricsList.map( elt =>[ elt.ACTUAL_DATE,elt.FORECASTED_CONSUMPTION,elt.ACTUAL_CONSUMPTION,elt.FORECAST_ERROR*100,elt.MONTHS_COUNT]);
+    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,elt.forecastError*100,elt.monthsInCalc]);
     
     let content = {
     margin: {top: 80},
@@ -302,9 +302,13 @@ class ForcastMatrixOverTime extends Component {
    let countryId = document.getElementById("countryId").value;
    let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
+    let startDate=this.state.rangeValue.from.year + '-' +  ("00"+this.state.rangeValue.from.month).substr(-2) + '-01';
+    let stopDate=this.state.rangeValue.to.year + '-' + ("00"+this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+   
+    var input= {"realmCountryId":countryId,"planningUnitId":planningUnitId,"startDate": startDate,"stopDate":stopDate}
     if(countryId>0 && planningUnitId>0){
       AuthenticationService.setupAxiosInterceptors();
-      ReportService.getForecastMatricsOverTime(countryId,planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+      ReportService.getForecastMatricsOverTime(input)
         .then(response => {
           console.log(JSON.stringify(response.data));
           this.setState({
@@ -528,7 +532,7 @@ this.fetchData();
     
     const  bar = {
     
-        labels: this.state.matricsList.map((item, index) => (item.ACTUAL_DATE)),
+        labels: this.state.matricsList.map((item, index) => (item.consumptionDateString)),
         datasets: [
            {
             type: "line",
@@ -541,7 +545,7 @@ this.fetchData();
             pointStyle: 'line',
             yValueFormatString: "$#####%",
             
-            data: this.state.matricsList.map((item, index) => (item.FORECAST_ERROR*100))
+            data: this.state.matricsList.map((item, index) => (item.forecastError*100))
           }
         ],
 
@@ -709,19 +713,19 @@ this.fetchData();
 
                                 <tr align="right" id="addr0" key={idx} >
                                 
-                                  <td>{this.state.matricsList[idx].ACTUAL_DATE}</td>
+                                  <td>{this.state.matricsList[idx].consumptionDateString}</td>
                                   <td>
 
-                                    {this.state.matricsList[idx].FORECASTED_CONSUMPTION}
+                                    {this.state.matricsList[idx].forecastedConsumption}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].ACTUAL_CONSUMPTION}
+                                    {this.state.matricsList[idx].actualConsumption}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].FORECAST_ERROR*100+'%'}
+                                    {this.state.matricsList[idx].forecastError*100+'%'}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].MONTHS_COUNT}
+                                    {this.state.matricsList[idx].monthsInCalc}
                                   </td></tr>)
 
                             }
