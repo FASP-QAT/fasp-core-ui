@@ -1452,11 +1452,6 @@ export default class SupplyPlanComponent extends React.Component {
                         var data = [];
                         var suggestedShipmentsArr = []
                         var orderedDate = moment(Date.now()).format("YYYY-MM-DD");
-                        if (month > orderedDate) {
-                            orderedDate = month;
-                        } else {
-                            orderedDate = orderedDate;
-                        }
                         for (var j = 0; j < suggestedShipmentList.length; j++) {
                             data = [];
                             data[0] = expectedDeliveryDateEnFormat;
