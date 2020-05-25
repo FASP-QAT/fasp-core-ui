@@ -473,6 +473,7 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
+  padding: 5px 0 !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -1790,7 +1791,7 @@ input::placeholder {
 }
 ///////Report Consumption globe
 .css-1r4vtzz {
-padding: 1px 8px 5px 8px !important;
+padding: 1px 8px 5px 10px !important;
 background-color: #FFF;
  box-shadow: none !important;
 color: #515151;
@@ -1804,9 +1805,14 @@ text-decoration: none;
  max-width: none!important; 
 position: relative!important;
 display: flex!important;
-flex-wrap: wrap!important;
+// flex-wrap: wrap!important;
+overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
 align-items: stretch!important;
-width: 238%!important;
+// width: 238%!important;
+width: 229px!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
 border: 1px solid #e4e7ea!important;
@@ -1817,7 +1823,7 @@ border-radius: 0.2rem!important;
 }
 .css-48ayfv
 {
-  padding: 1px 8px 5px 8px !important;
+  padding: 1px 8px 5px 10px !important;
   background-color: #FFF;
    box-shadow: none !important;
   color: #515151;
@@ -1831,9 +1837,14 @@ border-radius: 0.2rem!important;
    max-width: none!important; 
   position: relative!important;
   display: flex!important;
-  flex-wrap: wrap!important;
+  // flex-wrap: wrap!important;
   align-items: stretch!important;
-  width: 238%!important;
+  width: 229px!important;
+  overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
+  // width: 238%!important;
   height: calc(1.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
   border: 1px solid #e4e7ea!important;
@@ -1842,15 +1853,19 @@ border-radius: 0.2rem!important;
   border-radius: 0.2rem!important;
   
 }
+.css-1gpjby2 {
+
+  margin: 0px -12px!important;
+}
 
 @media (max-width: 768px){
 .css-1r4vtzz
 {
-  width: 175%!important;
+  width: 380px!important;
 }
 .css-48ayfv
 {
-  width: 175%!important;
+  width: 380px!important;
 }
 .css-1jllj6i-control {
   min-height: 30px!important;
@@ -1871,13 +1886,34 @@ border-radius: 0.2rem!important;
 @media only screen and (max-width: 1024px) {
   .css-1r4vtzz
 {
-  width: 180%!important;
+  width: 157px!important;
 }
 .css-48ayfv
 {
-  width: 180%!important;
+  width: 157px!important;
 }
 }
+@media screen and (min-width: 1920px) {
+  .css-48ayfv{
+    width: 380px!important;
+    overflow: hidden;
+  word-wrap: normal !important;
+  white-space: normal;
+  text-overflow: ellipsis;
+  }
+  .css-1r4vtzz {
+   
+    overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+    align-items: stretch!important;
+    // width: 238%!important;
+    width: 380px!important;
+
+    
+    }
+  }
 .css-1hwfws3
 {
   height: calc(1.5em + 0.5rem + -1px) !important;
@@ -1905,11 +1941,16 @@ border-radius: 0.2rem!important;
 // }
 
 .supplyplanformulas{
-  color: #212721 !important;
-  font-size: 11px!important;
+  color: #20a8d8 !important;
+  font-size: 12px!important;
   font-weight: bold!important;
 }
 .formulasheading{
   font-size:14px!important;
   font-weight: bold!important;
+  color: #212721!important;
+}
+.formulastext{
+
+  color: #212721!important;
 }

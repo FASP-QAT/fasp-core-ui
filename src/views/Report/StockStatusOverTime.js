@@ -574,9 +574,9 @@ class StockStatusOverTime extends Component {
                                                                         options={planningUnitList && planningUnitList.length>0?planningUnitList:[]}
                                                                     /> </InputGroup>    </div></FormGroup>
                                                             <FormGroup className="col-sm-3">
-                                                                <InputGroupAddon addonType="append">
+                                                                {/* <InputGroupAddon addonType="append">
                                                                     <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                                                </InputGroupAddon>
+                                                                </InputGroupAddon> */}
 
 
                                                             </FormGroup>
@@ -591,8 +591,8 @@ class StockStatusOverTime extends Component {
                                                         (this.state.matricsList.length > 0 || this.state.planningUnitMatrix.planningUnitData.length>0)
                                                         &&
                                                         
-                                                            <div className="col-md-9">
-                                                                <div className="chart-wrapper chart-graph">
+                                                            <div className="col-md-12">
+                                                                <div className="chart-wrapper chart-graph-report">
                                                                     <Line id="cool-canvas" data={bar} options={options} />
 
                                                                 </div>
