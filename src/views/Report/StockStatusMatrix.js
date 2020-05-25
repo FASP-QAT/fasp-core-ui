@@ -699,7 +699,7 @@ export default class StockStatusMatrix extends React.Component {
     const doc = new jsPDF(orientation, unit, size);
 
     doc.setFontSize(15);
-    
+
 
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     const headers = [];
@@ -724,19 +724,33 @@ export default class StockStatusMatrix extends React.Component {
       body: this.state.view == 1 ? data1 : data2,
       columnStyles: {
         0: { cellWidth: 120 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 40 },
-        3: { cellWidth: 40 },
-        4: { cellWidth: 40 },
-        5: { cellWidth: 40 },
-        6: { cellWidth: 40 },
-        7: { cellWidth: 40 },
-        8: { cellWidth: 40 },
-        9: { cellWidth: 40 },
-        10: { cellWidth: 40 },
-        11: { cellWidth: 40 },
-        12: { cellWidth: 40 },
-        13: { cellWidth: 40 }
+        1: { cellWidth: 15 },
+        2: { cellWidth: 15 },
+        3: { cellWidth: 15 },
+        4: { cellWidth: 15 },
+        5: { cellWidth: 15 },
+        6: { cellWidth: 15 },
+        7: { cellWidth: 15 },
+        8: { cellWidth: 15 },
+        9: { cellWidth: 15 },
+        10: { cellWidth: 15 },
+        11: { cellWidth: 15 },
+        12: { cellWidth: 15 },
+        13: { cellWidth: 15 },
+
+        1: { halign: 'right' },
+        2: { halign: 'right' },
+        3: { halign: 'right' },
+        4: { halign: 'right' },
+        5: { halign: 'right' },
+        6: { halign: 'right' },
+        7: { halign: 'right' },
+        8: { halign: 'right' },
+        9: { halign: 'right' },
+        10: { halign: 'right' },
+        11: { halign: 'right' },
+        12: { halign: 'right' },
+        13: { halign: 'right' },
       }
     };
 

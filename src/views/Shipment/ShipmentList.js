@@ -403,8 +403,8 @@ export default class LanguageListComponent extends Component {
                                                 bsSize="sm"
                                                 value={this.state.filterBy}
                                                 name="filterBy" id="filterBy"
-                                                // onChange={this.displayInsertRowButton}
-                                                onChange={this.formSubmit}
+                                            // onChange={this.displayInsertRowButton}
+                                            // onChange={this.formSubmit}
                                             >
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="1">Ordered Date</option>
