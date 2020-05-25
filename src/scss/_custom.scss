@@ -592,33 +592,6 @@ label.arrow_label:after {
   border-radius: 0.25rem;
 }
 
-// table loader
-#loader {
-  border: 12px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 12px solid #444444;
-  width: 45px;
-  height: 45px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-// .center {
-//   position: absolute;
-//   top: 0;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-//   margin: auto;
-// }
-// .order-1 :first-child {
-//  display: none;
-// }
 
 .RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
@@ -718,10 +691,25 @@ label.arrow_label:after {
     }
 
     .ReportFirstHead>.react-bootstrap-table>.table thead tr th:first-child {
-width: 180px !important;
+      width: 95px !important;
     }
 
-
+// #consumptionDetailsTable .jexcel_content .tbody tr {}
+  //   #hideMe {
+  //     -webkit-animation: cssAnimation 8s forwards; 
+  //     animation: cssAnimation 8s forwards;
+  //     // display: block;
+  // }
+  // @keyframes cssAnimation {
+  //     0%   {opacity: 1;}
+  //     90%  {opacity: 1;}
+  //     100% {opacity: 0;}
+  // }
+  // @-webkit-keyframes cssAnimation {
+  //     0%   {opacity: 1;}
+  //     90%  {opacity: 1;}
+  //     100% {opacity: 0;}
+  // }
 
 // .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 

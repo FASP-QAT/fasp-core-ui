@@ -53,7 +53,9 @@ class ForgotPasswordComponent extends Component {
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideMessage = this.hideMessage.bind(this);
     }
+
 
     cancelClicked() {
         this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
@@ -80,11 +82,14 @@ class ForgotPasswordComponent extends Component {
             }
         }
     }
+    hideMessage(){
+        setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 8000);
+    }
 
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg +")" }}>
+                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center ">
                             <Col md="12">
@@ -93,7 +98,7 @@ class ForgotPasswordComponent extends Component {
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
-                                <h5 className="mx-4">{i18n.t(this.state.message)}</h5>
+                                <h5 style={{ color:"red" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4 ">
 
                                     <CardHeader>
@@ -140,9 +145,14 @@ class ForgotPasswordComponent extends Component {
                                                     );
 
                                             } else {
+                                                
+
                                                 this.setState({
                                                     message: "You must be online to update the password."
-                                                });
+                                                },
+                                                    () => { 
+                                                        this.hideMessage();
+                                                    })
                                             }
                                         }}
                                         render={
