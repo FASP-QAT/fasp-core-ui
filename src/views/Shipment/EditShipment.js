@@ -375,6 +375,18 @@ export default class ConsumptionDetails extends React.Component {
 
                                                     var procurementAgentPlanningUnitObj = procurementAgentPlanningUnit.filter(p => p.procurementAgentId == shipmentList.procurementAgent.id && p.planningUnitId == shipmentList.planningUnit.id)[0];
 
+                                                    if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
+                                                        // console.log("UNDEFINE-----------------");
+                                                        procurementAgentPlanningUnitObj = {
+                                                            procurementAgentId: 0,
+                                                            planningUnitId: planningUnitId,
+                                                            catalogPrice: 0,
+                                                            moq: 0,
+                                                            unitsPerPallet: 0,
+                                                            unitsPerContainer: 0
+                                                        }
+                                                    }
+
                                                     if (shipmentList.shipmentStatus.id == 2) {//planned
 
 
@@ -394,19 +406,6 @@ export default class ConsumptionDetails extends React.Component {
                                                             budgetJson.push(shipmentBudgetList[sb]);
                                                         }
                                                         budgetAmount = budgetAmount.toFixed(2);
-
-
-                                                        if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
-                                                            // console.log("UNDEFINE-----------------");
-                                                            procurementAgentPlanningUnitObj = {
-                                                                procurementAgentId: 0,
-                                                                planningUnitId: planningUnitId,
-                                                                catalogPrice: 0,
-                                                                moq: 0,
-                                                                unitsPerPallet: 0,
-                                                                unitsPerContainer: 0
-                                                            }
-                                                        }
 
 
                                                         // console.log("budgetAmount--- ", budgetAmount);
