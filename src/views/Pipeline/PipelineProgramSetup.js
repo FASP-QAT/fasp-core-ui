@@ -175,22 +175,58 @@ export default class PipelineProgramSetup extends Component {
 
     }
     finishedStepTwo() {
-        this.setState({ pipelineProgramSetupPer: 50 });
-        document.getElementById('stepOne').style.display = 'none';
-        document.getElementById('stepTwo').style.display = 'none';
-        document.getElementById('stepThree').style.display = 'block';
-        document.getElementById('stepFour').style.display = 'none';
-        document.getElementById('stepFive').style.display = 'none';
+        // alert(this.refs.child.checkValidation());
+        if (this.refs.child.checkValidation() != true) {
+            alert("Please resolve all error and then proceed.");
+        }
+        else {
+            // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
+            var planningUnits = this.refs.child.savePlanningUnits();
+            AuthenticationService.setupAxiosInterceptors();
+            PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).then(response => {
+                if (response.status == "200") {
+                    this.setState({ pipelineProgramSetupPer: 50 });
+                    document.getElementById('stepOne').style.display = 'none';
+                    document.getElementById('stepTwo').style.display = 'none';
+                    document.getElementById('stepThree').style.display = 'block';
+                    document.getElementById('stepFour').style.display = 'none';
+                    document.getElementById('stepFive').style.display = 'none';
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
+            }
+            )
+            // this.setState({ pipelineProgramSetupPer: 50 });
+            // document.getElementById('stepOne').style.display = 'none';
+            // document.getElementById('stepTwo').style.display = 'none';
+            // document.getElementById('stepThree').style.display = 'block';
+            // document.getElementById('stepFour').style.display = 'none';
+            // document.getElementById('stepFive').style.display = 'none';
+        }
 
     }
     finishedStepThree() {
-        this.setState({ pipelineProgramSetupPer: 75 });
-        document.getElementById('stepOne').style.display = 'none';
-        document.getElementById('stepTwo').style.display = 'none';
-        document.getElementById('stepThree').style.display = 'none';
-        document.getElementById('stepFour').style.display = 'block';
-        document.getElementById('stepFive').style.display = 'none';
+        var consumption = this.refs.consumptionChild.saveConsumption();
+        AuthenticationService.setupAxiosInterceptors();
+        PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
+            then(response => {
+                console.log("consumption add response--->",response);
+                if (response.status == "200") {
+                    this.setState({ pipelineProgramSetupPer: 75 });
+                    document.getElementById('stepOne').style.display = 'none';
+                    document.getElementById('stepTwo').style.display = 'none';
+                    document.getElementById('stepThree').style.display = 'none';
+                    document.getElementById('stepFour').style.display = 'block';
+                    document.getElementById('stepFive').style.display = 'none';
+                } else {
+                    this.setState({
+                        message: response.data.messageCode
+                    })
+                }
 
+            });
     }
     finishedStepFour() {
         this.setState({ pipelineProgramSetupPer: 100 });
@@ -470,7 +506,7 @@ export default class PipelineProgramSetup extends Component {
                     })
                 }
 
-                
+
 
             }).catch(
                 error => {
@@ -740,7 +776,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/* <h3>Program Planning Units</h3> */}
-                                                <PipelineProgramPlanningUnits pipelineId={this.props.match.params.pipelineId}></PipelineProgramPlanningUnits>
+                                                <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId}></PipelineProgramPlanningUnits>
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
@@ -749,6 +785,12 @@ export default class PipelineProgramSetup extends Component {
                                                 &nbsp;
 
                                             </CardFooter> */}
+                                            <CardFooter>
+                                                <span className="red">
+                                                    *Planning Unit cells in yellow color indicates that either the same planning unit is being selected twice or the planning unit which you are trying to map does not exist.
+                                                    please created ticket for the planning units which do not exist.
+                                                </span>
+                                            </CardFooter>
                                         </Card>
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
@@ -764,7 +806,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/* <h3>Consumption</h3> */}
-                                                <PipelineProgramConsumption></PipelineProgramConsumption>
+                                                <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramConsumption>
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
@@ -813,7 +855,7 @@ export default class PipelineProgramSetup extends Component {
                                             <CardBody>
                                                 {/*<h3>Shipments</h3>*/}
                                                 <PipelineProgramShipment></PipelineProgramShipment>
-                                                
+
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>

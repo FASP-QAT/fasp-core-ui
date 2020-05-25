@@ -26,13 +26,43 @@ class PipelineService {
         );
     }
 
-    getPipelineProductListById(json){
+    getPipelineProductListById(json) {
         return axios.get(`${API_URL}/api/pipeline/product/${json}`, {}
         );
     }
-    
+
     getShipmentDataById(json) {
         return axios.get(`${API_URL}/api/pipeline/shipment/${json}`, {}
+        );
+    }
+
+    addProgramToQatTempPlanningUnits(json, pipelineId) {
+        return axios.put(`${API_URL}/api/pipeline/planningUnit/${pipelineId}`, json, {}
+        );
+    }
+
+    getQatTempPlanningUnitList(json) {
+        
+        return axios.get(`${API_URL}/api/qatTemp/planningUnitList/${json}`, {}
+        );
+    }
+
+    getPipelineProgramConsumption(json) {
+        return axios.get(`${API_URL}/api/pipeline/consumption/${json}`, {}
+        );
+    }
+    getQatTempProgramregion(json) {
+        return axios.get(`${API_URL}/api/qatTem/regions/${json}`, {}
+        );
+    }
+
+    addQatTempConsumption(json, pipelineId){
+        return axios.put(`${API_URL}/api/pipeline/consumption/${pipelineId}`, json, {}
+        );
+    }
+
+    getQatTempConsumptionById(json){
+        return axios.get(`${API_URL}/api/qatTemp/consumption/${json}`, {}
         );
     }
 }
