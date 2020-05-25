@@ -426,56 +426,56 @@ export default class ConsumptionDetails extends React.Component {
                                                         data[12] = ""; // Rounding option
                                                         data[13] = shipmentList.quantity; // User Qty
                                                         data[14] = `=IF(L${i + 1}==3,
-   
-                                                        IF(M${i + 1}==1,
-                                                                CEILING(I${i + 1},1),
-                                                                FLOOR(I${i + 1},1)
-                                                        )
-                                                ,
-                                                IF(L${i + 1}==4,
-                                                        IF(NOT(ISBLANK(N${i + 1})),
-                                                                IF(M${i + 1}==1,
-                                                                        CEILING(N${i + 1}/Z${i + 1},1)*Z${i + 1},
-                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*Z${i + 1}
-                                                                ),
-                                                                IF(M${i + 1}==1,
-                                                                        CEILING(J${i + 1},1)*Z${i + 1},
-                                                                        FLOOR(J${i + 1},1)*Z${i + 1}
-                                                                )
-                                                        ),
-                                                        IF(L${i + 1}==1,
-                                                                IF(NOT(ISBLANK(N${i + 1})),
-                                                                        IF(M${i + 1}==1,
-                                                                        CEILING(N${i + 1}/Z${i + 1},1)*AA${i + 1},
-                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*AA${i + 1}
-                                                                ),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(K${i + 1},1)*AA${i + 1},
-                                                                                FLOOR(K${i + 1},1)*AA${i + 1}
-                                                                        )
-                                                                ),
-                                                                IF(NOT(ISBLANK(N${i + 1})),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(N${i + 1},1),
-                                                                                FLOOR(N${i + 1},1)
-                                                                        ),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(H${i + 1},1),
-                                                                                FLOOR(H${i + 1},1)
-                                                                        )
-                                                                )
-                                                        )
-                                                )
-                                         )`;
+       
+                                                            IF(M${i + 1}==1,
+                                                                    CEILING(I${i + 1},1),
+                                                                    FLOOR(I${i + 1},1)
+                                                            )
+                                                    ,
+                                                    IF(L${i + 1}==4,
+                                                            IF(NOT(ISBLANK(N${i + 1})),
+                                                                    IF(M${i + 1}==1,
+                                                                            CEILING(N${i + 1}/Z${i + 1},1)*Z${i + 1},
+                                                                            FLOOR(N${i + 1}/Z${i + 1},1)*Z${i + 1}
+                                                                    ),
+                                                                    IF(M${i + 1}==1,
+                                                                            CEILING(J${i + 1},1)*Z${i + 1},
+                                                                            FLOOR(J${i + 1},1)*Z${i + 1}
+                                                                    )
+                                                            ),
+                                                            IF(L${i + 1}==1,
+                                                                    IF(NOT(ISBLANK(N${i + 1})),
+                                                                            IF(M${i + 1}==1,
+                                                                            CEILING(N${i + 1}/AA${i + 1},1)*AA${i + 1},
+                                                                            FLOOR(N${i + 1}/AA${i + 1},1)*AA${i + 1}
+                                                                    ),
+                                                                            IF(M${i + 1}==1,
+                                                                                    CEILING(K${i + 1},1)*AA${i + 1},
+                                                                                    FLOOR(K${i + 1},1)*AA${i + 1}
+                                                                            )
+                                                                    ),
+                                                                    IF(NOT(ISBLANK(N${i + 1})),
+                                                                            IF(M${i + 1}==1,
+                                                                                    CEILING(N${i + 1},1),
+                                                                                    FLOOR(N${i + 1},1)
+                                                                            ),
+                                                                            IF(M${i + 1}==1,
+                                                                                    CEILING(H${i + 1},1),
+                                                                                    FLOOR(H${i + 1},1)
+                                                                            )
+                                                                    )
+                                                            )
+                                                    )
+                                             )`;
                                                         data[15] = `=O${i + 1}/Z${i + 1}`;
                                                         data[16] = `=O${i + 1}/AA${i + 1}`;
-                                                        data[17] = "";//Manual price
+                                                        data[17] = shipmentList.rate;//Manual price
                                                         data[18] = procurementAgentPlanningUnitObj.catalogPrice;
-                                                        data[19] = `=ROUND(S${i + 1}*O${i + 1},2)`; //Amount
+                                                        data[19] = `=ROUND(IF(AND(NOT(ISBLANK(R${i + 1})),(R${i + 1} != 0)),R${i + 1},S${i + 1})*O${i + 1},2)`; //Amount
                                                         data[20] = shipmentList.shipmentMode;//Shipment method
                                                         data[21] = shipmentList.freightCost;// Freight Cost
                                                         data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
-                                                        data[23] = `=ROUND(T${i + 1}+W${i + 1},2)`; // Final Amount
+                                                        data[23] = `=ROUND(T${i + 1}+IF(AND(NOT(ISBLANK(V${i + 1})),(V${i + 1}!= 0)),V${i + 1},W${i + 1}),2)`; // Final Amount
                                                         data[24] = shipmentList.notes;//Notes
                                                         data[25] = procurementAgentPlanningUnitObj.unitsPerPallet;
                                                         data[26] = procurementAgentPlanningUnitObj.unitsPerContainer;
@@ -1801,7 +1801,7 @@ export default class ConsumptionDetails extends React.Component {
                                         data[12] = '';
                                         data[13] = '';
                                         data[14] = `=IF(L${i + 1}==3,
-   
+       
                                             IF(M${i + 1}==1,
                                                     CEILING(I${i + 1},1),
                                                     FLOOR(I${i + 1},1)
@@ -1821,8 +1821,8 @@ export default class ConsumptionDetails extends React.Component {
                                             IF(L${i + 1}==1,
                                                     IF(NOT(ISBLANK(N${i + 1})),
                                                             IF(M${i + 1}==1,
-                                                            CEILING(N${i + 1}/Z${i + 1},1)*AA${i + 1},
-                                                            FLOOR(N${i + 1}/Z${i + 1},1)*AA${i + 1}
+                                                            CEILING(N${i + 1}/AA${i + 1},1)*AA${i + 1},
+                                                            FLOOR(N${i + 1}/AA${i + 1},1)*AA${i + 1}
                                                     ),
                                                             IF(M${i + 1}==1,
                                                                     CEILING(K${i + 1},1)*AA${i + 1},
@@ -1846,11 +1846,11 @@ export default class ConsumptionDetails extends React.Component {
                                         data[16] = `=O${i + 1}/AA${i + 1}`;
                                         data[17] = "";//Manual price
                                         data[18] = '';
-                                        data[19] = `=ROUND(S${i + 1}*O${i + 1},2)`; //Amount
+                                        data[19] = `=ROUND(IF(AND(NOT(ISBLANK(R${i + 1})),(R${i + 1} != 0)),R${i + 1},S${i + 1})*O${i + 1},2)`; //Amount
                                         data[20] = "";//Shipment method
                                         data[21] = "";// Freight Cost
                                         data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
-                                        data[23] = `=ROUND(T${i + 1}+W${i + 1},2)`; // Final Amount
+                                        data[23] = `=ROUND(T${i + 1}+IF(AND(NOT(ISBLANK(V${i + 1})),(V${i + 1}!= 0)),V${i + 1},W${i + 1}),2)`; // Final Amount
                                         data[24] = "";//Notes
                                         data[25] = '';
                                         data[26] = '';
@@ -1967,8 +1967,18 @@ export default class ConsumptionDetails extends React.Component {
 
                                 var quantity = (elInstance.getCell(`O${i}`)).innerHTML;
                                 var productCost = (elInstance.getCell(`T${i}`)).innerHTML;
-                                var rate = (elInstance.getCell(`S${i}`)).innerHTML;
-                                var freightCost = (elInstance.getCell(`W${i}`)).innerHTML;
+                                var rate = 0;
+                                if ((elInstance.getCell(`R${i}`)).innerHTML != "" || (elInstance.getCell(`R${i}`)).innerHTML != 0) {
+                                    rate = (elInstance.getCell(`R${i}`)).innerHTML;
+                                } else {
+                                    rate = (elInstance.getCell(`S${i}`)).innerHTML;
+                                }
+                                var freightCost = 0;
+                                if ((elInstance.getCell(`V${i}`)).innerHTML != "" || (elInstance.getCell(`V${i}`)).innerHTML != 0) {
+                                    freightCost = (elInstance.getCell(`V${i}`)).innerHTML;
+                                } else {
+                                    freightCost = (elInstance.getCell(`W${i}`)).innerHTML;
+                                }
 
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = 3;
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.label.label_en = 'Submitted';
@@ -1978,6 +1988,7 @@ export default class ConsumptionDetails extends React.Component {
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].procurementAgent.id = map.get("5");
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].suggestedQty = map.get("7");
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].quantity = quantity;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].productCost = productCost;
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].rate = rate;
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentMode = map.get("20");
                                 shipmentDataListNotFiltered[parseInt(rowIndex1)].freightCost = freightCost;
@@ -2003,6 +2014,22 @@ export default class ConsumptionDetails extends React.Component {
                             }
 
 
+                            var quantity = (elInstance.getCell(`O${i}`)).innerHTML;
+                            var productCost = (elInstance.getCell(`T${i}`)).innerHTML;
+                            var rate = 0;
+                            if ((elInstance.getCell(`R${i}`)).innerHTML != "" || (elInstance.getCell(`R${i}`)).innerHTML != 0) {
+                                rate = (elInstance.getCell(`R${i}`)).innerHTML;
+                            } else {
+                                rate = (elInstance.getCell(`S${i}`)).innerHTML;
+                            }
+                            var freightCost = 0;
+                            if ((elInstance.getCell(`V${i}`)).innerHTML != "" || (elInstance.getCell(`V${i}`)).innerHTML != 0) {
+                                freightCost = (elInstance.getCell(`V${i}`)).innerHTML;
+                            } else {
+                                freightCost = (elInstance.getCell(`W${i}`)).innerHTML;
+                            }
+
+
                             var json = {
                                 shipmentId: 0,
                                 planningUnit: {
@@ -2022,11 +2049,11 @@ export default class ConsumptionDetails extends React.Component {
                                 supplier: {
                                     id: 0
                                 },
-                                quantity: map.get("14"),
-                                rate: map.get("17"),
-                                productCost: 0,
+                                quantity: quantity,
+                                rate: rate,
+                                productCost: productCost,
                                 shipmentMode: map.get("20"),
-                                freightCost: map.get("21"),
+                                freightCost: freightCost,
                                 orderedDate: moment(new Date()).format("YYYY-MM-DD"),
                                 shippedDate: '',
                                 receivedDate: '',
