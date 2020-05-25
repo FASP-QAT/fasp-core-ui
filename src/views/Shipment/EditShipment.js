@@ -37,6 +37,7 @@ export default class ConsumptionDetails extends React.Component {
             message: '',
             countVar: 1,
             planningUnitId: 0,
+            rowIndex1: 0,
         }
 
         // this.getConsumptionData = this.getConsumptionData.bind(this);
@@ -110,8 +111,55 @@ export default class ConsumptionDetails extends React.Component {
                     // }
                     shipmentListFilter[0] = dateFilterList[rowIndex];
                     console.log("shipmentListFilter---- ", shipmentListFilter);
+
+                    for (var i = 0; i < shipmentListWithoutFilter.length; i++) {
+
+                        if (shipmentListWithoutFilter[i].planningUnit.id == planningUnitId) {
+
+                            if (filterBy == 1) {
+                                if (moment(shipmentListWithoutFilter[i].orderedDate).isBetween(startDate, endDate, null, '[)')) {
+                                    this.setState({
+                                        rowIndex1: i + parseInt(rowIndex)
+                                    },
+                                        () => {
+                                            console.log("WHICH ROW--NON-SHIPMENT-----", this.state.rowIndex1);
+                                        })
+                                    break;
+                                }
+
+                            } else {
+                                if (moment(shipmentListWithoutFilter[i].expectedDeliveryDate).isBetween(startDate, endDate, null, '[)')) {
+                                    this.setState({
+                                        rowIndex1: i + parseInt(rowIndex)
+                                    },
+                                        () => {
+                                            console.log("WHICH ROW--NON-SHIPMENT-----", this.state.rowIndex1);
+                                        })
+                                    break;
+                                }
+                            }
+
+                        }
+
+                    }
+
+
+
                 } else {
                     shipmentListFilter = (programJson.shipmentList).filter(c => c.shipmentId == shipmentId);
+                    for (var i = 0; i < shipmentListWithoutFilter.length; i++) {
+                        if (shipmentListWithoutFilter[i].shipmentId == shipmentId) {
+                            this.setState({
+                                rowIndex1: i
+                            },
+                                () => {
+                                    console.log("WHICH ROW--------", this.state.rowIndex1);
+                                })
+                        }
+
+                    }
+
+
                 }
                 var shipmentList = '';
                 shipmentList = shipmentListFilter[0];
@@ -346,6 +394,20 @@ export default class ConsumptionDetails extends React.Component {
                                                             budgetJson.push(shipmentBudgetList[sb]);
                                                         }
                                                         budgetAmount = budgetAmount.toFixed(2);
+
+
+                                                        if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
+                                                            // console.log("UNDEFINE-----------------");
+                                                            procurementAgentPlanningUnitObj = {
+                                                                procurementAgentId: 0,
+                                                                planningUnitId: planningUnitId,
+                                                                catalogPrice: 0,
+                                                                moq: 0,
+                                                                unitsPerPallet: 0,
+                                                                unitsPerContainer: 0
+                                                            }
+                                                        }
+
 
                                                         // console.log("budgetAmount--- ", budgetAmount);
                                                         // console.log("budgetJson--- ", budgetJson);
@@ -748,6 +810,19 @@ export default class ConsumptionDetails extends React.Component {
                                                             budgetJson.push(shipmentBudgetList[sb]);
                                                         }
                                                         budgetAmount = budgetAmount.toFixed(2);
+
+                                                        // console.log("procurementAgentPlanningUnitObj------", procurementAgentPlanningUnitObj);
+                                                        if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
+                                                            // console.log("UNDEFINE-----------------");
+                                                            procurementAgentPlanningUnitObj = {
+                                                                procurementAgentId: 0,
+                                                                planningUnitId: planningUnitId,
+                                                                catalogPrice: 0,
+                                                                moq: 0,
+                                                                unitsPerPallet: 0,
+                                                                unitsPerContainer: 0
+                                                            }
+                                                        }
 
                                                         // console.log("budgetAmount--- ", budgetAmount);
                                                         // console.log("budgetJson--- ", budgetJson);
@@ -1552,7 +1627,7 @@ export default class ConsumptionDetails extends React.Component {
             document.getElementById("showButtonsDiv").style.display = 'none';
             elInstance.destroy();
         } else {
-            alert("Validation failed");
+            alert("Budget Save fail validation");
         }
     }
 
@@ -1790,7 +1865,9 @@ export default class ConsumptionDetails extends React.Component {
                                             countVar: i++
                                         })
 
-                                        this.el.insertRow(
+                                        var elInstance = this.state.shipmentEL;
+
+                                        elInstance.insertRow(
                                             data
                                         );
 
@@ -1810,15 +1887,15 @@ export default class ConsumptionDetails extends React.Component {
         var dd = someDate.getDate();
         var mm = someDate.getMonth() + 1;
         var y = someDate.getFullYear();
-        var someFormattedDate = y + '-' + dd + '-' + mm;
+        var someFormattedDate = y + '-' + mm + '-' + dd;
         console.log("someFormattedDate-------", someFormattedDate);
         return someFormattedDate;
     }.bind(this)
 
     saveData = function () {
 
-        // var validation = this.checkValidation();
-        var validation = true;
+        var validation = this.checkValidation();
+        // var validation = true;
         if (validation == true) {
             this.setState(
                 {
@@ -1834,8 +1911,10 @@ export default class ConsumptionDetails extends React.Component {
             let rowIndex = this.props.match.params.rowIndex;
             let programId = this.props.match.params.programId;
 
+            let rowIndex1 = this.state.rowIndex1;
 
-            var tableJson = this.el.getJson();
+            var elInstance = this.state.shipmentEL;
+            var tableJson = elInstance.getJson();
             var db1;
             var storeOS;
             getDatabase();
@@ -1886,27 +1965,44 @@ export default class ConsumptionDetails extends React.Component {
                             var map = new Map(Object.entries(tableJson[i]));
                             if (map.get("32") == false || map.get("32") == 'false') {
 
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = 3;
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.label.label_en = 'Submitted';
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].orderNo = map.get("2");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].primeLineNo = map.get("3");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].dataSource.id = map.get("4");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].procurementAgent.id = map.get("5");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].suggestedQty = map.get("7");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].quantity = map.get("14");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].rate = map.get("17");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentMode = map.get("20");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].freightCost = map.get("21");
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].notes = map.get("24");
+                                var quantity = (elInstance.getCell(`O${i}`)).innerHTML;
+                                var productCost = (elInstance.getCell(`T${i}`)).innerHTML;
+                                var rate = (elInstance.getCell(`S${i}`)).innerHTML;
+                                var freightCost = (elInstance.getCell(`W${i}`)).innerHTML;
+
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = 3;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.label.label_en = 'Submitted';
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].orderNo = map.get("2");
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].primeLineNo = map.get("3");
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].dataSource.id = map.get("4");
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].procurementAgent.id = map.get("5");
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].suggestedQty = map.get("7");
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].quantity = quantity;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].rate = rate;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentMode = map.get("20");
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].freightCost = freightCost;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].notes = map.get("24");
 
                             } else {
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = 7;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = 7;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.label.label_en = 'Cancelled';
                             }
 
                         }
 
                         for (var i = shipmentDataList.length; i < tableJson.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]))
+                            let shipId = 0;
+                            let shipLabel = '';
+                            if (map.get("32") == false || map.get("32") == 'false') {
+                                shipId = 3;
+                                shipLabel = 'Submitted';
+                            } else {
+                                shipId = 7;
+                                shipLabel = 'Cancelled';
+                            }
+
+
                             var json = {
                                 shipmentId: 0,
                                 planningUnit: {
@@ -1935,9 +2031,9 @@ export default class ConsumptionDetails extends React.Component {
                                 shippedDate: '',
                                 receivedDate: '',
                                 shipmentStatus: {
-                                    id: 3,
+                                    id: shipId,
                                     label: {
-                                        label_en: 'Submitted'
+                                        label_en: shipLabel
                                     }
                                 },
                                 notes: map.get("24"),
@@ -1963,8 +2059,10 @@ export default class ConsumptionDetails extends React.Component {
                             var map = new Map(Object.entries(tableJson[i]));
 
                             if (map.get("31") == false || map.get("31") == "false") {
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = 2;
-                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.label.label_en = 'Planned';
+                                console.log("rowIndex---", rowIndex1);
+
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = 2;
+                                shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.label.label_en = 'Planned';
                             }
                         }
 
@@ -1983,17 +2081,30 @@ export default class ConsumptionDetails extends React.Component {
                                 shipmentLabel = 'Delivered';
                             }
 
-                            shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = map.get("1");
-                            shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.label.label_en = shipmentLabel;
-                            shipmentDataListNotFiltered[parseInt(rowIndex)].procurementUnit.id = map.get("32");
-                            shipmentDataListNotFiltered[parseInt(rowIndex)].supplier.id = map.get("33");
+                            shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = map.get("1");
+                            shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.label.label_en = shipmentLabel;
+                            shipmentDataListNotFiltered[parseInt(rowIndex1)].procurementUnit.id = map.get("32");
+                            shipmentDataListNotFiltered[parseInt(rowIndex1)].supplier.id = map.get("33");
                         }
 
                     } else if ((shipmentDataList[0].shipmentStatus.id == 4 || shipmentDataList[0].shipmentStatus.id == 5 || shipmentDataList[0].shipmentStatus.id == 6) && shipmentDataList[0].procurementAgent.id != 1) {
 
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
-                            shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = map.get("1");
+
+                            let shipmentLabel = '';
+                            if (map.get("1") == 3) {
+                                shipmentLabel = 'Submitted';
+                            } else if (map.get("1") == 4) {
+                                shipmentLabel = 'Approved';
+                            } else if (map.get("1") == 5) {
+                                shipmentLabel = 'Shipped';
+                            } else if (map.get("1") == 6) {
+                                shipmentLabel = 'Delivered';
+                            }
+
+                            shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = map.get("1");
+                            shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.label.label_en = shipmentLabel;
                         }
                     }
 
@@ -2023,7 +2134,7 @@ export default class ConsumptionDetails extends React.Component {
 
         } else {
             console.log("some thing get wrong...");
-            alert("some thing get wrong...");
+            // alert("some thing get wrong...");
         }
 
     }.bind(this);
@@ -2040,6 +2151,7 @@ export default class ConsumptionDetails extends React.Component {
             <div className="animated fadeIn">
                 <Col xs="12" sm="12">
                     <h5>{i18n.t(this.state.message)}</h5>
+                    <h5 style={{ color: 'red' }}>{i18n.t(this.state.budgetError)}</h5>
                     <Card>
 
                         <CardHeader>
@@ -2232,6 +2344,16 @@ export default class ConsumptionDetails extends React.Component {
             var json = elInstance.getJson();
             for (var y = 0; y < json.length; y++) {
 
+                var col = ("AG").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(32, y);
+                console.log("val-------------- ", value);
+                // if (value == false || value == "false") {
+
+                // }
+
+
+
+
 
                 var col = ("A").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(0, y);
@@ -2249,6 +2371,105 @@ export default class ConsumptionDetails extends React.Component {
                         elInstance.setComments(col, "");
                     }
                 }
+
+                var col = ("C").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(2, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("D").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(3, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("H").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(7, y);
+                if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("L").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(11, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("U").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(20, y);
+                if (value == "") {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    valid = false;
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("V").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(21, y);
+                if (value == "" || isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value < 0) {
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+                var col = ("O").concat(parseInt(y) + 1);
+                var value = elInstance.getValueFromCoords(14, y);
+                if (value == "" || isNaN(Number.parseInt(value)) || value <= 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    valid = false;
+                    if (isNaN(Number.parseInt(value)) || value <= 0) {
+                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                    }
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+
+
 
                 var col = ("U").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(20, y);
@@ -2288,15 +2509,25 @@ export default class ConsumptionDetails extends React.Component {
 
                 var budgetAmount = (elInstance.getValueFromCoords(29, y));
                 budgetAmount = parseFloat(budgetAmount).toFixed(2);
-                var totalAmount = (elInstance.getCell(`X${y}`)).innerHTML;
+                var totalAmount = parseFloat((elInstance.getCell(`X${y + 1}`)).innerHTML).toFixed(2);
                 console.log("BudgetAmount", budgetAmount);
                 console.log("Total AMount", totalAmount);
+                console.log("yyyy ", y);
                 if (budgetAmount != totalAmount) {
                     this.setState({
                         budgetError: "Budget amount does not match required amount."
                     })
                     valid = false;
                 }
+
+
+
+
+
+
+
+
+
 
             }
 
