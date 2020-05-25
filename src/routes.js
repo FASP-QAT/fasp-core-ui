@@ -452,7 +452,7 @@ const routes = [
   { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/shipment/addShipment', name: 'Shipment / Add Shipment', component: AddShipment },
-  { path: '/shipment/ShipmentList', exact: true, name: 'Shipment / Shipment', component: ShipmentList },
+  { path: '/shipment/ShipmentList', exact: true, name: 'Shipment / Shipment List', component: ShipmentList },
   { path: '/shipment/shipmentList/:message', component: ShipmentList },
   { path: '/shipment/editShipment/:programId/:shipmentId/:planningUnitId/:filterBy/:startDate/:endDate/:rowIndex', name: 'Shipment / Edit Shipment', component: EditShipment },
 ];
