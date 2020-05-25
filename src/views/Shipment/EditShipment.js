@@ -1069,7 +1069,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         var options = {
                                                             data: data,
                                                             columnDrag: true,
-                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                             columns: [
                                                                 { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                 { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
@@ -1114,7 +1114,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             allowInsertColumn: false,
                                                             allowManualInsertColumn: false,
                                                             allowDeleteRow: false,
-                                                            // onchange: this.plannedPsmChanged,
+                                                            onchange: this.plannedPsmChanged,
                                                             oneditionend: this.onedit,
                                                             copyCompatibility: true,
                                                             paginationOptions: [10, 25, 50, 100],
@@ -1233,7 +1233,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             var options = {
                                                                 data: data,
                                                                 columnDrag: true,
-                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                                 columns: [
                                                                     { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
@@ -1276,7 +1276,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 allowInsertColumn: false,
                                                                 allowManualInsertColumn: false,
                                                                 allowDeleteRow: false,
-                                                                // onchange: this.plannedPsmChanged,
+                                                                onchange: this.plannedPsmChanged,
                                                                 oneditionend: this.onedit,
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
@@ -1393,7 +1393,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             var options = {
                                                                 data: data,
                                                                 columnDrag: true,
-                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                                 columns: [
                                                                     { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
@@ -1436,7 +1436,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 allowInsertColumn: false,
                                                                 allowManualInsertColumn: false,
                                                                 allowDeleteRow: false,
-                                                                // onchange: this.plannedPsmChanged,
+                                                                onchange: this.plannedPsmChanged,
                                                                 oneditionend: this.onedit,
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
@@ -2109,6 +2109,8 @@ export default class ConsumptionDetails extends React.Component {
                                 shipmentLabel = 'Shipped';
                             } else if (map.get("1") == 6) {
                                 shipmentLabel = 'Delivered';
+                            } else if (map.get("1") == 7) {
+                                shipmentLabel = 'Cancelled';
                             }
 
                             shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = map.get("1");
@@ -2133,6 +2135,8 @@ export default class ConsumptionDetails extends React.Component {
                                 shipmentLabel = 'Shipped';
                             } else if (map.get("1") == 6) {
                                 shipmentLabel = 'Delivered';
+                            } else if (map.get("1") == 7) {
+                                shipmentLabel = 'Cancelled';
                             }
 
                             shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = map.get("1");
@@ -2584,7 +2588,7 @@ export default class ConsumptionDetails extends React.Component {
                         this.el.setComments(col, "");
                     }
 
-                    var col = ("AF").concat(parseInt(y) + 1);
+                    var col = ("AG").concat(parseInt(y) + 1);
                     var value = this.el.getValueFromCoords(32, y);
                     if (value == "Invalid date" || value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -2596,7 +2600,7 @@ export default class ConsumptionDetails extends React.Component {
                         this.el.setComments(col, "");
                     }
 
-                    var col = ("AG").concat(parseInt(y) + 1);
+                    var col = ("AH").concat(parseInt(y) + 1);
                     var value = this.el.getValueFromCoords(33, y);
                     if (value == "Invalid date" || value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
