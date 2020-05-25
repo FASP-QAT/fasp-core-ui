@@ -395,7 +395,28 @@ export default class LanguageListComponent extends Component {
 
                         <Col md="12 pl-0">
                             <div className="d-md-flex">
-                            <FormGroup className="tab-ml-1">
+                                <FormGroup className="tab-ml-1">
+                                    <Label htmlFor="appendedInputButton">Filter By</Label>
+                                    <div className="controls SelectGo">
+                                        <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                value={this.state.filterBy}
+                                                name="filterBy" id="filterBy"
+                                            // onChange={this.displayInsertRowButton}
+                                            >
+                                                {/* <option value="0">Please select</option> */}
+                                                <option value="1">Ordered Date</option>
+                                                <option value="2">Expected Delivery Date</option>
+
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append" className="ml-1">
+                                                <Button color="secondary btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon> */}
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1">
                                     <Label htmlFor="appendedInputButton">Select Period</Label>
                                     <div className="controls">
                                         <InputGroup>
@@ -410,7 +431,7 @@ export default class LanguageListComponent extends Component {
                                             >
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                             </Picker>
-                                            
+
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
@@ -440,35 +461,19 @@ export default class LanguageListComponent extends Component {
                                                 id="planningUnitId"
                                                 bsSize="sm"
                                                 value={this.state.planningUnitId}
+                                                onChange={this.formSubmit}
                                             >
                                                 <option value="0">Please Select</option>
                                                 {planningUnits}
                                             </Input>
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-                                <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Filter By</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input type="select"
-                                                bsSize="sm"
-                                                value={this.state.filterBy}
-                                                name="filterBy" id="filterBy"
-                                            // onChange={this.displayInsertRowButton}
-                                            >
-                                                {/* <option value="0">Please select</option> */}
-                                                <option value="1">Ordered Date</option>
-                                                <option value="2">Expected Delivery Date</option>
-
-                                            </Input>
-                                            <InputGroupAddon addonType="append" className="ml-1">
+                                            {/* <InputGroupAddon addonType="append" className="ml-1">
                                                 <Button color="secondary btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
+                                            </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                               
+
+
                             </div>
                         </Col>
                         <ToolkitProvider
