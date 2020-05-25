@@ -707,7 +707,7 @@ this.fetchData();
                               &&
                               this.state.matricsList.map((item, idx) =>
 
-                                <tr id="addr0" key={idx} >
+                                <tr align="right" id="addr0" key={idx} >
                                 
                                   <td>{this.state.matricsList[idx].ACTUAL_DATE}</td>
                                   <td>
