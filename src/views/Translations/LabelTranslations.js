@@ -65,7 +65,7 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'text' },
                     ],
                     text: {
-                        showingPage: 'Showing page {0} of {1} pages',
+                        showingPage: 'Showing {0} to {1} of {1}',
                         show: '',
                         entries: '',
                     },
