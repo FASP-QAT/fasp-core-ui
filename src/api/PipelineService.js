@@ -42,7 +42,7 @@ class PipelineService {
     }
 
     getQatTempPlanningUnitList(json) {
-        
+
         return axios.get(`${API_URL}/api/qatTemp/planningUnitList/${json}`, {}
         );
     }
@@ -56,13 +56,17 @@ class PipelineService {
         );
     }
 
-    addQatTempConsumption(json, pipelineId){
+    addQatTempConsumption(json, pipelineId) {
         return axios.put(`${API_URL}/api/pipeline/consumption/${pipelineId}`, json, {}
         );
     }
 
-    getQatTempConsumptionById(json){
+    getQatTempConsumptionById(json) {
         return axios.get(`${API_URL}/api/qatTemp/consumption/${json}`, {}
+        );
+    }
+    submitShipmentData(pipelineId, json) {
+        return axios.post(`${API_URL}/api/pipeline/shipment/${pipelineId}`, json, {}
         );
     }
 }

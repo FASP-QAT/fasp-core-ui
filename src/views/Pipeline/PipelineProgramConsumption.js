@@ -3,7 +3,8 @@ import jexcel from 'jexcel';
 import i18n from '../../i18n';
 import PipelineService from '../../api/PipelineService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
-import DataSourceService from '../../api/DataSourceService.js'
+import DataSourceService from '../../api/DataSourceService.js';
+import PlanningUnitService from '../../api/PlanningUnitService'
 
 export default class PipelineProgramConsumption extends Component {
 
@@ -80,6 +81,8 @@ export default class PipelineProgramConsumption extends Component {
             console.log("my region List ----->", response.data);
             var regionList = [];
             var dataSourceList = [];
+            var planningUnitListQat = []
+
             for (var i = 0; i < response.data.length; i++) {
                 var regionJson = {
                     id: ((response.data)[i]).regionId,
@@ -100,214 +103,235 @@ export default class PipelineProgramConsumption extends Component {
                     dataSourceList.push(dataSourceJson);
                 }
 
+
                 AuthenticationService.setupAxiosInterceptors();
-                PipelineService.getQatTempConsumptionById(this.props.pipelineId).then(response => {
-                    console.log("temp consumpton list--->", response.data);
-                    if (response.data.length > 0) {
-                        console.log("in if==================");
-                        var data = [];
-                            var consumptionDataArr = [];
-                            var consumptionList = response.data;
+                PlanningUnitService.getActivePlanningUnitList()
+                    .then(response => {
 
-                            //don for loaded function
-                            this.setState({ consumptionList: consumptionList });
-                            //don for loaded function
-
-                            for (var j = 0; j < consumptionList.length; j++) {
-                                data = [];
-                                data[0] = consumptionList[j].consumptionDate;
-                                data[1] = consumptionList[j].region.id;
-                                data[2] = consumptionList[j].consumptionQty;
-                                data[3] = consumptionList[j].dayOfStockOut;
-                                data[4] = consumptionList[j].dataSource.id;
-                                if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
-                                    data[5] = '';
-                                } else {
-                                    data[5] = consumptionList[j].notes;
-                                }
-                                data[6] = consumptionList[j].actualFlag;
-                                data[7] = consumptionList[j].planningUnit.id;
-                                consumptionDataArr.push(data);
+                        // planningUnitListQat = response.data
+                        for (var k = 0; k < (response.data).length; k++) {
+                            var planningUnitJson = {
+                                name: response.data[k].label.label_en,
+                                id: response.data[k].planningUnitId
                             }
+                            planningUnitListQat.push(planningUnitJson);
+                        }
 
-                            this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
-                            this.el.destroy();
-                            var json = [];
-                            var data = consumptionDataArr;
-                            // var data = [{}, {}, {}, {}, {}];
-                            // json[0] = data;
-                            var options = {
-                                data: data,
-                                columnDrag: true,
-                                colWidths: [130, 130, 120, 120, 100, 100, 100, 100],
-                                columns: [
-                                    // { title: 'Month', type: 'text', readOnly: true },
-                                    {
-                                        title: 'Consumption Date',
-                                        type: 'calendar',
-                                        options: {
-                                            format: 'MM-YYYY'
-                                        }
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.region'),
-                                        type: 'dropdown',
-                                        source: regionList
-                                    },
-                                    {
-                                        title: i18n.t('static.consumption.consumptionqty'),
-                                        type: 'numeric'
-                                    },
-                                    {
-                                        title: i18n.t('static.consumption.daysofstockout'),
-                                        type: 'numeric'
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.dataSource'),
-                                        type: 'dropdown',
-                                        source: dataSourceList
-                                    },
-                                    {
-                                        title: 'Notes',
-                                        type: 'text'
-                                    },
-                                    {
-                                        title: i18n.t('static.consumption.actualflag'),
-                                        type: 'dropdown',
-                                        source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
-                                    },
-                                    { title: 'Product Id', type: 'hidden' },
-                                    // { title: 'Created By', type: 'text', readOnly: true },
-                                    // { title: 'Last Modified date', type: 'text', readOnly: true },
-                                    // { title: 'Last Modified by', type: 'text', readOnly: true }
-                                ],
-                                pagination: 10,
-                                search: true,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                onchange: this.changed,
-                                oneditionend: this.onedit,
-                                copyCompatibility: true,
-                                // paginationOptions: [10, 25, 50, 100],
-                                position: 'top'
-                            };
-
-                            this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
-                            this.loaded();
-                        
-
-
-                    } else {
-                        console.log("in else==================");
                         AuthenticationService.setupAxiosInterceptors();
-                        PipelineService.getPipelineProgramConsumption(this.props.pipelineId).then(response => {
-                            console.log("consumption List ----->", response.data);
-                            var data = [];
-                            var consumptionDataArr = [];
-                            var consumptionList = response.data;
+                        PipelineService.getQatTempConsumptionById(this.props.pipelineId).then(response => {
+                            console.log("temp consumpton list--->", response.data);
+                            if (response.data.length > 0) {
+                                console.log("in if==================");
+                                var data = [];
+                                var consumptionDataArr = [];
+                                var consumptionList = response.data;
 
-                            //don for loaded function
-                            this.setState({ consumptionList: consumptionList });
-                            //don for loaded function
+                                //don for loaded function
+                                this.setState({ consumptionList: consumptionList });
+                                //don for loaded function
 
-                            for (var j = 0; j < consumptionList.length; j++) {
-                                data = [];
-                                data[0] = consumptionList[j].conDate;
-                                data[1] = "";
-                                data[2] = consumptionList[j].consamount;
-                                data[3] = "";
-                                data[4] = consumptionList[j].consdatasourceid;
-                                if (consumptionList[j].consnote === null || consumptionList[j].consnote === ' NULL') {
-                                    data[5] = '';
-                                } else {
-                                    data[5] = consumptionList[j].consnote;
+                                for (var j = 0; j < consumptionList.length; j++) {
+                                    data = [];
+                                    data[0] = consumptionList[j].consumptionDate;
+                                    data[1] = consumptionList[j].region.id;
+                                    data[2] = consumptionList[j].consumptionQty;
+                                    data[3] = consumptionList[j].dayOfStockOut;
+                                    data[4] = consumptionList[j].dataSource.id;
+                                    if (consumptionList[j].notes === null || consumptionList[j].notes === ' NULL') {
+                                        data[5] = '';
+                                    } else {
+                                        data[5] = consumptionList[j].notes;
+                                    }
+                                    data[6] = consumptionList[j].actualFlag;
+                                    data[7] = consumptionList[j].planningUnit.id;
+                                    consumptionDataArr.push(data);
                                 }
-                                data[6] = consumptionList[j].consactualflag;
-                                data[7] = consumptionList[j].productid;
-                                consumptionDataArr.push(data);
-                            }
 
-                            this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
-                            this.el.destroy();
-                            var json = [];
-                            var data = consumptionDataArr;
-                            // var data = [{}, {}, {}, {}, {}];
-                            // json[0] = data;
-                            var options = {
-                                data: data,
-                                columnDrag: true,
-                                colWidths: [130, 130, 120, 120, 100, 100, 100, 100],
-                                columns: [
-                                    // { title: 'Month', type: 'text', readOnly: true },
-                                    {
-                                        title: 'Consumption Date',
-                                        type: 'calendar',
-                                        options: {
-                                            format: 'MM-YYYY'
+                                this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
+                                this.el.destroy();
+                                var json = [];
+                                var data = consumptionDataArr;
+                                // var data = [{}, {}, {}, {}, {}];
+                                // json[0] = data;
+                                var options = {
+                                    data: data,
+                                    columnDrag: true,
+                                    colWidths: [130, 130, 120, 120, 100, 100, 100, 100],
+                                    columns: [
+                                        // { title: 'Month', type: 'text', readOnly: true },
+                                        {
+                                            title: 'Consumption Date',
+                                            type: 'calendar',
+                                            options: {
+                                                format: 'MM-YYYY'
+                                            }
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.region'),
+                                            type: 'dropdown',
+                                            source: regionList
+                                        },
+                                        {
+                                            title: i18n.t('static.consumption.consumptionqty'),
+                                            type: 'numeric'
+                                        },
+                                        {
+                                            title: i18n.t('static.consumption.daysofstockout'),
+                                            type: 'numeric'
+                                        },
+                                        {
+                                            title: i18n.t('static.inventory.dataSource'),
+                                            type: 'dropdown',
+                                            source: dataSourceList
+                                        },
+                                        {
+                                            title: 'Notes',
+                                            type: 'text'
+                                        },
+                                        {
+                                            title: i18n.t('static.consumption.actualflag'),
+                                            type: 'dropdown',
+                                            source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
+                                        },
+                                        {
+                                            title: 'Planning Unit',
+                                            type: 'dropdown',
+                                            source:planningUnitListQat,
+                                            readOnly:true
+                                        },
+                                        // { title: 'Created By', type: 'text', readOnly: true },
+                                        // { title: 'Last Modified date', type: 'text', readOnly: true },
+                                        // { title: 'Last Modified by', type: 'text', readOnly: true }
+                                    ],
+                                    pagination: 10,
+                                    search: true,
+                                    columnSorting: true,
+                                    tableOverflow: true,
+                                    wordWrap: true,
+                                    allowInsertColumn: false,
+                                    allowManualInsertColumn: false,
+                                    allowDeleteRow: false,
+                                    onchange: this.changed,
+                                    oneditionend: this.onedit,
+                                    copyCompatibility: true,
+                                    // paginationOptions: [10, 25, 50, 100],
+                                    position: 'top'
+                                };
+
+                                this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
+                                this.loaded();
+                            } else {
+                                console.log("in else==================");
+                                AuthenticationService.setupAxiosInterceptors();
+                                PipelineService.getPipelineProgramConsumption(this.props.pipelineId).then(response => {
+                                    console.log("consumption List ----->", response.data);
+                                    var data = [];
+                                    var consumptionDataArr = [];
+                                    var consumptionList = response.data;
+
+                                    //don for loaded function
+                                    this.setState({ consumptionList: consumptionList });
+                                    //don for loaded function
+
+                                    for (var j = 0; j < consumptionList.length; j++) {
+                                        data = [];
+                                        data[0] = consumptionList[j].conDate;
+                                        data[1] = "";
+                                        data[2] = consumptionList[j].consamount;
+                                        data[3] = "";
+                                        data[4] = consumptionList[j].consdatasourceid;
+                                        if (consumptionList[j].consnote === null || consumptionList[j].consnote === ' NULL') {
+                                            data[5] = '';
+                                        } else {
+                                            data[5] = consumptionList[j].consnote;
                                         }
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.region'),
-                                        type: 'dropdown',
-                                        source: regionList
-                                    },
-                                    {
-                                        title: i18n.t('static.consumption.consumptionqty'),
-                                        type: 'numeric'
-                                    },
-                                    {
-                                        title: i18n.t('static.consumption.daysofstockout'),
-                                        type: 'numeric'
-                                    },
-                                    {
-                                        title: i18n.t('static.inventory.dataSource'),
-                                        type: 'dropdown',
-                                        source: dataSourceList
-                                    },
-                                    {
-                                        title: 'Notes',
-                                        type: 'text'
-                                    },
-                                    {
-                                        title: i18n.t('static.consumption.actualflag'),
-                                        type: 'dropdown',
-                                        source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
-                                    },
-                                    { title: 'Product Id', type: 'hidden' },
-                                    // { title: 'Created By', type: 'text', readOnly: true },
-                                    // { title: 'Last Modified date', type: 'text', readOnly: true },
-                                    // { title: 'Last Modified by', type: 'text', readOnly: true }
-                                ],
-                                pagination: 10,
-                                search: true,
-                                columnSorting: true,
-                                tableOverflow: true,
-                                wordWrap: true,
-                                allowInsertColumn: false,
-                                allowManualInsertColumn: false,
-                                allowDeleteRow: false,
-                                onchange: this.changed,
-                                oneditionend: this.onedit,
-                                copyCompatibility: true,
-                                // paginationOptions: [10, 25, 50, 100],
-                                position: 'top'
-                            };
+                                        data[6] = consumptionList[j].consactualflag;
+                                        data[7] = consumptionList[j].productid;
+                                        consumptionDataArr.push(data);
+                                    }
 
-                            this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
-                            this.loaded();
+                                    this.el = jexcel(document.getElementById("consumptiontableDiv"), '');
+                                    this.el.destroy();
+                                    var json = [];
+                                    var data = consumptionDataArr;
+                                    // var data = [{}, {}, {}, {}, {}];
+                                    // json[0] = data;
+                                    var options = {
+                                        data: data,
+                                        columnDrag: true,
+                                        colWidths: [130, 130, 120, 120, 100, 100, 100, 100],
+                                        columns: [
+                                            // { title: 'Month', type: 'text', readOnly: true },
+                                            {
+                                                title: 'Consumption Date',
+                                                type: 'calendar',
+                                                options: {
+                                                    format: 'MM-YYYY'
+                                                }
+                                            },
+                                            {
+                                                title: i18n.t('static.inventory.region'),
+                                                type: 'dropdown',
+                                                source: regionList
+                                            },
+                                            {
+                                                title: i18n.t('static.consumption.consumptionqty'),
+                                                type: 'numeric'
+                                            },
+                                            {
+                                                title: i18n.t('static.consumption.daysofstockout'),
+                                                type: 'numeric'
+                                            },
+                                            {
+                                                title: i18n.t('static.inventory.dataSource'),
+                                                type: 'dropdown',
+                                                source: dataSourceList
+                                            },
+                                            {
+                                                title: 'Notes',
+                                                type: 'text'
+                                            },
+                                            {
+                                                title: i18n.t('static.consumption.actualflag'),
+                                                type: 'dropdown',
+                                                source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
+                                            },
+                                            { 
+                                                title: 'Planning Unit', 
+                                                type: 'dropdown',
+                                                source:planningUnitListQat,
+                                                readOnly:true 
+                                            },
+                                            // { title: 'Created By', type: 'text', readOnly: true },
+                                            // { title: 'Last Modified date', type: 'text', readOnly: true },
+                                            // { title: 'Last Modified by', type: 'text', readOnly: true }
+                                        ],
+                                        pagination: 10,
+                                        search: true,
+                                        columnSorting: true,
+                                        tableOverflow: true,
+                                        wordWrap: true,
+                                        allowInsertColumn: false,
+                                        allowManualInsertColumn: false,
+                                        allowDeleteRow: false,
+                                        onchange: this.changed,
+                                        oneditionend: this.onedit,
+                                        copyCompatibility: true,
+                                        // paginationOptions: [10, 25, 50, 100],
+                                        position: 'top'
+                                    };
+
+                                    this.el = jexcel(document.getElementById("consumptiontableDiv"), options);
+                                    this.loaded();
+                                });
+
+                            }
                         });
 
-                    }
-                });
-
+                    });
             });
+
         });
-
-
     }
     render() {
         return (
