@@ -667,6 +667,7 @@
     "static.dashboard.stockstatusovertime":"Stock Status Over time",
     "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
     "static.report.noofmonth":"Number Of Months",
+    "static.supplyplan.supplyplanformula":"Supply plan formulas",
     "static.message.shipmentSaved": "Shipment Data Saved"
     
 }
