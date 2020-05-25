@@ -837,6 +837,7 @@ if(productCategoryId!=-1){
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
                       <InputGroup>
+                      <div className="controls edit">
                         <ReactMultiSelectCheckboxes
 
                           bsSize="sm"
@@ -849,6 +850,7 @@ if(productCategoryId!=-1){
                           this.props.touched && (
                             <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
+                          </div>
                       </InputGroup>
                     </FormGroup>
                     <FormGroup className="col-md-3">
@@ -897,13 +899,18 @@ if(productCategoryId!=-1){
                     <FormGroup className="col-sm-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
                                                                 <div className="controls">
-                                                                    <InputGroup>   <ReactMultiSelectCheckboxes
+                                                                    <InputGroup>  
+                                                                     <ReactMultiSelectCheckboxes
+                                                                    
                                                                         name="planningUnitId"
                                                                         id="planningUnitId"
-                                                                        bsSize="md"
+                                                                        bsSize="sm"
                                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                                         options={planningUnitList && planningUnitList.length>0?planningUnitList:[]}
-                                                                    /> </InputGroup>    </div></FormGroup>
+                                                                    />
+                                                                     </InputGroup>  
+                                                                       </div>
+                                                                       </FormGroup>
                                                            
                   </div>
                 </Col>

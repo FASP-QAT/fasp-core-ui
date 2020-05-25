@@ -574,9 +574,9 @@ class StockStatusOverTime extends Component {
                                                                         options={planningUnitList && planningUnitList.length>0?planningUnitList:[]}
                                                                     /> </InputGroup>    </div></FormGroup>
                                                             <FormGroup className="col-sm-3">
-                                                                <InputGroupAddon addonType="append">
+                                                                {/* <InputGroupAddon addonType="append">
                                                                     <Button color="secondary Gobtn btn-sm" onClick={this.fetchData}>{i18n.t('static.common.go')}</Button>
-                                                                </InputGroupAddon>
+                                                                </InputGroupAddon> */}
 
 
                                                             </FormGroup>
