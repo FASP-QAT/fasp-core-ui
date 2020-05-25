@@ -89,7 +89,7 @@ export default class ConsumptionDetails extends React.Component {
 
                 let shipmentListWithoutFilter = (programJson.shipmentList);
 
-                var shipmentListFilter = '';
+                var shipmentListFilter = [];
                 if (shipmentId == 0 || typeof shipmentId == "undefined") {
 
                     const planningUnitFilterList = shipmentListWithoutFilter.filter(c => c.planningUnit.id == planningUnitId);
@@ -101,18 +101,21 @@ export default class ConsumptionDetails extends React.Component {
                         //Expected Delivery Date
                         dateFilterList = planningUnitFilterList.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
                     }
-                    let rowIndexFilterList = [];
-                    for (var y = 0; y < dateFilterList.length; y++) {
-                        if (y == rowIndex) {
-                            rowIndexFilterList[0] = dateFilterList[y];
-                        }
-                    }
-                    shipmentListFilter = rowIndexFilterList[0];
+                    console.log("dateFilterList---- ", dateFilterList);
+                    // let rowIndexFilterList = [];
+                    // for (var y = 0; y < dateFilterList.length; y++) {
+                    //     if (y == rowIndex) {
+                    //         rowIndexFilterList[0] = dateFilterList[y];
+                    //     }
+                    // }
+                    shipmentListFilter[0] = dateFilterList[rowIndex];
+                    console.log("shipmentListFilter---- ", shipmentListFilter);
                 } else {
                     shipmentListFilter = (programJson.shipmentList).filter(c => c.shipmentId == shipmentId);
                 }
                 var shipmentList = '';
                 shipmentList = shipmentListFilter[0];
+                console.log("shipmentList-------", shipmentList);
                 //--------------VariableSec--------------------
 
                 var planningUnit = [];
@@ -143,10 +146,9 @@ export default class ConsumptionDetails extends React.Component {
 
                         let planningUnitJson = {
                             name: planningUnitResult[k].label.label_en,
-                            id: planningUnitResult[k].id
+                            id: planningUnitResult[k].planningUnitId
                         }
                         planningUnit[k] = planningUnitJson;
-
 
                     }
 
@@ -419,7 +421,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         data[28] = programByte.seaFreightPerc;
                                                         data[29] = budgetAmount;
                                                         data[30] = budgetJson;
-                                                        data[31] = 0;
+                                                        data[31] = rowIndex;
                                                         data[32] = '';
 
                                                         shipmentDataArr[0] = data;
@@ -430,9 +432,9 @@ export default class ConsumptionDetails extends React.Component {
                                                         var options = {
                                                             data: data,
                                                             columnDrag: true,
-                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                             columns: [
-                                                                { type: 'calendar', options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                 { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
                                                                 { type: 'text', title: "Order No" },
                                                                 { type: 'text', title: "Prime line number" },
@@ -464,7 +466,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 { type: 'hidden', title: 'Budget Amount' },
                                                                 { type: 'hidden', title: "Budget Array" },
                                                                 { type: 'hidden', title: 'index' },
-                                                                { type: 'checkbox', title: 'Cacelled Order' }
+                                                                { type: 'checkbox', title: 'Cancelled Order' }
                                                             ],
                                                             pagination: 10,
                                                             search: true,
@@ -821,8 +823,8 @@ export default class ConsumptionDetails extends React.Component {
                                                         data[28] = programByte.seaFreightPerc;
                                                         data[29] = budgetAmount;
                                                         data[30] = budgetJson;
-                                                        data[31] = 0;
-                                                        data[32] = true;
+                                                        data[31] = true;
+                                                        data[32] = rowIndex;
 
                                                         shipmentDataArr[0] = data;
 
@@ -832,9 +834,9 @@ export default class ConsumptionDetails extends React.Component {
                                                         var options = {
                                                             data: data,
                                                             columnDrag: true,
-                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                             columns: [
-                                                                { type: 'calendar', options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                 { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
                                                                 { type: 'text', title: "Order No" },
                                                                 { type: 'text', title: "Prime line number" },
@@ -865,8 +867,8 @@ export default class ConsumptionDetails extends React.Component {
                                                                 { type: 'hidden', title: "Sea Freight Percentage" },
                                                                 { type: 'hidden', title: 'Budget Amount' },
                                                                 { type: 'hidden', title: "Budget Array" },
-                                                                { type: 'hidden', title: 'index' },
                                                                 { type: 'checkbox', title: "Cancelled Order" },
+                                                                { type: 'hidden', title: 'index' },
                                                             ],
                                                             pagination: 10,
                                                             search: true,
@@ -981,7 +983,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         data[28] = programByte.seaFreightPerc;
                                                         data[29] = budgetAmount;
                                                         data[30] = budgetJson;
-                                                        data[31] = 0;
+                                                        data[31] = rowIndex;
                                                         data[32] = '';
                                                         data[33] = '';
 
@@ -995,7 +997,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             columnDrag: true,
                                                             colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                             columns: [
-                                                                { type: 'calendar', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                 { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
                                                                 { type: 'text', readOnly: true, title: "Order No" },
                                                                 { type: 'text', readOnly: true, title: "Prime line number" },
@@ -1147,7 +1149,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             data[28] = programByte.seaFreightPerc;
                                                             data[29] = budgetAmount;
                                                             data[30] = budgetJson;
-                                                            data[31] = 0;
+                                                            data[31] = rowIndex;
 
                                                             shipmentDataArr[0] = data;
 
@@ -1159,7 +1161,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 columnDrag: true,
                                                                 colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                                 columns: [
-                                                                    { type: 'calendar', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                    { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
                                                                     { type: 'text', readOnly: true, title: "Order No" },
                                                                     { type: 'text', readOnly: true, title: "Prime line number" },
@@ -1307,7 +1309,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             data[28] = programByte.seaFreightPerc;
                                                             data[29] = budgetAmount;
                                                             data[30] = budgetJson;
-                                                            data[31] = 0;
+                                                            data[31] = rowIndex;
 
                                                             shipmentDataArr[0] = data;
 
@@ -1319,7 +1321,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 columnDrag: true,
                                                                 colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                                 columns: [
-                                                                    { type: 'calendar', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                    { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
                                                                     { type: 'text', readOnly: true, title: "Order No" },
                                                                     { type: 'text', readOnly: true, title: "Prime line number" },
@@ -1564,6 +1566,7 @@ export default class ConsumptionDetails extends React.Component {
         let procurementAgentPlanningList = [];
         var dataSourceList = [];
         var programByteList = '';
+        var planningUnitObj = '';
 
         var programId = (this.props.match.params.programId).split("_")[0];
 
@@ -1658,14 +1661,14 @@ export default class ConsumptionDetails extends React.Component {
                                     if (planningUnitResult[k].planningUnitId == this.props.match.params.planningUnitId) {
                                         let planningUnitJson = {
                                             name: planningUnitResult[k].label.label_en,
-                                            id: planningUnitResult[k].id
+                                            id: planningUnitResult[k].planningUnitId
                                         }
-                                        planningUnitList[0] = planningUnitJson;
+                                        planningUnitObj = planningUnitJson;
 
                                     }
                                 }
 
-                                this.setState({ planningUnitList: planningUnitList });
+                                this.setState({ planningUnitObj: planningUnitObj });
 
                                 let procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                                 let procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
@@ -1708,13 +1711,13 @@ export default class ConsumptionDetails extends React.Component {
                                         var budgetAmount = 0;
                                         var budgetJson = [];
                                         var data = [];
-                                        data[0] = new Date(expectedDeliveryDate);//a
+                                        data[0] = expectedDeliveryDate;//a
                                         data[1] = 2;//b
                                         data[2] = '';//c
                                         data[3] = '';//d
                                         data[4] = '';//e
                                         data[5] = '';//f
-                                        data[6] = '';//g
+                                        data[6] = this.props.match.params.planningUnitId;//g
                                         data[7] = '';//h
                                         data[8] = '';//i
                                         data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
@@ -1781,6 +1784,7 @@ export default class ConsumptionDetails extends React.Component {
                                         data[29] = budgetAmount;
                                         data[30] = budgetJson;
                                         data[31] = -1;
+                                        data[32] = false;
 
                                         this.setState({
                                             countVar: i++
@@ -1807,12 +1811,14 @@ export default class ConsumptionDetails extends React.Component {
         var mm = someDate.getMonth() + 1;
         var y = someDate.getFullYear();
         var someFormattedDate = y + '-' + dd + '-' + mm;
+        console.log("someFormattedDate-------", someFormattedDate);
         return someFormattedDate;
     }.bind(this)
 
     saveData = function () {
 
-        var validation = this.checkValidation();
+        // var validation = this.checkValidation();
+        var validation = true;
         if (validation == true) {
             this.setState(
                 {
@@ -1829,7 +1835,7 @@ export default class ConsumptionDetails extends React.Component {
             let programId = this.props.match.params.programId;
 
 
-
+            var tableJson = this.el.getJson();
             var db1;
             var storeOS;
             getDatabase();
@@ -1846,7 +1852,7 @@ export default class ConsumptionDetails extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
 
-                    var shipmentDataList = '';
+                    var shipmentDataList = [];
                     if (shipmentId == 0 || typeof shipmentId == "undefined") {
                         const planningUnitFilterList = (programJson.shipmentList).filter(c => c.planningUnit.id == planningUnitId);
 
@@ -1866,106 +1872,134 @@ export default class ConsumptionDetails extends React.Component {
                             }
                         }
 
-                        shipmentDataList = rowIndexFilterList[0];
+                        shipmentDataList = rowIndexFilterList;
                     } else {
-                        shipmentDataList = (programJson.shipmentList).filter(c => c.shipmentId == shipmentId)[0];
+                        shipmentDataList = (programJson.shipmentList).filter(c => c.shipmentId == shipmentId);
                     }
 
-
+                    console.log("shipmentDataList[0].shipmentStatus.id----", shipmentDataList[0].shipmentStatus.id);
                     let shipmentDataListNotFiltered = (programJson.shipmentList);
 
-                    if (shipmentDataList.shipmentStatus.id == 2) {
-                        var tableJson = this.state.shipmentEL;
-                        var map = new Map(Object.entries(tableJson[i]));
+                    if (shipmentDataList[0].shipmentStatus.id == 2) {
 
-                        if (map.get("32") == false || map.get("32") == 'false') {
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].shipmentStatus.id = map.get("1");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].orderNo = map.get("2");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].primeLineNo = map.get("3");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].dataSource.id = map.get("4");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].procurementAgent.id = map.get("5");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].suggestedQty = map.get("7");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].quantity = map.get("14");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].rate = map.get("17");
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].notes = map.get("24");
+                        for (var i = 0; i < shipmentDataList.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]));
+                            if (map.get("32") == false || map.get("32") == 'false') {
 
-                            for (var i = shipmentDataList.length; i < tableJson.length; i++) {
-                                var map = new Map(Object.entries(tableJson[i]))
-                                var json = {
-                                    shipmentId: 0,
-                                    planningUnit: {
-                                        id: planningUnitId,
-                                    },
-                                    expectedDeliveryDate: moment(map.get("0")).format("YYYY-MM-DD"),
-                                    suggestedQty: map.get("7"),
-                                    procurementAgent: {
-                                        id: map.get("5"),
-                                    },
-                                    procurementUnit: {
-                                        id: 0
-                                    },
-                                    supplier: {
-                                        id: 0
-                                    },
-                                    quantity: map.get("14"),
-                                    rate: map.get("17"),
-                                    productCost: 0,
-                                    shipmentMode: map.get("20"),
-                                    freightCost: map.get("21"),
-                                    orderedDate: moment(new Date()).format("YYYY-MM-DD"),
-                                    shippedDate: '',
-                                    receivedDate: '',
-                                    shipmentStatus: {
-                                        id: 3,
-                                    },
-                                    notes: map.get("24"),
-                                    dataSource: {
-                                        id: map.get("4")
-                                    },
-                                    accountFlag: '',
-                                    erpFlag: '',
-                                    orderNo: map.get("2"),
-                                    primeLineNo: map.get("3"),
-                                    versionId: 1,
-                                    shipmentBudgetList: map.get("30"),
-                                    active: true
-                                }
-                                // shipmentDataList.push(json);
-                                shipmentDataListNotFiltered.push(json);
-                                console.log("JSON---- ", json);
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = 3;
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.label.label_en = 'Submitted';
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].orderNo = map.get("2");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].primeLineNo = map.get("3");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].dataSource.id = map.get("4");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].procurementAgent.id = map.get("5");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].suggestedQty = map.get("7");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].quantity = map.get("14");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].rate = map.get("17");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentMode = map.get("20");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].freightCost = map.get("21");
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].notes = map.get("24");
+
+                            } else {
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = 7;
                             }
 
-                        } else {
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].shipmentStatus.id = 7;
                         }
 
-
-
-                    } else if (shipmentDataList.shipmentStatus.id == 7) {
-
-                        var tableJson = this.el.getJson();
-
-                        var map = new Map(Object.entries(tableJson[i]));
-                        if (map.get("30") == false || map.get("30") == 'false') {
-                            shipmentDataListNotFiltered[parseInt(map.get("31"))].shipmentStatus.id = 2;
+                        for (var i = shipmentDataList.length; i < tableJson.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]))
+                            var json = {
+                                shipmentId: 0,
+                                planningUnit: {
+                                    id: planningUnitId,
+                                    label: {
+                                        label_en: this.state.planningUnitObj.name
+                                    }
+                                },
+                                expectedDeliveryDate: moment(map.get("0")).format("YYYY-MM-DD"),
+                                suggestedQty: map.get("7"),
+                                procurementAgent: {
+                                    id: map.get("5"),
+                                },
+                                procurementUnit: {
+                                    id: 0
+                                },
+                                supplier: {
+                                    id: 0
+                                },
+                                quantity: map.get("14"),
+                                rate: map.get("17"),
+                                productCost: 0,
+                                shipmentMode: map.get("20"),
+                                freightCost: map.get("21"),
+                                orderedDate: moment(new Date()).format("YYYY-MM-DD"),
+                                shippedDate: '',
+                                receivedDate: '',
+                                shipmentStatus: {
+                                    id: 3,
+                                    label: {
+                                        label_en: 'Submitted'
+                                    }
+                                },
+                                notes: map.get("24"),
+                                dataSource: {
+                                    id: map.get("4")
+                                },
+                                accountFlag: '',
+                                erpFlag: '',
+                                orderNo: map.get("2"),
+                                primeLineNo: map.get("3"),
+                                versionId: 1,
+                                shipmentBudgetList: map.get("30"),
+                                active: true
+                            }
+                            // shipmentDataList.push(json);
+                            shipmentDataListNotFiltered.push(json);
+                            console.log("JSON---- ", json);
                         }
 
-                    } else if (shipmentDataList.shipmentStatus.id == 3 && shipmentDataList.procurementAgent.id != 1) {
+                    } else if (shipmentDataList[0].shipmentStatus.id == 7) {
 
-                        var tableJson = this.el.getJson();
-                        var map = new Map(Object.entries(tableJson[i]));
-                        shipmentDataListNotFiltered[parseInt(map.get("31"))].shipmentStatus.id = map.get("1");
-                        shipmentDataListNotFiltered[parseInt(map.get("31"))].procurementUnit.id = map.get("32");
-                        shipmentDataListNotFiltered[parseInt(map.get("31"))].supplier.id = map.get("33");
+                        for (var i = 0; i < shipmentDataList.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]));
 
-                    } else if ((shipmentDataList.shipmentStatus.id == 4 || shipmentDataList.shipmentStatus.id == 5 || shipmentDataList.shipmentStatus.id == 6) && shipmentDataList.procurementAgent.id != 1) {
-                        var tableJson = this.el.getJson();
-                        var map = new Map(Object.entries(tableJson[i]));
-                        shipmentDataListNotFiltered[parseInt(map.get("31"))].shipmentStatus.id = map.get("1");
+                            if (map.get("31") == false || map.get("31") == "false") {
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = 2;
+                                shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.label.label_en = 'Planned';
+                            }
+                        }
+
+                    } else if (shipmentDataList[0].shipmentStatus.id == 3 && shipmentDataList[0].procurementAgent.id != 1) {
+
+                        for (var i = 0; i < shipmentDataList.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]));
+                            let shipmentLabel = '';
+                            if (map.get("1") == 3) {
+                                shipmentLabel = 'Submitted';
+                            } else if (map.get("1") == 4) {
+                                shipmentLabel = 'Approved';
+                            } else if (map.get("1") == 5) {
+                                shipmentLabel = 'Shipped';
+                            } else if (map.get("1") == 6) {
+                                shipmentLabel = 'Delivered';
+                            }
+
+                            shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = map.get("1");
+                            shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.label.label_en = shipmentLabel;
+                            shipmentDataListNotFiltered[parseInt(rowIndex)].procurementUnit.id = map.get("32");
+                            shipmentDataListNotFiltered[parseInt(rowIndex)].supplier.id = map.get("33");
+                        }
+
+                    } else if ((shipmentDataList[0].shipmentStatus.id == 4 || shipmentDataList[0].shipmentStatus.id == 5 || shipmentDataList[0].shipmentStatus.id == 6) && shipmentDataList[0].procurementAgent.id != 1) {
+
+                        for (var i = 0; i < shipmentDataList.length; i++) {
+                            var map = new Map(Object.entries(tableJson[i]));
+                            shipmentDataListNotFiltered[parseInt(rowIndex)].shipmentStatus.id = map.get("1");
+                        }
                     }
 
 
                     // console.log("1111111111111111111   ", consumptionDataList)
+                    console.log("shipmentDataListNotFiltered---", shipmentDataListNotFiltered);
                     programJson.shipmentList = shipmentDataListNotFiltered;
                     programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     var putRequest = programTransaction.put(programRequest.result);
@@ -1981,6 +2015,7 @@ export default class ConsumptionDetails extends React.Component {
                         })
                         // this.props.history.push(`/consumptionDetails/${document.getElementById('programId').value}/${document.getElementById("planningUnitId").value}/` + i18n.t('static.message.consumptionSuccess'))
                         this.props.history.push(`/shipment/ShipmentList/` + i18n.t('static.message.shipmentSaved'));
+                        // this.props.history.push(`/consumptionDetails/` + i18n.t('static.message.consumptionSuccess'));
                     }.bind(this)
                 }.bind(this)
             }.bind(this)
@@ -1988,7 +2023,7 @@ export default class ConsumptionDetails extends React.Component {
 
         } else {
             console.log("some thing get wrong...");
-            alert("Fail to validate");
+            alert("some thing get wrong...");
         }
 
     }.bind(this);
@@ -2125,7 +2160,7 @@ export default class ConsumptionDetails extends React.Component {
                         var procurementAgentPlanningUnit = papuResult.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
                         console.log("--------2222--------", procurementAgentPlanningUnit)
                         elInstance.setValueFromCoords(8, y, procurementAgentPlanningUnit.moq, true);
-                        elInstance.setValueFromCoords(18, y, procurementAgentPlanningUnit.pricePerPlanningUnit, true);
+                        elInstance.setValueFromCoords(18, y, procurementAgentPlanningUnit.catalogPrice, true);
                         elInstance.setValueFromCoords(25, y, procurementAgentPlanningUnit.unitsPerPallet, true);
                         elInstance.setValueFromCoords(26, y, procurementAgentPlanningUnit.unitsPerContainer, true);
                     }.bind(this)
@@ -2176,13 +2211,28 @@ export default class ConsumptionDetails extends React.Component {
 
     checkValidation() {
         let shipmentStatusId = this.state.shipmentStatusId;
-        var valid = true;
         console.log("shipmentStatusId---///--- ", shipmentStatusId);
+
+        var valid = true;
+
+        // var json = this.el.getJson();
+        // for (var y = 0; y < json.length; y++) {
+        //     var col = ("F").concat(parseInt(y) + 1);
+        //     var value = this.el.getValueFromCoords(5, y);
+        //     console.log("value-------- ", value);
+        // }
+
+
+
+
+
         if (shipmentStatusId == 2) {
 
             var elInstance = this.state.shipmentEL;
             var json = elInstance.getJson();
             for (var y = 0; y < json.length; y++) {
+
+
                 var col = ("A").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(0, y);
                 if (value == "") {
@@ -2199,7 +2249,6 @@ export default class ConsumptionDetails extends React.Component {
                         elInstance.setComments(col, "");
                     }
                 }
-
 
                 var col = ("U").concat(parseInt(y) + 1);
                 var value = elInstance.getValueFromCoords(20, y);
@@ -2248,6 +2297,7 @@ export default class ConsumptionDetails extends React.Component {
                     })
                     valid = false;
                 }
+
             }
 
         } else if (shipmentStatusId == 3) {
@@ -2255,7 +2305,9 @@ export default class ConsumptionDetails extends React.Component {
             for (var y = 0; y < json.length; y++) {
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
-                if (value != "1" || value != 1) {
+                console.log("VALUE1111-", value);
+                // if (value != " PSM" || value != '') {
+                if (value != "PSM") {
 
                     var col = ("B").concat(parseInt(y) + 1);
                     var value = this.el.getValueFromCoords(1, y);
@@ -2302,7 +2354,7 @@ export default class ConsumptionDetails extends React.Component {
             for (var y = 0; y < json.length; y++) {
                 var col = ("F").concat(parseInt(y) + 1);
                 var value = this.el.getValueFromCoords(5, y);
-                if (value != "1" || value != 1) {
+                if (value != "PSM") {
                     var col = ("B").concat(parseInt(y) + 1);
                     var value = this.el.getValueFromCoords(1, y);
                     if (value == "Invalid date" || value == "") {
@@ -2327,7 +2379,7 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     backClicked() {
-        this.props.history.push(`/shipment/shipmentList/` + i18n.t('static.common.back'))
+        this.props.history.push(`/shipment/shipmentList`)
     }
 
     getProcurementAgentById() {
