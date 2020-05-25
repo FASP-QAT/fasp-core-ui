@@ -691,6 +691,7 @@ export default class StockStatusMatrix extends React.Component {
     const doc = new jsPDF(orientation, unit, size);
 
     doc.setFontSize(15);
+    
 
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     const headers = [];
@@ -816,14 +817,14 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center'
       },
       {
         dataField: 'Jan',
         text: i18n.t('static.month.jan'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -842,7 +843,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Feb',
         text: i18n.t('static.month.feb'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -861,7 +862,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Mar',
         text: i18n.t('static.month.mar'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -880,7 +881,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Apr',
         text: i18n.t('static.month.apr'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -899,7 +900,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'May',
         text: i18n.t('static.month.may'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -918,7 +919,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Jun',
         text: i18n.t('static.month.jun'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -937,7 +938,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Jul',
         text: i18n.t('static.month.jul'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -956,7 +957,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Aug',
         text: i18n.t('static.month.aug'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -975,7 +976,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Sep',
         text: i18n.t('static.month.sep'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -994,7 +995,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Oct',
         text: i18n.t('static.month.oct'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -1013,7 +1014,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Nov',
         text: i18n.t('static.month.nov'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -1032,7 +1033,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Dec',
         text: i18n.t('static.month.dec'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -1064,32 +1065,32 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center'
       },
       {
         dataField: 'Q1',
         text: i18n.t('static.common.quarter1'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center'
       }, {
         dataField: 'Q2',
         text: i18n.t('static.common.quarter2'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center'
       }, {
         dataField: 'Q3',
         text: i18n.t('static.common.quarter3'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center'
       }, {
         dataField: 'Q4',
         text: i18n.t('static.common.quarter4'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center'
       }]
 
