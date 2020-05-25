@@ -962,7 +962,6 @@ export default class ConsumptionDetails extends React.Component {
 
                                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
-
                                                     } else if (shipmentList.shipmentStatus.id == 3 && shipmentList.procurementAgent.id != 1) {//submitted
 
                                                         //submitted-notpsm
@@ -1913,8 +1912,7 @@ export default class ConsumptionDetails extends React.Component {
 
             let rowIndex1 = this.state.rowIndex1;
 
-            var elInstance = this.state.shipmentEL;
-            var tableJson = elInstance.getJson();
+
             var db1;
             var storeOS;
             getDatabase();
@@ -1960,6 +1958,8 @@ export default class ConsumptionDetails extends React.Component {
                     let shipmentDataListNotFiltered = (programJson.shipmentList);
 
                     if (shipmentDataList[0].shipmentStatus.id == 2) {
+                        var elInstance = this.state.shipmentEL;
+                        var tableJson = elInstance.getJson();
 
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
@@ -2081,6 +2081,7 @@ export default class ConsumptionDetails extends React.Component {
                         }
 
                     } else if (shipmentDataList[0].shipmentStatus.id == 7) {
+                        var tableJson = this.el.getJson();
 
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
@@ -2094,6 +2095,8 @@ export default class ConsumptionDetails extends React.Component {
                         }
 
                     } else if (shipmentDataList[0].shipmentStatus.id == 3 && shipmentDataList[0].procurementAgent.id != 1) {
+
+                        var tableJson = this.el.getJson();
 
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
@@ -2115,6 +2118,8 @@ export default class ConsumptionDetails extends React.Component {
                         }
 
                     } else if ((shipmentDataList[0].shipmentStatus.id == 4 || shipmentDataList[0].shipmentStatus.id == 5 || shipmentDataList[0].shipmentStatus.id == 6) && shipmentDataList[0].procurementAgent.id != 1) {
+
+                        var tableJson = this.el.getJson();
 
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));

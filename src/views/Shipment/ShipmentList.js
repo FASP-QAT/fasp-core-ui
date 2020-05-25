@@ -403,7 +403,8 @@ export default class LanguageListComponent extends Component {
                                                 bsSize="sm"
                                                 value={this.state.filterBy}
                                                 name="filterBy" id="filterBy"
-                                            // onChange={this.displayInsertRowButton}
+                                                // onChange={this.displayInsertRowButton}
+                                                onChange={this.formSubmit}
                                             >
                                                 {/* <option value="0">Please select</option> */}
                                                 <option value="1">Ordered Date</option>
@@ -427,6 +428,7 @@ export default class LanguageListComponent extends Component {
                                                 lang={pickerLang}
                                                 //theme="light"
                                                 onChange={this.handleRangeChange}
+                                                // onChange={this.formSubmit}
                                                 onDismiss={this.handleRangeDissmis}
                                             >
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
