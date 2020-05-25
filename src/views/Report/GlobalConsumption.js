@@ -922,8 +922,8 @@ if(productCategoryId!=-1){
                     this.state.consumptions.length > 0
                     &&
                     <div className="col-md-12">
-                    <div className="col-md-9">
-                      <div className="chart-wrapper chart-graph">
+                    <div className="col-md-12">
+                      <div className="chart-wrapper chart-graph-report">
                         <Bar id="cool-canvas" data={bar} options={options} />
                       </div>
                     </div>   <div className="col-md-12">
@@ -941,9 +941,9 @@ if(productCategoryId!=-1){
 
                         <thead>
                           <tr>
-                          <th className="text-center"> {i18n.t('static.dashboard.country')} </th>
-                            <th className="text-center"> {i18n.t('static.report.month')} </th>
-                            <th className="text-center">{i18n.t('static.consumption.consumptionqty')}</th>
+                          <th className="text-center" style={{width:'34%'}}> {i18n.t('static.dashboard.country')} </th>
+                            <th className="text-center " style={{width:'34%'}}> {i18n.t('static.report.month')} </th>
+                            <th className="text-center" style={{width:'34%'}}>{i18n.t('static.consumption.consumptionqty')}</th>
                               </tr>
                         </thead>
                        
@@ -960,7 +960,7 @@ if(productCategoryId!=-1){
 
                                     {this.state.consumptions[idx].consumptionDateString}
                                   </td>
-                                  <td>
+                                  <td >
                                     {this.state.consumptions[idx].planningUnitQty}
                                   </td>
                                  </tr>)

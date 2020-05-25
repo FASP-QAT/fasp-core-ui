@@ -697,11 +697,11 @@ this.fetchData();
 
                         <thead>
                           <tr>
-                            <th className="text-center"> {i18n.t('static.report.month')} </th>
-                            <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
-                            <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
-                            <th className="text-center">{i18n.t('static.report.errorperc')}</th>
-                            <th className="text-center">{i18n.t('static.report.noofmonth')}</th>
+                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.month')} </th>
+                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.forecastConsumption')} </th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.actualConsumption')}</th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.errorperc')}</th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.noofmonth')}</th>
                           </tr>
                         </thead>
                        
@@ -711,7 +711,7 @@ this.fetchData();
                               &&
                               this.state.matricsList.map((item, idx) =>
 
-                                <tr align="right" id="addr0" key={idx} >
+                                <tr id="addr0" key={idx} >
                                 
                                   <td>{this.state.matricsList[idx].consumptionDateString}</td>
                                   <td>
