@@ -42,10 +42,12 @@ class DefaultLayout extends Component {
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
     var bfunction = [];
+    if(curUserBusinessFunctions != null && curUserBusinessFunctions != ""){
     for (let i = 0; i < curUserBusinessFunctions.length; i++) {
       bfunction.push(curUserBusinessFunctions[i].authority);
     }
     this.setState({ businessFunctions: bfunction });
+  }
 
   }
 
@@ -474,6 +476,11 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.inventorydetails'),
                             url: '/inventory/addInventory',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: 'Shipment Details',
+                            url: '/shipment/shipmentList',
                             icon: 'fa fa-list',
                           }
                         ]
