@@ -957,6 +957,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             copyCompatibility: true,
                                                             paginationOptions: [10, 25, 50, 100],
                                                             position: 'top',
+                                                            contextMenu: false
                                                         };
 
                                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
@@ -1118,6 +1119,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             copyCompatibility: true,
                                                             paginationOptions: [10, 25, 50, 100],
                                                             position: 'top',
+                                                            contextMenu: false
                                                         };
 
                                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
@@ -1280,6 +1282,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
                                                                 position: 'top',
+                                                                contextMenu: false
                                                             };
 
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
@@ -1440,6 +1443,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
                                                                 position: 'top',
+                                                                contextMenu: false
                                                             };
 
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);

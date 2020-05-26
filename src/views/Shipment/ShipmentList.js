@@ -272,16 +272,64 @@ export default class LanguageListComponent extends Component {
 
                 console.log("d1111111111---> ", dateFilterList);
 
-                this.setState({
-                    shipmentList: dateFilterList,
-                    selSource: dateFilterList
-                },
-                    () => {
-                        // console.log("dateFilterList---> ", dateFilterList);
-                    });
+                var procurementAgentObjList = [];
+                var shipmentStatusList = [];
+                let finalShipmentList = [];
 
-                document.getElementById("TableCust").style.display = "block";
+                var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                var planningUnitOs = planningUnitTransaction.objectStore('planningUnit');
+                var planningUnitRequest = planningUnitOs.getAll();
 
+                planningUnitRequest.onsuccess = function (event) {
+                    var planningUnitResult = [];
+                    planningUnitResult = planningUnitRequest.result;
+
+                    for (var k = 0; k < planningUnitResult.length; k++) {
+
+                        for (var i = 0; i < dateFilterList.length; i++) {
+                            if (planningUnitResult[k].planningUnitId == dateFilterList[i].planningUnit.id) {
+                                dateFilterList[i].planningUnit.label.label_en = planningUnitResult[k].label.label_en;
+                            }
+                        }
+                    }
+
+                    var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                    var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
+                    var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
+
+
+                    allowShipmentStatusRequest.onsuccess = function (event) {
+                        var allowShipmentStatusResult = [];
+                        allowShipmentStatusResult = allowShipmentStatusRequest.result;
+                        for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                            // if (shipmentList.shipmentStatus.id == allowShipmentStatusResult[k].shipmentStatusId) {
+                            //     shipmentStatusList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
+                            // }
+                            for (var i = 0; i < dateFilterList.length; i++) {
+                                if (dateFilterList[i].shipmentStatus.id == allowShipmentStatusResult[k].shipmentStatusId) {
+                                    dateFilterList[i].shipmentStatus.label.label_en = allowShipmentStatusResult[k].label.label_en;
+                                }
+                            }
+                        }
+
+
+
+                        console.log("d2222222222222---> ", dateFilterList);
+
+
+
+                        this.setState({
+                            shipmentList: dateFilterList,
+                            selSource: dateFilterList
+                        },
+                            () => {
+                                // console.log("dateFilterList---> ", dateFilterList);
+                            });
+
+                        document.getElementById("TableCust").style.display = "block";
+
+                    }.bind(this);
+                }.bind(this);
             }.bind(this);
         }.bind(this);
     }.bind(this);
