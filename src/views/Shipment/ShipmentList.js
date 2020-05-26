@@ -383,19 +383,19 @@ export default class LanguageListComponent extends Component {
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'shipmentStatus.label',
+            dataField: 'shipmentStatus.label.label_en',
             text: 'Shipment Status',
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter: this.formatLabel
+            // formatter: this.formatLabel
         }, {
-            dataField: 'planningUnit.label',
+            dataField: 'planningUnit.label.label_en',
             text: 'Planning Unit',
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter: this.formatLabel
+            // formatter: this.formatLabel
         },
         {
             dataField: 'suggestedQty',
