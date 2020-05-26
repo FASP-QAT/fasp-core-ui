@@ -957,7 +957,24 @@ export default class ConsumptionDetails extends React.Component {
                                                             copyCompatibility: true,
                                                             paginationOptions: [10, 25, 50, 100],
                                                             position: 'top',
-                                                            contextMenu: false
+                                                            // contextMenu: false
+                                                            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                                         };
 
                                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
@@ -1132,7 +1149,7 @@ export default class ConsumptionDetails extends React.Component {
                                                     } else if (shipmentList.shipmentStatus.id == 3 || shipmentList.shipmentStatus.id == 4 || shipmentList.shipmentStatus.id == 5 || shipmentList.shipmentStatus.id == 6) {
 
                                                         if (shipmentList.procurementAgent.id == 1) {//approved-psm
-
+                                                            document.getElementById("saveButton").style.display = "none";
                                                             document.getElementById("addButton").style.display = "none";
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
                                                             this.el.destroy();
@@ -2215,7 +2232,7 @@ export default class ConsumptionDetails extends React.Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.backClicked}><i className="fa fa-times"></i> {i18n.t('static.common.back')}</Button>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} id="saveButton" ><i className="fa fa-check"></i>Save Data</Button>
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} id="addButton"><i className="fa fa-check"></i>Add Row</Button>
 
                                 &nbsp;
