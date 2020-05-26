@@ -691,10 +691,13 @@ label.arrow_label:after {
     }
 
     .ReportFirstHead>.react-bootstrap-table>.table thead tr th:first-child {
-      width: 95px !important;
+      width: 60px !important;
+    }
+    .ReportFirstHead>.react-bootstrap-table>.table thead tr th{
+      width: 60px !important;
     }
 
-// #consumptionDetailsTable .jexcel_content .tbody tr {}
+    // #consumptionDetailsTable>.jexcel_content>.jexcel > tbody > tr > td:nth-child(4)  {text-align: right;}
   //   #hideMe {
   //     -webkit-animation: cssAnimation 8s forwards; 
   //     animation: cssAnimation 8s forwards;
