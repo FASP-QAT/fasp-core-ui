@@ -473,6 +473,7 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
+  padding: 5px 0 !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -591,37 +592,6 @@ label.arrow_label:after {
   border-radius: 0.25rem;
 }
 
-// table loader
-#loader {
-  border: 12px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 12px solid #444444;
-  width: 45px;
-  height: 45px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.order-1{
-  width: 50px !important;
-}
-
-// .center {
-//   position: absolute;
-//   top: 0;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-//   margin: auto;
-// }
-// .order-1 :first-child {
-//  display: none;
-// }
 
 .RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
@@ -721,10 +691,28 @@ label.arrow_label:after {
     }
 
     .ReportFirstHead>.react-bootstrap-table>.table thead tr th:first-child {
-width: 180px !important;
+      width: 60px !important;
+    }
+    .ReportFirstHead>.react-bootstrap-table>.table thead tr th{
+      width: 60px !important;
     }
 
-
+    // #consumptionDetailsTable>.jexcel_content>.jexcel > tbody > tr > td:nth-child(4)  {text-align: right;}
+  //   #hideMe {
+  //     -webkit-animation: cssAnimation 8s forwards; 
+  //     animation: cssAnimation 8s forwards;
+  //     // display: block;
+  // }
+  // @keyframes cssAnimation {
+  //     0%   {opacity: 1;}
+  //     90%  {opacity: 1;}
+  //     100% {opacity: 0;}
+  // }
+  // @-webkit-keyframes cssAnimation {
+  //     0%   {opacity: 1;}
+  //     90%  {opacity: 1;}
+  //     100% {opacity: 0;}
+  // }
 
 // .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 
@@ -1806,7 +1794,7 @@ input::placeholder {
 }
 ///////Report Consumption globe
 .css-1r4vtzz {
-padding: 1px 8px 5px 8px !important;
+padding: 1px 8px 5px 10px !important;
 background-color: #FFF;
  box-shadow: none !important;
 color: #515151;
@@ -1820,9 +1808,14 @@ text-decoration: none;
  max-width: none!important; 
 position: relative!important;
 display: flex!important;
-flex-wrap: wrap!important;
+// flex-wrap: wrap!important;
+overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
 align-items: stretch!important;
-width: 238%!important;
+// width: 238%!important;
+width: 229px!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
 border: 1px solid #e4e7ea!important;
@@ -1833,7 +1826,7 @@ border-radius: 0.2rem!important;
 }
 .css-48ayfv
 {
-  padding: 1px 8px 5px 8px !important;
+  padding: 1px 8px 5px 10px !important;
   background-color: #FFF;
    box-shadow: none !important;
   color: #515151;
@@ -1847,9 +1840,14 @@ border-radius: 0.2rem!important;
    max-width: none!important; 
   position: relative!important;
   display: flex!important;
-  flex-wrap: wrap!important;
+  // flex-wrap: wrap!important;
   align-items: stretch!important;
-  width: 238%!important;
+  width: 229px!important;
+  overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
+  // width: 238%!important;
   height: calc(1.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
   border: 1px solid #e4e7ea!important;
@@ -1858,15 +1856,19 @@ border-radius: 0.2rem!important;
   border-radius: 0.2rem!important;
   
 }
+.css-1gpjby2 {
+
+  margin: 0px -12px!important;
+}
 
 @media (max-width: 768px){
 .css-1r4vtzz
 {
-  width: 175%!important;
+  width: 380px!important;
 }
 .css-48ayfv
 {
-  width: 175%!important;
+  width: 380px!important;
 }
 .css-1jllj6i-control {
   min-height: 30px!important;
@@ -1887,13 +1889,34 @@ border-radius: 0.2rem!important;
 @media only screen and (max-width: 1024px) {
   .css-1r4vtzz
 {
-  width: 180%!important;
+  width: 157px!important;
 }
 .css-48ayfv
 {
-  width: 180%!important;
+  width: 157px!important;
 }
 }
+@media screen and (min-width: 1920px) {
+  .css-48ayfv{
+    width: 380px!important;
+    overflow: hidden;
+  word-wrap: normal !important;
+  white-space: normal;
+  text-overflow: ellipsis;
+  }
+  .css-1r4vtzz {
+   
+    overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+    align-items: stretch!important;
+    // width: 238%!important;
+    width: 380px!important;
+
+    
+    }
+  }
 .css-1hwfws3
 {
   height: calc(1.5em + 0.5rem + -1px) !important;
@@ -1921,11 +1944,16 @@ border-radius: 0.2rem!important;
 // }
 
 .supplyplanformulas{
-  color: #212721 !important;
-  font-size: 11px!important;
+  color: #20a8d8 !important;
+  font-size: 12px!important;
   font-weight: bold!important;
 }
 .formulasheading{
   font-size:14px!important;
   font-weight: bold!important;
+  color: #212721!important;
+}
+.formulastext{
+
+  color: #212721!important;
 }

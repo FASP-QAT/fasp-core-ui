@@ -117,9 +117,11 @@ class Login extends Component {
   }
 
   incorrectPassmessageHide() {
-    console.log("forgotpass msg");
-    setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
+    console.log("-----------------incorrectPassmessageHide---------------");
+    // setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     setTimeout(function () { document.getElementById('div2').style.display = 'none'; }, 8000);
+    var incorrectPassword = document.getElementById('div2');
+    incorrectPassword.style.color = 'red';
     this.setState({
       message: ''
     },
@@ -129,14 +131,24 @@ class Login extends Component {
 
 
 
-        
+
       });
   }
 
   logoutMessagehide() {
-    console.log("logout");
+    console.log("-----------logoutMessagehide---------------");
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
-    setTimeout(function () {var div2= document.getElementById('div2').style.display = 'none';}, 8000);
+    var logoutMessage = document.getElementById('div1');
+    var htmlContent = logoutMessage.innerHTML;
+    console.log("htnl content.......",htmlContent);
+    if(htmlContent.includes('Cancelled')){
+      logoutMessage.style.color = 'red';
+    }
+    else{
+      logoutMessage.style.color = 'green';
+    }
+   
+    // setTimeout(function () {var div2= document.getElementById('div2').style.display = 'none';}, 8000);
     this.setState({
       message: ''
     },
@@ -335,8 +347,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                        official U.S. government information and does not represent the views or positions of the
-                                        Agency for International Development or the U.S. government.
+                                                      official U.S. government information and does not represent the views or positions of the
+                                                      Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

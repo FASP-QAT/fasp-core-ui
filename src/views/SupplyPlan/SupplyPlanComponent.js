@@ -6233,7 +6233,7 @@ export default class SupplyPlanComponent extends React.Component {
                             <strong>Supply plan</strong>
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">Supply Plan Formulas</small></Link>
+                                    <Link to='/supplyPlanFormulas'><small className="supplyplanformulas">Supply Plan Formulas</small></Link>
                                 </a>
                             </div>
                         </CardHeader>
@@ -6313,10 +6313,10 @@ export default class SupplyPlanComponent extends React.Component {
                                 <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                     <thead>
                                         <tr>
-                                            <th></th>
+                                            <th ></th>
                                             {
                                                 this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                    <th>{item.month}</th>
+                                                    <th style={{padding :'10px 0 !important'}}>{item.month}</th>
                                                 ))
                                             }
                                         </tr>
@@ -6325,129 +6325,129 @@ export default class SupplyPlanComponent extends React.Component {
                                         <MyMenu props />
                                         <NoSkip props />
                                         <tr>
-                                            <td>Opening Balance</td>
+                                            <td align="left">Opening Balance</td>
                                             {
                                                 this.state.openingBalanceArray.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
                                         <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
-                                            <td>Consumption</td>
+                                            <td align="left">Consumption</td>
                                             {
                                                 this.state.consumptionTotalData.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
                                         <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
-                                            <td>Suggested Shipments</td>
+                                            <td align="left">Suggested Shipments</td>
                                             {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
-                                                        return (<td className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                     } else {
-                                                        return (<td>{item1}</td>)
+                                                        return (<td align="right" >{item1}</td>)
                                                     }
                                                 })
                                             }
                                         </tr>
                                         <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
-                                            <td>PSM Shipments in QAT</td>
+                                            <td align="left">PSM Shipments in QAT</td>
                                             {
                                                 this.state.psmShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.accountFlag == true) {
-                                                            return (<td className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
-                                                            return (<td className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         }
                                                     } else {
-                                                        return (<td>{item1}</td>)
+                                                        return (<td align="right" >{item1}</td>)
                                                     }
                                                 })
                                             }
                                         </tr>
 
                                         <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
-                                            <td>PSM Shipments from ARTMIS</td>
+                                            <td align="left">PSM Shipments from ARTMIS</td>
                                             {
                                                 this.state.artmisShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.accountFlag == true) {
-                                                            return (<td className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
-                                                            return (<td style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         }
                                                     } else {
-                                                        return (<td>{item1}</td>)
+                                                        return (<td align="right" > {item1}</td>)
                                                     }
                                                 })
                                             }
                                         </tr>
 
                                         <tr style={{ "backgroundColor": "rgb(207, 226, 243)" }}>
-                                            <td>Non PSM Shipment</td>
+                                            <td align="left">Non PSM Shipment</td>
                                             {
                                                 this.state.nonPsmShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.accountFlag == true) {
-                                                            return (<td onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         } else {
-                                                            return (<td onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                         }
                                                     } else {
-                                                        return (<td>{item1}</td>)
+                                                        return (<td align="right" >{item1}</td>)
                                                     }
                                                 })
                                             }
                                         </tr>
 
                                         <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
-                                            <td>Adjustments</td>
+                                            <td align="left">Adjustments</td>
                                             {
                                                 this.state.inventoryTotalData.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
                                         <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
-                                            <td>Ending Balance</td>
+                                            <td align="left">Ending Balance</td>
                                             {
                                                 this.state.closingBalanceArray.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
                                         <tr>
-                                            <td>AMC</td>
+                                            <td align="left">AMC</td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
                                         <tr>
-                                            <td>Months of Stock</td>
+                                            <td align="left">Months of Stock</td>
                                             {
                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
                                         <tr>
-                                            <td>Min stock</td>
+                                            <td align="left">Min stock</td>
                                             {
                                                 this.state.minStockArray.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
                                         <tr>
-                                            <td>Max stock</td>
+                                            <td align="left">Max stock</td>
                                             {
                                                 this.state.maxStockArray.map(item1 => (
-                                                    <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                                    <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
                                                 ))
                                             }
                                         </tr>
@@ -6486,17 +6486,17 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.regionListFiltered.map(item => (
                                                     <tr>
-                                                        <td>{item.name}</td>
+                                                        <td align="left">{item.name}</td>
                                                         {
                                                             this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
                                                                 if (item1.consumptionQty.toString() != '') {
                                                                     if (item1.actualFlag.toString() == 'true') {
-                                                                        return (<td className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                                     } else {
-                                                                        return (<td style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                        return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                                     }
                                                                 } else {
-                                                                    return (<td></td>)
+                                                                    return (<td align="right"></td>)
                                                                 }
                                                             })
                                                         }
@@ -6507,10 +6507,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th>Total</th>
+                                                <th style={{textAlign:'left'}}>Total</th>
                                                 {
                                                     this.state.consumptionTotalMonthWise.map(item => (
-                                                        <th><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                        <th style={{textAlign:'right'}}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
                                                     ))
                                                 }
                                             </tr>
@@ -6551,13 +6551,13 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.regionListFiltered.map(item => (
                                                     <tr>
-                                                        <td>{item.name}</td>
+                                                        <td style={{textAlign:'left'}}>{item.name}</td>
                                                         {
                                                             this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
                                                                 if (item1.adjustmentQty.toString() != '') {
-                                                                    return (<td className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
+                                                                    return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
                                                                 } else {
-                                                                    return (<td></td>)
+                                                                    return (<td align="right"></td>)
                                                                 }
                                                             })
                                                         }
@@ -6568,10 +6568,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th>Total</th>
+                                                <th style={{textAlign:'left'}}>Total</th>
                                                 {
                                                     this.state.inventoryTotalMonthWise.map(item => (
-                                                        <th><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                        <th style={{textAlign:'right'}}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
                                                     ))
                                                 }
                                             </tr>

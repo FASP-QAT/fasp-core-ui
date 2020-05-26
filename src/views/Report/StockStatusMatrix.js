@@ -692,6 +692,7 @@ export default class StockStatusMatrix extends React.Component {
 
     doc.setFontSize(15);
 
+
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     const headers = [];
     columns.map((item, idx) => { headers[idx] = item.text });
@@ -715,19 +716,33 @@ export default class StockStatusMatrix extends React.Component {
       body: this.state.view == 1 ? data1 : data2,
       columnStyles: {
         0: { cellWidth: 120 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 40 },
-        3: { cellWidth: 40 },
-        4: { cellWidth: 40 },
-        5: { cellWidth: 40 },
-        6: { cellWidth: 40 },
-        7: { cellWidth: 40 },
-        8: { cellWidth: 40 },
-        9: { cellWidth: 40 },
-        10: { cellWidth: 40 },
-        11: { cellWidth: 40 },
-        12: { cellWidth: 40 },
-        13: { cellWidth: 40 }
+        1: { cellWidth: 15 },
+        2: { cellWidth: 15 },
+        3: { cellWidth: 15 },
+        4: { cellWidth: 15 },
+        5: { cellWidth: 15 },
+        6: { cellWidth: 15 },
+        7: { cellWidth: 15 },
+        8: { cellWidth: 15 },
+        9: { cellWidth: 15 },
+        10: { cellWidth: 15 },
+        11: { cellWidth: 15 },
+        12: { cellWidth: 15 },
+        13: { cellWidth: 15 },
+
+        1: { halign: 'right' },
+        2: { halign: 'right' },
+        3: { halign: 'right' },
+        4: { halign: 'right' },
+        5: { halign: 'right' },
+        6: { halign: 'right' },
+        7: { halign: 'right' },
+        8: { halign: 'right' },
+        9: { halign: 'right' },
+        10: { halign: 'right' },
+        11: { halign: 'right' },
+        12: { halign: 'right' },
+        13: { halign: 'right' },
       }
     };
 
@@ -811,20 +826,20 @@ export default class StockStatusMatrix extends React.Component {
         sort: true,
         align: 'left',
         headerAlign: 'left',
-        width:'180'
+        width: '180'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'center'
       },
       {
         dataField: 'Jan',
         text: i18n.t('static.month.jan'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Jan
@@ -843,7 +858,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.feb'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Feb
@@ -862,7 +877,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.mar'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Mar
@@ -881,7 +896,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.apr'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Apr
@@ -900,7 +915,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.may'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.May
@@ -919,7 +934,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.jun'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Jun
@@ -938,7 +953,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.jul'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Jul
@@ -956,7 +971,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'Aug',
         text: i18n.t('static.month.aug'),
         sort: true,
-        align: 'center',
+        align: 'right',
         headerAlign: 'center',
         formatter: (cell, row) => {
 
@@ -976,7 +991,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.sep'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Sep
@@ -995,7 +1010,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.oct'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Oct
@@ -1014,7 +1029,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.nov'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Nov
@@ -1033,7 +1048,7 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.month.dec'),
         sort: true,
         align: 'right',
-        headerAlign: 'right',
+        headerAlign: 'center',
         formatter: (cell, row) => {
 
           var cell1 = row.Dec
@@ -1059,38 +1074,38 @@ export default class StockStatusMatrix extends React.Component {
         sort: true,
         align: 'left',
         headerAlign: 'left',
-        width:'180'
+        width: '180'
       }, {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'center'
       },
       {
         dataField: 'Q1',
         text: i18n.t('static.common.quarter1'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'center'
       }, {
         dataField: 'Q2',
         text: i18n.t('static.common.quarter2'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'center'
       }, {
         dataField: 'Q3',
         text: i18n.t('static.common.quarter3'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'center'
       }, {
         dataField: 'Q4',
         text: i18n.t('static.common.quarter4'),
         sort: true,
         align: 'right',
-        headerAlign: 'right'
+        headerAlign: 'center'
       }]
 
     const options = {
