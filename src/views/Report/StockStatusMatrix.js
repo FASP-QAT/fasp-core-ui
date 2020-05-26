@@ -831,7 +831,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center'
       },
       {
@@ -1079,7 +1079,7 @@ export default class StockStatusMatrix extends React.Component {
         dataField: 'YEAR',
         text: i18n.t('static.common.year'),
         sort: true,
-        align: 'right',
+        align: 'center',
         headerAlign: 'center'
       },
       {
