@@ -269,7 +269,8 @@ class ForcastMatrixOverTime extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4,'','FAST' );
+    // doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4,'','FAST' );
+    doc.addImage(canvasImg, 'png', 50, 200,750,290,'CANVAS');
     const headers =[ [   i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.errorperc'),i18n.t('static.report.noofmonth')]];
     const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,elt.forecastError*100,elt.monthsInCalc]);

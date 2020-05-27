@@ -284,7 +284,7 @@ class Consumption extends Component {
     var h1 = 50;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 150, aspectwidth1, height * 2 / 3);
+    doc.addImage(canvasImg, 'png', 50, 200,750,290,'CANVAS');
       
       const headers =[[i18n.t('static.dashboard.country'),i18n.t('static.report.month'),i18n.t('static.consumption.consumptionqty')]]
       const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),elt.consumptionDateString,elt.planningUnitQty]);
@@ -916,6 +916,7 @@ if(productCategoryId!=-1){
                 </Col>
               </Form>
               <Col md="12 pl-0">
+                <div className="globalviwe-scroll">
                 <div className="row">
 
                   {
@@ -969,6 +970,7 @@ if(productCategoryId!=-1){
                           </tbody>
                  </Table>}
 
+                   </div>
                    </div>
                    </div>
               </Col>
