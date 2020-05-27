@@ -275,6 +275,9 @@ export default class SupplyPlanComponent extends React.Component {
             var inventoryTotalData = [];
             var expectedBalTotalData = [];
             var suggestedShipmentsTotalData = [];
+            for (var i = 3; i < 21; i++) {
+                suggestedShipmentsTotalData.push("");
+            }
             var inventoryTotalMonthWise = [];
             var filteredArrayInventory = [];
             var openingBalanceArray = [];
@@ -487,14 +490,10 @@ export default class SupplyPlanComponent extends React.Component {
 
                 // Shipments part
                 var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 7);
-                console.log("Shipment List initial", shipmentList);
                 for (var i = 3; i < 21; i++) {
                     var psm = shipmentList.filter(c => (c.expectedDeliveryDate >= m[i].startDate && c.expectedDeliveryDate <= m[i].endDate) && c.erpFlag == false && c.procurementAgent.id == 1)
-                    console.log("PSM SHipment data", psm);
                     var nonPsm = shipmentList.filter(c => (c.expectedDeliveryDate >= m[i].startDate && c.expectedDeliveryDate <= m[i].endDate) && c.procurementAgent.id != 1)
-                    console.log("Non PSM", nonPsm);
                     var artmisShipments = shipmentList.filter(c => (c.expectedDeliveryDate >= m[i].startDate && c.expectedDeliveryDate <= m[i].endDate) && c.erpFlag == true)
-                    console.log("ARTMIS", artmisShipments)
                     var psmQty = 0;
                     var psmToBeAccounted = 0;
                     var nonPsmQty = 0;
@@ -568,25 +567,17 @@ export default class SupplyPlanComponent extends React.Component {
                     totalAdjustments += parseFloat((adjustmentsRemainingList[j].adjustmentQty * adjustmentsRemainingList[j].multiplier));
                 }
 
-                openingBalance = totalAdjustments - totalConsumption;
+                var shipmentsRemainingList = shipmentList.filter(c => c.orderedDate < m[3].startDate && c.accountFlag == true);
+                for (var j = 0; j < shipmentsRemainingList.length; j++) {
+                    totalShipments += parseFloat((shipmentsRemainingList[j].quantity));
+                }
+                console.log("totalAdjustments", totalAdjustments);
+                console.log("Total consumption", totalConsumption);
+                console.log("Total shipments", totalShipments);
+                openingBalance = totalAdjustments - totalConsumption + totalShipments;
+                console.log("Opening balance", openingBalance);
                 openingBalanceArray.push(openingBalance);
                 for (var i = 1; i <= 18; i++) {
-                    // Suggested shipments part
-                    var s = i - 1;
-                    var month = m[s + 3].startDate;
-                    var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-                    var compare = (month >= currentMonth);
-                    if (compare && parseInt(openingBalanceArray[s]) <= parseInt(minStockArray[s])) {
-                        var suggestedOrd = parseInt(maxStockArray[s] - minStockArray[s]);
-                        if (suggestedOrd == 0) {
-                            suggestedShipmentsTotalData.push("");
-                        } else {
-                            suggestedShipmentsTotalData.push({ "suggestedOrderQty": suggestedOrd, "month": m[s + 3].startDate });
-                        }
-                    } else {
-                        suggestedShipmentsTotalData.push("");
-                    }
-
                     var consumptionQtyForCB = 0;
                     if (consumptionTotalData[i - 1] != "") {
                         consumptionQtyForCB = consumptionTotalData[i - 1];
@@ -594,11 +585,6 @@ export default class SupplyPlanComponent extends React.Component {
                     var inventoryQtyForCB = 0;
                     if (inventoryTotalData[i - 1] != "") {
                         inventoryQtyForCB = inventoryTotalData[i - 1];
-                    }
-
-                    var suggestedShipmentsQty = 0;
-                    if (suggestedShipmentsTotalData[i - 1] != "") {
-                        suggestedShipmentsQty = suggestedShipmentsTotalData[i - 1].suggestedOrderQty;
                     }
 
                     var psmShipmentQtyForCB = 0;
@@ -615,13 +601,73 @@ export default class SupplyPlanComponent extends React.Component {
                     if (artmisShipmentsTotalData[i - 1] != "" && artmisShipmentsTotalData[i - 1].accountFlag == true) {
                         artmisShipmentQtyForCB = artmisShipmentsTotalData[i - 1].qty;
                     }
-                    var closingBalance = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB + psmShipmentQtyForCB + nonPsmShipmentQtyForCB + artmisShipmentQtyForCB + suggestedShipmentsQty;
-                    var openingBalanceWithoutShipments = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB + suggestedShipmentsQty;
+                    var closingBalance = openingBalanceArray[i - 1] - consumptionQtyForCB + inventoryQtyForCB + psmShipmentQtyForCB + nonPsmShipmentQtyForCB + artmisShipmentQtyForCB;
                     closingBalanceArray.push(closingBalance);
                     if (i != 18) {
-                        openingBalanceArray.push(openingBalanceWithoutShipments);
+                        openingBalanceArray.push(closingBalance);
                     }
                 }
+
+                // Suggested shipments part
+                for (var s = 0; s < 18; s++) {
+                    var month = m[s + 3].startDate;
+                    var addLeadTimes = parseInt(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
+                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
+                        parseFloat(programJson.shippedToArrivedBySeaLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime)) + 1;
+                    console.log("Add Lead times", addLeadTimes);
+                    console.log("Program Json", programJson);
+                    console.log("programJson.plannedToDraftLeadTime", programJson.plannedToDraftLeadTime);
+                    console.log("programJson.draftToSubmittedLeadTime", programJson.draftToSubmittedLeadTime);
+                    console.log("programJson.submittedToApprovedLeadTime", programJson.submittedToApprovedLeadTime)
+                    console.log("programJson.approvedToShippedLeadTime", programJson.approvedToShippedLeadTime);
+
+                    console.log("programJson.shippedToArrivedBySeaLeadTime", programJson.shippedToArrivedBySeaLeadTime)
+                    console.log("programJson.arrivedToDeliveredLeadTime", programJson.arrivedToDeliveredLeadTime);
+                    var expectedDeliveryDate = moment(month).subtract(addLeadTimes, 'months').format("YYYY-MM-DD");
+                    var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                    var compare = (expectedDeliveryDate >= currentMonth);
+                    if (compare) {
+                        if (parseInt(closingBalanceArray[s]) <= parseInt(minStockArray[s])) {
+                            var suggestedOrd = parseInt(maxStockArray[s] - minStockArray[s]);
+                            if (suggestedOrd == 0) {
+                                // suggestedShipmentsTotalData.push("");
+                            } else {
+                                var index = m.findIndex(c => c.startDate <= expectedDeliveryDate && c.endDate >= expectedDeliveryDate);
+                                if (index != -1) {
+                                    var updatedIndex = index - 3;
+                                    var json = { "suggestedOrderQty": suggestedOrd, "month": m[updatedIndex].startDate }
+                                    suggestedShipmentsTotalData[updatedIndex] = json;
+                                    // suggestedShipmentsTotalData.push(json);
+                                }
+                            }
+                        }
+                    } else {
+                        // suggestedShipmentsTotalData.push("");
+                    }
+                }
+
+
+                for (var s = 0; s < 18; s++) {
+                    var suggestedShipmentQty = 0;
+                    var addLeadTimes = parseInt(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
+                        parseFloat(programJson.sparseFloatubmittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
+                        parseFloat(programJson.shippedToArrivedBySeaLeadTime)) + 1;
+                    for (var j = 0; j < s; j++) {
+                        if ((s - addLeadTimes) > 0 && suggestedShipmentsTotalData[j] != "") {
+                            console.log("J", j, "S", s, "suggestedShipmentsTotalData[j].suggestedOrderQty", suggestedShipmentsTotalData[j].suggestedOrderQty, 'AddLead Times', addLeadTimes);
+                            suggestedShipmentQty = suggestedShipmentQty + suggestedShipmentsTotalData[j - 1].suggestedOrderQty;
+                        }
+                    }
+                    console.log("Suggested Order Qty", suggestedShipmentQty);
+                    console.log("parseInt(openingBalanceArray[s]", parseInt(openingBalanceArray[s]));
+                    if (parseInt(closingBalanceArray[s] + suggestedShipmentQty) <= parseInt(minStockArray[s])) {
+
+                    } else {
+                        suggestedShipmentsTotalData[s] = "";
+                    }
+
+                }
+
 
                 // Calculations for monthsOfStock
                 for (var s = 0; s < 18; s++) {
@@ -681,8 +727,6 @@ export default class SupplyPlanComponent extends React.Component {
                 suggestedShipments: !this.state.suggestedShipments,
             });
             this.suggestedShipmentsDetailsClicked(month, quantity);
-            console.log("Month-------->", month);
-            console.log("Quantity----->", quantity);
         } else if (supplyPlanType == 'psmShipments') {
             this.setState({
                 psmShipments: !this.state.psmShipments
@@ -1396,22 +1440,12 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                console.log("Program Json", programJson);
 
-                var addLeadTimes = Math.floor(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
-                    parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
-                    parseFloat(programJson.deliveredToReceivedLeadTime));
-                console.log("parseFloat(programJson.plannedToDraftLeadTime)", parseFloat(programJson.plannedToDraftLeadTime));
-                console.log("parseFloat(programJson.draftToSubmittedLeadTime)", parseFloat(programJson.draftToSubmittedLeadTime));
-                console.log("parseFloat(programJson.submittedToApprovedLeadTime)", parseFloat(programJson.submittedToApprovedLeadTime));
-                console.log("parseFloat(programJson.approvedToShippedLeadTime)", parseFloat(programJson.approvedToShippedLeadTime));
-                console.log("parseFloat(programJson.deliveredToReceivedLeadTime)", parseFloat(programJson.deliveredToReceivedLeadTime))
-                console.log("Output", Math.floor(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
-                    parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
-                    parseFloat(programJson.deliveredToReceivedLeadTime)));
-                console.log("Add Lead times", addLeadTimes);
-                var expectedDeliveryDateEnFormat = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("MM-DD-YYYY");
-                var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("YYYY-MM-DD");
+                // var addLeadTimes = Math.floor(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
+                //     parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
+                //     parseFloat(programJson.deliveredToReceivedLeadTime));
+                // var expectedDeliveryDateEnFormat = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("MM-DD-YYYY");
+                // var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("YYYY-MM-DD");
                 var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                 var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
                 var papuRequest = papuOs.getAll();
@@ -1454,44 +1488,42 @@ export default class SupplyPlanComponent extends React.Component {
                         var orderedDate = moment(Date.now()).format("YYYY-MM-DD");
                         for (var j = 0; j < suggestedShipmentList.length; j++) {
                             data = [];
-                            data[0] = expectedDeliveryDateEnFormat;
-                            data[1] = "SUGGESTED";
-                            data[2] = this.state.planningUnitName;
+                            // data[0]=expectedDeliveryDateEnFormat;
+                            data[0] = "SUGGESTED";
+                            data[1] = this.state.planningUnitName;
+                            data[2] = suggestedShipmentList[j].suggestedOrderQty;
                             data[3] = suggestedShipmentList[j].suggestedOrderQty;
-                            data[4] = suggestedShipmentList[j].suggestedOrderQty;
+                            data[4] = "";
                             data[5] = "";
-                            data[6] = "";
+                            data[6] = suggestedShipmentList[j].shipmentMode;
                             data[7] = "";
                             data[8] = orderedDate;
-                            data[9] = expectedDeliveryDate
                             suggestedShipmentsArr[j] = data;
                         }
                         var options = {
                             data: suggestedShipmentsArr,
                             colHeaders: [
-                                "Expected delivery date",
                                 "Shipment status",
                                 "Planning unit",
                                 "Suggested order qty",
                                 "Adjusted order qty",
                                 "Data Source",
                                 "Procurement agent",
+                                "Shipment Mode",
                                 "Notes",
                                 "Ordered Date",
-                                "Expected delivery date"
                             ],
-                            colWidths: [80, 150, 200, 80, 80, 150, 350, 80, 80, 80],
+                            colWidths: [150, 200, 80, 80, 150, 350, 150, 150, 80],
                             columns: [
-                                { type: 'text', readOnly: true },
                                 { type: 'text', readOnly: true },
                                 { type: 'text', readOnly: true },
                                 { type: 'numeric', readOnly: true },
                                 { type: 'numeric', readOnly: true },
                                 { type: 'dropdown', source: dataSourceList },
                                 { type: 'dropdown', source: procurementAgentList },
+                                { type: 'dropdown', source: ['Sea', 'Air'] },
                                 { type: 'text' },
                                 { type: 'hidden' },
-                                { type: 'hidden' }
                             ],
                             pagination: false,
                             search: false,
@@ -1519,6 +1551,18 @@ export default class SupplyPlanComponent extends React.Component {
     // Suggested shipment changed 
     suggestedShipmentChanged = function (instance, cell, x, y, value) {
         var elInstance = this.state.suggestedShipmentsEl;
+        if (x == 4) {
+            var col = ("E").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
         if (x == 5) {
             var col = ("F").concat(parseInt(y) + 1);
             if (value == "") {
@@ -1554,6 +1598,19 @@ export default class SupplyPlanComponent extends React.Component {
         var elInstance = this.state.suggestedShipmentsEl;
         var json = elInstance.getJson();
         for (var y = 0; y < json.length; y++) {
+
+            var col = ("E").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(4, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
             var col = ("F").concat(parseInt(y) + 1);
             var value = elInstance.getValueFromCoords(5, y);
             if (value == "") {
@@ -1606,16 +1663,29 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
-                    console.log("Shipment data list", shipmentDataList);
                     var map = new Map(Object.entries(json[0]));
+
+
+                    var addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
+                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
+
+                    if (map.get("6") == "Sea") {
+                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
+                    } else {
+                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredByAirLeadTime);
+                    }
+                    addLeadTimes = parseInt(addLeadTimes) + 1;
+                    console.log("Add lead times", addLeadTimes);
+                    var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("YYYY-MM-DD");
+                    console.log("Expected delivery date", expectedDeliveryDate);
                     var shipmentJson = {
                         accountFlag: true,
                         active: true,
                         dataSource: {
-                            id: map.get("5")
+                            id: map.get("4")
                         },
                         erpFlag: false,
-                        expectedDeliveryDate: map.get("9"),
+                        expectedDeliveryDate: expectedDeliveryDate,
                         freightCost: 0,
                         notes: map.get("7"),
                         orderedDate: map.get("8"),
@@ -1623,22 +1693,22 @@ export default class SupplyPlanComponent extends React.Component {
                             id: planningUnitId
                         },
                         procurementAgent: {
-                            id: map.get("6")
+                            id: map.get("5")
                         },
                         procurementUnit: {
                             id: 0
                         },
                         productCost: 0,
-                        quantity: map.get("3"),
+                        quantity: map.get("2"),
                         rate: 0,
                         receivedDate: "",
                         shipmentId: 0,
-                        shipmentMode: "",
+                        shipmentMode: map.get("6"),
                         shipmentStatus: {
                             id: 1
                         },
                         shippedDate: "",
-                        suggestedQty: map.get("3"),
+                        suggestedQty: map.get("2"),
                         supplier: {
                             id: 0
                         },
@@ -1699,7 +1769,6 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 var airFreightPerc = programJson.airFreightPerc;
                 var seaFreightPerc = programJson.seaFreightPerc;
-                console.log("Program Json", programJson.shipmentList);
                 var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                 var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
                 var papuRequest = papuOs.getAll();
@@ -1808,7 +1877,6 @@ export default class SupplyPlanComponent extends React.Component {
                                         })
                                         var shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate && c.procurementAgent.id == 1 && c.erpFlag == false);
                                         var shipmentListUnFiltered = programJson.shipmentList;
-                                        console.log("shipment List", shipmentList);
                                         this.el = jexcel(document.getElementById("plannedPsmShipmentsDetailsTable"), '');
                                         this.el.destroy();
 
@@ -1824,7 +1892,6 @@ export default class SupplyPlanComponent extends React.Component {
                                         var submittedShipmentArr = [];
                                         for (var i = 0; i < shipmentList.length; i++) {
                                             var procurementAgentPlanningUnit = procurementAgentListAll.filter(p => p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
-                                            console.log("procurementAgentPlanningUnit", procurementAgentPlanningUnit);
                                             var moq = procurementAgentPlanningUnit.moq;
                                             var pricePerPlanningUnit = procurementAgentPlanningUnit.catalogPrice;
                                             var budgetAmount = 0;
@@ -1833,6 +1900,10 @@ export default class SupplyPlanComponent extends React.Component {
                                             for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
                                                 budgetAmount += (shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd);
                                                 budgetJson.push(shipmentBudgetList[sb]);
+                                            }
+                                            var userQty = "";
+                                            if (procurementAgentPlanningUnit.unitsPerPallet != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
+                                                userQty = shipmentList[i].quantity;
                                             }
                                             budgetAmount = budgetAmount.toFixed(2);
                                             data[0] = shipmentList[i].expectedDeliveryDate; // A
@@ -1844,11 +1915,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             data[6] = this.state.planningUnitName; //G
                                             data[7] = shipmentList[i].suggestedQty; //H
                                             data[8] = moq; //I
-                                            data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
-                                            data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
+                                            data[9] = `=IF(Z${i + 1}!=0,IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1}),0)`;
+                                            data[10] = `=IF(AA${i + 1}!=0,IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1}),0)`;
                                             data[11] = ""; // Order based on
                                             data[12] = ""; // Rounding option
-                                            data[13] = shipmentList[i].quantity; // User Qty
+                                            data[13] = userQty; // User Qty
                                             data[14] = `=IF(L${i + 1}==3,
        
                                         IF(M${i + 1}==1,
@@ -1891,14 +1962,14 @@ export default class SupplyPlanComponent extends React.Component {
                                         )
                                 )
                          )`;
-                                            data[15] = `=O${i + 1}/Z${i + 1}`;
-                                            data[16] = `=O${i + 1}/AA${i + 1}`;
+                                            data[15] = `=IF(Z${i + 1}!=0,O${i + 1}/Z${i + 1},0)`;
+                                            data[16] = `=IF(Z${i + 1}!=0,O${i + 1}/AA${i + 1},0)`;
                                             data[17] = shipmentList[i].rate;//Manual price
                                             data[18] = pricePerPlanningUnit;
                                             data[19] = `=ROUND(IF(AND(NOT(ISBLANK(R${i + 1})),(R${i + 1} != 0)),R${i + 1},S${i + 1})*O${i + 1},2)`; //Amount
                                             data[20] = shipmentList[i].shipmentMode;//Shipment method
                                             data[21] = shipmentList[i].freightCost;// Freight Cost
-                                            data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
+                                            data[22] = `=ROUND(IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100),2)`;// Default frieght cost
                                             data[23] = `=ROUND(T${i + 1}+IF(AND(NOT(ISBLANK(V${i + 1})),(V${i + 1}!= 0)),V${i + 1},W${i + 1}),2)`; // Final Amount
                                             data[24] = shipmentList[i].notes;//Notes
                                             data[25] = procurementAgentPlanningUnit.unitsPerPallet;
@@ -1969,6 +2040,36 @@ export default class SupplyPlanComponent extends React.Component {
                                             allowManualInsertRow: false,
                                             copyCompatibility: true,
                                             onchange: this.plannedPsmChanged,
+                                            updateTable: function (el, cell, x, y, source, value, id) {
+                                                var elInstance = el.jexcel;
+                                                var rowData = elInstance.getRowData(y)
+                                                var unitsPerPalletForUpdate = rowData[25];
+                                                var unitsPerContainerForUpdate = rowData[26];
+                                                if (unitsPerPalletForUpdate == 0 || unitsPerContainerForUpdate == 0) {
+                                                    var cell = elInstance.getCell(`J${y + 1}`)
+                                                    cell.classList.add('readonly');
+                                                    var cell = elInstance.getCell(`K${y + 1}`)
+                                                    cell.classList.add('readonly');
+                                                    var cell = elInstance.getCell(`L${y + 1}`)
+                                                    cell.classList.add('readonly');
+                                                    var cell = elInstance.getCell(`M${y + 1}`)
+                                                    cell.classList.add('readonly');
+                                                    var cell = elInstance.getCell(`N${y + 1}`)
+                                                    cell.classList.add('readonly');
+
+                                                } else {
+                                                    var cell = elInstance.getCell(`J${y + 1}`)
+                                                    cell.classList.remove('readonly');
+                                                    var cell = elInstance.getCell(`K${y + 1}`)
+                                                    cell.classList.remove('readonly');
+                                                    var cell = elInstance.getCell(`L${y + 1}`)
+                                                    cell.classList.remove('readonly');
+                                                    var cell = elInstance.getCell(`M${y + 1}`)
+                                                    cell.classList.remove('readonly');
+                                                    var cell = elInstance.getCell(`N${y + 1}`)
+                                                    cell.classList.remove('readonly');
+                                                }
+                                            },
                                             contextMenu: function (obj, x, y, e) {
                                                 var items = [];
                                                 //Add Shipment Budget
@@ -1981,9 +2082,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         var json = [];
                                                         // var elInstance=this.state.plannedPsmShipmentsEl;
                                                         var rowData = obj.getRowData(y)
-                                                        console.log("RowData", rowData);
                                                         var shipmentBudget = rowData[30];
-                                                        console.log("Shipemnt Budget", shipmentBudget);
                                                         for (var sb = 0; sb < shipmentBudget.length; sb++) {
                                                             var data = [];
                                                             data[0] = shipmentBudget[sb].shipmentBudgetId;
@@ -2047,7 +2146,130 @@ export default class SupplyPlanComponent extends React.Component {
                                                             allowDeleteRow: false,
                                                             oneditionend: this.onedit,
                                                             copyCompatibility: true,
-                                                            onchange: this.budgetChanged
+                                                            onchange: this.budgetChanged,
+                                                            contextMenu: function (obj, x, y, e) {
+                                                                var items = [];
+                                                                if (y == null) {
+                                                                    // Insert a new column
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnBefore,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 1);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnAfter,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 0);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // Delete a column
+                                                                    if (obj.options.allowDeleteColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.deleteSelectedColumns,
+                                                                            onclick: function () {
+                                                                                obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                            }
+                                                                        });
+                                                                    }
+
+
+
+                                                                    // Rename column
+                                                                    if (obj.options.allowRenameColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.renameThisColumn,
+                                                                            onclick: function () {
+                                                                                obj.setHeader(x);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // Sorting
+                                                                    if (obj.options.columnSorting == true) {
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        items.push({
+                                                                            title: obj.options.text.orderAscending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 0);
+                                                                            }
+                                                                        });
+                                                                        items.push({
+                                                                            title: obj.options.text.orderDescending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 1);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                } else {
+                                                                    // Insert new row
+                                                                    if (obj.options.allowInsertRow == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewRowAfter,
+                                                                            onclick: function () {
+                                                                                obj.insertRow(1, parseInt(y));
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (obj.options.allowDeleteRow == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.deleteSelectedRows,
+                                                                            onclick: function () {
+                                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (x) {
+                                                                        if (obj.options.allowComments == true) {
+                                                                            items.push({ type: 'line' });
+
+                                                                            var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                            items.push({
+                                                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                onclick: function () {
+                                                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                }
+                                                                            });
+
+                                                                            if (title) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.clearComments,
+                                                                                    onclick: function () {
+                                                                                        obj.setComments([x, y], '');
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                // Line
+                                                                items.push({ type: 'line' });
+
+                                                                // Save
+                                                                if (obj.options.allowExport) {
+                                                                    items.push({
+                                                                        title: obj.options.text.saveAs,
+                                                                        shortcut: 'Ctrl + S',
+                                                                        onclick: function () {
+                                                                            obj.download(true);
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                return items;
+                                                            }.bind(this)
 
                                                         };
                                                         elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
@@ -2179,17 +2401,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         title: obj.options.text.saveAs,
                                                         shortcut: 'Ctrl + S',
                                                         onclick: function () {
-                                                            obj.download();
-                                                        }
-                                                    });
-                                                }
-
-                                                // About
-                                                if (obj.options.about) {
-                                                    items.push({
-                                                        title: obj.options.text.about,
-                                                        onclick: function () {
-                                                            alert(obj.options.about);
+                                                            obj.download(true);
                                                         }
                                                     });
                                                 }
@@ -2200,8 +2412,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             myVar = jexcel(document.getElementById("plannedPsmShipmentsDetailsTable"), options);
                                             this.el = myVar;
                                         }
-
-                                        // Submitted shiments
 
                                         var options = {
                                             data: submittedShipmentArr,
@@ -2264,9 +2474,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         var json = [];
                                                         // var elInstance=this.state.plannedPsmShipmentsEl;
                                                         var rowData = obj.getRowData(y)
-                                                        console.log("RowData", rowData);
                                                         var shipmentBudget = rowData[30];
-                                                        console.log("Shipemnt Budget", shipmentBudget);
                                                         for (var sb = 0; sb < shipmentBudget.length; sb++) {
                                                             var data = [];
                                                             data[0] = shipmentBudget[sb].shipmentBudgetId;
@@ -2333,7 +2541,130 @@ export default class SupplyPlanComponent extends React.Component {
                                                             allowDeleteRow: false,
                                                             oneditionend: this.onedit,
                                                             copyCompatibility: true,
-                                                            editable: false
+                                                            editable: false,
+                                                            contextMenu: function (obj, x, y, e) {
+                                                                var items = [];
+                                                                if (y == null) {
+                                                                    // Insert a new column
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnBefore,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 1);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnAfter,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 0);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // Delete a column
+                                                                    if (obj.options.allowDeleteColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.deleteSelectedColumns,
+                                                                            onclick: function () {
+                                                                                obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                            }
+                                                                        });
+                                                                    }
+
+
+
+                                                                    // Rename column
+                                                                    if (obj.options.allowRenameColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.renameThisColumn,
+                                                                            onclick: function () {
+                                                                                obj.setHeader(x);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // Sorting
+                                                                    if (obj.options.columnSorting == true) {
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        items.push({
+                                                                            title: obj.options.text.orderAscending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 0);
+                                                                            }
+                                                                        });
+                                                                        items.push({
+                                                                            title: obj.options.text.orderDescending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 1);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                } else {
+                                                                    // Insert new row
+                                                                    if (obj.options.allowInsertRow == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewRowAfter,
+                                                                            onclick: function () {
+                                                                                obj.insertRow(1, parseInt(y));
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (obj.options.allowDeleteRow == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.deleteSelectedRows,
+                                                                            onclick: function () {
+                                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (x) {
+                                                                        if (obj.options.allowComments == true) {
+                                                                            items.push({ type: 'line' });
+
+                                                                            var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                            items.push({
+                                                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                onclick: function () {
+                                                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                }
+                                                                            });
+
+                                                                            if (title) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.clearComments,
+                                                                                    onclick: function () {
+                                                                                        obj.setComments([x, y], '');
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                // Line
+                                                                items.push({ type: 'line' });
+
+                                                                // Save
+                                                                if (obj.options.allowExport) {
+                                                                    items.push({
+                                                                        title: obj.options.text.saveAs,
+                                                                        shortcut: 'Ctrl + S',
+                                                                        onclick: function () {
+                                                                            obj.download(true);
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                return items;
+                                                            }.bind(this)
 
                                                         };
                                                         elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
@@ -2465,17 +2796,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         title: obj.options.text.saveAs,
                                                         shortcut: 'Ctrl + S',
                                                         onclick: function () {
-                                                            obj.download();
-                                                        }
-                                                    });
-                                                }
-
-                                                // About
-                                                if (obj.options.about) {
-                                                    items.push({
-                                                        title: obj.options.text.about,
-                                                        onclick: function () {
-                                                            alert(obj.options.about);
+                                                            obj.download(true);
                                                         }
                                                     });
                                                 }
@@ -2507,10 +2828,6 @@ export default class SupplyPlanComponent extends React.Component {
     plannedPsmChanged = function (instance, cell, x, y, value) {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var elInstance = this.state.plannedPsmShipmentsEl;
-        if (x == 30) {
-            console.log("Value------------->", value);
-        }
-
         if (x == 0) {
             var col = ("A").concat(parseInt(y) + 1);
             if (value == "") {
@@ -2578,6 +2895,11 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(18, y, procurementAgentPlanningUnit.catalogPrice, true);
                         elInstance.setValueFromCoords(25, y, procurementAgentPlanningUnit.unitsPerPallet, true);
                         elInstance.setValueFromCoords(26, y, procurementAgentPlanningUnit.unitsPerContainer, true);
+                        if (procurementAgentPlanningUnit.unitsPerPallet == 0 || procurementAgentPlanningUnit.unitsPerPallet == 0) {
+                            elInstance.setValueFromCoords(11, y, "", true);
+                            elInstance.setValueFromCoords(12, y, "", true);
+                            elInstance.setValueFromCoords(13, y, "", true);
+                        }
                     }.bind(this)
                 }.bind(this)
             }
@@ -2720,9 +3042,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             var budgetAmount = (elInstance.getValueFromCoords(29, y));
             budgetAmount = parseFloat(budgetAmount).toFixed(2);
-            var totalAmount = parseFloat((elInstance.getCell(`X${y}`)).innerHTML).toFixed(2);
-            console.log("BudgetAmount", budgetAmount);
-            console.log("Total AMount", totalAmount);
+            var totalAmount = parseFloat((elInstance.getCell(`X${y + 1}`)).innerHTML).toFixed(2);
             if (budgetAmount != totalAmount) {
                 this.setState({
                     budgetError: "Budget amount does not match required amount."
@@ -2842,7 +3162,6 @@ export default class SupplyPlanComponent extends React.Component {
         var validation = this.checkBudgetValidation()
         if (validation == true) {
             var elInstance = this.state.shipmentBudgetTableEl;
-            console.log(elInstance);
             var json = elInstance.getJson();
             var budgetArray = [];
             var rowNumber = 0;
@@ -2890,7 +3209,6 @@ export default class SupplyPlanComponent extends React.Component {
             })
             var elInstance = this.state.plannedPsmShipmentsEl;
             var json = elInstance.getJson();
-            console.log("Json", json);
             var planningUnitId = document.getElementById("planningUnitId").value;
             var db1;
             var storeOS;
@@ -2909,10 +3227,8 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
-                    console.log("Json", json);
 
                     for (var j = 0; j < json.length; j++) {
-                        console.log(json[j]);
                         var map = new Map(Object.entries(json[j]));
                         var shipmentStatusId = 2;
                         if (map.get("2").length != 0 && map.get("3").length != 0) {
@@ -2943,7 +3259,7 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("31"))].rate = rate;
                         shipmentDataList[parseInt(map.get("31"))].productCost = productCost;
                         shipmentDataList[parseInt(map.get("31"))].shipmentMode = map.get("20");
-                        shipmentDataList[parseInt(map.get("31"))].freightCost = freightCost;
+                        shipmentDataList[parseInt(map.get("31"))].freightCost = parseFloat(freightCost).toFixed(2);
                         shipmentDataList[parseInt(map.get("31"))].notes = map.get("24");
                         shipmentDataList[parseInt(map.get("31"))].shipmentBudgetList = map.get("30");
                     }
@@ -2997,7 +3313,6 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 var airFreightPerc = programJson.airFreightPerc;
                 var seaFreightPerc = programJson.seaFreightPerc;
-                console.log("Program Json", programJson.shipmentList);
                 var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                 var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
                 var papuRequest = papuOs.getAll();
@@ -3115,7 +3430,6 @@ export default class SupplyPlanComponent extends React.Component {
                                         var artmisShipmentsArr = [];
                                         for (var i = 0; i < shipmentList.length; i++) {
                                             var procurementAgentPlanningUnit = procurementAgentListAll.filter(p => p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
-                                            console.log("procurementAgentPlanningUnit", procurementAgentPlanningUnit);
                                             var moq = procurementAgentPlanningUnit.moq;
                                             var pricePerPlanningUnit = procurementAgentPlanningUnit.catalogPrice;
                                             var budgetAmount = 0;
@@ -3126,6 +3440,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                 budgetJson.push(shipmentBudgetList[sb]);
                                             }
                                             budgetAmount = budgetAmount.toFixed(2);
+                                            var userQty = "";
+                                            if (procurementAgentPlanningUnit.unitsPerPallet != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
+                                                userQty = shipmentList[i].quantity;
+                                            }
                                             data[0] = shipmentList[i].expectedDeliveryDate; // A
                                             data[1] = shipmentList[i].shipmentStatus.id; //B
                                             data[2] = shipmentList[i].orderNo; //C
@@ -3135,11 +3453,11 @@ export default class SupplyPlanComponent extends React.Component {
                                             data[6] = this.state.planningUnitName; //G
                                             data[7] = shipmentList[i].suggestedQty; //H
                                             data[8] = moq; //I
-                                            data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
-                                            data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
+                                            data[9] = `=IF(Z${i + 1}!=0,IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1}),0)`;
+                                            data[10] = `=IF(AA${i + 1}!=0,IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1}),0)`;
                                             data[11] = ""; // Order based on
                                             data[12] = ""; // Rounding option
-                                            data[13] = shipmentList[i].quantity; // User Qty
+                                            data[13] = userQty; // User Qty
                                             data[14] = `=IF(L${i + 1}==3,
    
                                     IF(M${i + 1}==1,
@@ -3182,14 +3500,14 @@ export default class SupplyPlanComponent extends React.Component {
                                     )
                             )
                      )`;
-                                            data[15] = `=O${i + 1}/Z${i + 1}`;
-                                            data[16] = `=O${i + 1}/AA${i + 1}`;
+                                            data[15] = `=IF(Z${i + 1}!=0,O${i + 1}/Z${i + 1},0)`;
+                                            data[16] = `=IF(Z${i + 1}!=0,O${i + 1}/AA${i + 1},0)`;
                                             data[17] = shipmentList[i].rate;//Manual price
                                             data[18] = pricePerPlanningUnit;
                                             data[19] = `=ROUND(IF(AND(NOT(ISBLANK(R${i + 1})),(R${i + 1} != 0)),R${i + 1},S${i + 1})*O${i + 1},2)`; //Amount
                                             data[20] = shipmentList[i].shipmentMode;//Shipment method
                                             data[21] = shipmentList[i].freightCost;// Freight Cost
-                                            data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
+                                            data[22] = `=ROUND(IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100),2)`;// Default frieght cost
                                             data[23] = `=ROUND(T${i + 1}+IF(AND(NOT(ISBLANK(V${i + 1})),(V${i + 1} != 0)),V${i + 1},W${i + 1}),2)`; // Final Amount
                                             data[24] = shipmentList[i].notes;//Notes
                                             data[25] = procurementAgentPlanningUnit.unitsPerPallet;
@@ -3270,9 +3588,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         var json = [];
                                                         // var elInstance=this.state.plannedPsmShipmentsEl;
                                                         var rowData = obj.getRowData(y)
-                                                        console.log("RowData", rowData);
                                                         var shipmentBudget = rowData[30];
-                                                        console.log("Shipemnt Budget", shipmentBudget);
                                                         for (var sb = 0; sb < shipmentBudget.length; sb++) {
                                                             var data = [];
                                                             data[0] = shipmentBudget[sb].shipmentBudgetId;
@@ -3338,7 +3654,130 @@ export default class SupplyPlanComponent extends React.Component {
                                                             copyCompatibility: true,
                                                             allowInsertRow: false,
                                                             allowManualInsertRow: false,
-                                                            editable: false
+                                                            editable: false,
+                                                            contextMenu: function (obj, x, y, e) {
+                                                                var items = [];
+                                                                if (y == null) {
+                                                                    // Insert a new column
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnBefore,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 1);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (obj.options.allowInsertColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewColumnAfter,
+                                                                            onclick: function () {
+                                                                                obj.insertColumn(1, parseInt(x), 0);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // Delete a column
+                                                                    if (obj.options.allowDeleteColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.deleteSelectedColumns,
+                                                                            onclick: function () {
+                                                                                obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                            }
+                                                                        });
+                                                                    }
+
+
+
+                                                                    // Rename column
+                                                                    if (obj.options.allowRenameColumn == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.renameThisColumn,
+                                                                            onclick: function () {
+                                                                                obj.setHeader(x);
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // Sorting
+                                                                    if (obj.options.columnSorting == true) {
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        items.push({
+                                                                            title: obj.options.text.orderAscending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 0);
+                                                                            }
+                                                                        });
+                                                                        items.push({
+                                                                            title: obj.options.text.orderDescending,
+                                                                            onclick: function () {
+                                                                                obj.orderBy(x, 1);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                } else {
+                                                                    // Insert new row
+                                                                    if (obj.options.allowInsertRow == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.insertANewRowAfter,
+                                                                            onclick: function () {
+                                                                                obj.insertRow(1, parseInt(y));
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (obj.options.allowDeleteRow == true) {
+                                                                        items.push({
+                                                                            title: obj.options.text.deleteSelectedRows,
+                                                                            onclick: function () {
+                                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    if (x) {
+                                                                        if (obj.options.allowComments == true) {
+                                                                            items.push({ type: 'line' });
+
+                                                                            var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                            items.push({
+                                                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                onclick: function () {
+                                                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                }
+                                                                            });
+
+                                                                            if (title) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.clearComments,
+                                                                                    onclick: function () {
+                                                                                        obj.setComments([x, y], '');
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                // Line
+                                                                items.push({ type: 'line' });
+
+                                                                // Save
+                                                                if (obj.options.allowExport) {
+                                                                    items.push({
+                                                                        title: obj.options.text.saveAs,
+                                                                        shortcut: 'Ctrl + S',
+                                                                        onclick: function () {
+                                                                            obj.download(true);
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                return items;
+                                                            }.bind(this)
 
                                                         };
                                                         elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
@@ -3470,17 +3909,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         title: obj.options.text.saveAs,
                                                         shortcut: 'Ctrl + S',
                                                         onclick: function () {
-                                                            obj.download();
-                                                        }
-                                                    });
-                                                }
-
-                                                // About
-                                                if (obj.options.about) {
-                                                    items.push({
-                                                        title: obj.options.text.about,
-                                                        onclick: function () {
-                                                            alert(obj.options.about);
+                                                            obj.download(true);
                                                         }
                                                     });
                                                 }
@@ -3534,7 +3963,6 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
                 var airFreightPerc = programJson.airFreightPerc;
                 var seaFreightPerc = programJson.seaFreightPerc;
-                console.log("Program Json", programJson.shipmentList);
                 var papuTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
                 var papuOs = papuTransaction.objectStore('procurementAgentPlanningUnit');
                 var papuRequest = papuOs.getAll();
@@ -3676,7 +4104,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 })
                                                 var shipmentList = programJson.shipmentList.filter(c => c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate);
                                                 var shipmentListUnFiltered = programJson.shipmentList;
-                                                console.log("shipment List", shipmentList);
                                                 this.el = jexcel(document.getElementById("plannedNonPsmShipmentsDetailsTable"), '');
                                                 this.el.destroy();
                                                 this.el = jexcel(document.getElementById("otherNonPsmShipmentsDetailsTable"), '');
@@ -3690,7 +4117,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                 var submittedShipmentArr = [];
                                                 for (var i = 0; i < shipmentList.length; i++) {
                                                     var procurementAgentPlanningUnit = procurementAgentListAll.filter(p => p.procurementAgent.id == shipmentList[i].procurementAgent.id)[0];
-                                                    console.log("procurementAgentPlanningUnit", procurementAgentPlanningUnit);
                                                     var moq = procurementAgentPlanningUnit.moq;
                                                     var pricePerPlanningUnit = procurementAgentPlanningUnit.catalogPrice;
                                                     var budgetAmount = 0;
@@ -3701,6 +4127,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                         budgetJson.push(shipmentBudgetList[sb]);
                                                     }
                                                     budgetAmount = budgetAmount.toFixed(2);
+                                                    var userQty = "";
+                                                    if (procurementAgentPlanningUnit.unitsPerPallet != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
+                                                        userQty = shipmentList[i].quantity;
+                                                    }
                                                     data[0] = shipmentList[i].expectedDeliveryDate; // A
                                                     data[1] = shipmentList[i].shipmentStatus.id; //B
                                                     data[2] = shipmentList[i].orderNo; //C
@@ -3710,11 +4140,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                     data[6] = this.state.planningUnitName; //G
                                                     data[7] = shipmentList[i].suggestedQty; //H
                                                     data[8] = moq; //I
-                                                    data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AB${i + 1},I${i + 1}/AB${i + 1})`;
-                                                    data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AC${i + 1},I${i + 1}/AC${i + 1})`;
+                                                    data[9] = `=IF(AB${i + 1}!=0,IF(H${i + 1}>I${i + 1},H${i + 1}/AB${i + 1},I${i + 1}/AB${i + 1}),0)`;
+                                                    data[10] = `=IF(AC${i + 1}!=0,IF(H${i + 1}>I${i + 1},H${i + 1}/AC${i + 1},I${i + 1}/AC${i + 1}),0)`;
                                                     data[11] = ""; // Order based on
                                                     data[12] = ""; // Rounding option
-                                                    data[13] = shipmentList[i].quantity; // User Qty
+                                                    data[13] = userQty; // User Qty
                                                     data[14] = `=IF(L${i + 1}==3,
    
                                     IF(M${i + 1}==1,
@@ -3757,8 +4187,8 @@ export default class SupplyPlanComponent extends React.Component {
                                     )
                             )
                      )`;
-                                                    data[15] = `=O${i + 1}/AB${i + 1}`;
-                                                    data[16] = `=O${i + 1}/AC${i + 1}`;
+                                                    data[15] = `=IF(AB${i + 1}!=0,O${i + 1}/AB${i + 1},0)`;
+                                                    data[16] = `=IF(AC${i + 1},O${i + 1}/AC${i + 1},0)`;
                                                     data[17] = shipmentList[i].rate;//Manual price
                                                     data[18] = shipmentList[i].procurementUnit.id;
                                                     data[19] = shipmentList[i].supplier.id;
@@ -3766,7 +4196,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     data[21] = `=ROUND(IF(AND(NOT(ISBLANK(R${i + 1})),(R${i + 1} != 0)),R${i + 1},U${i + 1})*O${i + 1},2)`; //Amount
                                                     data[22] = shipmentList[i].shipmentMode;//Shipment method
                                                     data[23] = shipmentList[i].freightCost;// Freight Cost
-                                                    data[24] = `=IF(W${i + 1}=="Sea",(V${i + 1}*AE${i + 1})/100,(V${i + 1}*AD${i + 1})/100)`;// Default frieght cost
+                                                    data[24] = `=ROUND(IF(W${i + 1}=="Sea",(V${i + 1}*AE${i + 1})/100,(V${i + 1}*AD${i + 1})/100),2)`;// Default frieght cost
                                                     data[25] = `=ROUND(V${i + 1}+IF(AND(NOT(ISBLANK(X${i + 1})),(X${i + 1}!= 0)),X${i + 1},Y${i + 1}),2)`; // Final Amount
                                                     data[26] = shipmentList[i].notes;//Notes
                                                     data[27] = procurementAgentPlanningUnit.unitsPerPallet;
@@ -3843,6 +4273,38 @@ export default class SupplyPlanComponent extends React.Component {
                                                     allowManualInsertRow: false,
                                                     copyCompatibility: true,
                                                     onchange: this.nonPsmChanged,
+
+                                                    updateTable: function (el, cell, x, y, source, value, id) {
+                                                        var elInstance = el.jexcel;
+                                                        var rowData = elInstance.getRowData(y)
+                                                        var unitsPerPalletForUpdate = rowData[27];
+                                                        var unitsPerContainerForUpdate = rowData[28];
+                                                        if (unitsPerPalletForUpdate == 0 || unitsPerContainerForUpdate == 0) {
+                                                            var cell = elInstance.getCell(`J${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`K${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`L${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`M${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`N${y + 1}`)
+                                                            cell.classList.add('readonly');
+
+                                                        } else {
+                                                            var cell = elInstance.getCell(`J${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`K${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`L${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`M${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`N${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                        }
+                                                    },
+
                                                     contextMenu: function (obj, x, y, e) {
                                                         var items = [];
                                                         //Add Shipment Budget
@@ -3855,9 +4317,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 var json = [];
                                                                 // var elInstance=this.state.plannedPsmShipmentsEl;
                                                                 var rowData = obj.getRowData(y)
-                                                                console.log("RowData", rowData);
                                                                 var shipmentBudget = rowData[32];
-                                                                console.log("Shipemnt Budget", shipmentBudget);
                                                                 for (var sb = 0; sb < shipmentBudget.length; sb++) {
                                                                     var data = [];
                                                                     data[0] = shipmentBudget[sb].shipmentBudgetId;
@@ -3921,7 +4381,130 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     allowDeleteRow: false,
                                                                     oneditionend: this.onedit,
                                                                     copyCompatibility: true,
-                                                                    onchange: this.nonPsmBudgetChanged
+                                                                    onchange: this.nonPsmBudgetChanged,
+                                                                    contextMenu: function (obj, x, y, e) {
+                                                                        var items = [];
+                                                                        if (y == null) {
+                                                                            // Insert a new column
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnBefore,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 0);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Delete a column
+                                                                            if (obj.options.allowDeleteColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedColumns,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+
+
+                                                                            // Rename column
+                                                                            if (obj.options.allowRenameColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.renameThisColumn,
+                                                                                    onclick: function () {
+                                                                                        obj.setHeader(x);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Sorting
+                                                                            if (obj.options.columnSorting == true) {
+                                                                                // Line
+                                                                                items.push({ type: 'line' });
+
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderAscending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 0);
+                                                                                    }
+                                                                                });
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderDescending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            // Insert new row
+                                                                            if (obj.options.allowInsertRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewRowAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertRow(1, parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowDeleteRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (x) {
+                                                                                if (obj.options.allowComments == true) {
+                                                                                    items.push({ type: 'line' });
+
+                                                                                    var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                    items.push({
+                                                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                        onclick: function () {
+                                                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                        }
+                                                                                    });
+
+                                                                                    if (title) {
+                                                                                        items.push({
+                                                                                            title: obj.options.text.clearComments,
+                                                                                            onclick: function () {
+                                                                                                obj.setComments([x, y], '');
+                                                                                            }
+                                                                                        });
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        // Save
+                                                                        if (obj.options.allowExport) {
+                                                                            items.push({
+                                                                                title: obj.options.text.saveAs,
+                                                                                shortcut: 'Ctrl + S',
+                                                                                onclick: function () {
+                                                                                    obj.download(true);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        return items;
+                                                                    }.bind(this)
 
                                                                 };
                                                                 elVar = jexcel(document.getElementById("nonPsmShipmentBudgetTable"), options);
@@ -4053,17 +4636,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 title: obj.options.text.saveAs,
                                                                 shortcut: 'Ctrl + S',
                                                                 onclick: function () {
-                                                                    obj.download();
-                                                                }
-                                                            });
-                                                        }
-
-                                                        // About
-                                                        if (obj.options.about) {
-                                                            items.push({
-                                                                title: obj.options.text.about,
-                                                                onclick: function () {
-                                                                    alert(obj.options.about);
+                                                                    obj.download(true);
                                                                 }
                                                             });
                                                         }
@@ -4079,7 +4652,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                                 var options = {
                                                     data: submittedShipmentArr,
-                                                    colWidths: [100, 100, 100, 100, 120, 120, 200, 80, 80, 80, 80, 100, 100, 80, 80, 80, 80, 80, 80, 80, 80, 100, 80, 80, 80, 100],
+                                                    colWidths: [100, 100, 100, 100, 120, 120, 200, 80, 80, 80, 80, 100, 100, 80, 80, 80, 80, 80, 250, 120, 80, 100, 80, 80, 80, 100],
                                                     columns: [
                                                         { type: 'calendar', options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                         { type: 'dropdown', title: "Shipment status", source: shipmentStatusList, filter: this.shipmentStatusDropdownFilter },
@@ -4130,6 +4703,36 @@ export default class SupplyPlanComponent extends React.Component {
                                                     allowManualInsertRow: false,
                                                     copyCompatibility: true,
                                                     onchange: this.nonPsmOtherChanged,
+                                                    updateTable: function (el, cell, x, y, source, value, id) {
+                                                        var elInstance = el.jexcel;
+                                                        var rowData = elInstance.getRowData(y)
+                                                        var unitsPerPalletForUpdate = rowData[27];
+                                                        var unitsPerContainerForUpdate = rowData[28];
+                                                        if (unitsPerPalletForUpdate == 0 || unitsPerContainerForUpdate == 0) {
+                                                            var cell = elInstance.getCell(`J${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`K${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`L${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`M${y + 1}`)
+                                                            cell.classList.add('readonly');
+                                                            var cell = elInstance.getCell(`N${y + 1}`)
+                                                            cell.classList.add('readonly');
+
+                                                        } else {
+                                                            var cell = elInstance.getCell(`J${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`K${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`L${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`M${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                            var cell = elInstance.getCell(`N${y + 1}`)
+                                                            cell.classList.remove('readonly');
+                                                        }
+                                                    },
                                                     contextMenu: function (obj, x, y, e) {
                                                         var items = [];
                                                         //Add Shipment Budget
@@ -4142,9 +4745,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 var json = [];
                                                                 // var elInstance=this.state.plannedPsmShipmentsEl;
                                                                 var rowData = obj.getRowData(y)
-                                                                console.log("RowData", rowData);
                                                                 var shipmentBudget = rowData[32];
-                                                                console.log("Shipemnt Budget", shipmentBudget);
                                                                 for (var sb = 0; sb < shipmentBudget.length; sb++) {
                                                                     var data = [];
                                                                     data[0] = shipmentBudget[sb].shipmentBudgetId;
@@ -4209,7 +4810,130 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     allowDeleteRow: false,
                                                                     oneditionend: this.onedit,
                                                                     copyCompatibility: true,
-                                                                    onchange: this.nonPsmOtherBudgetChanged
+                                                                    onchange: this.nonPsmOtherBudgetChanged,
+                                                                    contextMenu: function (obj, x, y, e) {
+                                                                        var items = [];
+                                                                        if (y == null) {
+                                                                            // Insert a new column
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnBefore,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 0);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Delete a column
+                                                                            if (obj.options.allowDeleteColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedColumns,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+
+
+                                                                            // Rename column
+                                                                            if (obj.options.allowRenameColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.renameThisColumn,
+                                                                                    onclick: function () {
+                                                                                        obj.setHeader(x);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Sorting
+                                                                            if (obj.options.columnSorting == true) {
+                                                                                // Line
+                                                                                items.push({ type: 'line' });
+
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderAscending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 0);
+                                                                                    }
+                                                                                });
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderDescending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            // Insert new row
+                                                                            if (obj.options.allowInsertRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewRowAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertRow(1, parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowDeleteRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (x) {
+                                                                                if (obj.options.allowComments == true) {
+                                                                                    items.push({ type: 'line' });
+
+                                                                                    var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                    items.push({
+                                                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                        onclick: function () {
+                                                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                        }
+                                                                                    });
+
+                                                                                    if (title) {
+                                                                                        items.push({
+                                                                                            title: obj.options.text.clearComments,
+                                                                                            onclick: function () {
+                                                                                                obj.setComments([x, y], '');
+                                                                                            }
+                                                                                        });
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        // Save
+                                                                        if (obj.options.allowExport) {
+                                                                            items.push({
+                                                                                title: obj.options.text.saveAs,
+                                                                                shortcut: 'Ctrl + S',
+                                                                                onclick: function () {
+                                                                                    obj.download(true);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        return items;
+                                                                    }.bind(this)
 
                                                                 };
                                                                 elVar = jexcel(document.getElementById("nonPsmOtherShipmentBudgetTable"), options);
@@ -4341,20 +5065,11 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 title: obj.options.text.saveAs,
                                                                 shortcut: 'Ctrl + S',
                                                                 onclick: function () {
-                                                                    obj.download();
+                                                                    obj.download(true);
                                                                 }
                                                             });
                                                         }
 
-                                                        // About
-                                                        if (obj.options.about) {
-                                                            items.push({
-                                                                title: obj.options.text.about,
-                                                                onclick: function () {
-                                                                    alert(obj.options.about);
-                                                                }
-                                                            });
-                                                        }
                                                         return items;
                                                     }.bind(this)
                                                 };
@@ -4385,15 +5100,10 @@ export default class SupplyPlanComponent extends React.Component {
     shipmentStatusDropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[35];
-        console.log("Value---------->", value);
         if (value != "") {
-            console.log("Value", value);
-            console.log("this.state.shipmentStatusList", this.state.shipmentStatusList);
             var shipmentStatusList = this.state.shipmentStatusList;
             var shipmentStatus = (this.state.shipmentStatusList).filter(c => c.shipmentStatusId == value)[0];
-            console.log("shipmentstatus List", shipmentStatusList);
             var possibleStatusArray = shipmentStatus.nextShipmentStatusAllowedList;
-            console.log("possible status array", possibleStatusArray);
             for (var k = 0; k < shipmentStatusList.length; k++) {
                 if (possibleStatusArray.includes(shipmentStatusList[k].shipmentStatusId)) {
                     var shipmentStatusJson = {
@@ -4405,7 +5115,6 @@ export default class SupplyPlanComponent extends React.Component {
 
             }
         }
-        console.log("MyList-------------->", mylist);
         return mylist;
     }
 
@@ -4414,10 +5123,8 @@ export default class SupplyPlanComponent extends React.Component {
     procurementUnitDropdownFilter = function (instance, cell, c, r, source) {
         var mylist = [];
         var value = (instance.jexcel.getJson()[r])[5];
-        console.log("Value---------->", value);
         if (value != "") {
             var procurementUnitList = (this.state.procurementUnitList).filter(c => c.procurementAgent.id == value);
-            console.log("this.state.procurementUnitList", this.state.procurementUnitList)
             for (var k = 0; k < procurementUnitList.length; k++) {
                 var procurementUnitJson = {
                     name: procurementUnitList[k].procurementUnit.label.label_en,
@@ -4426,7 +5133,6 @@ export default class SupplyPlanComponent extends React.Component {
                 mylist.push(procurementUnitJson);
             }
         }
-        console.log("MyList-------------->", mylist);
         return mylist;
     }
 
@@ -4499,11 +5205,15 @@ export default class SupplyPlanComponent extends React.Component {
                         var papuResult = [];
                         papuResult = papuRequest.result;
                         var procurementAgentPlanningUnit = papuResult.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
-                        console.log("Procurement Agent planing uinit", procurementAgentPlanningUnit);
                         elInstance.setValueFromCoords(8, y, procurementAgentPlanningUnit.moq, true);
                         elInstance.setValueFromCoords(20, y, procurementAgentPlanningUnit.catalogPrice, true);
                         elInstance.setValueFromCoords(27, y, procurementAgentPlanningUnit.unitsPerPallet, true);
                         elInstance.setValueFromCoords(28, y, procurementAgentPlanningUnit.unitsPerContainer, true);
+                        if (procurementAgentPlanningUnit.unitsPerPallet == 0 || procurementAgentPlanningUnit.unitsPerPallet == 0) {
+                            elInstance.setValueFromCoords(11, y, "", true);
+                            elInstance.setValueFromCoords(12, y, "", true);
+                            elInstance.setValueFromCoords(13, y, "", true);
+                        }
                     }.bind(this)
                 }.bind(this)
             }
@@ -4646,9 +5356,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             var budgetAmount = (elInstance.getValueFromCoords(31, y));
             budgetAmount = parseFloat(budgetAmount).toFixed(2);
-            var totalAmount = parseFloat((elInstance.getCell(`Z${y}`)).innerHTML).toFixed(2);
-            console.log("BudgetAmount", budgetAmount);
-            console.log("Total AMount", totalAmount);
+            var totalAmount = parseFloat((elInstance.getCell(`Z${y + 1}`)).innerHTML).toFixed(2);
             if (budgetAmount != totalAmount) {
                 this.setState({
                     nonPsmBudgetError: "Budget amount does not match required amount."
@@ -4768,7 +5476,6 @@ export default class SupplyPlanComponent extends React.Component {
         var validation = this.nonPsmCheckBudgetValidation();
         if (validation == true) {
             var elInstance = this.state.nonPsmShipmentBudgetTableEl;
-            console.log(elInstance);
             var json = elInstance.getJson();
             var budgetArray = [];
             var rowNumber = 0;
@@ -4831,6 +5538,18 @@ export default class SupplyPlanComponent extends React.Component {
             }
         }
 
+        if (x == 1) {
+            var col = ("B").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
         if (x == 4) {
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
@@ -4880,6 +5599,12 @@ export default class SupplyPlanComponent extends React.Component {
                         elInstance.setValueFromCoords(20, y, procurementAgentPlanningUnit.catalogPrice, true);
                         elInstance.setValueFromCoords(27, y, procurementAgentPlanningUnit.unitsPerPallet, true);
                         elInstance.setValueFromCoords(28, y, procurementAgentPlanningUnit.unitsPerContainer, true);
+
+                        if (procurementAgentPlanningUnit.unitsPerPallet == 0 || procurementAgentPlanningUnit.unitsPerPallet == 0) {
+                            elInstance.setValueFromCoords(11, y, "", true);
+                            elInstance.setValueFromCoords(12, y, "", true);
+                            elInstance.setValueFromCoords(13, y, "", true);
+                        }
                     }.bind(this)
                 }.bind(this)
             }
@@ -4921,6 +5646,30 @@ export default class SupplyPlanComponent extends React.Component {
             }
         }
 
+        if (x == 18) {
+            var col = ("S").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
+        if (x == 19) {
+            var col = ("T").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+
         this.setState({
             nonPsmChangedFlag: 1
         });
@@ -4948,6 +5697,42 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col, "");
                 }
             }
+
+            var col = ("B").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(1, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("S").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(18, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
+            var col = ("T").concat(parseInt(y) + 1);
+            var value = elInstance.getValueFromCoords(19, y);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, "This field is required.");
+                valid = false;
+            } else {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+
 
 
             var col = ("W").concat(parseInt(y) + 1);
@@ -5022,9 +5807,7 @@ export default class SupplyPlanComponent extends React.Component {
 
             var budgetAmount = (elInstance.getValueFromCoords(31, y));
             budgetAmount = parseFloat(budgetAmount).toFixed(2);
-            var totalAmount = parseFloat((elInstance.getCell(`Z${y}`)).innerHTML).toFixed(2);
-            console.log("BudgetAmount", budgetAmount);
-            console.log("Total AMount", totalAmount);
+            var totalAmount = parseFloat((elInstance.getCell(`Z${y + 1}`)).innerHTML).toFixed(2);
             if (budgetAmount != totalAmount) {
                 this.setState({
                     nonPsmOtherBudgetError: "Budget amount does not match required amount."
@@ -5147,7 +5930,6 @@ export default class SupplyPlanComponent extends React.Component {
         var validation = this.nonPsmOtherCheckBudgetValidation();
         if (validation == true) {
             var elInstance = this.state.nonPsmOtherShipmentBudgetTableEl;
-            console.log(elInstance);
             var json = elInstance.getJson();
             var budgetArray = [];
             var rowNumber = 0;
@@ -5195,15 +5977,12 @@ export default class SupplyPlanComponent extends React.Component {
         var json1 = {};
         var validation = true;
         var json = {}
-        console.log("elInstance", elInstance);
         if (elInstance1 != undefined && elInstance1 != "") {
-            console.log("in if 1")
             otherValidations = this.checkValidationForNonPsmOtherShipments();
             json1 = elInstance1.getJson();
         }
 
         if (elInstance != undefined && elInstance != "") {
-            console.log("in if 2")
             otherValidations = this.checkValidationForNonPsmShipments();
             json = elInstance.getJson();
         }
@@ -5211,7 +5990,6 @@ export default class SupplyPlanComponent extends React.Component {
             this.setState({
                 budgetError: ""
             })
-            console.log("Json", json);
             var planningUnitId = document.getElementById("planningUnitId").value;
             var db1;
             var storeOS;
@@ -5230,10 +6008,8 @@ export default class SupplyPlanComponent extends React.Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     var shipmentDataList = (programJson.shipmentList);
-                    console.log("Json", json);
 
                     for (var j = 0; j < json.length; j++) {
-                        console.log(json[j]);
                         var map = new Map(Object.entries(json[j]));
                         var shipmentStatusId = 2;
                         if (map.get("2").length != 0 && map.get("3").length != 0) {
@@ -5259,11 +6035,20 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("33"))].primeLineNo = map.get("3");
                         shipmentDataList[parseInt(map.get("33"))].dataSource.id = map.get("4");
                         shipmentDataList[parseInt(map.get("33"))].procurementAgent.id = map.get("5");
+                        shipmentDataList[parseInt(map.get("33"))].procurementUnit.id = map.get("18");
+                        shipmentDataList[parseInt(map.get("33"))].supplier.id = map.get("19");
                         shipmentDataList[parseInt(map.get("33"))].quantity = quantity;
                         shipmentDataList[parseInt(map.get("33"))].rate = rate;
                         shipmentDataList[parseInt(map.get("33"))].productCost = productCost;
                         shipmentDataList[parseInt(map.get("33"))].shipmentMode = map.get("22");
-                        shipmentDataList[parseInt(map.get("33"))].freightCost = freightCost;
+                        shipmentDataList[parseInt(map.get("33"))].freightCost = parseFloat(freightCost).toFixed(2);
+                        if (shipmentStatusId == 5) {
+                            shipmentDataList[parseInt(map.get("33"))].shippedDate = moment(Date.now()).format("YYYY-MM-DD");
+                        }
+                        if (shipmentStatusId == 6) {
+                            shipmentDataList[parseInt(map.get("33"))].receivedDate = moment(Date.now()).format("YYYY-MM-DD");
+                        }
+
                         shipmentDataList[parseInt(map.get("33"))].notes = map.get("26");
                         shipmentDataList[parseInt(map.get("33"))].shipmentBudgetList = map.get("32");
                     }
@@ -5292,11 +6077,20 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("33"))].primeLineNo = map.get("3");
                         shipmentDataList[parseInt(map.get("33"))].dataSource.id = map.get("4");
                         shipmentDataList[parseInt(map.get("33"))].procurementAgent.id = map.get("5");
+                        shipmentDataList[parseInt(map.get("33"))].procurementUnit.id = map.get("18");
+                        shipmentDataList[parseInt(map.get("33"))].supplier.id = map.get("19");
                         shipmentDataList[parseInt(map.get("33"))].quantity = quantity;
                         shipmentDataList[parseInt(map.get("33"))].rate = rate;
                         shipmentDataList[parseInt(map.get("33"))].productCost = productCost;
                         shipmentDataList[parseInt(map.get("33"))].shipmentMode = map.get("22");
-                        shipmentDataList[parseInt(map.get("33"))].freightCost = freightCost;
+                        shipmentDataList[parseInt(map.get("33"))].freightCost = parseFloat(freightCost).toFixed(2);
+                        if (shipmentStatusId == 5) {
+                            shipmentDataList[parseInt(map.get("33"))].shippedDate = moment(Date.now()).format("YYYY-MM-DD");
+                        }
+                        if (shipmentStatusId == 6) {
+                            shipmentDataList[parseInt(map.get("33"))].receivedDate = moment(Date.now()).format("YYYY-MM-DD");
+                        }
+
                         shipmentDataList[parseInt(map.get("33"))].notes = map.get("26");
                         shipmentDataList[parseInt(map.get("33"))].shipmentBudgetList = map.get("32");
                     }
@@ -5531,7 +6325,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <th ></th>
                                             {
                                                 this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                    <th style={{padding :'10px 0 !important'}}>{item.month}</th>
+                                                    <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
                                                 ))
                                             }
                                         </tr>
@@ -5722,10 +6516,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th style={{textAlign:'left'}}>Total</th>
+                                                <th style={{ textAlign: 'left' }}>Total</th>
                                                 {
                                                     this.state.consumptionTotalMonthWise.map(item => (
-                                                        <th style={{textAlign:'right'}}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
                                                     ))
                                                 }
                                             </tr>
@@ -5766,7 +6560,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.regionListFiltered.map(item => (
                                                     <tr>
-                                                        <td style={{textAlign:'left'}}>{item.name}</td>
+                                                        <td style={{ textAlign: 'left' }}>{item.name}</td>
                                                         {
                                                             this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
                                                                 if (item1.adjustmentQty.toString() != '') {
@@ -5783,10 +6577,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th style={{textAlign:'left'}}>Total</th>
+                                                <th style={{ textAlign: 'left' }}>Total</th>
                                                 {
                                                     this.state.inventoryTotalMonthWise.map(item => (
-                                                        <th style={{textAlign:'right'}}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
                                                     ))
                                                 }
                                             </tr>

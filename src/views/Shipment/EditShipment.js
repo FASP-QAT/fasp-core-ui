@@ -375,6 +375,18 @@ export default class ConsumptionDetails extends React.Component {
 
                                                     var procurementAgentPlanningUnitObj = procurementAgentPlanningUnit.filter(p => p.procurementAgentId == shipmentList.procurementAgent.id && p.planningUnitId == shipmentList.planningUnit.id)[0];
 
+                                                    if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
+                                                        // console.log("UNDEFINE-----------------");
+                                                        procurementAgentPlanningUnitObj = {
+                                                            procurementAgentId: 0,
+                                                            planningUnitId: planningUnitId,
+                                                            catalogPrice: 0,
+                                                            moq: 0,
+                                                            unitsPerPallet: 0,
+                                                            unitsPerContainer: 0
+                                                        }
+                                                    }
+
                                                     if (shipmentList.shipmentStatus.id == 2) {//planned
 
 
@@ -394,19 +406,6 @@ export default class ConsumptionDetails extends React.Component {
                                                             budgetJson.push(shipmentBudgetList[sb]);
                                                         }
                                                         budgetAmount = budgetAmount.toFixed(2);
-
-
-                                                        if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
-                                                            // console.log("UNDEFINE-----------------");
-                                                            procurementAgentPlanningUnitObj = {
-                                                                procurementAgentId: 0,
-                                                                planningUnitId: planningUnitId,
-                                                                catalogPrice: 0,
-                                                                moq: 0,
-                                                                unitsPerPallet: 0,
-                                                                unitsPerContainer: 0
-                                                            }
-                                                        }
 
 
                                                         // console.log("budgetAmount--- ", budgetAmount);
@@ -958,10 +957,10 @@ export default class ConsumptionDetails extends React.Component {
                                                             copyCompatibility: true,
                                                             paginationOptions: [10, 25, 50, 100],
                                                             position: 'top',
+                                                            contextMenu: false
                                                         };
 
                                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-
 
                                                     } else if (shipmentList.shipmentStatus.id == 3 && shipmentList.procurementAgent.id != 1) {//submitted
 
@@ -1070,7 +1069,7 @@ export default class ConsumptionDetails extends React.Component {
                                                         var options = {
                                                             data: data,
                                                             columnDrag: true,
-                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                             columns: [
                                                                 { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                 { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
@@ -1115,11 +1114,12 @@ export default class ConsumptionDetails extends React.Component {
                                                             allowInsertColumn: false,
                                                             allowManualInsertColumn: false,
                                                             allowDeleteRow: false,
-                                                            // onchange: this.plannedPsmChanged,
+                                                            onchange: this.plannedPsmChanged,
                                                             oneditionend: this.onedit,
                                                             copyCompatibility: true,
                                                             paginationOptions: [10, 25, 50, 100],
                                                             position: 'top',
+                                                            contextMenu: false
                                                         };
 
                                                         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
@@ -1234,7 +1234,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             var options = {
                                                                 data: data,
                                                                 columnDrag: true,
-                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                                 columns: [
                                                                     { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
@@ -1277,11 +1277,12 @@ export default class ConsumptionDetails extends React.Component {
                                                                 allowInsertColumn: false,
                                                                 allowManualInsertColumn: false,
                                                                 allowDeleteRow: false,
-                                                                // onchange: this.plannedPsmChanged,
+                                                                onchange: this.plannedPsmChanged,
                                                                 oneditionend: this.onedit,
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
                                                                 position: 'top',
+                                                                contextMenu: false
                                                             };
 
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
@@ -1394,7 +1395,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             var options = {
                                                                 data: data,
                                                                 columnDrag: true,
-                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                                 columns: [
                                                                     { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
@@ -1437,11 +1438,12 @@ export default class ConsumptionDetails extends React.Component {
                                                                 allowInsertColumn: false,
                                                                 allowManualInsertColumn: false,
                                                                 allowDeleteRow: false,
-                                                                // onchange: this.plannedPsmChanged,
+                                                                onchange: this.plannedPsmChanged,
                                                                 oneditionend: this.onedit,
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
                                                                 position: 'top',
+                                                                contextMenu: false
                                                             };
 
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
@@ -1913,8 +1915,7 @@ export default class ConsumptionDetails extends React.Component {
 
             let rowIndex1 = this.state.rowIndex1;
 
-            var elInstance = this.state.shipmentEL;
-            var tableJson = elInstance.getJson();
+
             var db1;
             var storeOS;
             getDatabase();
@@ -1960,6 +1961,8 @@ export default class ConsumptionDetails extends React.Component {
                     let shipmentDataListNotFiltered = (programJson.shipmentList);
 
                     if (shipmentDataList[0].shipmentStatus.id == 2) {
+                        var elInstance = this.state.shipmentEL;
+                        var tableJson = elInstance.getJson();
 
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
@@ -2081,6 +2084,7 @@ export default class ConsumptionDetails extends React.Component {
                         }
 
                     } else if (shipmentDataList[0].shipmentStatus.id == 7) {
+                        var tableJson = this.el.getJson();
 
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
@@ -2095,6 +2099,8 @@ export default class ConsumptionDetails extends React.Component {
 
                     } else if (shipmentDataList[0].shipmentStatus.id == 3 && shipmentDataList[0].procurementAgent.id != 1) {
 
+                        var tableJson = this.el.getJson();
+
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
                             let shipmentLabel = '';
@@ -2106,6 +2112,8 @@ export default class ConsumptionDetails extends React.Component {
                                 shipmentLabel = 'Shipped';
                             } else if (map.get("1") == 6) {
                                 shipmentLabel = 'Delivered';
+                            } else if (map.get("1") == 7) {
+                                shipmentLabel = 'Cancelled';
                             }
 
                             shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = map.get("1");
@@ -2116,6 +2124,8 @@ export default class ConsumptionDetails extends React.Component {
 
                     } else if ((shipmentDataList[0].shipmentStatus.id == 4 || shipmentDataList[0].shipmentStatus.id == 5 || shipmentDataList[0].shipmentStatus.id == 6) && shipmentDataList[0].procurementAgent.id != 1) {
 
+                        var tableJson = this.el.getJson();
+
                         for (var i = 0; i < shipmentDataList.length; i++) {
                             var map = new Map(Object.entries(tableJson[i]));
 
@@ -2128,6 +2138,8 @@ export default class ConsumptionDetails extends React.Component {
                                 shipmentLabel = 'Shipped';
                             } else if (map.get("1") == 6) {
                                 shipmentLabel = 'Delivered';
+                            } else if (map.get("1") == 7) {
+                                shipmentLabel = 'Cancelled';
                             }
 
                             shipmentDataListNotFiltered[parseInt(rowIndex1)].shipmentStatus.id = map.get("1");
@@ -2579,7 +2591,7 @@ export default class ConsumptionDetails extends React.Component {
                         this.el.setComments(col, "");
                     }
 
-                    var col = ("AF").concat(parseInt(y) + 1);
+                    var col = ("AG").concat(parseInt(y) + 1);
                     var value = this.el.getValueFromCoords(32, y);
                     if (value == "Invalid date" || value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -2591,7 +2603,7 @@ export default class ConsumptionDetails extends React.Component {
                         this.el.setComments(col, "");
                     }
 
-                    var col = ("AG").concat(parseInt(y) + 1);
+                    var col = ("AH").concat(parseInt(y) + 1);
                     var value = this.el.getValueFromCoords(33, y);
                     if (value == "Invalid date" || value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
