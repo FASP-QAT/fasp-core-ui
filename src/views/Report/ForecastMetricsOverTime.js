@@ -176,6 +176,7 @@ class ForcastMatrixOverTime extends Component {
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
     csvRow.push(i18n.t('static.dashboard.country')+' : '+ (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' : ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ','%20')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
     csvRow.push('')
     csvRow.push('')
@@ -244,7 +245,10 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.dashboard.country')+' : '+ document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
         }
@@ -269,7 +273,7 @@ class ForcastMatrixOverTime extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4,'','FAST' );
+    doc.addImage(canvasImg, 'png',  50, 200,750,290,'CANVAS' );
     const headers =[ [   i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.errorperc'),i18n.t('static.report.noofmonth')]];
     const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,elt.forecastError*100,elt.monthsInCalc]);
@@ -523,7 +527,7 @@ this.fetchData();
           && productCategories.map((item, i) => {
               return (
                 <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
-                {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
+                {Array(item.level).fill(' ').join('')+(getLabelText(item.payload.label, this.state.lang))}
               </option>
               )
           }, this);

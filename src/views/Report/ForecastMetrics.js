@@ -27,7 +27,11 @@ import {
   Table, FormGroup, Input, InputGroup, InputGroupAddon, Label, Form
 } from 'reactstrap';
 import Select from 'react-select';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import ToolkitProvider, { Search, CSVExport } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator'
+import BootstrapTable from 'react-bootstrap-table-next';
+import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
+
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
@@ -53,15 +57,11 @@ import "jspdf-autotable";
 import ReportService from '../../api/ReportService';
 import ProgramService from '../../api/ProgramService';
 // const { getToggledOptions } = utils;
-const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
+const Widget04 = lazy(() => import('../Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 const ref = React.createRef();
 
-const brandPrimary = getStyle('--primary')
-const brandSuccess = getStyle('--success')
-const brandInfo = getStyle('--info')
-const brandWarning = getStyle('--warning')
-const brandDanger = getStyle('--danger')
+
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -125,13 +125,11 @@ var programValues= [];
 var programLabels= [];
 
 
-class GlobalConsumption extends Component {
+class ForecastMetrics extends Component {
   constructor(props) {
     super(props);
 
-    this.toggledata = this.toggledata.bind(this);
-    this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
-
+   
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
@@ -140,14 +138,9 @@ class GlobalConsumption extends Component {
       planningUnits: [],
       consumptions: [],
       productCategories: [],
-      countryValues: [],
-      countryLabels: [],
-      planningUnitValues: [],
-      planningUnitLabels: [],
-      programValues: [],
-      programLabels: [],
       programs:[],
       message:'',
+      singleValue2: {year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -165,6 +158,10 @@ class GlobalConsumption extends Component {
     this.getRandomColor = this.getRandomColor.bind(this)
     this.handleChangeProgram=this.handleChangeProgram.bind(this)
     this.handlePlanningUnitChange=this.handlePlanningUnitChange.bind(this)
+    this.formatLabel = this.formatLabel.bind(this);
+    this.formatValue=this.formatValue.bind(this)
+    this.pickAMonth2 = React.createRef();
+    this.rowClassNameFormat = this.rowClassNameFormat.bind(this)
   }
 
   makeText = m => {
@@ -172,10 +169,27 @@ class GlobalConsumption extends Component {
     return '?'
   }
  
+  formatLabel(cell, row) {
+    // console.log("celll----", cell);
+    if (cell != null && cell != "") {
+      return getLabelText(cell, this.state.lang);
+    }
+  }
+
+  formatValue(cell, row) {
+    // console.log("celll----", cell);
+    if (cell != null && cell != "") {
+      return cell*100+'%';
+    }else if(cell=="0" && row.months==0){
+      return "No data points containing both actual and forecast consumption ";
+    }else{
+      return "0%"
+    }
+  }
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.report.selectMonth') + ' : ' +this.makeText(this.state.singleValue2)).replaceAll(' ','%20'))
     csvRow.push(i18n.t('static.dashboard.country') + ' : ' + ((countryLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push(i18n.t('static.program.program') + ' : ' + ((programLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
     csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' : ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
@@ -184,12 +198,16 @@ class GlobalConsumption extends Component {
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ','%20'),(i18n.t('static.report.month')).replaceAll(' ','%20'),(i18n.t('static.consumption.consumptionqty')).replaceAll(' ','%20')]]
+    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ','%20'),(i18n.t('static.dashboard.program')).replaceAll(' ','%20'),(i18n.t('static.dashboard.planningunit')).replaceAll(' ','%20'),
+    //(i18n.t('static.report.historicalConsumptionDiff')).replaceAll(' ','%20'),(i18n.t('static.report.historicalConsumptionActual')).replaceAll(' ','%20'),
+    (i18n.t('static.report.error')).replaceAll(' ','%20'),(i18n.t('static.report.noofmonth')).replaceAll(' ','%20')]]
 
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([[getLabelText(re[item].realmCountry.label),re[item].consumptionDateString,re[item].planningUnitQty]])
+      A.push([[getLabelText(re[item].realmCountry.label),(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),(getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
+     // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
+      re[item].months==0?("No data points containing both actual and forecast consumption").replaceAll(' ', '%20'):re[item].forecastError*100+'%',re[item].months]])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -198,7 +216,7 @@ class GlobalConsumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+    a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.singleValue2) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -233,15 +251,7 @@ class GlobalConsumption extends Component {
 
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
-
-      //  var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
-      // var reader = new FileReader();
-
-      //var data='';
-      // Use fs.readFile() method to read the file 
-      //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
-      //}); 
-      for (var i = 1; i <= pageCount; i++) {
+  for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(18)
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
@@ -254,7 +264,7 @@ class GlobalConsumption extends Component {
         })
         if (i == 1) {
           doc.setFontSize(12)
-          doc.text(i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.selectMonth') + ' : ' +this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.dashboard.country') + ' : ' + countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
@@ -283,23 +293,18 @@ class GlobalConsumption extends Component {
     doc.setFontSize(15);
 
     const title = "Consumption Report";
-    var canvas = document.getElementById("cool-canvas");
-    //creates image
-
-    var canvasImg = canvas.toDataURL("image/png", 1.0);
-    var width = doc.internal.pageSize.width;
+    
     var height = doc.internal.pageSize.height;
-    var h1 = 50;
-    var aspectwidth1 = (width - h1);
-
-    doc.addImage(canvasImg, 'png', 50, 200,750,290,'CANVAS');
-      
-      const headers =[[i18n.t('static.dashboard.country'),i18n.t('static.report.month'),i18n.t('static.consumption.consumptionqty')]]
-      const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),elt.consumptionDateString,elt.planningUnitQty]);
+     const headers =[[i18n.t('static.dashboard.country'),i18n.t('static.dashboard.program'),i18n.t('static.dashboard.planningunit'),
+     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
+     i18n.t('static.report.error'),i18n.t('static.report.noofmonth')]]
+      const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),getLabelText(elt.program.label),getLabelText(elt.planningUnit.label),
+        //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
+       elt.months==0?"No data points containing both actual and forecast consumption": elt.forecastError*100+'%',elt.months]);
       
       let content = {
       margin: {top: 80},
-      startY:  height,
+      startY:  190,
       head: headers,
       body: data,
       
@@ -320,7 +325,13 @@ class GlobalConsumption extends Component {
 
 
 
-
+  rowClassNameFormat(row, rowIdx) {
+    // row is whole row object
+    // rowIdx is index of row
+    // console.log('in rowClassNameFormat')
+    // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
+    return row.forecastError*100>50 || (row.budgetAmt - row.usedAmt) <= 0 ? 'background-red' : '';
+  }
 
 
 
@@ -339,7 +350,7 @@ class GlobalConsumption extends Component {
       countryValues= countryIdArray;
       countryLabels= countrylabelArray;
    
-  this.filterData(this.state.rangeValue)
+  this.filterData()
     
   }
    handleChangeProgram(programIds) {
@@ -354,7 +365,7 @@ class GlobalConsumption extends Component {
       programValues= programIdArray;
       programLabels= programlabelArray;
   
-      this.filterData(this.state.rangeValue)
+  this.filterData()
     
   }
 
@@ -375,12 +386,12 @@ class GlobalConsumption extends Component {
       planningUnitValues= planningUnitIds.map(ele=>ele.value);
       planningUnitLabels=planningUnitIds.map(ele=>ele.label);
   
-      this.filterData(this.state.rangeValue)
+  this.filterData()
     
   }
 
 
-  filterData(rangeValue) {
+  filterData() {
     /*this.setState({
       consumptions: {date:["04-2019","05-2019","06-2019","07-2019"],countryData:[{label:"c1",value:[10,4,5,7]},
       {label:"c2",value:[13,2,8,7]},
@@ -393,17 +404,16 @@ class GlobalConsumption extends Component {
     let CountryIds = countryValues;
     let planningUnitIds = planningUnitValues;
     let programIds = programValues
-    let startDate=rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-    let stopDate=rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+    let startDate=this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
+    //let stopDate=this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
     if(CountryIds.length>0 && planningUnitIds.length>0&&programIds.length>0){
     
     var inputjson={
-    "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate,"stopDate":stopDate
+    "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate
    }
-   console.log('***'+inputjson)
     AuthenticationService.setupAxiosInterceptors();
     
-    ReportService.getGlobalConsumptiondata( inputjson )
+    ReportService.getForecastError( inputjson )
       .then(response => {
         console.log(JSON.stringify(response.data));
         this.setState({
@@ -693,8 +703,19 @@ if(productCategoryId!=-1){
   }
   handleRangeDissmis(value) {
     this.setState({ rangeValue: value })
-    this.filterData(value);
+
   }
+  handleClickMonthBox2 = (e) => {
+    this.refs.pickAMonth2.show()
+}
+  handleAMonthChange2 = (value, text) => {
+    //
+       //
+      }
+      handleAMonthDissmis2 = (value) => {
+          this.setState( {singleValue2: value} )
+          this.filterData()
+      }
 
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
@@ -746,57 +767,96 @@ if(productCategoryId!=-1){
         )
       }, this);
 
-    const backgroundColor = [
-      '#4dbd74',
-      '#c8ced3',
-      '#000',
-      '#ffc107',
-      '#f86c6b',
-    ]
-    let country=[...new Set(this.state.consumptions.map(ele=>(getLabelText(ele.realmCountry.label,this.state.lang))))]
-    let consumptiondata=[];
-    let data=[];
-    for (var i = 0; i < country.length; i++) {
-    data=this.state.consumptions.filter(c=> country[i].localeCompare(getLabelText(c.realmCountry.label,this.state.lang))==0).map(ele=>(ele.planningUnitQty))
-    console.log(data)
-    consumptiondata.push(data)}
+      const columns = [
+        {
+            dataField: 'realmCountry.label',
+            text: i18n.t('static.dashboard.country'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
+            dataField: 'program.label',
+            text: i18n.t('static.dashboard.program'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }, {
+            dataField: 'planningUnit.label',
+            text: i18n.t('static.dashboard.planningunit'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+            formatter: this.formatLabel
+        }/*, {
+            dataField: 'historicalConsumptionDiff',
+            text: i18n.t('static.report.historicalConsumptionDiff'),
+            sort: true,
+            align: 'center',
+            headerAlign: 'center',
+         
+        }, {
+          dataField: 'historicalConsumptionActual',
+          text: i18n.t('static.report.historicalConsumptionActual'),
+          sort: true,
+          align: 'center',
+          headerAlign: 'center',
+       
+      }*/, {
+        dataField: 'forecastError',
+        text: i18n.t('static.report.error'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter:this.formatValue
+     
+    }, {
+      dataField: 'months',
+      text: i18n.t('static.report.noofmonth'),
+      sort: true,
+      align: 'center',
+      headerAlign: 'center',
    
-    const bar = {
-
-      labels: [...new Set(this.state.consumptions.map(ele=>(ele.consumptionDateString)))],
-      datasets: consumptiondata.map((item, index) => ({ stack: 1, label: country[index], data: item, backgroundColor: backgroundColor[index] }))
-      /* datasets: [
-         {
-           label: 'Actual Cconsumptionsonsuconsumptionsmption',
-           backgroundColor: '#86CD99',
-           borderColor: 'rgba(179,181,198,1)',
-           pointBackgroundColor: 'rgba(179,181,198,1)',
-           pointBorderColor: '#fff',
-           pointHoverBackgroundColor: '#fff',
-           pointHoverBorderColor: 'rgba(179,181,198,1)',
-           data: this.state.consumptions.map((item, index) => (item.Actual)),
-         }, {
-           type: "line",
-           label: "Forecast Consumption",
-           backgroundColor: 'transparent',
-           borderColor: 'rgba(179,181,158,1)',
-           borderStyle: 'dotted',
-           ticks: {
-             fontSize: 2,
-             fontColor: 'transparent',
-           },
-           showInLegend: true,
-           yValueFormatString: "$#,##0",
-           data: this.state.consumptions.map((item, index) => (item.forcast))
-         }
-       ],*/
-
-    };
+  }];
+  const options = {
+    hidePageListOnlyOnePage: true,
+    firstPageText: i18n.t('static.common.first'),
+    prePageText: i18n.t('static.common.back'),
+    nextPageText: i18n.t('static.common.next'),
+    lastPageText: i18n.t('static.common.last'),
+    nextPageTitle: i18n.t('static.common.firstPage'),
+    prePageTitle: i18n.t('static.common.prevPage'),
+    firstPageTitle: i18n.t('static.common.nextPage'),
+    lastPageTitle: i18n.t('static.common.lastPage'),
+    showTotal: true,
+    paginationTotalRenderer: customTotal,
+    disablePageTitle: true,
+    sizePerPageList: [{
+        text: '10', value: 10
+    }, {
+        text: '30', value: 30
+    }
+        ,
+    {
+        text: '50', value: 50
+    },
+    {
+        text: 'All', value: this.state.consumptions.length
+    }]
+};
+const { SearchBar, ClearSearchButton } = Search;
+const customTotal = (from, to, size) => (
+    <span className="react-bootstrap-table-pagination-total">
+        {i18n.t('static.common.result', { from, to, size })}
+    </span>
+);
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       from: 'From', to: 'To',
     }
     const { rangeValue } = this.state
+    const { singleValue2 } = this.state
 
     const makeText = m => {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
@@ -810,8 +870,8 @@ if(productCategoryId!=-1){
 
         <Card>
           <CardHeader>
-            <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.globalconsumption')}</strong>
-           {this.state.consumptions.length > 0 && <div className="card-header-actions">
+            <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong>
+           {this.state.consumptions.length>0&& <div className="card-header-actions">
               <a className="card-header-action">
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
@@ -825,8 +885,26 @@ if(productCategoryId!=-1){
               <Form >
                 <Col md="12 pl-0">
                   <div className="row">
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+
+                  <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                      <div className="controls edit">
+                      <Picker
+                                ref="pickAMonth2"
+                                years={{min: {year: 2010, month: 1}, max: {year: 2021, month: 12}}}
+                                value={singleValue2}
+                                lang={pickerLang.months}
+                                theme="dark"
+                                onChange={this.handleAMonthChange2}
+                                onDismiss={this.handleAMonthDissmis2}
+                            >
+                                <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                            </Picker>
+                      </div>
+
+                    </FormGroup>
+                   {/*} <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
 
                         <Picker
@@ -842,7 +920,7 @@ if(productCategoryId!=-1){
                         </Picker>
                       </div>
 
-                    </FormGroup>
+    </FormGroup>*/}
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
@@ -897,7 +975,7 @@ if(productCategoryId!=-1){
                               && productCategories.map((item, i) => {
                                 return (
                                   <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                    {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                    {Array(item.level).fill('  ').join('') + (getLabelText(item.payload.label, this.state.lang))}
                                   </option>
                                 )
                               }, this)}
@@ -926,60 +1004,37 @@ if(productCategoryId!=-1){
                 </Col>
               </Form>
               <Col md="12 pl-0">
-                <div className="row">
-
-                  {
-                    this.state.consumptions.length > 0
-                    &&
-                    <div className="col-md-12 grapg-margin " >
-                    <div className="col-md-12">
-                      <div className="chart-wrapper chart-graph-report">
-                        <Bar id="cool-canvas" data={bar} options={options} />
-                      </div>
-                    </div>   <div className="col-md-12">
-                        <button className="mr-1 float-right btn btn-info btn-md showdatabtn" onClick={this.toggledata}>
-                          {this.state.show ? 'Hide Data' : 'Show Data'}
-                        </button>
-
-                      </div> </div>}
-
-                </div>
+              
                 <div className="row">
                     <div className="col-md-12">
-                      {this.state.show && this.state.consumptions.length > 0 &&
-                    
-                       <Table responsive className="table-striped  table-hover table-bordered text-center mt-2">
+                      {this.state.consumptions.length > 0 &&
+                       <ToolkitProvider
+                       keyField="procurementUnitId"
+                       data={this.state.consumptions}
+                       columns={columns}
+                       exportCSV exportCSV
+                       search={{ searchFormatted: true }}
+                       hover
+                       filter={filterFactory()}
 
-                        <thead>
-                          <tr>
-                          <th className="text-center" style={{width:'34%'}}> {i18n.t('static.dashboard.country')} </th>
-                            <th className="text-center " style={{width:'34%'}}> {i18n.t('static.report.month')} </th>
-                            <th className="text-center" style={{width:'34%'}}>{i18n.t('static.consumption.consumptionqty')}</th>
-                              </tr>
-                        </thead>
-                       
-                          <tbody>
-                            {
-                              this.state.consumptions.length > 0
-                              &&
-                              this.state.consumptions.map((item, idx) =>
+                   >
+                       {
+                           props => (
+                               <div className="TableCust">
+                                   <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                       <SearchBar {...props.searchProps} />
+                                       <ClearSearchButton {...props.searchProps} /></div>
+                                   <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                       pagination={paginationFactory(options)}
 
-                                <tr id="addr0" key={idx} >
-                                
-                                  <td>{getLabelText(this.state.consumptions[idx].realmCountry.label,this.state.lang)}</td>
-                                  <td>
+                                       {...props.baseProps}
+                                   /></div>
 
-                                    {this.state.consumptions[idx].consumptionDateString}
-                                  </td>
-                                  <td >
-                                    {this.state.consumptions[idx].planningUnitQty}
-                                  </td>
-                                 </tr>)
+                           )
+                       }
+                   </ToolkitProvider>
 
-                            }
-                          </tbody>
-                 </Table>
-                 }
+}
 
                    </div>
                    </div>
@@ -995,4 +1050,4 @@ if(productCategoryId!=-1){
   }
 }
 
-export default GlobalConsumption;
+export default ForecastMetrics;

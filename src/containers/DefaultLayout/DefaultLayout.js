@@ -401,6 +401,10 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.report.forecasterrorovertime'),
                             url: '/report/forecastOverTheTime',
                             icon: 'fa fa-exchange'
+                          }, {
+                            name: i18n.t('static.dashboard.forecastmetrics'),
+                            url: '/report/forecastMetrics',
+                            icon: 'fa fa-exchange'
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatusovertime'),
