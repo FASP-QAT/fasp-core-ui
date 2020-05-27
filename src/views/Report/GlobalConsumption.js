@@ -117,12 +117,6 @@ for (var i = 0; i <= elements; i++) {
   data3.push(65);
 }
 
-var countryValues= [];
-var countryLabels= [];
-var planningUnitValues= [];
-var planningUnitLabels= [];
-var programValues= [];
-var programLabels= [];
 
 
 class GlobalConsumption extends Component {
@@ -175,13 +169,18 @@ class GlobalConsumption extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
-    csvRow.push(i18n.t('static.dashboard.country') + ' : ' + ((countryLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.program.program') + ' : ' + ((programLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' : ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + ((planningUnitLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push('')
-    csvRow.push('')
+    csvRow.push((i18n.t('static.report.dateRange') + ' , ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
+    this.state.programLabels.map(ele=>
+      csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+      this.state.programLabels.map(ele=>
+      csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+      csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+      this.state.planningUnitLabels.map(ele=>
+      csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+      csvRow.push('')
+      csvRow.push('')
+      csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+      csvRow.push('')
     var re;
 
     var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ','%20'),(i18n.t('static.report.month')).replaceAll(' ','%20'),(i18n.t('static.consumption.consumptionqty')).replaceAll(' ','%20')]]
@@ -257,16 +256,16 @@ class GlobalConsumption extends Component {
           doc.text(i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country') + ' : ' + countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
             align: 'left'
         })
-          doc.text(i18n.t('static.program.program') + ' : ' + programLabels.toString(), doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
           doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 170, {
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 170, {
             align: 'left'
           })
         }
@@ -329,54 +328,29 @@ class GlobalConsumption extends Component {
 
  handleChange(countrysId) {
 
-    var countryIdArray = [];
-    var countrylabelArray = [];
-    for (var i = 0; i < countrysId.length; i++) {
-      countryIdArray[i] = countrysId[i].value;
-      countrylabelArray[i] = countrysId[i].label;
-    }
-    // await this.setState({
-      countryValues= countryIdArray;
-      countryLabels= countrylabelArray;
-   
-  this.filterData(this.state.rangeValue)
-    
+    this.setState({
+      countryValues: countrysId.map(ele=>ele.value),
+      countryLabels: countrysId.map(ele=>ele.label)},() => {
+  
+        this.filterData(this.state.rangeValue)})
   }
    handleChangeProgram(programIds) {
 
-    var programIdArray = [];
-    var programlabelArray = []
-    for (var i = 0; i < programIds.length; i++) {
-      programIdArray[i] = programIds[i].value;
-      programlabelArray = programIds[i].label
-    }
-   // await this.setState({
-      programValues= programIdArray;
-      programLabels= programlabelArray;
+     this.setState({
+      programValues: programIds.map(ele=>ele.value),
+      programLabels: programIds.map(ele=>ele.label)},() => {
   
-      this.filterData(this.state.rangeValue)
+      this.filterData(this.state.rangeValue)})
     
   }
 
   handlePlanningUnitChange(planningUnitIds) {
    
+    this.setState({
+      planningUnitValues: planningUnitIds.map(ele=>ele.value),
+      planningUnitLabels:planningUnitIds.map(ele=>ele.label)},() => {
   
-    var planningUnitIdArray = [];
-    var planningUnitLabel = [];
-    planningUnitIdArray= planningUnitIds.map(ele=>ele.value)
-    planningUnitLabel=planningUnitIds.map(ele=>ele.label)
-   /* for (var i = 0; i < planningUnitIds.length; i++) {
-      planningUnitIdArray[i] = planningUnitIds[i].value;
-      planningUnitLabel[i] = planningUnitIds[i].label
-
-    }*/
-   
-    //await this.setState({
-      planningUnitValues= planningUnitIds.map(ele=>ele.value);
-      planningUnitLabels=planningUnitIds.map(ele=>ele.label);
-  
-      this.filterData(this.state.rangeValue)
-    
+        this.filterData(this.state.rangeValue)})
   }
 
 
@@ -390,9 +364,9 @@ class GlobalConsumption extends Component {
     */
    setTimeout('', 10000);
     let productCategoryId = document.getElementById("productCategoryId").value;
-    let CountryIds = countryValues;
-    let planningUnitIds = planningUnitValues;
-    let programIds = programValues
+    let CountryIds = this.state.countryValues;
+    let planningUnitIds = this.state.planningUnitValues;
+    let programIds = this.state.programValues
     let startDate=rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate=rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
     if(CountryIds.length>0 && planningUnitIds.length>0&&programIds.length>0){

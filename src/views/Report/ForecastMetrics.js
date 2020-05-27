@@ -117,12 +117,7 @@ for (var i = 0; i <= elements; i++) {
   data3.push(65);
 }
 
-var countryValues= [];
-var countryLabels= [];
-var planningUnitValues= [];
-var planningUnitLabels= [];
-var programValues= [];
-var programLabels= [];
+
 
 
 class ForecastMetrics extends Component {
@@ -139,6 +134,12 @@ class ForecastMetrics extends Component {
       consumptions: [],
       productCategories: [],
       programs:[],
+      countryValues: [],
+      countryLabels: [],
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      programValues: [],
+      programLabels: [],
       message:'',
       singleValue2: {year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
@@ -189,12 +190,17 @@ class ForecastMetrics extends Component {
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.selectMonth') + ' : ' +this.makeText(this.state.singleValue2)).replaceAll(' ','%20'))
-    csvRow.push(i18n.t('static.dashboard.country') + ' : ' + ((countryLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push(i18n.t('static.program.program') + ' : ' + ((programLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' : ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' : ' + ((planningUnitLabels.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.report.selectMonth') + ' , ' +this.makeText(this.state.singleValue2)).replaceAll(' ','%20'))
+    this.state.programLabels.map(ele=>
+    csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+    this.state.programLabels.map(ele=>
+    csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    this.state.planningUnitLabels.map(ele=>
+    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     csvRow.push('')
+    csvRow.push('')
+    csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
 
@@ -267,16 +273,16 @@ class ForecastMetrics extends Component {
           doc.text(i18n.t('static.report.selectMonth') + ' : ' +this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country') + ' : ' + countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
+          doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
             align: 'left'
         })
-          doc.text(i18n.t('static.program.program') + ' : ' + programLabels.toString(), doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width / 8, 130, {
             align: 'left'
           })
           doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 170, {
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 170, {
             align: 'left'
           })
         }
@@ -338,56 +344,31 @@ class ForecastMetrics extends Component {
 
 
 
- handleChange(countrysId) {
+  handleChange(countrysId) {
 
-    var countryIdArray = [];
-    var countrylabelArray = [];
-    for (var i = 0; i < countrysId.length; i++) {
-      countryIdArray[i] = countrysId[i].value;
-      countrylabelArray[i] = countrysId[i].label;
-    }
-    // await this.setState({
-      countryValues= countryIdArray;
-      countryLabels= countrylabelArray;
-   
-  this.filterData()
-    
+    this.setState({
+      countryValues: countrysId.map(ele=>ele.value),
+      countryLabels: countrysId.map(ele=>ele.label)},() => {
+  
+        this.filterData(this.state.rangeValue)})
   }
    handleChangeProgram(programIds) {
 
-    var programIdArray = [];
-    var programlabelArray = []
-    for (var i = 0; i < programIds.length; i++) {
-      programIdArray[i] = programIds[i].value;
-      programlabelArray = programIds[i].label
-    }
-   // await this.setState({
-      programValues= programIdArray;
-      programLabels= programlabelArray;
+     this.setState({
+      programValues: programIds.map(ele=>ele.value),
+      programLabels: programIds.map(ele=>ele.label)},() => {
   
-  this.filterData()
+      this.filterData(this.state.rangeValue)})
     
   }
 
   handlePlanningUnitChange(planningUnitIds) {
    
+    this.setState({
+      planningUnitValues: planningUnitIds.map(ele=>ele.value),
+      planningUnitLabels:planningUnitIds.map(ele=>ele.label)},() => {
   
-    var planningUnitIdArray = [];
-    var planningUnitLabel = [];
-    planningUnitIdArray= planningUnitIds.map(ele=>ele.value)
-    planningUnitLabel=planningUnitIds.map(ele=>ele.label)
-   /* for (var i = 0; i < planningUnitIds.length; i++) {
-      planningUnitIdArray[i] = planningUnitIds[i].value;
-      planningUnitLabel[i] = planningUnitIds[i].label
-
-    }*/
-   
-    //await this.setState({
-      planningUnitValues= planningUnitIds.map(ele=>ele.value);
-      planningUnitLabels=planningUnitIds.map(ele=>ele.label);
-  
-  this.filterData()
-    
+        this.filterData(this.state.rangeValue)})
   }
 
 
@@ -401,9 +382,9 @@ class ForecastMetrics extends Component {
     */
    setTimeout('', 10000);
     let productCategoryId = document.getElementById("productCategoryId").value;
-    let CountryIds = countryValues;
-    let planningUnitIds = planningUnitValues;
-    let programIds = programValues
+    let CountryIds = this.state.countryValues;
+    let planningUnitIds = this.state.planningUnitValues;
+    let programIds = this.state.programValues
     let startDate=this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
     //let stopDate=this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
     if(CountryIds.length>0 && planningUnitIds.length>0&&programIds.length>0){
@@ -713,8 +694,10 @@ if(productCategoryId!=-1){
        //
       }
       handleAMonthDissmis2 = (value) => {
-          this.setState( {singleValue2: value} )
-          this.filterData()
+          this.setState( {singleValue2: value} , () => {
+            this.filterData();
+          })
+          
       }
 
   _handleClickRangeBox(e) {

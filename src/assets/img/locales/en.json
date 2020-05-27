@@ -673,7 +673,8 @@
     "static.dashboard.forecastmetrics": "Forecast Metrics",
     "static.report.historicalConsumptionDiff": "Historical Consumption Diff",
     "static.report.error": "Forecast Error",
-    "static.report.selectMonth": "Select Month"
+    "static.report.selectMonth": "Select Month",
+    "static.common.youdatastart":"Your data has started from here"
 
     
 }
