@@ -3088,10 +3088,15 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var currency = (this.state.currencyListAll).filter(c => c.currencyId == value)[0];
-                elInstance.setValueFromCoords(4, y, currency.conversionRateToUsd, true)
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
             }
         }
     }
@@ -6316,7 +6321,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             <th ></th>
                                             {
                                                 this.state.monthsArray.filter(m => m.display == 1).map(item => (
-                                                    <th style={{padding :'10px 0 !important'}}>{item.month}</th>
+                                                    <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
                                                 ))
                                             }
                                         </tr>
@@ -6507,10 +6512,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th style={{textAlign:'left'}}>Total</th>
+                                                <th style={{ textAlign: 'left' }}>Total</th>
                                                 {
                                                     this.state.consumptionTotalMonthWise.map(item => (
-                                                        <th style={{textAlign:'right'}}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
                                                     ))
                                                 }
                                             </tr>
@@ -6551,7 +6556,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             {
                                                 this.state.regionListFiltered.map(item => (
                                                     <tr>
-                                                        <td style={{textAlign:'left'}}>{item.name}</td>
+                                                        <td style={{ textAlign: 'left' }}>{item.name}</td>
                                                         {
                                                             this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
                                                                 if (item1.adjustmentQty.toString() != '') {
@@ -6568,10 +6573,10 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th style={{textAlign:'left'}}>Total</th>
+                                                <th style={{ textAlign: 'left' }}>Total</th>
                                                 {
                                                     this.state.inventoryTotalMonthWise.map(item => (
-                                                        <th style={{textAlign:'right'}}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                                        <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
                                                     ))
                                                 }
                                             </tr>

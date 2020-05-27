@@ -42,10 +42,13 @@ class DefaultLayout extends Component {
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
     var bfunction = [];
-    for (let i = 0; i < curUserBusinessFunctions.length; i++) {
-      bfunction.push(curUserBusinessFunctions[i].authority);
+
+    if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
+      for (let i = 0; i < curUserBusinessFunctions.length; i++) {
+        bfunction.push(curUserBusinessFunctions[i].authority);
+      }
+      this.setState({ businessFunctions: bfunction });
     }
-    this.setState({ businessFunctions: bfunction });
 
   }
 
