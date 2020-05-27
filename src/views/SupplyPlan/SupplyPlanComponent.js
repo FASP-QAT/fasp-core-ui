@@ -613,7 +613,16 @@ export default class SupplyPlanComponent extends React.Component {
                     var month = m[s + 3].startDate;
                     var addLeadTimes = parseInt(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
                         parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
-                        parseFloat(programJson.shippedToDeliveredBySeaLeadTime)) + 1;
+                        parseFloat(programJson.shippedToArrivedBySeaLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime)) + 1;
+                    console.log("Add Lead times", addLeadTimes);
+                    console.log("Program Json", programJson);
+                    console.log("programJson.plannedToDraftLeadTime", programJson.plannedToDraftLeadTime);
+                    console.log("programJson.draftToSubmittedLeadTime", programJson.draftToSubmittedLeadTime);
+                    console.log("programJson.submittedToApprovedLeadTime", programJson.submittedToApprovedLeadTime)
+                    console.log("programJson.approvedToShippedLeadTime", programJson.approvedToShippedLeadTime);
+
+                    console.log("programJson.shippedToArrivedBySeaLeadTime", programJson.shippedToArrivedBySeaLeadTime)
+                    console.log("programJson.arrivedToDeliveredLeadTime", programJson.arrivedToDeliveredLeadTime);
                     var expectedDeliveryDate = moment(month).subtract(addLeadTimes, 'months').format("YYYY-MM-DD");
                     var currentMonth = moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
                     var compare = (expectedDeliveryDate >= currentMonth);
@@ -641,8 +650,8 @@ export default class SupplyPlanComponent extends React.Component {
                 for (var s = 0; s < 18; s++) {
                     var suggestedShipmentQty = 0;
                     var addLeadTimes = parseInt(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
-                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
-                        parseFloat(programJson.shippedToDeliveredBySeaLeadTime)) + 1;
+                        parseFloat(programJson.sparseFloatubmittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
+                        parseFloat(programJson.shippedToArrivedBySeaLeadTime)) + 1;
                     for (var j = 0; j < s; j++) {
                         if ((s - addLeadTimes) > 0 && suggestedShipmentsTotalData[j] != "") {
                             console.log("J", j, "S", s, "suggestedShipmentsTotalData[j].suggestedOrderQty", suggestedShipmentsTotalData[j].suggestedOrderQty, 'AddLead Times', addLeadTimes);
@@ -1657,11 +1666,11 @@ export default class SupplyPlanComponent extends React.Component {
                     var map = new Map(Object.entries(json[0]));
 
 
-                    var addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
+                    var addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
                         parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
 
                     if (map.get("6") == "Sea") {
-                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredBySeaLeadTime);
+                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
                     } else {
                         addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredByAirLeadTime);
                     }
