@@ -13,7 +13,7 @@
     "static.dashboard.downloadprogram": "Descargar programa",
     "static.dashboard.currency": "Moneda",
     "static.dashboard.datasource": "Fuente de datos",
-    "static.dashboard.datasourcetype": "Tipo de fuente de datos",
+    "static.dashboard.datasourcetype": "Tipos de fuente de datos",
     "static.dashboard.addproductcategory": "Añadir categoría de producto",
     "static.dashboard.program": "Programa",
     "static.budget.budgetlist": "Lista de orçamento",
@@ -180,6 +180,10 @@
     "static.common.selectPlanningUnit": "Por favor seleccione la unidad de planificación",
     "static.common.selectProductCategory": "Por favor seleccione categoría de producto",
     "static.region.glnvalue": "GLN No debe tener 13 dígitos.",
-    "static.message.shipmentSaved": "Datos de envío guardados"
-
+    "static.message.shipmentSaved": "Datos de envío guardados",
+    "static.datasourcetype.datasourcetype": "Tipo de fuente de datos",
+    "static.common.realmtext": "Por favor seleccione reino",
+    "static.datasourcetype.datasourcetypetext": "Por favor, introduzca el tipo de fuente de datos",
+    "static.realm.realm": "Reino",
+    "static.breadcrum.add": "{{entityname}} / Añadir {{entityname}}"
 }
