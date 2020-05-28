@@ -185,5 +185,8 @@
     "static.common.realmtext": "Por favor seleccione reino",
     "static.datasourcetype.datasourcetypetext": "Por favor, introduzca el tipo de fuente de datos",
     "static.realm.realm": "Reino",
-    "static.breadcrum.add": "{{entityname}} / Añadir {{entityname}}"
+    "static.breadcrum.add": "{{entityname}} / Añadir {{entityname}}",
+    "static.program.shippedToArrivedByAirLeadTime": "Ingrese enviado a llegado por tiempo de entrega aérea",
+    "static.program.shippedToArrivedBySeaLeadTime": "Ingrese enviado a llegado por tiempo de entrega marítima",
+    "static.program.arrivedToDeliveredLeadTime": "Digite chegou ao prazo de entrega entregue"
 }

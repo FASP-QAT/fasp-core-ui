@@ -152,5 +152,8 @@
     "static.datasourcetype.datasourcetypetext": "Digite o tipo de fonte de dados",
     "static.realm.realm": "Reino",
     "static.dashboard.datasourcetype": "Tipos de fonte de dados",
-    "static.breadcrum.add": "{{entityname}} / Adicionar {{entityname}}"
+    "static.breadcrum.add": "{{entityname}} / Adicionar {{entityname}}",
+    "static.program.shippedToArrivedByAirLeadTime": "Por favor, insira enviado para chegar por tempo de entrega aérea",
+    "static.program.shippedToArrivedBySeaLeadTime": "Digite enviado para chegar por tempo de entrega do mar",
+    "static.program.arrivedToDeliveredLeadTime": "Digite chegou ao prazo de entrega entregue"
 }

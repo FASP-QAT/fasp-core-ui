@@ -177,6 +177,8 @@ export default class ConsumptionDetails extends React.Component {
                 var dataSource = [];
                 var supplier = [];
                 var programByte = [];
+                var currencyList = [];
+                var currencyListAll = [];
                 var elVar = "";
                 this.setState({ shipmentStatusId: shipmentList.shipmentStatus.id });
                 this.setState({ shipmentList: shipmentList });
@@ -200,231 +202,249 @@ export default class ConsumptionDetails extends React.Component {
 
                     }
 
-                    var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                    var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
-                    var procurementAgentRequest = procurementAgentOs.getAll();
+                    var currencyTransaction = db1.transaction(['currency'], 'readwrite');
+                    var currencyOs = currencyTransaction.objectStore('currency');
+                    var currencyRequest = currencyOs.getAll();
+                    currencyRequest.onsuccess = function (event) {
+                        var currencyResult = [];
+                        currencyResult = currencyRequest.result;
+                        for (var k = 0; k < currencyResult.length; k++) {
 
-                    procurementAgentRequest.onsuccess = function (event) {
-                        var procurementAgentResult = [];
-                        procurementAgentResult = procurementAgentRequest.result;
-                        for (var k = 0; k < procurementAgentResult.length; k++) {
-                            var procurementAgentJson = {
-                                name: procurementAgentResult[k].label.label_en,
-                                id: procurementAgentResult[k].procurementAgentId
+                            var currencyJson = {
+                                name: currencyResult[k].label.label_en,
+                                id: currencyResult[k].currencyId
                             }
-                            procurementAgent[k] = procurementAgentJson
+                            currencyList.push(currencyJson);
+                            currencyListAll.push(currencyResult[k]);
                         }
 
 
-                        var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
-                        var procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
-                        var procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
 
-                        procurementAgentPlanningUnitRequest.onsuccess = function (event) {
-                            var procurementAgentPlanningUnitResult = [];
-                            procurementAgentPlanningUnitResult = procurementAgentPlanningUnitRequest.result;
-                            for (var k = 0; k < procurementAgentPlanningUnitResult.length; k++) {
+                        var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                        var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
+                        var procurementAgentRequest = procurementAgentOs.getAll();
+
+                        procurementAgentRequest.onsuccess = function (event) {
+                            var procurementAgentResult = [];
+                            procurementAgentResult = procurementAgentRequest.result;
+                            for (var k = 0; k < procurementAgentResult.length; k++) {
                                 var procurementAgentJson = {
-                                    procurementAgentId: procurementAgentPlanningUnitResult[k].procurementAgent.id,
-                                    planningUnitId: procurementAgentPlanningUnitResult[k].planningUnit.id,
-                                    catalogPrice: procurementAgentPlanningUnitResult[k].catalogPrice,
-                                    moq: procurementAgentPlanningUnitResult[k].moq,
-                                    unitsPerPallet: procurementAgentPlanningUnitResult[k].unitsPerPallet,
-                                    unitsPerContainer: procurementAgentPlanningUnitResult[k].unitsPerContainer
+                                    name: procurementAgentResult[k].label.label_en,
+                                    id: procurementAgentResult[k].procurementAgentId
                                 }
-                                procurementAgentPlanningUnit[k] = procurementAgentJson
+                                procurementAgent[k] = procurementAgentJson
                             }
 
 
-                            var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
-                            var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
-                            var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
+                            var procurementAgentPlanningUnitTransaction = db1.transaction(['procurementAgentPlanningUnit'], 'readwrite');
+                            var procurementAgentPlanningUnitOs = procurementAgentPlanningUnitTransaction.objectStore('procurementAgentPlanningUnit');
+                            var procurementAgentPlanningUnitRequest = procurementAgentPlanningUnitOs.getAll();
 
-
-                            allowShipmentStatusRequest.onsuccess = function (event) {
-                                var allowShipmentStatusResult = [];
-                                allowShipmentStatusResult = allowShipmentStatusRequest.result;
-                                for (var k = 0; k < allowShipmentStatusResult.length; k++) {
-                                    if (shipmentList.shipmentStatus.id == allowShipmentStatusResult[k].shipmentStatusId) {
-                                        nextShipmentAllowedList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
+                            procurementAgentPlanningUnitRequest.onsuccess = function (event) {
+                                var procurementAgentPlanningUnitResult = [];
+                                procurementAgentPlanningUnitResult = procurementAgentPlanningUnitRequest.result;
+                                for (var k = 0; k < procurementAgentPlanningUnitResult.length; k++) {
+                                    var procurementAgentJson = {
+                                        procurementAgentId: procurementAgentPlanningUnitResult[k].procurementAgent.id,
+                                        planningUnitId: procurementAgentPlanningUnitResult[k].planningUnit.id,
+                                        catalogPrice: procurementAgentPlanningUnitResult[k].catalogPrice,
+                                        moq: procurementAgentPlanningUnitResult[k].moq,
+                                        unitsPerPallet: procurementAgentPlanningUnitResult[k].unitsPerPallet,
+                                        unitsPerContainer: procurementAgentPlanningUnitResult[k].unitsPerContainer
                                     }
+                                    procurementAgentPlanningUnit[k] = procurementAgentJson
                                 }
-                                var count = 0;
-                                for (var k = 0; k < allowShipmentStatusResult.length; k++) {
-                                    if (nextShipmentAllowedList[count] == allowShipmentStatusResult[k].shipmentStatusId) {
-                                        var allowShipStatusJson = {
+
+
+                                var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                                var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
+                                var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
+
+
+                                allowShipmentStatusRequest.onsuccess = function (event) {
+                                    var allowShipmentStatusResult = [];
+                                    allowShipmentStatusResult = allowShipmentStatusRequest.result;
+                                    for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                        if (shipmentList.shipmentStatus.id == allowShipmentStatusResult[k].shipmentStatusId) {
+                                            nextShipmentAllowedList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
+                                        }
+                                    }
+                                    var count = 0;
+                                    for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                        if (nextShipmentAllowedList[count] == allowShipmentStatusResult[k].shipmentStatusId) {
+                                            var allowShipStatusJson = {
+                                                name: allowShipmentStatusResult[k].label.label_en,
+                                                id: allowShipmentStatusResult[k].shipmentStatusId
+                                            }
+                                            allowShipStatusList[count] = allowShipStatusJson;
+                                            count++;
+                                        }
+                                    }
+                                    for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                        var shipmentStatusJson = {
                                             name: allowShipmentStatusResult[k].label.label_en,
                                             id: allowShipmentStatusResult[k].shipmentStatusId
                                         }
-                                        allowShipStatusList[count] = allowShipStatusJson;
-                                        count++;
-                                    }
-                                }
-                                for (var k = 0; k < allowShipmentStatusResult.length; k++) {
-                                    var shipmentStatusJson = {
-                                        name: allowShipmentStatusResult[k].label.label_en,
-                                        id: allowShipmentStatusResult[k].shipmentStatusId
-                                    }
-                                    shipmentStatus[k] = shipmentStatusJson
-                                }
-
-                                var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
-                                var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
-                                var procurementUnitRequest = procurementUnitOs.getAll();
-                                procurementUnitRequest.onsuccess = function (event) {
-
-                                    var procurementUnitResult = [];
-                                    procurementUnitResult = procurementUnitRequest.result;
-                                    for (var k = 0; k < procurementUnitResult.length; k++) {
-                                        var procurementUnitJson = {
-                                            name: procurementUnitResult[k].label.label_en,
-                                            id: procurementUnitResult[k].procurementUnitId
-                                        }
-                                        procurementUnit[k] = procurementUnitJson;
+                                        shipmentStatus[k] = shipmentStatusJson
                                     }
 
-                                    var budgetTransaction = db1.transaction(['budget'], 'readwrite');
-                                    var budgetOs = budgetTransaction.objectStore('budget');
-                                    var budgetRequest = budgetOs.getAll();
+                                    var procurementUnitTransaction = db1.transaction(['procurementUnit'], 'readwrite');
+                                    var procurementUnitOs = procurementUnitTransaction.objectStore('procurementUnit');
+                                    var procurementUnitRequest = procurementUnitOs.getAll();
+                                    procurementUnitRequest.onsuccess = function (event) {
 
-                                    budgetRequest.onsuccess = function (event) {
-                                        var budgetResult = [];
-                                        budgetResult = budgetRequest.result;
-                                        for (var k = 0; k < budgetResult.length; k++) {
-                                            var budgetObj = {
-                                                name: budgetResult[k].label.label_en,
-                                                id: budgetResult[k].budgetId
+                                        var procurementUnitResult = [];
+                                        procurementUnitResult = procurementUnitRequest.result;
+                                        for (var k = 0; k < procurementUnitResult.length; k++) {
+                                            var procurementUnitJson = {
+                                                name: procurementUnitResult[k].label.label_en,
+                                                id: procurementUnitResult[k].procurementUnitId
                                             }
-                                            budgetList[k] = budgetObj
+                                            procurementUnit[k] = procurementUnitJson;
                                         }
 
-                                        var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                                        var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                                        var dataSourceRequest = dataSourceOs.getAll();
+                                        var budgetTransaction = db1.transaction(['budget'], 'readwrite');
+                                        var budgetOs = budgetTransaction.objectStore('budget');
+                                        var budgetRequest = budgetOs.getAll();
 
-                                        dataSourceRequest.onsuccess = function (event) {
-                                            var dataSourceResult = [];
-                                            dataSourceResult = dataSourceRequest.result;
-                                            for (var k = 0; k < dataSourceResult.length; k++) {
-                                                var dataSourceJson = {
-                                                    name: dataSourceResult[k].label.label_en,
-                                                    id: dataSourceResult[k].dataSourceId
+                                        budgetRequest.onsuccess = function (event) {
+                                            var budgetResult = [];
+                                            budgetResult = budgetRequest.result;
+                                            for (var k = 0; k < budgetResult.length; k++) {
+                                                var budgetObj = {
+                                                    name: budgetResult[k].label.label_en,
+                                                    id: budgetResult[k].budgetId
                                                 }
-                                                dataSource[k] = dataSourceJson
+                                                budgetList[k] = budgetObj
                                             }
 
+                                            var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                                            var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                                            var dataSourceRequest = dataSourceOs.getAll();
 
-                                            var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
-                                            var supplierOs = supplierTransaction.objectStore('supplier');
-                                            var supplierRequest = supplierOs.getAll();
-
-                                            supplierRequest.onsuccess = function (event) {
-                                                var supplierResult = [];
-                                                supplierResult = supplierRequest.result;
-                                                for (var k = 0; k < supplierResult.length; k++) {
-                                                    var supplierJson = {
-                                                        name: supplierResult[k].label.label_en,
-                                                        id: supplierResult[k].supplierId
+                                            dataSourceRequest.onsuccess = function (event) {
+                                                var dataSourceResult = [];
+                                                dataSourceResult = dataSourceRequest.result;
+                                                for (var k = 0; k < dataSourceResult.length; k++) {
+                                                    var dataSourceJson = {
+                                                        name: dataSourceResult[k].label.label_en,
+                                                        id: dataSourceResult[k].dataSourceId
                                                     }
-                                                    supplier[k] = supplierJson;
+                                                    dataSource[k] = dataSourceJson
                                                 }
 
-                                                var programTransaction1 = db1.transaction(['program'], 'readwrite');
-                                                var programOs1 = programTransaction1.objectStore('program');
-                                                var programRequest1 = programOs1.getAll();
 
-                                                programRequest1.onsuccess = function (event) {
+                                                var supplierTransaction = db1.transaction(['supplier'], 'readwrite');
+                                                var supplierOs = supplierTransaction.objectStore('supplier');
+                                                var supplierRequest = supplierOs.getAll();
 
-                                                    var expectedDeliveryInDays = 0;
-                                                    var programResult = [];
-                                                    programResult = programRequest1.result;
-
-                                                    for (var k = 0; k < programResult.length; k++) {
-                                                        if (programResult[k].programId == (this.props.match.params.programId).split("_")[0]) {
-                                                            expectedDeliveryInDays = parseInt(programResult[k].plannedToDraftLeadTime) + parseInt(programResult[k].draftToSubmittedLeadTime) + parseInt(programResult[k].submittedToApprovedLeadTime) + parseInt(programResult[k].approvedToShippedLeadTime) + parseInt(programResult[k].deliveredToReceivedLeadTime);
-                                                            var programByteJson = {
-                                                                airFreightPerc: programResult[k].airFreightPerc,
-                                                                seaFreightPerc: programResult[k].seaFreightPerc
-                                                            }
-                                                            programByte = programByteJson
+                                                supplierRequest.onsuccess = function (event) {
+                                                    var supplierResult = [];
+                                                    supplierResult = supplierRequest.result;
+                                                    for (var k = 0; k < supplierResult.length; k++) {
+                                                        var supplierJson = {
+                                                            name: supplierResult[k].label.label_en,
+                                                            id: supplierResult[k].supplierId
                                                         }
+                                                        supplier[k] = supplierJson;
                                                     }
 
+                                                    var programTransaction1 = db1.transaction(['program'], 'readwrite');
+                                                    var programOs1 = programTransaction1.objectStore('program');
+                                                    var programRequest1 = programOs1.getAll();
 
-                                                    // console.log("procurementAgent--  ", procurementAgent);
-                                                    var procurementAgentDuplicateList = procurementAgentPlanningUnit.filter(p => p.planningUnitId == shipmentList.planningUnit.id);
-                                                    // console.log("procurementAgentDuplicateList--  ", procurementAgentDuplicateList);
-                                                    var procurementAgentUniqueIdList = procurementAgentDuplicateList.filter((v, i, a) => a.indexOf(v) === i);
-                                                    // console.log("procurementAgentUniqueIdList--  ", procurementAgentUniqueIdList);
+                                                    programRequest1.onsuccess = function (event) {
 
-                                                    // var procurementAgentPerPlanningUnit = procurementAgent.filter(p => p.id == procurementAgentUniqueIdList.procurementAgentId);
-                                                    // console.log('procurementAgentPerPlanningUnit-- ', procurementAgentPerPlanningUnit);
+                                                        var expectedDeliveryInDays = 0;
+                                                        var programResult = [];
+                                                        programResult = programRequest1.result;
 
-                                                    var procurementAgentPerPlanningUnit = [];
-                                                    let flag = 0;
-                                                    for (var i = 0; i < procurementAgent.length; i++) {
-                                                        for (var j = 0; j < procurementAgentUniqueIdList.length; j++) {
-                                                            if (procurementAgent[i].id == procurementAgentUniqueIdList[j].procurementAgentId) {
-                                                                procurementAgentPerPlanningUnit[flag] = procurementAgent[i];
-                                                                flag++;
+                                                        for (var k = 0; k < programResult.length; k++) {
+                                                            if (programResult[k].programId == (this.props.match.params.programId).split("_")[0]) {
+                                                                expectedDeliveryInDays = parseInt(programResult[k].plannedToDraftLeadTime) + parseInt(programResult[k].draftToSubmittedLeadTime) + parseInt(programResult[k].submittedToApprovedLeadTime) + parseInt(programResult[k].approvedToShippedLeadTime) + parseInt(programResult[k].deliveredToReceivedLeadTime);
+                                                                var programByteJson = {
+                                                                    airFreightPerc: programResult[k].airFreightPerc,
+                                                                    seaFreightPerc: programResult[k].seaFreightPerc
+                                                                }
+                                                                programByte = programByteJson
                                                             }
                                                         }
-                                                    }
-                                                    // console.log('procurementAgentPerPlanningUnit-- ', procurementAgentPerPlanningUnit);
 
 
-                                                    var procurementAgentPlanningUnitObj = procurementAgentPlanningUnit.filter(p => p.procurementAgentId == shipmentList.procurementAgent.id && p.planningUnitId == shipmentList.planningUnit.id)[0];
+                                                        // console.log("procurementAgent--  ", procurementAgent);
+                                                        var procurementAgentDuplicateList = procurementAgentPlanningUnit.filter(p => p.planningUnitId == shipmentList.planningUnit.id);
+                                                        // console.log("procurementAgentDuplicateList--  ", procurementAgentDuplicateList);
+                                                        var procurementAgentUniqueIdList = procurementAgentDuplicateList.filter((v, i, a) => a.indexOf(v) === i);
+                                                        // console.log("procurementAgentUniqueIdList--  ", procurementAgentUniqueIdList);
 
-                                                    if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
-                                                        // console.log("UNDEFINE-----------------");
-                                                        procurementAgentPlanningUnitObj = {
-                                                            procurementAgentId: 0,
-                                                            planningUnitId: planningUnitId,
-                                                            catalogPrice: 0,
-                                                            moq: 0,
-                                                            unitsPerPallet: 0,
-                                                            unitsPerContainer: 0
+                                                        // var procurementAgentPerPlanningUnit = procurementAgent.filter(p => p.id == procurementAgentUniqueIdList.procurementAgentId);
+                                                        // console.log('procurementAgentPerPlanningUnit-- ', procurementAgentPerPlanningUnit);
+
+                                                        var procurementAgentPerPlanningUnit = [];
+                                                        let flag = 0;
+                                                        for (var i = 0; i < procurementAgent.length; i++) {
+                                                            for (var j = 0; j < procurementAgentUniqueIdList.length; j++) {
+                                                                if (procurementAgent[i].id == procurementAgentUniqueIdList[j].procurementAgentId) {
+                                                                    procurementAgentPerPlanningUnit[flag] = procurementAgent[i];
+                                                                    flag++;
+                                                                }
+                                                            }
                                                         }
-                                                    }
-
-                                                    if (shipmentList.shipmentStatus.id == 2) {//planned
+                                                        // console.log('procurementAgentPerPlanningUnit-- ', procurementAgentPerPlanningUnit);
 
 
-                                                        document.getElementById("addButton").style.display = "block";
-                                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                                                        this.el.destroy();
+                                                        var procurementAgentPlanningUnitObj = procurementAgentPlanningUnit.filter(p => p.procurementAgentId == shipmentList.procurementAgent.id && p.planningUnitId == shipmentList.planningUnit.id)[0];
 
-                                                        var data = [];
-                                                        var shipmentDataArr = [];
-                                                        var i = 0;
-
-                                                        var budgetAmount = 0;
-                                                        var budgetJson = [];
-                                                        var shipmentBudgetList = shipmentList.shipmentBudgetList;
-                                                        for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
-                                                            budgetAmount += (shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd);
-                                                            budgetJson.push(shipmentBudgetList[sb]);
+                                                        if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
+                                                            // console.log("UNDEFINE-----------------");
+                                                            procurementAgentPlanningUnitObj = {
+                                                                procurementAgentId: 0,
+                                                                planningUnitId: planningUnitId,
+                                                                catalogPrice: 0,
+                                                                moq: 0,
+                                                                unitsPerPallet: 0,
+                                                                unitsPerContainer: 0
+                                                            }
                                                         }
-                                                        budgetAmount = budgetAmount.toFixed(2);
+
+                                                        if (shipmentList.shipmentStatus.id == 2) {//planned
 
 
-                                                        // console.log("budgetAmount--- ", budgetAmount);
-                                                        // console.log("budgetJson--- ", budgetJson);
-                                                        data[0] = shipmentList.expectedDeliveryDate;
-                                                        data[1] = shipmentList.shipmentStatus.id;
-                                                        data[2] = shipmentList.orderNo;
-                                                        data[3] = shipmentList.primeLineNo;
-                                                        data[4] = shipmentList.dataSource.id; // E
-                                                        data[5] = shipmentList.procurementAgent.id;
-                                                        data[6] = shipmentList.planningUnit.id;
-                                                        data[7] = shipmentList.suggestedQty;
-                                                        data[8] = procurementAgentPlanningUnitObj.moq;
-                                                        data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
-                                                        data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
-                                                        data[11] = ""; // Order based on
-                                                        data[12] = ""; // Rounding option
-                                                        data[13] = shipmentList.quantity; // User Qty
-                                                        data[14] = `=IF(L${i + 1}==3,
+                                                            document.getElementById("addButton").style.display = "block";
+                                                            this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                                            this.el.destroy();
+
+                                                            var data = [];
+                                                            var shipmentDataArr = [];
+                                                            var i = 0;
+
+                                                            var budgetAmount = 0;
+                                                            var budgetJson = [];
+                                                            var shipmentBudgetList = shipmentList.shipmentBudgetList;
+                                                            for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
+                                                                budgetAmount += (shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd);
+                                                                budgetJson.push(shipmentBudgetList[sb]);
+                                                            }
+                                                            budgetAmount = budgetAmount.toFixed(2);
+
+
+                                                            // console.log("budgetAmount--- ", budgetAmount);
+                                                            // console.log("budgetJson--- ", budgetJson);
+                                                            data[0] = shipmentList.expectedDeliveryDate;
+                                                            data[1] = shipmentList.shipmentStatus.id;
+                                                            data[2] = shipmentList.orderNo;
+                                                            data[3] = shipmentList.primeLineNo;
+                                                            data[4] = shipmentList.dataSource.id; // E
+                                                            data[5] = shipmentList.procurementAgent.id;
+                                                            data[6] = shipmentList.planningUnit.id;
+                                                            data[7] = shipmentList.suggestedQty;
+                                                            data[8] = procurementAgentPlanningUnitObj.moq;
+                                                            data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
+                                                            data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
+                                                            data[11] = ""; // Order based on
+                                                            data[12] = ""; // Rounding option
+                                                            data[13] = shipmentList.quantity; // User Qty
+                                                            data[14] = `=IF(L${i + 1}==3,
        
                                                             IF(M${i + 1}==1,
                                                                     CEILING(I${i + 1},1),
@@ -466,303 +486,436 @@ export default class ConsumptionDetails extends React.Component {
                                                             )
                                                     )
                                              )`;
-                                                        data[15] = `=O${i + 1}/Z${i + 1}`;
-                                                        data[16] = `=O${i + 1}/AA${i + 1}`;
-                                                        data[17] = shipmentList.rate;//Manual price
-                                                        data[18] = procurementAgentPlanningUnitObj.catalogPrice;
-                                                        data[19] = `=ROUND(IF(AND(NOT(ISBLANK(R${i + 1})),(R${i + 1} != 0)),R${i + 1},S${i + 1})*O${i + 1},2)`; //Amount
-                                                        data[20] = shipmentList.shipmentMode;//Shipment method
-                                                        data[21] = shipmentList.freightCost;// Freight Cost
-                                                        data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
-                                                        data[23] = `=ROUND(T${i + 1}+IF(AND(NOT(ISBLANK(V${i + 1})),(V${i + 1}!= 0)),V${i + 1},W${i + 1}),2)`; // Final Amount
-                                                        data[24] = shipmentList.notes;//Notes
-                                                        data[25] = procurementAgentPlanningUnitObj.unitsPerPallet;
-                                                        data[26] = procurementAgentPlanningUnitObj.unitsPerContainer;
-                                                        data[27] = programByte.airFreightPerc;
-                                                        data[28] = programByte.seaFreightPerc;
-                                                        data[29] = budgetAmount;
-                                                        data[30] = budgetJson;
-                                                        data[31] = rowIndex;
-                                                        data[32] = '';
+                                                            data[15] = `=O${i + 1}/Z${i + 1}`;
+                                                            data[16] = `=O${i + 1}/AA${i + 1}`;
+                                                            data[17] = shipmentList.rate;//Manual price
+                                                            data[18] = procurementAgentPlanningUnitObj.catalogPrice;
+                                                            data[19] = `=ROUND(IF(AND(NOT(ISBLANK(R${i + 1})),(R${i + 1} != 0)),R${i + 1},S${i + 1})*O${i + 1},2)`; //Amount
+                                                            data[20] = shipmentList.shipmentMode;//Shipment method
+                                                            data[21] = shipmentList.freightCost;// Freight Cost
+                                                            data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
+                                                            data[23] = `=ROUND(T${i + 1}+IF(AND(NOT(ISBLANK(V${i + 1})),(V${i + 1}!= 0)),V${i + 1},W${i + 1}),2)`; // Final Amount
+                                                            data[24] = shipmentList.notes;//Notes
+                                                            data[25] = procurementAgentPlanningUnitObj.unitsPerPallet;
+                                                            data[26] = procurementAgentPlanningUnitObj.unitsPerContainer;
+                                                            data[27] = programByte.airFreightPerc;
+                                                            data[28] = programByte.seaFreightPerc;
+                                                            data[29] = budgetAmount;
+                                                            data[30] = budgetJson;
+                                                            data[31] = rowIndex;
+                                                            data[32] = '';
 
-                                                        shipmentDataArr[0] = data;
+                                                            shipmentDataArr[0] = data;
 
-                                                        var json = [];
-                                                        var data = shipmentDataArr;
+                                                            var json = [];
+                                                            var data = shipmentDataArr;
 
-                                                        var options = {
-                                                            data: data,
-                                                            columnDrag: true,
-                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                                            columns: [
-                                                                { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
-                                                                { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
-                                                                { type: 'text', title: "Order No" },
-                                                                { type: 'text', title: "Prime line number" },
-                                                                { type: 'dropdown', title: "Data source", source: dataSource },
-                                                                { type: 'dropdown', title: "Procurement Agent", source: procurementAgentPerPlanningUnit },
-                                                                { type: 'dropdown', readOnly: true, title: "Planning unit", source: planningUnit },
-                                                                { type: 'number', title: "Suggested order qty" },
-                                                                { type: 'number', readOnly: true, title: "MoQ" },
-                                                                { type: 'number', readOnly: true, title: "No of pallets" },
-                                                                { type: 'number', readOnly: true, title: "No of containers" },
-                                                                { type: 'dropdown', title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
-                                                                { type: 'dropdown', title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
-                                                                { type: 'text', title: "User qty" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted order qty" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted pallets" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted containers" },
-                                                                { type: 'text', title: "Manual price per planning unit" },
-                                                                { type: 'text', readOnly: true, title: "Price per planning unit" },
-                                                                { type: 'text', readOnly: true, title: "Amount" },
-                                                                { type: 'dropdown', title: "Shipped method", source: ['Sea', 'Air'] },
-                                                                { type: 'text', title: "Freight cost amount" },
-                                                                { type: 'text', readOnly: true, title: "Default freight cost" },
-                                                                { type: 'text', readOnly: true, title: "Total amount" },
-                                                                { type: 'text', title: "Notes" },
-                                                                { type: 'hidden', title: "Units/Pallet" },
-                                                                { type: 'hidden', title: "Units/Container" },
-                                                                { type: 'hidden', title: "Air Freight Percentage" },
-                                                                { type: 'hidden', title: "Sea Freight Percentage" },
-                                                                { type: 'hidden', title: 'Budget Amount' },
-                                                                { type: 'hidden', title: "Budget Array" },
-                                                                { type: 'hidden', title: 'index' },
-                                                                { type: 'checkbox', title: 'Cancelled Order' }
-                                                            ],
-                                                            pagination: 10,
-                                                            search: true,
-                                                            columnSorting: true,
-                                                            tableOverflow: true,
-                                                            wordWrap: true,
-                                                            allowInsertColumn: false,
-                                                            allowManualInsertColumn: false,
-                                                            allowDeleteRow: false,
-                                                            onchange: this.plannedPsmChanged,
-                                                            oneditionend: this.onedit,
-                                                            copyCompatibility: true,
-                                                            paginationOptions: [10, 25, 50, 100],
-                                                            position: 'top',
-                                                            contextMenu: function (obj, x, y, e) {
-                                                                var items = [];
-                                                                //Add Shipment Budget
-                                                                items.push({
-                                                                    title: "List / Add shipment budget",
-                                                                    onclick: function () {
-                                                                        document.getElementById("showButtonsDiv").style.display = 'block';
-                                                                        this.el = jexcel(document.getElementById("shipmentBudgetTable"), '');
-                                                                        this.el.destroy();
-                                                                        var json = [];
-                                                                        // var elInstance=this.state.plannedPsmShipmentsEl;
-                                                                        var rowData = obj.getRowData(y)
-                                                                        console.log("RowData", rowData);
-                                                                        var shipmentBudget = rowData[30];
-                                                                        console.log("Shipemnt Budget", shipmentBudget);
-                                                                        for (var sb = 0; sb < shipmentBudget.length; sb++) {
-                                                                            var data = [];
-                                                                            data[0] = shipmentBudget[sb].shipmentBudgetId;
-                                                                            data[1] = shipmentBudget[sb].budget.budgetId;
-                                                                            data[2] = shipmentBudget[sb].budgetAmt;
-                                                                            data[3] = shipmentBudget[sb].conversionRateToUsd;
-                                                                            data[4] = y;
-                                                                            json.push(data);
-                                                                        }
-                                                                        if (shipmentBudget.length == 0) {
-                                                                            var data = [];
-                                                                            data[0] = "";
-                                                                            data[1] = "";
-                                                                            data[2] = "";
-                                                                            data[3] = "";
-                                                                            data[4] = y;
-                                                                            json = [data]
-                                                                        }
-                                                                        var options = {
-                                                                            data: json,
-                                                                            columnDrag: true,
-                                                                            colWidths: [290, 290, 170, 170],
-                                                                            columns: [
+                                                            var options = {
+                                                                data: data,
+                                                                columnDrag: true,
+                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                columns: [
+                                                                    { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                    { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
+                                                                    { type: 'text', title: "Order No" },
+                                                                    { type: 'text', title: "Prime line number" },
+                                                                    { type: 'dropdown', title: "Data source", source: dataSource },
+                                                                    { type: 'dropdown', title: "Procurement Agent", source: procurementAgentPerPlanningUnit },
+                                                                    { type: 'dropdown', readOnly: true, title: "Planning unit", source: planningUnit },
+                                                                    { type: 'number', title: "Suggested order qty" },
+                                                                    { type: 'number', readOnly: true, title: "MoQ" },
+                                                                    { type: 'number', readOnly: true, title: "No of pallets" },
+                                                                    { type: 'number', readOnly: true, title: "No of containers" },
+                                                                    { type: 'dropdown', title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
+                                                                    { type: 'dropdown', title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
+                                                                    { type: 'text', title: "User qty" },
+                                                                    { type: 'text', readOnly: true, title: "Adjusted order qty" },
+                                                                    { type: 'text', readOnly: true, title: "Adjusted pallets" },
+                                                                    { type: 'text', readOnly: true, title: "Adjusted containers" },
+                                                                    { type: 'text', title: "Manual price per planning unit" },
+                                                                    { type: 'text', readOnly: true, title: "Price per planning unit" },
+                                                                    { type: 'text', readOnly: true, title: "Amount" },
+                                                                    { type: 'dropdown', title: "Shipped method", source: ['Sea', 'Air'] },
+                                                                    { type: 'text', title: "Freight cost amount" },
+                                                                    { type: 'text', readOnly: true, title: "Default freight cost" },
+                                                                    { type: 'text', readOnly: true, title: "Total amount" },
+                                                                    { type: 'text', title: "Notes" },
+                                                                    { type: 'hidden', title: "Units/Pallet" },
+                                                                    { type: 'hidden', title: "Units/Container" },
+                                                                    { type: 'hidden', title: "Air Freight Percentage" },
+                                                                    { type: 'hidden', title: "Sea Freight Percentage" },
+                                                                    { type: 'hidden', title: 'Budget Amount' },
+                                                                    { type: 'hidden', title: "Budget Array" },
+                                                                    { type: 'hidden', title: 'index' },
+                                                                    { type: 'checkbox', title: 'Cancelled Order' }
+                                                                ],
+                                                                pagination: 10,
+                                                                search: true,
+                                                                columnSorting: true,
+                                                                tableOverflow: true,
+                                                                wordWrap: true,
+                                                                allowInsertColumn: false,
+                                                                allowManualInsertColumn: false,
+                                                                allowDeleteRow: false,
+                                                                onchange: this.plannedPsmChanged,
+                                                                oneditionend: this.onedit,
+                                                                copyCompatibility: true,
+                                                                paginationOptions: [10, 25, 50, 100],
+                                                                position: 'top',
+                                                                contextMenu: function (obj, x, y, e) {
+                                                                    var items = [];
+                                                                    //Add Shipment Budget
+                                                                    items.push({
+                                                                        title: "List / Add shipment budget",
+                                                                        onclick: function () {
+                                                                            document.getElementById("showButtonsDiv").style.display = 'block';
+                                                                            this.el = jexcel(document.getElementById("shipmentBudgetTable"), '');
+                                                                            this.el.destroy();
+                                                                            var json = [];
+                                                                            // var elInstance=this.state.plannedPsmShipmentsEl;
+                                                                            var rowData = obj.getRowData(y)
+                                                                            console.log("RowData", rowData);
+                                                                            var shipmentBudget = rowData[30];
+                                                                            console.log("Shipemnt Budget", shipmentBudget);
+                                                                            for (var sb = 0; sb < shipmentBudget.length; sb++) {
+                                                                                var data = [];
+                                                                                data[0] = shipmentBudget[sb].shipmentBudgetId;
+                                                                                data[1] = shipmentBudget[sb].budget.budgetId;
+                                                                                data[2] = shipmentBudget[sb].budgetAmt;
+                                                                                data[3] = shipmentBudget[sb].currency.currencyId;
+                                                                                data[4] = shipmentBudget[sb].conversionRateToUsd;
+                                                                                data[5] = y;
+                                                                                json.push(data);
+                                                                            }
+                                                                            if (shipmentBudget.length == 0) {
+                                                                                var data = [];
+                                                                                data[0] = "";
+                                                                                data[1] = "";
+                                                                                data[2] = "";
+                                                                                data[3] = "";
+                                                                                data[4] = ""
+                                                                                data[5] = y;
+                                                                                json = [data]
+                                                                            }
+                                                                            var options = {
+                                                                                data: json,
+                                                                                columnDrag: true,
+                                                                                colWidths: [290, 290, 170, 170, 170],
+                                                                                columns: [
 
-                                                                                {
-                                                                                    title: 'Shipment Budget Id',
-                                                                                    type: 'hidden',
-                                                                                },
-                                                                                {
-                                                                                    title: 'Budget',
-                                                                                    type: 'dropdown',
-                                                                                    source: budgetList
-                                                                                },
-                                                                                {
-                                                                                    title: 'Budget Amount',
-                                                                                    type: 'number',
-                                                                                },
-                                                                                {
-                                                                                    title: 'Conversion rate to USD',
-                                                                                    type: 'number'
-                                                                                },
-                                                                                {
-                                                                                    title: 'Row number',
-                                                                                    type: 'hidden'
+                                                                                    {
+                                                                                        title: 'Shipment Budget Id',
+                                                                                        type: 'hidden',
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Budget',
+                                                                                        type: 'dropdown',
+                                                                                        source: budgetList
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Budget Amount',
+                                                                                        type: 'number',
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Currency',
+                                                                                        type: 'dropdown',
+                                                                                        source: currencyList
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Conversion rate to USD',
+                                                                                        type: 'number'
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Row number',
+                                                                                        type: 'hidden'
+                                                                                    }
+                                                                                ],
+                                                                                pagination: false,
+                                                                                search: true,
+                                                                                columnSorting: true,
+                                                                                tableOverflow: true,
+                                                                                wordWrap: true,
+                                                                                allowInsertColumn: false,
+                                                                                allowManualInsertColumn: false,
+                                                                                allowDeleteRow: false,
+                                                                                oneditionend: this.onedit,
+                                                                                copyCompatibility: true,
+                                                                                // editable: false
+                                                                                onchange: this.budgetChanged,
+
+                                                                                contextMenu: function (obj, x, y, e) {
+                                                                                    var items = [];
+                                                                                    if (y == null) {
+                                                                                        // Insert a new column
+                                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        // Delete a column
+                                                                                        if (obj.options.allowDeleteColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.deleteSelectedColumns,
+                                                                                                onclick: function () {
+                                                                                                    obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+
+
+                                                                                        // Rename column
+                                                                                        if (obj.options.allowRenameColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.renameThisColumn,
+                                                                                                onclick: function () {
+                                                                                                    obj.setHeader(x);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        // Sorting
+                                                                                        if (obj.options.columnSorting == true) {
+                                                                                            // Line
+                                                                                            items.push({ type: 'line' });
+
+                                                                                            items.push({
+                                                                                                title: obj.options.text.orderAscending,
+                                                                                                onclick: function () {
+                                                                                                    obj.orderBy(x, 0);
+                                                                                                }
+                                                                                            });
+                                                                                            items.push({
+                                                                                                title: obj.options.text.orderDescending,
+                                                                                                onclick: function () {
+                                                                                                    obj.orderBy(x, 1);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    } else {
+                                                                                        // Insert new row
+                                                                                        if (obj.options.allowInsertRow == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewRowAfter,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertRow(1, parseInt(y));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (obj.options.allowDeleteRow == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.deleteSelectedRows,
+                                                                                                onclick: function () {
+                                                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (x) {
+                                                                                            if (obj.options.allowComments == true) {
+                                                                                                items.push({ type: 'line' });
+
+                                                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                                items.push({
+                                                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                                    onclick: function () {
+                                                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                                    }
+                                                                                                });
+
+                                                                                                if (title) {
+                                                                                                    items.push({
+                                                                                                        title: obj.options.text.clearComments,
+                                                                                                        onclick: function () {
+                                                                                                            obj.setComments([x, y], '');
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+
+                                                                                    // Line
+                                                                                    items.push({ type: 'line' });
+
+                                                                                    // Save
+                                                                                    if (obj.options.allowExport) {
+                                                                                        items.push({
+                                                                                            title: obj.options.text.saveAs,
+                                                                                            shortcut: 'Ctrl + S',
+                                                                                            onclick: function () {
+                                                                                                obj.download(true);
+                                                                                            }
+                                                                                        });
+                                                                                    }
+
+                                                                                    return items;
+                                                                                }.bind(this)
+
+
+
+
+                                                                            };
+                                                                            elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
+                                                                            this.el = elVar;
+                                                                            this.setState({ shipmentBudgetTableEl: elVar });
+                                                                        }.bind(this)
+                                                                        // this.setState({ shipmentBudgetTableEl: elVar });
+                                                                    });
+                                                                    // -------------------------------------
+
+                                                                    if (y == null) {
+                                                                        // Insert a new column
+                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                                onclick: function () {
+                                                                                    obj.insertColumn(1, parseInt(x), 1);
                                                                                 }
-                                                                            ],
-                                                                            pagination: false,
-                                                                            search: true,
-                                                                            columnSorting: true,
-                                                                            tableOverflow: true,
-                                                                            wordWrap: true,
-                                                                            allowInsertColumn: false,
-                                                                            allowManualInsertColumn: false,
-                                                                            allowDeleteRow: false,
-                                                                            oneditionend: this.onedit,
-                                                                            copyCompatibility: true,
-                                                                            // editable: false
-                                                                            onchange: this.budgetChanged
+                                                                            });
+                                                                        }
 
-                                                                        };
-                                                                        elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
-                                                                        this.el = elVar;
-                                                                        this.setState({ shipmentBudgetTableEl: elVar });
-                                                                    }.bind(this)
-                                                                    // this.setState({ shipmentBudgetTableEl: elVar });
-                                                                });
-                                                                // -------------------------------------
+                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                                onclick: function () {
+                                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                                }
+                                                                            });
+                                                                        }
 
-                                                                if (y == null) {
-                                                                    // Insert a new column
-                                                                    if (obj.options.allowInsertColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewColumnBefore,
-                                                                            onclick: function () {
-                                                                                obj.insertColumn(1, parseInt(x), 1);
-                                                                            }
-                                                                        });
-                                                                    }
-
-                                                                    if (obj.options.allowInsertColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewColumnAfter,
-                                                                            onclick: function () {
-                                                                                obj.insertColumn(1, parseInt(x), 0);
-                                                                            }
-                                                                        });
-                                                                    }
-
-                                                                    // Delete a column
-                                                                    if (obj.options.allowDeleteColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.deleteSelectedColumns,
-                                                                            onclick: function () {
-                                                                                obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
-                                                                            }
-                                                                        });
-                                                                    }
+                                                                        // Delete a column
+                                                                        if (obj.options.allowDeleteColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.deleteSelectedColumns,
+                                                                                onclick: function () {
+                                                                                    obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                }
+                                                                            });
+                                                                        }
 
 
 
-                                                                    // Rename column
-                                                                    if (obj.options.allowRenameColumn == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.renameThisColumn,
-                                                                            onclick: function () {
-                                                                                obj.setHeader(x);
-                                                                            }
-                                                                        });
-                                                                    }
+                                                                        // Rename column
+                                                                        if (obj.options.allowRenameColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.renameThisColumn,
+                                                                                onclick: function () {
+                                                                                    obj.setHeader(x);
+                                                                                }
+                                                                            });
+                                                                        }
 
-                                                                    // Sorting
-                                                                    if (obj.options.columnSorting == true) {
-                                                                        // Line
-                                                                        items.push({ type: 'line' });
-
-                                                                        items.push({
-                                                                            title: obj.options.text.orderAscending,
-                                                                            onclick: function () {
-                                                                                obj.orderBy(x, 0);
-                                                                            }
-                                                                        });
-                                                                        items.push({
-                                                                            title: obj.options.text.orderDescending,
-                                                                            onclick: function () {
-                                                                                obj.orderBy(x, 1);
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                } else {
-                                                                    // Insert new row
-                                                                    if (obj.options.allowInsertRow == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewRowBefore,
-                                                                            onclick: function () {
-                                                                                obj.insertRow(1, parseInt(y), 1);
-                                                                            }
-                                                                        });
-
-                                                                        items.push({
-                                                                            title: obj.options.text.insertANewRowAfter,
-                                                                            onclick: function () {
-                                                                                obj.insertRow(1, parseInt(y));
-                                                                            }
-                                                                        });
-                                                                    }
-
-                                                                    if (obj.options.allowDeleteRow == true) {
-                                                                        items.push({
-                                                                            title: obj.options.text.deleteSelectedRows,
-                                                                            onclick: function () {
-                                                                                obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
-                                                                            }
-                                                                        });
-                                                                    }
-
-                                                                    if (x) {
-                                                                        if (obj.options.allowComments == true) {
+                                                                        // Sorting
+                                                                        if (obj.options.columnSorting == true) {
+                                                                            // Line
                                                                             items.push({ type: 'line' });
 
-                                                                            var title = obj.records[y][x].getAttribute('title') || '';
-
                                                                             items.push({
-                                                                                title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                title: obj.options.text.orderAscending,
                                                                                 onclick: function () {
-                                                                                    obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                    obj.orderBy(x, 0);
+                                                                                }
+                                                                            });
+                                                                            items.push({
+                                                                                title: obj.options.text.orderDescending,
+                                                                                onclick: function () {
+                                                                                    obj.orderBy(x, 1);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    } else {
+                                                                        // Insert new row
+                                                                        if (obj.options.allowInsertRow == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewRowBefore,
+                                                                                onclick: function () {
+                                                                                    obj.insertRow(1, parseInt(y), 1);
                                                                                 }
                                                                             });
 
-                                                                            if (title) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewRowAfter,
+                                                                                onclick: function () {
+                                                                                    obj.insertRow(1, parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (obj.options.allowDeleteRow == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.deleteSelectedRows,
+                                                                                onclick: function () {
+                                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (x) {
+                                                                            if (obj.options.allowComments == true) {
+                                                                                items.push({ type: 'line' });
+
+                                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
                                                                                 items.push({
-                                                                                    title: obj.options.text.clearComments,
+                                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
                                                                                     onclick: function () {
-                                                                                        obj.setComments([x, y], '');
+                                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
                                                                                     }
                                                                                 });
+
+                                                                                if (title) {
+                                                                                    items.push({
+                                                                                        title: obj.options.text.clearComments,
+                                                                                        onclick: function () {
+                                                                                            obj.setComments([x, y], '');
+                                                                                        }
+                                                                                    });
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
-                                                                }
 
-                                                                // Line
-                                                                items.push({ type: 'line' });
+                                                                    // Line
+                                                                    items.push({ type: 'line' });
 
-                                                                // Save
-                                                                if (obj.options.allowExport) {
-                                                                    items.push({
-                                                                        title: obj.options.text.saveAs,
-                                                                        shortcut: 'Ctrl + S',
-                                                                        onclick: function () {
-                                                                            obj.download();
-                                                                        }
-                                                                    });
-                                                                }
+                                                                    // Save
+                                                                    if (obj.options.allowExport) {
+                                                                        items.push({
+                                                                            title: obj.options.text.saveAs,
+                                                                            shortcut: 'Ctrl + S',
+                                                                            onclick: function () {
+                                                                                obj.download();
+                                                                            }
+                                                                        });
+                                                                    }
 
-                                                                // About
-                                                                if (obj.options.about) {
-                                                                    items.push({
-                                                                        title: obj.options.text.about,
-                                                                        onclick: function () {
-                                                                            alert(obj.options.about);
-                                                                        }
-                                                                    });
-                                                                }
-                                                                return items;
-                                                            }.bind(this)
-
+                                                                    // About
+                                                                    if (obj.options.about) {
+                                                                        items.push({
+                                                                            title: obj.options.text.about,
+                                                                            onclick: function () {
+                                                                                alert(obj.options.about);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    return items;
+                                                                }.bind(this)
 
 
 
@@ -776,362 +929,23 @@ export default class ConsumptionDetails extends React.Component {
 
 
 
-                                                        };
 
-                                                        // this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                                                            };
 
-                                                        var shipmentEL = jexcel(document.getElementById("shipmenttableDiv"), options);
+                                                            // this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
-                                                        this.el = shipmentEL;
+                                                            var shipmentEL = jexcel(document.getElementById("shipmenttableDiv"), options);
 
-                                                        this.setState({
-                                                            shipmentEL: shipmentEL
-                                                        })
+                                                            this.el = shipmentEL;
 
-
-
-
-                                                    } else if (shipmentList.shipmentStatus.id == 7) {//cancelled
-
-                                                        document.getElementById("addButton").style.display = "none";
-                                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                                                        this.el.destroy();
-
-                                                        var data = [];
-                                                        var shipmentDataArr = [];
-                                                        var i = 0;
-
-                                                        var budgetAmount = 0;
-                                                        var budgetJson = [];
-                                                        var shipmentBudgetList = shipmentList.shipmentBudgetList;
-                                                        for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
-                                                            budgetAmount += (shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd);
-                                                            budgetJson.push(shipmentBudgetList[sb]);
-                                                        }
-                                                        budgetAmount = budgetAmount.toFixed(2);
-
-                                                        // console.log("procurementAgentPlanningUnitObj------", procurementAgentPlanningUnitObj);
-                                                        if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
-                                                            // console.log("UNDEFINE-----------------");
-                                                            procurementAgentPlanningUnitObj = {
-                                                                procurementAgentId: 0,
-                                                                planningUnitId: planningUnitId,
-                                                                catalogPrice: 0,
-                                                                moq: 0,
-                                                                unitsPerPallet: 0,
-                                                                unitsPerContainer: 0
-                                                            }
-                                                        }
-
-                                                        // console.log("budgetAmount--- ", budgetAmount);
-                                                        // console.log("budgetJson--- ", budgetJson);
-                                                        data[0] = shipmentList.expectedDeliveryDate;
-                                                        data[1] = shipmentList.shipmentStatus.id;
-                                                        data[2] = shipmentList.orderNo;
-                                                        data[3] = shipmentList.primeLineNo;
-                                                        data[4] = shipmentList.dataSource.id; // E
-                                                        data[5] = shipmentList.procurementAgent.id;
-                                                        data[6] = shipmentList.planningUnit.id;
-                                                        data[7] = shipmentList.suggestedQty;
-                                                        data[8] = procurementAgentPlanningUnitObj.moq;
-                                                        data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
-                                                        data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
-                                                        data[11] = ""; // Order based on
-                                                        data[12] = ""; // Rounding option
-                                                        data[13] = shipmentList.quantity; // User Qty
-                                                        data[14] = `=IF(L${i + 1}==3,
-   
-                                                        IF(M${i + 1}==1,
-                                                                CEILING(I${i + 1},1),
-                                                                FLOOR(I${i + 1},1)
-                                                        )
-                                                ,
-                                                IF(L${i + 1}==4,
-                                                        IF(NOT(ISBLANK(N${i + 1})),
-                                                                IF(M${i + 1}==1,
-                                                                        CEILING(N${i + 1}/Z${i + 1},1)*Z${i + 1},
-                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*Z${i + 1}
-                                                                ),
-                                                                IF(M${i + 1}==1,
-                                                                        CEILING(J${i + 1},1)*Z${i + 1},
-                                                                        FLOOR(J${i + 1},1)*Z${i + 1}
-                                                                )
-                                                        ),
-                                                        IF(L${i + 1}==1,
-                                                                IF(NOT(ISBLANK(N${i + 1})),
-                                                                        IF(M${i + 1}==1,
-                                                                        CEILING(N${i + 1}/Z${i + 1},1)*AA${i + 1},
-                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*AA${i + 1}
-                                                                ),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(K${i + 1},1)*AA${i + 1},
-                                                                                FLOOR(K${i + 1},1)*AA${i + 1}
-                                                                        )
-                                                                ),
-                                                                IF(NOT(ISBLANK(N${i + 1})),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(N${i + 1},1),
-                                                                                FLOOR(N${i + 1},1)
-                                                                        ),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(H${i + 1},1),
-                                                                                FLOOR(H${i + 1},1)
-                                                                        )
-                                                                )
-                                                        )
-                                                )
-                                         )`;
-                                                        data[15] = `=O${i + 1}/Z${i + 1}`;
-                                                        data[16] = `=O${i + 1}/AA${i + 1}`;
-                                                        data[17] = "";//Manual price
-                                                        data[18] = procurementAgentPlanningUnitObj.catalogPrice;
-                                                        data[19] = `=ROUND(S${i + 1}*O${i + 1},2)`; //Amount
-                                                        data[20] = shipmentList.shipmentMode;//Shipment method
-                                                        data[21] = shipmentList.freightCost;// Freight Cost
-                                                        data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
-                                                        data[23] = `=ROUND(T${i + 1}+W${i + 1},2)`; // Final Amount
-                                                        data[24] = shipmentList.notes;//Notes
-                                                        data[25] = procurementAgentPlanningUnitObj.unitsPerPallet;
-                                                        data[26] = procurementAgentPlanningUnitObj.unitsPerContainer;
-                                                        data[27] = programByte.airFreightPerc;
-                                                        data[28] = programByte.seaFreightPerc;
-                                                        data[29] = budgetAmount;
-                                                        data[30] = budgetJson;
-                                                        data[31] = true;
-                                                        data[32] = rowIndex;
-
-                                                        shipmentDataArr[0] = data;
-
-                                                        var json = [];
-                                                        var data = shipmentDataArr;
-
-                                                        var options = {
-                                                            data: data,
-                                                            columnDrag: true,
-                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                                            columns: [
-                                                                { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
-                                                                { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
-                                                                { type: 'text', title: "Order No" },
-                                                                { type: 'text', title: "Prime line number" },
-                                                                { type: 'dropdown', readOnly: true, title: "Data source", source: dataSource },
-                                                                { type: 'dropdown', readOnly: true, title: "Procurement Agent", source: procurementAgentPerPlanningUnit },
-                                                                { type: 'dropdown', readOnly: true, title: "Planning unit", source: planningUnit },
-                                                                { type: 'number', readOnly: true, title: "Suggested order qty" },
-                                                                { type: 'number', readOnly: true, title: "MoQ" },
-                                                                { type: 'number', readOnly: true, title: "No of pallets" },
-                                                                { type: 'number', readOnly: true, title: "No of containers" },
-                                                                { type: 'dropdown', readOnly: true, title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
-                                                                { type: 'dropdown', readOnly: true, title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
-                                                                { type: 'text', readOnly: true, title: "User qty" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted order qty" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted pallets" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted containers" },
-                                                                { type: 'text', readOnly: true, title: "Manual price per planning unit" },
-                                                                { type: 'text', readOnly: true, title: "Price per planning unit" },
-                                                                { type: 'text', readOnly: true, title: "Amount" },
-                                                                { type: 'dropdown', readOnly: true, title: "Shipped method", source: ['Sea', 'Air'] },
-                                                                { type: 'text', title: "Freight cost amount" },
-                                                                { type: 'text', readOnly: true, title: "Default freight cost" },
-                                                                { type: 'text', readOnly: true, title: "Total amount" },
-                                                                { type: 'text', readOnly: true, title: "Notes" },
-                                                                { type: 'hidden', title: "Units/Pallet" },
-                                                                { type: 'hidden', title: "Units/Container" },
-                                                                { type: 'hidden', title: "Air Freight Percentage" },
-                                                                { type: 'hidden', title: "Sea Freight Percentage" },
-                                                                { type: 'hidden', title: 'Budget Amount' },
-                                                                { type: 'hidden', title: "Budget Array" },
-                                                                { type: 'checkbox', title: "Cancelled Order" },
-                                                                { type: 'hidden', title: 'index' },
-                                                            ],
-                                                            pagination: 10,
-                                                            search: true,
-                                                            columnSorting: true,
-                                                            tableOverflow: true,
-                                                            wordWrap: true,
-                                                            allowInsertColumn: false,
-                                                            allowManualInsertColumn: false,
-                                                            allowDeleteRow: false,
-                                                            // onchange: this.plannedPsmChanged,
-                                                            oneditionend: this.onedit,
-                                                            copyCompatibility: true,
-                                                            paginationOptions: [10, 25, 50, 100],
-                                                            position: 'top',
-                                                            contextMenu: false
-                                                        };
-
-                                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
-
-                                                    } else if (shipmentList.shipmentStatus.id == 3 && shipmentList.procurementAgent.id != 1) {//submitted
-
-                                                        //submitted-notpsm
-
-                                                        document.getElementById("addButton").style.display = "none";
-                                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                                                        this.el.destroy();
-
-                                                        var data = [];
-                                                        var shipmentDataArr = [];
-                                                        var i = 0;
-
-                                                        var budgetAmount = 0;
-                                                        var budgetJson = [];
-                                                        var shipmentBudgetList = shipmentList.shipmentBudgetList;
-                                                        for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
-                                                            budgetAmount += (shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd);
-                                                            budgetJson.push(shipmentBudgetList[sb]);
-                                                        }
-                                                        budgetAmount = budgetAmount.toFixed(2);
-
-                                                        // console.log("budgetAmount--- ", budgetAmount);
-                                                        // console.log("budgetJson--- ", budgetJson);
-                                                        data[0] = shipmentList.expectedDeliveryDate;
-                                                        data[1] = shipmentList.shipmentStatus.id;
-                                                        data[2] = shipmentList.orderNo;
-                                                        data[3] = shipmentList.primeLineNo;
-                                                        data[4] = shipmentList.dataSource.id; // E
-                                                        data[5] = shipmentList.procurementAgent.id;
-                                                        data[6] = shipmentList.planningUnit.id;
-                                                        data[7] = shipmentList.suggestedQty;
-                                                        data[8] = procurementAgentPlanningUnitObj.moq;
-                                                        data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
-                                                        data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
-                                                        data[11] = ""; // Order based on
-                                                        data[12] = ""; // Rounding option
-                                                        data[13] = shipmentList.quantity; // User Qty
-                                                        data[14] = `=IF(L${i + 1}==3,
-   
-                                                        IF(M${i + 1}==1,
-                                                                CEILING(I${i + 1},1),
-                                                                FLOOR(I${i + 1},1)
-                                                        )
-                                                ,
-                                                IF(L${i + 1}==4,
-                                                        IF(NOT(ISBLANK(N${i + 1})),
-                                                                IF(M${i + 1}==1,
-                                                                        CEILING(N${i + 1}/Z${i + 1},1)*Z${i + 1},
-                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*Z${i + 1}
-                                                                ),
-                                                                IF(M${i + 1}==1,
-                                                                        CEILING(J${i + 1},1)*Z${i + 1},
-                                                                        FLOOR(J${i + 1},1)*Z${i + 1}
-                                                                )
-                                                        ),
-                                                        IF(L${i + 1}==1,
-                                                                IF(NOT(ISBLANK(N${i + 1})),
-                                                                        IF(M${i + 1}==1,
-                                                                        CEILING(N${i + 1}/Z${i + 1},1)*AA${i + 1},
-                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*AA${i + 1}
-                                                                ),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(K${i + 1},1)*AA${i + 1},
-                                                                                FLOOR(K${i + 1},1)*AA${i + 1}
-                                                                        )
-                                                                ),
-                                                                IF(NOT(ISBLANK(N${i + 1})),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(N${i + 1},1),
-                                                                                FLOOR(N${i + 1},1)
-                                                                        ),
-                                                                        IF(M${i + 1}==1,
-                                                                                CEILING(H${i + 1},1),
-                                                                                FLOOR(H${i + 1},1)
-                                                                        )
-                                                                )
-                                                        )
-                                                )
-                                         )`;
-                                                        data[15] = `=O${i + 1}/Z${i + 1}`;
-                                                        data[16] = `=O${i + 1}/AA${i + 1}`;
-                                                        data[17] = "";//Manual price
-                                                        data[18] = procurementAgentPlanningUnitObj.catalogPrice;
-                                                        data[19] = `=ROUND(S${i + 1}*O${i + 1},2)`; //Amount
-                                                        data[20] = shipmentList.shipmentMode;//Shipment method
-                                                        data[21] = shipmentList.freightCost;// Freight Cost
-                                                        data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
-                                                        data[23] = `=ROUND(T${i + 1}+W${i + 1},2)`; // Final Amount
-                                                        data[24] = shipmentList.notes;//Notes
-                                                        data[25] = procurementAgentPlanningUnitObj.unitsPerPallet;
-                                                        data[26] = procurementAgentPlanningUnitObj.unitsPerContainer;
-                                                        data[27] = programByte.airFreightPerc;
-                                                        data[28] = programByte.seaFreightPerc;
-                                                        data[29] = budgetAmount;
-                                                        data[30] = budgetJson;
-                                                        data[31] = rowIndex;
-                                                        data[32] = '';
-                                                        data[33] = '';
-
-                                                        shipmentDataArr[0] = data;
-
-                                                        var json = [];
-                                                        var data = shipmentDataArr;
-
-                                                        var options = {
-                                                            data: data,
-                                                            columnDrag: true,
-                                                            colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
-                                                            columns: [
-                                                                { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
-                                                                { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
-                                                                { type: 'text', readOnly: true, title: "Order No" },
-                                                                { type: 'text', readOnly: true, title: "Prime line number" },
-                                                                { type: 'dropdown', readOnly: true, title: "Data source", source: dataSource },
-                                                                { type: 'dropdown', readOnly: true, title: "Procurement Agent", source: procurementAgentPerPlanningUnit },
-                                                                { type: 'dropdown', readOnly: true, title: "Planning unit", source: planningUnit },
-                                                                { type: 'number', readOnly: true, title: "Suggested order qty" },
-                                                                { type: 'number', readOnly: true, title: "MoQ" },
-                                                                { type: 'number', readOnly: true, title: "No of pallets" },
-                                                                { type: 'number', readOnly: true, title: "No of containers" },
-                                                                { type: 'dropdown', readOnly: true, title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
-                                                                { type: 'dropdown', readOnly: true, title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
-                                                                { type: 'text', readOnly: true, title: "User qty" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted order qty" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted pallets" },
-                                                                { type: 'text', readOnly: true, title: "Adjusted containers" },
-                                                                { type: 'text', readOnly: true, title: "Manual price per planning unit" },
-                                                                { type: 'text', readOnly: true, title: "Price per planning unit" },
-                                                                { type: 'text', readOnly: true, title: "Amount" },
-                                                                { type: 'dropdown', readOnly: true, title: "Shipped method", source: ['Sea', 'Air'] },
-                                                                { type: 'text', readOnly: true, title: "Freight cost amount" },
-                                                                { type: 'text', readOnly: true, title: "Default freight cost" },
-                                                                { type: 'text', readOnly: true, title: "Total amount" },
-                                                                { type: 'text', readOnly: true, title: "Notes" },
-                                                                { type: 'hidden', title: "Units/Pallet" },
-                                                                { type: 'hidden', title: "Units/Container" },
-                                                                { type: 'hidden', title: "Air Freight Percentage" },
-                                                                { type: 'hidden', title: "Sea Freight Percentage" },
-                                                                { type: 'hidden', title: 'Budget Amount' },
-                                                                { type: 'hidden', title: "Budget Array" },
-                                                                { type: 'hidden', title: 'index' },
-                                                                { type: 'dropdown', title: "Procurement Unit", source: procurementUnit },
-                                                                { type: 'dropdown', title: "Supplier", source: supplier },
-                                                            ],
-                                                            pagination: 10,
-                                                            search: true,
-                                                            columnSorting: true,
-                                                            tableOverflow: true,
-                                                            wordWrap: true,
-                                                            allowInsertColumn: false,
-                                                            allowManualInsertColumn: false,
-                                                            allowDeleteRow: false,
-                                                            onchange: this.plannedPsmChanged,
-                                                            oneditionend: this.onedit,
-                                                            copyCompatibility: true,
-                                                            paginationOptions: [10, 25, 50, 100],
-                                                            position: 'top',
-                                                            contextMenu: false
-                                                        };
-
-                                                        this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                                                            this.setState({
+                                                                shipmentEL: shipmentEL
+                                                            })
 
 
 
 
-
-
-                                                    } else if (shipmentList.shipmentStatus.id == 3 || shipmentList.shipmentStatus.id == 4 || shipmentList.shipmentStatus.id == 5 || shipmentList.shipmentStatus.id == 6) {
-
-                                                        if (shipmentList.procurementAgent.id == 1) {//approved-psm
+                                                        } else if (shipmentList.shipmentStatus.id == 7) {//cancelled
 
                                                             document.getElementById("addButton").style.display = "none";
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
@@ -1149,6 +963,19 @@ export default class ConsumptionDetails extends React.Component {
                                                                 budgetJson.push(shipmentBudgetList[sb]);
                                                             }
                                                             budgetAmount = budgetAmount.toFixed(2);
+
+                                                            // console.log("procurementAgentPlanningUnitObj------", procurementAgentPlanningUnitObj);
+                                                            if (procurementAgentPlanningUnitObj == "" || procurementAgentPlanningUnitObj === undefined) {
+                                                                // console.log("UNDEFINE-----------------");
+                                                                procurementAgentPlanningUnitObj = {
+                                                                    procurementAgentId: 0,
+                                                                    planningUnitId: planningUnitId,
+                                                                    catalogPrice: 0,
+                                                                    moq: 0,
+                                                                    unitsPerPallet: 0,
+                                                                    unitsPerContainer: 0
+                                                                }
+                                                            }
 
                                                             // console.log("budgetAmount--- ", budgetAmount);
                                                             // console.log("budgetJson--- ", budgetJson);
@@ -1224,7 +1051,8 @@ export default class ConsumptionDetails extends React.Component {
                                                             data[28] = programByte.seaFreightPerc;
                                                             data[29] = budgetAmount;
                                                             data[30] = budgetJson;
-                                                            data[31] = rowIndex;
+                                                            data[31] = true;
+                                                            data[32] = rowIndex;
 
                                                             shipmentDataArr[0] = data;
 
@@ -1238,8 +1066,8 @@ export default class ConsumptionDetails extends React.Component {
                                                                 columns: [
                                                                     { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
-                                                                    { type: 'text', readOnly: true, title: "Order No" },
-                                                                    { type: 'text', readOnly: true, title: "Prime line number" },
+                                                                    { type: 'text', title: "Order No" },
+                                                                    { type: 'text', title: "Prime line number" },
                                                                     { type: 'dropdown', readOnly: true, title: "Data source", source: dataSource },
                                                                     { type: 'dropdown', readOnly: true, title: "Procurement Agent", source: procurementAgentPerPlanningUnit },
                                                                     { type: 'dropdown', readOnly: true, title: "Planning unit", source: planningUnit },
@@ -1257,7 +1085,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     { type: 'text', readOnly: true, title: "Price per planning unit" },
                                                                     { type: 'text', readOnly: true, title: "Amount" },
                                                                     { type: 'dropdown', readOnly: true, title: "Shipped method", source: ['Sea', 'Air'] },
-                                                                    { type: 'text', readOnly: true, title: "Freight cost amount" },
+                                                                    { type: 'text', title: "Freight cost amount" },
                                                                     { type: 'text', readOnly: true, title: "Default freight cost" },
                                                                     { type: 'text', readOnly: true, title: "Total amount" },
                                                                     { type: 'text', readOnly: true, title: "Notes" },
@@ -1267,6 +1095,7 @@ export default class ConsumptionDetails extends React.Component {
                                                                     { type: 'hidden', title: "Sea Freight Percentage" },
                                                                     { type: 'hidden', title: 'Budget Amount' },
                                                                     { type: 'hidden', title: "Budget Array" },
+                                                                    { type: 'checkbox', title: "Cancelled Order" },
                                                                     { type: 'hidden', title: 'index' },
                                                                 ],
                                                                 pagination: 10,
@@ -1277,22 +1106,391 @@ export default class ConsumptionDetails extends React.Component {
                                                                 allowInsertColumn: false,
                                                                 allowManualInsertColumn: false,
                                                                 allowDeleteRow: false,
-                                                                onchange: this.plannedPsmChanged,
+                                                                // onchange: this.plannedPsmChanged,
                                                                 oneditionend: this.onedit,
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
                                                                 position: 'top',
-                                                                contextMenu: false
+                                                                // contextMenu: false
+                                                                contextMenu: function (obj, x, y, e) {
+                                                                    var items = [];
+                                                                    //Add Shipment Budget
+                                                                    items.push({
+                                                                        title: "List / Add shipment budget",
+                                                                        onclick: function () {
+                                                                            document.getElementById("showButtonsDiv").style.display = 'block';
+                                                                            this.el = jexcel(document.getElementById("shipmentBudgetTable"), '');
+                                                                            this.el.destroy();
+                                                                            var json = [];
+                                                                            // var elInstance=this.state.plannedPsmShipmentsEl;
+                                                                            var rowData = obj.getRowData(y)
+                                                                            console.log("RowData", rowData);
+                                                                            var shipmentBudget = rowData[30];
+                                                                            console.log("Shipemnt Budget", shipmentBudget);
+                                                                            for (var sb = 0; sb < shipmentBudget.length; sb++) {
+                                                                                var data = [];
+                                                                                data[0] = shipmentBudget[sb].shipmentBudgetId;
+                                                                                data[1] = shipmentBudget[sb].budget.budgetId;
+                                                                                data[2] = shipmentBudget[sb].budgetAmt;
+                                                                                data[3] = shipmentBudget[sb].currency.currencyId;
+                                                                                data[4] = shipmentBudget[sb].conversionRateToUsd;
+                                                                                data[5] = y;
+                                                                                json.push(data);
+                                                                            }
+                                                                            if (shipmentBudget.length == 0) {
+                                                                                var data = [];
+                                                                                data[0] = "";
+                                                                                data[1] = "";
+                                                                                data[2] = "";
+                                                                                data[3] = "";
+                                                                                data[4] = ""
+                                                                                data[5] = y;
+                                                                                json = [data]
+                                                                            }
+                                                                            var options = {
+                                                                                data: json,
+                                                                                columnDrag: true,
+                                                                                colWidths: [290, 290, 170, 170, 170],
+                                                                                columns: [
+
+                                                                                    {
+                                                                                        title: 'Shipment Budget Id',
+                                                                                        type: 'hidden',
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Budget',
+                                                                                        type: 'dropdown',
+                                                                                        source: budgetList
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Budget Amount',
+                                                                                        type: 'number',
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Currency',
+                                                                                        type: 'dropdown',
+                                                                                        source: currencyList
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Conversion rate to USD',
+                                                                                        type: 'number'
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Row number',
+                                                                                        type: 'hidden'
+                                                                                    }
+                                                                                ],
+                                                                                pagination: false,
+                                                                                search: true,
+                                                                                columnSorting: true,
+                                                                                tableOverflow: true,
+                                                                                wordWrap: true,
+                                                                                allowInsertColumn: false,
+                                                                                allowManualInsertColumn: false,
+                                                                                allowDeleteRow: false,
+                                                                                oneditionend: this.onedit,
+                                                                                copyCompatibility: true,
+                                                                                editable: false,
+                                                                                // onchange: this.budgetChanged,
+
+                                                                                contextMenu: function (obj, x, y, e) {
+                                                                                    var items = [];
+                                                                                    if (y == null) {
+                                                                                        // Insert a new column
+                                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        // Delete a column
+                                                                                        if (obj.options.allowDeleteColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.deleteSelectedColumns,
+                                                                                                onclick: function () {
+                                                                                                    obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+
+
+                                                                                        // Rename column
+                                                                                        if (obj.options.allowRenameColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.renameThisColumn,
+                                                                                                onclick: function () {
+                                                                                                    obj.setHeader(x);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        // Sorting
+                                                                                        if (obj.options.columnSorting == true) {
+                                                                                            // Line
+                                                                                            items.push({ type: 'line' });
+
+                                                                                            items.push({
+                                                                                                title: obj.options.text.orderAscending,
+                                                                                                onclick: function () {
+                                                                                                    obj.orderBy(x, 0);
+                                                                                                }
+                                                                                            });
+                                                                                            items.push({
+                                                                                                title: obj.options.text.orderDescending,
+                                                                                                onclick: function () {
+                                                                                                    obj.orderBy(x, 1);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    } else {
+                                                                                        // Insert new row
+                                                                                        if (obj.options.allowInsertRow == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewRowAfter,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertRow(1, parseInt(y));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (obj.options.allowDeleteRow == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.deleteSelectedRows,
+                                                                                                onclick: function () {
+                                                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (x) {
+                                                                                            if (obj.options.allowComments == true) {
+                                                                                                items.push({ type: 'line' });
+
+                                                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                                items.push({
+                                                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                                    onclick: function () {
+                                                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                                    }
+                                                                                                });
+
+                                                                                                if (title) {
+                                                                                                    items.push({
+                                                                                                        title: obj.options.text.clearComments,
+                                                                                                        onclick: function () {
+                                                                                                            obj.setComments([x, y], '');
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+
+                                                                                    // Line
+                                                                                    items.push({ type: 'line' });
+
+                                                                                    // Save
+                                                                                    if (obj.options.allowExport) {
+                                                                                        items.push({
+                                                                                            title: obj.options.text.saveAs,
+                                                                                            shortcut: 'Ctrl + S',
+                                                                                            onclick: function () {
+                                                                                                obj.download(true);
+                                                                                            }
+                                                                                        });
+                                                                                    }
+
+                                                                                    return items;
+                                                                                }.bind(this)
+
+
+
+
+                                                                            };
+                                                                            elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
+                                                                            this.el = elVar;
+                                                                            this.setState({ shipmentBudgetTableEl: elVar });
+                                                                        }.bind(this)
+                                                                        // this.setState({ shipmentBudgetTableEl: elVar });
+                                                                    });
+                                                                    // -------------------------------------
+
+                                                                    if (y == null) {
+                                                                        // Insert a new column
+                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                                onclick: function () {
+                                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                                onclick: function () {
+                                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        // Delete a column
+                                                                        if (obj.options.allowDeleteColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.deleteSelectedColumns,
+                                                                                onclick: function () {
+                                                                                    obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                }
+                                                                            });
+                                                                        }
+
+
+
+                                                                        // Rename column
+                                                                        if (obj.options.allowRenameColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.renameThisColumn,
+                                                                                onclick: function () {
+                                                                                    obj.setHeader(x);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        // Sorting
+                                                                        if (obj.options.columnSorting == true) {
+                                                                            // Line
+                                                                            items.push({ type: 'line' });
+
+                                                                            items.push({
+                                                                                title: obj.options.text.orderAscending,
+                                                                                onclick: function () {
+                                                                                    obj.orderBy(x, 0);
+                                                                                }
+                                                                            });
+                                                                            items.push({
+                                                                                title: obj.options.text.orderDescending,
+                                                                                onclick: function () {
+                                                                                    obj.orderBy(x, 1);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    } else {
+                                                                        // Insert new row
+                                                                        if (obj.options.allowInsertRow == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewRowBefore,
+                                                                                onclick: function () {
+                                                                                    obj.insertRow(1, parseInt(y), 1);
+                                                                                }
+                                                                            });
+
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewRowAfter,
+                                                                                onclick: function () {
+                                                                                    obj.insertRow(1, parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (obj.options.allowDeleteRow == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.deleteSelectedRows,
+                                                                                onclick: function () {
+                                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (x) {
+                                                                            if (obj.options.allowComments == true) {
+                                                                                items.push({ type: 'line' });
+
+                                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                items.push({
+                                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                    onclick: function () {
+                                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                    }
+                                                                                });
+
+                                                                                if (title) {
+                                                                                    items.push({
+                                                                                        title: obj.options.text.clearComments,
+                                                                                        onclick: function () {
+                                                                                            obj.setComments([x, y], '');
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    // Line
+                                                                    items.push({ type: 'line' });
+
+                                                                    // Save
+                                                                    if (obj.options.allowExport) {
+                                                                        items.push({
+                                                                            title: obj.options.text.saveAs,
+                                                                            shortcut: 'Ctrl + S',
+                                                                            onclick: function () {
+                                                                                obj.download();
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // About
+                                                                    if (obj.options.about) {
+                                                                        items.push({
+                                                                            title: obj.options.text.about,
+                                                                            onclick: function () {
+                                                                                alert(obj.options.about);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    return items;
+                                                                }.bind(this)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                                             };
 
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
+                                                        } else if (shipmentList.shipmentStatus.id == 3 && shipmentList.procurementAgent.id != 1) {//submitted
 
-
-
-
-                                                        } else {//approved-notpsm
-
+                                                            //submitted-notpsm
 
                                                             document.getElementById("addButton").style.display = "none";
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
@@ -1386,6 +1584,8 @@ export default class ConsumptionDetails extends React.Component {
                                                             data[29] = budgetAmount;
                                                             data[30] = budgetJson;
                                                             data[31] = rowIndex;
+                                                            data[32] = '';
+                                                            data[33] = '';
 
                                                             shipmentDataArr[0] = data;
 
@@ -1395,7 +1595,7 @@ export default class ConsumptionDetails extends React.Component {
                                                             var options = {
                                                                 data: data,
                                                                 columnDrag: true,
-                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
                                                                 columns: [
                                                                     { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
                                                                     { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
@@ -1429,6 +1629,8 @@ export default class ConsumptionDetails extends React.Component {
                                                                     { type: 'hidden', title: 'Budget Amount' },
                                                                     { type: 'hidden', title: "Budget Array" },
                                                                     { type: 'hidden', title: 'index' },
+                                                                    { type: 'dropdown', title: "Procurement Unit", source: procurementUnit },
+                                                                    { type: 'dropdown', title: "Supplier", source: supplier },
                                                                 ],
                                                                 pagination: 10,
                                                                 search: true,
@@ -1443,14 +1645,1410 @@ export default class ConsumptionDetails extends React.Component {
                                                                 copyCompatibility: true,
                                                                 paginationOptions: [10, 25, 50, 100],
                                                                 position: 'top',
-                                                                contextMenu: false
+                                                                contextMenu: function (obj, x, y, e) {
+                                                                    var items = [];
+                                                                    //Add Shipment Budget
+                                                                    items.push({
+                                                                        title: "List / Add shipment budget",
+                                                                        onclick: function () {
+                                                                            document.getElementById("showButtonsDiv").style.display = 'block';
+                                                                            this.el = jexcel(document.getElementById("shipmentBudgetTable"), '');
+                                                                            this.el.destroy();
+                                                                            var json = [];
+                                                                            // var elInstance=this.state.plannedPsmShipmentsEl;
+                                                                            var rowData = obj.getRowData(y)
+                                                                            console.log("RowData", rowData);
+                                                                            var shipmentBudget = rowData[30];
+                                                                            console.log("Shipemnt Budget", shipmentBudget);
+                                                                            for (var sb = 0; sb < shipmentBudget.length; sb++) {
+                                                                                var data = [];
+                                                                                data[0] = shipmentBudget[sb].shipmentBudgetId;
+                                                                                data[1] = shipmentBudget[sb].budget.budgetId;
+                                                                                data[2] = shipmentBudget[sb].budgetAmt;
+                                                                                data[3] = shipmentBudget[sb].currency.currencyId;
+                                                                                data[4] = shipmentBudget[sb].conversionRateToUsd;
+                                                                                data[5] = y;
+                                                                                json.push(data);
+                                                                            }
+                                                                            if (shipmentBudget.length == 0) {
+                                                                                var data = [];
+                                                                                data[0] = "";
+                                                                                data[1] = "";
+                                                                                data[2] = "";
+                                                                                data[3] = "";
+                                                                                data[4] = ""
+                                                                                data[5] = y;
+                                                                                json = [data]
+                                                                            }
+                                                                            var options = {
+                                                                                data: json,
+                                                                                columnDrag: true,
+                                                                                colWidths: [290, 290, 170, 170, 170],
+                                                                                columns: [
+
+                                                                                    {
+                                                                                        title: 'Shipment Budget Id',
+                                                                                        type: 'hidden',
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Budget',
+                                                                                        type: 'dropdown',
+                                                                                        source: budgetList
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Budget Amount',
+                                                                                        type: 'number',
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Currency',
+                                                                                        type: 'dropdown',
+                                                                                        source: currencyList
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Conversion rate to USD',
+                                                                                        type: 'number'
+                                                                                    },
+                                                                                    {
+                                                                                        title: 'Row number',
+                                                                                        type: 'hidden'
+                                                                                    }
+                                                                                ],
+                                                                                pagination: false,
+                                                                                search: true,
+                                                                                columnSorting: true,
+                                                                                tableOverflow: true,
+                                                                                wordWrap: true,
+                                                                                allowInsertColumn: false,
+                                                                                allowManualInsertColumn: false,
+                                                                                allowDeleteRow: false,
+                                                                                oneditionend: this.onedit,
+                                                                                copyCompatibility: true,
+                                                                                editable: false,
+                                                                                // onchange: this.budgetChanged,
+
+                                                                                contextMenu: function (obj, x, y, e) {
+                                                                                    var items = [];
+                                                                                    if (y == null) {
+                                                                                        // Insert a new column
+                                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        // Delete a column
+                                                                                        if (obj.options.allowDeleteColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.deleteSelectedColumns,
+                                                                                                onclick: function () {
+                                                                                                    obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+
+
+                                                                                        // Rename column
+                                                                                        if (obj.options.allowRenameColumn == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.renameThisColumn,
+                                                                                                onclick: function () {
+                                                                                                    obj.setHeader(x);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        // Sorting
+                                                                                        if (obj.options.columnSorting == true) {
+                                                                                            // Line
+                                                                                            items.push({ type: 'line' });
+
+                                                                                            items.push({
+                                                                                                title: obj.options.text.orderAscending,
+                                                                                                onclick: function () {
+                                                                                                    obj.orderBy(x, 0);
+                                                                                                }
+                                                                                            });
+                                                                                            items.push({
+                                                                                                title: obj.options.text.orderDescending,
+                                                                                                onclick: function () {
+                                                                                                    obj.orderBy(x, 1);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    } else {
+                                                                                        // Insert new row
+                                                                                        if (obj.options.allowInsertRow == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.insertANewRowAfter,
+                                                                                                onclick: function () {
+                                                                                                    obj.insertRow(1, parseInt(y));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (obj.options.allowDeleteRow == true) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.deleteSelectedRows,
+                                                                                                onclick: function () {
+                                                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        if (x) {
+                                                                                            if (obj.options.allowComments == true) {
+                                                                                                items.push({ type: 'line' });
+
+                                                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                                items.push({
+                                                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                                    onclick: function () {
+                                                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                                    }
+                                                                                                });
+
+                                                                                                if (title) {
+                                                                                                    items.push({
+                                                                                                        title: obj.options.text.clearComments,
+                                                                                                        onclick: function () {
+                                                                                                            obj.setComments([x, y], '');
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+
+                                                                                    // Line
+                                                                                    items.push({ type: 'line' });
+
+                                                                                    // Save
+                                                                                    if (obj.options.allowExport) {
+                                                                                        items.push({
+                                                                                            title: obj.options.text.saveAs,
+                                                                                            shortcut: 'Ctrl + S',
+                                                                                            onclick: function () {
+                                                                                                obj.download(true);
+                                                                                            }
+                                                                                        });
+                                                                                    }
+
+                                                                                    return items;
+                                                                                }.bind(this)
+
+
+
+
+                                                                            };
+                                                                            elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
+                                                                            this.el = elVar;
+                                                                            this.setState({ shipmentBudgetTableEl: elVar });
+                                                                        }.bind(this)
+                                                                        // this.setState({ shipmentBudgetTableEl: elVar });
+                                                                    });
+                                                                    // -------------------------------------
+
+                                                                    if (y == null) {
+                                                                        // Insert a new column
+                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewColumnBefore,
+                                                                                onclick: function () {
+                                                                                    obj.insertColumn(1, parseInt(x), 1);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (obj.options.allowInsertColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewColumnAfter,
+                                                                                onclick: function () {
+                                                                                    obj.insertColumn(1, parseInt(x), 0);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        // Delete a column
+                                                                        if (obj.options.allowDeleteColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.deleteSelectedColumns,
+                                                                                onclick: function () {
+                                                                                    obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                }
+                                                                            });
+                                                                        }
+
+
+
+                                                                        // Rename column
+                                                                        if (obj.options.allowRenameColumn == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.renameThisColumn,
+                                                                                onclick: function () {
+                                                                                    obj.setHeader(x);
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        // Sorting
+                                                                        if (obj.options.columnSorting == true) {
+                                                                            // Line
+                                                                            items.push({ type: 'line' });
+
+                                                                            items.push({
+                                                                                title: obj.options.text.orderAscending,
+                                                                                onclick: function () {
+                                                                                    obj.orderBy(x, 0);
+                                                                                }
+                                                                            });
+                                                                            items.push({
+                                                                                title: obj.options.text.orderDescending,
+                                                                                onclick: function () {
+                                                                                    obj.orderBy(x, 1);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    } else {
+                                                                        // Insert new row
+                                                                        if (obj.options.allowInsertRow == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewRowBefore,
+                                                                                onclick: function () {
+                                                                                    obj.insertRow(1, parseInt(y), 1);
+                                                                                }
+                                                                            });
+
+                                                                            items.push({
+                                                                                title: obj.options.text.insertANewRowAfter,
+                                                                                onclick: function () {
+                                                                                    obj.insertRow(1, parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (obj.options.allowDeleteRow == true) {
+                                                                            items.push({
+                                                                                title: obj.options.text.deleteSelectedRows,
+                                                                                onclick: function () {
+                                                                                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        if (x) {
+                                                                            if (obj.options.allowComments == true) {
+                                                                                items.push({ type: 'line' });
+
+                                                                                var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                items.push({
+                                                                                    title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                    onclick: function () {
+                                                                                        obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                    }
+                                                                                });
+
+                                                                                if (title) {
+                                                                                    items.push({
+                                                                                        title: obj.options.text.clearComments,
+                                                                                        onclick: function () {
+                                                                                            obj.setComments([x, y], '');
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    // Line
+                                                                    items.push({ type: 'line' });
+
+                                                                    // Save
+                                                                    if (obj.options.allowExport) {
+                                                                        items.push({
+                                                                            title: obj.options.text.saveAs,
+                                                                            shortcut: 'Ctrl + S',
+                                                                            onclick: function () {
+                                                                                obj.download();
+                                                                            }
+                                                                        });
+                                                                    }
+
+                                                                    // About
+                                                                    if (obj.options.about) {
+                                                                        items.push({
+                                                                            title: obj.options.text.about,
+                                                                            onclick: function () {
+                                                                                alert(obj.options.about);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    return items;
+                                                                }.bind(this)
+
+
+
+
+
                                                             };
 
                                                             this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
-                                                        }
-                                                    }
 
+
+
+
+
+                                                        } else if (shipmentList.shipmentStatus.id == 3 || shipmentList.shipmentStatus.id == 4 || shipmentList.shipmentStatus.id == 5 || shipmentList.shipmentStatus.id == 6) {
+
+                                                            if (shipmentList.procurementAgent.id == 1) {//approved-psm
+                                                                document.getElementById("saveButton").style.display = "none";
+                                                                document.getElementById("addButton").style.display = "none";
+                                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                                                this.el.destroy();
+
+                                                                var data = [];
+                                                                var shipmentDataArr = [];
+                                                                var i = 0;
+
+                                                                var budgetAmount = 0;
+                                                                var budgetJson = [];
+                                                                var shipmentBudgetList = shipmentList.shipmentBudgetList;
+                                                                for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
+                                                                    budgetAmount += (shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd);
+                                                                    budgetJson.push(shipmentBudgetList[sb]);
+                                                                }
+                                                                budgetAmount = budgetAmount.toFixed(2);
+
+                                                                // console.log("budgetAmount--- ", budgetAmount);
+                                                                // console.log("budgetJson--- ", budgetJson);
+                                                                data[0] = shipmentList.expectedDeliveryDate;
+                                                                data[1] = shipmentList.shipmentStatus.id;
+                                                                data[2] = shipmentList.orderNo;
+                                                                data[3] = shipmentList.primeLineNo;
+                                                                data[4] = shipmentList.dataSource.id; // E
+                                                                data[5] = shipmentList.procurementAgent.id;
+                                                                data[6] = shipmentList.planningUnit.id;
+                                                                data[7] = shipmentList.suggestedQty;
+                                                                data[8] = procurementAgentPlanningUnitObj.moq;
+                                                                data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
+                                                                data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
+                                                                data[11] = ""; // Order based on
+                                                                data[12] = ""; // Rounding option
+                                                                data[13] = shipmentList.quantity; // User Qty
+                                                                data[14] = `=IF(L${i + 1}==3,
+   
+                                                        IF(M${i + 1}==1,
+                                                                CEILING(I${i + 1},1),
+                                                                FLOOR(I${i + 1},1)
+                                                        )
+                                                ,
+                                                IF(L${i + 1}==4,
+                                                        IF(NOT(ISBLANK(N${i + 1})),
+                                                                IF(M${i + 1}==1,
+                                                                        CEILING(N${i + 1}/Z${i + 1},1)*Z${i + 1},
+                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*Z${i + 1}
+                                                                ),
+                                                                IF(M${i + 1}==1,
+                                                                        CEILING(J${i + 1},1)*Z${i + 1},
+                                                                        FLOOR(J${i + 1},1)*Z${i + 1}
+                                                                )
+                                                        ),
+                                                        IF(L${i + 1}==1,
+                                                                IF(NOT(ISBLANK(N${i + 1})),
+                                                                        IF(M${i + 1}==1,
+                                                                        CEILING(N${i + 1}/Z${i + 1},1)*AA${i + 1},
+                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*AA${i + 1}
+                                                                ),
+                                                                        IF(M${i + 1}==1,
+                                                                                CEILING(K${i + 1},1)*AA${i + 1},
+                                                                                FLOOR(K${i + 1},1)*AA${i + 1}
+                                                                        )
+                                                                ),
+                                                                IF(NOT(ISBLANK(N${i + 1})),
+                                                                        IF(M${i + 1}==1,
+                                                                                CEILING(N${i + 1},1),
+                                                                                FLOOR(N${i + 1},1)
+                                                                        ),
+                                                                        IF(M${i + 1}==1,
+                                                                                CEILING(H${i + 1},1),
+                                                                                FLOOR(H${i + 1},1)
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                         )`;
+                                                                data[15] = `=O${i + 1}/Z${i + 1}`;
+                                                                data[16] = `=O${i + 1}/AA${i + 1}`;
+                                                                data[17] = "";//Manual price
+                                                                data[18] = procurementAgentPlanningUnitObj.catalogPrice;
+                                                                data[19] = `=ROUND(S${i + 1}*O${i + 1},2)`; //Amount
+                                                                data[20] = shipmentList.shipmentMode;//Shipment method
+                                                                data[21] = shipmentList.freightCost;// Freight Cost
+                                                                data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
+                                                                data[23] = `=ROUND(T${i + 1}+W${i + 1},2)`; // Final Amount
+                                                                data[24] = shipmentList.notes;//Notes
+                                                                data[25] = procurementAgentPlanningUnitObj.unitsPerPallet;
+                                                                data[26] = procurementAgentPlanningUnitObj.unitsPerContainer;
+                                                                data[27] = programByte.airFreightPerc;
+                                                                data[28] = programByte.seaFreightPerc;
+                                                                data[29] = budgetAmount;
+                                                                data[30] = budgetJson;
+                                                                data[31] = rowIndex;
+
+                                                                shipmentDataArr[0] = data;
+
+                                                                var json = [];
+                                                                var data = shipmentDataArr;
+
+                                                                var options = {
+                                                                    data: data,
+                                                                    columnDrag: true,
+                                                                    colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                    columns: [
+                                                                        { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                        { type: 'dropdown', readOnly: true, title: "Shipment status", source: shipmentStatus },
+                                                                        { type: 'text', readOnly: true, title: "Order No" },
+                                                                        { type: 'text', readOnly: true, title: "Prime line number" },
+                                                                        { type: 'dropdown', readOnly: true, title: "Data source", source: dataSource },
+                                                                        { type: 'dropdown', readOnly: true, title: "Procurement Agent", source: procurementAgentPerPlanningUnit },
+                                                                        { type: 'dropdown', readOnly: true, title: "Planning unit", source: planningUnit },
+                                                                        { type: 'number', readOnly: true, title: "Suggested order qty" },
+                                                                        { type: 'number', readOnly: true, title: "MoQ" },
+                                                                        { type: 'number', readOnly: true, title: "No of pallets" },
+                                                                        { type: 'number', readOnly: true, title: "No of containers" },
+                                                                        { type: 'dropdown', readOnly: true, title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
+                                                                        { type: 'dropdown', readOnly: true, title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
+                                                                        { type: 'text', readOnly: true, title: "User qty" },
+                                                                        { type: 'text', readOnly: true, title: "Adjusted order qty" },
+                                                                        { type: 'text', readOnly: true, title: "Adjusted pallets" },
+                                                                        { type: 'text', readOnly: true, title: "Adjusted containers" },
+                                                                        { type: 'text', readOnly: true, title: "Manual price per planning unit" },
+                                                                        { type: 'text', readOnly: true, title: "Price per planning unit" },
+                                                                        { type: 'text', readOnly: true, title: "Amount" },
+                                                                        { type: 'dropdown', readOnly: true, title: "Shipped method", source: ['Sea', 'Air'] },
+                                                                        { type: 'text', readOnly: true, title: "Freight cost amount" },
+                                                                        { type: 'text', readOnly: true, title: "Default freight cost" },
+                                                                        { type: 'text', readOnly: true, title: "Total amount" },
+                                                                        { type: 'text', readOnly: true, title: "Notes" },
+                                                                        { type: 'hidden', title: "Units/Pallet" },
+                                                                        { type: 'hidden', title: "Units/Container" },
+                                                                        { type: 'hidden', title: "Air Freight Percentage" },
+                                                                        { type: 'hidden', title: "Sea Freight Percentage" },
+                                                                        { type: 'hidden', title: 'Budget Amount' },
+                                                                        { type: 'hidden', title: "Budget Array" },
+                                                                        { type: 'hidden', title: 'index' },
+                                                                    ],
+                                                                    pagination: 10,
+                                                                    search: true,
+                                                                    columnSorting: true,
+                                                                    tableOverflow: true,
+                                                                    wordWrap: true,
+                                                                    allowInsertColumn: false,
+                                                                    allowManualInsertColumn: false,
+                                                                    allowDeleteRow: false,
+                                                                    onchange: this.plannedPsmChanged,
+                                                                    oneditionend: this.onedit,
+                                                                    copyCompatibility: true,
+                                                                    paginationOptions: [10, 25, 50, 100],
+                                                                    position: 'top',
+                                                                    contextMenu: function (obj, x, y, e) {
+                                                                        var items = [];
+                                                                        //Add Shipment Budget
+                                                                        items.push({
+                                                                            title: "List / Add shipment budget",
+                                                                            onclick: function () {
+                                                                                document.getElementById("showButtonsDiv").style.display = 'block';
+                                                                                this.el = jexcel(document.getElementById("shipmentBudgetTable"), '');
+                                                                                this.el.destroy();
+                                                                                var json = [];
+                                                                                // var elInstance=this.state.plannedPsmShipmentsEl;
+                                                                                var rowData = obj.getRowData(y)
+                                                                                console.log("RowData", rowData);
+                                                                                var shipmentBudget = rowData[30];
+                                                                                console.log("Shipemnt Budget", shipmentBudget);
+                                                                                for (var sb = 0; sb < shipmentBudget.length; sb++) {
+                                                                                    var data = [];
+                                                                                    data[0] = shipmentBudget[sb].shipmentBudgetId;
+                                                                                    data[1] = shipmentBudget[sb].budget.budgetId;
+                                                                                    data[2] = shipmentBudget[sb].budgetAmt;
+                                                                                    data[3] = shipmentBudget[sb].currency.currencyId;
+                                                                                    data[4] = shipmentBudget[sb].conversionRateToUsd;
+                                                                                    data[5] = y;
+                                                                                    json.push(data);
+                                                                                }
+                                                                                if (shipmentBudget.length == 0) {
+                                                                                    var data = [];
+                                                                                    data[0] = "";
+                                                                                    data[1] = "";
+                                                                                    data[2] = "";
+                                                                                    data[3] = "";
+                                                                                    data[4] = ""
+                                                                                    data[5] = y;
+                                                                                    json = [data]
+                                                                                }
+                                                                                var options = {
+                                                                                    data: json,
+                                                                                    columnDrag: true,
+                                                                                    colWidths: [290, 290, 170, 170, 170],
+                                                                                    columns: [
+
+                                                                                        {
+                                                                                            title: 'Shipment Budget Id',
+                                                                                            type: 'hidden',
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Budget',
+                                                                                            type: 'dropdown',
+                                                                                            source: budgetList
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Budget Amount',
+                                                                                            type: 'number',
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Currency',
+                                                                                            type: 'dropdown',
+                                                                                            source: currencyList
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Conversion rate to USD',
+                                                                                            type: 'number'
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Row number',
+                                                                                            type: 'hidden'
+                                                                                        }
+                                                                                    ],
+                                                                                    pagination: false,
+                                                                                    search: true,
+                                                                                    columnSorting: true,
+                                                                                    tableOverflow: true,
+                                                                                    wordWrap: true,
+                                                                                    allowInsertColumn: false,
+                                                                                    allowManualInsertColumn: false,
+                                                                                    allowDeleteRow: false,
+                                                                                    oneditionend: this.onedit,
+                                                                                    copyCompatibility: true,
+                                                                                    editable: false,
+                                                                                    // onchange: this.budgetChanged,
+
+                                                                                    contextMenu: function (obj, x, y, e) {
+                                                                                        var items = [];
+                                                                                        if (y == null) {
+                                                                                            // Insert a new column
+                                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.insertANewColumnBefore,
+                                                                                                    onclick: function () {
+                                                                                                        obj.insertColumn(1, parseInt(x), 1);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.insertANewColumnAfter,
+                                                                                                    onclick: function () {
+                                                                                                        obj.insertColumn(1, parseInt(x), 0);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            // Delete a column
+                                                                                            if (obj.options.allowDeleteColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.deleteSelectedColumns,
+                                                                                                    onclick: function () {
+                                                                                                        obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+
+
+                                                                                            // Rename column
+                                                                                            if (obj.options.allowRenameColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.renameThisColumn,
+                                                                                                    onclick: function () {
+                                                                                                        obj.setHeader(x);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            // Sorting
+                                                                                            if (obj.options.columnSorting == true) {
+                                                                                                // Line
+                                                                                                items.push({ type: 'line' });
+
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.orderAscending,
+                                                                                                    onclick: function () {
+                                                                                                        obj.orderBy(x, 0);
+                                                                                                    }
+                                                                                                });
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.orderDescending,
+                                                                                                    onclick: function () {
+                                                                                                        obj.orderBy(x, 1);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                        } else {
+                                                                                            // Insert new row
+                                                                                            if (obj.options.allowInsertRow == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.insertANewRowAfter,
+                                                                                                    onclick: function () {
+                                                                                                        obj.insertRow(1, parseInt(y));
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            if (obj.options.allowDeleteRow == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                                                    onclick: function () {
+                                                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            if (x) {
+                                                                                                if (obj.options.allowComments == true) {
+                                                                                                    items.push({ type: 'line' });
+
+                                                                                                    var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                                    items.push({
+                                                                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                                        onclick: function () {
+                                                                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                                        }
+                                                                                                    });
+
+                                                                                                    if (title) {
+                                                                                                        items.push({
+                                                                                                            title: obj.options.text.clearComments,
+                                                                                                            onclick: function () {
+                                                                                                                obj.setComments([x, y], '');
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+
+                                                                                        // Line
+                                                                                        items.push({ type: 'line' });
+
+                                                                                        // Save
+                                                                                        if (obj.options.allowExport) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.saveAs,
+                                                                                                shortcut: 'Ctrl + S',
+                                                                                                onclick: function () {
+                                                                                                    obj.download(true);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        return items;
+                                                                                    }.bind(this)
+
+
+
+
+                                                                                };
+                                                                                elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
+                                                                                this.el = elVar;
+                                                                                this.setState({ shipmentBudgetTableEl: elVar });
+                                                                            }.bind(this)
+                                                                            // this.setState({ shipmentBudgetTableEl: elVar });
+                                                                        });
+                                                                        // -------------------------------------
+
+                                                                        if (y == null) {
+                                                                            // Insert a new column
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnBefore,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 0);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Delete a column
+                                                                            if (obj.options.allowDeleteColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedColumns,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+
+
+                                                                            // Rename column
+                                                                            if (obj.options.allowRenameColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.renameThisColumn,
+                                                                                    onclick: function () {
+                                                                                        obj.setHeader(x);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Sorting
+                                                                            if (obj.options.columnSorting == true) {
+                                                                                // Line
+                                                                                items.push({ type: 'line' });
+
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderAscending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 0);
+                                                                                    }
+                                                                                });
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderDescending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            // Insert new row
+                                                                            if (obj.options.allowInsertRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewRowBefore,
+                                                                                    onclick: function () {
+                                                                                        obj.insertRow(1, parseInt(y), 1);
+                                                                                    }
+                                                                                });
+
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewRowAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertRow(1, parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowDeleteRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (x) {
+                                                                                if (obj.options.allowComments == true) {
+                                                                                    items.push({ type: 'line' });
+
+                                                                                    var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                    items.push({
+                                                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                        onclick: function () {
+                                                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                        }
+                                                                                    });
+
+                                                                                    if (title) {
+                                                                                        items.push({
+                                                                                            title: obj.options.text.clearComments,
+                                                                                            onclick: function () {
+                                                                                                obj.setComments([x, y], '');
+                                                                                            }
+                                                                                        });
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        // Save
+                                                                        if (obj.options.allowExport) {
+                                                                            items.push({
+                                                                                title: obj.options.text.saveAs,
+                                                                                shortcut: 'Ctrl + S',
+                                                                                onclick: function () {
+                                                                                    obj.download();
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        // About
+                                                                        if (obj.options.about) {
+                                                                            items.push({
+                                                                                title: obj.options.text.about,
+                                                                                onclick: function () {
+                                                                                    alert(obj.options.about);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                        return items;
+                                                                    }.bind(this)
+
+
+
+
+                                                                };
+
+                                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+
+
+
+
+                                                            } else {//approved-notpsm
+
+
+                                                                document.getElementById("addButton").style.display = "none";
+                                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                                                                this.el.destroy();
+
+                                                                var data = [];
+                                                                var shipmentDataArr = [];
+                                                                var i = 0;
+
+                                                                var budgetAmount = 0;
+                                                                var budgetJson = [];
+                                                                var shipmentBudgetList = shipmentList.shipmentBudgetList;
+                                                                for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
+                                                                    budgetAmount += (shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd);
+                                                                    budgetJson.push(shipmentBudgetList[sb]);
+                                                                }
+                                                                budgetAmount = budgetAmount.toFixed(2);
+
+                                                                // console.log("budgetAmount--- ", budgetAmount);
+                                                                // console.log("budgetJson--- ", budgetJson);
+                                                                data[0] = shipmentList.expectedDeliveryDate;
+                                                                data[1] = shipmentList.shipmentStatus.id;
+                                                                data[2] = shipmentList.orderNo;
+                                                                data[3] = shipmentList.primeLineNo;
+                                                                data[4] = shipmentList.dataSource.id; // E
+                                                                data[5] = shipmentList.procurementAgent.id;
+                                                                data[6] = shipmentList.planningUnit.id;
+                                                                data[7] = shipmentList.suggestedQty;
+                                                                data[8] = procurementAgentPlanningUnitObj.moq;
+                                                                data[9] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/Z${i + 1},I${i + 1}/Z${i + 1})`;
+                                                                data[10] = `=IF(H${i + 1}>I${i + 1},H${i + 1}/AA${i + 1},I${i + 1}/AA${i + 1})`;
+                                                                data[11] = ""; // Order based on
+                                                                data[12] = ""; // Rounding option
+                                                                data[13] = shipmentList.quantity; // User Qty
+                                                                data[14] = `=IF(L${i + 1}==3,
+   
+                                                        IF(M${i + 1}==1,
+                                                                CEILING(I${i + 1},1),
+                                                                FLOOR(I${i + 1},1)
+                                                        )
+                                                ,
+                                                IF(L${i + 1}==4,
+                                                        IF(NOT(ISBLANK(N${i + 1})),
+                                                                IF(M${i + 1}==1,
+                                                                        CEILING(N${i + 1}/Z${i + 1},1)*Z${i + 1},
+                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*Z${i + 1}
+                                                                ),
+                                                                IF(M${i + 1}==1,
+                                                                        CEILING(J${i + 1},1)*Z${i + 1},
+                                                                        FLOOR(J${i + 1},1)*Z${i + 1}
+                                                                )
+                                                        ),
+                                                        IF(L${i + 1}==1,
+                                                                IF(NOT(ISBLANK(N${i + 1})),
+                                                                        IF(M${i + 1}==1,
+                                                                        CEILING(N${i + 1}/Z${i + 1},1)*AA${i + 1},
+                                                                        FLOOR(N${i + 1}/Z${i + 1},1)*AA${i + 1}
+                                                                ),
+                                                                        IF(M${i + 1}==1,
+                                                                                CEILING(K${i + 1},1)*AA${i + 1},
+                                                                                FLOOR(K${i + 1},1)*AA${i + 1}
+                                                                        )
+                                                                ),
+                                                                IF(NOT(ISBLANK(N${i + 1})),
+                                                                        IF(M${i + 1}==1,
+                                                                                CEILING(N${i + 1},1),
+                                                                                FLOOR(N${i + 1},1)
+                                                                        ),
+                                                                        IF(M${i + 1}==1,
+                                                                                CEILING(H${i + 1},1),
+                                                                                FLOOR(H${i + 1},1)
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                         )`;
+                                                                data[15] = `=O${i + 1}/Z${i + 1}`;
+                                                                data[16] = `=O${i + 1}/AA${i + 1}`;
+                                                                data[17] = "";//Manual price
+                                                                data[18] = procurementAgentPlanningUnitObj.catalogPrice;
+                                                                data[19] = `=ROUND(S${i + 1}*O${i + 1},2)`; //Amount
+                                                                data[20] = shipmentList.shipmentMode;//Shipment method
+                                                                data[21] = shipmentList.freightCost;// Freight Cost
+                                                                data[22] = `=IF(U${i + 1}=="Sea",(T${i + 1}*AC${i + 1})/100,(T${i + 1}*AB${i + 1})/100)`;// Default frieght cost
+                                                                data[23] = `=ROUND(T${i + 1}+W${i + 1},2)`; // Final Amount
+                                                                data[24] = shipmentList.notes;//Notes
+                                                                data[25] = procurementAgentPlanningUnitObj.unitsPerPallet;
+                                                                data[26] = procurementAgentPlanningUnitObj.unitsPerContainer;
+                                                                data[27] = programByte.airFreightPerc;
+                                                                data[28] = programByte.seaFreightPerc;
+                                                                data[29] = budgetAmount;
+                                                                data[30] = budgetJson;
+                                                                data[31] = rowIndex;
+
+                                                                shipmentDataArr[0] = data;
+
+                                                                var json = [];
+                                                                var data = shipmentDataArr;
+
+                                                                var options = {
+                                                                    data: data,
+                                                                    columnDrag: true,
+                                                                    colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+                                                                    columns: [
+                                                                        { type: 'text', readOnly: true, options: { format: 'MM-DD-YYYY' }, title: "Expected Delivery date" },
+                                                                        { type: 'dropdown', title: "Shipment status", source: allowShipStatusList },
+                                                                        { type: 'text', readOnly: true, title: "Order No" },
+                                                                        { type: 'text', readOnly: true, title: "Prime line number" },
+                                                                        { type: 'dropdown', readOnly: true, title: "Data source", source: dataSource },
+                                                                        { type: 'dropdown', readOnly: true, title: "Procurement Agent", source: procurementAgentPerPlanningUnit },
+                                                                        { type: 'dropdown', readOnly: true, title: "Planning unit", source: planningUnit },
+                                                                        { type: 'number', readOnly: true, title: "Suggested order qty" },
+                                                                        { type: 'number', readOnly: true, title: "MoQ" },
+                                                                        { type: 'number', readOnly: true, title: "No of pallets" },
+                                                                        { type: 'number', readOnly: true, title: "No of containers" },
+                                                                        { type: 'dropdown', readOnly: true, title: "Order based on", source: [{ id: 1, name: 'Container' }, { id: 2, name: 'Suggested Order Qty' }, { id: 3, name: 'MoQ' }, { id: 4, name: 'Pallet' }] },
+                                                                        { type: 'dropdown', readOnly: true, title: "Rounding option", source: [{ id: 1, name: 'Round Up' }, { id: 2, name: 'Round Down' }] },
+                                                                        { type: 'text', readOnly: true, title: "User qty" },
+                                                                        { type: 'text', readOnly: true, title: "Adjusted order qty" },
+                                                                        { type: 'text', readOnly: true, title: "Adjusted pallets" },
+                                                                        { type: 'text', readOnly: true, title: "Adjusted containers" },
+                                                                        { type: 'text', readOnly: true, title: "Manual price per planning unit" },
+                                                                        { type: 'text', readOnly: true, title: "Price per planning unit" },
+                                                                        { type: 'text', readOnly: true, title: "Amount" },
+                                                                        { type: 'dropdown', readOnly: true, title: "Shipped method", source: ['Sea', 'Air'] },
+                                                                        { type: 'text', readOnly: true, title: "Freight cost amount" },
+                                                                        { type: 'text', readOnly: true, title: "Default freight cost" },
+                                                                        { type: 'text', readOnly: true, title: "Total amount" },
+                                                                        { type: 'text', readOnly: true, title: "Notes" },
+                                                                        { type: 'hidden', title: "Units/Pallet" },
+                                                                        { type: 'hidden', title: "Units/Container" },
+                                                                        { type: 'hidden', title: "Air Freight Percentage" },
+                                                                        { type: 'hidden', title: "Sea Freight Percentage" },
+                                                                        { type: 'hidden', title: 'Budget Amount' },
+                                                                        { type: 'hidden', title: "Budget Array" },
+                                                                        { type: 'hidden', title: 'index' },
+                                                                    ],
+                                                                    pagination: 10,
+                                                                    search: true,
+                                                                    columnSorting: true,
+                                                                    tableOverflow: true,
+                                                                    wordWrap: true,
+                                                                    allowInsertColumn: false,
+                                                                    allowManualInsertColumn: false,
+                                                                    allowDeleteRow: false,
+                                                                    onchange: this.plannedPsmChanged,
+                                                                    oneditionend: this.onedit,
+                                                                    copyCompatibility: true,
+                                                                    paginationOptions: [10, 25, 50, 100],
+                                                                    position: 'top',
+                                                                    contextMenu: function (obj, x, y, e) {
+                                                                        var items = [];
+                                                                        //Add Shipment Budget
+                                                                        items.push({
+                                                                            title: "List / Add shipment budget",
+                                                                            onclick: function () {
+                                                                                document.getElementById("showButtonsDiv").style.display = 'block';
+                                                                                this.el = jexcel(document.getElementById("shipmentBudgetTable"), '');
+                                                                                this.el.destroy();
+                                                                                var json = [];
+                                                                                // var elInstance=this.state.plannedPsmShipmentsEl;
+                                                                                var rowData = obj.getRowData(y)
+                                                                                console.log("RowData", rowData);
+                                                                                var shipmentBudget = rowData[30];
+                                                                                console.log("Shipemnt Budget", shipmentBudget);
+                                                                                for (var sb = 0; sb < shipmentBudget.length; sb++) {
+                                                                                    var data = [];
+                                                                                    data[0] = shipmentBudget[sb].shipmentBudgetId;
+                                                                                    data[1] = shipmentBudget[sb].budget.budgetId;
+                                                                                    data[2] = shipmentBudget[sb].budgetAmt;
+                                                                                    data[3] = shipmentBudget[sb].currency.currencyId;
+                                                                                    data[4] = shipmentBudget[sb].conversionRateToUsd;
+                                                                                    data[5] = y;
+                                                                                    json.push(data);
+                                                                                }
+                                                                                if (shipmentBudget.length == 0) {
+                                                                                    var data = [];
+                                                                                    data[0] = "";
+                                                                                    data[1] = "";
+                                                                                    data[2] = "";
+                                                                                    data[3] = "";
+                                                                                    data[4] = ""
+                                                                                    data[5] = y;
+                                                                                    json = [data]
+                                                                                }
+                                                                                var options = {
+                                                                                    data: json,
+                                                                                    columnDrag: true,
+                                                                                    colWidths: [290, 290, 170, 170, 170],
+                                                                                    columns: [
+
+                                                                                        {
+                                                                                            title: 'Shipment Budget Id',
+                                                                                            type: 'hidden',
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Budget',
+                                                                                            type: 'dropdown',
+                                                                                            source: budgetList
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Budget Amount',
+                                                                                            type: 'number',
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Currency',
+                                                                                            type: 'dropdown',
+                                                                                            source: currencyList
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Conversion rate to USD',
+                                                                                            type: 'number'
+                                                                                        },
+                                                                                        {
+                                                                                            title: 'Row number',
+                                                                                            type: 'hidden'
+                                                                                        }
+                                                                                    ],
+                                                                                    pagination: false,
+                                                                                    search: true,
+                                                                                    columnSorting: true,
+                                                                                    tableOverflow: true,
+                                                                                    wordWrap: true,
+                                                                                    allowInsertColumn: false,
+                                                                                    allowManualInsertColumn: false,
+                                                                                    allowDeleteRow: false,
+                                                                                    oneditionend: this.onedit,
+                                                                                    copyCompatibility: true,
+                                                                                    editable: false,
+                                                                                    // onchange: this.budgetChanged,
+
+                                                                                    contextMenu: function (obj, x, y, e) {
+                                                                                        var items = [];
+                                                                                        if (y == null) {
+                                                                                            // Insert a new column
+                                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.insertANewColumnBefore,
+                                                                                                    onclick: function () {
+                                                                                                        obj.insertColumn(1, parseInt(x), 1);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.insertANewColumnAfter,
+                                                                                                    onclick: function () {
+                                                                                                        obj.insertColumn(1, parseInt(x), 0);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            // Delete a column
+                                                                                            if (obj.options.allowDeleteColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.deleteSelectedColumns,
+                                                                                                    onclick: function () {
+                                                                                                        obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+
+
+                                                                                            // Rename column
+                                                                                            if (obj.options.allowRenameColumn == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.renameThisColumn,
+                                                                                                    onclick: function () {
+                                                                                                        obj.setHeader(x);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            // Sorting
+                                                                                            if (obj.options.columnSorting == true) {
+                                                                                                // Line
+                                                                                                items.push({ type: 'line' });
+
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.orderAscending,
+                                                                                                    onclick: function () {
+                                                                                                        obj.orderBy(x, 0);
+                                                                                                    }
+                                                                                                });
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.orderDescending,
+                                                                                                    onclick: function () {
+                                                                                                        obj.orderBy(x, 1);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                        } else {
+                                                                                            // Insert new row
+                                                                                            if (obj.options.allowInsertRow == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.insertANewRowAfter,
+                                                                                                    onclick: function () {
+                                                                                                        obj.insertRow(1, parseInt(y));
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            if (obj.options.allowDeleteRow == true) {
+                                                                                                items.push({
+                                                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                                                    onclick: function () {
+                                                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+
+                                                                                            if (x) {
+                                                                                                if (obj.options.allowComments == true) {
+                                                                                                    items.push({ type: 'line' });
+
+                                                                                                    var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                                    items.push({
+                                                                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                                        onclick: function () {
+                                                                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                                        }
+                                                                                                    });
+
+                                                                                                    if (title) {
+                                                                                                        items.push({
+                                                                                                            title: obj.options.text.clearComments,
+                                                                                                            onclick: function () {
+                                                                                                                obj.setComments([x, y], '');
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+
+                                                                                        // Line
+                                                                                        items.push({ type: 'line' });
+
+                                                                                        // Save
+                                                                                        if (obj.options.allowExport) {
+                                                                                            items.push({
+                                                                                                title: obj.options.text.saveAs,
+                                                                                                shortcut: 'Ctrl + S',
+                                                                                                onclick: function () {
+                                                                                                    obj.download(true);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+
+                                                                                        return items;
+                                                                                    }.bind(this)
+
+
+
+
+                                                                                };
+                                                                                elVar = jexcel(document.getElementById("shipmentBudgetTable"), options);
+                                                                                this.el = elVar;
+                                                                                this.setState({ shipmentBudgetTableEl: elVar });
+                                                                            }.bind(this)
+                                                                            // this.setState({ shipmentBudgetTableEl: elVar });
+                                                                        });
+                                                                        // -------------------------------------
+
+                                                                        if (y == null) {
+                                                                            // Insert a new column
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnBefore,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowInsertColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewColumnAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertColumn(1, parseInt(x), 0);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Delete a column
+                                                                            if (obj.options.allowDeleteColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedColumns,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+
+
+                                                                            // Rename column
+                                                                            if (obj.options.allowRenameColumn == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.renameThisColumn,
+                                                                                    onclick: function () {
+                                                                                        obj.setHeader(x);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            // Sorting
+                                                                            if (obj.options.columnSorting == true) {
+                                                                                // Line
+                                                                                items.push({ type: 'line' });
+
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderAscending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 0);
+                                                                                    }
+                                                                                });
+                                                                                items.push({
+                                                                                    title: obj.options.text.orderDescending,
+                                                                                    onclick: function () {
+                                                                                        obj.orderBy(x, 1);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            // Insert new row
+                                                                            if (obj.options.allowInsertRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewRowBefore,
+                                                                                    onclick: function () {
+                                                                                        obj.insertRow(1, parseInt(y), 1);
+                                                                                    }
+                                                                                });
+
+                                                                                items.push({
+                                                                                    title: obj.options.text.insertANewRowAfter,
+                                                                                    onclick: function () {
+                                                                                        obj.insertRow(1, parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (obj.options.allowDeleteRow == true) {
+                                                                                items.push({
+                                                                                    title: obj.options.text.deleteSelectedRows,
+                                                                                    onclick: function () {
+                                                                                        obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            if (x) {
+                                                                                if (obj.options.allowComments == true) {
+                                                                                    items.push({ type: 'line' });
+
+                                                                                    var title = obj.records[y][x].getAttribute('title') || '';
+
+                                                                                    items.push({
+                                                                                        title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                                                                                        onclick: function () {
+                                                                                            obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                                                                                        }
+                                                                                    });
+
+                                                                                    if (title) {
+                                                                                        items.push({
+                                                                                            title: obj.options.text.clearComments,
+                                                                                            onclick: function () {
+                                                                                                obj.setComments([x, y], '');
+                                                                                            }
+                                                                                        });
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        // Line
+                                                                        items.push({ type: 'line' });
+
+                                                                        // Save
+                                                                        if (obj.options.allowExport) {
+                                                                            items.push({
+                                                                                title: obj.options.text.saveAs,
+                                                                                shortcut: 'Ctrl + S',
+                                                                                onclick: function () {
+                                                                                    obj.download();
+                                                                                }
+                                                                            });
+                                                                        }
+
+                                                                        // About
+                                                                        if (obj.options.about) {
+                                                                            items.push({
+                                                                                title: obj.options.text.about,
+                                                                                onclick: function () {
+                                                                                    alert(obj.options.about);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                        return items;
+                                                                    }.bind(this)
+
+
+
+                                                                };
+
+                                                                this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+                                                            }
+                                                        }
+
+                                                    }.bind(this);
                                                 }.bind(this);
                                             }.bind(this);
                                         }.bind(this);
@@ -1569,16 +3167,8 @@ export default class ConsumptionDetails extends React.Component {
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
                 valid = false
             } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
             }
 
         }
@@ -1606,11 +3196,14 @@ export default class ConsumptionDetails extends React.Component {
                     active: true,
                     budgetAmt: map.get('2'),
                     conversionRateToUsd: map.get("3"),
+                    currency: {
+                        currencyId: map.get("3")
+                    }
                 }
                 budgetArray.push(budgetJson);
-                totalBudget += map.get('2') * map.get("3");
+                totalBudget += map.get('2') * map.get("4");
                 if (i == 0) {
-                    rowNumber = map.get("4");
+                    rowNumber = map.get("5");
                 }
             }
             var shipmentInstance = this.state.shipmentEL;
@@ -2213,10 +3806,11 @@ export default class ConsumptionDetails extends React.Component {
                         </CardBody>
                         <CardFooter>
                             <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.backClicked}><i className="fa fa-times"></i> {i18n.t('static.common.back')}</Button>
+                                {/* <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.backClicked}><i className="fa fa-times"></i> {i18n.t('static.common.back')}</Button> */}
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>Save Data</Button>
+                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} id="saveButton" ><i className="fa fa-check"></i>Save Data</Button>
                                 <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} id="addButton"><i className="fa fa-check"></i>Add Row</Button>
+                                <Button type="button" size="md" color="info" className="float-right mr-1" onClick={this.backClicked}><i class="fa fa-arrow-left" aria-hidden="true"></i>Back</Button>
 
                                 &nbsp;
 </FormGroup>

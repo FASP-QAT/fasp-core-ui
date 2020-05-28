@@ -3101,10 +3101,15 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var currency = (this.state.currencyListAll).filter(c => c.currencyId == value)[0];
-                elInstance.setValueFromCoords(4, y, currency.conversionRateToUsd, true)
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
             }
         }
     }
