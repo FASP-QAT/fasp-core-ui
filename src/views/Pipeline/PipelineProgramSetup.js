@@ -161,12 +161,6 @@ export default class PipelineProgramSetup extends Component {
             }
         }
         )
-<<<<<<< HEAD
-
-=======
->>>>>>> 68d7100fb728d1f1fe827e98d950e4a86054aa94
-
-    }
 
     }
 
@@ -511,11 +505,6 @@ export default class PipelineProgramSetup extends Component {
                     })
                 }
 
-<<<<<<< HEAD
-                
-=======
-
->>>>>>> 68d7100fb728d1f1fe827e98d950e4a86054aa94
 
             }).catch(
                 error => {
@@ -785,11 +774,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/* <h3>Program Planning Units</h3> */}
-<<<<<<< HEAD
-                                                <PipelineProgramPlanningUnits pipelineId={this.props.match.params.pipelineId}></PipelineProgramPlanningUnits>
-=======
                                                 <PipelineProgramPlanningUnits ref="child" pipelineId={this.props.match.params.pipelineId}></PipelineProgramPlanningUnits>
->>>>>>> 68d7100fb728d1f1fe827e98d950e4a86054aa94
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
@@ -819,11 +804,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/* <h3>Consumption</h3> */}
-<<<<<<< HEAD
-                                                <PipelineProgramConsumption></PipelineProgramConsumption>
-=======
                                                 <PipelineProgramConsumption ref="consumptionChild" pipelineId={this.props.match.params.pipelineId}></PipelineProgramConsumption>
->>>>>>> 68d7100fb728d1f1fe827e98d950e4a86054aa94
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>

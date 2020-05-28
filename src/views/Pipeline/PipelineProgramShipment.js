@@ -481,7 +481,7 @@ export default class PipelineProgramShipment extends Component {
                         planningUnitList: response.data.map(ele => ({
                             name: getLabelText(ele.label, this.state.lang),
                             id: ele.planningUnitId
-                        }))
+                        }))})
                     ShipmentStatusService.getShipmentStatusListActive()
                         .then(response => {
                             if (response.status == 200) {
