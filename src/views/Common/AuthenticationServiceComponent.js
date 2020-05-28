@@ -33,51 +33,60 @@ export default class AuthenticationServiceComponent extends Component {
     componentDidMount = () => {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         if (AuthenticationService.checkTypeOfSession()) {
-            if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+            if (navigator.onLine) {
+                if (localStorage.getItem('token-' + decryptedCurUser) != null && localStorage.getItem('token-' + decryptedCurUser) != "") {
+                    if (AuthenticationService.checkLastActionTaken()) {
+                        localStorage.removeItem('lastActionTaken');
+                        localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
+                        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
+                        let basicAuthHeader = 'Bearer ' + decryptedToken
+                        axios.defaults.headers.common['Authorization'] = basicAuthHeader;
+
+                        axios.interceptors.response.use((response) => {
+                            if (response != null && response != "") {
+                                return response;
+                            } else {
+                                this.props.message("Network Error")
+                                return "";
+                            }
+                        }, (error) => {
+                            if (error.message === "Network Error") {
+                                this.props.message("Network Error")
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                    case 412:
+                                        this.props.message(error.response.data.messageCode);
+                                        break;
+                                    default:
+                                        this.props.message('static.unkownError');
+                                        break;
+                                }
+                                return Promise.reject(error);
+                            }
+                        });
+
+                    } else {
+                        this.props.history.push(`/logout/static.message.sessionExpired`)
+                    }
+                } else {
+                    this.props.history.push(`/logout/static.message.tokenError`)
+                }
+            } else {
                 if (AuthenticationService.checkLastActionTaken()) {
                     localStorage.removeItem('lastActionTaken');
                     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
-                    let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-                    let basicAuthHeader = 'Bearer ' + decryptedToken
-                    axios.defaults.headers.common['Authorization'] = basicAuthHeader;
-
-                    axios.interceptors.response.use((response) => {
-                        if (response != null && response != "") {
-                            return response;
-                        } else {
-                            this.props.message("Network Error")
-                            return "";
-                        }
-                    }, (error) => {
-                        if (error.message === "Network Error") {
-                            this.props.message("Network Error")
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                case 412:
-                                    this.props.message(error.response.data.messageCode);
-                                    break;
-                                default:
-                                    this.props.message('static.unkownError');
-                                    break;
-                            }
-                            return Promise.reject(error);
-                        }
-                    });
-
                 } else {
                     this.props.history.push(`/logout/static.message.sessionExpired`)
                 }
-            } else {
-                this.props.history.push(`/logout/static.message.tokenError`)
             }
         } else {
             this.props.history.push(`/logout/static.message.sessionChange`)

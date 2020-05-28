@@ -42,12 +42,12 @@ class DefaultLayout extends Component {
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
     var bfunction = [];
-    if(curUserBusinessFunctions != null && curUserBusinessFunctions != ""){
-    for (let i = 0; i < curUserBusinessFunctions.length; i++) {
-      bfunction.push(curUserBusinessFunctions[i].authority);
+    if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
+      for (let i = 0; i < curUserBusinessFunctions.length; i++) {
+        bfunction.push(curUserBusinessFunctions[i].authority);
+      }
+      this.setState({ businessFunctions: bfunction });
     }
-    this.setState({ businessFunctions: bfunction });
-  }
 
   }
 
@@ -402,6 +402,10 @@ class DefaultLayout extends Component {
                           }, {
                             name: i18n.t('static.report.forecasterrorovertime'),
                             url: '/report/forecastOverTheTime',
+                            icon: 'fa fa-exchange'
+                          }, {
+                            name: i18n.t('static.dashboard.forecastmetrics'),
+                            url: '/report/forecastMetrics',
                             icon: 'fa fa-exchange'
                           },
                           {
