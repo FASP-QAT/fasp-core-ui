@@ -370,7 +370,7 @@ class RealmCountry extends Component {
             }
         );
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
-            console.log(response.data);
+            console.log("getRealmCountryrealmIdById---", response.data);
             this.setState({
                 realmCountry: response.data,
                 rows: response.data
@@ -832,10 +832,10 @@ class RealmCountry extends Component {
                                                     {this.state.rows[idx].seaFreightPercentage}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].shippedToArrivedAirLeadTime}
+                                                    {this.state.rows[idx].shippedToArrivedByAirLeadTime}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].shippedToArrivedSeaLeadTime}
+                                                    {this.state.rows[idx].shippedToArrivedBySeaLeadTime}
                                                 </td> <td>
                                                     {this.state.rows[idx].arrivedToDeliveredLeadTime}
                                                 </td>

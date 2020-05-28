@@ -140,14 +140,14 @@ class Login extends Component {
     setTimeout(function () { document.getElementById('div1').style.display = 'none'; }, 8000);
     var logoutMessage = document.getElementById('div1');
     var htmlContent = logoutMessage.innerHTML;
-    console.log("htnl content.......",htmlContent);
-    if(htmlContent.includes('Cancelled')){
+    console.log("htnl content.......", htmlContent);
+    if (htmlContent.includes('Cancelled')) {
       logoutMessage.style.color = 'red';
     }
-    else{
+    else {
       logoutMessage.style.color = 'green';
     }
-   
+
     // setTimeout(function () {var div2= document.getElementById('div2').style.display = 'none';}, 8000);
     this.setState({
       message: ''
@@ -188,8 +188,8 @@ class Login extends Component {
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
 
-                                // decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
-                                decoded.user.syncExpiresOn = moment("2020-04-29 13:13:19").format("YYYY-MM-DD HH:mm:ss");
+                                decoded.user.syncExpiresOn = moment().format("YYYY-MM-DD HH:mm:ss");
+                                // decoded.user.syncExpiresOn = moment("2020-04-29 13:13:19").format("YYYY-MM-DD HH:mm:ss");
                                 localStorage.setItem('token-' + decoded.userId, CryptoJS.AES.encrypt((response.data.token).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('user-' + decoded.userId, CryptoJS.AES.encrypt(JSON.stringify(decoded.user), `${SECRET_KEY}`));
                                 localStorage.setItem('typeOfSession', "Online");
@@ -347,8 +347,8 @@ class Login extends Component {
                   and delivers health commodities, offers comprehensive technical assistance to strengthen
                   national supply chain systems, and provides global supply chain leadership. For more
                   information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                                                      official U.S. government information and does not represent the views or positions of the
-                                                      Agency for International Development or the U.S. government.
+                                                        official U.S. government information and does not represent the views or positions of the
+                                                        Agency for International Development or the U.S. government.
               </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">

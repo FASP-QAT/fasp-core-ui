@@ -180,6 +180,8 @@
     "static.common.selectPlanningUnit": "Por favor seleccione la unidad de planificación",
     "static.common.selectProductCategory": "Por favor seleccione categoría de producto",
     "static.region.glnvalue": "GLN No debe tener 13 dígitos.",
-    "static.message.shipmentSaved": "Datos de envío guardados"
-
+    "static.message.shipmentSaved": "Datos de envío guardados",
+    "static.program.shippedToArrivedByAirLeadTime": "Ingrese enviado a llegado por tiempo de entrega aérea",
+    "static.program.shippedToArrivedBySeaLeadTime": "Ingrese enviado a llegado por tiempo de entrega marítima",
+    "static.program.arrivedToDeliveredLeadTime": "Digite chegou ao prazo de entrega entregue"
 }

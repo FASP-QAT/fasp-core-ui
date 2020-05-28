@@ -43,12 +43,10 @@ class DefaultLayout extends Component {
     console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
     var bfunction = [];
 
-    if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
-      for (let i = 0; i < curUserBusinessFunctions.length; i++) {
-        bfunction.push(curUserBusinessFunctions[i].authority);
-      }
-      this.setState({ businessFunctions: bfunction });
+    for (let i = 0; i < curUserBusinessFunctions.length; i++) {
+      bfunction.push(curUserBusinessFunctions[i].authority);
     }
+    this.setState({ businessFunctions: bfunction });
 
   }
 
