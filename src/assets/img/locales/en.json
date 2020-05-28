@@ -676,5 +676,8 @@
     "static.report.selectMonth": "Select Month",
     "static.program.shippedToArrivedByAirLeadTime": "Please enter shipped to arrived by air lead time",
     "static.program.shippedToArrivedBySeaLeadTime": "Please enter shipped to arrived by sea lead time",
-    "static.program.arrivedToDeliveredLeadTime": "Please enter arrived to delivered lead time"
+    "static.program.arrivedToDeliveredLeadTime": "Please enter arrived to delivered lead time",
+    "static.common.youdatastart":"Your data has started from here"
+    
 }
+
