@@ -666,10 +666,7 @@
     "static.common.selectProductCategory": "Please select product category",
     "static.dashboard.stockstatusovertime":"Stock Status Over time",
     "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
-<<<<<<< HEAD
     "static.report.noofmonth":"Number Of Months",
-=======
->>>>>>> 68d7100fb728d1f1fe827e98d950e4a86054aa94
     "static.shipment.edd":"Expected Delivery Date",
     "static.shipment.suggestedQty":"Suggested Quantity",
     "static.shipment.qty":"Quantity",
