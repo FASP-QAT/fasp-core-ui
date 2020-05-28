@@ -377,7 +377,7 @@ export default class PipelineProgramShipment extends Component {
                     this.el.setComments(col, "");
                 }
             }
-        }  if (x == 9) {
+        } if (x == 9) {
             var reg = /^[0-9\b]+$/;
             var col = ("J").concat(parseInt(y) + 1);
             if (value == "") {
@@ -396,7 +396,7 @@ export default class PipelineProgramShipment extends Component {
             }
         }
         if (x == 10) {
-            var col = ("k").concat(parseInt(y) + 1);
+            var col = ("K").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setStyle(col, "background-color", "yellow");
@@ -472,9 +472,7 @@ export default class PipelineProgramShipment extends Component {
 
 
     componentDidMount() {
-        console.log("pipelineProgramId----->", this.props.match.params.pipelineId);
         AuthenticationService.setupAxiosInterceptors();
-
         PlanningUnitService.getAllPlanningUnitList()
             .then(response => {
                 if (response.status == 200) {
@@ -484,190 +482,193 @@ export default class PipelineProgramShipment extends Component {
                             name: getLabelText(ele.label, this.state.lang),
                             id: ele.planningUnitId
                         }))
+                    ShipmentStatusService.getShipmentStatusListActive()
+                        .then(response => {
+                            if (response.status == 200) {
+                                // console.log(response.data)
+                                this.setState({
+                                    shipmentStatusList: response.data.map(ele => ({
+                                        name: getLabelText(ele.label, this.state.lang),
+                                        id: ele.shipmentStatusId
+                                    }))
+                                });
+
+                                DataSourceService.getAllDataSourceList()
+                                    .then(response => {
+                                        if (response.status == 200) {
+                                            // console.log(response.data)
+                                            this.setState({
+                                                dataSourceList: response.data.map(ele => ({
+                                                    name: getLabelText(ele.label, this.state.lang),
+                                                    id: ele.dataSourceId
+                                                }))
+                                            });
+
+                                            ProcurementAgentService.getProcurementAgentListAll()
+                                                .then(response => {
+                                                    if (response.status == 200) {
+                                                        console.log(response.data)
+                                                        this.setState({
+                                                            procurementAgentList: response.data.map(ele => ({
+                                                                name: getLabelText(ele.label, this.state.lang),
+                                                                id: ele.procurementAgentId
+                                                            }))
+                                                        });
+
+                                                        ManufaturerService.getSupplierListAll()
+                                                            .then(response => {
+                                                                if (response.status == 200) {
+                                                                    console.log(response.data)
+                                                                    this.setState({
+                                                                        supplierList: response.data.map(ele => ({
+                                                                            name: getLabelText(ele.label, this.state.lang),
+                                                                            id: ele.supplierId
+                                                                        }))
+                                                                    });
+
+                                                                    PipelineService.getShipmentDataById(this.props.match.params.pipelineId)
+                                                                        .then(response => {
+                                                                            if (response.status == 200) {
+                                                                                console.log("pipeline shipment data my console--->", response.data);
+                                                                                this.setState({
+                                                                                    pipelineShipmentData: response.data
+                                                                                })
+                                                                                this.initialiseshipment();
+                                                                            } else {
+                                                                                this.setState({
+                                                                                    message: response.data.messageCode
+                                                                                })
+                                                                            }
+                                                                        }).catch(
+                                                                            error => {
+                                                                                if (error.message === "Network Error") {
+                                                                                    this.setState({ message: error.message });
+                                                                                } else {
+                                                                                    switch (error.response ? error.response.status : "") {
+                                                                                        case 500:
+                                                                                        case 401:
+                                                                                        case 404:
+                                                                                        case 406:
+                                                                                        case 412:
+                                                                                            this.setState({ message: error.response.data.messageCode });
+                                                                                            break;
+                                                                                        default:
+                                                                                            this.setState({ message: 'static.unkownError' });
+                                                                                            break;
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        );
 
 
-                    });
-                    console.log(response.data)
-                    this.initialiseshipment();
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+
+                                                                } else {
+                                                                    this.setState({
+                                                                        message: response.data.messageCode
+                                                                    })
+                                                                }
+                                                            }).catch(
+                                                                error => {
+                                                                    if (error.message === "Network Error") {
+                                                                        this.setState({ message: error.message });
+                                                                    } else {
+                                                                        switch (error.response ? error.response.status : "") {
+                                                                            case 500:
+                                                                            case 401:
+                                                                            case 404:
+                                                                            case 406:
+                                                                            case 412:
+                                                                                this.setState({ message: error.response.data.messageCode });
+                                                                                break;
+                                                                            default:
+                                                                                this.setState({ message: 'static.unkownError' });
+                                                                                break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            );
 
 
-        ShipmentStatusService.getShipmentStatusListActive()
-            .then(response => {
-                if (response.status == 200) {
-                    // console.log(response.data)
-                    this.setState({
-                        shipmentStatusList: response.data.map(ele => ({
-                            name: getLabelText(ele.label, this.state.lang),
-                            id: ele.shipmentStatusId
-                        }))
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+                                                    } else {
+                                                        this.setState({
+                                                            message: response.data.messageCode
+                                                        })
+                                                    }
+                                                }).catch(
+                                                    error => {
+                                                        if (error.message === "Network Error") {
+                                                            this.setState({ message: error.message });
+                                                        } else {
+                                                            switch (error.response ? error.response.status : "") {
+                                                                case 500:
+                                                                case 401:
+                                                                case 404:
+                                                                case 406:
+                                                                case 412:
+                                                                    this.setState({ message: error.response.data.messageCode });
+                                                                    break;
+                                                                default:
+                                                                    this.setState({ message: 'static.unkownError' });
+                                                                    break;
+                                                            }
+                                                        }
+                                                    }
+                                                );
 
 
 
-        DataSourceService.getAllDataSourceList()
-            .then(response => {
-                if (response.status == 200) {
-                    // console.log(response.data)
-                    this.setState({
-                        dataSourceList: response.data.map(ele => ({
-                            name: getLabelText(ele.label, this.state.lang),
-                            id: ele.dataSourceId
-                        }))
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+                                        } else {
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            })
+                                        }
+                                    }).catch(
+                                        error => {
+                                            if (error.message === "Network Error") {
+                                                this.setState({ message: error.message });
+                                            } else {
+                                                switch (error.response ? error.response.status : "") {
+                                                    case 500:
+                                                    case 401:
+                                                    case 404:
+                                                    case 406:
+                                                    case 412:
+                                                        this.setState({ message: error.response.data.messageCode });
+                                                        break;
+                                                    default:
+                                                        this.setState({ message: 'static.unkownError' });
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    );
 
-        ProcurementAgentService.getProcurementAgentListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    console.log(response.data)
-                    this.setState({
-                        procurementAgentList: response.data.map(ele => ({
-                            name: getLabelText(ele.label, this.state.lang),
-                            id: ele.procurementAgentId
-                        }))
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+                            } else {
+                                this.setState({
+                                    message: response.data.messageCode
+                                })
+                            }
+                        }).catch(
+                            error => {
+                                if (error.message === "Network Error") {
+                                    this.setState({ message: error.message });
+                                } else {
+                                    switch (error.response ? error.response.status : "") {
+                                        case 500:
+                                        case 401:
+                                        case 404:
+                                        case 406:
+                                        case 412:
+                                            this.setState({ message: error.response.data.messageCode });
+                                            break;
+                                        default:
+                                            this.setState({ message: 'static.unkownError' });
+                                            break;
+                                    }
+                                }
+                            }
+                        );
 
-
-        ManufaturerService.getSupplierListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    console.log(response.data)
-                    this.setState({
-                        supplierList: response.data.map(ele => ({
-                            name: getLabelText(ele.label, this.state.lang),
-                            id: ele.supplierId
-                        }))
-                    })
-                } else {
-                    this.setState({
-                        message: response.data.messageCode
-                    })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
-        PipelineService.getShipmentDataById(this.props.match.params.pipelineId)
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        pipelineShipmentData: response.data
-                    })
 
                 } else {
                     this.setState({
@@ -705,20 +706,14 @@ export default class PipelineProgramShipment extends Component {
         // var data = shipmentDataArr;
 
         var shipmentdata = [];
-        console.log('**'+this.state.pipelineShipmentData)
+        console.log('**' + this.state.pipelineShipmentData)
         if (this.state.pipelineShipmentData.length != 0) {
             if (this.state.pipelineShipmentData[0].shippo != null) {
-                shipmentdata = this.state.pipelineShipmentData.map((item, index) => [item.shipdatasourceid, item.productid, moment(null).format("YYYY-MM-DD"), item.supplierid, "", item.shipamount, "", "", item.shipfreightcost,0, moment(item.shipordereddate).format("YYYY-MM-DD"), moment(item.shipshippeddate).format("YYYY-MM-DD"), moment(item.shipreceiveddate).format("YYYY-MM-DD"), "", item.shipnote, true])
+                shipmentdata = this.state.pipelineShipmentData.map((item, index) => [item.shipdatasourceid, item.productid, moment(null).format("YYYY-MM-DD"), item.supplierid, "", item.shipamount, "", "", item.shipfreightcost, 0, moment(item.shipordereddate).format("YYYY-MM-DD"), moment(item.shipshippeddate).format("YYYY-MM-DD"), moment(item.shipreceiveddate).format("YYYY-MM-DD"), "", item.shipnote, true])
             } else {
-                shipmentdata = this.state.pipelineShipmentData.map((item, index) => [item.dataSource.id, item.planningUnit.id, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), item.procurementAgent.id, item.supplier.id, item.quantity, item.rate, item.shipmentMode, item.freightCost,item.productCost, moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.shipmentStatus.id, item.notes, true])
+                shipmentdata = this.state.pipelineShipmentData.map((item, index) => [item.dataSource.id, item.planningUnit.id, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), item.procurementAgent.id, item.supplier.id, item.quantity, item.rate, item.shipmentMode, item.freightCost, item.productCost, moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.shipmentStatus.id, item.notes, true])
             } console.log(shipmentdata)
         }
-
-
-
-
-
-
 
         var data = shipmentdata;
         // json[0] = data;
@@ -858,7 +853,7 @@ export default class PipelineProgramShipment extends Component {
                 "accountFlag": false,
                 "erpFlag": false,
                 "versionId": 0,
-                "active":ele[15]
+                "active": ele[15]
             }))
             console.log(JSON.stringify(data))
             PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
