@@ -681,7 +681,7 @@ for(var i=0,j=1;i<this.state.years.length;i++){
       const pageCount = doc.internal.getNumberOfPages()
 
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
+      doc.setFontSize(6)
       for (var i = 1; i <= pageCount; i++) {
         doc.setPage(i)
 
@@ -709,7 +709,7 @@ for(var i=0,j=1;i<this.state.years.length;i++){
       //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
       //}); 
       for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(18)
+        doc.setFontSize(15)
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
@@ -720,7 +720,7 @@ for(var i=0,j=1;i<this.state.years.length;i++){
           align: 'center'
         })
         if (i == 1) {
-          doc.setFontSize(12)
+          doc.setFontSize(8)
           doc.text(i18n.t('static.report.dateRange') + ' : ' + this.state.rangeValue.from.month + '/' + this.state.rangeValue.from.year + ' to ' + this.state.rangeValue.to.month + '/' + this.state.rangeValue.to.year, doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
@@ -739,13 +739,13 @@ for(var i=0,j=1;i<this.state.years.length;i++){
     }
 
     const unit = "pt";
-    const size = "A1"; // Use A1, A2, A3 or A4
+    const size = "A4"; // Use A1, A2, A3 or A4
     const orientation = "landscape"; // portrait or landscape
 
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size);
 
-    doc.setFontSize(15);
+    doc.setFontSize(8);
 
 
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
@@ -771,13 +771,16 @@ console.log(header)
    
    
     console.log(header);
-    let data1, data2;
-    if (navigator.onLine) {
-      data1 = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+    let data;
+    if (navigator.onLine && this.state.view==2) {
+      data = this.state.data.map(ele => ele.map((item,index) => (index==0?{content:item,styles: { halign: 'left' }}:{content:this.formatter(item),styles: { halign: 'right' }})));
+    }
+    else if (navigator.onLine) {
+      data = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
         , ele.Dec]);
-      data2 = this.state.data.map(ele => ele.map((item,index) => (index==0?{content:item,styles: { halign: 'left' }}:{content:this.formatter(item),styles: { halign: 'right' }})));
-    } else {
-      data1 = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
+        
+       } else {
+      data = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
         .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
     }
 
@@ -786,8 +789,8 @@ console.log(header)
       margin: { top: 40 },
       startY: 180,
       head: header,
-      body: this.state.view == 1 ? data1 : data2,
-      styles:{lineWidth:  1},
+      body: data,
+      styles:{lineWidth:  1,fontSize : 8},
       columnStyles: {
         0: { cellWidth: 120 },
         1: { cellWidth: 15 },
