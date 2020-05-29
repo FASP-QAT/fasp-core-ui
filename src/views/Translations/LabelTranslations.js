@@ -118,11 +118,13 @@ export default class DatabaseTranslations extends React.Component {
         var elInstance = instance.jexcel;
         elInstance.hideIndex(0);
         console.log("In loaded function hide method");
+        var pagignation = document.getElementsByClassName('jexcel_pagination')[0];
+        pagignation.classList.add('row');
         var searchContainer = document.getElementsByClassName('jexcel_filter')[0];
-        var searchDiv=(document.getElementsByClassName('jexcel_filter')[0]).childNodes[1];
-        console.log("Search div",searchDiv);
+        var searchDiv = (document.getElementsByClassName('jexcel_filter')[0]).childNodes[1];
+        console.log("Search div", searchDiv);
         searchDiv.removeChild(((document.getElementsByClassName('jexcel_filter')[0]).childNodes[1]).childNodes[0]);
-        document.getElementsByClassName("jexcel_search")[0].placeholder = "Search"; 
+        document.getElementsByClassName("jexcel_search")[0].placeholder = "Search";
         // searchContainer.classList.add('TableCust');
         console.log('searchContainer', searchContainer);
         var clearBtn = document.createElement('button');
@@ -158,11 +160,14 @@ export default class DatabaseTranslations extends React.Component {
         console.log(obj.show, '....................in show');
         jexcel_pagination.firstChild.classList.add('order-2');
         jexcel_pagination.firstChild.classList.add('mr-auto');
+        jexcel_pagination.firstChild.classList.add('pl-0');
+
 
 
         var jexcel_filterFirstdiv = document.getElementsByClassName('jexcel_filter')[0];
         var filter = jexcel_filterFirstdiv.firstChild;
         filter.classList.add('order-1');
+        filter.classList.add('pr-1');
         jexcel_pagination.appendChild(filter);
 
 

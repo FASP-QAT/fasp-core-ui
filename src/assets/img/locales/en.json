@@ -668,6 +668,7 @@
     "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
     "static.report.noofmonth":"Number Of Months",
     "static.supplyplan.supplyplanformula":"Supply plan formulas",
-    "static.message.shipmentSaved": "Shipment Data Saved"
+    "static.message.shipmentSaved": "Shipment Data Saved",
+    "static.message.masterSyncFail":"Master Data Sync Fail"
     
 }
