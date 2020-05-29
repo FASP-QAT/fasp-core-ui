@@ -39,7 +39,7 @@ class AuthenticationService {
         // console.log("diffDuration---",diffDuration)
         // console.log("Days:", diffDuration.days());
         console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
-        if (diff < 15) {
+        if (diff < 30) {
             return false;
         }
         return true;

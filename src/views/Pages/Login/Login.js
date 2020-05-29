@@ -238,7 +238,7 @@ class Login extends Component {
                                 if (res) {
                                   let tempUser = localStorage.getItem("tempUser");
                                   let user = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + tempUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng"];
+                                  let keysToRemove = ["curUser", "lang", "typeOfSession", "i18nextLng","lastActionTaken"];
                                   keysToRemove.forEach(k => localStorage.removeItem(k))
 
                                   localStorage.setItem('typeOfSession', "Offline");
@@ -248,6 +248,7 @@ class Login extends Component {
                                   if (AuthenticationService.syncExpiresOn() == true) {
                                     this.props.history.push(`/logout/static.message.syncExpiresOn`)
                                   } else {
+                                    localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                     this.props.history.push(`/ApplicationDashboard`)
                                   }
                                 } else {
