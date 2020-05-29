@@ -140,11 +140,12 @@ class DefaultLayout extends Component {
                             url: '/role/listRole',
                             icon: 'fa fa-dot-circle-o'
                           },
+                          (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
                           {
                             name: i18n.t('static.dashboard.user'),
                             url: '/user/listUser',
                             icon: 'fa fa-users'
-                          },
+                          }:""),
                           {
                             name: i18n.t('static.dashboard.language'),
                             url: '/language/listLanguage',
@@ -422,12 +423,22 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.funderExport'),
+                            url: '/report/funderExport',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            url: '/report/procurementAgentExport',
+                            icon: 'fa fa-exchange'
                           }
                         ]
                       }
                       // {
                       //   name: "Supply plan",
-                      //   icon: 'fa fa-list',
+                      //   icon: 'fa fa-list',  
                       //   children: [
                       //     {
                       //       name: "Supply Plan",
