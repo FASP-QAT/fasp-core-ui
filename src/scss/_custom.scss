@@ -1363,6 +1363,11 @@ h5,
   background-color: red;
   border-color: 1px solid red;
 }
+
+.legend .skipedShipmentslegend{
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
 .legend .purplelegend {
   background-color: rgb(170, 85, 161);
   border-color: 1px solid rgb(170, 85, 161);
@@ -1784,6 +1789,15 @@ input::placeholder {
 .legendTextsync {
   float: right!important;
   width: 200px !important;
+  height: 15px;
+  padding-left: 44%!important;
+  margin: -17px -13px 0px -9px !important;
+  border-radius: 3px;
+}
+
+.legendTextSupplyPlan{
+  float: right!important;
+  width: 300px !important;
   height: 15px;
   padding-left: 44%!important;
   margin: -17px -13px 0px -9px !important;
