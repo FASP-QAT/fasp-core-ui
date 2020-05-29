@@ -63,9 +63,16 @@ export default class EditLanguageComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChange(event) {
@@ -111,9 +118,18 @@ export default class EditLanguageComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         LanguageService.getLanguageById(this.props.match.params.languageId).then(response => {
-            this.setState({
-                language: response.data
-            });
+            if (response.status == 200) {
+                this.setState({
+                    language: response.data
+                });
+            } else {
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
 
         })
     }
@@ -130,7 +146,7 @@ export default class EditLanguageComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -149,11 +165,14 @@ export default class EditLanguageComponent extends Component {
                                     LanguageService.editLanguage(this.state.language).then(response => {
                                         console.log(response)
                                         if (response.status == 200) {
-                                            this.props.history.push(`/language/listLanguage/` + i18n.t(response.data.messageCode, { entityname }))
+                                            this.props.history.push(`/language/listLanguage/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode
-                                            })
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
                                         }
 
                                     }
@@ -257,7 +276,7 @@ export default class EditLanguageComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/language/listLanguage/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/language/listLanguage/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

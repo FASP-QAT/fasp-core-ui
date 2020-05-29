@@ -664,10 +664,20 @@
     "static.report.errorperc": "Forecast Error Percentage",
     "static.common.selectPlanningUnit": "Please select planning unit",
     "static.common.selectProductCategory": "Please select product category",
-    "static.dashboard.stockstatusovertime":"Stock Status Over time",
-    "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
-    "static.report.noofmonth":"Number Of Months",
-    "static.supplyplan.supplyplanformula":"Supply plan formulas",
-    "static.message.shipmentSaved": "Shipment Data Saved"
+    "static.dashboard.stockstatusovertime": "Stock Status Over time",
+    "static.report.stockstatusovertimeReport": "Stock Status Over time Report",
+    "static.report.noofmonth": "Number Of Months",
+    "static.supplyplan.supplyplanformula": "Supply plan formulas",
+    "static.message.shipmentSaved": "Shipment Data Saved",
+    "static.report.historicalConsumptionActual": "Historical Actual Consumption",
+    "static.dashboard.forecastmetrics": "Forecast Metrics",
+    "static.report.historicalConsumptionDiff": "Historical Consumption Diff",
+    "static.report.error": "Forecast Error",
+    "static.report.selectMonth": "Select Month",
+    "static.program.shippedToArrivedByAirLeadTime": "Please enter shipped to arrived by air lead time",
+    "static.program.shippedToArrivedBySeaLeadTime": "Please enter shipped to arrived by sea lead time",
+    "static.program.arrivedToDeliveredLeadTime": "Please enter arrived to delivered lead time",
+    "static.common.youdatastart":"Your data has started from here"
     
 }
+

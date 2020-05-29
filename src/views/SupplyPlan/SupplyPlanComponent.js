@@ -231,6 +231,7 @@ export default class SupplyPlanComponent extends React.Component {
         var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id = planningUnitId))[0];
+        console.log("programPlanningUnit--->",programPlanningUnit);
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
         var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
 
@@ -429,6 +430,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 for (var i = 3; i < 21; i++) {
                     var c = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate))
+                    console.log("c--->",c);
                     var adjustmentQty = 0;
                     var filteredJsonInventory = { adjustmentQty: '', region: { id: 0 } };
                     for (var j = 0; j < c.length; j++) {
@@ -438,6 +440,8 @@ export default class SupplyPlanComponent extends React.Component {
                     if (c.length == 0) {
                         inventoryTotalData.push("");
                     } else {
+                        console.log("month---",m[i]);
+                        console.log("qty---",adjustmentQty);
                         inventoryTotalData.push(adjustmentQty);
                     }
                     filteredArrayInventory.push(filteredJsonInventory);
@@ -2734,11 +2738,33 @@ export default class SupplyPlanComponent extends React.Component {
                                                             fundingSource: bResult[k].fundingSource
                                                         })
 
+<<<<<<< HEAD
                                                     }
                                                     this.setState({
                                                         budgetList: budgetListAll,
                                                         currencyListAll: currencyListAll
                                                     })
+=======
+        if (x == 3) {
+            var col = ("D").concat(parseInt(y) + 1);
+            if (value == "") {
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                if (isNaN(Number.parseInt(value)) || value < 0) {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setStyle(col, "background-color", "yellow");
+                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
+                } else {
+                    elInstance.setStyle(col, "background-color", "transparent");
+                    elInstance.setComments(col, "");
+                }
+
+            }
+        }
+    }
+>>>>>>> dev
 
                                                     var shipmentListUnFiltered = programJson.shipmentList;
                                                     console.log("Shipment List un filtered", shipmentListUnFiltered);

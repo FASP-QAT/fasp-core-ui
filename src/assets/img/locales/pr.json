@@ -146,5 +146,14 @@
     "static.common.selectPlanningUnit": "Selecione a unidade de planejamento",
     "static.common.selectProductCategory": "Selecione a categoria do produto",
     "static.region.glnvalue": "GLN Não deve ter 13 dígitos.",
-    "static.message.shipmentSaved": "Dados da remessa salvos"
+    "static.message.shipmentSaved": "Dados da remessa salvos",
+    "static.datasourcetype.datasourcetype": "Tipo de fonte de dados",
+    "static.common.realmtext": "Por favor selecione o reino",
+    "static.datasourcetype.datasourcetypetext": "Digite o tipo de fonte de dados",
+    "static.realm.realm": "Reino",
+    "static.dashboard.datasourcetype": "Tipos de fonte de dados",
+    "static.breadcrum.add": "{{entityname}} / Adicionar {{entityname}}",
+    "static.program.shippedToArrivedByAirLeadTime": "Por favor, insira enviado para chegar por tempo de entrega aérea",
+    "static.program.shippedToArrivedBySeaLeadTime": "Digite enviado para chegar por tempo de entrega do mar",
+    "static.program.arrivedToDeliveredLeadTime": "Digite chegou ao prazo de entrega entregue"
 }

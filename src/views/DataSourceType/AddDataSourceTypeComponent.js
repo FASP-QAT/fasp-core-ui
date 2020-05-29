@@ -8,6 +8,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import DataSourceTypeService from '../../api/DataSourceTypeService.js'
 import RealmService from "../../api/RealmService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+import getLabelText from '../../CommonComponent/getLabelText';
 
 const initialValues = {
     realmId: [],
@@ -51,6 +52,7 @@ export default class AddDataSourceTypeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            lang: localStorage.getItem('lang'),
             realms: [],
             dataSourceType:
             {
@@ -132,7 +134,7 @@ export default class AddDataSourceTypeComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {item.label.label_en}
+                       {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
