@@ -69,6 +69,21 @@ class PipelineService {
         return axios.post(`${API_URL}/api/pipeline/shipment/${pipelineId}`, json, {}
         );
     }
+
+    getPipelineProgramInventory(json) {
+        return axios.get(`${API_URL}/api/pipeline/inventory/${json}`, {}
+        );
+    }
+
+    addQatTempInventory(json, pipelineId) {
+        return axios.put(`${API_URL}/api/pipeline/inventory/${pipelineId}`, json, {}
+        );
+    }
+
+    getPlanningUnitListWithFinalInventry(json) {
+        return axios.get(`${API_URL}/api/qatTemp/planningUnitListFinalInventry/${json}`, {}
+        );
+    }
 }
 
 export default new PipelineService();

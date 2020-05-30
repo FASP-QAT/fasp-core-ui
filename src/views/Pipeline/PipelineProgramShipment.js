@@ -483,7 +483,7 @@ export default class PipelineProgramShipment extends Component {
                             id: ele.planningUnitId
                         }))
                     });
-                    
+
                     ShipmentStatusService.getShipmentStatusListActive()
                         .then(response => {
                             if (response.status == 200) {
@@ -711,7 +711,7 @@ export default class PipelineProgramShipment extends Component {
         console.log('**' + this.state.pipelineShipmentData)
         if (this.state.pipelineShipmentData.length != 0) {
             if (this.state.pipelineShipmentData[0].shippo != null) {
-                shipmentdata = this.state.pipelineShipmentData.map((item, index) => [item.shipdatasourceid, item.productid, moment(null).format("YYYY-MM-DD"), item.supplierid, "", item.shipamount, "", "", item.shipfreightcost, 0, moment(item.shipordereddate).format("YYYY-MM-DD"), moment(item.shipshippeddate).format("YYYY-MM-DD"), moment(item.shipreceiveddate).format("YYYY-MM-DD"), "", item.shipnote, true])
+                shipmentdata = this.state.pipelineShipmentData.map((item, index) => [item.shipdatasourceid, item.productid, moment(item.shipreceiveddate).format("YYYY-MM-DD"), item.supplierid, "", item.shipamount, "", "", item.shipfreightcost, 0, moment(item.shipordereddate).format("YYYY-MM-DD"), moment(item.shipshippeddate).format("YYYY-MM-DD"), moment(item.shipreceiveddate).format("YYYY-MM-DD"), "", item.shipnote, true])
             } else {
                 shipmentdata = this.state.pipelineShipmentData.map((item, index) => [item.dataSource.id, item.planningUnit.id, moment(item.expectedDeliveryDate).format("YYYY-MM-DD"), item.procurementAgent.id, item.supplier.id, item.quantity, item.rate, item.shipmentMode, item.freightCost, item.productCost, moment(item.orderedDate).format("YYYY-MM-DD"), moment(item.shippedDate).format("YYYY-MM-DD"), moment(item.receivedDate).format("YYYY-MM-DD"), item.shipmentStatus.id, item.notes, true])
             } console.log(shipmentdata)
@@ -861,9 +861,9 @@ export default class PipelineProgramShipment extends Component {
             PipelineService.submitShipmentData(this.props.match.params.pipelineId, data)
                 .then(response => {
                     // console.log(response.data)
-                    this.setState({
-                        message: response.data.messageCode
-                    })
+                        this.setState({
+                            message: response.data.messageCode
+                        })
                 }
                 ).catch(
                     error => {
@@ -887,7 +887,7 @@ export default class PipelineProgramShipment extends Component {
                 );
 
         } else {
-            alert('Please enter valid data')
+            // alert('Please enter valid data')
         }
     }
 

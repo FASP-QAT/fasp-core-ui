@@ -107,7 +107,7 @@ export default class PipelineProgramConsumption extends Component {
                 AuthenticationService.setupAxiosInterceptors();
                 PlanningUnitService.getActivePlanningUnitList()
                     .then(response => {
-
+                        console.log("planning units list in consumption--->",response.data);
                         // planningUnitListQat = response.data
                         for (var k = 0; k < (response.data).length; k++) {
                             var planningUnitJson = {
@@ -156,7 +156,7 @@ export default class PipelineProgramConsumption extends Component {
                                 var options = {
                                     data: data,
                                     columnDrag: true,
-                                    colWidths: [130, 130, 120, 120, 100, 100, 100, 100],
+                                    colWidths: [100, 100, 100,70, 100, 120, 90, 160],
                                     columns: [
                                         // { title: 'Month', type: 'text', readOnly: true },
                                         {
@@ -224,10 +224,11 @@ export default class PipelineProgramConsumption extends Component {
                                 console.log("in else==================");
                                 AuthenticationService.setupAxiosInterceptors();
                                 PipelineService.getPipelineProgramConsumption(this.props.pipelineId).then(response => {
-                                    console.log("consumption List ----->", response.data);
+                                    console.log("consumption List pipeline ----->", response.data);
                                     var data = [];
                                     var consumptionDataArr = [];
                                     var consumptionList = response.data;
+                                    // var consumptionList=this.props.pipelineConsumptionList;
 
                                     //don for loaded function
                                     this.setState({ consumptionList: consumptionList });
@@ -259,7 +260,7 @@ export default class PipelineProgramConsumption extends Component {
                                     var options = {
                                         data: data,
                                         columnDrag: true,
-                                        colWidths: [130, 130, 120, 120, 100, 100, 100, 100],
+                                        colWidths: [100, 100, 100,70, 100, 120, 90, 160],
                                         columns: [
                                             // { title: 'Month', type: 'text', readOnly: true },
                                             {
@@ -296,11 +297,11 @@ export default class PipelineProgramConsumption extends Component {
                                                 type: 'dropdown',
                                                 source: [{ id: true, name: i18n.t('static.consumption.actual') }, { id: false, name: i18n.t('static.consumption.forcast') }]
                                             },
-                                            { 
-                                                title: 'Planning Unit', 
+                                            {
+                                                title: 'Planning Unit',
                                                 type: 'dropdown',
                                                 source:planningUnitListQat,
-                                                readOnly:true 
+                                                readOnly:true
                                             },
                                             // { title: 'Created By', type: 'text', readOnly: true },
                                             // { title: 'Last Modified date', type: 'text', readOnly: true },

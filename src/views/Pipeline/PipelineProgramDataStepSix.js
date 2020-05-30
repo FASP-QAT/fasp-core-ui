@@ -22,7 +22,11 @@ const initialValuesSix = {
     monthsInFutureForAmc: '',
     monthsInPastForAmc: '',
     // healthAreaId: '',
-    programNotes: ''
+    programNotes: '',
+
+    arrivedToDeliveredLeadTime: '',
+    shippedToArrivedBySeaLeadTime: '',
+    shippedToArrivedByAirLeadTime: ''
 
 }
 
@@ -50,6 +54,13 @@ const validationSchemaSix = function (values) {
             .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
         monthsInPastForAmc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
+
+        arrivedToDeliveredLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required('Please enter Arrived to deliverd lead time').min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedBySeaLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required('Please enter shipped to arrived by sea lead time').min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedByAirLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required('Please enter shipped to arrived by air lead time').min(0, i18n.t('static.program.validvaluetext')),
         // healthAreaId: Yup.string()
         //     .required(i18n.t('static.program.validhealthareatext')),
         // programNotes: Yup.string()
@@ -105,6 +116,9 @@ export default class PipelineProgramDataStepSix extends Component {
             monthsInPastForAmc: true,
             // healthAreaId: true,
             // programNotes: true,
+            arrivedToDeliveredLeadTime: '',
+            shippedToArrivedBySeaLeadTime: '',
+            shippedToArrivedByAirLeadTime: ''
 
         }
         )
@@ -188,7 +202,10 @@ export default class PipelineProgramDataStepSix extends Component {
                         approvedToShippedLeadTime: this.props.items.program.approvedToShippedLeadTime,
                         monthsInFutureForAmc: this.props.items.program.monthsInFutureForAmc,
                         monthsInPastForAmc: this.props.items.program.monthsInPastForAmc,
-                        programNotes: this.props.items.program.programNotes
+                        programNotes: this.props.items.program.programNotes,
+                        arrivedToDeliveredLeadTime:this.props.items.program.arrivedToDeliveredLeadTime,
+                        shippedToArrivedBySeaLeadTime:this.props.items.program.shippedToArrivedBySeaLeadTime,
+                        shippedToArrivedByAirLeadTime:this.props.items.program.shippedToArrivedByAirLeadTime
                     }
                 }
                 validate={validateSix(validationSchemaSix)}
@@ -234,26 +251,13 @@ export default class PipelineProgramDataStepSix extends Component {
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                             type="select" name="userId" id="userId"
                                             value={this.props.items.program.programManager.userId}
-                                            >
+                                        >
                                             <option value="">{i18n.t('static.common.select')}</option>
                                             {programManagers}
                                         </Input>
                                         <FormFeedback className="red">{errors.userId}</FormFeedback>
                                     </FormGroup>
-                                    <FormGroup className="col-md-6">
-                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
-                                        <Input
-                                            onBlur={handleBlur}
-                                            valid={!errors.programNotes && this.props.items.program.programNotes != ''}
-                                            invalid={touched.programNotes && !!errors.programNotes}
-                                            bsSize="sm"
-                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
-                                            type="textarea"
-                                            name="programNotes"
-                                            id="programNotes"
-                                            value={this.props.items.program.programNotes} />
-                                        <FormFeedback className="red">{errors.programNotes}</FormFeedback>
-                                    </FormGroup>
+
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
@@ -265,8 +269,8 @@ export default class PipelineProgramDataStepSix extends Component {
                                             type="number"
                                             min="0"
                                             value={this.props.items.program.airFreightPerc}
-                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')} 
-                                            />
+                                            name="airFreightPerc" id="airFreightPerc" placeholder={i18n.t('static.program.airfreightperctext')}
+                                        />
                                         <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
@@ -354,6 +358,48 @@ export default class PipelineProgramDataStepSix extends Component {
                                         <FormFeedback className="red">{errors.deliveredToReceivedLeadTime}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">Arrived To Delivered Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.arrivedToDeliveredLeadTime && this.props.items.program.arrivedToDeliveredLeadTime != ''}
+                                            invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            value={this.props.items.program.arrivedToDeliveredLeadTime}
+                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" />
+                                        <FormFeedback className="red">{errors.arrivedToDeliveredLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">Shipped To Arrived By Sea Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.shippedToArrivedBySeaLeadTime && this.props.items.program.shippedToArrivedBySeaLeadTime != ''}
+                                            invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            value={this.props.items.program.shippedToArrivedBySeaLeadTime}
+                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" />
+                                        <FormFeedback className="red">{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="company">Shipped To Arrived By Air Lead Time<span class="red Reqasterisk">*</span></Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.shippedToArrivedByAirLeadTime && this.props.items.program.shippedToArrivedByAirLeadTime != ''}
+                                            invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="number"
+                                            min="0"
+                                            value={this.props.items.program.shippedToArrivedByAirLeadTime}
+                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" />
+                                        <FormFeedback className="red">{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
@@ -380,6 +426,20 @@ export default class PipelineProgramDataStepSix extends Component {
                                             value={this.props.items.program.monthsInFutureForAmc}
                                             name="monthsInFutureForAmc" id="monthsInFutureForAmc" placeholder={i18n.t('static.program.monthfutureamctext')} />
                                         <FormFeedback className="red">{errors.monthsInFutureForAmc}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup className="col-md-6">
+                                        <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
+                                        <Input
+                                            onBlur={handleBlur}
+                                            valid={!errors.programNotes && this.props.items.program.programNotes != ''}
+                                            invalid={touched.programNotes && !!errors.programNotes}
+                                            bsSize="sm"
+                                            onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
+                                            type="textarea"
+                                            name="programNotes"
+                                            id="programNotes"
+                                            value={this.props.items.program.programNotes} />
+                                        <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-12">
                                         <Button color="info" size="md" className="float-left mr-1" type="button" name="regionPrevious" id="regionPrevious" onClick={this.props.backToprogramInfoStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
