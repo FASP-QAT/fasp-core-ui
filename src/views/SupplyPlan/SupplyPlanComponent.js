@@ -6236,7 +6236,7 @@ export default class SupplyPlanComponent extends React.Component {
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Col xs="12" sm="12">
+            
                     <Card>
                         <CardHeader>
                             <strong>Supply plan</strong>
@@ -6254,9 +6254,9 @@ export default class SupplyPlanComponent extends React.Component {
                                             <Form name='simpleForm'>
                                                 <Col md="9 pl-0">
                                                     <div className="d-md-flex">
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">Program</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input type="select"
                                                                         bsSize="sm"
@@ -6270,9 +6270,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input
                                                                         type="select"
@@ -6710,7 +6710,7 @@ export default class SupplyPlanComponent extends React.Component {
                             {/* Non PSM Shipments modal */}
                         </CardBody>
                     </Card>
-                </Col>
+                
             </div>
         )
     }

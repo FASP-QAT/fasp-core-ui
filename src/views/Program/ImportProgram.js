@@ -298,7 +298,6 @@ export default class ImportProgram extends Component {
     render() {
         return (
             <>
-                <Col xs="12" sm="8">
                     <Card>
                         <Formik
                             initialValues={initialValues}
@@ -316,10 +315,12 @@ export default class ImportProgram extends Component {
                                             <CardBody>
                                                 <FormGroup id="fileImportDiv">
                                                     <Col md="3">
-                                                        <Label htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
                                                     </Col>
-                                                    <Col xs="12" md="9">
-                                                        <Input type="file" id="file-input" name="file-input" />
+                                                    <Col xs="12" md="4" className="custom-file">
+                                                        {/* <Input type="file" id="file-input" name="file-input" /> */}
+                                                        <Input type="file" className="custom-file-input" id="file-input" name="file-input" />
+                                                        <label className="custom-file-label" id="file-input">Choose file</label>
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup id="programIdDiv">
@@ -349,7 +350,7 @@ export default class ImportProgram extends Component {
                                         </Form>
                                     )} />
                     </Card>
-                </Col>
+               
             </>
         )
 

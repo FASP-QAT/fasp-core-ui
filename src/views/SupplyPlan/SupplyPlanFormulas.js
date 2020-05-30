@@ -41,7 +41,7 @@ class SupplyPlanFormulas extends Component {
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Min Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    Min = AMC * MAX(MIN_MONTHS_OF_STOCK,3)
+                    <img src="../../../assets/Formulas/Min formula.png"/>
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>

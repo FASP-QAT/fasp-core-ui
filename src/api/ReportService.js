@@ -10,6 +10,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/globalConsumption`, json,{}
         );
     }
+    getForecastError(json) {
+        return axios.post(`${API_URL}/api/report/forecastMetrics`, json,{}
+        );
+    }
 
 }
 export default new ReportService();

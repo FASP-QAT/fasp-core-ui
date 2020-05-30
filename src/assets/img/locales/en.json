@@ -668,6 +668,13 @@
     "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
     "static.report.noofmonth":"Number Of Months",
     "static.supplyplan.supplyplanformula":"Supply plan formulas",
-    "static.message.shipmentSaved": "Shipment Data Saved"
+    "static.message.shipmentSaved": "Shipment Data Saved",
+    "static.report.historicalConsumptionActual": "Historical Actual Consumption",
+    "static.dashboard.forecastmetrics": "Forecast Metrics",
+    "static.report.historicalConsumptionDiff": "Historical Consumption Diff",
+    "static.report.error": "Forecast Error",
+    "static.report.selectMonth": "Select Month",
+    "static.common.youdatastart":"Your data has started from here"
+
     
 }

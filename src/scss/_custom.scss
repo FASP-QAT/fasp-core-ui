@@ -473,7 +473,7 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
-  padding: 5px 0 !important;
+  padding: 5px 0px 0px 5px !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -935,8 +935,7 @@ label.arrow_label:after {
   height: 280px;
 }
 .chart-graph-report {
-  // height: 100%;
-  height: 400px;
+  height:400px;
 }
 a {
   color: #205493;
@@ -970,6 +969,7 @@ a:hover {
 
 .table-responsive {
   overflow-x: auto;
+  max-height: 240px;
 }
 
 .navbar-nav .nav-link {
@@ -1378,9 +1378,10 @@ h5,
   border-color: 1px solid #e5edf5;
 }
 
-// .card {
-//   margin-top: -2%;
-// }
+.card {
+  // margin-top: -2%;
+  margin: 0px -2% 1.5em -2%!important;
+}
 
 ///avtar icon
 .avatar .avatar-status {
@@ -1791,7 +1792,7 @@ input::placeholder {
   border-radius: 3px;
 }
 .showdatabtn{
-  margin-top:-3%;
+  margin-top:-1%;
 }
 ///////Report Consumption globe
 .css-1r4vtzz {
@@ -1862,6 +1863,73 @@ text-overflow: ellipsis;
   margin: 0px -12px!important;
 }
 
+
+@media (max-width: 992px){
+
+  .css-1r4vtzz {
+    padding: 1px 8px 5px 10px !important;
+    background-color: #FFF;
+     box-shadow: none !important;
+    color: #515151;
+    cursor: pointer;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    text-align: left;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+     max-width: none!important; 
+    position: relative!important;
+    display: flex!important;
+    // flex-wrap: wrap!important;
+    overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+    align-items: stretch!important;
+    // width: 238%!important;
+    width: 355px!important;
+    height: calc(1.5em + 0.5rem + 2px)!important;
+    background-clip: padding-box!important;
+    border: 1px solid #e4e7ea!important;
+    font-size: 0.76562rem!important;
+    line-height: 1.5!important;
+    border-radius: 0.2rem!important;
+    
+    }
+    .css-48ayfv
+    {
+      padding: 1px 8px 5px 10px !important;
+      background-color: #FFF;
+       box-shadow: none !important;
+      color: #515151;
+      cursor: pointer;
+      display: -webkit-inline-box;
+      display: -webkit-inline-flex;
+      display: -ms-inline-flexbox;
+      text-align: left;
+      -webkit-text-decoration: none;
+      text-decoration: none;
+       max-width: none!important; 
+      position: relative!important;
+      display: flex!important;
+      // flex-wrap: wrap!important;
+      align-items: stretch!important;
+      width: 355px!important;
+      overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+      // width: 238%!important;
+      height: calc(1.5em + 0.5rem + 2px)!important;
+      background-clip: padding-box!important;
+      border: 1px solid #e4e7ea!important;
+      font-size: 0.76562rem!important;
+      line-height: 1.5!important;
+      border-radius: 0.2rem!important;
+      
+    }
+}
 @media (max-width: 768px){
 .css-1r4vtzz
 {
@@ -1958,8 +2026,40 @@ text-overflow: ellipsis;
 
   color: #212721!important;
 }
+.grapg-margin{
+  margin-top:-2%;
+}
+.app-footer {
+  flex: 0 0 26px!important;
+}
+.uploadfilelable
+{
+  margin-left: -11px;
+}
 
-// .globalviwe-scroll{
+.custom-file-label::after {
+  color: #fff!important;
+ background-color: #20a8d8!important;
+ 
+}
+.custom-file-label {
+  color: #697069!important;
+ 
+}
+.report-table{
+  max-height:300px;
+}
+
+// .table-fixed tbody {
+//   height: 300px;
 //   overflow-y: auto;
-//   height: 450px;
+//   width: 100%;
+// }
+
+// .table-fixed thead,
+// .table-fixed tbody,
+// .table-fixed tr,
+// .table-fixed td,
+// .table-fixed th {
+//   display: block;
 // }
