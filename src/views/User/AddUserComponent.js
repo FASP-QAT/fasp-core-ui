@@ -101,6 +101,7 @@ class AddUserComponent extends Component {
                 emailId: '',
                 phoneNumber: '',
             },
+            loading: false,
             roleId: '',
             roleList: [],
             message: '',
@@ -300,7 +301,7 @@ class AddUserComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
@@ -310,13 +311,18 @@ class AddUserComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log(JSON.stringify(this.state.user))
+                                    this.setState({
+                                        loading: true
+                                    })
+                                    // console.log(JSON.stringify(this.state.user))
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
+
                                             } else {
                                                 this.setState({
+                                                    loading: false,
                                                     message: response.data.messageCode
                                                 })
                                             }
@@ -500,6 +506,14 @@ class AddUserComponent extends Component {
                                         )} />
                         </Card>
                     </Col>
+                </Row>
+                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div class="d-flex justify-content-center">
+                        <strong>Loading...</strong>
+                        <div class="spinner-border" role="status">
+
+                        </div>
+                    </div>
                 </Row>
             </div>
         );

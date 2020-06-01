@@ -243,4 +243,5 @@ export default class DatabaseTranslations extends React.Component {
             rowId: y
         })
     }.bind(this)
+
 }

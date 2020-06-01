@@ -57,7 +57,7 @@ class AddRoleComponent extends Component {
             roles: [],
             role: {
                 businessFunctions: [],
-                canCreateRole: [],
+                canCreateRoles: [],
                 label: {
                     label_en: ''
                 }
@@ -83,7 +83,6 @@ class AddRoleComponent extends Component {
             return "";
         }
     }
-
 
     dataChange(event) {
         let { role } = this.state;
@@ -117,7 +116,7 @@ class AddRoleComponent extends Component {
         for (var i = 0; i < canCreateRoleId.length; i++) {
             canCreateRoleIdArray[i] = canCreateRoleId[i].value;
         }
-        role.canCreateRole = canCreateRoleIdArray;
+        role.canCreateRoles = canCreateRoleIdArray;
         this.setState({
             role
         },
@@ -128,7 +127,7 @@ class AddRoleComponent extends Component {
         setTouched({
             roleName: true,
             businessFunctions: true,
-            canCreateRole: true
+            canCreateRoles: true
         }
         )
         this.validateForm(errors)
@@ -224,6 +223,7 @@ class AddRoleComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    console.log("8888888************", this.state.role);
                                     UserService.addNewRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
@@ -308,25 +308,25 @@ class AddRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
 
                                                         <Select
-                                                            valid={!errors.canCreateRole}
+                                                            valid={!errors.canCreateRoles}
                                                             bsSize="sm"
-                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
+                                                            invalid={touched.canCreateRoles && !!errors.canCreateRoles}
                                                             onChange={(e) => { handleChange(e); this.canCreateRoleChange(e) }}
                                                             onBlur={handleBlur}
-                                                            name="canCreateRole"
-                                                            id="canCreateRole"
+                                                            name="canCreateRoles"
+                                                            id="canCreateRoles"
                                                             multi
                                                             required
                                                             min={1}
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.canCreateRoleId}
-                                                            error={errors.canCreateRole}
-                                                            touched={touched.canCreateRole}
+                                                            error={errors.canCreateRoles}
+                                                            touched={touched.canCreateRoles}
                                                         />
-                                                        <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
