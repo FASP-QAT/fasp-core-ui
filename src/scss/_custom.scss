@@ -2089,5 +2089,13 @@ text-overflow: ellipsis;
 // }
 
 .formula-img-mr{
-  margin: 10px 0px -9px 0px;
+  margin: 10px 0px 20px 0px;
+  border: 1px solid #20a8d8;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.formulastext-p{
+
+  color: #20a8d8!important;
 }
