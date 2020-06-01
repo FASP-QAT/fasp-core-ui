@@ -24,6 +24,19 @@ class ListRoleComponent extends Component {
         this.editRole = this.editRole.bind(this);
         this.addNewRole = this.addNewRole.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     addNewRole() {
@@ -38,29 +51,40 @@ class ListRoleComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        this.hideFirstComponent();
         UserService.getRoleList()
             .then(response => {
-                this.setState({
-                    roleList: response.data,
-                    selSource: response.data
-                })
-            }).catch(
-                error => {
-                    switch (error.response ? error.response.status : "") {
-
-                        case 500:
-                        case 401:
-                        case 404:
-                        case 406:
-                        case 412:
-                            this.setState({ message: error.response.data.messageCode });
-                            break;
-                        default:
-                            this.setState({ message: 'static.unkownError' });
-                            break;
-                    }
+                if (response.status == 200) {
+                    this.setState({ roleList: response.data, selSource: response.data })
                 }
-            );
+                else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+
+            })
+
+        // .catch(
+        //     error => {
+        //         switch (error.response ? error.response.status : "") {
+
+        //             case 500:
+        //             case 401:
+        //             case 404:
+        //             case 406:
+        //             case 412:
+        //                 this.setState({ message: error.response.data.messageCode });
+        //                 break;
+        //             default:
+        //                 this.setState({ message: 'static.unkownError' });
+        //                 break;
+        //         }
+        //     }
+        // );
     }
 
     showRoleLabel(cell, row) {
@@ -121,8 +145,8 @@ class ListRoleComponent extends Component {
         return (
             <div className="animated">
 
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}

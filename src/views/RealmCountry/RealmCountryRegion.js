@@ -464,7 +464,7 @@ class RealmCountryRegion extends Component {
 
                                 <thead>
                                     <tr>
-                                        <th className="text-center"> {i18n.t('static.dashboard.region')} </th>
+                                        <th className="text-left"> {i18n.t('static.dashboard.region')} </th>
                                         <th className="text-center">{i18n.t('static.region.capacitycbm')}</th>
                                         <th className="text-center">{i18n.t('static.region.gln')}</th>
                                         <th className="text-center">{i18n.t('static.common.status')}</th>
@@ -478,11 +478,11 @@ class RealmCountryRegion extends Component {
                                         this.state.rows.map((item, idx) =>
 
                                             <tr id="addr0" key={idx} >
-                                                <td>
+                                                <td className="text-left">
 
                                                     {this.state.rows[idx].label.label_en}
                                                 </td>
-                                                <td>
+                                                <td className="text-right">
                                                     {this.state.rows[idx].capacityCbm}
                                                 </td>
                                                 <td>

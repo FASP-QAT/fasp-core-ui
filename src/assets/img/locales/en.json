@@ -97,7 +97,7 @@
     "static.subfundingsource.subfundingsourcelisttext": "Sub Funding Source List",
     "static.budget.budgetamount": "Budget Amount",
     "static.fundingsource.fundingsource": "Funding Source",
-    "static.dashboard.budget": "Budgets",
+    "static.dashboard.budget": "Budget",
     "static.procurementagent.procurementagentcode": "Procurement Agent Code",
     "static.program.monthpastamctext": "Enter month in Past for AMC",
     "static.program.validapprovetoshiptext": "Please enter approved to shippedLeadTime",
@@ -677,7 +677,7 @@
     "static.program.shippedToArrivedByAirLeadTime": "Please enter shipped to arrived by air lead time",
     "static.program.shippedToArrivedBySeaLeadTime": "Please enter shipped to arrived by sea lead time",
     "static.program.arrivedToDeliveredLeadTime": "Please enter arrived to delivered lead time",
-    "static.common.youdatastart":"Your data has started from here"
-    
+    "static.common.youdatastart": "Your data has started from here",
+    "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
+    "static.user.accessControlText": "Access Control"
 }
-

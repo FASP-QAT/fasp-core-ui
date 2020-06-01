@@ -240,11 +240,11 @@ class ListUserComponent extends Component {
             }
         }, {
             dataField: 'userId',
-            text: 'Access Control',
+            text: i18n.t('static.user.accessControlText'),
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" title="Add Access Control" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add</Button>
+                return (<Button type="button" size="sm" color="success" title="Add Access Control" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                 )
             }
         }
@@ -322,7 +322,7 @@ class ListUserComponent extends Component {
                             {
                                 props => (
 
-                                    <div className="TableCust">
+                                    <div className="TableCust userAlignThtd">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
@@ -336,7 +336,7 @@ class ListUserComponent extends Component {
                                                 }
                                             }}
                                             {...props.baseProps}
-                                        />
+                                        />om
                                     </div>
                                 )
                             }
