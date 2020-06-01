@@ -279,7 +279,7 @@ export default class DownloadProgram extends Component {
     render() {
         return (
             <>
-                <Col xs="12" sm="8">
+                
                     <Card>
                         <Formik
                             initialValues={initialValues}
@@ -321,7 +321,7 @@ export default class DownloadProgram extends Component {
                                         </Form>
                                     )} />
                     </Card>
-                </Col>
+              
             </>
         )
 

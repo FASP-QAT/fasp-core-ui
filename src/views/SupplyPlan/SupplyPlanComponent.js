@@ -2406,7 +2406,7 @@ export default class SupplyPlanComponent extends React.Component {
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Col xs="12" sm="12">
+                
                     <Card>
                         <CardHeader>
                             <strong>Supply plan</strong>
@@ -2458,7 +2458,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <ul className="legend legendsync">
+                                                        <ul className="legend legendsync mt-0" >
                                                             <li><span className="skipedShipmentslegend"></span><span className="legendTextsync">  Skipped shipments</span></li>
                                                             <li><span className="redlegend"></span><span className="legendTextsync"> Emergency shipments for frozen lead time</span></li>
                                                             <li><span className="skipedShipmentsEmegencylegend"></span><span className="legendTextsync"> Skipped Emergency shipments for frozen lead time</span></li>
@@ -2882,7 +2882,7 @@ export default class SupplyPlanComponent extends React.Component {
                             {/* Non PSM Shipments modal */}
                         </CardBody>
                     </Card>
-                </Col>
+                
             </div>
         )
     }

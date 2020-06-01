@@ -721,7 +721,7 @@ export default class AddInventory extends Component {
                 }} /> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Col xs="12" sm="12">
+              
                     <Card>
 
                         <CardHeader>
@@ -734,11 +734,11 @@ export default class AddInventory extends Component {
                                     }) => (
                                             <Form name='simpleForm'>
 
-                                                <Col md="9 pl-0">
+                                                <Col md="12 pl-0">
                                                     <div className="d-md-flex">
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input type="select"
                                                                         bsSize="sm"
@@ -752,9 +752,9 @@ export default class AddInventory extends Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input
                                                                         type="select"
@@ -793,7 +793,7 @@ export default class AddInventory extends Component {
 </FormGroup>
                         </CardFooter>
                     </Card>
-                </Col>
+               
 
             </div >
         );

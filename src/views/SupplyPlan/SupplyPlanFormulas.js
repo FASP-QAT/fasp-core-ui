@@ -35,26 +35,29 @@ class SupplyPlanFormulas extends Component {
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">AMC</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program)
+                    <img className="formula-img-mr" src="../src/assets/img/Formulas/AMC-Formula.png"/>
+                    {/* AMC = AVG(Consumption in last 3 months, current month,future 2 months)(Not based on program) */}
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Min Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    Min = AMC * MAX(MIN_MONTHS_OF_STOCK,3)
+                    <img className="formula-img-mr" src="../src/assets/img/Formulas/Min-Formula.png"/>
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Max Stock</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18)
+                    {/* Max = AMC * MIN(MAX(MIN_MONTHS_OF_STOCK,3)+REORDER_FREQUENCY,18) */}
+                    <img className="formula-img-mr" src="../src/assets/img/Formulas/Max-Formula.png"/>
                     </ListGroupItemText>
                   </ListGroupItem>
                   <ListGroupItem action>
                     <ListGroupItemHeading className="formulasheading">Suggested Order</ListGroupItemHeading>
                     <ListGroupItemText className="formulastext">
-                    Suggested Order = MAX - MIN
-                    When to suggest an order = Inventory  MIN
+                    {/* Suggested Order = MAX - MIN
+                    When to suggest an order = Inventory  MIN */}
+                     <img className="formula-img-mr" src="../src/assets/img/Formulas/Suggested-Order-Formula.png"/>
                     </ListGroupItemText>
                   </ListGroupItem>
                 </ListGroup>
