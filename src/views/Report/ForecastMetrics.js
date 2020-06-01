@@ -258,7 +258,7 @@ class ForecastMetrics extends Component {
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
   for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(18)
+        doc.setFontSize(15)
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
@@ -269,22 +269,22 @@ class ForecastMetrics extends Component {
           align: 'center'
         })
         if (i == 1) {
-          doc.setFontSize(12)
+          doc.setFontSize(8)
           doc.text(i18n.t('static.report.selectMonth') + ' : ' +this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
           doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
             align: 'left'
         })
-          doc.text(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width / 8, 130, {
+        var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width-100);
+
+        doc.text( doc.internal.pageSize.width / 8, 130,planningText)
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8,this.state.programLabels.size>2? 170:150, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-            align: 'left'
-          })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 170, {
-            align: 'left'
-          })
+          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' +this.state.planningUnitLabels.toString()), doc.internal.pageSize.width-100);
+
+          doc.text( doc.internal.pageSize.width / 8,this.state.programLabels.size>2? 190:170,planningText)
         }
 
       }
@@ -296,7 +296,7 @@ class ForecastMetrics extends Component {
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
 
-    doc.setFontSize(15);
+    doc.setFontSize(8);
 
     const title = "Consumption Report";
     
@@ -307,10 +307,10 @@ class ForecastMetrics extends Component {
       const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),getLabelText(elt.program.label),getLabelText(elt.planningUnit.label),
         //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
        elt.months==0?"No data points containing both actual and forecast consumption": elt.forecastError*100+'%',elt.months]);
-      
+      let startY=this.state.planningUnitLabels.size>2? 350:200
       let content = {
       margin: {top: 80},
-      startY:  190,
+      startY: startY,
       head: headers,
       body: data,
       

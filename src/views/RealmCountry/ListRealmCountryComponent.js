@@ -234,13 +234,13 @@ class ListRealmCountryComponent extends Component {
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'shippedToArrivedAirLeadTime',
+            dataField: 'shippedToArrivedByAirLeadTime',
             text: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
             sort: true,
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'shippedToArrivedSeaLeadTime',
+            dataField: 'shippedToArrivedBySeaLeadTime',
             text: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
             sort: true,
             align: 'center',

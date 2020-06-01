@@ -15,6 +15,7 @@ const initialValues = {
     businessFunctions: [],
     canCreateRole: []
 }
+
 const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -55,7 +56,14 @@ class EditRoleComponent extends Component {
             lang: localStorage.getItem('lang'),
             businessFunctions: [],
             roles: [],
-            role: this.props.location.state.role,
+            // role: this.props.location.state.role,
+            role: {
+                businessFunctions: [],
+                canCreateRole: [],
+                label: {
+                    label_en: ''
+                }
+            },
             businessFunctionId: '',
             businessFunctionList: [],
             canCreateRoleId: '',
@@ -141,6 +149,9 @@ class EditRoleComponent extends Component {
     }
 
     componentDidMount() {
+
+        // console.log("----**************---", this.props.match.params.roleId);
+        // alert("hi");
         AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
@@ -200,6 +211,35 @@ class EditRoleComponent extends Component {
                     }
                 }
             );
+
+        UserService.getRoleById(this.props.match.params.roleId)
+            .then(response => {
+                this.setState({
+                    role: response.data
+                },
+                    () => {
+                        console.log("ROLE****************> ", this.state.role)
+                    });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     render() {
@@ -213,6 +253,7 @@ class EditRoleComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={{
                                     roleName: this.state.role.label.label_en,
                                     businessFunctions: this.state.role.businessFunctions,

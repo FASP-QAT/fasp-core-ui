@@ -40,12 +40,12 @@ class DefaultHeader extends Component {
         minimized={{ src: QAT, width: 52, height: 50, alt: 'QAT Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg" />
-        <Nav className="d-md-down-none" navbar>
+        {/* <Nav className="d-md-down-none" navbar>
           <NavItem className="px-3">
             <NavLink to="/dashboard" className="nav-link" >Application Dashboard</NavLink>
           </NavItem>
          
-        </Nav>
+        </Nav> */}
         <Nav className="d-md-down-none" navbar>
 
 

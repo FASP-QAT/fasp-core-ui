@@ -26,6 +26,7 @@ export default class ConsumptionDetails extends React.Component {
         super(props);
         this.options = props.options;
         this.state = {
+            message: '',
             lang: localStorage.getItem("lang"),
             programList: [],
             categoryList: [],
@@ -927,6 +928,7 @@ export default class ConsumptionDetails extends React.Component {
     }.bind(this);
 
     render() {
+        
         const lan = 'en';
         const { programList } = this.state;
         let programs = programList.length > 0
@@ -959,6 +961,7 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
         return (
+            
             // <>
             //     <Col xs="12" sm="12">
             //         <Card>
@@ -1067,6 +1070,9 @@ export default class ConsumptionDetails extends React.Component {
 
 
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                this.setState({ message: message })
+            }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
              

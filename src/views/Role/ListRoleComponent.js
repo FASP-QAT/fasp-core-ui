@@ -25,13 +25,14 @@ class ListRoleComponent extends Component {
         this.addNewRole = this.addNewRole.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
     }
+
     addNewRole() {
         this.props.history.push("/role/addRole");
     }
     editRole(role) {
         this.props.history.push({
-            pathname: "/role/editRole",
-            state: { role }
+            pathname: `/role/editRole/${role.roleId}`,
+            // state: { role }
         });
     }
 
@@ -119,7 +120,7 @@ class ListRoleComponent extends Component {
         }
         return (
             <div className="animated">
-                
+
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>

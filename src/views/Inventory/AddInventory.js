@@ -377,14 +377,13 @@ export default class AddInventory extends Component {
             }
         }
         if (x == 4) {
-            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 // this.el.setValueFromCoords(4, y, 0, true)
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -498,7 +497,7 @@ export default class AddInventory extends Component {
                 // }
 
 
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -654,11 +653,13 @@ export default class AddInventory extends Component {
                             active: map.get("6"),
 
                             realmCountryPlanningUnit: {
-                                id: countrySKU
+                                id: countrySKU,
                             },
+                            multiplier:inventoryDataList[0].multiplier,
                             planningUnit: {
                                 id: planningUnitId
-                            }
+                            },
+                            notes:""
                         }
                         inventoryDataList.push(json);
                         inventoryDataListNotFiltered.push(json);
