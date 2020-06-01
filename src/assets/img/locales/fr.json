@@ -145,6 +145,15 @@
     "static.common.selectPlanningUnit": "Veuillez sélectionner l'unité de planification",
     "static.common.selectProductCategory": "Veuillez sélectionner une catégorie de produits",
     "static.region.glnvalue": "Le numéro GLN ne doit pas être composé de 13 chiffres.",
-    "static.message.shipmentSaved": "Données d'expédition enregistrées"
+    "static.message.shipmentSaved": "Données d'expédition enregistrées",
+    "static.datasourcetype.datasourcetype": "Type de source de données",
+    "static.common.realmtext": "Veuillez sélectionner le domaine",
+    "static.datasourcetype.datasourcetypetext": "Veuillez saisir le type de source de données",
+    "static.realm.realm": "Domaine",
+    "static.dashboard.datasourcetype": "Types de sources de données",
+    "static.breadcrum.add": "{{entityname}} / Ajouter {{entityname}}",
+    "static.program.shippedToArrivedByAirLeadTime": "Veuillez entrer expédié à arrivé par délai de livraison",
+    "static.program.shippedToArrivedBySeaLeadTime": "Veuillez entrer expédié à arrivé par mer délai de livraison",
+    "static.program.arrivedToDeliveredLeadTime": "Digite chegou ao prazo de entrega entregue"
 
 }

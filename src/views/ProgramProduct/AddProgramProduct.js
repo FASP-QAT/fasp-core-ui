@@ -492,7 +492,7 @@ class AddprogramPlanningUnit extends Component {
                                 <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
                                     <thead>
                                         <tr>
-                                            <th> {i18n.t('static.program.program')} </th>
+                                            <th className="text-left"> {i18n.t('static.program.program')} </th>
                                             <th> {i18n.t('static.planningunit.planningunit')}</th>
                                             <th> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
                                             <th>Minimum month of stock</th>
@@ -505,16 +505,16 @@ class AddprogramPlanningUnit extends Component {
                                         {
                                             this.state.rows.map((item, idx) => (
                                                 <tr id="addr0" key={idx}>
-                                                    <td>
+                                                    <td className="text-left">
                                                         {this.state.rows[idx].program.label.label_en}
                                                     </td>
                                                     <td>
                                                         {this.state.rows[idx].planningUnit.label.label_en}
                                                     </td>
-                                                    <td>
+                                                    <td  className="text-right">
                                                         {this.state.rows[idx].reorderFrequencyInMonths}
                                                     </td>
-                                                    <td>
+                                                    <td  className="text-right">
                                                         {this.state.rows[idx].minMonthsOfStock}
                                                     </td>
                                                     <td>

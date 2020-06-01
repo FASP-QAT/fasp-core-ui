@@ -415,6 +415,11 @@ label.arrow_label:after {
   color: red !important;
 }
 .blue{color: 20a8d8 !important;}
+.green {
+  //  color: #f86c6b !important;
+
+  color: green !important;
+}
 
 .invalid-feedback {
   display: none;
@@ -474,7 +479,7 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
-  padding: 5px 0 !important;
+  padding: 5px !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -725,9 +730,38 @@ label.arrow_label:after {
 .react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item:active{ background-color: #ef6e12e8;}
 .TableCust span.btn-default{padding-left: 10px !important;}
 #pageDropDown span{padding-left: 7px;}
-
+// loader css
 .spinner-border{color:#20a8d8; height: 2.5rem;width: 2.5rem;}
 
+// tableAlignThtd
+// user
+.userAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+// listRalm
+.listRealmAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
+
+// listBudgetAlignThtd 
+.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+
+// PlanningUnitlist
+.PlanningUnitlistAlignThtd .PlanningUnirlistAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+
+.listprocurementUnitAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+
+// .realmcountrypUnitTd{text-align: right !important;}
 // css by junaid last line
 
 
@@ -972,7 +1006,7 @@ label.arrow_label:after {
   height: 280px;
 }
 .chart-graph-report {
-  height: 100%;
+  height:400px;
 }
 a {
   color: #205493;
@@ -1400,6 +1434,11 @@ h5,
   background-color: red;
   border-color: 1px solid red;
 }
+
+.legend .skipedShipmentslegend{
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
 .legend .purplelegend {
   background-color: rgb(170, 85, 161);
   border-color: 1px solid rgb(170, 85, 161);
@@ -1826,8 +1865,17 @@ input::placeholder {
   margin: -17px -13px 0px -9px !important;
   border-radius: 3px;
 }
+
+.legendTextSupplyPlan{
+  float: right!important;
+  width: 300px !important;
+  height: 15px;
+  padding-left: 44%!important;
+  margin: -17px -13px 0px -9px !important;
+  border-radius: 3px;
+}
 .showdatabtn{
-  margin-top:-3%;
+  margin-top:-1%;
 }
 ///////Report Consumption globe
 .css-1r4vtzz {
@@ -1898,6 +1946,73 @@ text-overflow: ellipsis;
   margin: 0px -12px!important;
 }
 
+
+@media (min-width: 992px){
+
+  .css-1r4vtzz {
+    padding: 1px 8px 5px 10px !important;
+    background-color: #FFF;
+     box-shadow: none !important;
+    color: #515151;
+    cursor: pointer;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    text-align: left;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+     max-width: none!important; 
+    position: relative!important;
+    display: flex!important;
+    // flex-wrap: wrap!important;
+    overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+    align-items: stretch!important;
+    // width: 238%!important;
+    width: 355px!important;
+    height: calc(1.5em + 0.5rem + 2px)!important;
+    background-clip: padding-box!important;
+    border: 1px solid #e4e7ea!important;
+    font-size: 0.76562rem!important;
+    line-height: 1.5!important;
+    border-radius: 0.2rem!important;
+    
+    }
+    .css-48ayfv
+    {
+      padding: 1px 8px 5px 10px !important;
+      background-color: #FFF;
+       box-shadow: none !important;
+      color: #515151;
+      cursor: pointer;
+      display: -webkit-inline-box;
+      display: -webkit-inline-flex;
+      display: -ms-inline-flexbox;
+      text-align: left;
+      -webkit-text-decoration: none;
+      text-decoration: none;
+       max-width: none!important; 
+      position: relative!important;
+      display: flex!important;
+      // flex-wrap: wrap!important;
+      align-items: stretch!important;
+      width: 355px!important;
+      overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+      // width: 238%!important;
+      height: calc(1.5em + 0.5rem + 2px)!important;
+      background-clip: padding-box!important;
+      border: 1px solid #e4e7ea!important;
+      font-size: 0.76562rem!important;
+      line-height: 1.5!important;
+      border-radius: 0.2rem!important;
+      
+    }
+}
 @media (max-width: 768px){
 .css-1r4vtzz
 {
@@ -1993,4 +2108,7 @@ text-overflow: ellipsis;
 .formulastext{
 
   color: #212721!important;
+}
+.grapg-margin{
+  margin-top:-2%;
 }

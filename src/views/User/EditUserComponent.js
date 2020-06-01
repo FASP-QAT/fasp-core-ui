@@ -175,8 +175,8 @@ class EditUserComponent extends Component {
 
             }, (
             ) => {
-                console.log("state after update---", this.state.user);
-                console.log("Role list---", this.state.user.roleList);
+                // console.log("state after update---", this.state.user);
+                // console.log("Role list---", this.state.user.roleList);
             });
 
         })
