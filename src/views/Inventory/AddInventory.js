@@ -377,14 +377,13 @@ export default class AddInventory extends Component {
             }
         }
         if (x == 4) {
-            var reg = /^[0-9\b]+$/;
             var col = ("E").concat(parseInt(y) + 1);
             if (value == "") {
                 this.el.setStyle(col, "background-color", "transparent");
                 this.el.setComments(col, "");
                 // this.el.setValueFromCoords(4, y, 0, true)
             } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -498,7 +497,7 @@ export default class AddInventory extends Component {
                 // }
 
 
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
+                if (isNaN(parseInt(value))) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -654,11 +653,13 @@ export default class AddInventory extends Component {
                             active: map.get("6"),
 
                             realmCountryPlanningUnit: {
-                                id: countrySKU
+                                id: countrySKU,
                             },
+                            multiplier:inventoryDataList[0].multiplier,
                             planningUnit: {
                                 id: planningUnitId
-                            }
+                            },
+                            notes:""
                         }
                         inventoryDataList.push(json);
                         inventoryDataListNotFiltered.push(json);
@@ -720,7 +721,7 @@ export default class AddInventory extends Component {
                 }} /> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Col xs="12" sm="12">
+              
                     <Card>
 
                         <CardHeader>
@@ -733,11 +734,11 @@ export default class AddInventory extends Component {
                                     }) => (
                                             <Form name='simpleForm'>
 
-                                                <Col md="9 pl-0">
+                                                <Col md="12 pl-0">
                                                     <div className="d-md-flex">
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input type="select"
                                                                         bsSize="sm"
@@ -751,9 +752,9 @@ export default class AddInventory extends Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input
                                                                         type="select"
@@ -792,7 +793,7 @@ export default class AddInventory extends Component {
 </FormGroup>
                         </CardFooter>
                     </Card>
-                </Col>
+               
 
             </div >
         );

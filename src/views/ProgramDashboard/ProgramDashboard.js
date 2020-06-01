@@ -122,7 +122,7 @@ class ProgramDashboard extends Component {
       <div className="animated fadeIn">
  
          <Row>
-          <Col md="6">
+          <Col md="6" style={{padding:'0px 33px 0px 2px' }}>
           <Card>
             <CardHeader className="text-center">
            
@@ -140,7 +140,7 @@ class ProgramDashboard extends Component {
           </Card>
           </Col> 
        
-        <Col md="6">
+        <Col md="6" style={{padding:' 0px 4px 0px 10px' }}>
             <Card>
               <CardHeader className="text-center">
               <b className="count-text"> <i className=""></i> &nbsp; Program Inventory Levels  <span className="count-clr"></span></b>

@@ -908,7 +908,7 @@ const customTotal = (from, to, size) => (
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
                       <InputGroup>
-                      <div className="controls edit">
+                     
                         <ReactMultiSelectCheckboxes
 
                           bsSize="sm"
@@ -921,7 +921,7 @@ const customTotal = (from, to, size) => (
                           this.props.touched && (
                             <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
-                          </div>
+                          
                       </InputGroup>
                     </FormGroup>
                     <FormGroup className="col-md-3">
@@ -944,7 +944,7 @@ const customTotal = (from, to, size) => (
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
-                      <div className="controls ">
+                      
                         <InputGroup>
                           <Input
                             type="select"
@@ -964,10 +964,9 @@ const customTotal = (from, to, size) => (
                               }, this)}
                           </Input>
                         </InputGroup>
-                      </div>
-
+                    
                     </FormGroup>
-                    <FormGroup className="col-sm-3">
+                    <FormGroup className="col-md-3">
                                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
                                                                 <div className="controls">
                                                                     <InputGroup>  
