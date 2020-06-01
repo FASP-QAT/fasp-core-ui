@@ -760,13 +760,14 @@ export default class AddInventory extends Component {
                                                                         name="countrySKU"
                                                                         id="countrySKU"
                                                                         bsSize="sm"
+                                                                        onChange={this.formSubmit}
                                                                     >
                                                                         <option value="0">{i18n.t('static.common.select')}</option>
                                                                         {countrySKUs}
                                                                     </Input>
-                                                                    <InputGroupAddon addonType="append">
+                                                                    {/* <InputGroupAddon addonType="append">
                                                                         <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
-                                                                    </InputGroupAddon>
+                                                                    </InputGroupAddon> */}
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>

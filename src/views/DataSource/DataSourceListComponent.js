@@ -367,6 +367,7 @@ export default class DataSourceListComponent extends Component {
                                                 name="realmId"
                                                 id="realmId"
                                                 bsSize="sm"
+                                                onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {realmList}
@@ -384,6 +385,7 @@ export default class DataSourceListComponent extends Component {
                                                 name="programId"
                                                 id="programId"
                                                 bsSize="sm"
+                                                onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {programList}
@@ -401,13 +403,14 @@ export default class DataSourceListComponent extends Component {
                                                 name="dataSourceTypeId"
                                                 id="dataSourceTypeId"
                                                 bsSize="sm"
+                                                onChange={this.filterData}
                                             >
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {dataSourceTypeList}
                                             </Input>
-                                            <InputGroupAddon addonType="append">
+                                            {/* <InputGroupAddon addonType="append">
                                                 <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
+                                            </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>

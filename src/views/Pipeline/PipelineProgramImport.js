@@ -25,8 +25,12 @@ export default class PipelineProgramImport extends Component {
 
     showPipelineProgramInfo() {
         var myJson = JSON.parse(this.state.jsonText);
+        var fileName=this.state.fileName;
+
+        // alert(myJson);
+        // alert(fileName);
         AuthenticationService.setupAxiosInterceptors();
-        PipelineService.savePipelineJson(myJson)
+        PipelineService.savePipelineJson(myJson,fileName)
             .then(response => {
                 console.log("response--------->", response)
                 this.props.history.push('/pipeline/pieplineProgramList')
@@ -36,11 +40,13 @@ export default class PipelineProgramImport extends Component {
 
     showFile = async (e) => {
         e.preventDefault()
-        const reader = new FileReader()
+        const reader = new FileReader();
+        var fileName=e.target.files[0].name;
+        // alert(e.target.files[0].name);
         reader.onload = async (e) => {
             const text = (e.target.result)
             console.log(text)
-            this.setState({ jsonText: text });
+            this.setState({ jsonText: text ,fileName:fileName});
         };
         reader.readAsText(e.target.files[0])
     }

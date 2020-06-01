@@ -2,8 +2,8 @@ import axios from "axios"
 import { API_URL } from '../Constants.js'
 
 class PipelineService {
-    savePipelineJson(json) {
-        return axios.post(`${API_URL}/api/pipelineJson/`, json, {}
+    savePipelineJson(json,fileName) {
+        return axios.post(`${API_URL}/api/pipelineJson/${fileName}`, json, {}
         );
     }
     getPipelineProgramList() {
@@ -15,7 +15,6 @@ class PipelineService {
         return axios.get(`${API_URL}/api/pipeline/programInfo/${json}`, {}
         );
     }
-
     addProgramToQatTempTable(json, pipelineId) {
         return axios.post(`${API_URL}/api/qatTemp/program/${pipelineId}`, json, {}
         );

@@ -41,8 +41,8 @@ class ProductService {
         return axios.get(`${API_URL}/api/stockmatrix/${realmId}/${productCategoryId}/${productId}/${view}/${startDate}/${endDate}`,{});   
     }
 
-    getProductCategoryListByProgram(programId) {
-        return axios.get(`${API_URL}/api/productCategory/programId/${programId}`, {}
+    getProductCategoryListByProgram(realmId,programId) {
+        return axios.get(`${API_URL}/api/productCategory/realmId/${realmId}/programId/${programId}`, {}
         );
     }
 

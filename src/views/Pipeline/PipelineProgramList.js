@@ -91,6 +91,13 @@ export default class PipelineProgramList extends Component {
         );
         const columns = [
             {
+                dataField: 'PIPELINE_ID',
+                text: 'Program Id',
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            {
                 dataField: 'USERNAME',
                 text: 'User',
                 sort: true,
@@ -98,14 +105,15 @@ export default class PipelineProgramList extends Component {
                 headerAlign: 'center',
                 // formatter: this.formatLabel
             },
+
             {
-                dataField: 'PIPELINE_ID',
-                text: 'Program Id',
+                dataField: 'FILE_NAME',
+                text: 'File Name',
                 sort: true,
                 align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                // formatter: this.formatLabel
             },
-
             {
                 dataField: 'CREATED_DATE',
                 text: 'Import Date',
@@ -161,7 +169,7 @@ export default class PipelineProgramList extends Component {
                     </CardHeader>
                     <CardBody className="pb-lg-0 pt-lg-0">
                         <ToolkitProvider
-                            keyField="programId"
+                            keyField="pipelineId"
                             data={this.state.pipelineProgramList}
                             columns={columns}
                             search={{ searchFormatted: true }}

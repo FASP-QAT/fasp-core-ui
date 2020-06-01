@@ -286,10 +286,11 @@ export default class StockStatusMatrix extends React.Component {
 
   getProductCategories() {
     let programId = document.getElementById("programId").value;
+    let realmId = AuthenticationService.getRealmId();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
       let programId = document.getElementById("programId").value;
-      ProductService.getProductCategoryListByProgram(programId)
+      ProductService.getProductCategoryListByProgram(realmId,programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -673,9 +674,9 @@ export default class StockStatusMatrix extends React.Component {
     let productCategoryList = productCategories.length > 0
       && productCategories.map((item, i) => {
         return (
-          <option key={i} value={item.productCategoryId}>
-            {getLabelText(item.label, this.state.lang)}
-          </option>
+          <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
+          {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
+        </option>
         )
       }, this);
     const pickerLang = {
@@ -1269,10 +1270,10 @@ export default class StockStatusMatrix extends React.Component {
                 props => (
                   <div className="TableCust">
 
-                    <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
+                    {/* <div className="col-md-3 pr-0 offset-md-9 text-right stock-status-search">
 
                       <SearchBar {...props.searchProps} />
-                      <ClearSearchButton {...props.searchProps} /></div>
+                      <ClearSearchButton {...props.searchProps} /></div> */}
                     <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                       pagination={paginationFactory(options)}
 

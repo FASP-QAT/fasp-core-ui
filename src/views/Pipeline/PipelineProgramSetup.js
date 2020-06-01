@@ -85,7 +85,8 @@ export default class PipelineProgramSetup extends Component {
 
 
             consumptionStatus: false,
-            inventoryStatus: false
+            inventoryStatus: false,
+            shipmentStatus: false
             // pipelineConsumptionList: []
         }
         this.endProgramInfoStepOne = this.endProgramInfoStepOne.bind(this);
@@ -171,7 +172,6 @@ export default class PipelineProgramSetup extends Component {
         }
         )
 
-
     }
 
     finishedStepOne() {
@@ -185,26 +185,30 @@ export default class PipelineProgramSetup extends Component {
     }
     finishedStepTwo() {
         // alert(this.refs.child.checkValidation());
-        if (this.refs.child.checkValidation() != true) {
-            alert("Please resolve all error and then proceed.");
-        }
-        else {
+        // if (this.refs.child.checkValidation() != true) {
+        //     alert("Please resolve all error and then proceed.");
+        // }
+        // else {
             // console.log("planning unit data---->",this.refs.child.savePlanningUnits());
             var planningUnits = this.refs.child.savePlanningUnits();
+            var checkValidation = this.refs.child.checkValidation();
             AuthenticationService.setupAxiosInterceptors();
             PipelineService.addProgramToQatTempPlanningUnits(planningUnits, this.props.match.params.pipelineId).
                 then(response => {
                     if (response.status == "200") {
                         // PipelineService.getPipelineProgramConsumption(this.props.match.params.pipelineId).then(response => {
                         //     if (response.status == "200") {
-
-                        this.setState({ pipelineProgramSetupPer: 50, consumptionStatus: true });
-
-                        document.getElementById('stepOne').style.display = 'none';
-                        document.getElementById('stepTwo').style.display = 'none';
-                        document.getElementById('stepThree').style.display = 'block';
-                        document.getElementById('stepFour').style.display = 'none';
-                        document.getElementById('stepFive').style.display = 'none';
+                        if (checkValidation == true) {
+                            this.setState({ pipelineProgramSetupPer: 50, consumptionStatus: true });
+                            document.getElementById('stepOne').style.display = 'none';
+                            document.getElementById('stepTwo').style.display = 'none';
+                            document.getElementById('stepThree').style.display = 'block';
+                            document.getElementById('stepFour').style.display = 'none';
+                            document.getElementById('stepFive').style.display = 'none';
+                        }
+                        else {
+                            alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                        }
 
                         // } else {
                         //     this.setState({
@@ -221,23 +225,29 @@ export default class PipelineProgramSetup extends Component {
                     }
                 }
                 )
-        }
+        // }
 
     }
     finishedStepThree() {
         var consumption = this.refs.consumptionChild.saveConsumption();
-        console.log("consumption save------>",consumption);
+        var checkValidation = this.refs.consumptionChild.checkValidation();
+        // console.log("consumption save------>",consumption);
         AuthenticationService.setupAxiosInterceptors();
         PipelineService.addQatTempConsumption(consumption, this.props.match.params.pipelineId).
             then(response => {
-                console.log("consumption add response--->", response);
+                // console.log("consumption add response--->", response);
                 if (response.status == "200") {
-                    this.setState({ pipelineProgramSetupPer: 75, inventoryStatus: true });
-                    document.getElementById('stepOne').style.display = 'none';
-                    document.getElementById('stepTwo').style.display = 'none';
-                    document.getElementById('stepThree').style.display = 'none';
-                    document.getElementById('stepFour').style.display = 'block';
-                    document.getElementById('stepFive').style.display = 'none';
+                    if (checkValidation == true) {
+                        this.setState({ pipelineProgramSetupPer: 75, inventoryStatus: true });
+                        document.getElementById('stepOne').style.display = 'none';
+                        document.getElementById('stepTwo').style.display = 'none';
+                        document.getElementById('stepThree').style.display = 'none';
+                        document.getElementById('stepFour').style.display = 'block';
+                        document.getElementById('stepFive').style.display = 'none';
+                    }
+                    else {
+                        alert("Saved rows with vaild data. To proceed further validated all rows and continue.");
+                    }
                 } else {
                     this.setState({
                         message: response.data.messageCode
@@ -256,7 +266,8 @@ export default class PipelineProgramSetup extends Component {
                 if (response.status == "200") {
 
                     if (checkValidation == true) {
-                        this.setState({ pipelineProgramSetupPer: 100 });
+                        this.setState({ pipelineProgramSetupPer: 100, shipmentStatus: true });
+
                         document.getElementById('stepOne').style.display = 'none';
                         document.getElementById('stepTwo').style.display = 'none';
                         document.getElementById('stepThree').style.display = 'none';
@@ -550,7 +561,6 @@ export default class PipelineProgramSetup extends Component {
                         message: response.data.messageCode
                     })
                 }
-
 
 
             }).catch(
@@ -900,7 +910,7 @@ export default class PipelineProgramSetup extends Component {
                                             </CardHeader>
                                             <CardBody>
                                                 {/*<h3>Shipments</h3>*/}
-                                                <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepFour} {...this.props}></PipelineProgramShipment>
+                                                {this.state.shipmentStatus && <PipelineProgramShipment endProgramInfoStepFive={this.endProgramInfoStepFive} previousToStepFour={this.previousToStepFour} {...this.props}></PipelineProgramShipment>}
                                             </CardBody>
                                             {/* <CardFooter>
                                                 <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.previousToStepFour} > <i className="fa fa-angle-double-left"></i> Previous</Button>
