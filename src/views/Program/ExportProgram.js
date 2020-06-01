@@ -178,7 +178,7 @@ export default class ExportProgram extends Component {
     render() {
         return (
             <>
-                <Col xs="12" sm="8">
+               
                     <Card>
                         <Formik
                             initialValues={initialValues}
@@ -194,7 +194,7 @@ export default class ExportProgram extends Component {
                                                 <strong>{i18n.t('static.program.export')}</strong>
                                             </CardHeader>
                                             <CardBody>
-                                                <FormGroup >
+                                                <FormGroup className="col-md-4" >
                                                     <Label htmlFor="select">{i18n.t('static.program.program')}</Label>
                                                     <Select
                                                         bsSize="sm"
@@ -220,7 +220,7 @@ export default class ExportProgram extends Component {
                                         </Form>
                                     )} />
                     </Card>
-                </Col>
+               
             </>
         )
     }

@@ -21,11 +21,12 @@ const entityname = i18n.t('static.dashboard.programPlanningUnit');
 let initialValues = {
     planningUnitId: '',
     reorderFrequencyInMonths: '',
-    minMonthsOfStock: ''
+    minMonthsOfStock: '',
+    localProcurementLeadTime: ''
 }
 
 const validationSchema = function (values, t) {
-    console.log("made by us schema--->", values)
+    // console.log("made by us schema--->", values)
     return Yup.object().shape({
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
@@ -34,7 +35,10 @@ const validationSchema = function (values, t) {
             .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText')),
         minMonthsOfStock: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText'))
+            .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText')),
+        localProcurementLeadTime: Yup.number().
+            typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .required('Please enter local procurement lead time').min(0, i18n.t('static.procurementUnit.validValueText'))
     })
 }
 
@@ -84,7 +88,9 @@ class AddprogramPlanningUnit extends Component {
             isNew: true,
             programId: this.props.match.params.programId,
             updateRowStatus: 0,
-            lang: localStorage.getItem('lang')
+            lang: localStorage.getItem('lang'),
+            batchNoRequired: false,
+            localProcurementLeadTime: ''
 
         }
         this.addRow = this.addRow.bind(this);
@@ -127,6 +133,8 @@ class AddprogramPlanningUnit extends Component {
                     },
                     reorderFrequencyInMonths: this.state.reorderFrequencyInMonths,
                     minMonthsOfStock: this.state.minMonthsOfStock,
+                    localProcurementLeadTime: this.state.localProcurementLeadTime,
+                    batchNoRequired: this.state.batchNoRequired,
                     active: true,
                     isNew: this.state.isNew,
                     programPlanningUnitId: this.state.programPlanningUnitId
@@ -145,7 +153,9 @@ class AddprogramPlanningUnit extends Component {
             planningUnitName: '',
             programPlanningUnitId: 0,
             isNew: true,
-            updateRowStatus: 0
+            updateRowStatus: 0,
+            localProcurementLeadTime: '',
+            batchNoRequired: false
         });
         document.getElementById('select').disabled = false;
     }
@@ -159,7 +169,9 @@ class AddprogramPlanningUnit extends Component {
             initialValues = {
                 planningUnitId: this.state.rows[idx].planningUnit.id,
                 reorderFrequencyInMonths: this.state.rows[idx].reorderFrequencyInMonths,
-                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock
+                minMonthsOfStock: this.state.rows[idx].minMonthsOfStock,
+                localProcurementLeadTime: this.state.rows[idx].localProcurementLeadTime,
+                batchNoRequired: this.state.rows[idx].batchNoRequired
             }
 
             const rows = [...this.state.rows]
@@ -170,7 +182,9 @@ class AddprogramPlanningUnit extends Component {
                 minMonthsOfStock: this.state.rows[idx].minMonthsOfStock,
                 programPlanningUnitId: this.state.rows[idx].programPlanningUnitId,
                 isNew: false,
-                updateRowStatus: 1
+                updateRowStatus: 1,
+                localProcurementLeadTime: this.state.rows[idx].localProcurementLeadTime,
+                batchNoRequired: this.state.rows[idx].batchNoRequired
             })
             rows.splice(idx, 1);
             this.setState({ rows });
@@ -204,10 +218,17 @@ class AddprogramPlanningUnit extends Component {
             this.setState({ planningUnitName: event.target[event.target.selectedIndex].text });
             this.setState({ planningUnitId: event.target.value })
         }
+        if (event.target.name === 'localProcurementLeadTime') {
+            this.setState({ localProcurementLeadTime: event.target.value });
+        }
+        if (event.target.name === 'batchNoRequired') {
+            // this.setState({ batchNoRequired: event.target.value });
+            this.setState({ batchNoRequired: event.target.id === "batchNoRequired2" ? false : true })
+        }
     };
     submitForm() {
         AuthenticationService.setupAxiosInterceptors();
-
+        console.log("SUBMIT----", this.state.rows);
         ProgramService.addprogramPlanningUnitMapping(this.state.rows)
             .then(response => {
                 if (response.status == "200") {
@@ -251,6 +272,7 @@ class AddprogramPlanningUnit extends Component {
                 if (response.status == 200) {
                     let myReasponse = response.data;
                     if (myReasponse.length > 0) {
+                        // console.log("myReasponse ---", myReasponse);
                         this.setState({ rows: myReasponse });
                     }
                 } else {
@@ -399,7 +421,7 @@ class AddprogramPlanningUnit extends Component {
                                     validate={validate(validationSchema)}
                                     onSubmit={(values, { setSubmitting, setErrors, resetForm }) => {
                                         this.addRow();
-                                        resetForm({ planningUnitId: "", reorderFrequencyInMonths: "", minMonthsOfStock: "" });
+                                        resetForm({ planningUnitId: "", reorderFrequencyInMonths: "", minMonthsOfStock: "", localProcurementLeadTime: "", batchNoRequired: false });
                                     }}
                                     render={
                                         ({
@@ -480,6 +502,65 @@ class AddprogramPlanningUnit extends Component {
                                                             <FormFeedback className="red">{errors.minMonthsOfStock}</FormFeedback>
                                                         </FormGroup>
 
+
+
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="company">Local procurementAgent lead time<span className="red Reqasterisk">*</span></Label>
+                                                            <Input
+                                                                type="number"
+                                                                min='0'
+                                                                name="localProcurementLeadTime"
+                                                                id="localProcurementLeadTime"
+                                                                bsSize="sm"
+                                                                valid={!errors.localProcurementLeadTime && this.state.localProcurementLeadTime != ''}
+                                                                invalid={touched.localProcurementLeadTime && !!errors.localProcurementLeadTime}
+                                                                value={this.state.localProcurementLeadTime}
+                                                                placeholder='Local procurementAgent lead time'
+                                                                onBlur={handleBlur}
+                                                                onChange={event => { handleChange(event); this.setTextAndValue(event) }}
+                                                            />
+                                                            <FormFeedback className="red">{errors.localProcurementLeadTime}</FormFeedback>
+                                                        </FormGroup>
+                                                        <FormGroup className="col-md-6">
+                                                            <Label htmlFor="company">Batch No Required<span className="red Reqasterisk">*</span></Label>
+                                                            <FormGroup check inline>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="batchNoRequired1"
+                                                                    name="batchNoRequired"
+                                                                    value={true}
+                                                                    checked={this.state.batchNoRequired === true}
+                                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio1">
+                                                                    {i18n.t('static.program.yes')}
+                                                                </Label>
+                                                            </FormGroup>
+                                                            <FormGroup check inline>
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="radio"
+                                                                    id="batchNoRequired2"
+                                                                    name="batchNoRequired"
+                                                                    value={false}
+                                                                    checked={this.state.batchNoRequired === false}
+                                                                    onChange={(e) => { handleChange(e); this.setTextAndValue(e) }}
+                                                                />
+                                                                <Label
+                                                                    className="form-check-label"
+                                                                    check htmlFor="inline-radio2">
+                                                                    {i18n.t('static.program.no')}
+                                                                </Label>
+                                                            </FormGroup>
+
+
+
+                                                        </FormGroup>
+
+
                                                         <FormGroup className="col-md-12 mt-md-4">
                                                             {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
                                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
@@ -496,6 +577,8 @@ class AddprogramPlanningUnit extends Component {
                                             <th> {i18n.t('static.planningunit.planningunit')}</th>
                                             <th> {i18n.t('static.program.reorderFrequencyInMonths')} </th>
                                             <th>Minimum month of stock</th>
+                                            <th>Local procurementAgent lead time</th>
+                                            <th>Batch no required</th>
                                             <th>{i18n.t('static.common.status')}</th>
                                             <th>{i18n.t('static.common.update')}</th>
 
@@ -516,6 +599,12 @@ class AddprogramPlanningUnit extends Component {
                                                     </td>
                                                     <td  className="text-right">
                                                         {this.state.rows[idx].minMonthsOfStock}
+                                                    </td>
+                                                    <td>
+                                                        {this.state.rows[idx].localProcurementLeadTime}
+                                                    </td>
+                                                    <td>
+                                                        {this.state.rows[idx].batchNoRequired ? 'Yes' : 'No'}
                                                     </td>
                                                     <td>
                                                         <StatusUpdateButtonFeature removeRow={this.handleRemoveSpecificRow} enableRow={this.enableRow} disableRow={this.disableRow} rowId={idx} status={this.state.rows[idx].active} isRowNew={this.state.rows[idx].isNew} />

@@ -231,7 +231,7 @@ export default class SupplyPlanComponent extends React.Component {
         var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
 
         var programPlanningUnit = ((this.state.programPlanningUnitList).filter(p => p.planningUnit.id = planningUnitId))[0];
-        console.log("programPlanningUnit--->",programPlanningUnit);
+        console.log("programPlanningUnit--->", programPlanningUnit);
         var minMonthsOfStock = programPlanningUnit.minMonthsOfStock;
         var reorderFrequencyInMonths = programPlanningUnit.reorderFrequencyInMonths;
 
@@ -430,7 +430,7 @@ export default class SupplyPlanComponent extends React.Component {
                 }
                 for (var i = 3; i < 21; i++) {
                     var c = inventoryList.filter(c => (c.inventoryDate >= m[i].startDate && c.inventoryDate <= m[i].endDate))
-                    console.log("c--->",c);
+                    console.log("c--->", c);
                     var adjustmentQty = 0;
                     var filteredJsonInventory = { adjustmentQty: '', region: { id: 0 } };
                     for (var j = 0; j < c.length; j++) {
@@ -440,8 +440,8 @@ export default class SupplyPlanComponent extends React.Component {
                     if (c.length == 0) {
                         inventoryTotalData.push("");
                     } else {
-                        console.log("month---",m[i]);
-                        console.log("qty---",adjustmentQty);
+                        console.log("month---", m[i]);
+                        console.log("qty---", adjustmentQty);
                         inventoryTotalData.push(adjustmentQty);
                     }
                     filteredArrayInventory.push(filteredJsonInventory);
@@ -488,16 +488,22 @@ export default class SupplyPlanComponent extends React.Component {
                     var nonPsmToBeAccounted = 0;
                     var artmisQty = 0;
                     var artmisToBeAccounted = 0;
+                    var psmEmergencyOrder = 0;
+                    var artmisEmergencyOrder = 0;
+                    var nonPsmEmergencyOrder = 0;
                     for (var j = 0; j < psm.length; j++) {
                         psmQty += parseFloat((psm[j].quantity));
                         if (psm[j].accountFlag == 1) {
                             psmToBeAccounted = 1;
                         }
+                        if (psm[j].emergencyOrder == 1) {
+                            psmEmergencyOrder = 1;
+                        }
                     }
                     if (psm.length == 0) {
                         psmShipmentsTotalData.push("");
                     } else {
-                        psmShipmentsTotalData.push({ qty: psmQty, accountFlag: psmToBeAccounted, index: i - 3, month: m[i] });
+                        psmShipmentsTotalData.push({ qty: psmQty, accountFlag: psmToBeAccounted, index: i - 3, month: m[i], isEmergencyOrder: psmEmergencyOrder });
                     }
 
                     for (var np = 0; np < nonPsm.length; np++) {
@@ -505,11 +511,15 @@ export default class SupplyPlanComponent extends React.Component {
                         if (nonPsm[np].accountFlag == 1) {
                             nonPsmToBeAccounted = 1;
                         }
+
+                        if (nonPsm[np].emergencyOrder == 1) {
+                            nonPsmEmergencyOrder = 1;
+                        }
                     }
                     if (nonPsm.length == 0) {
                         nonPsmShipmentsTotalData.push("");
                     } else {
-                        nonPsmShipmentsTotalData.push({ qty: nonPsmQty, accountFlag: nonPsmToBeAccounted, index: i - 3, month: m[i] });
+                        nonPsmShipmentsTotalData.push({ qty: nonPsmQty, accountFlag: nonPsmToBeAccounted, index: i - 3, month: m[i], isEmergencyOrder: nonPsmEmergencyOrder });
                     }
 
                     for (var a = 0; a < artmisShipments.length; a++) {
@@ -517,11 +527,14 @@ export default class SupplyPlanComponent extends React.Component {
                         if (artmisShipments[a].accountFlag == 1) {
                             artmisToBeAccounted = 1;
                         }
+                        if (psm[a].emergencyOrder == 1) {
+                            artmisEmergencyOrder = 1;
+                        }
                     }
                     if (artmisShipments.length == 0) {
                         artmisShipmentsTotalData.push("");
                     } else {
-                        artmisShipmentsTotalData.push({ qty: artmisQty, accountFlag: artmisToBeAccounted, index: i - 3, month: m[i] });
+                        artmisShipmentsTotalData.push({ qty: artmisQty, accountFlag: artmisToBeAccounted, index: i - 3, month: m[i], isEmergencyOrder: artmisEmergencyOrder });
                     }
                 }
 
@@ -600,7 +613,9 @@ export default class SupplyPlanComponent extends React.Component {
                             var addLeadTimes = parseInt(parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) +
                                 parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime) +
                                 parseFloat(programJson.shippedToArrivedBySeaLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime)) + 1;
+                            console.log("AddLeadTimes", addLeadTimes);
                             var expectedDeliveryDate = moment(month).subtract(addLeadTimes, 'months').format("YYYY-MM-DD");
+                            console.log("Expected delivery date", expectedDeliveryDate);
                             var isEmergencyOrder = 0;
                             if (expectedDeliveryDate >= currentMonth) {
                                 isEmergencyOrder = 0;
@@ -659,7 +674,7 @@ export default class SupplyPlanComponent extends React.Component {
 
     }
 
-    toggleLarge(supplyPlanType, month, quantity, startDate, endDate) {
+    toggleLarge(supplyPlanType, month, quantity, startDate, endDate, isEmergencyOrder) {
         var supplyPlanType = supplyPlanType;
         this.setState({
             budgetError: "",
@@ -676,7 +691,7 @@ export default class SupplyPlanComponent extends React.Component {
             this.setState({
                 suggestedShipments: !this.state.suggestedShipments,
             });
-            this.suggestedShipmentsDetailsClicked(month, quantity);
+            this.suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder);
         } else if (supplyPlanType == 'psmShipments') {
             this.setState({
                 psmShipments: !this.state.psmShipments
@@ -1396,7 +1411,7 @@ export default class SupplyPlanComponent extends React.Component {
     // Suggested shipments
 
     //Show Suggested shipments details
-    suggestedShipmentsDetailsClicked(month, quantity) {
+    suggestedShipmentsDetailsClicked(month, quantity, isEmergencyOrder) {
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
         var db1;
@@ -1464,6 +1479,7 @@ export default class SupplyPlanComponent extends React.Component {
                         var data = [];
                         var suggestedShipmentsArr = []
                         var orderedDate = moment(Date.now()).format("YYYY-MM-DD");
+                        console.log("Emergency order", isEmergencyOrder);
                         for (var j = 0; j < suggestedShipmentList.length; j++) {
                             data = [];
                             // data[0]= expectedDeliveryDateEnFormat;
@@ -1477,6 +1493,7 @@ export default class SupplyPlanComponent extends React.Component {
                             data[7] = "";
                             data[8] = orderedDate;
                             data[9] = "";
+                            data[10] = isEmergencyOrder;
                             suggestedShipmentsArr[j] = data;
                         }
                         var options = {
@@ -1491,7 +1508,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 "Shipment Mode",
                                 "Notes",
                                 "Ordered Date",
-                                "Expected delivery date"
+                                "Expected delivery date",
+                                "Emergency Order"
                             ],
                             colWidths: [150, 200, 80, 80, 150, 350, 150, 150, 80, 100],
                             columns: [
@@ -1505,6 +1523,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 { type: 'text' },
                                 { type: 'hidden' },
                                 { type: 'calendar', options: { format: 'MM-DD-YYYY', validRange: [moment(Date.now()).format("YYYY-MM-DD"), ''] } },
+                                { type: 'text' }
                             ],
                             pagination: false,
                             search: false,
@@ -1743,7 +1762,8 @@ export default class SupplyPlanComponent extends React.Component {
                         supplier: {
                             id: 0
                         },
-                        shipmentBudgetList: []
+                        shipmentBudgetList: [],
+                        emergencyOrder: map.get("10")
                     }
 
                     shipmentDataList.push(shipmentJson);
@@ -2110,7 +2130,7 @@ export default class SupplyPlanComponent extends React.Component {
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Col xs="12" sm="12">
+                
                     <Card>
                         <CardHeader>
                             <strong>Supply plan</strong>
@@ -2162,9 +2182,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <ul className="legend legendsync">
+                                                        <ul className="legend legendsync mt-0" >
                                                             <li><span className="skipedShipmentslegend"></span><span className="legendTextsync">  Skipped shipments</span></li>
-                                                            <li><span className="redlegend"></span><span className="legendTextSupplyPlan"> Suggested Emergency shipments for frozen lead time</span></li>
+                                                            <li><span className="redlegend"></span><span className="legendTextsync"> Emergency shipments for frozen lead time</span></li>
+                                                            <li><span className="skipedShipmentsEmegencylegend"></span><span className="legendTextsync"> Skipped Emergency shipments for frozen lead time</span></li>
                                                         </ul>
                                                     </div>
                                                 </Col>
@@ -2214,9 +2235,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.suggestedShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                            return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                         } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
                                                         }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
@@ -2230,9 +2251,17 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.psmShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.accountFlag == true) {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            if (item1.isEmergencyOrder == 1) {
+                                                                return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            } else {
+                                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            }
                                                         } else {
-                                                            return (<td align="right" className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            if (item1.isEmergencyOrder == 1) {
+                                                                return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            } else {
+                                                                return (<td align="right" className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            }
                                                         }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
@@ -2247,9 +2276,17 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.artmisShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.accountFlag == true) {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            if (item1.isEmergencyOrder == 1) {
+                                                                return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            } else {
+                                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            }
                                                         } else {
-                                                            return (<td align="right" style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            if (item1.isEmergencyOrder == 1) {
+                                                                return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            } else {
+                                                                return (<td align="right" style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            }
                                                         }
                                                     } else {
                                                         return (<td align="right" > {item1}</td>)
@@ -2264,9 +2301,18 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.nonPsmShipmentsTotalData.map(item1 => {
                                                     if (item1.toString() != "") {
                                                         if (item1.accountFlag == true) {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            if (item1.isEmergencyOrder == 1) {
+                                                                return (<td align="right" style={{ color: 'red' }} onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            } else {
+                                                                return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            }
                                                         } else {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            if (item1.isEmergencyOrder == 1) {
+                                                                return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#FA8072' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            } else {
+                                                                return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            }
+
                                                         }
                                                     } else {
                                                         return (<td align="right" >{item1}</td>)
@@ -2554,7 +2600,7 @@ export default class SupplyPlanComponent extends React.Component {
                             {/* Non PSM Shipments modal */}
                         </CardBody>
                     </Card>
-                </Col>
+                
             </div>
         )
     }

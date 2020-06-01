@@ -456,13 +456,13 @@ export default class LanguageListComponent extends Component {
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                     </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="">
 
                         <Col md="12 pl-0">
                             <div className="d-md-flex">
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Filter By</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -482,10 +482,10 @@ export default class LanguageListComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Select Period</Label>
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton"><span className="stock-box-icon  fa fa-sort-desc ml-1"></span>Select Period</Label>
                                     <div className="controls">
-                                        <InputGroup>
+                                        
                                             <Picker
                                                 ref="pickRange"
                                                 years={{ min: 2013 }}
@@ -499,12 +499,12 @@ export default class LanguageListComponent extends Component {
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                             </Picker>
 
-                                        </InputGroup>
+                                        
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Program</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -518,9 +518,9 @@ export default class LanguageListComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"

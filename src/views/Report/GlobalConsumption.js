@@ -28,6 +28,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import paginationFactory from 'react-bootstrap-table2-paginator'
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui-pro/dist/js/coreui-utilities'
 import i18n from '../../i18n'
@@ -900,6 +901,7 @@ if(productCategoryId!=-1){
                 </Col>
               </Form>
               <Col md="12 pl-0">
+                <div className="globalviwe-scroll">
                 <div className="row">
 
                   {
@@ -921,8 +923,8 @@ if(productCategoryId!=-1){
                 <div className="row">
                     <div className="col-md-12">
                       {this.state.show && this.state.consumptions.length > 0 &&
-                    
-                       <Table responsive className="table-striped  table-hover table-bordered text-center mt-2">
+                        <div className="table-responsive ">
+                       <Table responsive className="table-striped  table-fixed table-hover table-bordered text-center mt-2">
 
                         <thead>
                           <tr>
@@ -953,8 +955,10 @@ if(productCategoryId!=-1){
                             }
                           </tbody>
                  </Table>
+                 </div>
                  }
 
+                   </div>
                    </div>
                    </div>
               </Col>
