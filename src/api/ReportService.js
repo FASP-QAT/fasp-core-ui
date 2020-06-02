@@ -14,6 +14,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/forecastMetrics`, json,{}
         );
     }
+    getAnnualShipmentCost(json) {
+        return axios.post(`${API_URL}/api/report/annualShipmentCost`, json,{}
+        );
+    }
 
 }
 export default new ReportService();

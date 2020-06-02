@@ -169,7 +169,9 @@ class ForecastMetrics extends Component {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
- 
+  roundN = num=>{
+    return parseFloat(Math.round(num * Math.pow(10, 2)) /Math.pow(10,2)).toFixed(2);
+  }
   formatLabel(cell, row) {
     // console.log("celll----", cell);
     if (cell != null && cell != "") {
@@ -180,7 +182,7 @@ class ForecastMetrics extends Component {
   formatValue(cell, row) {
     // console.log("celll----", cell);
     if (cell != null && cell != "") {
-      return cell*100+'%';
+      return this.roundN(cell*100)+'%';
     }else if(cell=="0" && row.months==0){
       return "No data points containing both actual and forecast consumption ";
     }else{
@@ -213,7 +215,7 @@ class ForecastMetrics extends Component {
     for (var item = 0; item < re.length; item++) {
       A.push([[getLabelText(re[item].realmCountry.label),(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),(getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
      // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
-      re[item].months==0?("No data points containing both actual and forecast consumption").replaceAll(' ', '%20'):re[item].forecastError*100+'%',re[item].months]])
+      re[item].months==0?("No data points containing both actual and forecast consumption").replaceAll(' ', '%20'):this.roundN(re[item].forecastError*100)+'%',re[item].months]])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -222,7 +224,7 @@ class ForecastMetrics extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.singleValue2) + ".csv"
+    a.download = i18n.t('static.dashboard.forecastmetrics') + this.makeText(this.state.singleValue2) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -276,13 +278,13 @@ class ForecastMetrics extends Component {
           doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
             align: 'left'
         })
-        var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width-100);
+        var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width*3/4);
 
         doc.text( doc.internal.pageSize.width / 8, 130,planningText)
           doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8,this.state.programLabels.size>2? 170:150, {
             align: 'left'
           })
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' +this.state.planningUnitLabels.toString()), doc.internal.pageSize.width-100);
+          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' +this.state.planningUnitLabels.toString()), doc.internal.pageSize.width*3/4);
 
           doc.text( doc.internal.pageSize.width / 8,this.state.programLabels.size>2? 190:170,planningText)
         }
@@ -306,8 +308,8 @@ class ForecastMetrics extends Component {
      i18n.t('static.report.error'),i18n.t('static.report.noofmonth')]]
       const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),getLabelText(elt.program.label),getLabelText(elt.planningUnit.label),
         //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-       elt.months==0?"No data points containing both actual and forecast consumption": elt.forecastError*100+'%',elt.months]);
-      let startY=this.state.planningUnitLabels.size>2? 350:200
+       elt.months==0?"No data points containing both actual and forecast consumption": this.roundN(elt.forecastError*100)+'%',elt.months]);
+      let startY=this.state.planningUnitLabels.length>2? 350:200
       let content = {
       margin: {top: 80},
       startY: startY,
@@ -321,7 +323,7 @@ class ForecastMetrics extends Component {
       doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("report.pdf")
+    doc.save("ForecastMatrics.pdf")
     //creates PDF from img
     /*  var doc = new jsPDF('landscape');
       doc.setFontSize(20);
@@ -332,11 +334,7 @@ class ForecastMetrics extends Component {
 
 
   rowClassNameFormat(row, rowIdx) {
-    // row is whole row object
-    // rowIdx is index of row
-    // console.log('in rowClassNameFormat')
-    // console.log(new Date(row.stopDate).getTime() < new Date().getTime())
-    return row.forecastError*100>50 || (row.budgetAmt - row.usedAmt) <= 0 ? 'background-red' : '';
+    return (row.forecastError*100)>50? 'background-red' : '';
   }
 
 
@@ -1006,7 +1004,7 @@ const customTotal = (from, to, size) => (
                                    <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                        <SearchBar {...props.searchProps} />
                                        <ClearSearchButton {...props.searchProps} /></div>
-                                   <BootstrapTable hover rowClasses={this.rowClassNameFormat} striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                   <BootstrapTable striped rowClasses={this.rowClassNameFormat} hover  noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                        pagination={paginationFactory(options)}
 
                                        {...props.baseProps}
