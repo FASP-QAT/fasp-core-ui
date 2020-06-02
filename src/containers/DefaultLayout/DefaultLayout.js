@@ -434,6 +434,12 @@ class DefaultLayout extends Component {
                             url: '/report/procurementAgentExport',
                             icon: 'fa fa-exchange'
                           }
+                          ,
+                          {
+                            name: i18n.t('static.report.annualshipmentcost'),
+                            url: '/report/annualShipmentCost',
+                            icon: 'fa fa-exchange'
+                          }
                         ]
                       }
                       // {

@@ -634,7 +634,7 @@
     "static.report.exportPdf": "Export PDF",
     "static.report.exportCsv": "Export CSV",
     "static.report.consumptionReport": "Consumption Report",
-    "static.report.dateRange": "Select Period",
+    "static.report.dateRange": "Report Period",
     "static.report.consumption_": "Consumption_",
     "static.report.consumptionTo": "_to_",
     "static.common.loading": "Loading...",
@@ -681,5 +681,9 @@
     "static.dashboard.funderExport": "Funder Report",
     "static.dashboard.procurementAgentExport": "Procurement Agent Report",
     "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
-    "static.user.accessControlText": "Access Control"
+    "static.user.accessControlText": "Access Control",
+    "static.report.annualshipmentcost":"Annual Shipment Cost",
+    "static.common.reportbase":"Report based on",
+    "static.common.shippingdate":"Shipping Date",
+    "static.common.receivedate":"Receiving Date"
 }
