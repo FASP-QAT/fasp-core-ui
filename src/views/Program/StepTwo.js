@@ -134,7 +134,7 @@ export default class Steptwo extends Component {
                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e); this.props.getRegionList(e) }}
                                             bsSize="sm"
-                                            className="col-md-6"
+                                            className="col-md-4"
                                             onBlur={handleBlur}
                                             type="select" name="realmCountryId" id="realmCountryId">
                                             <option value="">{i18n.t('static.common.select')}</option>

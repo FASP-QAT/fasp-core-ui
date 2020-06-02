@@ -217,7 +217,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.programNotes}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.airFreightPerc && this.props.items.program.airFreightPerc != ''}
@@ -230,7 +230,7 @@ export default class StepSix extends Component {
                                         <FormFeedback className="red">{errors.airFreightPerc}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup className="col-md-6">
-                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
                                             valid={!errors.seaFreightPerc && this.props.items.program.seaFreightPerc != ''}
