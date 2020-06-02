@@ -57,7 +57,7 @@ class AddRoleComponent extends Component {
             roles: [],
             role: {
                 businessFunctions: [],
-                canCreateRole: [],
+                canCreateRoles: [],
                 label: {
                     label_en: ''
                 }
@@ -74,6 +74,7 @@ class AddRoleComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.businessFunctionChange = this.businessFunctionChange.bind(this);
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
 
     Capitalize(str) {
@@ -83,7 +84,6 @@ class AddRoleComponent extends Component {
             return "";
         }
     }
-
 
     dataChange(event) {
         let { role } = this.state;
@@ -117,7 +117,7 @@ class AddRoleComponent extends Component {
         for (var i = 0; i < canCreateRoleId.length; i++) {
             canCreateRoleIdArray[i] = canCreateRoleId[i].value;
         }
-        role.canCreateRole = canCreateRoleIdArray;
+        role.canCreateRoles = canCreateRoleIdArray;
         this.setState({
             role
         },
@@ -128,7 +128,7 @@ class AddRoleComponent extends Component {
         setTouched({
             roleName: true,
             businessFunctions: true,
-            canCreateRole: true
+            canCreateRoles: true
         }
         )
         this.validateForm(errors)
@@ -148,72 +148,106 @@ class AddRoleComponent extends Component {
         }
     }
 
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
-                var businessFunctionList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
-                }
-                this.setState({
-                    businessFunctionList
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
+                if (response.status == 200) {
+                    var businessFunctionList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    this.setState({
+                        businessFunctionList
+                    })
                 }
-            );
+                else {
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+
+                }
+
+            })
+
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
         UserService.getRoleList()
             .then(response => {
-                var canCreateRoleList = [];
-                for (var i = 0; i < response.data.length; i++) {
-                    canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
-                }
-                this.setState({
-                    canCreateRoleList
-                })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
+                if (response.status == 200) {
+                    var canCreateRoleList = [];
+                    for (var i = 0; i < response.data.length; i++) {
+                        canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
                     }
+                    this.setState({
+                        canCreateRoleList
+                    })
+                }else{
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+
                 }
-            );
+                
+               
+            })
+            
+            // .catch(
+            //     error => {
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response ? error.response.status : "") {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: error.response.data.messageCode });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
     }
 
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -224,37 +258,43 @@ class AddRoleComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    console.log("8888888************", this.state.role);
                                     UserService.addNewRole(this.state.role)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/role/listRole/` + i18n.t(response.data.messageCode, { entityname }))
-                                            } else {
+                                                this.props.history.push(`/role/listRole/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            }
+
+                                            else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
 
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+                                    // .catch(
+                                    //     error => {
+                                    //         if (error.message === "Network Error") {
+                                    //             this.setState({ message: error.message });
+                                    //         } else {
+                                    //             switch (error.response ? error.response.status : "") {
+                                    //                 case 500:
+                                    //                 case 401:
+                                    //                 case 404:
+                                    //                 case 406:
+                                    //                 case 412:
+                                    //                     this.setState({ message: error.response.data.messageCode });
+                                    //                     break;
+                                    //                 default:
+                                    //                     this.setState({ message: 'static.unkownError' });
+                                    //                     break;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // );
 
 
                                 }}
@@ -308,25 +348,25 @@ class AddRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
 
                                                         <Select
-                                                            valid={!errors.canCreateRole}
+                                                            valid={!errors.canCreateRoles}
                                                             bsSize="sm"
-                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
+                                                            invalid={touched.canCreateRoles && !!errors.canCreateRoles}
                                                             onChange={(e) => { handleChange(e); this.canCreateRoleChange(e) }}
                                                             onBlur={handleBlur}
-                                                            name="canCreateRole"
-                                                            id="canCreateRole"
+                                                            name="canCreateRoles"
+                                                            id="canCreateRoles"
                                                             multi
                                                             required
                                                             min={1}
                                                             options={this.state.canCreateRoleList}
                                                             value={this.state.canCreateRoleId}
-                                                            error={errors.canCreateRole}
-                                                            touched={touched.canCreateRole}
+                                                            error={errors.canCreateRoles}
+                                                            touched={touched.canCreateRoles}
                                                         />
-                                                        <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
@@ -347,7 +387,7 @@ class AddRoleComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/role/listRole/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/role/listRole/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

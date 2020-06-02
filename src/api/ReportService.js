@@ -14,6 +14,10 @@ class ReportService {
         return axios.post(`${API_URL}/api/report/forecastMetrics`, json,{}
         );
     }
+    getFunderExportData(programIds) {
+        return axios.post(`${API_URL}/api/budget/programIds`,programIds,{}
+        );
+    }
 
 }
 export default new ReportService();

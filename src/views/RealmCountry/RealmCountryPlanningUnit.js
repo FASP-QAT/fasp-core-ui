@@ -685,7 +685,7 @@ realmCountryPlanningUnitId:'',
 
                                 <thead>
                                     <tr>
-                                        <th className="text-center"> {i18n.t('static.dashboard.planningunit')} </th>
+                                        <th className="text-left pl-1"> {i18n.t('static.dashboard.planningunit')} </th>
                                         <th className="text-center"> {i18n.t('static.planningunit.countrysku')}</th>
                                         <th className="text-center"> {i18n.t('static.procurementAgentProcurementUnit.skuCode')} </th>
                                         <th className="text-center">{i18n.t('static.unit.unit')}</th>
@@ -701,11 +701,11 @@ realmCountryPlanningUnitId:'',
                                         &&
                                         this.state.rows.map((item, idx) =>
 
-                                            <tr id="addr0" key={idx} >
-                                                <td>
+                                            <tr id="addr0" className="realmcountrypUnitTd" key={idx}  >
+                                                <td className="text-left">
                                                     {this.state.rows[idx].planningUnit.label.label_en}
                                                 </td>
-                                                <td>
+                                                <td >
 
                                                     {this.state.rows[idx].label.label_en}
                                                 </td>
@@ -714,7 +714,7 @@ realmCountryPlanningUnitId:'',
                                                 </td><td>
                                                     {this.state.rows[idx].unit.label.label_en}
                                                 </td>
-                                                <td>
+                                                <td className="text-right">
                                                     {this.state.rows[idx].multiplier}
                                                 </td>
                                                 <td>

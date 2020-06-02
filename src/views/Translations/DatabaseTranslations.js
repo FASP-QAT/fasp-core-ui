@@ -181,14 +181,20 @@ export default class DatabaseTranslations extends React.Component {
                         </Card>
                     </Col>
                 </Row>
-                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                <Row style={{ display: this.state.loading ? "block" : "none" }} className="d-flex align-items-center justify-content-center" style={{height: "500px"}}>
                     {/* <h1>-------LOADING--------</h1> */}
-                    <div class="d-flex justify-content-center">
-                        <strong>Loading...</strong>
-                        <div class="spinner-border" role="status">
+                    
+                       <div class="align-items-center">
+                       <div ><h4> <strong>Loading...</strong></h4></div>
+                        
+                        <div class="spinner-border blue ml-4" role="status">
 
                         </div>
                     </div>
+                
+                  
+                    
+             
                 </Row>
             </div>
         )
@@ -243,4 +249,5 @@ export default class DatabaseTranslations extends React.Component {
             rowId: y
         })
     }.bind(this)
+
 }

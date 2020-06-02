@@ -57,7 +57,7 @@ class FunderExport extends Component {
     exportCSV() {
 
         var csvRow = [];
-       
+
         this.state.programLabels.map(ele =>
             csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
         csvRow.push('')
@@ -66,12 +66,12 @@ class FunderExport extends Component {
         csvRow.push('')
         var re;
 
-        var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
+        var A = [[("Program Name").replaceAll(' ', '%20'), ("Budget Name").replaceAll(' ', '%20'), ("Funding Source Name").replaceAll(' ', '%20'), ("Budget Usable").replaceAll(' ', '%20')]]
 
         re = this.state.funders
 
         for (var item = 0; item < re.length; item++) {
-            A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
+            A.push([[getLabelText(re[item].program.label).replaceAll(' ', '%20'), getLabelText(re[item].label).replaceAll(' ', '%20'), getLabelText(re[item].fundingSource.label).replaceAll(' ', '%20'), (re[item].budgetUsable ? "Yes" : "No")]])
         }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -80,7 +80,7 @@ class FunderExport extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = "Funder Report.csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -98,7 +98,7 @@ class FunderExport extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -114,7 +114,7 @@ class FunderExport extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+                doc.text("Funder Report", doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -135,24 +135,24 @@ class FunderExport extends Component {
 
         doc.setFontSize(15);
 
-        const title = "Funder Export";
-        var canvas = document.getElementById("cool-canvas");
+        const title = "Funder Report";
+        // var canvas = document.getElementById("cool-canvas");
         //creates image
 
-        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        // var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
+        // var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
+        // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
-        const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
-        const data = this.state.funders.map(elt => [getLabelText(elt.realmCountry.label), elt.consumptionDateString, elt.planningUnitQty]);
+        const headers = [["Program Name", "Budget Name", "Funding Source Name", "Budget Usable"]]
+        const data = this.state.funders.map(elt => [getLabelText(elt.program.label), getLabelText(elt.label), getLabelText(elt.fundingSource.label), (elt.budgetUsable ? "Yes" : "No")]);
 
         let content = {
             margin: { top: 80 },
-            startY: height,
+            startY: 150,
             head: headers,
             body: data,
 
@@ -160,7 +160,7 @@ class FunderExport extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Funder Export.pdf")
+        doc.save("Funder Report.pdf")
     }
     handleChangeProgram(programIds) {
 
@@ -169,15 +169,13 @@ class FunderExport extends Component {
             programLabels: programIds.map(ele => ele.label)
         }, () => {
 
-            this.filterData(this.state.rangeValue)
+            this.filterData();
         })
 
     }
-    filterData(rangeValue) {
+    filterData() {
         setTimeout('', 10000);
         let programIds = this.state.programValues;
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         if (programIds.length > 0) {
 
             var inputjson = {
@@ -186,37 +184,38 @@ class FunderExport extends Component {
             console.log('***' + inputjson)
             AuthenticationService.setupAxiosInterceptors();
 
-            // ReportService.getGlobalConsumptiondata(inputjson)
-            //     .then(response => {
-            //         console.log(JSON.stringify(response.data));
-            //         this.setState({
-            //             funders: response.data,
-            //             message: ''
-            //         })
-            //     }).catch(
-            //         error => {
-            //             this.setState({
-            //                 funders: []
-            //             })
+            ReportService.getFunderExportData(programIds)
+                .then(response => {
+                    console.log("response---", response.data);
+                    this.setState({
+                        funders: response.data,
+                        message: ''
+                    });
+                    console.log("funders data---", this.state.funders);
+                }).catch(
+                    error => {
+                        this.setState({
+                            funders: []
+                        })
 
-            //             if (error.message === "Network Error") {
-            //                 this.setState({ message: error.message });
-            //             } else {
-            //                 switch (error.response ? error.response.status : "") {
-            //                     case 500:
-            //                     case 401:
-            //                     case 404:
-            //                     case 406:
-            //                     case 412:
-            //                         this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-            //                         break;
-            //                     default:
-            //                         this.setState({ message: 'static.unkownError' });
-            //                         break;
-            //                 }
-            //             }
-            //         }
-            //     );
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
         } else if (programIds.length == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), funders: [] });
 
@@ -276,7 +275,7 @@ class FunderExport extends Component {
     }
     loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
     render() {
-
+        console.log("funder----", this.state.funders);
         const { programs } = this.state;
         let programList = [];
         programList = programs.length > 0
@@ -291,6 +290,7 @@ class FunderExport extends Component {
 
         return (
             <div className="animated fadeIn" >
+
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
@@ -341,33 +341,27 @@ class FunderExport extends Component {
 
                                             <thead>
                                                 <tr>
-                                                    <th className="text-center"> Program Code </th>
                                                     <th className="text-center "> Program Name </th>
-                                                    <th className="text-center"> Funding Source </th>
-                                                    <th className="text-center"> Funding Source Code</th>
-                                                    <th className="text-center"> Active </th>
+                                                    <th className="text-center "> Budget Name </th>
+                                                    <th className="text-center"> Funding Source Name </th>
+                                                    <th className="text-center"> Budget Usable </th>
                                                 </tr>
                                             </thead>
 
                                             <tbody>
-                                                {/* {
+                                                {/* console.log("") */}
+                                                {
                                                     this.state.funders.length > 0
                                                     &&
                                                     this.state.funders.map((item, idx) =>
-
                                                         <tr id="addr0" key={idx} >
-
-                                                            <td>{getLabelText(this.state.funders[idx].realmCountry.label, this.state.lang)}</td>
-                                                            <td>
-
-                                                                {this.state.funders[idx].consumptionDateString}
-                                                            </td>
-                                                            <td >
-                                                                {this.state.funders[idx].planningUnitQty}
-                                                            </td>
+                                                            <td>{getLabelText(this.state.funders[idx].program.label, this.state.lang)}</td>
+                                                            <td>{getLabelText(this.state.funders[idx].label, this.state.lang)}</td>
+                                                            <td>{getLabelText(this.state.funders[idx].fundingSource.label, this.state.lang)}</td>
+                                                            <td>{this.state.funders[idx].budgetUsable.toString() ? "Yes" : "No"}</td>
                                                         </tr>)
 
-                                                } */}
+                                                }
                                             </tbody>
                                         </Table>
                                         {/* } */}

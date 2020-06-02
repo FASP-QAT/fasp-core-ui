@@ -30,7 +30,21 @@ export default class CountryListComponent extends Component {
         this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     filterData() {
         var selStatus = document.getElementById("active").value;
         if (selStatus != "") {
@@ -73,6 +87,7 @@ export default class CountryListComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        this.hideFirstComponent();
         CountryService.getCountryListAll().then(response => {
             if (response.status == 200) {
                 console.log("response--->", response.data);
@@ -80,8 +95,15 @@ export default class CountryListComponent extends Component {
                     countryList: response.data,
                     selCountry: response.data
                 })
+
             } else {
-                this.setState({ message: response.data.messageCode })
+
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         })
         // .catch(
@@ -179,8 +201,8 @@ export default class CountryListComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
                     <CardHeader className="mb-md-3 pb-lg-1">
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
