@@ -168,6 +168,9 @@ class ForcastMatrixOverTime extends Component {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
+  roundN = num=>{
+    return parseFloat(Math.round(num * Math.pow(10, 2)) /Math.pow(10,2)).toFixed(2);
+  }
 
   toggledata = () => this.setState((currentState) => ({show: !currentState.show}));
 
@@ -189,7 +192,7 @@ class ForcastMatrixOverTime extends Component {
    
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].consumptionDateString, re[item].forecastedConsumption, re[item].actualConsumption, re[item].forecastError*100, re[item].monthsInCalc])
+      A.push([re[item].consumptionDateString, re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError*100), re[item].monthsInCalc])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -278,7 +281,7 @@ class ForcastMatrixOverTime extends Component {
     doc.addImage(canvasImg, 'png',  50, 200,750,290,'CANVAS' );
     const headers =[ [   i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.errorperc'),i18n.t('static.report.noofmonth')]];
-    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,elt.forecastError*100,elt.monthsInCalc]);
+    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,this.roundN(elt.forecastError*100),elt.monthsInCalc]);
     
     let content = {
     margin: {top: 80},
@@ -294,7 +297,7 @@ class ForcastMatrixOverTime extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("report.pdf")
+    doc.save("ForecastMetricsOverTime.pdf")
     //creates PDF from img
   /*  var doc = new jsPDF('landscape');
     doc.setFontSize(20);
@@ -553,7 +556,7 @@ class ForcastMatrixOverTime extends Component {
             pointStyle: 'line',
             yValueFormatString: "$#####%",
             
-            data: this.state.matricsList.map((item, index) => (item.forecastError*100))
+            data: this.state.matricsList.map((item, index) => (this.roundN(item.forecastError*100)))
           }
         ],
 
@@ -730,7 +733,7 @@ class ForcastMatrixOverTime extends Component {
                                     {this.state.matricsList[idx].actualConsumption}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].forecastError*100+'%'}
+                                    {this.roundN(this.state.matricsList[idx].forecastError*100)+'%'}
                                   </td>
                                   <td>
                                     {this.state.matricsList[idx].monthsInCalc}

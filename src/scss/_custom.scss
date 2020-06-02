@@ -414,6 +414,7 @@ label.arrow_label:after {
 
   color: red !important;
 }
+.blue{color: 20a8d8 !important;}
 .green {
   //  color: #f86c6b !important;
 
@@ -478,7 +479,7 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
-  padding: 5px 0px 0px 5px !important;
+  padding: 5px !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -701,6 +702,71 @@ label.arrow_label:after {
     .ReportFirstHead>.react-bootstrap-table>.table thead tr th{
       width: 60px !important;
     }
+  
+    .jexcel_clear_btn {
+  
+       margin-left: 0px !important; 
+  }   .jexcel_pagination_dropdown {
+          
+    margin-left: 0px !important;}
+
+//  table dropdown css removed sorting in all master consistent to jexcel
+.dropdown-item {
+    border-bottom: none;
+}.dropdown-menu {border-radius: 0px !important;}
+.jexcel_pagination_dropdown option {
+  color: #205493 !important;}
+.dropdown-menu {
+  text-align: center !important;
+}
+.dropdown-item:hover {
+  background-color: #ef6e12e8;
+  
+}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a:hover {color: #fff !important;}
+.dropdown-menu.show{width:50px !important;z-index: 1000!important;}
+.dropdown-menu { min-width: 4rem !important; margin-left: 2px;top: auto !important; z-index: 1000;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a {padding: 8px 35px 8px 15px;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item:active{ background-color: #ef6e12e8;}
+.TableCust span.btn-default{padding-left: 10px !important;}
+#pageDropDown span{padding-left: 7px;}
+// loader css
+.spinner-border{color:#20a8d8; height: 2.5rem;width: 2.5rem;}
+
+// tableAlignThtd
+// user
+.userAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+// listRalm
+.listRealmAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
+
+// listBudgetAlignThtd 
+.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+
+// PlanningUnitlist
+.PlanningUnitlistAlignThtd .PlanningUnirlistAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+
+.listprocurementUnitAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+
+// .realmcountrypUnitTd{text-align: right !important;}
+// css by junaid last line
+
+
+
+
 
     // #consumptionDetailsTable>.jexcel_content>.jexcel > tbody > tr > td:nth-child(4)  {text-align: right;}
   //   #hideMe {
@@ -2098,4 +2164,8 @@ text-overflow: ellipsis;
 .formulastext-p{
 
   color: #20a8d8!important;
+}
+
+.ml-field{
+  margin-left: -15px;
 }

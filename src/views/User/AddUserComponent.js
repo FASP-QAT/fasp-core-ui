@@ -41,13 +41,13 @@ const validationSchema = function (values) {
                 return schema;
             }),
         // roleId: Yup.array()
-        //     .min(3, 'Pick at least 3 tags')
-        //     .of(
-        //         Yup.object().shape({
-        //             label: Yup.string().required(),
-        //             value: Yup.string().required(),
-        //         })
-        //     ),
+        // .min(3, 'Pick at least 3 tags')
+        // .of(
+        // Yup.object().shape({
+        // label: Yup.string().required(),
+        // value: Yup.string().required(),
+        // })
+        // ),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
@@ -456,21 +456,21 @@ class AddUserComponent extends Component {
                                                                 <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                                                             )}
                                                         {/* <Input
-                                                            type="select"
-                                                            name="roleId"
-                                                            id="roleId"
-                                                            bsSize="sm"
-                                                            valid={!errors.roleId}
-                                                            invalid={touched.roleId && !!errors.roleId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.user.roles}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="" disabled>{i18n.t('static.common.select')}</option>
-                                                            {roleList}
-                                                        </Input> */}
+ type="select"
+ name="roleId"
+ id="roleId"
+ bsSize="sm"
+ valid={!errors.roleId}
+ invalid={touched.roleId && !!errors.roleId}
+ onChange={(e) => { handleChange(e); this.dataChange(e) }}
+ onBlur={handleBlur}
+ required
+ value={this.state.user.roles}
+ multiple={true}
+ >
+ <option value="" disabled>{i18n.t('static.common.select')}</option>
+ {roleList}
+ </Input> */}
                                                         {/* <FormFeedback>{errors.roleId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup>
@@ -499,8 +499,8 @@ class AddUserComponent extends Component {
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                                                        &nbsp;
-                          </FormGroup>
+ &nbsp;
+ </FormGroup>
                                                 </CardFooter>
                                             </Form>
                                         )} />
