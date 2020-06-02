@@ -498,7 +498,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var artmisEmergencyOrder = 0;
                     var nonPsmEmergencyOrder = 0;
                     for (var j = 0; j < psm.length; j++) {
-                        psmQty += parseFloat((psm[j].quantity));
+                        psmQty += parseFloat((psm[j].shipmentQty));
                         if (psm[j].accountFlag == 1) {
                             psmToBeAccounted = 1;
                         }
@@ -513,7 +513,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }
 
                     for (var np = 0; np < nonPsm.length; np++) {
-                        nonPsmQty += parseFloat((nonPsm[np].quantity));
+                        nonPsmQty += parseFloat((nonPsm[np].shipmentQty));
                         if (nonPsm[np].accountFlag == 1) {
                             nonPsmToBeAccounted = 1;
                         }
@@ -529,7 +529,7 @@ export default class SupplyPlanComponent extends React.Component {
                     }
 
                     for (var a = 0; a < artmisShipments.length; a++) {
-                        artmisQty += parseFloat((artmisShipments[a].quantity));
+                        artmisQty += parseFloat((artmisShipments[a].shipmentQty));
                         if (artmisShipments[a].accountFlag == 1) {
                             artmisToBeAccounted = 1;
                         }
@@ -576,7 +576,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                 var shipmentsRemainingList = shipmentList.filter(c => c.orderedDate < m[3].startDate && c.accountFlag == true);
                 for (var j = 0; j < shipmentsRemainingList.length; j++) {
-                    totalShipments += parseFloat((shipmentsRemainingList[j].quantity));
+                    totalShipments += parseFloat((shipmentsRemainingList[j].shipmentQty));
                 }
                 openingBalance = totalAdjustments - totalConsumption + totalShipments;
                 openingBalanceArray.push(openingBalance);
@@ -691,55 +691,55 @@ export default class SupplyPlanComponent extends React.Component {
 
                     var plannedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 1);
                     for (var j = 0; j < plannedShipments.length; j++) {
-                        plannedShipmentQty += parseInt((plannedShipments[j].quantity));
+                        plannedShipmentQty += parseInt((plannedShipments[j].shipmentQty));
                     }
                     plannedTotalShipmentsBasedOnMonth.push(plannedShipmentQty);
 
                     var draftShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 2);
                     for (var j = 0; j < draftShipments.length; j++) {
-                        draftShipmentQty += parseInt((draftShipments[j].quantity));
+                        draftShipmentQty += parseInt((draftShipments[j].shipmentQty));
                     }
                     draftTotalShipmentsBasedOnMonth.push(draftShipmentQty);
 
                     var submittedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 3);
                     for (var j = 0; j < submittedShipments.length; j++) {
-                        submittedShipmentQty += parseInt((submittedShipments[j].quantity));
+                        submittedShipmentQty += parseInt((submittedShipments[j].shipmentQty));
                     }
                     submittedTotalShipmentsBasedOnMonth.push(submittedShipmentQty);
 
                     var approvedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 4);
                     for (var j = 0; j < approvedShipments.length; j++) {
-                        approvedShipmentQty += parseInt((approvedShipments[j].quantity));
+                        approvedShipmentQty += parseInt((approvedShipments[j].shipmentQty));
                     }
                     approvedTotalShipmentsBasedOnMonth.push(approvedShipmentQty);
 
                     var shippedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 5);
                     for (var j = 0; j < shippedShipments.length; j++) {
-                        shippedShipmentQty += parseInt((shippedShipments[j].quantity));
+                        shippedShipmentQty += parseInt((shippedShipments[j].shipmentQty));
                     }
                     shippedTotalShipmentsBasedOnMonth.push(shippedShipmentQty);
 
                     var arrivedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 6);
                     for (var j = 0; j < arrivedShipments.length; j++) {
-                        arrivedShipmentQty += parseInt((arrivedShipments[j].quantity));
+                        arrivedShipmentQty += parseInt((arrivedShipments[j].shipmentQty));
                     }
                     arrivedTotalShipmentsBasedOnMonth.push(arrivedShipmentQty);
 
                     var deliveredShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 7);
                     for (var j = 0; j < deliveredShipments.length; j++) {
-                        deliveredShipmentQty += parseInt((deliveredShipments[j].quantity));
+                        deliveredShipmentQty += parseInt((deliveredShipments[j].shipmentQty));
                     }
                     deliveredTotalShipmentsBasedOnMonth.push(deliveredShipmentQty);
 
                     var cancelledShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 8);
                     for (var j = 0; j < cancelledShipments.length; j++) {
-                        cancelledShipmentQty += parseInt((cancelledShipments[j].quantity));
+                        cancelledShipmentQty += parseInt((cancelledShipments[j].shipmentQty));
                     }
                     cancelledTotalShipmentsBasedOnMonth.push(cancelledShipmentQty);
 
                     var onHoldShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 9);
                     for (var j = 0; j < onHoldShipments.length; j++) {
-                        onHoldShipmentQty += parseInt((onHoldShipments[j].quantity));
+                        onHoldShipmentQty += parseInt((onHoldShipments[j].shipmentQty));
                     }
                     onHoldTotalShipmentsBasedOnMonth.push(onHoldShipmentQty);
 
@@ -2708,9 +2708,9 @@ export default class SupplyPlanComponent extends React.Component {
                                 id: 0
                             },
                             productCost: 0,
-                            quantity: map.get("2"),
+                            shipmentQty: map.get("2"),
                             rate: 0,
-                            receivedDate: "",
+                            deliveredDate: "",
                             shipmentId: 0,
                             shipmentMode: map.get("6"),
                             shipmentStatus: {
@@ -3815,7 +3815,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         }
                                                         var userQty = "";
                                                         if (procurementAgentPlanningUnit.unitsPerPallet != 0 && procurementAgentPlanningUnit.unitsPerContainer != 0) {
-                                                            userQty = shipmentList[i].quantity;
+                                                            userQty = shipmentList[i].shipmentQty;
                                                         }
                                                         budgetAmount = budgetAmount.toFixed(2);
                                                         data[0] = shipmentList[i].expectedDeliveryDate; // A
@@ -4987,7 +4987,7 @@ export default class SupplyPlanComponent extends React.Component {
                         } else {
                             shipmentStatusId = selectedShipmentStatus;
                         }
-                        var quantity = (elInstance.getCell(`O${j}`)).innerHTML;
+                        var shipmentQty = (elInstance.getCell(`O${j}`)).innerHTML;
                         var productCost = (elInstance.getCell(`V${j}`)).innerHTML;
                         var rate = 0;
                         if ((elInstance.getCell(`R${j}`)).innerHTML != "" || (elInstance.getCell(`R${j}`)).innerHTML != 0) {
@@ -5007,7 +5007,7 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("33"))].primeLineNo = map.get("3");
                         shipmentDataList[parseInt(map.get("33"))].dataSource.id = map.get("4");
                         shipmentDataList[parseInt(map.get("33"))].procurementAgent.id = map.get("5");
-                        shipmentDataList[parseInt(map.get("33"))].quantity = quantity;
+                        shipmentDataList[parseInt(map.get("33"))].shipmentQty = shipmentQty;
                         shipmentDataList[parseInt(map.get("33"))].rate = rate;
                         shipmentDataList[parseInt(map.get("33"))].productCost = productCost;
                         shipmentDataList[parseInt(map.get("33"))].shipmentMode = map.get("22");
@@ -5021,7 +5021,7 @@ export default class SupplyPlanComponent extends React.Component {
                             shipmentDataList[parseInt(map.get("33"))].shippedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
                         if (shipmentStatusId == 7) {
-                            shipmentDataList[parseInt(map.get("33"))].receivedDate = moment(Date.now()).format("YYYY-MM-DD");
+                            shipmentDataList[parseInt(map.get("33"))].deliveredDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
                     }
 
