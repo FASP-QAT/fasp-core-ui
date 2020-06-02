@@ -273,8 +273,18 @@ export default class SupplyPlanComponent extends React.Component {
             var nonPsmShipmentsTotalData = [];
             var artmisFilteredArray = [];
             var artmisShipmentsTotalData = [];
-
+            var jsonArrForGraph = [];
             var monthsOfStockArray = [];
+
+            var plannedTotalShipmentsBasedOnMonth = [];
+            var draftTotalShipmentsBasedOnMonth = [];
+            var submittedTotalShipmentsBasedOnMonth = [];
+            var approvedTotalShipmentsBasedOnMonth = [];
+            var shippedTotalShipmentsBasedOnMonth = [];
+            var arrivedTotalShipmentsBasedOnMonth = [];
+            var deliveredTotalShipmentsBasedOnMonth = [];
+            var cancelledTotalShipmentsBasedOnMonth = [];
+            var onHoldTotalShipmentsBasedOnMonth = [];
             programRequest.onsuccess = function (event) {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -411,7 +421,6 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     }
                 }
-                console.log("Filtered array", filteredArray);
                 for (var i = 3; i < 21; i++) {
                     var consumptionListFilteredForMonth = filteredArray.filter(c => c.consumptionQty == '' || c.month.month == m[i].month);
                     var monthWiseCount = 0;
@@ -664,6 +673,97 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                 }
 
+                // Calculating shipments based on shipment status
+                var shipmentList = (programJson.shipmentList).filter(c => c.active == true && c.planningUnit.id == planningUnitId);
+
+                for (var i = 3; i < 21; i++) {
+                    var shipmentsBasedOnMonth = shipmentList.filter(c => (c.expectedDeliveryDate >= m[i].startDate && c.expectedDeliveryDate <= m[i].endDate));
+
+                    var plannedShipmentQty = 0;
+                    var draftShipmentQty = 0;
+                    var submittedShipmentQty = 0;
+                    var approvedShipmentQty = 0;
+                    var shippedShipmentQty = 0;
+                    var arrivedShipmentQty = 0;
+                    var deliveredShipmentQty = 0;
+                    var cancelledShipmentQty = 0;
+                    var onHoldShipmentQty = 0;
+
+                    var plannedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 1);
+                    for (var j = 0; j < plannedShipments.length; j++) {
+                        plannedShipmentQty += parseInt((plannedShipments[j].quantity));
+                    }
+                    plannedTotalShipmentsBasedOnMonth.push(plannedShipmentQty);
+
+                    var draftShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 2);
+                    for (var j = 0; j < draftShipments.length; j++) {
+                        draftShipmentQty += parseInt((draftShipments[j].quantity));
+                    }
+                    draftTotalShipmentsBasedOnMonth.push(draftShipmentQty);
+
+                    var submittedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 3);
+                    for (var j = 0; j < submittedShipments.length; j++) {
+                        submittedShipmentQty += parseInt((submittedShipments[j].quantity));
+                    }
+                    submittedTotalShipmentsBasedOnMonth.push(submittedShipmentQty);
+
+                    var approvedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 4);
+                    for (var j = 0; j < approvedShipments.length; j++) {
+                        approvedShipmentQty += parseInt((approvedShipments[j].quantity));
+                    }
+                    approvedTotalShipmentsBasedOnMonth.push(approvedShipmentQty);
+
+                    var shippedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 5);
+                    for (var j = 0; j < shippedShipments.length; j++) {
+                        shippedShipmentQty += parseInt((shippedShipments[j].quantity));
+                    }
+                    shippedTotalShipmentsBasedOnMonth.push(shippedShipmentQty);
+
+                    var arrivedShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 6);
+                    for (var j = 0; j < arrivedShipments.length; j++) {
+                        arrivedShipmentQty += parseInt((arrivedShipments[j].quantity));
+                    }
+                    arrivedTotalShipmentsBasedOnMonth.push(arrivedShipmentQty);
+
+                    var deliveredShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 7);
+                    for (var j = 0; j < deliveredShipments.length; j++) {
+                        deliveredShipmentQty += parseInt((deliveredShipments[j].quantity));
+                    }
+                    deliveredTotalShipmentsBasedOnMonth.push(deliveredShipmentQty);
+
+                    var cancelledShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 8);
+                    for (var j = 0; j < cancelledShipments.length; j++) {
+                        cancelledShipmentQty += parseInt((cancelledShipments[j].quantity));
+                    }
+                    cancelledTotalShipmentsBasedOnMonth.push(cancelledShipmentQty);
+
+                    var onHoldShipments = shipmentsBasedOnMonth.filter(c => c.shipmentStatus.id == 9);
+                    for (var j = 0; j < onHoldShipments.length; j++) {
+                        onHoldShipmentQty += parseInt((onHoldShipments[j].quantity));
+                    }
+                    onHoldTotalShipmentsBasedOnMonth.push(onHoldShipmentQty);
+
+                }
+
+                // Building json for graph
+                for (var jsonForGraph = 0; jsonForGraph < 18; jsonForGraph++) {
+                    var json = {
+                        month: m[jsonForGraph + 3].month,
+                        consumption: consumptionTotalData[jsonForGraph],
+                        stock: inventoryTotalData[jsonForGraph],
+                        planned: plannedTotalShipmentsBasedOnMonth[jsonForGraph],
+                        draft: draftTotalShipmentsBasedOnMonth[jsonForGraph],
+                        submitted: submittedTotalShipmentsBasedOnMonth[jsonForGraph],
+                        approved: approvedTotalShipmentsBasedOnMonth[jsonForGraph],
+                        shipped: shippedTotalShipmentsBasedOnMonth[jsonForGraph],
+                        arrived: arrivedTotalShipmentsBasedOnMonth[jsonForGraph],
+                        delivered: deliveredTotalShipmentsBasedOnMonth[jsonForGraph],
+                        cancelled: cancelledTotalShipmentsBasedOnMonth[jsonForGraph],
+                        onHold: onHoldTotalShipmentsBasedOnMonth[jsonForGraph]
+                    }
+                    jsonArrForGraph.push(json);
+                }
+                console.log("JsonforGrpah----------------->", jsonArrForGraph);
                 this.setState({
                     suggestedShipmentsTotalData: suggestedShipmentsTotalData,
                     inventoryTotalData: inventoryTotalData,
@@ -682,7 +782,8 @@ export default class SupplyPlanComponent extends React.Component {
                     planningUnitName: planningUnitName,
                     psmShipmentsTotalData: psmShipmentsTotalData,
                     nonPsmShipmentsTotalData: nonPsmShipmentsTotalData,
-                    artmisShipmentsTotalData: artmisShipmentsTotalData
+                    artmisShipmentsTotalData: artmisShipmentsTotalData,
+                    jsonArrForGraph: jsonArrForGraph
                 })
             }.bind(this)
         }.bind(this)
@@ -700,8 +801,8 @@ export default class SupplyPlanComponent extends React.Component {
             suggestedShipmentError: '',
             suggestedShipmentDuplicateError: '',
             budgetError: '',
-            consumptionDuplicateError:'',
-            inventoryDuplicateError:'',
+            consumptionDuplicateError: '',
+            inventoryDuplicateError: '',
 
         })
         if (supplyPlanType == 'Consumption') {
@@ -760,8 +861,8 @@ export default class SupplyPlanComponent extends React.Component {
             consumptionChangedFlag: 0,
             suggestedShipmentChangedFlag: 0,
             inventoryChangedFlag: 0,
-            consumptionDuplicateError:'',
-            inventoryDuplicateError:''
+            consumptionDuplicateError: '',
+            inventoryDuplicateError: ''
 
         })
         this.toggleLarge(supplyPlanType);
@@ -868,7 +969,6 @@ export default class SupplyPlanComponent extends React.Component {
                         this.el.destroy();
                         var data = [];
                         var consumptionDataArr = []
-                        console.log("Consumption list--------------> ", consumptionList);
                         for (var j = 0; j < consumptionList.length; j++) {
                             data = [];
                             data[0] = month;
@@ -1277,8 +1377,6 @@ export default class SupplyPlanComponent extends React.Component {
                     var consumptionDataList = (programJson.consumptionList);
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
-                        console.log("Actual flag ----------->", map.get("8"));
-                        console.log("Active---------->", map.get("9"));
                         if (map.get("6") != -1) {
                             consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
                             consumptionDataList[parseInt(map.get("6"))].consumptionQty = map.get("3");
@@ -1603,9 +1701,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     data[13] = "";
                                                     data[14] = endDate;
                                                     obj.insertRow(data);
-                                                    console.log("D${parseInt(json.length) + 1}", `${parseInt(json.length) + 1}`);
                                                     var cell = obj.getCell(`D${parseInt(json.length) + 1}`)
-                                                    console.log("cell", cell);
                                                     cell.classList.remove('readonly');
 
                                                 }.bind(this)
@@ -1712,13 +1808,10 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setValueFromCoords(4, y, multiplier, true);
                 var region = elInstance.getValueFromCoords(1, y);
                 var endDate = elInstance.getValueFromCoords(14, y);
-                console.log("End date", endDate);
                 var inventoryDetails = this.state.inventoryListUnFiltered.filter(c => c.realmCountryPlanningUnit.id == value
                     && c.region.id == region
                     && c.inventoryDate <= endDate
                 );
-                console.log("Inventory details", inventoryDetails);
-                console.log("Value", value);
                 var lastInventoryDate = "";
                 for (var id = 0; id < inventoryDetails.length; id++) {
                     if (id == 0) {
@@ -2005,7 +2098,6 @@ export default class SupplyPlanComponent extends React.Component {
                                             lastInventoryDate = inventoryDetails[id].inventoryDate;
                                         }
                                     }
-                                    console.log("LastInventoryDate", lastInventoryDate);
                                     var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
                                     if (inventoryDetailsFiltered.length != 0) {
                                         inventoryDataList[index].expectedBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
@@ -3290,7 +3382,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                     <td align="left">{item.name}</td>
                                                     {
                                                         this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                            console.log("consumption filter Aarray------------>", item1);
                                                             if (item1.consumptionQty.toString() != '') {
                                                                 if (item1.actualFlag.toString() == 'true') {
                                                                     return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
@@ -3811,6 +3902,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                         data[34] = ""// Procurment unit price
                                                         data[35] = shipmentList[i].shipmentStatus.id;
                                                         data[36] = supplyPlanType;
+                                                        data[37] = shipmentList[i].active;
                                                         shipmentsArr.push(data);
                                                     }
                                                     var options = {
@@ -3834,15 +3926,15 @@ export default class SupplyPlanComponent extends React.Component {
                                                             { type: 'text', readOnly: true, title: "Adjusted order qty" },
                                                             { type: 'text', readOnly: true, title: "Adjusted pallets" },
                                                             { type: 'text', readOnly: true, title: "Adjusted containers" },
-                                                            { type: 'text', title: "User price per planning unit in USD" },
+                                                            { type: 'text', title: "User price per planning unit (in USD)" },
                                                             { type: procurementUnitType, title: "Procurement Unit", source: procurementUnitList, filter: this.procurementUnitDropdownFilter },
                                                             { type: procurementUnitType, title: 'Supplier', source: supplierList },
-                                                            { type: 'text', readOnly: true, title: "Price per planning unit in USD" },
-                                                            { type: 'text', readOnly: true, title: "Amount in USD" },
+                                                            { type: 'text', readOnly: true, title: "Price per planning unit (in USD)" },
+                                                            { type: 'text', readOnly: true, title: "Amount (in USD)" },
                                                             { type: 'dropdown', title: "Shipped method", source: ['Sea', 'Air'] },
-                                                            { type: 'text', title: "User Freight cost amount in USD" },
-                                                            { type: 'text', readOnly: true, title: "Default freight cost in USD" },
-                                                            { type: 'text', readOnly: true, title: "Total amount in USD" },
+                                                            { type: 'text', title: "User Freight cost amount (in USD)" },
+                                                            { type: 'text', readOnly: true, title: "Default freight cost (in USD)" },
+                                                            { type: 'text', readOnly: true, title: "Total amount (in USD)" },
                                                             { type: 'text', title: "Notes" },
                                                             { type: 'hidden', title: "Units/Pallet" },
                                                             { type: 'hidden', title: "Units/Container" },
@@ -3853,7 +3945,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                             { type: 'hidden', title: 'index' },
                                                             { type: 'hidden', title: 'Price per procurement unit' },
                                                             { type: 'hidden', title: 'Shipment status id' },
-                                                            { type: 'hidden', title: 'Supply plan type' }
+                                                            { type: 'hidden', title: 'Supply plan type' },
+                                                            { type: 'checkbox', title: 'Active' }
                                                         ],
                                                         pagination: false,
                                                         search: false,
@@ -4291,7 +4384,6 @@ export default class SupplyPlanComponent extends React.Component {
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, "This field is required.");
             } else {
-                console.log("Valueee------------>Check", moment(value).format("YYYY-MM-DD"));
                 // if (moment(value).format("YYYY-MM-DD") == 'Invalid date') {
                 //     elInstance.setStyle(col, "background-color", "transparent");
                 //     elInstance.setStyle(col, "background-color", "yellow");
@@ -4649,8 +4741,6 @@ export default class SupplyPlanComponent extends React.Component {
                     elInstance.setComments(col, "This field is required.");
                     valid = false;
                 } else {
-                    console.log("Value------->", value);
-                    console.log("Format correct date", moment(value.toString()).format("YYYY-MM-DD"));
                     // if (moment(value).format("YYYY-MM-DD") == 'Invalid date') {
                     //     elInstance.setStyle(col, "background-color", "transparent");
                     //     elInstance.setStyle(col, "background-color", "yellow");
@@ -4926,6 +5016,7 @@ export default class SupplyPlanComponent extends React.Component {
                         shipmentDataList[parseInt(map.get("33"))].shipmentBudgetList = map.get("32");
                         shipmentDataList[parseInt(map.get("33"))].procurementUnit.id = map.get("18");
                         shipmentDataList[parseInt(map.get("33"))].supplier.id = map.get("19");
+                        shipmentDataList[parseInt(map.get("33"))].active = map.get("37");
                         if (shipmentStatusId == 5) {
                             shipmentDataList[parseInt(map.get("33"))].shippedDate = moment(Date.now()).format("YYYY-MM-DD");
                         }
