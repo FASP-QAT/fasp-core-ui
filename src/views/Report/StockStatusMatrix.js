@@ -174,7 +174,7 @@ export default class StockStatusMatrix extends React.Component {
             var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
             var programJson = JSON.parse(programData);
             var offlineInventoryList = (programJson.inventoryList);
-            console.log("offlineInventoryList---", offlineInventoryList);
+            console.log("offlineInventoryList 1st---", offlineInventoryList);
 
             const activeFilter = offlineInventoryList.filter(c => (c.active == true || c.active == "true"));
             console.log("activeFilter---", activeFilter);
@@ -267,6 +267,7 @@ export default class StockStatusMatrix extends React.Component {
                 Nov: nov,
                 Dec: dec
               }
+              console.log("json---", json);
               finalOfflineInventory.push(json);
             }
 
@@ -314,13 +315,103 @@ export default class StockStatusMatrix extends React.Component {
             // }
             // console.log("final consumption---", finalOfflineConsumption);
             this.setState({
-              offlineInventoryList: finalOfflineInventory
+              offlineInventoryList: finalOfflineInventory,
+              view: view
             });
+            console.log("view------------" + this.state.view);
+            console.log("finalOfflineInventory---", finalOfflineInventory);
+
+            console.log("offlineInventoryList final one is---", offlineInventoryList);
 
           }.bind(this)
 
         }.bind(this)
 
+      } else {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open('fasp', 1);
+        openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var programRequest = programTransaction.get(programId);
+
+
+          programRequest.onsuccess = function (event) {
+            var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson = JSON.parse(programData);
+            var offlineInventoryList = (programJson.inventoryList);
+            console.log("offlineInventoryList 1st---", offlineInventoryList);
+
+            const activeFilter = offlineInventoryList.filter(c => (c.active == true || c.active == "true"));
+            console.log("activeFilter---", activeFilter);
+
+            const planningUnitFilter = activeFilter.filter(c => c.planningUnit.id == planningUnitId);
+            console.log("planningUnitFilter---", planningUnitFilter);
+            const productCategoryFilter = planningUnitFilter.filter(c => (c.planningUnit.forecastingUnit != null && c.planningUnit.forecastingUnit != "") && (c.planningUnit.forecastingUnit.productCategory.id == productCategoryId));
+            console.log("productCategoryFilter---", productCategoryFilter)
+
+            // const dateFilter = planningUnitFilter.filter(c => moment(c.startDate).isAfter(startDate) && moment(c.stopDate).isBefore(endDate))
+            const filteredData = productCategoryFilter.filter(c => moment(c.inventoryDate).isBetween(startDate, endDate, null, '[)'))
+            console.log("filteredData---", filteredData);
+            let finalOfflineInventory = [];
+            let previousYear = 0;
+            let json;
+            for (let i = this.state.rangeValue.from.year; i <= this.state.rangeValue.to.year; i++) {
+              let q1 = 0;
+              let q2 = 0;
+              let q3 = 0;
+              let q4 = 0;
+              let monthArray = [];
+              for (let j = 0; j <= filteredData.length; j++) {
+                if (filteredData[j] != null && filteredData[j] != "" && (i == moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('YYYY'))) {
+                  // for (let k = 0; k <= filteredData.length; k++) {
+
+                  // }
+
+                  let month = moment(filteredData[j].inventoryDate, 'YYYY-MM-DD').format('MM');
+                  if ((month == "01" || month == "1" || month == 1) || (month == "02" || month == "2" || month == 2) || (month == "03" || month == "3" || month == 3)) {
+                    q1 = q1 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
+                  }
+                  if ((month == "04" || month == "4" || month == 4) || (month == "05" || month == "5" || month == 5) || (month == "06" || month == "6" || month == 6)) {
+                    q2 = q2 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
+                  }
+                  if ((month == "07" || month == "7" || month == 7) || (month == "08" || month == "8" || month == 8) || (month == "09" || month == "9" || month == 9)) {
+                    q3 = q3 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
+                  }
+                  if ((month == "10" || month == 10) || (month == "11" || month == 11) || (month == "12" || month == 12)) {
+                    q4 = q4 + (filteredData[j].actualQty ? filteredData[j].actualQty : 0);
+                  }
+                }
+              }
+              let sel = document.getElementById("planningUnitId");
+              var text = sel.options[sel.selectedIndex].text;
+              json = {
+                PLANNING_UNIT_LABEL_EN: text,
+                YEAR: i,
+                Q1: q1,
+                Q2: q2,
+                Q3: q3,
+                Q4: q4
+              }
+              console.log("json---", json);
+              finalOfflineInventory.push(json);
+            }
+            this.setState({
+              offlineInventoryList: finalOfflineInventory,
+              view: view
+            });
+            console.log("view------------" + this.state.view);
+            console.log("finalOfflineInventory---", finalOfflineInventory);
+
+            console.log("offlineInventoryList final one is---", offlineInventoryList);
+
+          }.bind(this)
+
+        }.bind(this)
       }
     }
   }
@@ -376,7 +467,7 @@ export default class StockStatusMatrix extends React.Component {
           var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
           var programJson = JSON.parse(programData);
           var offlineInventoryList = (programJson.inventoryList);
-          console.log("offlineInventoryList---", offlineInventoryList);
+          console.log("offlineInventoryList pc---", offlineInventoryList);
           let offlineProductCategoryList = [];
           var json;
 
@@ -644,7 +735,7 @@ export default class StockStatusMatrix extends React.Component {
         headers[j++] = ('Q4 ' + this.state.years[i]).replaceAll(' ', '%20')
       }
     } else {
-      columns.map((item, idx) => { headers[idx] = item.text });
+      columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
     }
     var A = [headers]
     var re;
@@ -666,6 +757,8 @@ export default class StockStatusMatrix extends React.Component {
       if (this.state.view == 1) {
         this.state.offlineInventoryList.map(ele => A.push([(ele.PLANNING_UNIT_LABEL_EN.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
           , ele.Dec]));
+      } else {
+        this.state.offlineInventoryList.map(ele => A.push([(ele.PLANNING_UNIT_LABEL_EN.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.YEAR, ele.Q1, ele.Q2, ele.Q3, ele.Q4]));
       }
     }
     /*for(var item=0;item<re.length;item++){
@@ -701,7 +794,7 @@ export default class StockStatusMatrix extends React.Component {
         doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
-        doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+        doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
           align: 'center'
         })
 
@@ -763,7 +856,7 @@ export default class StockStatusMatrix extends React.Component {
     // const title = i18n.t('static.dashboard.stockstatusmatrix');
     let header = []
 
-    if (navigator.onLine && this.state.view == 2) {
+    if (this.state.view == 2) {
       let header1 = [{ content: i18n.t('static.planningunit.planningunit'), rowSpan: 2, styles: { halign: 'center' } }, ...this.state.years.map(ele => ({ content: ele, colSpan: 4, styles: { halign: 'center' } }))]
       let quarterheader = [];
       //headers[0]=i18n.t('static.planningunit.planningunit')
@@ -784,16 +877,23 @@ export default class StockStatusMatrix extends React.Component {
 
     console.log(header);
     let data;
-    if (navigator.onLine && this.state.view==2) {
-      data = this.state.data.map(ele => ele.map((item,index) => (index==0?{content:item,styles: { halign: 'left' }}:{content:this.formatter(item),styles: { halign: 'right' }})));
+    if (navigator.onLine && this.state.view == 2) {
+      data = this.state.data.map(ele => ele.map((item, index) => (index == 0 ? { content: item, styles: { halign: 'left' } } : { content: this.formatter(item), styles: { halign: 'right' } })));
     }
     else if (navigator.onLine) {
       data = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
         , ele.Dec]);
-        
-       } else {
-      data = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
-        .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
+
+    } else {
+      if (this.state.view == 1) {
+        data = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
+          , ele.Dec]);
+      } else {
+        // data = this.state.offlineInventoryList.map(ele => A.push([(ele.PLANNING_UNIT_LABEL_EN.replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.YEAR, ele.Q1.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Q2.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Q3.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Q4.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]));
+        // data = this.state.offlineInventoryList.map(ele => ele.map((item, index) => (index == 0 ? { content: item, styles: { halign: 'left' } } : { content: this.formatter(item), styles: { halign: 'right' } })));
+        // data = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Q1, ele.Q2, ele.Q3, ele.Q4]);
+        data = this.state.offlineInventoryList.map(ele => ele.map((item, index) => (index == 0 ? { content: item, styles: { halign: 'left' } } : { content: this.formatter(item), styles: { halign: 'right' } })));
+      }
     }
 
     // console.log(data1);
@@ -802,7 +902,7 @@ export default class StockStatusMatrix extends React.Component {
       startY: 180,
       head: header,
       body: data,
-      styles:{lineWidth:  1,fontSize : 8},
+      styles: { lineWidth: 1, fontSize: 8 },
       columnStyles: {
         0: { cellWidth: 120 },
         1: { cellWidth: 15 },
@@ -1188,25 +1288,77 @@ export default class StockStatusMatrix extends React.Component {
         text: i18n.t('static.common.quarter1'),
         sort: true,
         align: 'right',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Q1
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Q2',
         text: i18n.t('static.common.quarter2'),
         sort: true,
         align: 'right',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Q2
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Q3',
         text: i18n.t('static.common.quarter3'),
         sort: true,
         align: 'right',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Q3
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }, {
         dataField: 'Q4',
         text: i18n.t('static.common.quarter4'),
         sort: true,
         align: 'right',
-        headerAlign: 'center'
+        headerAlign: 'center',
+        formatter: (cell, row) => {
+
+          var cell1 = row.Q4
+          cell1 += '';
+          var x = cell1.split('.');
+          var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        }
       }]
 
     const options = {
@@ -1427,7 +1579,7 @@ export default class StockStatusMatrix extends React.Component {
                     </div>
                   </FormGroup>
                 </Offline>
-            
+
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                   <div className="controls">
@@ -1470,9 +1622,11 @@ export default class StockStatusMatrix extends React.Component {
               </div>
             </Col>
 
-            {this.state.view == 1 && (this.state.data.length > 0 || this.state.offlineInventoryList > 0) && <ToolkitProvider
+            {/* {this.state.view == 1 && (this.state.data.length > 0 || this.state.offlineInventoryList > 0) &&  */}
+            <ToolkitProvider
               keyField="procurementUnitId"
               data={navigator.onLine ? this.state.data : this.state.offlineInventoryList}
+              // data={this.state.offlineInventoryList}
               columns={this.state.view == 1 ? columns : columns1}
               search={{ searchFormatted: true }}
               hover
@@ -1495,9 +1649,10 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 )
               }
-            </ToolkitProvider>}
-            {this.state.view == 2 && this.state.data.length > 0 &&
-              <Table striped bordered hover responsive="md">
+            </ToolkitProvider>
+            {/* // } */}
+            {/* {this.state.view == 2 && this.state.offlineInventoryList.length > 0 && */}
+            {/* <Table striped bordered hover responsive="md">
                 <thead>
                   <tr>
                     <th rowSpan="2" style={{ "width": "20%", "text-align": "center" }}> {i18n.t('static.planningunit.planningunit')}</th>
@@ -1520,8 +1675,8 @@ export default class StockStatusMatrix extends React.Component {
                     })}
                   </tr>
                 </tbody>
-              </Table>
-            }
+              </Table> */}
+            {/* // } */}
 
           </CardBody>
         </Card>

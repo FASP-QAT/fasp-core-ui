@@ -140,12 +140,13 @@ class DefaultLayout extends Component {
                             url: '/role/listRole',
                             icon: 'fa fa-dot-circle-o'
                           },
-                          (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
+                          // (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL')?
                           {
                             name: i18n.t('static.dashboard.user'),
                             url: '/user/listUser',
-                            icon: 'fa fa-users'
-                          }:""),
+                            icon: 'fa fa-users',
+                            attributes: { hidden: (this.state.businessFunctions.includes('ROLE_BF_CREATE_USER') ? false : true) }
+                          },
                           {
                             name: i18n.t('static.dashboard.language'),
                             url: '/language/listLanguage',
