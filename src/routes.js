@@ -209,6 +209,8 @@ const routes = [
   { path: '/programTree', name: i18n.t('static.dashboard.program'), component: ProgramTree },
   { path: '/diamension/AddDiamension', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.dimension') }), component: AddDimension },
   { path: '/diamension/diamensionlist', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.dimension') }), component: DimensionList },
+  // { path: '/diamension/diamensionlist/:message', component: DimensionList },
+  { path: '/diamension/diamensionlist/:color/:message', component: DimensionList },
   { path: '/diamension/diamensionlist/:message', component: DimensionList },
   { path: '/diamension/editDiamension/:dimensionId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.dimension') }), component: EditDimension },
 
@@ -298,8 +300,7 @@ const routes = [
   { path: '/changePassword', exact: true, name: i18n.t('static.dashboard.changepassword'), component: ChangePassword },
   { path: '/logout', exact: true, component: Logout },
   { path: '/logout/:message', exact: true, component: Logout },
-
-  { path: '/role/listRole/:message', component: ListRole },
+  { path: '/role/listRole/:color/:message', component: ListRole },
   { path: '/role/listRole', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.role') }), component: ListRole },
   { path: '/role/addRole', exact: true, name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.role') }), component: AddRole },
   { path: '/role/editRole/:roleId', exact: true, name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.role') }), component: EditRole },
@@ -331,12 +332,14 @@ const routes = [
 
   { path: '/unit/addUnit', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.unit') }), component: AddUnit },
   { path: '/unit/listUnit', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.unit') }), component: ListUnit },
-  { path: '/unit/listUnit/:message', component: ListUnit },
+  // { path: '/unit/listUnit/:message', component: ListUnit },
+  { path: '/unit/listUnit/:color/:message', component: ListUnit },
   { path: '/unit/editUnit/:unitId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.unit') }), component: EditUnit },
 
   { path: '/country/addCountry', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.country') }), component: AddCountry },
   { path: '/country/listCountry', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.country') }), component: ListCountry },
-  { path: '/country/listCountry/:message', component: ListCountry },
+  // { path: '/country/listCountry/:message', component: ListCountry },
+  { path: '/country/listCountry/:color/:message', component: ListCountry },
   { path: '/country/editCountry/:countryId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.country') }), component: EditCountry },
 
   { path: '/dataSourceType/addDataSourceType', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.datasourcetype') }), component: AddDataSourceType },
@@ -351,7 +354,8 @@ const routes = [
 
   { path: '/currency/addCurrency', name: i18n.t('static.breadcrum.add', { entityname: i18n.t('static.dashboard.currency') }), component: AddCurrency },
   { path: '/currency/listCurrency', exact: true, name: i18n.t('static.breadcrum.list', { entityname: i18n.t('static.dashboard.currency') }), component: ListCurrency },
-  { path: '/currency/listCurrency/:message', component: ListCurrency },
+  { path: '/currency/listCurrency/:color/:message', component: ListCurrency },
+  // { path: '/currency/listCurrency/:message', component: ListCurrency },
   { path: '/currency/editCurrency/:currencyId', name: i18n.t('static.breadcrum.edit', { entityname: i18n.t('static.dashboard.currency') }), component: EditCurrency },
 
   { path: '/translations/databaseTranslations', name: i18n.t('static.label.databaseTranslations'), component: DatabaseTranslation },

@@ -280,7 +280,7 @@ export default class EditLanguageComponent extends Component {
     }
 
     resetClicked() {
-        console.log("iiii-------->>>>>", this.props.match.params.languageId)
+        // console.log("iiii-------->>>>>", this.props.match.params.languageId)
         LanguageService.getLanguageById(this.props.match.params.languageId).then(response => {
             this.setState({
                 language: response.data
