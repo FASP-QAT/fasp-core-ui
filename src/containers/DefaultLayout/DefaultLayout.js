@@ -422,6 +422,11 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: 'QatProblemPlusActionReport',
+                            url: '/report/qatProblemPlusActionReport',
+                            icon: 'fa fa-exchange'
                           }
                         ]
                       }

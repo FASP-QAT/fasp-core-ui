@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import ProcurementAgentService from "../../api/ProcurementAgentService";
 import {
     Card, CardBody, CardHeader,
-    Label, Input, FormGroup,
+    Label, Input, FormGroup, InputGroup,
     CardFooter, Button, Table, Badge, Col, Row, Form, FormFeedback
 
 } from 'reactstrap';
@@ -632,7 +632,6 @@ export default class AddProcurementAgentPlanningUnit extends Component {
                                                             {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
                                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                             &nbsp;
-
                         </FormGroup></Row>
                                                 </Form>
                                             )} />

@@ -260,29 +260,46 @@ class ListBudgetComponent extends Component {
         headerAlign: 'center',
         formatter: this.addCommas
       },
-      {
+      // {
 
-        dataField: 'usedAmt',
+      //   dataField: 'usedAmt',
+      //   text: i18n.t('static.budget.availableAmt'),
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: (cell, row) => {
+
+
+      //     var cell1 = row.budgetAmt - row.usedAmt
+      //     var currencyCode = row.currency.currencyCode;
+      //     cell1 += '';
+      //     var x = cell1.split('.');
+      //     var x1 = x[0];
+      //     var x2 = x.length > 1 ? '.' + x[1] : '';
+      //     var rgx = /(\d+)(\d{3})/;
+      //     while (rgx.test(x1)) {
+      //       x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      //     }
+      //     return currencyCode + " " + x1 + x2;
+      //   }
+      // }
+      {
+        dataField: 'budgetUsdAmt',
+        text: i18n.t('static.budget.budgetamountUSD'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.addCommas
+      },
+      {
+        dataField: 'usedUsdAmt',
         text: i18n.t('static.budget.availableAmt'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
+        formatter: this.addCommas
+      },
 
-
-          var cell1 = row.budgetAmt - row.usedAmt
-          var currencyCode = row.currency.currencyCode;
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return currencyCode + " " + x1 + x2;
-        }
-      }
       ,
       {
         dataField: 'startDate',

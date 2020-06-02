@@ -679,5 +679,6 @@
     "static.program.arrivedToDeliveredLeadTime": "Please enter arrived to delivered lead time",
     "static.common.youdatastart": "Your data has started from here",
     "static.procurementAgent.localProcurementAgent": "Is local procurement agent?",
-    "static.user.accessControlText": "Access Control"
+    "static.user.accessControlText": "Access Control",
+    "static.budget.budgetamountUSD": "Budget Amount USD"
 }
