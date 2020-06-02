@@ -425,7 +425,7 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-exchange'
                           },
                           {
-                            name: 'QatProblemPlusActionReport',
+                            name: 'QAT PROBLEM+ACTION REPORT',
                             url: '/report/qatProblemPlusActionReport',
                             icon: 'fa fa-exchange'
                           },

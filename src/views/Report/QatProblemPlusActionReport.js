@@ -48,7 +48,7 @@ export default class ConsumptionDetails extends React.Component {
     }
 
     componentDidMount = function () {
-        document.getElementById("shipmentFilters").style.display = "none";
+
         const lan = 'en';
         var db1;
         getDatabase();
@@ -82,6 +82,103 @@ export default class ConsumptionDetails extends React.Component {
                 this.setState({
                     programList: proList
                 })
+
+
+                data = [];
+                data[0] = 'abc';
+                data[1] = 'a';
+                data[2] = '';
+                data[3] = '30-03-2020';
+                data[4] = '60';
+                data[5] = 'High';
+                data[6] = 'Button. Which will be clickable and redirect on respective page';
+                data[7] = 'Text Area';
+                data[8] = 1;
+
+                var dataArray = [];
+                dataArray[0] = data
+
+                this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                this.el.destroy();
+                var json = [];
+                var data = dataArray;
+                var options = {
+                    data: data,
+                    columnDrag: true,
+                    colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
+                    columns: [
+                        {
+                            title: 'Problem Type',
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: 'Program',
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: 'Planning Unit',
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: 'Problem Raised On',
+                            type: 'text',
+                            options: {
+                                format: 'YYYY-DD-MM'
+                            },
+                            readOnly: true
+                        },
+                        {
+                            title: 'Number of days the action has been outstanding​',
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: 'Priority',
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: 'Action',
+                            type: 'text',
+                            readOnly: true
+                        },
+                        {
+                            title: 'Country Updates',
+                            type: 'text',
+                        },
+                        {
+                            title: 'Post HQ Review Status',
+                            type: 'dropdown',
+                            source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
+                        },
+                    ],
+                    pagination: 10,
+                    search: true,
+                    columnSorting: true,
+                    tableOverflow: true,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    onchange: this.changed,
+                    oneditionend: this.onedit,
+                    copyCompatibility: true,
+                    paginationOptions: [10, 25, 50, 100],
+                    position: 'top'
+                };
+                this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+
+
+
+
+
+
+
+
+
             }.bind(this);
         }.bind(this)
 
@@ -122,93 +219,92 @@ export default class ConsumptionDetails extends React.Component {
                     var sel = document.getElementById("planningUnitId");
                     var planningUnitText = sel.options[sel.selectedIndex].text;
 
-                    data = [];
-                    data[0] = 'abc';
-                    data[1] = 'a';
-                    data[2] = planningUnitText;
-                    data[3] = '30-03-2020';
-                    data[4] = '60';
-                    data[5] = 'High';
-                    data[6] = 'Button. Which will be clickable and redirect on respective page';
-                    data[7] = 'Text Area';
-                    data[8] = 1;
+                    // data = [];
+                    // data[0] = 'abc';
+                    // data[1] = 'a';
+                    // data[2] = planningUnitText;
+                    // data[3] = '30-03-2020';
+                    // data[4] = '60';
+                    // data[5] = 'High';
+                    // data[6] = 'Button. Which will be clickable and redirect on respective page';
+                    // data[7] = 'Text Area';
+                    // data[8] = 1;
 
-                    var dataArray = [];
-                    dataArray[0] = data
+                    // var dataArray = [];
+                    // dataArray[0] = data
 
-                    this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
-                    this.el.destroy();
-                    var json = [];
-                    var data = dataArray;
-                    var options = {
-                        data: data,
-                        columnDrag: true,
-                        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
-                        columns: [
-                            {
-                                title: 'Problem Type',
-                                type: 'text',
-                                readOnly: true
-                            },
-                            {
-                                title: 'Program',
-                                type: 'text',
-                                readOnly: true
-                            },
-                            {
-                                title: 'Planning Unit',
-                                type: 'text',
-                                readOnly: true
-                            },
-                            {
-                                title: 'Problem Raised On',
-                                type: 'text',
-                                options: {
-                                    format: 'YYYY-DD-MM'
-                                },
-                                readOnly: true
-                            },
-                            {
-                                title: 'Number of days the action has been outstanding​',
-                                type: 'text',
-                                readOnly: true
-                            },
-                            {
-                                title: 'Priority',
-                                type: 'text',
-                                readOnly: true
-                            },
-                            {
-                                title: 'Action',
-                                type: 'text',
-                                readOnly: true
-                            },
-                            {
-                                title: 'Country Updates',
-                                type: 'text',
-                            },
-                            {
-                                title: 'Post HQ Review Status',
-                                type: 'dropdown',
-                                source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
-                            },
-                        ],
-                        pagination: 10,
-                        search: true,
-                        columnSorting: true,
-                        tableOverflow: true,
-                        wordWrap: true,
-                        allowInsertColumn: false,
-                        allowManualInsertColumn: false,
-                        allowDeleteRow: false,
-                        onchange: this.changed,
-                        oneditionend: this.onedit,
-                        copyCompatibility: true,
-                        paginationOptions: [10, 25, 50, 100],
-                        position: 'top'
-                    };
-                    document.getElementById("shipmentFilters").style.display = "block";
-                    this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
+                    // this.el = jexcel(document.getElementById("shipmenttableDiv"), '');
+                    // this.el.destroy();
+                    // var json = [];
+                    // var data = dataArray;
+                    // var options = {
+                    //     data: data,
+                    //     columnDrag: true,
+                    //     colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100],
+                    //     columns: [
+                    //         {
+                    //             title: 'Problem Type',
+                    //             type: 'text',
+                    //             readOnly: true
+                    //         },
+                    //         {
+                    //             title: 'Program',
+                    //             type: 'text',
+                    //             readOnly: true
+                    //         },
+                    //         {
+                    //             title: 'Planning Unit',
+                    //             type: 'text',
+                    //             readOnly: true
+                    //         },
+                    //         {
+                    //             title: 'Problem Raised On',
+                    //             type: 'text',
+                    //             options: {
+                    //                 format: 'YYYY-DD-MM'
+                    //             },
+                    //             readOnly: true
+                    //         },
+                    //         {
+                    //             title: 'Number of days the action has been outstanding​',
+                    //             type: 'text',
+                    //             readOnly: true
+                    //         },
+                    //         {
+                    //             title: 'Priority',
+                    //             type: 'text',
+                    //             readOnly: true
+                    //         },
+                    //         {
+                    //             title: 'Action',
+                    //             type: 'text',
+                    //             readOnly: true
+                    //         },
+                    //         {
+                    //             title: 'Country Updates',
+                    //             type: 'text',
+                    //         },
+                    //         {
+                    //             title: 'Post HQ Review Status',
+                    //             type: 'dropdown',
+                    //             source: [{ id: 1, name: 'Open' }, { id: 2, name: 'Closed' }]
+                    //         },
+                    //     ],
+                    //     pagination: 10,
+                    //     search: true,
+                    //     columnSorting: true,
+                    //     tableOverflow: true,
+                    //     wordWrap: true,
+                    //     allowInsertColumn: false,
+                    //     allowManualInsertColumn: false,
+                    //     allowDeleteRow: false,
+                    //     onchange: this.changed,
+                    //     oneditionend: this.onedit,
+                    //     copyCompatibility: true,
+                    //     paginationOptions: [10, 25, 50, 100],
+                    //     position: 'top'
+                    // };
+                    // this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
 
 
 
@@ -347,49 +443,6 @@ export default class ConsumptionDetails extends React.Component {
                                             </Form>
                                         )} />
 
-                            <br></br>
-                            <br></br>
-                            <Col md="9 pl-0" id="shipmentFilters" style={{ display: 'none' }}>
-                                <div className="d-md-flex" >
-                                    <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                        <div className="controls SelectGo">
-                                            <InputGroup>
-                                                <Input
-                                                    type="select"
-                                                    name="planningUnitId"
-                                                    id="planningUnitId"
-                                                    bsSize="sm"
-                                                    value={this.state.planningUnitId}
-                                                // onChange={this.filterData}
-                                                >
-                                                    <option value="0">Please Select</option>
-                                                    {planningUnits}
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-                                    <FormGroup className="tab-ml-1">
-                                        <Label htmlFor="appendedInputButton">Priority</Label>
-                                        <div className="controls SelectGo">
-                                            <InputGroup>
-                                                <Input type="select"
-                                                    bsSize="sm"
-                                                    value={this.state.priorityId}
-                                                    name="priorityId" id="priorityId"
-                                                // onChange={this.filterData}
-                                                >
-                                                    <option value="0">Please select</option>
-                                                    <option value="1">High</option>
-                                                    <option value="2">Midium</option>
-                                                    <option value="3">Low</option>
-                                                </Input>
-                                            </InputGroup>
-                                        </div>
-                                    </FormGroup>
-
-                                </div>
-                            </Col>
                             <Col xs="12" sm="12">
                                 <div className="table-responsive">
                                     <div id="shipmenttableDiv">
