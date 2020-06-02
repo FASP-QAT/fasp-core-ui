@@ -285,7 +285,7 @@ class Consumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("report.pdf")
+    doc.save("Consumption.pdf")
     //creates PDF from img
     /* var doc = new jsPDF('landscape');
     doc.setFontSize(20);

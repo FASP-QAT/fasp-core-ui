@@ -634,7 +634,7 @@
     "static.report.exportPdf": "Export PDF",
     "static.report.exportCsv": "Export CSV",
     "static.report.consumptionReport": "Consumption Report",
-    "static.report.dateRange": "Select Period",
+    "static.report.dateRange": "Report Period",
     "static.report.consumption_": "Consumption_",
     "static.report.consumptionTo": "_to_",
     "static.common.loading": "Loading...",
@@ -677,7 +677,11 @@
     "static.program.shippedToArrivedByAirLeadTime": "Please enter shipped to arrived by air lead time",
     "static.program.shippedToArrivedBySeaLeadTime": "Please enter shipped to arrived by sea lead time",
     "static.program.arrivedToDeliveredLeadTime": "Please enter arrived to delivered lead time",
-    "static.common.youdatastart":"Your data has started from here"
+    "static.common.youdatastart":"Your data has started from here",
+    "static.report.annualshipmentcost":"Annual Shipment Cost",
+    "static.common.reportbase":"Report based on",
+    "static.common.shippingdate":"Shipping Date",
+    "static.common.receivedate":"Receiving Date"
     
 }
 
