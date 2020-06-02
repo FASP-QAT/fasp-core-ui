@@ -64,12 +64,14 @@ class ProcurementAgentExport extends Component {
         csvRow.push('')
         var re;
 
-        var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty')).replaceAll(' ', '%20')]]
+        var A = [[("Program Name").replaceAll(' ', '%20'), ("Freight Cost Sea (%)").replaceAll(' ', '%20'), ("Freight Cost Air (%)").replaceAll(' ', '%20'), ("Plan to Draft LT (Months)").replaceAll(' ', '%20'), ("Draft to Submitted LT (Months)").replaceAll(' ', '%20'), ("Submitted to Approved LT (Months)").replaceAll(' ', '%20'), ("Approved to Shipped LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Sea LT (Months)").replaceAll(' ', '%20'), ("Shipped to Arrived by Air LT (Months)").replaceAll(' ', '%20'), ("Arrived to Delivered LT (Months)").replaceAll(' ', '%20'), ("Total LT By Sea (Months)").replaceAll(' ', '%20'), ("Total LT By Air (Months)").replaceAll(' ', '%20')]]
 
         re = this.state.procurementAgents
 
         for (var item = 0; item < re.length; item++) {
-            A.push([[getLabelText(re[item].realmCountry.label), re[item].consumptionDateString, re[item].planningUnitQty]])
+            let totalSeaLeadTime = re[item].plannedToDraftLeadTime + re[item].draftToSubmittedLeadTime + re[item].submittedToApprovedLeadTime + re[item].approvedToShippedLeadTime + re[item].shippedToArrivedBySeaLeadTime + re[item].arrivedToDeliveredLeadTime;
+            let totalAirLeadTime = re[item].plannedToDraftLeadTime + re[item].draftToSubmittedLeadTime + re[item].submittedToApprovedLeadTime + re[item].approvedToShippedLeadTime + re[item].shippedToArrivedByAirLeadTime + re[item].arrivedToDeliveredLeadTime;
+            A.push([[getLabelText(re[item].label), re[item].seaFreightPerc, re[item].airFreightPerc, re[item].plannedToDraftLeadTime, re[item].draftToSubmittedLeadTime, re[item].submittedToApprovedLeadTime, re[item].approvedToShippedLeadTime, re[item].shippedToArrivedBySeaLeadTime, re[item].shippedToArrivedByAirLeadTime, re[item].arrivedToDeliveredLeadTime, totalSeaLeadTime, totalAirLeadTime]])
         }
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
@@ -78,7 +80,7 @@ class ProcurementAgentExport extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.report.consumption_') + this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to) + ".csv"
+        a.download = "Procurement Agent Report.csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -96,7 +98,7 @@ class ProcurementAgentExport extends Component {
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
-                doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                doc.text('Copyright © 2020 Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
                     align: 'center'
                 })
 
@@ -112,7 +114,7 @@ class ProcurementAgentExport extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.report.consumptionReport'), doc.internal.pageSize.width / 2, 60, {
+                doc.text("Procurement Agent Report", doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -133,24 +135,24 @@ class ProcurementAgentExport extends Component {
 
         doc.setFontSize(15);
 
-        const title = "Funder Export";
-        var canvas = document.getElementById("cool-canvas");
+        const title = "Procurement Agent Report";
+        // var canvas = document.getElementById("cool-canvas");
         //creates image
 
-        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        // var canvasImg = canvas.toDataURL("image/png", 1.0);
         var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        var aspectwidth1 = (width - h1);
+        // var aspectwidth1 = (width - h1);
 
-        doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
+        // doc.addImage(canvasImg, 'png', 50, 200, 750, 290, 'CANVAS');
 
-        const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
-        const data = this.state.procurementAgents.map(elt => [getLabelText(elt.realmCountry.label), elt.consumptionDateString, elt.planningUnitQty]);
+        const headers = [["Program Name", "Freight Cost Sea (%)", "Freight Cost Air (%)", "Plan to Draft LT (Months)", "Draft to Submitted LT (Months)", "Submitted to Approved LT (Months)", "Approved to Shipped LT (Months)", "Shipped to Arrived by Sea LT (Months)", "Shipped to Arrived by Air LT (Months)", "Arrived to Delivered LT (Months)", "Total LT By Sea (Months)", "Total LT By Air (Months)"]]
+        const data = this.state.procurementAgents.map(elt => [getLabelText(elt.label), elt.seaFreightPerc, elt.airFreightPerc, elt.plannedToDraftLeadTime, elt.draftToSubmittedLeadTime, elt.submittedToApprovedLeadTime, elt.approvedToShippedLeadTime, elt.shippedToArrivedBySeaLeadTime, elt.shippedToArrivedByAirLeadTime, elt.arrivedToDeliveredLeadTime, (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedBySeaLeadTime + elt.arrivedToDeliveredLeadTime), (elt.plannedToDraftLeadTime + elt.draftToSubmittedLeadTime + elt.submittedToApprovedLeadTime + elt.approvedToShippedLeadTime + elt.shippedToArrivedByAirLeadTime + elt.arrivedToDeliveredLeadTime)]);
 
         let content = {
             margin: { top: 80 },
-            startY: height,
+            startY: 150,
             head: headers,
             body: data,
 
@@ -158,7 +160,7 @@ class ProcurementAgentExport extends Component {
         doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save("Funder Export.pdf")
+        doc.save("Procurement Agent Report.pdf")
     }
     handleChangeProgram(programIds) {
 
@@ -174,47 +176,40 @@ class ProcurementAgentExport extends Component {
     filterData(rangeValue) {
         setTimeout('', 10000);
         let programIds = this.state.programValues;
-        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         if (programIds.length > 0) {
-
-            var inputjson = {
-                "programIds": programIds
-            }
-            console.log('***' + inputjson)
             AuthenticationService.setupAxiosInterceptors();
 
-            // ReportService.getGlobalConsumptiondata(inputjson)
-            //     .then(response => {
-            //         console.log(JSON.stringify(response.data));
-            //         this.setState({
-            //             procurementAgents: response.data,
-            //             message: ''
-            //         })
-            //     }).catch(
-            //         error => {
-            //             this.setState({
-            //                 procurementAgents: []
-            //             })
+            ReportService.getProcurementAgentExportData(programIds)
+                .then(response => {
+                    console.log(JSON.stringify(response.data));
+                    this.setState({
+                        procurementAgents: response.data,
+                        message: ''
+                    })
+                }).catch(
+                    error => {
+                        this.setState({
+                            procurementAgents: []
+                        })
 
-            //             if (error.message === "Network Error") {
-            //                 this.setState({ message: error.message });
-            //             } else {
-            //                 switch (error.response ? error.response.status : "") {
-            //                     case 500:
-            //                     case 401:
-            //                     case 404:
-            //                     case 406:
-            //                     case 412:
-            //                         this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-            //                         break;
-            //                     default:
-            //                         this.setState({ message: 'static.unkownError' });
-            //                         break;
-            //                 }
-            //             }
-            //         }
-            //     );
+                        if (error.message === "Network Error") {
+                            this.setState({ message: error.message });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 500:
+                                case 401:
+                                case 404:
+                                case 406:
+                                case 412:
+                                    this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                                    break;
+                                default:
+                                    this.setState({ message: 'static.unkownError' });
+                                    break;
+                            }
+                        }
+                    }
+                );
         } else if (programIds.length == 0) {
             this.setState({ message: i18n.t('static.common.selectProgram'), procurementAgents: [] });
 
@@ -339,37 +334,47 @@ class ProcurementAgentExport extends Component {
 
                                             <thead>
                                                 <tr>
-                                                    <th className="text-center"> Program Code </th>
                                                     <th className="text-center "> Program Name </th>
-                                                    <th className="text-center"> Procurement Agent </th>
-                                                    <th className="text-center"> Procurement Agent Code</th>
-                                                    <th className="text-center"> Is Procurement Agent Program Specific?</th>
-                                                    <th className="text-center"> Freight Cost</th>
-                                                    <th className="text-center"> Plan to Order LT(Months)</th>
-                                                    <th className="text-center"> Order to Ship LT(Months)</th>
-                                                    <th className="text-center"> Ship to Receive LT(Months)</th>
+                                                    <th className="text-center"> Freight Cost Sea (%)</th>
+                                                    <th className="text-center"> Freight Cost Air (%)</th>
+                                                    <th className="text-center"> Plan to Draft LT (Months)</th>
+                                                    <th className="text-center"> Draft to Submitted LT (Months)</th>
+                                                    <th className="text-center"> Submitted to Approved LT (Months)</th>
+                                                    <th className="text-center"> Approved to Shipped LT (Months)</th>
+                                                    <th className="text-center"> Shipped to Arrived by Sea LT (Months)</th>
+                                                    <th className="text-center"> Shipped to Arrived by Air LT (Months)</th>
+                                                    <th className="text-center"> Arrived to Delivered LT (Months)</th>
+                                                    <th className="text-center"> Total LT By Sea (Months)</th>
+                                                    <th className="text-center"> Total LT By Air (Months)</th>
                                                 </tr>
                                             </thead>
 
                                             <tbody>
-                                                {/* {
+                                                {
                                                     this.state.procurementAgents.length > 0
                                                     &&
                                                     this.state.procurementAgents.map((item, idx) =>
 
                                                         <tr id="addr0" key={idx} >
 
-                                                            <td>{getLabelText(this.state.procurementAgents[idx].realmCountry.label, this.state.lang)}</td>
-                                                            <td>
+                                                            <td>{getLabelText(this.state.procurementAgents[idx].label, this.state.lang)}</td>
 
-                                                                {this.state.procurementAgents[idx].consumptionDateString}
-                                                            </td>
-                                                            <td >
-                                                                {this.state.procurementAgents[idx].planningUnitQty}
-                                                            </td>
+                                                            <td>{this.state.procurementAgents[idx].seaFreightPerc}</td>
+                                                            <td>{this.state.procurementAgents[idx].airFreightPerc}</td>
+
+                                                            <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime}</td>
+                                                            <td>{this.state.procurementAgents[idx].draftToSubmittedLeadTime}</td>
+                                                            <td>{this.state.procurementAgents[idx].submittedToApprovedLeadTime}</td>
+                                                            <td>{this.state.procurementAgents[idx].approvedToShippedLeadTime}</td>
+                                                            <td>{this.state.procurementAgents[idx].shippedToArrivedBySeaLeadTime}</td>
+                                                            <td>{this.state.procurementAgents[idx].shippedToArrivedByAirLeadTime}</td>
+                                                            <td>{this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
+
+                                                            <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime + this.state.procurementAgents[idx].draftToSubmittedLeadTime + this.state.procurementAgents[idx].submittedToApprovedLeadTime + this.state.procurementAgents[idx].approvedToShippedLeadTime + this.state.procurementAgents[idx].shippedToArrivedBySeaLeadTime + this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
+                                                            <td>{this.state.procurementAgents[idx].plannedToDraftLeadTime + this.state.procurementAgents[idx].draftToSubmittedLeadTime + this.state.procurementAgents[idx].submittedToApprovedLeadTime + this.state.procurementAgents[idx].approvedToShippedLeadTime + this.state.procurementAgents[idx].shippedToArrivedByAirLeadTime + this.state.procurementAgents[idx].arrivedToDeliveredLeadTime}</td>
                                                         </tr>)
 
-                                                } */}
+                                                }
                                             </tbody>
                                         </Table>
                                         {/* } */}
