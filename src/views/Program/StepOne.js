@@ -145,7 +145,7 @@ export default class StepOne extends Component {
                                             valid={!errors.realmId && this.props.items.program.realm.realmId != ''}
                                             invalid={touched.realmId && !!errors.realmId}
                                             bsSize="sm"
-                                            className="col-md-6"
+                                            className="col-md-4"
                                             onBlur={handleBlur}
                                             type="select" name="realmId" id="realmId"
                                             // value={this.props.program.realm.realmId}

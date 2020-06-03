@@ -256,7 +256,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.program'),
                             url: '/program/listProgram',
-                            icon: 'icon-graph',
+                            icon: 'fa fa-file-text-o',
                             //     children: [
                             //       // {
                             //       //   name: i18n.t('static.dashboard.addprogram'),
@@ -272,7 +272,7 @@ class DefaultLayout extends Component {
                           }, {
                             name: i18n.t('static.dashboard.tracercategory'),
                             url: '/tracerCategory/listTracerCategory',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-th-large'
                           },
                           // {
 
@@ -283,20 +283,20 @@ class DefaultLayout extends Component {
                           {
                             name: 'Product Category',
                             url: '/productCategory/productCategoryTree',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-cubes'
                           },
                           {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-line-chart'
                           }, {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-list-alt'
                           }, {
                             name: i18n.t('static.dashboad.planningunitcapacity'),
                             url: '/planningUnitCapacity/listPlanningUnitcapacity',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-tasks'
                           },
                           {
                             name: i18n.t('static.procurementUnit.procurementUnit'),
@@ -324,7 +324,7 @@ class DefaultLayout extends Component {
                           {
                             name: 'Commit Version',
                             url: '/program/syncPage',
-                            icon: 'fa fa-download',
+                            icon: 'fa fa-code-fork',
                           },
                           {
                             name: i18n.t('static.dashboard.program'),
@@ -357,12 +357,12 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.consumptiondetails'),
                             url: '/consumptionDetails',
-                            icon: 'fa fa-list',
+                            icon: 'fa fa-bar-chart',
                           },
                           {
                             name: 'Inventory Details',
                             url: '/inventory/addInventory',
-                            icon: 'fa fa-list',
+                            icon: 'fa fa-cube',
                           },
                           // {
                           //   name: 'Shipment Details',
@@ -372,7 +372,7 @@ class DefaultLayout extends Component {
                           {
                             name: 'Shipment Details',
                             url: '/shipment/shipmentList',
-                            icon: 'fa fa-list',
+                            icon: 'fa fa-truck',
                           }
                         ]
                       },
@@ -384,50 +384,71 @@ class DefaultLayout extends Component {
                           {
                             name: "Supply Plan",
                             url: '/supplyPlan',
-                            icon: 'fa fa-list-alt'
+                            icon: 'fa fa-calculator'
                           },
                           {
                             name: i18n.t('static.dashboard.productcatalog'),
                             url: '/report/productCatalog',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-th'
                           },
                           {
                             name: i18n.t('static.dashboard.consumption'),
                             url: '/report/consumption',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-bar-chart'
                           }, {
                             name: i18n.t('static.dashboard.globalconsumption'),
                             url: '/report/globalConsumption',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-globe'
                           }, {
                             name: i18n.t('static.report.forecasterrorovertime'),
                             url: '/report/forecastOverTheTime',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-line-chart'
                           }, {
                             name: i18n.t('static.dashboard.forecastmetrics'),
                             url: '/report/forecastMetrics',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-bar-chart'
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatusovertime'),
                             url: '/report/stockStatusOverTime',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-line-chart'
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatusmatrix'),
                             url: '/report/stockStatusMatrix',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-line-chart'
                           },
                           {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
-                            icon: 'fa fa-exchange'
+                            icon: 'fa fa-line-chart'
+                          },
+                          {
+                            name: 'QAT PROBLEM+ACTION REPORT',
+                            url: '/report/qatProblemPlusActionReport',
+                            icon: 'fa fa-file-text-o'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.funderExport'),
+                            url: '/report/funderExport',
+                            icon: 'fa fa-list-alt'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            url: '/report/procurementAgentExport',
+                            icon: 'fa fa-wpforms'
+                          }
+                          ,
+                          {
+                            name: i18n.t('static.report.annualshipmentcost'),
+                            url: '/report/annualShipmentCost',
+                            icon: 'fa fa-file-text'
                           }
                         ]
                       }
                       // {
                       //   name: "Supply plan",
-                      //   icon: 'fa fa-list',
+                      //   icon: 'fa fa-list',  
                       //   children: [
                       //     {
                       //       name: "Supply Plan",
@@ -441,13 +462,13 @@ class DefaultLayout extends Component {
                       {
                         name: 'Setup Program',
                         url: '/program/programOnboarding',
-                        icon: 'icon-graph'
+                        icon: 'fa fa-list-ol'
                       },
                       this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: 'Pipeline Program Import',
                         url: '/pipeline/pipelineProgramImport',
-                        icon: 'icon-graph'
+                        icon: 'fa fa-list-alt'
                       }
 
                     ]

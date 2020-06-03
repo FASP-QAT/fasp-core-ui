@@ -386,7 +386,7 @@ class StockStatusOverTime extends Component {
         doc.autoTable(content);*/
         addHeaders(doc)
         addFooters(doc)
-        doc.save("report.pdf")
+        doc.save("StockStatusOverTime.pdf")
         //creates PDF from img
         /* var doc = new jsPDF('landscape');
         doc.setFontSize(20);

@@ -140,7 +140,7 @@ export default class StepFour extends Component {
                                             type="select"
                                             name="organisationId"
                                             id="organisationId"
-                                            className="col-md-6"
+                                            className="col-md-4"
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
