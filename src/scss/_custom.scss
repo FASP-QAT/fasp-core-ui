@@ -1815,7 +1815,7 @@ input::placeholder {
 
 .background-red {
   // background-color: red;
-  background-color: #fac8c8;
+  background-color: #fac8c8!important;
 }
 
 .supplyplan-larrow {
@@ -2168,4 +2168,7 @@ text-overflow: ellipsis;
 
 .ml-field{
   margin-left: -15px;
+}
+.mt-reporttable{
+  margin-top: -4%;
 }
