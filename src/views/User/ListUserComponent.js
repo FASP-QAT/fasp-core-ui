@@ -336,7 +336,7 @@ class ListUserComponent extends Component {
                                                 }
                                             }}
                                             {...props.baseProps}
-                                        />om
+                                        />
                                     </div>
                                 )
                             }

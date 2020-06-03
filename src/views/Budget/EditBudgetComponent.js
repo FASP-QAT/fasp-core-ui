@@ -115,10 +115,15 @@ class EditBudgetComponent extends Component {
         // console.log(this.state);
         this.dataChangeDate = this.dataChangeDate.bind(this);
         this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
-
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChangeDate(date) {
@@ -138,16 +143,28 @@ class EditBudgetComponent extends Component {
         AuthenticationService.setupAxiosInterceptors();
         BudgetService.getBudgetDataById(this.props.match.params.budgetId)
             .then(response => {
+                if (response.status == 200) {
+                    console.log("(response.data.startDate)--", new Date(response.data.startDate));
+                    response.data.startDate = new Date(response.data.startDate);
+                    response.data.stopDate = new Date(response.data.stopDate);
+                    this.setState({
+                        budget: response.data
+                    });
+                }
+                else {
+
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
                 // response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
                 // response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
                 // new Date('2019-06-11')
 
-                console.log("(response.data.startDate)--", new Date(response.data.startDate));
-                response.data.startDate = new Date(response.data.startDate);
-                response.data.stopDate = new Date(response.data.stopDate);
-                this.setState({
-                    budget: response.data
-                });
+
 
 
             })
@@ -220,7 +237,7 @@ class EditBudgetComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -242,11 +259,14 @@ class EditBudgetComponent extends Component {
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                this.props.history.push(`/budget/listBudget/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/budget/listBudget/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                 }}
@@ -527,7 +547,7 @@ class EditBudgetComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/budget/listBudget/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
