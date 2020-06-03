@@ -198,6 +198,12 @@ const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusO
 const SupplyPlanFormulas = React.lazy(() => import('./views/SupplyPlan/SupplyPlanFormulas'));
 const ForecastMetrics = React.lazy(() => import('./views/Report/ForecastMetrics'));
 
+const QatProblemPlusActionReport = React.lazy(() => import('./views/Report/QatProblemPlusActionReport'));
+const FunderExport = React.lazy(() => import('./views/Report/FunderExport'));
+const ProcurementAgentExport = React.lazy(() => import('./views/Report/ProcurementAgentExport'));
+const AnnualShipmentCost = React.lazy(() => import('./views/Report/AnnualShipmentCost'));
+
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/pipeline/pieplineProgramSetup', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
@@ -396,6 +402,13 @@ const routes = [
   { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
 
+  { path: '/report/qatProblemPlusActionReport', name: i18n.t('static.dashboard.report') + " / " + 'QatProblemPlusActionReport', component: QatProblemPlusActionReport },
+
+  { path: '/report/funderExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.funderExport'), component: FunderExport },
+  { path: '/report/procurementAgentExport', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.procurementAgentExport'), component: ProcurementAgentExport },
+
+  { path: '/report/annualShipmentCost', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.annualshipmentcost'), component: AnnualShipmentCost },
+ 
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

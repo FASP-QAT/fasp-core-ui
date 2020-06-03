@@ -140,11 +140,12 @@ class DefaultLayout extends Component {
                             url: '/role/listRole',
                             icon: 'fa fa-dot-circle-o'
                           },
-                          {
-                            name: i18n.t('static.dashboard.user'),
-                            url: '/user/listUser',
-                            icon: 'fa fa-users'
-                          },
+                          (this.state.businessFunctions.includes('ROLE_BF_CREATE_USERL') ?
+                            {
+                              name: i18n.t('static.dashboard.user'),
+                              url: '/user/listUser',
+                              icon: 'fa fa-users'
+                            } : ""),
                           {
                             name: i18n.t('static.dashboard.language'),
                             url: '/language/listLanguage',
@@ -422,12 +423,33 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-line-chart'
+                          },
+                          {
+                            name: 'QAT PROBLEM+ACTION REPORT',
+                            url: '/report/qatProblemPlusActionReport',
+                            icon: 'fa fa-file-text-o'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.funderExport'),
+                            url: '/report/funderExport',
+                            icon: 'fa fa-list-alt'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            url: '/report/procurementAgentExport',
+                            icon: 'fa fa-wpforms'
+                          }
+                          ,
+                          {
+                            name: i18n.t('static.report.annualshipmentcost'),
+                            url: '/report/annualShipmentCost',
+                            icon: 'fa fa-file-text'
                           }
                         ]
                       }
                       // {
                       //   name: "Supply plan",
-                      //   icon: 'fa fa-list',
+                      //   icon: 'fa fa-list',  
                       //   children: [
                       //     {
                       //       name: "Supply Plan",
