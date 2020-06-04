@@ -124,7 +124,7 @@ class ForecastMetrics extends Component {
   constructor(props) {
     super(props);
 
-   
+
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
@@ -133,15 +133,15 @@ class ForecastMetrics extends Component {
       planningUnits: [],
       consumptions: [],
       productCategories: [],
-      programs:[],
+      programs: [],
       countryValues: [],
       countryLabels: [],
       planningUnitValues: [],
       planningUnitLabels: [],
       programValues: [],
       programLabels: [],
-      message:'',
-      singleValue2: {year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+      message: '',
+      singleValue2: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -154,13 +154,13 @@ class ForecastMetrics extends Component {
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getPlanningUnit = this.getPlanningUnit.bind(this);
     this.getProductCategories = this.getProductCategories.bind(this)
-    this.getPrograms=this.getPrograms.bind(this)
+    this.getPrograms = this.getPrograms.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.getRandomColor = this.getRandomColor.bind(this)
-    this.handleChangeProgram=this.handleChangeProgram.bind(this)
-    this.handlePlanningUnitChange=this.handlePlanningUnitChange.bind(this)
+    this.handleChangeProgram = this.handleChangeProgram.bind(this)
+    this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
     this.formatLabel = this.formatLabel.bind(this);
-    this.formatValue=this.formatValue.bind(this)
+    this.formatValue = this.formatValue.bind(this)
     this.pickAMonth2 = React.createRef();
     this.rowClassNameFormat = this.rowClassNameFormat.bind(this)
   }
@@ -169,8 +169,8 @@ class ForecastMetrics extends Component {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
-  roundN = num=>{
-    return parseFloat(Math.round(num * Math.pow(10, 2)) /Math.pow(10,2)).toFixed(2);
+  roundN = num => {
+    return parseFloat(Math.round(num * Math.pow(10, 2)) / Math.pow(10, 2)).toFixed(2);
   }
   formatLabel(cell, row) {
     // console.log("celll----", cell);
@@ -182,40 +182,40 @@ class ForecastMetrics extends Component {
   formatValue(cell, row) {
     // console.log("celll----", cell);
     if (cell != null && cell != "") {
-      return this.roundN(cell*100)+'%';
-    }else if(cell=="0" && row.months==0){
+      return this.roundN(cell * 100) + '%';
+    } else if (cell == "0" && row.months == 0) {
       return "No data points containing both actual and forecast consumption ";
-    }else{
+    } else {
       return "0%"
     }
   }
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.selectMonth') + ' , ' +this.makeText(this.state.singleValue2)).replaceAll(' ','%20'))
-    this.state.programLabels.map(ele=>
-    csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
-    this.state.programLabels.map(ele=>
-    csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+    csvRow.push((i18n.t('static.report.selectMonth') + ' , ' + this.makeText(this.state.singleValue2)).replaceAll(' ', '%20'))
+    this.state.countryLabels.map(ele =>
+      csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+    this.state.programLabels.map(ele =>
+      csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
-    this.state.planningUnitLabels.map(ele=>
-    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
+    this.state.planningUnitLabels.map(ele =>
+      csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
     csvRow.push('')
     csvRow.push('')
     csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
 
-    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ','%20'),(i18n.t('static.dashboard.program')).replaceAll(' ','%20'),(i18n.t('static.dashboard.planningunit')).replaceAll(' ','%20'),
+    var A = [[(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.program')).replaceAll(' ', '%20'), (i18n.t('static.dashboard.planningunit')).replaceAll(' ', '%20'),
     //(i18n.t('static.report.historicalConsumptionDiff')).replaceAll(' ','%20'),(i18n.t('static.report.historicalConsumptionActual')).replaceAll(' ','%20'),
-    (i18n.t('static.report.error')).replaceAll(' ','%20'),(i18n.t('static.report.noofmonth')).replaceAll(' ','%20')]]
+    (i18n.t('static.report.error')).replaceAll(' ', '%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ', '%20')]]
 
     re = this.state.consumptions
 
     for (var item = 0; item < re.length; item++) {
-      A.push([[getLabelText(re[item].realmCountry.label),(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),(getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
-     // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
-      re[item].months==0?("No data points containing both actual and forecast consumption").replaceAll(' ', '%20'):this.roundN(re[item].forecastError*100)+'%',re[item].months]])
+      A.push([[getLabelText(re[item].realmCountry.label), (getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), (getLabelText(re[item].planningUnit.label).replaceAll(',', '%20')).replaceAll(' ', '%20'),
+      // re[item].historicalConsumptionDiff,re[item].historicalConsumptionActual,
+      re[item].months == 0 ? ("No data points containing both actual and forecast consumption").replaceAll(' ', '%20') : this.roundN(re[item].forecastError * 100) + '%', re[item].months]])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -259,7 +259,7 @@ class ForecastMetrics extends Component {
 
       const pageCount = doc.internal.getNumberOfPages()
       doc.setFont('helvetica', 'bold')
-  for (var i = 1; i <= pageCount; i++) {
+      for (var i = 1; i <= pageCount; i++) {
         doc.setFontSize(15)
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
@@ -272,21 +272,21 @@ class ForecastMetrics extends Component {
         })
         if (i == 1) {
           doc.setFontSize(8)
-          doc.text(i18n.t('static.report.selectMonth') + ' : ' +this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
+          doc.text(i18n.t('static.report.selectMonth') + ' : ' + this.makeText(this.state.singleValue2), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
-            align: 'left'
-        })
-        var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width*3/4);
+          var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
 
-        doc.text( doc.internal.pageSize.width / 8, 130,planningText)
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8,this.state.programLabels.size>2? 170:150, {
+          planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+
+          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
             align: 'left'
           })
-          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' +this.state.planningUnitLabels.toString()), doc.internal.pageSize.width*3/4);
+          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
 
-          doc.text( doc.internal.pageSize.width / 8,this.state.programLabels.size>2? 190:170,planningText)
+          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
         }
 
       }
@@ -301,26 +301,26 @@ class ForecastMetrics extends Component {
     doc.setFontSize(8);
 
     const title = "Consumption Report";
-    
+
     var height = doc.internal.pageSize.height;
-     const headers =[[i18n.t('static.dashboard.country'),i18n.t('static.dashboard.program'),i18n.t('static.dashboard.planningunit'),
-     //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
-     i18n.t('static.report.error'),i18n.t('static.report.noofmonth')]]
-      const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),getLabelText(elt.program.label),getLabelText(elt.planningUnit.label),
-        //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
-       elt.months==0?"No data points containing both actual and forecast consumption": this.roundN(elt.forecastError*100)+'%',elt.months]);
-      let startY=this.state.planningUnitLabels.length>2? 350:200
-      let content = {
-      margin: {top: 80},
+    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.dashboard.program'), i18n.t('static.dashboard.planningunit'),
+    //i18n.t('static.report.historicalConsumptionDiff'),i18n.t('static.report.historicalConsumptionActual'),
+    i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
+    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label), getLabelText(elt.program.label), getLabelText(elt.planningUnit.label),
+    //elt.historicalConsumptionDiff,elt.historicalConsumptionActual,
+    elt.months == 0 ? "No data points containing both actual and forecast consumption" : this.roundN(elt.forecastError * 100) + '%', elt.months]);
+    let startY = this.state.planningUnitLabels.length > 2 ? 350 : 200
+    let content = {
+      margin: { top: 80 },
       startY: startY,
       head: headers,
       body: data,
-      
+
     };
-    
-     
-      //doc.text(title, marginLeft, 40);
-      doc.autoTable(content);
+
+
+    //doc.text(title, marginLeft, 40);
+    doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
     doc.save("ForecastMatrics.pdf")
@@ -334,7 +334,7 @@ class ForecastMetrics extends Component {
 
 
   rowClassNameFormat(row, rowIdx) {
-    return (row.forecastError*100)>50? 'background-red' : '';
+    return (row.forecastError * 100) > 50 ? 'background-red' : '';
   }
 
 
@@ -345,28 +345,34 @@ class ForecastMetrics extends Component {
   handleChange(countrysId) {
 
     this.setState({
-      countryValues: countrysId.map(ele=>ele.value),
-      countryLabels: countrysId.map(ele=>ele.label)},() => {
-  
-        this.filterData(this.state.rangeValue)})
-  }
-   handleChangeProgram(programIds) {
+      countryValues: countrysId.map(ele => ele.value),
+      countryLabels: countrysId.map(ele => ele.label)
+    }, () => {
 
-     this.setState({
-      programValues: programIds.map(ele=>ele.value),
-      programLabels: programIds.map(ele=>ele.label)},() => {
-  
-      this.filterData(this.state.rangeValue)})
-    
+      this.filterData(this.state.rangeValue)
+    })
+  }
+  handleChangeProgram(programIds) {
+
+    this.setState({
+      programValues: programIds.map(ele => ele.value),
+      programLabels: programIds.map(ele => ele.label)
+    }, () => {
+
+      this.filterData(this.state.rangeValue)
+    })
+
   }
 
   handlePlanningUnitChange(planningUnitIds) {
-   
+
     this.setState({
-      planningUnitValues: planningUnitIds.map(ele=>ele.value),
-      planningUnitLabels:planningUnitIds.map(ele=>ele.label)},() => {
-  
-        this.filterData(this.state.rangeValue)})
+      planningUnitValues: planningUnitIds.map(ele => ele.value),
+      planningUnitLabels: planningUnitIds.map(ele => ele.label)
+    }, () => {
+
+      this.filterData(this.state.rangeValue)
+    })
   }
 
 
@@ -378,64 +384,64 @@ class ForecastMetrics extends Component {
       {label:"c4",value:[5,4,3,7]}]}
     })
     */
-   setTimeout('', 10000);
+    setTimeout('', 10000);
     let productCategoryId = document.getElementById("productCategoryId").value;
     let CountryIds = this.state.countryValues;
     let planningUnitIds = this.state.planningUnitValues;
     let programIds = this.state.programValues
-    let startDate=this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
+    let startDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
     //let stopDate=this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-    if(CountryIds.length>0 && planningUnitIds.length>0&&programIds.length>0){
-    
-    var inputjson={
-    "realmCountryIds":CountryIds,"programIds":programIds,"planningUnitIds":planningUnitIds,"startDate": startDate
-   }
-    AuthenticationService.setupAxiosInterceptors();
-    
-    ReportService.getForecastError( inputjson )
-      .then(response => {
-        console.log(JSON.stringify(response.data));
-        this.setState({
-          consumptions: response.data,
-          message:''
-        })
-      }).catch(
-        error => {
-          this.setState({
-            consumptions: []
-          })
+    if (CountryIds.length > 0 && planningUnitIds.length > 0 && programIds.length > 0) {
 
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
+      var inputjson = {
+        "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate
+      }
+      AuthenticationService.setupAxiosInterceptors();
+
+      ReportService.getForecastError(inputjson)
+        .then(response => {
+          console.log(JSON.stringify(response.data));
+          this.setState({
+            consumptions: response.data,
+            message: ''
+          })
+        }).catch(
+          error => {
+            this.setState({
+              consumptions: []
+            })
+
+            if (error.message === "Network Error") {
+              this.setState({ message: error.message });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
             }
           }
-        }
-      );
-      } else if(CountryIds.length==0){
-        this.setState({ message: i18n.t('static.program.validcountrytext'),consumptions:[] });
-                
-      }else if(programIds.length==0){
-        this.setState({ message: i18n.t('static.common.selectProgram') ,consumptions:[]});
-                
-      }else if(productCategoryId==-1){
-        this.setState({ message: i18n.t('static.common.selectProductCategory'),consumptions:[] });
-    
-      }else{
-        this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'),consumptions:[] });
-   
-      }
+        );
+    } else if (CountryIds.length == 0) {
+      this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] });
+
+    } else if (programIds.length == 0) {
+      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+
+    } else if (productCategoryId == -1) {
+      this.setState({ message: i18n.t('static.common.selectProductCategory'), consumptions: [] });
+
+    } else {
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+
+    }
   }
 
   getCountrys() {
@@ -518,35 +524,36 @@ class ForecastMetrics extends Component {
       console.log('changed')
       let productCategoryId = document.getElementById("productCategoryId").value;
       AuthenticationService.setupAxiosInterceptors();
-if(productCategoryId!=-1){
-      PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
-        this.setState({
-          planningUnits: response.data,
+      if (productCategoryId != -1) {
+        PlanningUnitService.getPlanningUnitByProductCategoryId(productCategoryId).then(response => {
+          this.setState({
+            planningUnits: response.data,
+          })
         })
-      })
-        .catch(
-          error => {
-            this.setState({
-              planningUnits: [],
-            })
-            if (error.message === "Network Error") {
-              this.setState({ message: error.message });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 500:
-                case 401:
-                case 404:
-                case 406:
-                case 412:
-                //  this.setState({ message: error.response.data.messageCode });
-                  break;
-                default:
-                  this.setState({ message: 'static.unkownError' });
-                  break;
+          .catch(
+            error => {
+              this.setState({
+                planningUnits: [],
+              })
+              if (error.message === "Network Error") {
+                this.setState({ message: error.message });
+              } else {
+                switch (error.response ? error.response.status : "") {
+                  case 500:
+                  case 401:
+                  case 404:
+                  case 406:
+                  case 412:
+                    //  this.setState({ message: error.response.data.messageCode });
+                    break;
+                  default:
+                    this.setState({ message: 'static.unkownError' });
+                    break;
+                }
               }
             }
-          }
-        );}
+          );
+      }
     } else {
       const lan = 'en';
       var db1;
@@ -618,7 +625,7 @@ if(productCategoryId!=-1){
           }
         }
       );
-      }
+  }
 
   getProductCategories() {
     AuthenticationService.setupAxiosInterceptors();
@@ -663,7 +670,7 @@ if(productCategoryId!=-1){
 
   }
 
-  toggledata = () => this.setState((currentState) => ({show: !currentState.show}));
+  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
 
   onRadioBtnClick(radioSelected) {
     this.setState({
@@ -686,17 +693,17 @@ if(productCategoryId!=-1){
   }
   handleClickMonthBox2 = (e) => {
     this.refs.pickAMonth2.show()
-}
+  }
   handleAMonthChange2 = (value, text) => {
     //
-       //
-      }
-      handleAMonthDissmis2 = (value) => {
-          this.setState( {singleValue2: value} , () => {
-            this.filterData();
-          })
-          
-      }
+    //
+  }
+  handleAMonthDissmis2 = (value) => {
+    this.setState({ singleValue2: value }, () => {
+      this.filterData();
+    })
+
+  }
 
   _handleClickRangeBox(e) {
     this.refs.pickRange.show()
@@ -713,25 +720,25 @@ if(productCategoryId!=-1){
   }
   render() {
     const { planningUnits } = this.state;
-        let planningUnitList =[];
-        planningUnitList=planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
+    let planningUnitList = [];
+    planningUnitList = planningUnits.length > 0
+      && planningUnits.map((item, i) => {
+        return (
 
-                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
+          { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
 
-                )
-            }, this);
-            const { programs } = this.state;
-            let programList =[];
-            programList=programs.length > 0
-                && programs.map((item, i) => {
-                    return (
-    
-                        { label: getLabelText(item.label, this.state.lang), value: item.programId }
-    
-                    )
-                }, this);
+        )
+      }, this);
+    const { programs } = this.state;
+    let programList = [];
+    programList = programs.length > 0
+      && programs.map((item, i) => {
+        return (
+
+          { label: getLabelText(item.label, this.state.lang), value: item.programId }
+
+        )
+      }, this);
     const { countrys } = this.state;
     // console.log(JSON.stringify(countrys))
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
@@ -748,29 +755,29 @@ if(productCategoryId!=-1){
         )
       }, this);
 
-      const columns = [
-        {
-            dataField: 'realmCountry.label',
-            text: i18n.t('static.dashboard.country'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'program.label',
-            text: i18n.t('static.dashboard.program'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }, {
-            dataField: 'planningUnit.label',
-            text: i18n.t('static.dashboard.planningunit'),
-            sort: true,
-            align: 'center',
-            headerAlign: 'center',
-            formatter: this.formatLabel
-        }/*, {
+    const columns = [
+      {
+        dataField: 'realmCountry.label',
+        text: i18n.t('static.dashboard.country'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      }, {
+        dataField: 'program.label',
+        text: i18n.t('static.dashboard.program'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      }, {
+        dataField: 'planningUnit.label',
+        text: i18n.t('static.dashboard.planningunit'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.formatLabel
+      }/*, {
             dataField: 'historicalConsumptionDiff',
             text: i18n.t('static.report.historicalConsumptionDiff'),
             sort: true,
@@ -790,48 +797,48 @@ if(productCategoryId!=-1){
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter:this.formatValue
-     
-    }, {
-      dataField: 'months',
-      text: i18n.t('static.report.noofmonth'),
-      sort: true,
-      align: 'center',
-      headerAlign: 'center',
-   
-  }];
-  const options = {
-    hidePageListOnlyOnePage: true,
-    firstPageText: i18n.t('static.common.first'),
-    prePageText: i18n.t('static.common.back'),
-    nextPageText: i18n.t('static.common.next'),
-    lastPageText: i18n.t('static.common.last'),
-    nextPageTitle: i18n.t('static.common.firstPage'),
-    prePageTitle: i18n.t('static.common.prevPage'),
-    firstPageTitle: i18n.t('static.common.nextPage'),
-    lastPageTitle: i18n.t('static.common.lastPage'),
-    showTotal: true,
-    paginationTotalRenderer: customTotal,
-    disablePageTitle: true,
-    sizePerPageList: [{
+        formatter: this.formatValue
+
+      }, {
+        dataField: 'months',
+        text: i18n.t('static.report.noofmonth'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+
+      }];
+    const options = {
+      hidePageListOnlyOnePage: true,
+      firstPageText: i18n.t('static.common.first'),
+      prePageText: i18n.t('static.common.back'),
+      nextPageText: i18n.t('static.common.next'),
+      lastPageText: i18n.t('static.common.last'),
+      nextPageTitle: i18n.t('static.common.firstPage'),
+      prePageTitle: i18n.t('static.common.prevPage'),
+      firstPageTitle: i18n.t('static.common.nextPage'),
+      lastPageTitle: i18n.t('static.common.lastPage'),
+      showTotal: true,
+      paginationTotalRenderer: customTotal,
+      disablePageTitle: true,
+      sizePerPageList: [{
         text: '10', value: 10
-    }, {
+      }, {
         text: '30', value: 30
-    }
+      }
         ,
-    {
+      {
         text: '50', value: 50
-    },
-    {
+      },
+      {
         text: 'All', value: this.state.consumptions.length
-    }]
-};
-const { SearchBar, ClearSearchButton } = Search;
-const customTotal = (from, to, size) => (
-    <span className="react-bootstrap-table-pagination-total">
+      }]
+    };
+    const { SearchBar, ClearSearchButton } = Search;
+    const customTotal = (from, to, size) => (
+      <span className="react-bootstrap-table-pagination-total">
         {i18n.t('static.common.result', { from, to, size })}
-    </span>
-);
+      </span>
+    );
     const pickerLang = {
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       from: 'From', to: 'To',
@@ -852,7 +859,7 @@ const customTotal = (from, to, size) => (
         <Card>
           <CardHeader>
             <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.forecastmetrics')}</strong>
-           {this.state.consumptions.length>0&& <div className="card-header-actions">
+            {this.state.consumptions.length > 0 && <div className="card-header-actions">
               <a className="card-header-action">
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
@@ -867,24 +874,24 @@ const customTotal = (from, to, size) => (
                 <Col md="12 pl-0">
                   <div className="row">
 
-                  <FormGroup className="col-md-3">
+                    <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
-                      <Picker
-                                ref="pickAMonth2"
-                                years={{min: {year: 2010, month: 1}, max: {year: 2021, month: 12}}}
-                                value={singleValue2}
-                                lang={pickerLang.months}
-                                theme="dark"
-                                onChange={this.handleAMonthChange2}
-                                onDismiss={this.handleAMonthDissmis2}
-                            >
-                                <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
-                            </Picker>
+                        <Picker
+                          ref="pickAMonth2"
+                          years={{ min: { year: 2010, month: 1 }, max: { year: 2021, month: 12 } }}
+                          value={singleValue2}
+                          lang={pickerLang.months}
+                          theme="dark"
+                          onChange={this.handleAMonthChange2}
+                          onDismiss={this.handleAMonthDissmis2}
+                        >
+                          <MonthBox value={makeText(singleValue2)} onClick={this.handleClickMonthBox2} />
+                        </Picker>
                       </div>
 
                     </FormGroup>
-                   {/*} <FormGroup className="col-md-3">
+                    {/*} <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.report.selectMonth')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                       <div className="controls edit">
 
@@ -906,20 +913,20 @@ const customTotal = (from, to, size) => (
                     <FormGroup className="col-md-3">
                       <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}<span className="red Reqasterisk">*</span></Label>
                       <InputGroup>
-                     
+
                         <ReactMultiSelectCheckboxes
 
                           bsSize="sm"
                           name="countrysId"
                           id="countrysId"
                           onChange={(e) => { this.handleChange(e) }}
-                          options={countryList && countryList.length>0?countryList:[]}
+                          options={countryList && countryList.length > 0 ? countryList : []}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
                             <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                           )}
-                          
+
                       </InputGroup>
                     </FormGroup>
                     <FormGroup className="col-md-3">
@@ -931,7 +938,7 @@ const customTotal = (from, to, size) => (
                           name="programIds"
                           id="programIds"
                           onChange={(e) => { this.handleChangeProgram(e) }}
-                          options={programList && programList.length>0?programList:[]}
+                          options={programList && programList.length > 0 ? programList : []}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -942,82 +949,82 @@ const customTotal = (from, to, size) => (
 
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}<span className="red Reqasterisk">*</span></Label>
-                      
-                        <InputGroup>
-                          <Input
-                            type="select"
-                            name="productCategoryId"
-                            id="productCategoryId"
-                            bsSize="sm"
-                            onChange={this.getPlanningUnit}
-                          >
-                            <option value="-1">{i18n.t('static.common.select')}</option>
-                            {productCategories.length > 0
-                              && productCategories.map((item, i) => {
-                                return (
-                                  <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                    {Array(item.level).fill('  ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                  </option>
-                                )
-                              }, this)}
-                          </Input>
-                        </InputGroup>
-                    
+
+                      <InputGroup>
+                        <Input
+                          type="select"
+                          name="productCategoryId"
+                          id="productCategoryId"
+                          bsSize="sm"
+                          onChange={this.getPlanningUnit}
+                        >
+                          <option value="-1">{i18n.t('static.common.select')}</option>
+                          {productCategories.length > 0
+                            && productCategories.map((item, i) => {
+                              return (
+                                <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                  {Array(item.level).fill('  ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                </option>
+                              )
+                            }, this)}
+                        </Input>
+                      </InputGroup>
+
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
-                                                                <div className="controls">
-                                                                    <InputGroup>  
-                                                                     <ReactMultiSelectCheckboxes
-                                                                    
-                                                                        name="planningUnitId"
-                                                                        id="planningUnitId"
-                                                                        bsSize="sm"
-                                                                        onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                        options={planningUnitList && planningUnitList.length>0?planningUnitList:[]}
-                                                                    />
-                                                                     </InputGroup>  
-                                                                       </div>
-                                                                       </FormGroup>
-                                                           
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
+                      <div className="controls">
+                        <InputGroup>
+                          <ReactMultiSelectCheckboxes
+
+                            name="planningUnitId"
+                            id="planningUnitId"
+                            bsSize="sm"
+                            onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                            options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
+                          />
+                        </InputGroup>
+                      </div>
+                    </FormGroup>
+
                   </div>
                 </Col>
               </Form>
               <Col md="12 pl-0">
-              
+
                 <div className="row">
-                    <div className="col-md-12">
-                      {this.state.consumptions.length > 0 &&
-                       <ToolkitProvider
-                       keyField="procurementUnitId"
-                       data={this.state.consumptions}
-                       columns={columns}
-                       exportCSV exportCSV
-                       search={{ searchFormatted: true }}
-                       hover
-                       filter={filterFactory()}
+                  <div className="col-md-12">
+                    {this.state.consumptions.length > 0 &&
+                      <ToolkitProvider
+                        keyField="procurementUnitId"
+                        data={this.state.consumptions}
+                        columns={columns}
+                        exportCSV exportCSV
+                        search={{ searchFormatted: true }}
+                        hover
+                        filter={filterFactory()}
 
-                   >
-                       {
-                           props => (
-                               <div className="TableCust mt-reporttable">
-                                   <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
-                                       <SearchBar {...props.searchProps} />
-                                       <ClearSearchButton {...props.searchProps} /></div>
-                                   <BootstrapTable striped rowClasses={this.rowClassNameFormat} hover  noDataIndication={i18n.t('static.common.noData')} tabIndexCell
-                                       pagination={paginationFactory(options)}
+                      >
+                        {
+                          props => (
+                            <div className="TableCust">
+                              <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
+                                <SearchBar {...props.searchProps} />
+                                <ClearSearchButton {...props.searchProps} /></div>
+                              <BootstrapTable striped rowClasses={this.rowClassNameFormat} hover noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                pagination={paginationFactory(options)}
 
-                                       {...props.baseProps}
-                                   /></div>
+                                {...props.baseProps}
+                              /></div>
 
-                           )
-                       }
-                   </ToolkitProvider>
+                          )
+                        }
+                      </ToolkitProvider>
 
-}
+                    }
 
-                   </div>
-                   </div>
+                  </div>
+                </div>
               </Col>
 
             </div>

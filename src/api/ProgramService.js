@@ -96,6 +96,14 @@ class ProgramService {
         return axios.post(`${API_URL}/api/pipeline/programsetup`, {}
         );
     }
+    getVersionStatusList() {
+        return axios.get(`${API_URL}/api/versionStatus`, {}
+        );
+    }
+    updateProgramStatus(json) {
+        return axios.put(`${API_URL}/api/programVersion/programId/${json.programId}/versionId/${json.currentVersion.versionId}/versionStatusId/${json.currentVersion.versionStatus.id}`, {}
+        );
+    }
 
 }
 export default new ProgramService()
