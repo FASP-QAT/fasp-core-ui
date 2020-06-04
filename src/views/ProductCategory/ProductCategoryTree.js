@@ -570,7 +570,7 @@ export default class ProductCategoryTree extends Component {
                             </CardBody>
                             <CardFooter>
                                 <FormGroup>
-                                    <Button type="reset" size="md" onClick={this.reSetTree} color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
+                                    <Button type="reset" size="md" onClick={this.reSetTree} color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button>
                                     <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.getSortedFaltTreeData}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                 </ FormGroup>
                             </CardFooter>
