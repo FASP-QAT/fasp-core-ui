@@ -39,15 +39,15 @@ class DefaultLayout extends Component {
   }
 
   componentDidMount() {
-    var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
-    console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
-    var bfunction = [];
-    if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
-      for (let i = 0; i < curUserBusinessFunctions.length; i++) {
-        bfunction.push(curUserBusinessFunctions[i].authority);
-      }
-      this.setState({ businessFunctions: bfunction });
-    }
+    // var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
+    // console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
+    // var bfunction = [];
+    // if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
+    //   for (let i = 0; i < curUserBusinessFunctions.length; i++) {
+    //     bfunction.push(curUserBusinessFunctions[i].authority);
+    //   }
+    //   this.setState({ businessFunctions: bfunction });
+    // }
 
   }
 
@@ -96,7 +96,7 @@ class DefaultLayout extends Component {
                 <AppSidebarNav navConfig={{
                   items:
                     [
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationdashboard'),
                         url: '/ApplicationDashboard',
@@ -107,13 +107,13 @@ class DefaultLayout extends Component {
                       //   url: '/RealmDashboard',
                       //   icon: 'cui-dashboard icons',
                       // },
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
                         icon: 'cui-dashboard icons',
                       },
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
@@ -130,7 +130,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
@@ -190,7 +190,7 @@ class DefaultLayout extends Component {
                           },
                         ]
                       },
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.realmlevelmaster'),
                         icon: 'fa fa-list',
@@ -247,7 +247,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programmaster'),
                         url: '/program',
@@ -376,7 +376,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.report'),
                         icon: 'fa fa-list',
@@ -454,6 +454,16 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.report.annualshipmentcost'),
                             url: '/report/annualShipmentCost',
                             icon: 'fa fa-file-text'
+                          } ,
+                          {
+                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                            url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange'
+                          } ,
+                          {
+                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                            url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange'
                           }
                         ]
                       }
@@ -469,7 +479,7 @@ class DefaultLayout extends Component {
                       //   ]
                       // },
                       ,
-                      !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: 'Setup Program',
                         url: '/program/programOnboarding',
