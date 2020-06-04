@@ -11,7 +11,8 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory from 'react-bootstrap-table2-paginator'
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.tracercategory.tracercategory');
 class ListTracerCategoryComponent extends Component {
@@ -36,7 +37,7 @@ class ListTracerCategoryComponent extends Component {
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selTracerCategory = this.state.tracerCategoryList.filter(c => c.realm.realmId == realmId)
+            const selTracerCategory = this.state.tracerCategoryList.filter(c => c.realm.id == realmId)
             this.setState({
                 selTracerCategory
             });
@@ -48,8 +49,8 @@ class ListTracerCategoryComponent extends Component {
     }
     editTracerCategory(tracerCategory) {
         this.props.history.push({
-            pathname: "/tracerCategory/editTracerCategory",
-            state: { tracerCategory }
+            pathname: `/tracerCategory/editTracerCategory/${tracerCategory.tracerCategoryId}`,
+            // state: { tracerCategory }
         });
     }
 
@@ -64,27 +65,8 @@ class ListTracerCategoryComponent extends Component {
                 } else {
                     this.setState({ message: response.data.messageCode })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
 
         TracerCategoryService.getTracerCategoryListAll()
             .then(response => {
@@ -92,27 +74,8 @@ class ListTracerCategoryComponent extends Component {
                     tracerCategoryList: response.data,
                     selTracerCategory: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
     }
 
     formatLabel(cell, row) {
@@ -196,20 +159,23 @@ class ListTracerCategoryComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message,{entityname})}</h5>
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                    <CardHeader className="mb-md-3 pb-lg-1">
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.tracercategorylist')}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewTracerCategory}><i className="fa fa-plus-square"></i></a>
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -218,13 +184,14 @@ class ListTracerCategoryComponent extends Component {
                                             name="realmId"
                                             id="realmId"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>
@@ -244,7 +211,7 @@ class ListTracerCategoryComponent extends Component {
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
                                         </div>
-                                        <BootstrapTable hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
+                                        <BootstrapTable  hover striped noDataIndication={i18n.t('static.common.noData')} tabIndexCell
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {

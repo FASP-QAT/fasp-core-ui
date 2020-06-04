@@ -29,12 +29,22 @@ class ProductService {
         );
 
     }
-    getProductCategoryList() {
+    getProductCategoryList(realmId) {
         // /productCategory/realmId/{realmId}/list/{productCategoryId}/{includeCurrentLevel}/{includeAllChildren}
-        return axios.get(`${API_URL}/api/productCategory/`, {}
+        return axios.get(`${API_URL}/api/productCategory/realmId/${realmId}`, {}
         );
     }
+    getConsumptionData(realmId,programId,productId,startDate,endDate){
+        return axios.get(`${API_URL}/api/report/consumption/${realmId}/${programId}/${productId}/${startDate}/${endDate}`,{});   
+    }
+    getStockStatusMatrixData(realmId,productCategoryId,productId,view,startDate,endDate){
+        return axios.get(`${API_URL}/api/report/stockmatrix/${realmId}/${productCategoryId}/${productId}/${view}/${startDate}/${endDate}`,{});   
+    }
 
+    getProductCategoryListByProgram(realmId,programId) {
+        return axios.get(`${API_URL}/api/productCategory/realmId/${realmId}/programId/${programId}`, {}
+        );
+    }
 
 }
 export default new ProductService();

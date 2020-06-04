@@ -9,6 +9,7 @@ import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import DimensionService from '../../api/DimensionService.js';
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const initialValues = {
     label: ""
@@ -56,10 +57,17 @@ export default class AddDimensionComponent extends Component {
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
 
     dataChange(event) {
         let { dimension } = this.state
@@ -109,6 +117,10 @@ export default class AddDimensionComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -117,17 +129,20 @@ export default class AddDimensionComponent extends Component {
                             </CardHeader>
                             <CardBody>
                                 <Formik
-
+                                    initialValues={initialValues}
                                     validate={validate(validationSchema)}
 
                                     onSubmit={(values, { setSubmitting, setErrors }) => {
                                         console.log(this.state.dimension)
                                         DimensionService.addDimension(this.state.dimension).then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/diamension/diamensionlist/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/diamension/diamensionlist/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                message: response.data.messageCode
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
                                                 })
                                             }
                                         }
@@ -169,18 +184,19 @@ export default class AddDimensionComponent extends Component {
                                             handleSubmit,
                                             isSubmitting,
                                             isValid,
-                                            setTouched
+                                            setTouched,
+                                            handleReset
                                         }) => (
-                                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='simpleForm'>
+                                                <Form className="needs-validation" onSubmit={handleSubmit} onReset={handleReset} noValidate name='simpleForm'>
 
 
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.dimension.dimension')}</Label>
+                                                        <Label for="label">{i18n.t('static.dimension.dimension')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.dimension.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -188,10 +204,11 @@ export default class AddDimensionComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
- 
+
                                                     <FormGroup>
 
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -211,6 +228,16 @@ export default class AddDimensionComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` + "Action Canceled")
+        this.props.history.push(`/diamension/diamensionlist/` + 'red/' + "Action Canceled")
+    }
+
+    resetClicked() {
+        let { dimension } = this.state
+        dimension.label.label_en = ''
+        this.setState(
+            {
+                dimension
+            }
+        )
     }
 } 

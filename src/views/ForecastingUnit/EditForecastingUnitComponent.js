@@ -6,7 +6,8 @@ import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import ForecastingUnitService from '../../api/ForecastingUnitService.js';
 import i18n from '../../i18n';
-import getLabelText from '../../CommonComponent/getLabelText'
+import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 let initialValues = {
     label: ''
@@ -53,7 +54,6 @@ export default class EditForecastingUnitComponent extends Component {
             forecastingUnit:
             {
                 active: '',
-
                 label: {
                     label_en: '',
                     label_sp: '',
@@ -68,7 +68,7 @@ export default class EditForecastingUnitComponent extends Component {
                     label_fr: ''
                 },
                 realm: {
-                    realmId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -77,7 +77,7 @@ export default class EditForecastingUnitComponent extends Component {
                     }
                 },
                 productCategory: {
-                    productCategoryId: '',
+                    id: '',
                     label: {
                         label_en: '',
                         label_sp: '',
@@ -93,7 +93,16 @@ export default class EditForecastingUnitComponent extends Component {
                         label_pr: '',
                         label_fr: ''
                     }
-                }
+                },
+                unit: {
+                    id: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
             },
             lang: localStorage.getItem('lang')
         }
@@ -101,11 +110,12 @@ export default class EditForecastingUnitComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        initialValues = {
-            message: '',
-            label: this.props.location.state.forecastingUnit.label.label_en,
-            genericLabel: this.props.location.state.forecastingUnit.genericLabel.label_en
-        }
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     dataChange(event) {
@@ -165,15 +175,19 @@ export default class EditForecastingUnitComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+            this.setState({
+                forecastingUnit: response.data
+            });
 
-        this.setState({
-            forecastingUnit: this.props.location.state.forecastingUnit
-        });
+        })
+
     }
 
     Capitalize(str) {
         if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+            let { forecastingUnit } = this.state
+            forecastingUnit.label.label_en = str.charAt(0).toUpperCase() + str.slice(1);
         } else {
             return "";
         }
@@ -183,6 +197,7 @@ export default class EditForecastingUnitComponent extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -190,7 +205,12 @@ export default class EditForecastingUnitComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
-                                initialValues={initialValues}
+                                enableReinitialize={true}
+                                initialValues={{
+                                    message: '',
+                                    label: this.state.forecastingUnit.label.label_en,
+                                    genericLabel: this.state.forecastingUnit.genericLabel.label_en
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     ForecastingUnitService.editForecastingUnit(this.state.forecastingUnit)
@@ -278,21 +298,21 @@ export default class EditForecastingUnitComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
+                                                        <Label for="label">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
                                                             valid={!errors.label}
                                                             invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }} //this.Capitalize(e.target.value) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.forecastingUnit.label.label_en)}
+                                                            value={this.state.forecastingUnit.label.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}</Label>
+                                                        <Label for="genericLabel">{i18n.t('static.product.productgenericname')}<span className="red Reqasterisk">*</span><span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="genericLabel"
                                                             id="genericLabel"
@@ -304,6 +324,18 @@ export default class EditForecastingUnitComponent extends Component {
                                                             value={this.state.forecastingUnit.genericLabel.label_en}
                                                             required />
                                                         <FormFeedback className="red">{errors.genericLabel}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="unitId"
+                                                            id="unitId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={getLabelText(this.state.forecastingUnit.unit.label, this.state.lang)}
+                                                        >
+                                                        </Input>
                                                     </FormGroup>
 
                                                     <FormGroup>
@@ -345,7 +377,8 @@ export default class EditForecastingUnitComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}>{i18n.t('static.common.cancel')}</Button>
-                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}>{i18n.t('static.common.update')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                        <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
 
                                                         &nbsp;
@@ -370,5 +403,15 @@ export default class EditForecastingUnitComponent extends Component {
         this.props.history.push(`/forecastingUnit/listForecastingUnit/` + i18n.t('static.message.cancelled', { entityname }))
     }
 
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        ForecastingUnitService.getForcastingUnitById(this.props.match.params.forecastingUnitId).then(response => {
+            this.setState({
+                forecastingUnit: response.data
+            });
+
+        })
+
+    }
 }
 

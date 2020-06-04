@@ -7,21 +7,24 @@ import i18n from '../../i18n'
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import Select from 'react-select';
+import 'react-select/dist/react-select.min.css';
 
 const initialValues = {
     roleName: "",
     businessFunctions: [],
     canCreateRole: []
 }
+
 const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
         roleName: Yup.string()
-            .required('Please enter role name'),
-        businessFunctions: Yup.string()
-            .required('Please select business functions'),
-        canCreateRole: Yup.string()
-            .required('Please select can create role')
+            .required(i18n.t('static.role.roletext'))
+        // businessFunctions: Yup.string()
+        //     .required('Please select business functions'),
+        // canCreateRole: Yup.string()
+        //     .required('Please select can create role')
     })
 }
 
@@ -53,12 +56,26 @@ class EditRoleComponent extends Component {
             lang: localStorage.getItem('lang'),
             businessFunctions: [],
             roles: [],
-            role: this.props.location.state.role,
+            // role: this.props.location.state.role,
+            role: {
+                businessFunctions: [],
+                canCreateRoles: [],
+                label: {
+                    label_en: ''
+                }
+            },
+            businessFunctionId: '',
+            businessFunctionList: [],
+            canCreateRoleId: '',
+            canCreateRoleList: [],
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.businessFunctionChange = this.businessFunctionChange.bind(this);
+        this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     Capitalize(str) {
@@ -75,23 +92,44 @@ class EditRoleComponent extends Component {
         if (event.target.name == "roleName") {
             role.label.label_en = event.target.value;
         }
-        if (event.target.name == "businessFunctions") {
-            role.businessFunctions = Array.from(event.target.selectedOptions, (item) => item.value);
-        }
-        if (event.target.name == "canCreateRole") {
-            role.canCreateRole = Array.from(event.target.selectedOptions, (item) => item.value);
-        }
         this.setState({
             role
         },
             () => { });
     };
+    businessFunctionChange(businessFunctionId) {
+        let { role } = this.state;
+        this.setState({ businessFunctionId });
+        var businessFunctionIdArray = [];
+        for (var i = 0; i < businessFunctionId.length; i++) {
+            businessFunctionIdArray[i] = businessFunctionId[i].value;
+        }
+        role.businessFunctions = businessFunctionIdArray;
+        this.setState({
+            role
+        },
+            () => { });
+    }
+
+    canCreateRoleChange(canCreateRoleId) {
+        let { role } = this.state;
+        this.setState({ canCreateRoleId });
+        var canCreateRoleIdArray = [];
+        for (var i = 0; i < canCreateRoleId.length; i++) {
+            canCreateRoleIdArray[i] = canCreateRoleId[i].value;
+        }
+        role.canCreateRoles = canCreateRoleIdArray;
+        this.setState({
+            role
+        },
+            () => { });
+    }
 
     touchAll(setTouched, errors) {
         setTouched({
             roleName: true,
             businessFunctions: true,
-            canCreateRole: true
+            canCreateRoles: true
         }
         )
         this.validateForm(errors)
@@ -112,11 +150,18 @@ class EditRoleComponent extends Component {
     }
 
     componentDidMount() {
+
+        // console.log("----**************---", this.props.match.params.roleId);
+        // alert("hi");
         AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
+                var businessFunctionList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    businessFunctionList[i] = { value: response.data[i].businessFunctionId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
-                    businessFunctions: response.data
+                    businessFunctionList
                 })
             }).catch(
                 error => {
@@ -140,9 +185,42 @@ class EditRoleComponent extends Component {
             );
         UserService.getRoleList()
             .then(response => {
+                var canCreateRoleList = [];
+                for (var i = 0; i < response.data.length; i++) {
+                    canCreateRoleList[i] = { value: response.data[i].roleId, label: getLabelText(response.data[i].label, this.state.lang) }
+                }
                 this.setState({
-                    roles: response.data
+                    canCreateRoleList
                 })
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
+
+        UserService.getRoleById(this.props.match.params.roleId)
+            .then(response => {
+                this.setState({
+                    role: response.data
+                },
+                    () => {
+                        console.log("ROLE****************> ", this.state.role)
+                    });
             }).catch(
                 error => {
                     if (error.message === "Network Error") {
@@ -166,28 +244,6 @@ class EditRoleComponent extends Component {
     }
 
     render() {
-        const { businessFunctions } = this.state;
-        const { roles } = this.state;
-
-        let businessFunctionsList = businessFunctions.length > 0
-            && businessFunctions.map((item, i) => {
-                return (
-                    <>
-                        <option key={i} value={item.businessFunctionId}>
-                            {getLabelText(item.label, this.state.lang)}
-                        </option>
-                    </>
-                )
-            }, this);
-        let roleList = roles.length > 0
-            && roles.map((item, i) => {
-                return (
-                    <option key={i} value={item.roleId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
@@ -198,10 +254,11 @@ class EditRoleComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={{
                                     roleName: this.state.role.label.label_en,
                                     businessFunctions: this.state.role.businessFunctions,
-                                    canCreateRole: this.state.role.canCreateRole
+                                    canCreateRoles: this.state.role.canCreateRoles
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -254,7 +311,7 @@ class EditRoleComponent extends Component {
                                             <Form onSubmit={handleSubmit} noValidate name='roleForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label for="roleName">{i18n.t('static.role.role')}</Label>
+                                                        <Label for="roleName">{i18n.t('static.role.role')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="roleName"
                                                             id="roleName"
@@ -269,48 +326,50 @@ class EditRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.roleName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}</Label><Input
-                                                            type="select"
+                                                        <Label htmlFor="businessFunctions">{i18n.t('static.role.businessfunction')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Select
+                                                            valid={!errors.businessFunctions}
+                                                            bsSize="sm"
+                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
+                                                            onChange={(e) => { handleChange(e); this.businessFunctionChange(e) }}
+                                                            onBlur={handleBlur}
                                                             name="businessFunctions"
                                                             id="businessFunctions"
-                                                            bsSize="sm"
-                                                            valid={!errors.businessFunctions}
-                                                            invalid={touched.businessFunctions && !!errors.businessFunctions}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            multi
                                                             required
+                                                            min={1}
+                                                            options={this.state.businessFunctionList}
                                                             value={this.state.role.businessFunctions}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                            {businessFunctionsList}
-
-                                                        </Input>
+                                                            error={errors.businessFunctions}
+                                                            touched={touched.businessFunctions}
+                                                        />
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}</Label>
-                                                        <Input
-                                                            type="select"
-                                                            name="canCreateRole"
-                                                            id="canCreateRole"
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Select
+                                                            valid={!errors.canCreateRoles}
                                                             bsSize="sm"
-                                                            valid={!errors.canCreateRole}
-                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            invalid={touched.canCreateRoles && !!errors.canCreateRoles}
+                                                            onChange={(e) => { handleChange(e); this.canCreateRoleChange(e) }}
                                                             onBlur={handleBlur}
+                                                            name="canCreateRoles"
+                                                            id="canCreateRoles"
+                                                            multi
                                                             required
-                                                            value={this.state.role.canCreateRole}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="0" disabled>{i18n.t('static.common.select')}</option>
-                                                            {roleList}
-                                                        </Input> <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
+                                                            min={1}
+                                                            options={this.state.canCreateRoleList}
+                                                            value={this.state.role.canCreateRoles}
+                                                            error={errors.canCreateRoles}
+                                                            touched={touched.canCreateRoles}
+                                                        />
+                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
@@ -326,6 +385,14 @@ class EditRoleComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/role/listRole/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+    resetClicked() {
+        UserService.getRoleById(this.props.match.params.roleId)
+            .then(response => {
+                this.setState({
+                    role: response.data
+                });
+            })
     }
 }
 

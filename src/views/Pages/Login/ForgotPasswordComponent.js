@@ -4,18 +4,23 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import i18n from '../../../i18n'
 import '../../Forms/ValidationForms/ValidationForms.css';
+// import image1 from '../../../../public/assets/img/QAT-logo.png';
+import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
+import image1 from '../../../assets/img/QAT-logo.png';
+
 
 import UserService from '../../../api/UserService.js';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 
 const initialValues = {
-    username: ""
+    emailId: ""
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
-        username: Yup.string()
-            .required('Please enter username')
+        emailId: Yup.string()
+            .email(i18n.t('static.user.invalidemail'))
+            .required(i18n.t('static.user.validemail')),
     })
 }
 
@@ -48,15 +53,17 @@ class ForgotPasswordComponent extends Component {
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
+        this.hideMessage = this.hideMessage.bind(this);
     }
 
+
     cancelClicked() {
-        this.props.history.push(`/login/` + "Action Canceled")
+        this.props.history.push(`/login/` + i18n.t('static.message.cancelled'))
     }
 
     touchAll(setTouched, errors) {
         setTouched({
-            username: true
+            emailId: true
         }
         )
         this.validateForm(errors)
@@ -75,32 +82,34 @@ class ForgotPasswordComponent extends Component {
             }
         }
     }
+    hideMessage(){
+        setTimeout(function () { document.getElementById('hideDiv').style.display = 'none'; }, 8000);
+    }
 
     render() {
         return (
             <div className="app flex-row align-items-center">
-                <h5>{i18n.t(this.state.message)}</h5>
-                <div className="Login-component">
+                <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
                     <Container className="container-login">
                         <Row className="justify-content-center ">
                             <Col md="12">
                                 <div className="upper-logo mt-1">
-                                    <img src={'assets/img/QAT-logo.png'} className="img-fluid " />
+                                    <img src={image1} className="img-fluid " />
                                 </div>
                             </Col>
                             <Col md="9" lg="7" xl="6" className="mt-4">
-                                <h5 className="mx-4">{this.state.message}</h5>
+                                <h5 style={{ color:"red" }} className="mx-4" id="hideDiv">{i18n.t(this.state.message)}</h5>
                                 <Card className="mx-4 ">
 
                                     <CardHeader>
-                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">Forgot Password</strong>{' '}
+                                        <i className="icon-note frgtpass-heading"></i><strong className="frgtpass-heading">{i18n.t('static.user.forgotpassword')}</strong>{' '}
                                     </CardHeader>
                                     <Formik
                                         initialValues={initialValues}
                                         validate={validate(validationSchema)}
                                         onSubmit={(values, { setSubmitting, setErrors }) => {
                                             if (navigator.onLine) {
-                                                UserService.forgotPassword(values.username)
+                                                UserService.forgotPassword(values.emailId)
                                                     .then(response => {
                                                         if (response.status == 200) {
                                                             this.props.history.push(`/login/static.message.user.forgotPasswordSuccess`)
@@ -112,13 +121,17 @@ class ForgotPasswordComponent extends Component {
                                                     })
                                                     .catch(
                                                         error => {
+                                                            console.log(error)
                                                             if (error.message === "Network Error") {
                                                                 this.setState({ message: error.message });
                                                             } else {
                                                                 switch (error.response ? error.response.status : "") {
+                                                                    case 404:
+                                                                        this.props.history.push(`/login/${error.response.data.messageCode}`)
+                                                                        break;
                                                                     case 500:
                                                                     case 401:
-                                                                    case 404:
+                                                                    case 403:
                                                                     case 406:
                                                                     case 412:
                                                                         this.setState({ message: error.response.data.messageCode });
@@ -132,9 +145,14 @@ class ForgotPasswordComponent extends Component {
                                                     );
 
                                             } else {
+                                                
+
                                                 this.setState({
                                                     message: "You must be online to update the password."
-                                                });
+                                                },
+                                                    () => { 
+                                                        this.hideMessage();
+                                                    })
                                             }
                                         }}
                                         render={
@@ -153,24 +171,24 @@ class ForgotPasswordComponent extends Component {
                                                         <CardBody className="p-4">
 
                                                             <FormGroup>
-                                                                <Label for="username">Username</Label>
+                                                                <Label for="emailId">{i18n.t('static.user.emailid')}</Label>
                                                                 <Input type="text"
-                                                                    name="username"
-                                                                    id="username"
+                                                                    name="emailId"
+                                                                    id="emailId"
                                                                     bsSize="sm"
-                                                                    valid={!errors.username}
-                                                                    invalid={touched.username && !!errors.username}
+                                                                    valid={!errors.emailId}
+                                                                    invalid={touched.emailId && !!errors.emailId}
                                                                     onChange={handleChange}
                                                                     onBlur={handleBlur}
                                                                     required
                                                                 />
-                                                                <FormFeedback>{errors.username}</FormFeedback>
+                                                                <FormFeedback>{errors.emailId}</FormFeedback>
                                                             </FormGroup>
                                                         </CardBody>
                                                         <CardFooter>
                                                             <FormGroup>
-                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> Cancel</Button>
-                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button>
+                                                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                                 &nbsp;
                           </FormGroup>
                                                         </CardFooter>

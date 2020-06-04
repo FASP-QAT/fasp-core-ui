@@ -6,7 +6,8 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import FundingSourceService from "../../api/FundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
-import getLabelText from '../../CommonComponent/getLabelText'
+import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 let initialValues = {
     fundingSource: ""
@@ -45,12 +46,61 @@ class EditFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            fundingSource: this.props.location.state.fundingSource,
+            // fundingSource: this.props.location.state.fundingSource,
+            fundingSource: {
+                realm: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    }
+                },
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                }
+            },
             message: '',
             lang: localStorage.getItem('lang')
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
+    }
+
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
+            if (response.status == 200) {     
+                     this.setState({
+                fundingSource: response.data
+            });
+        }
+        else{
+
+            this.setState({
+                message: response.data.messageCode
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+        }
+
+        })
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChange(event) {
@@ -88,10 +138,18 @@ class EditFundingSourceComponent extends Component {
             }
         }
     }
+    Capitalize(str) {
+        if (str != null && str != "") {
+            let { fundingSource } = this.state
+            fundingSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
+    }
 
     render() {
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -100,38 +158,26 @@ class EditFundingSourceComponent extends Component {
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ fundingSource: this.state.fundingSource.label.label_en }}
+                                initialValues={{
+                                    fundingSource: this.state.fundingSource.label.label_en
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/fundingSource/listFundingSource/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
-                                                this.setState({ message: response.data.messageCode })
+                                                
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response.status) {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
                                 render={
                                     ({
@@ -160,14 +206,14 @@ class EditFundingSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}</Label>
+                                                        <Label for="fundingSource">{i18n.t('static.fundingsource.fundingsource')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Input type="text"
                                                             name="fundingSource"
                                                             id="fundingSource"
                                                             bsSize="sm"
                                                             valid={!errors.fundingSource}
                                                             invalid={touched.fundingSource && !!errors.fundingSource}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
                                                             value={this.state.fundingSource.label.label_en}
                                                             required />
@@ -212,6 +258,7 @@ class EditFundingSourceComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -231,7 +278,17 @@ class EditFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/fundingSource/listFundingSource/` + 'red/'+ i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
+            this.setState({
+                fundingSource: response.data
+            });
+
+        })
     }
 }
 

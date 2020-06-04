@@ -9,6 +9,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 import i18n from '../../i18n';
 import { boolean } from 'yup';
@@ -29,7 +30,21 @@ export default class CountryListComponent extends Component {
         this.editCountry = this.editCountry.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
     filterData() {
         var selStatus = document.getElementById("active").value;
         if (selStatus != "") {
@@ -64,14 +79,15 @@ export default class CountryListComponent extends Component {
     editCountry(country) {
         console.log(country);
         this.props.history.push({
-            pathname: "/country/editCountry",
-            state: { country: country }
+            pathname: `/country/editCountry/${country.countryId}`,
+            // state: { country: country }
         });
 
     }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
+        this.hideFirstComponent();
         CountryService.getCountryListAll().then(response => {
             if (response.status == 200) {
                 console.log("response--->", response.data);
@@ -79,30 +95,37 @@ export default class CountryListComponent extends Component {
                     countryList: response.data,
                     selCountry: response.data
                 })
+
             } else {
-                this.setState({ message: response.data.messageCode })
+
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
 
@@ -175,12 +198,15 @@ export default class CountryListComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         {/* <i className="icon-menu"></i>{i18n.t('static.country.countrylist')} */}
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.countrylist')}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -189,9 +215,9 @@ export default class CountryListComponent extends Component {
                         </div>
 
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -200,15 +226,16 @@ export default class CountryListComponent extends Component {
                                             name="active"
                                             id="active"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="">{i18n.t('static.common.all')}</option>
                                             <option value="true">{i18n.t('static.common.active')}</option>
                                             <option value="false">{i18n.t('static.common.disabled')}</option>
 
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>

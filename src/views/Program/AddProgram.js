@@ -14,6 +14,7 @@ import HealthAreaService from "../../api/HealthAreaService";
 import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.program.programMaster');
 const initialValues = {
@@ -24,16 +25,19 @@ const initialValues = {
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
-    deliveredToReceivedLeadTime: '',
+    // deliveredToReceivedLeadTime: '',
     draftToSubmittedLeadTime: '',
     plannedToDraftLeadTime: '',
     submittedToApprovedLeadTime: '',
     approvedToShippedLeadTime: '',
+    shippedToArrivedByAirLeadTime: '',
+    shippedToArrivedBySeaLeadTime: '',
+    arrivedToDeliveredLeadTime: '',
     monthsInFutureForAmc: '',
     monthsInPastForAmc: '',
     healthAreaId: '',
     programNotes: ''
-    
+
 }
 
 const validationSchema = function (values) {
@@ -52,25 +56,31 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.number()
             .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        deliveredToReceivedLeadTime: Yup.number()
-            .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
-        draftToSubmittedLeadTime: Yup.number()
+        // deliveredToReceivedLeadTime: Yup.number()
+        //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
+        draftToSubmittedLeadTime: Yup.string()
             .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
-        plannedToDraftLeadTime: Yup.number()
+        plannedToDraftLeadTime: Yup.string()
             .required(i18n.t('static.program.validplantodrafttext')).min(0, i18n.t('static.program.validvaluetext')),
-        submittedToApprovedLeadTime: Yup.number()
+        submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
-        approvedToShippedLeadTime: Yup.number()
+        approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInFutureForAmc: Yup.number()
+        shippedToArrivedByAirLeadTime: Yup.string()
+            .required(i18n.t('static.program.shippedToArrivedByAirLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedBySeaLeadTime: Yup.string()
+            .required(i18n.t('static.program.shippedToArrivedBySeaLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+        arrivedToDeliveredLeadTime: Yup.string()
+            .required(i18n.t('static.program.arrivedToDeliveredLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
+        monthsInFutureForAmc: Yup.string()
             .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInPastForAmc: Yup.number()
+        monthsInPastForAmc: Yup.string()
             .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
-        programNotes: Yup.string()
-            .required(i18n.t('static.program.validnotestext')),
-        
+        // programNotes: Yup.string()
+        //     .required(i18n.t('static.program.validnotestext')),
+
     })
 }
 
@@ -115,7 +125,7 @@ export default class AddProgram extends Component {
                     realmCountryId: ''
                 },
                 organisation: {
-                    organisationId: ''
+                    id: ''
                 },
                 programManager: {
                     userId: '',
@@ -128,15 +138,18 @@ export default class AddProgram extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
-                deliveredToReceivedLeadTime: '',
+                // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedBySeaLeadTime: '',
+                arrivedToDeliveredLeadTime: '',
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
                 healthArea: {
-                    healthAreaId: ''
+                    id: ''
                 },
                 programNotes: '',
                 regionArray: [],
@@ -162,6 +175,7 @@ export default class AddProgram extends Component {
         this.getRegionList = this.getRegionList.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
 
     }
 
@@ -182,28 +196,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
     getDependentLists(e) {
         console.log(e.target.value)
@@ -221,26 +214,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
         ProgramService.getRealmCountryList(e.target.value)
             .then(response => {
@@ -254,27 +228,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getOrganisationList(e.target.value)
@@ -289,27 +243,8 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
 
         AuthenticationService.setupAxiosInterceptors();
         ProgramService.getHealthAreaList(e.target.value)
@@ -324,28 +259,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
 
     getRegionList(e) {
@@ -368,28 +282,7 @@ export default class AddProgram extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
-
+            })
     }
     updateFieldData(value) {
         let { program } = this.state;
@@ -411,14 +304,16 @@ export default class AddProgram extends Component {
         } if (event.target.name == 'realmCountryId') {
             program.realmCountry.realmCountryId = event.target.value;
         } if (event.target.name == 'organisationId') {
-            program.organisation.organisationId = event.target.value;
+            program.organisation.id = event.target.value;
         } if (event.target.name == 'airFreightPerc') {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
-        } if (event.target.name == 'deliveredToReceivedLeadTime') {
-            program.deliveredToReceivedLeadTime = event.target.value;
-        } if (event.target.name == 'draftToSubmittedLeadTime') {
+        }
+        // if (event.target.name == 'deliveredToReceivedLeadTime') {
+        //     program.deliveredToReceivedLeadTime = event.target.value;
+        // }
+        if (event.target.name == 'draftToSubmittedLeadTime') {
             program.draftToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'plannedToDraftLeadTime') {
             program.plannedToDraftLeadTime = event.target.value;
@@ -426,12 +321,22 @@ export default class AddProgram extends Component {
             program.submittedToApprovedLeadTime = event.target.value;
         } if (event.target.name == 'approvedToShippedLeadTime') {
             program.approvedToShippedLeadTime = event.target.value;
-        } if (event.target.name == 'monthsInFutureForAmc') {
+        }
+        if (event.target.name == 'shippedToArrivedByAirLeadTime') {
+            program.shippedToArrivedByAirLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
+            program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == 'arrivedToDeliveredLeadTime') {
+            program.arrivedToDeliveredLeadTime = event.target.value;
+        }
+        if (event.target.name == 'monthsInFutureForAmc') {
             program.monthsInFutureForAmc = event.target.value;
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
         } if (event.target.name == 'healthAreaId') {
-            program.healthArea.healthAreaId = event.target.value;
+            program.healthArea.id = event.target.value;
         } if (event.target.name == 'userId') {
             program.programManager.userId = event.target.value;
         }
@@ -451,16 +356,19 @@ export default class AddProgram extends Component {
             userId: true,
             airFreightPerc: true,
             seaFreightPerc: true,
-            deliveredToReceivedLeadTime: true,
+            // deliveredToReceivedLeadTime: true,
             draftToSubmittedLeadTime: true,
             plannedToDraftLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
+            shippedToArrivedByAirLeadTime: true,
+            shippedToArrivedBySeaLeadTime: true,
+            arrivedToDeliveredLeadTime: true,
             monthsInFutureForAmc: true,
             monthsInPastForAmc: true,
             healthAreaId: true,
-            programNotes: true,
-        
+            // programNotes: true,
+
         }
         )
         this.validateForm(errors)
@@ -536,6 +444,9 @@ export default class AddProgram extends Component {
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
@@ -555,27 +466,7 @@ export default class AddProgram extends Component {
                                         }
                                     }
                                     )
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        )
+
                                 }}
                                 render={
                                     ({
@@ -587,19 +478,20 @@ export default class AddProgram extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
 
-                                            <Form onSubmit={handleSubmit} noValidate name='programForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='programForm'>
                                                 <CardHeader>
                                                     <strong>{i18n.t('static.program.programadd')}</strong>
                                                 </CardHeader>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.program')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.program')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            type="text" name="programName" valid={!errors.programName}
+                                                            type="text" name="programName" valid={!errors.programName && this.state.program.label.label_en != ''}
                                                             bsSize="sm"
                                                             invalid={touched.programName && !!errors.programName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
@@ -609,15 +501,16 @@ export default class AddProgram extends Component {
                                                         <FormFeedback className="red">{errors.programName}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realm')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
                                                             // value={this.state.program.realm.realmId}
                                                             bsSize="sm"
-                                                            valid={!errors.realmId}
+                                                            valid={!errors.realmId && this.state.program.realm.realmId != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getDependentLists(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.program.realm.realmId}
                                                             type="select" name="realmId" id="realmId">
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {realms}
@@ -627,12 +520,12 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.realmcountry')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.realmCountry.realmCountryId}
+                                                            value={this.state.program.realmCountry.realmCountryId}
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId}
+                                                            valid={!errors.realmCountryId && this.state.program.realmCountry.realmCountryId != ''}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getRegionList(e) }}
                                                             onBlur={handleBlur}
@@ -647,10 +540,10 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup >
-                                                        <Label htmlFor="select">{i18n.t('static.program.region')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.region')}<span class="red Reqasterisk">*</span><span class="red Reqasterisk">*</span></Label>
 
                                                         <Select
-                                                            valid={!errors.regionId}
+                                                            valid={!errors.regionId && this.state.regionId != ''}
                                                             bsSize="sm"
                                                             invalid={touched.reagonId && !!errors.regionId}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
@@ -664,11 +557,11 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.regionId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.organisation.organisationId}
+                                                            value={this.state.program.organisation.id}
                                                             bsSize="sm"
-                                                            valid={!errors.organisationId}
+                                                            valid={!errors.organisationId && this.state.program.organisation.id != ''}
                                                             invalid={touched.organisationId && !!errors.organisationId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -682,11 +575,11 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.organisationId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.healthArea.healthAreaId}
+                                                            value={this.state.program.healthArea.id}
                                                             bsSize="sm"
-                                                            valid={!errors.healthAreaId}
+                                                            valid={!errors.healthAreaId && this.state.program.healthArea.id != ''}
                                                             invalid={touched.healthAreaId && !!errors.healthAreaId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur} type="select" name="healthAreaId" id="healthAreaId">
@@ -700,11 +593,11 @@ export default class AddProgram extends Component {
 
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}</Label>
+                                                        <Label htmlFor="select">{i18n.t('static.program.programmanager')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.programManager.userId}
+                                                            value={this.state.program.programManager.userId}
                                                             bsSize="sm"
-                                                            valid={!errors.userId}
+                                                            valid={!errors.userId && this.state.program.programManager.userId != ''}
                                                             invalid={touched.userId && !!errors.userId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur} type="select" name="userId" id="userId">
@@ -720,21 +613,21 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="select">{i18n.t('static.program.notes')}</Label>
                                                         <Input
-                                                            // value={this.state.program.programNotes}
+                                                            value={this.state.program.programNotes}
                                                             bsSize="sm"
-                                                            valid={!errors.programNotes}
-                                                            invalid={touched.programNotes && !!errors.programNotes}
+                                                            // valid={!errors.programNotes}
+                                                            // invalid={touched.programNotes && !!errors.programNotes}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             type="textarea" name="programNotes" id="programNotes" />
                                                         <FormFeedback>{errors.programNotes}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.airfreightperc')} (%) <span class="red ">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.airFreightPerc}
+                                                            value={this.state.program.airFreightPerc}
                                                             bsSize="sm"
-                                                            valid={!errors.airFreightPerc}
+                                                            valid={!errors.airFreightPerc && this.state.program.airFreightPerc != ''}
                                                             invalid={touched.airFreightPerc && !!errors.airFreightPerc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -744,11 +637,11 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.airFreightPerc}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.seafreightperc')} (%) <span class="red ">*</span></Label>
                                                         <Input
-                                                            // value={this.state.program.seaFreightPerc}
+                                                            value={this.state.program.seaFreightPerc}
                                                             bsSize="sm"
-                                                            valid={!errors.seaFreightPerc}
+                                                            valid={!errors.seaFreightPerc && this.state.program.seaFreightPerc != ''}
                                                             invalid={touched.seaFreightPerc && !!errors.seaFreightPerc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -758,12 +651,12 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.draftleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.plannedToDraftLeadTime}
+                                                            value={this.state.program.plannedToDraftLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.plannedToDraftLeadTime}
+                                                            valid={!errors.plannedToDraftLeadTime && this.state.program.plannedToDraftLeadTime != ''}
                                                             invalid={touched.plannedToDraftLeadTime && !!errors.plannedToDraftLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -775,12 +668,12 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.drafttosubmitleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.draftToSubmittedLeadTime}
+                                                            value={this.state.program.draftToSubmittedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.draftToSubmittedLeadTime}
+                                                            valid={!errors.draftToSubmittedLeadTime && this.state.program.draftToSubmittedLeadTime != ''}
                                                             invalid={touched.draftToSubmittedLeadTime && !!errors.draftToSubmittedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -793,12 +686,12 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.submittoapproveleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.submittedToApprovedLeadTime}
+                                                            value={this.state.program.submittedToApprovedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.submittedToApprovedLeadTime}
+                                                            valid={!errors.submittedToApprovedLeadTime && this.state.program.submittedToApprovedLeadTime != ''}
                                                             invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -810,12 +703,12 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.approvetoshipleadtime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.approvedToShippedLeadTime}
+                                                            value={this.state.program.approvedToShippedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.approvedToShippedLeadTime}
+                                                            valid={!errors.approvedToShippedLeadTime && this.state.program.approvedToShippedLeadTime != ''}
                                                             invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -825,14 +718,14 @@ export default class AddProgram extends Component {
                                                         <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
 
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.deliveredToReceivedLeadTime}
+                                                            value={this.state.program.deliveredToReceivedLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.deliveredToReceivedLeadTime}
+                                                            valid={!errors.deliveredToReceivedLeadTime && this.state.program.deliveredToReceivedLeadTime != ''}
                                                             invalid={touched.deliveredToReceivedLeadTime && !!errors.deliveredToReceivedLeadTime}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -841,15 +734,66 @@ export default class AddProgram extends Component {
                                                             name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                                         <FormFeedback>{errors.deliveredToReceivedLeadTime}</FormFeedback>
 
+                                                    </FormGroup> */}
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.shippedToArrivedByAirLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.shippedToArrivedByAirLeadTime && this.state.program.shippedToArrivedByAirLeadTime != ''}
+                                                            invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" placeholder={i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext')} />
+                                                        <FormFeedback>{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
+
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.monthsInPastForAmc}
+                                                            value={this.state.program.shippedToArrivedBySeaLeadTime}
                                                             bsSize="sm"
-                                                            valid={!errors.monthsInPastForAmc}
+                                                            valid={!errors.shippedToArrivedBySeaLeadTime && this.state.program.shippedToArrivedBySeaLeadTime != ''}
+                                                            invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" placeholder={i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext')} />
+                                                        <FormFeedback>{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.arrivedToDeliveredLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.arrivedToDeliveredLeadTime && this.state.program.arrivedToDeliveredLeadTime != ''}
+                                                            invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" placeholder={i18n.t('static.realmcountry.arrivedToDeliveredLeadTimetext')} />
+                                                        <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.monthsInPastForAmc}
+                                                            bsSize="sm"
+                                                            valid={!errors.monthsInPastForAmc && this.state.program.monthsInPastForAmc != ''}
                                                             invalid={touched.monthsInPastForAmc && !!errors.monthsInPastForAmc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -861,12 +805,12 @@ export default class AddProgram extends Component {
                                                     </FormGroup>
                                                     <FormGroup>
 
-                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}</Label>
+                                                        <Label htmlFor="company">{i18n.t('static.program.monthfutureamc')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input
-                                                            // value={this.state.program.monthsInFutureForAmc}
+                                                            value={this.state.program.monthsInFutureForAmc}
                                                             bsSize="sm"
-                                                            valid={!errors.monthsInFutureForAmc}
+                                                            valid={!errors.monthsInFutureForAmc && this.state.program.monthsInFutureForAmc != ''}
                                                             invalid={touched.monthsInFutureForAmc && !!errors.monthsInFutureForAmc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -882,6 +826,7 @@ export default class AddProgram extends Component {
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="sm" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> Reset</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
                                                         {/* <Button type="submit" size="sm" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>Submit</Button> */}
                                                         &nbsp;
@@ -898,5 +843,29 @@ export default class AddProgram extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/program/listProgram/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+    resetClicked() {
+        let { program } = this.state;
+
+        program.label.label_en = ''
+        program.realm.realmId = ''
+        program.realmCountry.realmCountryId = ''
+        this.state.regionId = ''
+        program.organisation.id = ''
+        program.airFreightPerc = ''
+        program.seaFreightPerc = ''
+        program.deliveredToReceivedLeadTime = ''
+        program.draftToSubmittedLeadTime = ''
+        program.plannedToDraftLeadTime = ''
+        program.submittedToApprovedLeadTime = ''
+        program.approvedToShippedLeadTime = ''
+        program.monthsInFutureForAmc = ''
+        program.monthsInPastForAmc = ''
+        program.healthArea.id = ''
+        program.programManager.userId = ''
+        program.programNotes = ''
+
+        this.setState({ program }, () => { })
+
     }
 }

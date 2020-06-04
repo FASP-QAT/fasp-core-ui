@@ -12,6 +12,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.program.programMaster');
 export default class ProgramList extends Component {
@@ -66,26 +67,7 @@ export default class ProgramList extends Component {
         this.setState({ message: response.data.messageCode })
       }
     })
-      .catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
+
     CountryService.getCountryListActive().then(response => {
       if (response.status == 200) {
         console.log("response--->", response.data);
@@ -96,28 +78,6 @@ export default class ProgramList extends Component {
         this.setState({ message: response.data.messageCode })
       }
     })
-      .catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                break;
-            }
-          }
-        }
-      );
-
-
 
   }
 
@@ -151,49 +111,11 @@ export default class ProgramList extends Component {
     return <Button type="button" size="sm" color="success" onClick={(event) => this.addProductMapping(event, cell)} ><i className="fa fa-check"></i> Add</Button>;
   }
   addProductMapping(event, cell) {
-    // console.log(cell);
     event.stopPropagation();
-    AuthenticationService.setupAxiosInterceptors();
-    console.log("cell------", cell);
-    ProgramService.getProgramProductListByProgramId(cell)
-      .then(response => {
+    this.props.history.push({
+      pathname: `/programProduct/addProgramProduct/${cell}`,
+    });
 
-        if (response.status == 200) {
-          let myReasponse = response.data;
-          console.log("myResponce=========", response.data);
-          this.props.history.push({
-            pathname: "/programProduct/addProgramProduct",
-            state: {
-              programProduct: myReasponse
-            }
-
-          })
-        } else {
-          this.setState({
-            message: response.data.messageCode
-          })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({ message: error.message });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 500:
-              case 401:
-              case 404:
-              case 406:
-              case 412:
-                this.setState({ message: error.response.data.messageCode });
-                break;
-              default:
-                this.setState({ message: 'static.unkownError' });
-                console.log("Error code unkown");
-                break;
-            }
-          }
-        }
-      );
   }
 
   formatLabel(cell, row) {
@@ -250,15 +172,15 @@ export default class ProgramList extends Component {
         headerAlign: 'center',
         formatter: this.formatLabel
       }
-      // ,
-      // {
-      //   dataField: 'programId',
-      //   text: 'Map Product To Program',
-      //   sort: true,
-      //   align: 'center',
-      //   headerAlign: 'center',
-      //   formatter: this.buttonFormatter
-      // }
+      ,
+      {
+        dataField: 'programId',
+        text: i18n.t('static.program.mapPlanningUnit'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.buttonFormatter
+      }
     ];
     const options = {
       hidePageListOnlyOnePage: true,
@@ -288,10 +210,13 @@ export default class ProgramList extends Component {
     }
     return (
       <div className="animated">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
-          <CardHeader>
+          <CardHeader className="mb-md-3 pb-lg-1">
             <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
             <div className="card-header-actions">
               <div className="card-header-action">
@@ -299,9 +224,9 @@ export default class ProgramList extends Component {
               </div>
             </div>
           </CardHeader>
-          <CardBody>
+          <CardBody className="pb-lg-0">
             <Col md="3 pl-0" >
-              <FormGroup>
+              <FormGroup className="Selectdiv">
                 <Label htmlFor="appendedInputButton">{i18n.t('static.region.country')}</Label>
 
                 <div className="controls SelectGo">
@@ -311,13 +236,14 @@ export default class ProgramList extends Component {
                       name="countryId"
                       id="countryId"
                       bsSize="sm"
+                      onChange={this.filterData}
                     >
                       <option value="0">{i18n.t('static.common.all')}</option>
                       {countries}
                     </Input>
-                    <InputGroupAddon addonType="append">
+                    {/* <InputGroupAddon addonType="append">
                       <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                    </InputGroupAddon>
+                    </InputGroupAddon> */}
                   </InputGroup>
                 </div>
               </FormGroup>

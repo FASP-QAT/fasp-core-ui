@@ -9,25 +9,29 @@ import i18n from '../../i18n';
 import getLabelText from '../../CommonComponent/getLabelText';
 import BudgetService from "../../api/BudgetService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import moment from 'moment';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import DatePicker from 'react-datepicker';
+import '../../../node_modules/react-datepicker/dist/react-datepicker.css';
 
 const entityname = i18n.t('static.dashboard.budget');
 let initialValues = {
     budgetName: '',
     budgetAmt: '',
-    startDate: '',
-    stopDate: ''
+    // startDate: '',
+    // stopDate: ''
 }
 
 const validationSchema = function (values) {
     return Yup.object().shape({
         budgetName: Yup.string()
             .required(i18n.t('static.budget.budgetamountdesc')),
-        budgetAmt: Yup.number()
+        budgetAmt: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.budget.budgetamounttext')).min(0, i18n.t('static.program.validvaluetext')),
-        startDate: Yup.string()
-            .required(i18n.t('static.budget.startdatetext')),
-        stopDate: Yup.string()
-            .required(i18n.t('static.budget.stopdatetext'))
+        // startDate: Yup.string()
+        //     .required(i18n.t('static.budget.startdatetext')),
+        // stopDate: Yup.string()
+        //     .required(i18n.t('static.budget.stopdatetext'))
     })
 }
 
@@ -57,58 +61,115 @@ class EditBudgetComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            budget: this.props.location.state.budget,
+            // budget: this.props.location.state.budget,
+            budget: {
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                program: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                fundingSource: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+                },
+                currency: {
+                    currencyId: '',
+                    conversionRateToUsd: '',
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: ''
+                    }
+
+                },
+                startDate: '',
+                stopDate: '',
+                budgetAmt: '',
+                notes: ''
+
+            },
             message: '',
             lang: localStorage.getItem('lang'),
-        }
-        initialValues = {
-            budgetName: getLabelText(this.state.budget.label, this.state.lang),
-            budgetAmt: this.state.budget.budgetAmt,
-            startDate: this.state.budget.startDate,
-            stopDate: this.state.budget.stopDate
         }
 
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.currentDate = this.currentDate.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
         // console.log(this.state);
+        this.dataChangeDate = this.dataChangeDate.bind(this);
+        this.dataChangeEndDate = this.dataChangeEndDate.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
-    // componentDidMount() {
-    //     console.log("in componentdidmount---------------");
-    //     AuthenticationService.setupAxiosInterceptors();
-    //     BudgetService.getBudgetDataById(this.props.match.params.budgetId)
-    //         .then(response => {
-    //             this.setState({
-    //                 budget: response.data
-    //             });
-    //             initialValues = {
-    //                 budgetName: getLabelText(this.state.budget.label, this.state.lang),
-    //                 budgetAmt: this.state.budget.budgetAmt,
-    //                 startDate: this.state.budget.startDate,
-    //                 stopDate: this.state.budget.stopDate
-    //             }
-    //         })
-    //         .catch(
-    //             error => {
-    //                 switch (error.message) {
-    //                     case "Network Error":
-    //                         this.setState({
-    //                             message: error.message
-    //                         })
-    //                         break
-    //                     default:
-    //                         this.setState({
-    //                             message: error.message
-    //                         })
-    //                         break
-    //                 }
-    //             }
-    //         );
+    dataChangeDate(date) {
+        let { budget } = this.state
+        budget.startDate = date;
+        budget.stopDate = '';
+        this.setState({ budget: budget });
+    }
+
+    dataChangeEndDate(date) {
+        let { budget } = this.state;
+        budget.stopDate = date;
+        this.setState({ budget: budget });
+    }
+
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        BudgetService.getBudgetDataById(this.props.match.params.budgetId)
+            .then(response => {
+                if (response.status == 200) {
+                    console.log("(response.data.startDate)--", new Date(response.data.startDate));
+                    response.data.startDate = new Date(response.data.startDate);
+                    response.data.stopDate = new Date(response.data.stopDate);
+                    this.setState({
+                        budget: response.data
+                    });
+                }
+                else {
+
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+                // response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                // response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                // new Date('2019-06-11')
 
 
-    // }
+
+
+            })
+
+    }
     Capitalize(str) {
         let { budget } = this.state
         budget.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -130,11 +191,15 @@ class EditBudgetComponent extends Component {
         }
         if (event.target.name === "budgetAmt") {
             budget.budgetAmt = event.target.value;
-        } if (event.target.name === "startDate") {
-            budget.startDate = event.target.value;
-            budget.stopDate = ''
-        } if (event.target.name === "stopDate") {
-            budget.stopDate = event.target.value;
+        }
+        // if (event.target.name === "startDate") {
+        //     budget.startDate = event.target.value;
+        //     budget.stopDate = ''
+        // } if (event.target.name === "stopDate") {
+        //     budget.stopDate = event.target.value;
+        // } 
+        if (event.target.name === "notes") {
+            budget.notes = event.target.value;
         } else if (event.target.name === "active") {
             budget.active = event.target.id === "active2" ? false : true;
         }
@@ -148,8 +213,8 @@ class EditBudgetComponent extends Component {
         setTouched({
             budgetName: true,
             budgetAmt: true,
-            startDate: true,
-            stopDate: true
+            // startDate: true,
+            // stopDate: true
         });
         this.validateForm(errors)
     }
@@ -171,49 +236,39 @@ class EditBudgetComponent extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    budgetName: getLabelText(this.state.budget.label, this.state.lang),
+                                    budgetAmt: this.state.budget.budgetAmt,
+                                    // startDate: this.state.budget.startDate,
+                                    // stopDate: this.state.budget.stopDate
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
+                                    console.log("this.state.budget----->", this.state.budget);
                                     BudgetService.editBudget(this.state.budget)
                                         .then(response => {
                                             if (response.status == "200") {
-                                                this.props.history.push(`/budget/listBudget/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/budget/listBudget/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
                                 render={
 
@@ -230,23 +285,7 @@ class EditBudgetComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='budgetForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="budget">{i18n.t('static.budget.budget')}</Label>
 
-                                                        <Input
-                                                            type="text"
-                                                            name="budgetName"
-                                                            id="budget"
-                                                            valid={!errors.budgetName}
-                                                            invalid={touched.budgetName && !!errors.budgetName}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.budget.label.label_en}
-
-                                                        />
-
-                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
-                                                    </FormGroup>
                                                     <FormGroup>
                                                         <Label htmlFor="programId">{i18n.t('static.budget.program')}</Label>
 
@@ -268,26 +307,79 @@ class EditBudgetComponent extends Component {
                                                         <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="subFundingSourceId">{i18n.t('static.budget.subfundingsource')}</Label>
+                                                        <Label htmlFor="fundingSourceId">{i18n.t('static.budget.fundingsource')}</Label>
 
                                                         <Input
                                                             type="text"
-                                                            name="subFundingSourceId"
-                                                            id="subFundingSourceId"
+                                                            name="fundingSourceId"
+                                                            id="fundingSourceId"
                                                             bsSize="sm"
-                                                            valid={!errors.subFundingSourceId}
-                                                            invalid={touched.subFundingSourceId && !!errors.subFundingSourceId}
+                                                            valid={!errors.fundingSourceId}
+                                                            invalid={touched.fundingSourceId && !!errors.fundingSourceId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             readOnly
-                                                            value={getLabelText(this.state.budget.subFundingSource.label,this.state.lang)}
+                                                            value={getLabelText(this.state.budget.fundingSource.label, this.state.lang)}
                                                         >
                                                         </Input>
                                                         {/* </InputGroupAddon> */}
-                                                        <FormFeedback className="red">{errors.subFundingSourceId}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.fundingSourceId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}</Label>
+                                                        <Label for="budget">{i18n.t('static.budget.budget')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            type="text"
+                                                            name="budgetName"
+                                                            id="budget"
+                                                            bsSize="sm"
+                                                            valid={!errors.budgetName}
+                                                            invalid={touched.budgetName && !!errors.budgetName}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.budget.label.label_en}
+
+                                                        />
+
+                                                        <FormFeedback className="red">{errors.budgetName}</FormFeedback>
+                                                    </FormGroup>
+
+
+                                                    <FormGroup>
+                                                        <Label htmlFor="currencyId">{i18n.t("static.country.currency")}<span className="red Reqasterisk">*</span></Label>
+                                                        {/* <InputGroupAddon addonType="prepend"> */}
+                                                        {/* <InputGroupText><i className="fa fa-building-o"></i></InputGroupText> */}
+                                                        <Input
+                                                            type="text"
+                                                            name="currencyId"
+                                                            id="currencyId"
+                                                            bsSize="sm"
+                                                            value={this.state.budget.currency.label.label_en}
+                                                            disabled
+                                                        >
+                                                        </Input>
+                                                        {/* </InputGroupAddon> */}
+                                                        <FormFeedback className="red">{errors.currencyId}</FormFeedback>
+                                                    </FormGroup>
+
+                                                    <FormGroup>
+                                                        <Label for="conversionRateToUsd">{i18n.t("static.currency.conversionrateusd")}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input
+                                                            type="text"
+                                                            name="conversionRateToUsd"
+                                                            id="conversionRateToUsd"
+                                                            bsSize="sm"
+                                                            value={this.state.budget.currency.conversionRateToUsd}
+                                                            disabled />
+                                                        <FormFeedback className="red">{errors.budget}</FormFeedback>
+                                                    </FormGroup>
+
+
+
+
+
+                                                    <FormGroup>
+                                                        <Label for="budgetAmt">{i18n.t('static.budget.budgetamount')}<span class="red Reqasterisk">*</span></Label>
 
                                                         <Input type="number"
                                                             min="0"
@@ -302,48 +394,53 @@ class EditBudgetComponent extends Component {
                                                             placeholder={i18n.t('static.budget.budgetamountdesc')}
                                                             value={this.state.budget.budgetAmt}
                                                         />
-
                                                         <FormFeedback className="red">{errors.budgetAmt}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        {/* <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
 
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
                                                             name="startDate"
-                                                            id="startDate"
-                                                            bsSize="sm"
-                                                            valid={!errors.startDate}
-                                                            invalid={touched.startDate && !!errors.startDate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            id="startDate" */}
+                                                        {/* // bsSize="sm" */}
+                                                        {/* // valid={!errors.startDate} */}
+                                                        {/* // invalid={touched.startDate && !!errors.startDate} */}
+                                                        {/* onChange={(e) => { */}
+                                                        {/* // handleChange(e);  */}
+                                                        {/* this.dataChange(e) */}
+                                                        {/* }} */}
+                                                        {/* // onBlur={handleBlur}
                                                             type="date"
                                                             min={this.currentDate()}
                                                             value={this.state.budget.startDate}
                                                             placeholder="{i18n.t('static.budget.budgetstartdate')}"
-                                                        />
+                                                        /> */}
 
-                                                        <FormFeedback className="red">{errors.startDate}</FormFeedback>
+                                                        <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        {/* <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
 
                                                         <Input
                                                             className="fa fa-calendar Fa-right"
                                                             name="stopDate"
-                                                            id="stopDate"
-                                                            bsSize="sm"
-                                                            valid={!errors.stopDate}
-                                                            invalid={touched.stopDate && !!errors.stopDate}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
+                                                            id="stopDate" */}
+                                                        {/* // bsSize="sm"
+                                                            // valid={!errors.stopDate}
+                                                            // invalid={touched.stopDate && !!errors.stopDate}
+                                                            onChange={(e) => { */}
+                                                        {/* // handleChange(e); 
+                                                                this.dataChange(e)
+                                                            }}
+                                                            // onBlur={handleBlur}
                                                             type="date"
                                                             min={this.state.budget.startDate}
                                                             value={this.state.budget.stopDate}
                                                             placeholder="{i18n.t('static.budget.budgetstopdate')}"
-                                                        />
+                                                        /> */}
 
-                                                        <FormFeedback className="red">{errors.stopDate}</FormFeedback>
+                                                        <FormFeedback className="red"></FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
 
@@ -382,11 +479,55 @@ class EditBudgetComponent extends Component {
                                                             </Label>
                                                         </FormGroup>
                                                     </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="notes">{i18n.t('static.program.notes')}</Label>
+                                                        <Input
+                                                            value={this.state.budget.notes}
+                                                            name="notes"
+                                                            id="notes"
+                                                            bsSize="sm"
+                                                            onChange={(e) => { this.dataChange(e) }}
+
+                                                            type="textarea"
+                                                        />
+                                                        <FormFeedback className="red"></FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="startDate">{i18n.t('static.common.startdate')}</Label>
+                                                        <DatePicker
+                                                            id="startDate"
+                                                            name="startDate"
+                                                            bsSize="sm"
+                                                            minDate={new Date()}
+                                                            selected={this.state.budget.startDate}
+                                                            onChange={(date) => { this.dataChangeDate(date) }}
+                                                            placeholderText="mm-dd-yyy"
+                                                            className="form-control-sm form-control"
+                                                            disabledKeyboardNavigation
+
+                                                        />
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label for="stopDate">{i18n.t('static.common.stopdate')}</Label>
+                                                        <DatePicker
+                                                            id="stopDate"
+                                                            name="stopDate"
+                                                            bsSize="sm"
+                                                            minDate={this.state.budget.startDate}
+                                                            selected={this.state.budget.stopDate}
+                                                            onChange={(date) => { this.dataChangeEndDate(date) }}
+                                                            placeholderText="mm-dd-yyy"
+                                                            className="form-control-sm form-control"
+                                                            disabledKeyboardNavigation
+
+                                                        />
+                                                    </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
 
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>Update</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -406,7 +547,19 @@ class EditBudgetComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/budget/listBudget/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/budget/listBudget/` + 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        BudgetService.getBudgetDataById(this.props.match.params.budgetId)
+            .then(response => {
+                response.data.startDate = moment(response.data.startDate).format('YYYY-MM-DD');
+                response.data.stopDate = moment(response.data.stopDate).format('YYYY-MM-DD');
+                this.setState({
+                    budget: response.data
+                });
+            })
     }
 }
 

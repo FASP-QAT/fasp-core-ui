@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input ,InputGroupAddon,InputGroupText} from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, InputGroupAddon, InputGroupText } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
 import i18n from '../../i18n'
 import SubFundingSourceService from "../../api/SubFundingSourceService";
 import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 let initialValues = {
     subFundingSource: ""
 }
-const entityname=i18n.t('static.subfundingsource.subfundingsource');
+const entityname = i18n.t('static.subfundingsource.subfundingsource');
 const validationSchema = function (values) {
     return Yup.object().shape({
         subFundingSource: Yup.string()
-        .required( i18n.t('static.fundingsource.validsubfundingsource'))
+            .required(i18n.t('static.fundingsource.validsubfundingsource'))
     })
 }
 
@@ -44,18 +45,48 @@ class EditSubFundingSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subFundingSource: this.props.location.state.subFundingSource,
+            // subFundingSource: this.props.location.state.subFundingSource,
+            subFundingSource: {
+                fundingSource: {
+                    label: {
+                        label_en: '',
+                        label_sp: '',
+                        label_pr: '',
+                        label_fr: '',
+                    }
+                },
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: '',
+                }
+            },
             message: ''
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
+    changeMessage(message) {
+        this.setState({ message: message })
+    }
+
+    componentDidMount() {
+        SubFundingSourceService.getSubFundingSourceServiceById(this.props.match.params.subFundingSourceId).then(response => {
+            this.setState({
+                subFundingSource: response.data
+            });
+
+        })
+    }
+
     Capitalize(str) {
         if (str != null && str != "") {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        } else {
-            return "";
+            let { subFundingSource } = this.state;
+            subFundingSource.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
         }
     }
 
@@ -95,52 +126,52 @@ class EditSubFundingSourceComponent extends Component {
         }
     }
 
+    
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{this.state.message}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.commo.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.commo.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={{ subFundingSource: this.state.subFundingSource.label.label_en }}
+                                initialValues={{
+                                    subFundingSource: this.state.subFundingSource.label.label_en
+                                }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    AuthenticationService.setupAxiosInterceptors();
                                     SubFundingSourceService.updateSubFundingSource(this.state.subFundingSource)
                                         .then(response => {
+                                            console.log("my response---", response);
                                             if (response.status == 200) {
-                                                this.props.history.push(`/subFundingSource/listSubFundingSource/`+ i18n.t(response.data.messageCode,{entityname}))
-                                                } else {
-                                                this.setState({
-                                                    message: response.data.messageCode
-                                                })
+                                                this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+                                    // .catch(
+                                    //     error => {
+                                    //         if (error.message === "Network Error") {
+                                    //             this.setState({ message: error.message });
+                                    //         } else {
+                                    //             switch (error.response ? error.response.status : "") {
+                                    //                 case 500:
+                                    //                 case 401:
+                                    //                 case 404:
+                                    //                 case 406:
+                                    //                 case 412:
+                                    //                     this.setState({ message: error.response.data.messageCode });
+                                    //                     break;
+                                    //                 default:
+                                    //                     this.setState({ message: 'static.unkownError' });
+                                    //                     break;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // );
                                 }}
                                 render={
                                     ({
@@ -169,16 +200,16 @@ class EditSubFundingSourceComponent extends Component {
                                                         </Input>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}</Label>
+                                                        <Label for="subFundingSource">{i18n.t('static.subfundingsource.subfundingsource')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="subFundingSource"
                                                             id="subFundingSource"
                                                             bsSize="sm"
                                                             valid={!errors.subFundingSource}
                                                             invalid={touched.subFundingSource && !!errors.subFundingSource}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
-                                                            value={this.Capitalize(this.state.subFundingSource.label.label_en)}
+                                                            value={this.state.subFundingSource.label.label_en}
                                                             required />
                                                         <FormFeedback>{errors.subFundingSource}</FormFeedback>
                                                     </FormGroup>
@@ -221,6 +252,7 @@ class EditSubFundingSourceComponent extends Component {
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -236,7 +268,16 @@ class EditSubFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled',{entityname}));
+        this.props.history.push(`/subFundingSource/listSubFundingSource/` + i18n.t('static.message.cancelled', { entityname }));
+    }
+
+    resetClicked() {
+        SubFundingSourceService.getSubFundingSourceServiceById(this.props.match.params.subFundingSourceId).then(response => {
+            this.setState({
+                subFundingSource: response.data
+            });
+
+        })
     }
 }
 

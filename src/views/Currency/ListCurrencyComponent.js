@@ -12,6 +12,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.currency.currencyMaster');
 export default class CurrencyListComponent extends Component {
@@ -42,9 +43,22 @@ export default class CurrencyListComponent extends Component {
         this.editCurrency = this.editCurrency.bind(this);
         this.addNewCurrency = this.addNewCurrency.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
     }
 
     componentDidMount() {
+        this.hideFirstComponent();
         AuthenticationService.setupAxiosInterceptors();
         CurrencyService.getCurrencyList().then(response => {
             if (response.status == 200) {
@@ -52,38 +66,45 @@ export default class CurrencyListComponent extends Component {
                     currencyList: response.data,
                     selCurrency: response.data
                 })
+
             } else {
-                this.setState({ message: response.data.messageCode })
+
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
             }
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
 
     }
 
     editCurrency(currency) {
         this.props.history.push({
-            pathname: "/currency/editCurrency",
-            state: { currency: currency }
+            pathname: `/currency/editCurrency/${currency.currencyId}`,
+            // state: { currency: currency }
         });
 
     }
@@ -115,20 +136,6 @@ export default class CurrencyListComponent extends Component {
         );
         const columns = [
             {
-                dataField: 'currencyCode',
-                text: i18n.t('static.currency.currencycode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'currencySymbol',
-                text: i18n.t('static.currency.currencysymbol'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
                 dataField: 'label',
                 text: i18n.t('static.currency.currency'),
                 sort: true,
@@ -136,6 +143,20 @@ export default class CurrencyListComponent extends Component {
                 headerAlign: 'center',
                 formatter: this.formatLabel
             },
+            {
+                dataField: 'currencyCode',
+                text: i18n.t('static.currency.currencycode'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center'
+            },
+            // {
+            //     dataField: 'currencySymbol',
+            //     text: i18n.t('static.currency.currencysymbol'),
+            //     sort: true,
+            //     align: 'center',
+            //     headerAlign: 'center'
+            // },
             {
                 dataField: 'conversionRateToUsd',
                 text: i18n.t('static.currency.conversionrateusd'),
@@ -185,11 +206,14 @@ export default class CurrencyListComponent extends Component {
 
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
-                        <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
+                    <CardHeader className="mb-md-3 pb-lg-1">
+                        <i className="icon-menu"></i><strong>{i18n.t('static.dashboard.currencylist')}</strong>{' '}
 
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -197,7 +221,7 @@ export default class CurrencyListComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         {/* <BootstrapTable data={this.state.currencyList} version="4" hover pagination search options={this.options}>
                             <TableHeaderColumn isKey filterFormatted dataField="currencyCode" dataSort dataAlign="center">{i18n.t('static.currency.currencycode')}</TableHeaderColumn>
                             <TableHeaderColumn filterFormatted dataField="currencySymbol" dataSort dataAlign="center">{i18n.t('static.currency.currencysymbol')}</TableHeaderColumn>

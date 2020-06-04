@@ -72,8 +72,9 @@ class ListUserComponent extends Component {
     }
     editUser(user) {
         this.props.history.push({
-            pathname: "/user/editUser",
-            state: { user }
+            pathname: `/user/editUser/${user.userId}`,
+            // pathname: `/language/editLanguage/${language.languageId}`,
+            // state: { user }
         });
     }
 
@@ -239,11 +240,11 @@ class ListUserComponent extends Component {
             }
         }, {
             dataField: 'userId',
-            text: 'Action',
+            text: i18n.t('static.user.accessControlText'),
             align: 'center',
             headerAlign: 'center',
             formatter: (cellContent, row) => {
-                return (<Button type="button" size="sm" color="success" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>Add Access Control</Button>
+                return (<Button type="button" size="sm" color="success" title="Add Access Control" onClick={(event) => this.addAccessControls(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                 )
             }
         }
@@ -279,7 +280,7 @@ class ListUserComponent extends Component {
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -287,9 +288,9 @@ class ListUserComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3" className="pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -298,13 +299,14 @@ class ListUserComponent extends Component {
                                             name="realmId"
                                             id="realmId"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>
@@ -320,7 +322,7 @@ class ListUserComponent extends Component {
                             {
                                 props => (
 
-                                    <div className="TableCust">
+                                    <div className="TableCust userAlignThtd">
                                         <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                                             <SearchBar {...props.searchProps} />
                                             <ClearSearchButton {...props.searchProps} />
@@ -329,7 +331,7 @@ class ListUserComponent extends Component {
                                             pagination={paginationFactory(options)}
                                             rowEvents={{
                                                 onClick: (e, row, rowIndex) => {
-                                                   // row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
+                                                    // row.lastLoginDate = moment(row.lastLoginDate).format('YYYY-MM-DD');
                                                     this.editUser(row);
                                                 }
                                             }}

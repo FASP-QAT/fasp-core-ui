@@ -9,6 +9,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import DimensionService from '../../api/DimensionService.js';
 import getLabelText from '../../CommonComponent/getLabelText.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 // import { HashRouter, Route, Switch } from 'react-router-dom';
 const entityname = i18n.t('static.unit.unit');
@@ -43,13 +44,25 @@ export default class UnitListComponent extends Component {
         this.addUnit = this.addUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideFirstComponent = this.hideFirstComponent.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
 
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     editUnit(unit) {
         this.props.history.push({
-            pathname: "/unit/editUnit",
-            state: { unit }
+            pathname: `/unit/editUnit/${unit.unitId}`,
+            // state: { unit }
         });
     }
 
@@ -64,7 +77,7 @@ export default class UnitListComponent extends Component {
     filterData() {
         let dimensionId = document.getElementById("dimensionId").value;
         if (dimensionId != 0) {
-            const selSource = this.state.unitList.filter(c => c.dimension.dimensionId == dimensionId)
+            const selSource = this.state.unitList.filter(c => c.dimension.id == dimensionId)
             this.setState({
                 selSource
             });
@@ -77,36 +90,43 @@ export default class UnitListComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        DimensionService.getDimensionListAll()
-            .then(response => {
-                if (response.status == 200) {
-                    this.setState({
-                        dimensions: response.data
+        this.hideFirstComponent();
+        DimensionService.getDimensionListAll().then(response => {
+            if (response.status == 200) {
+                this.setState({
+                    dimensions: response.data
+                })
+            } else {
+                 this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
                     })
-                } else {
-                    this.setState({ message: response.data.messageCode })
-                }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+
+            }
+        })
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     console.log("Error code unkown");
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
         UnitService.getUnitListAll()
             .then(response => {
@@ -118,31 +138,31 @@ export default class UnitListComponent extends Component {
                 })
 
             })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
+        //     }
+        // );
 
     }
 
     formatLabel(cell, row) {
-        console.log("----------jjjjjjj",cell);
+        console.log("----------jjjjjjj", cell);
         return getLabelText(cell, this.state.lang);
     }
     render() {
@@ -223,10 +243,13 @@ export default class UnitListComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -234,28 +257,29 @@ export default class UnitListComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>   
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                        <FormGroup>
-                            <Label htmlFor="appendedInputButton">{i18n.t('static.dimension.dimension')}</Label>
-                            <div className="controls SelectGo">
-                                <InputGroup>
-                                    <Input
-                                        type="select"
-                                        name="dimensionId"
-                                        id="dimensionId"
-                                        bsSize="sm"
-                                    >
-                                        <option value="0">{i18n.t('static.common.all')}</option>
-                                        {dimensionList}
-                                    </Input>
-                                    <InputGroupAddon addonType="append">
-                                        <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                    </InputGroupAddon>
-                                </InputGroup>
-                            </div>
-                        </FormGroup>
-                    </Col>
+                            <FormGroup className="Selectdiv">
+                                <Label htmlFor="appendedInputButton">{i18n.t('static.dimension.dimension')}</Label>
+                                <div className="controls SelectGo">
+                                    <InputGroup>
+                                        <Input
+                                            type="select"
+                                            name="dimensionId"
+                                            id="dimensionId"
+                                            bsSize="sm"
+                                            onChange={this.filterData}
+                                        >
+                                            <option value="0">{i18n.t('static.common.all')}</option>
+                                            {dimensionList}
+                                        </Input>
+                                        {/* <InputGroupAddon addonType="append">
+                                            <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
+                                        </InputGroupAddon> */}
+                                    </InputGroup>
+                                </div>
+                            </FormGroup>
+                        </Col>
 
                         <ToolkitProvider
                             keyField="unitId"

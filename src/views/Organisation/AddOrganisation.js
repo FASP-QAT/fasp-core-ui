@@ -11,6 +11,7 @@ import OrganisationService from "../../api/OrganisationService";
 import UserService from "../../api/UserService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.organisation.organisation');
 
@@ -67,7 +68,7 @@ export default class AddOrganisationComponent extends Component {
                     label_en: ''
                 },
                 realm: {
-                    realmId: ""
+                    id: ""
                 },
                 realmCountryArray: [],
                 organisationCode: ''
@@ -85,6 +86,8 @@ export default class AddOrganisationComponent extends Component {
         this.dataChange = this.dataChange.bind(this);
         this.updateFieldData = this.updateFieldData.bind(this);
         this.getRealmCountryList = this.getRealmCountryList.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
 
     }
     dataChange(event) {
@@ -94,9 +97,9 @@ export default class AddOrganisationComponent extends Component {
         if (event.target.name === "organisationName") {
             organisation.label.label_en = event.target.value
         } else if (event.target.name === "organisationCode") {
-            organisation.organisationCode = event.target.value
+            organisation.organisationCode = event.target.value.toUpperCase();
         } else if (event.target.name === "realmId") {
-            organisation.realm.realmId = event.target.value
+            organisation.realm.id = event.target.value
         }
         this.setState({
             organisation
@@ -140,45 +143,20 @@ export default class AddOrganisationComponent extends Component {
                 this.setState({
                     countries: response.data
                 })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
+            })
+
         UserService.getRealmList()
             .then(response => {
                 console.log("realm list---", response.data);
                 this.setState({
                     realms: response.data
                 })
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.response.data.message
-                            })
-                            break
-                    }
-                }
-            );
-
+            })
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     updateFieldData(value) {
@@ -213,27 +191,7 @@ export default class AddOrganisationComponent extends Component {
                         message: response.data.messageCode
                     })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                console.log("Error code unkown");
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
     }
 
@@ -272,7 +230,10 @@ export default class AddOrganisationComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -294,27 +255,6 @@ export default class AddOrganisationComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
 
                                 }}
 
@@ -328,17 +268,18 @@ export default class AddOrganisationComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='organisationForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='organisationForm'>
                                                 <CardBody>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}</Label>
+                                                        <Label htmlFor="realmId">{i18n.t('static.organisation.realm')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            value={this.state.organisation.realm.realmId}
-                                                            valid={!errors.realmId}
+                                                            value={this.state.organisation.realm.id}
+                                                            valid={!errors.realmId && this.state.organisation.realm.id != ''}
                                                             invalid={touched.realmId && !!errors.realmId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.getRealmCountryList(e) }}
                                                             onBlur={handleBlur}
@@ -350,10 +291,10 @@ export default class AddOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}</Label>
+                                                        <Label htmlFor="realmCountryId">{i18n.t('static.organisation.realmcountry')}<span class="red Reqasterisk">*</span></Label>
                                                         <Select
                                                             bsSize="sm"
-                                                            valid={!errors.realmCountryId}
+                                                            valid={!errors.realmCountryId && this.state.realmCountryId != ''}
                                                             invalid={touched.realmCountryId && !!errors.realmCountryId}
                                                             onChange={(e) => { handleChange(e); this.updateFieldData(e) }}
                                                             onBlur={handleBlur} name="realmCountryId" id="realmCountryId"
@@ -365,25 +306,27 @@ export default class AddOrganisationComponent extends Component {
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')} </Label>
+                                                        <Label htmlFor="organisationCode">{i18n.t('static.organisation.organisationcode')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="organisationCode" valid={!errors.organisationCode}
+                                                            type="text" name="organisationCode" valid={!errors.organisationCode && this.state.organisation.organisationCode != ''}
                                                             invalid={touched.organisationCode && !!errors.organisationCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            id="organisationCode"  />
+                                                            value={this.state.organisation.organisationCode}
+                                                            id="organisationCode" />
                                                         <FormFeedback className="red">{errors.organisationCode}</FormFeedback>
                                                     </FormGroup>
 
                                                     <FormGroup>
-                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')} </Label>
+                                                        <Label htmlFor="organisationName">{i18n.t('static.organisation.organisationname')}<span class="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             bsSize="sm"
-                                                            type="text" name="organisationName" valid={!errors.organisationName}
+                                                            type="text" name="organisationName" valid={!errors.organisationName && this.state.organisation.label.label_en != ''}
                                                             invalid={touched.organisationName && !!errors.organisationName}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.organisation.label.label_en}
                                                             id="organisationName" />
                                                         <FormFeedback className="red">{errors.organisationName}</FormFeedback>
                                                     </FormGroup>
@@ -392,7 +335,8 @@ export default class AddOrganisationComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
                                                         &nbsp;
@@ -410,7 +354,21 @@ export default class AddOrganisationComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/organisation/listOrganisation/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/organisation/listOrganisation/`+ 'red/' + i18n.t('static.message.cancelled', { entityname }))
+    }
+    resetClicked() {
+        let { organisation } = this.state
+
+        organisation.label.label_en = ''
+        organisation.organisationCode = ''
+        organisation.realm.id = ''
+        this.state.realmCountryId = ''
+
+        this.setState({
+            organisation
+        }, (
+        ) => {
+        })
     }
 
 }

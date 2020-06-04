@@ -7,15 +7,17 @@ import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 
 const entityname = i18n.t('static.realm.realm');
 let initialValues = {
     realmCode: '',
-    label: '',
+    label: ''
+    /*,
     monthInPastForAmc: '',
     monthInFutureForAmc: '',
-    orderFrequency: '',
+    orderFrequency: '',*/
 
 }
 
@@ -25,12 +27,12 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
-        monthInPastForAmc: Yup.number()
-            .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-        monthInFutureForAmc: Yup.number()
-            .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
-        orderFrequency: Yup.number()
-            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))
+        /*   monthInPastForAmc: Yup.number()
+               .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
+           monthInFutureForAmc: Yup.number()
+               .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
+           orderFrequency: Yup.number()
+               .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))*/
     })
 }
 
@@ -61,22 +63,31 @@ export default class UpdateDataSourceComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            realm: this.props.location.state.realm,
+            // realm: this.props.location.state.realm,
+            realm: {
+                realmCode: '',
+                label: {
+                    label_en: '',
+                    label_sp: '',
+                    label_pr: '',
+                    label_fr: ''
+                },
+                /*  monthInPastForAmc: '',
+                  monthInFutureForAmc: '',
+                  orderFrequency: '',*/
+                defaultRealm: ''
+            },
             lang: localStorage.getItem('lang'),
             message: ''
         }
         this.Capitalize = this.Capitalize.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
-        initialValues = {
-            realmCode: this.state.realm.realmCode,
-            label: getLabelText(this.state.realm.label, this.state.lang),
-            monthInPastForAmc: this.state.realm.monthInPastForAmc,
-            monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
-            orderFrequency: this.state.realm.orderFrequency,
-            defaultRealm: this.state.realm.defaultRealm,
-        }
-
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     dataChange(event) {
@@ -87,15 +98,15 @@ export default class UpdateDataSourceComponent extends Component {
         if (event.target.name === "realmCode") {
             realm.realmCode = event.target.value.toUpperCase();
         }
-        if (event.target.name === "monthInPastForAmc") {
-            realm.monthInPastForAmc = event.target.value
-        }
-        if (event.target.name === "monthInFutureForAmc") {
-            realm.monthInFutureForAmc = event.target.value
-        }
-        if (event.target.name === "orderFrequency") {
-            realm.orderFrequency = event.target.value
-        }
+        /* if (event.target.name === "monthInPastForAmc") {
+             realm.monthInPastForAmc = event.target.value
+         }
+         if (event.target.name === "monthInFutureForAmc") {
+             realm.monthInFutureForAmc = event.target.value
+         }
+         if (event.target.name === "orderFrequency") {
+             realm.orderFrequency = event.target.value
+         }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
@@ -111,9 +122,9 @@ export default class UpdateDataSourceComponent extends Component {
         setTouched({
             realmCode: true,
             label: true,
-            monthInPastForAmc: true,
-            monthInFutureForAmc: true,
-            orderFrequency: true
+            /*   monthInPastForAmc: true,
+               monthInFutureForAmc: true,
+               orderFrequency: true*/
         }
         )
         this.validateForm(errors)
@@ -134,7 +145,13 @@ export default class UpdateDataSourceComponent extends Component {
     }
 
     componentDidMount(str) {
-      
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmById(this.props.match.params.realmId).then(response => {
+            this.setState({
+                realm: response.data
+            });
+
+        })
     }
 
     Capitalize(str) {
@@ -149,16 +166,25 @@ export default class UpdateDataSourceComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={initialValues}
+                                initialValues={{
+                                    realmCode: this.state.realm.realmCode,
+                                    label: getLabelText(this.state.realm.label, this.state.lang),
+                                    /* monthInPastForAmc: this.state.realm.monthInPastForAmc,
+                                     monthInFutureForAmc: this.state.realm.monthInFutureForAmc,
+                                     orderFrequency: this.state.realm.orderFrequency,*/
+                                    defaultRealm: this.state.realm.defaultRealm,
+                                }}
+
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
                                     AuthenticationService.setupAxiosInterceptors();
@@ -172,26 +198,6 @@ export default class UpdateDataSourceComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
 
 
@@ -209,20 +215,7 @@ export default class UpdateDataSourceComponent extends Component {
                                     }) => (
                                             <Form onSubmit={handleSubmit} noValidate name='realmForm'>
                                                 <CardBody>
-                                                    <FormGroup>
-                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
-                                                        <Input type="text"
-                                                            name="realmCode"
-                                                            id="realmCode"
-                                                            bsSize="sm"
-                                                            valid={!errors.realmCode}
-                                                            invalid={touched.realmCode && !!errors.realmCode}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.realmCode}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
-                                                    </FormGroup>
+
                                                     <FormGroup>
                                                         <Label for="label">{i18n.t('static.realm.realmName')}</Label>
                                                         <Input type="text"
@@ -238,6 +231,20 @@ export default class UpdateDataSourceComponent extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
+                                                        <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
+                                                        <Input type="text"
+                                                            name="realmCode"
+                                                            id="realmCode"
+                                                            bsSize="sm"
+                                                            valid={!errors.realmCode}
+                                                            invalid={touched.realmCode && !!errors.realmCode}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.realmCode}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.realmCode}</FormFeedback>
+                                                    </FormGroup>
+                                                    {/*    <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
                                                             name="monthInPastForAmc"
@@ -278,9 +285,9 @@ export default class UpdateDataSourceComponent extends Component {
                                                             value={this.state.realm.orderFrequency}
                                                             required />
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
-                                                    </FormGroup>
+                                                </FormGroup>*/}
                                                     <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -318,7 +325,8 @@ export default class UpdateDataSourceComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -331,6 +339,36 @@ export default class UpdateDataSourceComponent extends Component {
                     </Col>
                 </Row>
             </div>
+        );
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        RealmService.getRealmById(this.props.match.params.realmId).then(response => {
+            this.setState({
+                realm: response.data
+            });
+
+        }).catch(
+            error => {
+                if (error.message === "Network Error") {
+                    this.setState({ message: error.message });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 500:
+                        case 401:
+                        case 404:
+                        case 406:
+                        case 412:
+                            this.setState({ message: error.response.data.messageCode });
+                            break;
+                        default:
+                            this.setState({ message: 'static.unkownError' });
+                            console.log("Error code unkown");
+                            break;
+                    }
+                }
+            }
         );
     }
 

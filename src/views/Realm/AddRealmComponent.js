@@ -6,15 +6,17 @@ import '../Forms/ValidationForms/ValidationForms.css'
 import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 
 const entityname = i18n.t('static.realm.realm');
 const initialValues = {
     realmCode: '',
-    label: '',
+    label: ''
+    /*,
     monthInPastForAmc: '',
     monthInFutureForAmc: '',
-    orderFrequency: '',
+    orderFrequency: '',*/
 
 }
 
@@ -24,12 +26,12 @@ const validationSchema = function (values) {
             .required(i18n.t('static.realm.realmNameText')).max(6, i18n.t('static.realm.realmCodeLength')),
         label: Yup.string()
             .required(i18n.t('static.realm.realmCodeText')),
-        monthInPastForAmc: Yup.number()
+        /*monthInPastForAmc: Yup.number()
             .required(i18n.t('static.realm.monthInPastForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
         monthInFutureForAmc: Yup.number()
             .required(i18n.t('static.realm.monthInFutureForAmcText')).min(0, i18n.t('static.program.validvaluetext')),
         orderFrequency: Yup.number()
-            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))
+            .required(i18n.t('static.realm.orderFrequencyText')).min(0, i18n.t('static.program.validvaluetext'))*/
     })
 }
 
@@ -68,9 +70,9 @@ export default class AddRealmComponent extends Component {
                     label_pr: '',
                     label_fr: ''
                 },
-                monthInPastForAmc: '',
-                monthInFutureForAmc: '',
-                orderFrequency: '',
+                /* monthInPastForAmc: '',
+                 monthInFutureForAmc: '',
+                 orderFrequency: '',*/
                 defaultRealm: true
             },
             message: ''
@@ -78,6 +80,7 @@ export default class AddRealmComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     dataChange(event) {
@@ -88,15 +91,15 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "realmCode") {
             realm.realmCode = event.target.value.toUpperCase();
         }
-        if (event.target.name === "monthInPastForAmc") {
-            realm.monthInPastForAmc = event.target.value
-        }
-        if (event.target.name === "monthInFutureForAmc") {
-            realm.monthInFutureForAmc = event.target.value
-        }
-        if (event.target.name === "orderFrequency") {
-            realm.orderFrequency = event.target.value
-        }
+        /*  if (event.target.name === "monthInPastForAmc") {
+              realm.monthInPastForAmc = event.target.value
+          }
+          if (event.target.name === "monthInFutureForAmc") {
+              realm.monthInFutureForAmc = event.target.value
+          }
+          if (event.target.name === "orderFrequency") {
+              realm.orderFrequency = event.target.value
+          }*/
         else if (event.target.name === "defaultRealm") {
             realm.defaultRealm = event.target.id === "active2" ? false : true
         }
@@ -111,9 +114,9 @@ export default class AddRealmComponent extends Component {
         setTouched({
             realmCode: true,
             label: true,
-            monthInPastForAmc: true,
-            monthInFutureForAmc: true,
-            orderFrequency: true
+            /*  monthInPastForAmc: true,
+              monthInFutureForAmc: true,
+              orderFrequency: true*/
         }
         )
         this.validateForm(errors)
@@ -145,12 +148,15 @@ export default class AddRealmComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity',{entityname})}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 initialValues={initialValues}
@@ -200,17 +206,33 @@ export default class AddRealmComponent extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='realmForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='realmForm'>
                                                 <CardBody>
+
+                                                    <FormGroup>
+                                                        <Label for="label">{i18n.t('static.realm.realmName')}</Label>
+                                                        <Input type="text"
+                                                            name="label"
+                                                            id="label"
+                                                            bsSize="sm"
+                                                            valid={!errors.label && this.state.realm.label.label_en != ''}
+                                                            invalid={touched.label && !!errors.label}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={this.state.realm.label.label_en}
+                                                            required />
+                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
+                                                    </FormGroup>
                                                     <FormGroup>
                                                         <Label for="realmCode">{i18n.t('static.realm.realmCode')}</Label>
                                                         <Input type="text"
                                                             name="realmCode"
                                                             id="realmCode"
                                                             bsSize="sm"
-                                                            valid={!errors.realmCode}
+                                                            valid={!errors.realmCode && this.state.realm.realmCode != ''}
                                                             invalid={touched.realmCode && !!errors.realmCode}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
@@ -218,21 +240,7 @@ export default class AddRealmComponent extends Component {
                                                             required />
                                                         <FormFeedback className="red">{errors.realmCode}</FormFeedback>
                                                     </FormGroup>
-                                                    <FormGroup>
-                                                        <Label for="label">{i18n.t('static.realm.realmName')}</Label>
-                                                        <Input type="text"
-                                                            name="label"
-                                                            id="label"
-                                                            bsSize="sm"
-                                                            valid={!errors.label}
-                                                            invalid={touched.label && !!errors.label}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);this.Capitalize(e.target.value) }}
-                                                            onBlur={handleBlur}
-                                                            value={this.state.realm.label.label_en}
-                                                            required />
-                                                        <FormFeedback className="red">{errors.label}</FormFeedback>
-                                                    </FormGroup>
-                                                    <FormGroup>
+                                                    {/*  <FormGroup>
                                                         <Label for="monthInPastForAmc">{i18n.t('static.realm.monthInPastForAmc')}</Label>
                                                         <Input type="number"
                                                             name="monthInPastForAmc"
@@ -242,7 +250,7 @@ export default class AddRealmComponent extends Component {
                                                             invalid={touched.monthInPastForAmc && !!errors.monthInPastForAmc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            // value={this.state.realm.monthInPastForAmc}
+                                                            value={this.state.realm.monthInPastForAmc}
                                                             required />
                                                         <FormFeedback className="red">{errors.monthInPastForAmc}</FormFeedback>
                                                     </FormGroup>
@@ -256,7 +264,7 @@ export default class AddRealmComponent extends Component {
                                                             invalid={touched.monthInFutureForAmc && !!errors.monthInFutureForAmc}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            // value={this.state.realm.monthInFutureForAmc}
+                                                            value={this.state.realm.monthInFutureForAmc}
                                                             required />
                                                         <FormFeedback className="red">{errors.monthInFutureForAmc}</FormFeedback>
                                                     </FormGroup>
@@ -270,12 +278,12 @@ export default class AddRealmComponent extends Component {
                                                             invalid={touched.orderFrequency && !!errors.orderFrequency}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
-                                                            // value={this.state.realm.orderFrequency}
+                                                            value={this.state.realm.orderFrequency}
                                                             required />
                                                         <FormFeedback className="red">{errors.orderFrequency}</FormFeedback>
-                                                    </FormGroup>
+                                                  </FormGroup>*/}
                                                     <FormGroup>
-                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}</Label>
+                                                        <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
                                                         <FormGroup check inline>
                                                             <Input
                                                                 className="form-check-input"
@@ -289,7 +297,7 @@ export default class AddRealmComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio1">
-                                                                {i18n.t('static.common.active')}
+                                                                {i18n.t('static.realm.yes')}
                                                             </Label>
                                                         </FormGroup>
                                                         <FormGroup check inline>
@@ -305,7 +313,7 @@ export default class AddRealmComponent extends Component {
                                                             <Label
                                                                 className="form-check-label"
                                                                 check htmlFor="inline-radio2">
-                                                                {i18n.t('static.common.disabled')}
+                                                                {i18n.t('static.realm.no')}
                                                             </Label>
                                                         </FormGroup>
                                                     </FormGroup>
@@ -313,7 +321,8 @@ export default class AddRealmComponent extends Component {
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-check"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i>{i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" color="warning" size="md" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -331,6 +340,23 @@ export default class AddRealmComponent extends Component {
 
     cancelClicked() {
         this.props.history.push(`/realm/realmList/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { realm } = this.state
+
+        realm.label.label_en = ''
+        realm.realmCode = ''
+        realm.monthInPastForAmc = ''
+        realm.monthInFutureForAmc = ''
+        realm.orderFrequency = ''
+        realm.defaultRealm = true
+        this.setState(
+            {
+                realm
+            }
+        )
+
     }
 
 }

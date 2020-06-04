@@ -5,6 +5,7 @@ import { API_URL } from '../../Constants.js'
 import CryptoJS from 'crypto-js'
 import { SECRET_KEY } from '../../Constants.js'
 import bcrypt from 'bcryptjs';
+import moment from 'moment';
 
 let myDt;
 class AuthenticationService {
@@ -26,10 +27,46 @@ class AuthenticationService {
         return decryptedPassword;
     }
 
+    syncExpiresOn() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        let syncExpiresOn = moment(decryptedUser.syncExpiresOn);
+        console.log("syncExpiresOn---", syncExpiresOn);
+        var curDate = moment(new Date());
+        const diff = curDate.diff(syncExpiresOn, 'days');
+        // const diffDuration = moment.duration(diff);
+        console.log("diff---",diff);
+        // console.log("diffDuration---",diffDuration)
+        // console.log("Days:", diffDuration.days());
+        console.log("days diff new------ ---", curDate.diff(syncExpiresOn, 'days'));
+        if (diff < 30) {
+            return false;
+        }
+        return true;
+    }
+
     getLoggedInUsername() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
         return decryptedUser.username;
+    }
+
+    getLoggedInUserRole() {
+        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+        let roles = "";
+        for (let i = 0; i <= decryptedUser.roles.length; i++) {
+            let role = decryptedUser.roles[i];
+            // if (role != null && role != "") {
+            //     if (i > 0) {
+            //         roles += "," + role.label.label_en;
+            //     } else {
+            //         roles += role.label.label_en;
+            //     }
+            // }
+        }
+        console.log("decryptedUser.roles---" + decryptedUser.roles);
+        return decryptedUser.roles;
     }
 
     getLoggedInUserId() {
@@ -46,7 +83,7 @@ class AuthenticationService {
     getRealmId() {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        console.log(decryptedUser);
+        // console.log(decryptedUser);
         return decryptedUser.realm.realmId;
     }
 
@@ -108,44 +145,31 @@ class AuthenticationService {
     //         })
     // }
 
+
     setupAxiosInterceptors() {
+        // axios.defaults.headers.common['Authorization'] = '';
+        // delete axios.defaults.headers.common['Authorization'];
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        console.log("decryptedCurUser---", decryptedCurUser);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        console.log("decryptedToken---", decryptedToken);
+        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         let basicAuthHeader = 'Bearer ' + decryptedToken
-        console.log("basicAuthHeader---", basicAuthHeader);
+        axios.defaults.headers.common['Authorization'] = basicAuthHeader;
         // axios.interceptors.request.use(
         //     (config) => {
-        //         config.headers.authorization = basicAuthHeader
+        //         config.headers.authorization = decryptedToken ? basicAuthHeader : '';
         //         return config;
         //     }
         // )
 
-        axios.interceptors.request.use(function (config) {
-            console.log("response config---", config);
-            config.headers.authorization = basicAuthHeader
-            return config;
-        }, function (error) {
-            // Do something with request error
-            console.log("response config error---",error);
-            return Promise.reject(error);
-        });
 
-        // Add a response interceptor
-        axios.interceptors.response.use(function (response) {
-            // Any status code that lie within the range of 2xx cause this function to trigger
-            // Do something with response data
-            console.log("interceptor response---", response);
-            return response;
-        }, function (error) {
-            // Any status codes that falls outside the range of 2xx cause this function to trigger
-            // Do something with response error
-            console.log("interceptor error---", error);
-            return Promise.reject(error);
-        });
+        // // Add a response interceptor
+        // axios.interceptors.response.use(function (response) {
+        //     return response;
+        // }, function (error) {
+        //     return Promise.reject(error);
+        // });
 
     }
+
     storeTokenInIndexedDb(token, decodedObj) {
         let userObj = {
             token: token,
@@ -266,6 +290,27 @@ class AuthenticationService {
 
         }
     }
+    checkLastActionTaken() {
+        if (localStorage.getItem('lastActionTaken') != null && localStorage.getItem('lastActionTaken') != "") {
+            var lastActionTakenStorage = CryptoJS.AES.decrypt(localStorage.getItem('lastActionTaken').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            var lastActionTaken = moment(lastActionTakenStorage);
+            // console.log("lastActionTakenStorage---", lastActionTakenStorage);
+            var curDate = moment(new Date());
+            const diff = curDate.diff(lastActionTaken);
+            const diffDuration = moment.duration(diff);
+            // console.log("Total Duration in millis:", diffDuration.asMilliseconds());
+            // console.log("Days:", diffDuration.days());
+            // console.log("Hours:", diffDuration.hours());
+            // console.log("Minutes:", diffDuration.minutes());
+            // console.log("Seconds:", diffDuration.seconds());
+            if (diffDuration.minutes() < 30) {
+                // if (diffDuration.minutes() < 10) {
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
     getLoggedInUserDetails() {
         if (!('indexedDB' in window)) {
             alert('This browser does not support IndexedDB');
@@ -312,6 +357,14 @@ class AuthenticationService {
         }
         return userObj;
     }
+
+    // getLoggedInUserRoleBusinessFunction() {
+    //     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+    //     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    //     let businessFunctions = decryptedUser.businessFunction;
+    //     console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
+    //     return businessFunctions;
+    // }
 
 }
 

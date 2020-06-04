@@ -21,12 +21,36 @@ import routes from '../../routes';
 import LogoutService from "../../api/LogoutService";
 import AuthenticationService from '../../views/Common/AuthenticationService.js';
 import i18n from '../../i18n'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
+
 class DefaultLayout extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      businessFunctions: []
+    }
+  }
+
+  componentDidMount() {
+    // var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
+    // console.log("curUserBusinessFunctions------------>", curUserBusinessFunctions);
+    // var bfunction = [];
+    // if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
+    //   for (let i = 0; i < curUserBusinessFunctions.length; i++) {
+    //     bfunction.push(curUserBusinessFunctions[i].authority);
+    //   }
+    //   this.setState({ businessFunctions: bfunction });
+    // }
+
+  }
+
   loading = () => <div className="animated fadeIn pt-1 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
   changePassword(e) {
     e.preventDefault();
@@ -35,8 +59,23 @@ class DefaultLayout extends Component {
   }
   signOut(e) {
     e.preventDefault();
-    this.props.history.push(`/logout`)
+    confirmAlert({
+      message: i18n.t('static.logout.confirmLogout'),
+      buttons: [
+        {
+          label: i18n.t('static.program.yes'),
+          onClick: () => {
+            this.props.history.push(`/logout/static.logoutSuccess`)
+          }
+        },
+        {
+          label: i18n.t('static.program.no')
+        }
+      ]
+    });
+
   }
+
 
   render() {
     return (
@@ -50,13 +89,14 @@ class DefaultLayout extends Component {
           <AppSidebar fixed display="lg">
             <AppSidebarHeader />
             <AppSidebarForm />
-
             <Suspense>
 
               <Online>
+
                 <AppSidebarNav navConfig={{
                   items:
                     [
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationdashboard'),
                         url: '/ApplicationDashboard',
@@ -67,11 +107,13 @@ class DefaultLayout extends Component {
                       //   url: '/RealmDashboard',
                       //   icon: 'cui-dashboard icons',
                       // },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programdashboard'),
                         url: '/ProgramDashboard',
                         icon: 'cui-dashboard icons',
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.translations.translations'),
                         icon: 'fa fa-list',
@@ -88,6 +130,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.applicationmaster'),
                         icon: 'fa fa-list',
@@ -100,7 +143,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.user'),
                             url: '/user/listUser',
-                            icon: 'fa fa-user'
+                            icon: 'fa fa-users'
                           },
                           {
                             name: i18n.t('static.dashboard.language'),
@@ -130,13 +173,26 @@ class DefaultLayout extends Component {
                           ,
                           {
                             name: i18n.t('static.dashboard.realm'),
-                            url: '/realm/realmlist',
-                            icon: 'fa fa-th-large'
+                            icon: 'fa fa-list',
+                            children: [{
+                              name: i18n.t('static.dashboard.realm'),
+                              url: '/realm/realmlist',
+                              icon: 'fa fa-th-large'
+                            }, {
+                              name: i18n.t('static.dashboard.realmcountry'),
+                              url: '/realmCountry/listRealmCountry',
+                              icon: 'fa fa-globe'
+                            }, {
+                              name: i18n.t('static.dashboad.planningunitcountry'),
+                              url: '/realmCountry/listRealmCountryPlanningUnit',
+                              icon: 'fa fa-globe'
+                            }]
                           },
                         ]
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
-                        name: i18n.t('static.dashboard.realmmaster'),
+                        name: i18n.t('static.dashboard.realmlevelmaster'),
                         icon: 'fa fa-list',
                         children: [
                           {
@@ -154,11 +210,11 @@ class DefaultLayout extends Component {
                             icon: 'fa fa-bank',
                             url: '/fundingSource/listFundingSource'
                           },
-                          {
-                            name: i18n.t('static.dashboard.subfundingsource'),
-                            url: '/subFundingSource/listSubFundingSource',
-                            icon: 'fa fa-building-o'
-                          },
+                          // {
+                          //   name: i18n.t('static.dashboard.subfundingsource'),
+                          //   url: '/subFundingSource/listSubFundingSource',
+                          //   icon: 'fa fa-building-o'
+                          // },
                           {
                             name: i18n.t('static.dashboard.procurementagent'),
                             url: '/procurementAgent/listProcurementAgent',
@@ -167,17 +223,17 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.budget'),
                             url: '/budget/listBudget',
-                            icon: 'fa fa-line-chart'
+                            icon: 'fa fa-dollar'
                           },
                           {
                             name: i18n.t('static.dashboard.supplier'),
                             url: '/supplier/listSupplier',
-                            icon: 'fa fa-industry'
+                            icon: 'fa fa-user-circle-o'
                           },
                           {
                             name: i18n.t('static.dashboard.region'),
                             url: '/region/listRegion',
-                            icon: 'fa fa-pie-chart'
+                            icon: 'fa fa-globe'
                           },
                           {
                             name: i18n.t('static.healtharea.healtharea'),
@@ -191,6 +247,7 @@ class DefaultLayout extends Component {
                           }
                         ]
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
                       {
                         name: i18n.t('static.dashboard.programmaster'),
                         url: '/program',
@@ -199,7 +256,7 @@ class DefaultLayout extends Component {
                           {
                             name: i18n.t('static.dashboard.program'),
                             url: '/program/listProgram',
-                            icon: 'icon-graph',
+                            icon: 'fa fa-file-text-o',
                             //     children: [
                             //       // {
                             //       //   name: i18n.t('static.dashboard.addprogram'),
@@ -215,21 +272,36 @@ class DefaultLayout extends Component {
                           }, {
                             name: i18n.t('static.dashboard.tracercategory'),
                             url: '/tracerCategory/listTracerCategory',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-th-large'
                           },
                           // {
+
                           //   name: 'Product Category',
                           //   url: '/ProductCategory/AddProductCategory',
                           //   icon: 'icon-graph'
                           // },
                           {
+                            name: 'Product Category',
+                            url: '/productCategory/productCategoryTree',
+                            icon: 'fa fa-cubes'
+                          },
+                          {
                             name: i18n.t('static.dashboard.forecastingunit'),
                             url: '/forecastingUnit/listforecastingUnit',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-line-chart'
                           }, {
                             name: i18n.t('static.dashboard.planningunit'),
                             url: '/planningUnit/listPlanningUnit',
-                            icon: 'icon-graph'
+                            icon: 'fa fa-list-alt'
+                          }, {
+                            name: i18n.t('static.dashboad.planningunitcapacity'),
+                            url: '/planningUnitCapacity/listPlanningUnitcapacity',
+                            icon: 'fa fa-tasks'
+                          },
+                          {
+                            name: i18n.t('static.procurementUnit.procurementUnit'),
+                            url: '/procurementUnit/listProcurementUnit',
+                            icon: 'fa fa-building'
                           },
                           // {
                           //   name: i18n.t('static.dashboard.product'),
@@ -249,43 +321,155 @@ class DefaultLayout extends Component {
                           // ]
                           // },
 
-
-                          // {
-                          //   name: i18n.t('static.dashboard.program'),
-                          //   icon: 'fa fa-list',
-                          //   children: [
-                          //     {
-                          //       name: i18n.t('static.dashboard.downloadprogram'),
-                          //       url: '/program/downloadProgram',
-                          //       icon: 'fa fa-download',
-                          //     },
-                          //     {
-                          //       name: i18n.t('static.dashboard.exportprogram'),
-                          //       url: '/program/exportProgram',
-                          //       icon: 'fa fa-upload',
-                          //     },
-                          //     {
-                          //       name: i18n.t('static.dashboard.importprogram'),
-                          //       url: '/program/importProgram',
-                          //       icon: 'fa fa-long-arrow-down',
-                          //     }
-                          //   ]
-                          // },
                           {
-                            name: i18n.t('static.dashboard.datasync'),
-                            url: '/masterDataSync',
+                            name: 'Commit Version',
+                            url: '/program/syncPage',
+                            icon: 'fa fa-code-fork',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.program'),
                             icon: 'fa fa-list',
+                            children: [
+                              // {
+                              //   name: i18n.t('static.dashboard.datasync'),
+                              //   url: '/masterDataSync',
+                              //   icon: 'fa fa-list',
+                              // },
+                              {
+                                name: i18n.t('static.dashboard.downloadprogram'),
+                                url: '/program/downloadProgram',
+                                icon: 'fa fa-download',
+                              },
+                              {
+                                name: i18n.t('static.dashboard.importprogram'),
+                                url: '/program/importProgram',
+                                icon: 'fa fa-cloud-download',
+                              },
+                              {
+                                name: i18n.t('static.dashboard.exportprogram'),
+                                url: '/program/exportProgram',
+                                icon: 'fa fa-sign-in',
+                              }
+
+                            ]
+                          },
+
+                          {
+                            name: i18n.t('static.dashboard.consumptiondetails'),
+                            url: '/consumptionDetails',
+                            icon: 'fa fa-bar-chart',
+                          },
+                          {
+                            name: 'Inventory Details',
+                            url: '/inventory/addInventory',
+                            icon: 'fa fa-cube',
                           },
                           // {
-                          //   name: i18n.t('static.dashboard.consumptiondetails'),
-                          //   url: '/consumptionDetails',
+                          //   name: 'Shipment Details',
+                          //   url: '/shipment/addShipment',
                           //   icon: 'fa fa-list',
                           // },
+                          {
+                            name: 'Shipment Details',
+                            url: '/shipment/shipmentList',
+                            icon: 'fa fa-truck',
+                          }
                         ]
                       },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
+                        name: i18n.t('static.dashboard.report'),
+                        icon: 'fa fa-list',
+                        children: [
+                          {
+                            name: "Supply Plan",
+                            url: '/supplyPlan',
+                            icon: 'fa fa-calculator'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.productcatalog'),
+                            url: '/report/productCatalog',
+                            icon: 'fa fa-th'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.consumption'),
+                            url: '/report/consumption',
+                            icon: 'fa fa-bar-chart'
+                          }, {
+                            name: i18n.t('static.dashboard.globalconsumption'),
+                            url: '/report/globalConsumption',
+                            icon: 'fa fa-globe'
+                          }, {
+                            name: i18n.t('static.report.forecasterrorovertime'),
+                            url: '/report/forecastOverTheTime',
+                            icon: 'fa fa-line-chart'
+                          }, {
+                            name: i18n.t('static.dashboard.forecastmetrics'),
+                            url: '/report/forecastMetrics',
+                            icon: 'fa fa-bar-chart'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.stockstatusovertime'),
+                            url: '/report/stockStatusOverTime',
+                            icon: 'fa fa-line-chart'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.stockstatusmatrix'),
+                            url: '/report/stockStatusMatrix',
+                            icon: 'fa fa-line-chart'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.stockstatus'),
+                            url: '/report/stockStatus',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.costOfInventory'),
+                            url: '/report/costOfInventory',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.inventoryTurns'),
+                            url: '/report/inventoryTurns',
+                            // icon: 'fa fa-exchange'
+                            icon: 'fa fa-line-chart'
+                          },
+                          {
+                            name: 'QAT PROBLEM+ACTION REPORT',
+                            url: '/report/qatProblemPlusActionReport',
+                            icon: 'fa fa-file-text-o'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.funderExport'),
+                            url: '/report/funderExport',
+                            icon: 'fa fa-list-alt'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.procurementAgentExport'),
+                            url: '/report/procurementAgentExport',
+                            icon: 'fa fa-wpforms'
+                          }
+                          ,
+                          {
+                            name: i18n.t('static.report.annualshipmentcost'),
+                            url: '/report/annualShipmentCost',
+                            icon: 'fa fa-file-text'
+                          } ,
+                          {
+                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                            url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange'
+                          } ,
+                          {
+                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                            url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange'
+                          }
+                        ]
+                      }
                       // {
                       //   name: "Supply plan",
-                      //   icon: 'fa fa-list',
+                      //   icon: 'fa fa-list',  
                       //   children: [
                       //     {
                       //       name: "Supply Plan",
@@ -294,6 +478,21 @@ class DefaultLayout extends Component {
                       //     }
                       //   ]
                       // },
+                      ,
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
+                        name: 'Setup Program',
+                        url: '/program/programOnboarding',
+                        icon: 'fa fa-list-ol'
+                      },
+                      // !this.state.businessFunctions.includes('ROLE_BF_VIEW_GUEST_SCREENS') &&
+                      {
+                        name: 'Pipeline Program Import',
+                        // url: '/pipeline/pipelineProgramImport',
+                        url: '/pipeline/pieplineProgramList',
+                        icon: 'icon-graph'
+                      }
+
                     ]
 
                 }} {...this.props} />
@@ -307,20 +506,55 @@ class DefaultLayout extends Component {
                         icon: 'fa fa-list',
                         children: [
                           {
-                            name: i18n.t('static.dashboard.downloadprogram'),
-                            url: '/program/downloadProgram',
-                            icon: 'fa fa-download',
+                            name: i18n.t('static.dashboard.importprogram'),
+                            url: '/program/importProgram',
+                            icon: 'fa fa-cloud-download',
                           },
                           {
                             name: i18n.t('static.dashboard.exportprogram'),
                             url: '/program/exportProgram',
-                            icon: 'fa fa-upload',
+                            icon: 'fa fa-sign-in',
                           },
                           {
-                            name: i18n.t('static.dashboard.importprogram'),
-                            url: '/program/importProgram',
-                            icon: 'fa fa-long-arrow-down',
+                            name: i18n.t('static.dashboard.consumptiondetails'),
+                            url: '/consumptionDetails',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: i18n.t('static.dashboard.inventorydetails'),
+                            url: '/inventory/addInventory',
+                            icon: 'fa fa-list',
+                          },
+                          {
+                            name: 'Shipment Details',
+                            url: '/shipment/shipmentList',
+                            icon: 'fa fa-list',
                           }
+                        ]
+                      }, {
+                        name: i18n.t('static.dashboard.report'),
+                        icon: 'fa fa-list',
+                        children: [
+                          {
+                            name: "Supply Plan",
+                            url: '/supplyPlan',
+                            icon: 'fa fa-list-alt'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.consumption'),
+                            url: '/report/consumption',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.stockstatusmatrix'),
+                            url: '/report/stockStatusMatrix',
+                            icon: 'fa fa-exchange'
+                          },
+                          /* {
+                             name: i18n.t('static.dashboard.stockstatus'),
+                             url: '/report/stockStatus',
+                             icon: 'fa fa-exchange'
+                           }*/
                         ]
                       }
                     ]
@@ -331,7 +565,7 @@ class DefaultLayout extends Component {
             <AppSidebarMinimizer />
           </AppSidebar>
           <main className="main">
-            <AppBreadcrumb appRoutes={routes} />
+            {/* <AppBreadcrumb appRoutes={routes} /> */}
             <Container fluid>
               <Suspense fallback={this.loading()}>
                 <Switch>
@@ -367,5 +601,7 @@ class DefaultLayout extends Component {
     );
   }
 }
+
+
 
 export default DefaultLayout;

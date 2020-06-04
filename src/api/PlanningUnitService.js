@@ -16,11 +16,32 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/all`, {
         });
     }
+    getPlanningUnitByRealmId(json) {
+        return axios.get(`${API_URL}/api/planningUnit/realmId/${json}`, {}
+        );
+    }
 
     editPlanningUnit(json) {
-        return axios.put(`${API_URL}/api/planningUnit/`,json,{}
-            );
-        }
-    
+        return axios.put(`${API_URL}/api/planningUnit/`, json, {}
+        );
+    }
+    getPlanningUnitById(json) {
+        return axios.get(`${API_URL}/api/planningUnit/${json}`, {}
+        );
+    }
+
+    getPlanningUnitCapacityForId(planningUnitId) {
+        return axios.get(`${API_URL}/api/planningUnit/capacity/${planningUnitId}`, {}
+        );
+    }
+
+    editPlanningUnitCapacity(json){
+        return axios.put(`${API_URL}/api/planningUnit/capacity`, json, {}
+        );
+    }
+    getPlanningUnitByProductCategoryId(json) {
+        return axios.get(`${API_URL}/api/planningUnit/productCategory/${json}/all`, {}
+        );
+    }
 }
 export default new PlanningUnitService();

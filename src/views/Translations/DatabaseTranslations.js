@@ -5,7 +5,7 @@ import "../ProductCategory/style.css"
 import "../../../node_modules/jexcel/dist/jexcel.css";
 import {
     Card, CardBody, CardHeader, FormGroup,
-    CardFooter, Button, Col,Row
+    CardFooter, Button, Col, Row
 } from 'reactstrap';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -20,7 +20,8 @@ export default class DatabaseTranslations extends React.Component {
         this.state = {
             changedFlag: [],
             labelList: [],
-            rowId: 1
+            rowId: 1,
+            loading: true
         }
         this.saveData = this.saveData.bind(this)
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -58,12 +59,13 @@ export default class DatabaseTranslations extends React.Component {
                         { type: 'hidden' },
                         { type: 'text', readOnly: true }
                     ],
-                    pagination: 25,
+                    pagination: 10,
                     search: true,
                     columnSorting: true,
                     tableOverflow: true,
                     wordWrap: true,
-                    paginationOptions: [25, 50, 75, 100],
+                    paginationOptions: [10, 25, 50, 100],
+                    position: 'top',
                     allowInsertColumn: false,
                     allowManualInsertColumn: false,
                     onchange: this.changed,
@@ -73,6 +75,9 @@ export default class DatabaseTranslations extends React.Component {
                     // tableHeight: '500px',
                 };
                 this.el = jexcel(document.getElementById("databaseTranslationTable"), options);
+                this.setState({
+                    loading: false
+                })
             } else {
                 this.setState({
                     message: response.data.message
@@ -155,25 +160,41 @@ export default class DatabaseTranslations extends React.Component {
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message)}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
 
                     <Col xs="12" sm="12">
-                    <Card>
-                        <CardHeader>
-                            <strong>{i18n.t('static.label.databaseTranslations')}</strong>
-                        </CardHeader>
-                        <CardBody className="table-responsive">
-                        <div id="databaseTranslationTable"></div>
-                        </CardBody>
-                        <CardFooter>
-                            <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
-                                &nbsp;
+                        <Card>
+                            <CardHeader>
+                                <strong>{i18n.t('static.label.databaseTranslations')}</strong>
+                            </CardHeader>
+                            <CardBody className="table-responsive pt-md-1 pb-md-1">
+                                {/* <div id="loader" className="center"></div> */}
+                                <div id="databaseTranslationTable"></div>
+                            </CardBody>
+                            <CardFooter>
+                                <FormGroup>
+                                    <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button type="button" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')} </Button>
+                                    &nbsp;
                             </FormGroup>
-                        </CardFooter>
-                    </Card>
+                            </CardFooter>
+                        </Card>
                     </Col>
+                </Row>
+                <Row style={{ display: this.state.loading ? "block" : "none" }} className="d-flex align-items-center justify-content-center" style={{height: "500px"}}>
+                    {/* <h1>-------LOADING--------</h1> */}
+                    
+                       <div class="align-items-center">
+                       <div ><h4> <strong>Loading...</strong></h4></div>
+                        
+                        <div class="spinner-border blue ml-4" role="status">
+
+                        </div>
+                    </div>
+                
+                  
+                    
+             
                 </Row>
             </div>
         )
@@ -228,6 +249,5 @@ export default class DatabaseTranslations extends React.Component {
             rowId: y
         })
     }.bind(this)
+
 }
-
-

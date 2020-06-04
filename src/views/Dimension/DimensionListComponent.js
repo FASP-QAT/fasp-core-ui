@@ -8,7 +8,7 @@ import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'reac
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
 import getLabelText from '../../CommonComponent/getLabelText'
-
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 import i18n from '../../i18n';
 const entityname = i18n.t('static.dimension.dimension');
 export default class DimensionListComponent extends Component {
@@ -38,44 +38,67 @@ export default class DimensionListComponent extends Component {
         this.addNewDimension = this.addNewDimension.bind(this);
         this.editDimension = this.editDimension.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
-
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
     componentDidMount() {
+        this.hideFirstComponent();
         AuthenticationService.setupAxiosInterceptors();
         DimensionService.getDimensionListAll().then(response => {
-            console.log(response.data)
-            this.setState({
-                dimensionList: response.data,
-                selSource: response.data
-            })
+            if (response.status == 200) {
+                console.log(response.data)
+                this.setState({
+                    dimensionList: response.data,
+                    selSource: response.data
+                })
+
+            }
+            else{
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
+           
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            // .catch(
+            //     error => {
+            //         if (error.message === "Network Error") {
+            //             this.setState({ message: error.message });
+            //         } else {
+            //             switch (error.response.status) {
+            //                 case 500:
+            //                 case 401:
+            //                 case 404:
+            //                 case 406:
+            //                 case 412:
+            //                     this.setState({ message: error.response.data.messageCode });
+            //                     break;
+            //                 default:
+            //                     this.setState({ message: 'static.unkownError' });
+            //                     break;
+            //             }
+            //         }
+            //     }
+            // );
     }
 
 
     editDimension(dimension) {
         this.props.history.push({
-            pathname: "/diamension/editDiamension",
-            state: { dimension: dimension }
+            pathname: `/diamension/editDiamension/${dimension.dimensionId}`,
+            // state: { dimension: dimension }
         });
     }
 
@@ -135,10 +158,13 @@ export default class DimensionListComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+              <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -147,9 +173,9 @@ export default class DimensionListComponent extends Component {
                         </div>
 
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <ToolkitProvider
-                            keyField="dataSourceTypeId"
+                            keyField="dimensionId"
                             data={this.state.selSource}
                             columns={columns}
                             search={{ searchFormatted: true }}

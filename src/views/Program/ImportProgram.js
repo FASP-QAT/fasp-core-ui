@@ -232,7 +232,7 @@ export default class ImportProgram extends Component {
                                 console.log("filename", filename);
                                 programDataJson.filename = filename;
                                 fileName[i] = {
-                                    value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJsonDecrypted.programVersion
+                                    value: filename, label: (getLabelText((programDataJsonDecrypted.label), lan)) + "~v" + programDataJsonDecrypted.requestedProgramVersion
                                 }
                                 programListArray[i] = programDataJson;
                                 i++;
@@ -298,7 +298,6 @@ export default class ImportProgram extends Component {
     render() {
         return (
             <>
-                <Col xs="12" sm="8">
                     <Card>
                         <Formik
                             initialValues={initialValues}
@@ -316,10 +315,12 @@ export default class ImportProgram extends Component {
                                             <CardBody>
                                                 <FormGroup id="fileImportDiv">
                                                     <Col md="3">
-                                                        <Label htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
+                                                        <Label className="uploadfilelable" htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
                                                     </Col>
-                                                    <Col xs="12" md="9">
-                                                        <Input type="file" id="file-input" name="file-input" />
+                                                    <Col xs="12" md="4" className="custom-file">
+                                                        {/* <Input type="file" id="file-input" name="file-input" /> */}
+                                                        <Input type="file" className="custom-file-input" id="file-input" name="file-input" />
+                                                        <label className="custom-file-label" id="file-input">Choose file</label>
                                                     </Col>
                                                 </FormGroup>
                                                 <FormGroup id="programIdDiv">
@@ -339,7 +340,7 @@ export default class ImportProgram extends Component {
                                             </CardBody>
                                             <CardFooter>
                                                 <FormGroup>
-                                                    <Button type="reset" size="md" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                                    <Button type="reset" size="md" color="success" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                     <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                                     <Button type="button" id="fileImportButton" size="md" color="success" className="float-right mr-1" onClick={() => this.importFile()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                     <Button type="button" id="formSubmitButton" size="md" color="success" className="float-right mr-1" onClick={() => this.formSubmit()}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
@@ -349,7 +350,7 @@ export default class ImportProgram extends Component {
                                         </Form>
                                     )} />
                     </Card>
-                </Col>
+               
             </>
         )
 

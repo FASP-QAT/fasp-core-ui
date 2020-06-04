@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input,  } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardFooter, Button, FormFeedback, CardBody, Form, FormGroup, Label, Input, } from 'reactstrap';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 import '../Forms/ValidationForms/ValidationForms.css'
@@ -8,12 +8,13 @@ import PlanningUnitService from '../../api/PlanningUnitService';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import i18n from '../../i18n';
 import UnitService from '../../api/UnitService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const initialValues = {
     unitId: [],
     label: '',
     forecastingUnitId: [],
-    multiplier:''
+    multiplier: ''
 }
 const entityname = i18n.t('static.planningunit.planningunit');
 
@@ -25,7 +26,7 @@ const validationSchema = function (values) {
             .required(i18n.t('static.planningunit.planningunittext')),
         forecastingUnitId: Yup.string()
             .required(i18n.t('static.planningunit.forcastingunittext')),
-            multiplier: Yup.string()
+        multiplier: Yup.string()
             .required(i18n.t('static.planningunit.multipliertext'))
             .min(0, i18n.t('static.program.validvaluetext'))
     })
@@ -60,45 +61,46 @@ export default class AddPlanningUnit extends Component {
         super(props);
         this.state = {
             units: [],
-            forecastingUnits:[],
+            forecastingUnits: [],
 
             message: '',
             planningUnit:
             {
                 active: '',
-             unit: {
-                unitId:''
-            },
-            label: {
-                label_en: ''
-            },
-            foreacastingUnit: {
-                forecastingUnitId: ''
-            },
+                unit: {
+                    id: ''
+                },
+                label: {
+                    label_en: ''
+                },
+                forecastingUnit: {
+                    forecastingUnitId: ''
+                },
+                multiplier: ''
             }
         }
         this.Capitalize = this.Capitalize.bind(this);
-
+        this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
     }
 
     dataChange(event) {
         let { planningUnit } = this.state
-        console.log( event.target.value);
+        console.log(event.target.value);
         if (event.target.name === "label") {
             planningUnit.label.label_en = event.target.value
         }
         else if (event.target.name === "forecastingUnitId") {
-            planningUnit.foreacastingUnit.forecastingUnitId = event.target.value
+            planningUnit.forecastingUnit.forecastingUnitId = event.target.value
         }
         if (event.target.name === "unitId") {
-            planningUnit.unit.unitId = event.target.value;
+            planningUnit.unit.id = event.target.value;
         }
         if (event.target.name === "multiplier") {
             planningUnit.multiplier = event.target.value;
         }
-      
+
         this.setState(
             {
                 planningUnit
@@ -112,7 +114,7 @@ export default class AddPlanningUnit extends Component {
             'label': true,
             'forecastingUnitId': true,
             'unitId': true,
-            multipler:true
+            multipler: true
         }
         )
         this.validateForm(errors)
@@ -139,26 +141,8 @@ export default class AddPlanningUnit extends Component {
                 this.setState({
                     units: response.data
                 })
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response.status) {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
+
         AuthenticationService.setupAxiosInterceptors();
         ForecastingUnitService.getForecastingUnitList().then(response => {
             console.log(response.data)
@@ -166,26 +150,6 @@ export default class AddPlanningUnit extends Component {
                 forecastingUnits: response.data
             })
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
 
     }
 
@@ -215,10 +179,14 @@ export default class AddPlanningUnit extends Component {
             }, this);
 
 
-        
+
 
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -240,26 +208,7 @@ export default class AddPlanningUnit extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
+
                                 }}
 
 
@@ -273,39 +222,42 @@ export default class AddPlanningUnit extends Component {
                                         handleSubmit,
                                         isSubmitting,
                                         isValid,
-                                        setTouched
+                                        setTouched,
+                                        handleReset
                                     }) => (
-                                            <Form onSubmit={handleSubmit} noValidate name='planningUnitForm'>
+                                            <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='planningUnitForm'>
                                                 <CardBody>
                                                     <FormGroup>
-                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}</Label>
+                                                        <Label htmlFor="forecastingUnitId">{i18n.t('static.forecastingunit.forecastingunit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="forecastingUnitId"
                                                             id="forecastingUnitId"
                                                             bsSize="sm"
-                                                            valid={!errors.forecastingUnitId}
+                                                            valid={!errors.forecastingUnitId && this.state.planningUnit.forecastingUnit.forecastingUnitId != ''}
                                                             invalid={touched.forecastingUnitId && !!errors.forecastingUnitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
                                                             required
-                                                             >
+                                                            value={this.state.planningUnit.forecastingUnit.forecastingUnitId}
+                                                        >
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {forecastingUnitList}
                                                         </Input>
                                                         <FormFeedback className="red">{errors.forecastingUnitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}</Label>
+                                                        <Label htmlFor="unitId">{i18n.t('static.unit.unit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input
                                                             type="select"
                                                             name="unitId"
                                                             id="unitId"
                                                             bsSize="sm"
-                                                            valid={!errors.unitId}
+                                                            valid={!errors.unitId && this.state.planningUnit.unit.id != ''}
                                                             invalid={touched.unitId && !!errors.unitId}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                             onBlur={handleBlur}
+                                                            value={this.state.planningUnit.unit.id}
                                                             required>
                                                             <option value="">{i18n.t('static.common.select')}</option>
                                                             {unitList}
@@ -313,12 +265,12 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.unitId}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="label">{i18n.t('static.planningunit.planningunit')}</Label>
+                                                        <Label for="label">{i18n.t('static.planningunit.planningunit')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="text"
                                                             name="label"
                                                             id="label"
                                                             bsSize="sm"
-                                                            valid={!errors.label}
+                                                            valid={!errors.label && this.state.planningUnit.label.label_en != ''}
                                                             invalid={touched.label && !!errors.label}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
                                                             onBlur={handleBlur}
@@ -327,25 +279,26 @@ export default class AddPlanningUnit extends Component {
                                                         <FormFeedback className="red">{errors.label}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}</Label>
+                                                        <Label for="multiplier">{i18n.t('static.unit.multiplier')}<span className="red Reqasterisk">*</span></Label>
                                                         <Input type="number"
                                                             name="multiplier"
                                                             id="multiplier"
                                                             bsSize="sm"
-                                                            valid={!errors.multiplier}
+                                                            valid={!errors.multiplier && this.state.planningUnit.multiplier != ''}
                                                             invalid={touched.multiplier && !!errors.multiplier}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e);  }}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                             onBlur={handleBlur}
-                                                            value={this.state.multiplier}
+                                                            value={this.state.planningUnit.multiplier}
                                                             required />
                                                         <FormFeedback className="red">{errors.multiplier}</FormFeedback>
                                                     </FormGroup>
-                                                   
+
                                                 </CardBody>
 
                                                 <CardFooter>
                                                     <FormGroup>
-                                                        <Button type="reset" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" color="danger" className="mr-1 float-right" size="md" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="reset" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" color="success" className="mr-1 float-right" size="md" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
                                                         &nbsp;
 
@@ -368,6 +321,21 @@ export default class AddPlanningUnit extends Component {
 
     cancelClicked() {
         this.props.history.push(`/planningUnit/listPlanningUnit/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        let { planningUnit } = this.state
+
+        planningUnit.label.label_en = ''
+        planningUnit.forecastingUnit.forecastingUnitId = ''
+        planningUnit.unit.id = ''
+        planningUnit.multiplier = ''
+
+        this.setState(
+            {
+                planningUnit
+            }
+        )
     }
 
 }

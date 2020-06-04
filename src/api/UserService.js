@@ -33,7 +33,7 @@ class UserService {
         });
     }
     getUserByUserId(userId) {
-        return axios.get(`${API_URL}/api/getUserByUserId/${userId}`, {
+        return axios.get(`${API_URL}/api/user/${userId}`, {
         });
     }
     editUser(json) {
@@ -56,8 +56,8 @@ class UserService {
     changePassword(userId, oldPassword, newPassword) {
         return axios.post(`${API_URL}/api/changePassword/`, { userId, oldPassword, newPassword }, {});
     }
-    forgotPassword(username) {
-        return axios.get(`${API_URL}/api/forgotPassword/${username}`, {});
+    forgotPassword(emailId) {
+        return axios.post(`${API_URL}/api/forgotPassword/`, { emailId });
     }
     confirmForgotPasswordToken(username, token) {
         return axios.post(`${API_URL}/api/confirmForgotPasswordToken/`, { username, token }, {});
@@ -68,6 +68,10 @@ class UserService {
     accessControls(json) {
         return axios.put(`${API_URL}/api/accessControls/`, json, {
         });
+    }
+    getRoleById(json) {
+        return axios.get(`${API_URL}/api/role/${json}`, {}
+        );
     }
 }
 

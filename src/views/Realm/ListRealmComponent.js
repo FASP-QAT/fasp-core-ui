@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import RealmService from '../../api/RealmService'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import { NavLink } from 'react-router-dom'
-import { Card, CardHeader, CardBody } from 'reactstrap';
+import { Card, CardHeader, CardBody, Button } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText'
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import i18n from '../../i18n';
@@ -11,6 +11,8 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
+
 
 const entityname = i18n.t('static.realm.realm');
 export default class ReactListComponent extends Component {
@@ -39,32 +41,32 @@ export default class ReactListComponent extends Component {
                 this.setState({ message: response.data.messageCode })
             }
         })
-            .catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
+        // .catch(
+        //     error => {
+        //         if (error.message === "Network Error") {
+        //             this.setState({ message: error.message });
+        //         } else {
+        //             switch (error.response ? error.response.status : "") {
+        //                 case 500:
+        //                 case 401:
+        //                 case 404:
+        //                 case 406:
+        //                 case 412:
+        //                     this.setState({ message: error.response.data.messageCode });
+        //                     break;
+        //                 default:
+        //                     this.setState({ message: 'static.unkownError' });
+        //                     break;
+        //             }
+        //         }
 
-                }
-            );
+        //     }
+        // );
     }
     editRealm(realm) {
         this.props.history.push({
-            pathname: "/realm/updateRealm",
-            state: { realm: realm }
+            pathname: `/realm/updateRealm/${realm.realmId}`,
+            // state: { realm: realm }
         });
 
     }
@@ -76,6 +78,16 @@ export default class ReactListComponent extends Component {
             alert("You must be Online.")
         }
 
+    }
+    RealmCountry(event, row) {
+        event.stopPropagation();
+        console.log(JSON.stringify(row))
+        this.props.history.push({
+            pathname: `/realmCountry/RealmCountry/${row.realmId}`,
+            state: { realm: row }
+
+
+        })
     }
     formatLabel(cell, row) {
         return getLabelText(cell, this.state.lang);
@@ -90,13 +102,6 @@ export default class ReactListComponent extends Component {
 
         const columns = [
             {
-                dataField: 'realmCode',
-                text: i18n.t('static.realm.realmCode'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
-            },
-            {
                 dataField: 'label',
                 text: i18n.t('static.realm.realmName'),
                 sort: true,
@@ -105,25 +110,20 @@ export default class ReactListComponent extends Component {
                 formatter: this.formatLabel
             },
             {
-                dataField: 'monthInPastForAmc',
-                text: i18n.t('static.realm.monthInPastForAmc'),
+                dataField: 'realmCode',
+                text: i18n.t('static.realm.realmCode'),
                 sort: true,
                 align: 'center',
                 headerAlign: 'center'
-            },
-            {
-                dataField: 'monthInFutureForAmc',
-                text: i18n.t('static.realm.monthInFutureForAmc'),
-                sort: true,
+            }, {
+                dataField: 'realmId',
+                text: 'Action',
                 align: 'center',
-                headerAlign: 'center'
-            },
-            {
-                dataField: 'orderFrequency',
-                text: i18n.t('static.realm.orderFrequency'),
-                sort: true,
-                align: 'center',
-                headerAlign: 'center'
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (<div><Button type="button" size="sm" color="success" onClick={(event) => this.RealmCountry(event, row)} ><i className="fa fa-check"></i>{i18n.t('static.realm.mapcountry')}</Button>
+                    </div>)
+                }
             }
             // {
             //     dataField: 'defaultRealm',
@@ -165,10 +165,13 @@ export default class ReactListComponent extends Component {
         }
         return (
             <div className="animated">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
 
                         <div className="card-header-actions">
@@ -177,7 +180,7 @@ export default class ReactListComponent extends Component {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0 pt-lg-0">
                         <ToolkitProvider
                             keyField="realmId"
                             data={this.state.selRealm}

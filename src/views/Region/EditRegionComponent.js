@@ -7,6 +7,7 @@ import i18n from '../../i18n'
 import RegionService from "../../api/RegionService";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import getLabelText from '../../CommonComponent/getLabelText';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const entityname = i18n.t('static.region.region');
 
@@ -46,13 +47,38 @@ class EditRegionComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            region: this.props.location.state.region,
+            // region: this.props.location.state.region,
+            region: {
+                realmCountry: {
+                    country: {
+                        countryCode: '',
+                        label: {
+                            label_en: '',
+                            label_fr: '',
+                            label_sp: '',
+                            label_pr: ''
+                        }
+                    },
+                },
+                label: {
+                    label_en: '',
+                    label_fr: '',
+                    label_sp: '',
+                    label_pr: ''
+                },
+
+            },
             message: '',
             lang: localStorage.getItem('lang')
         }
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.Capitalize = this.Capitalize.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.changeMessage = this.changeMessage.bind(this);
+    }
+    changeMessage(message) {
+        this.setState({ message: message })
     }
 
     dataChange(event) {
@@ -91,18 +117,31 @@ class EditRegionComponent extends Component {
         }
     }
     Capitalize(str) {
-        this.state.region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        if (str != null && str != "") {
+            let { region } = this.state;
+            region.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
+        }
+    }
+    componentDidMount() {
+        AuthenticationService.setupAxiosInterceptors();
+        RegionService.getRegionById(this.props.match.params.regionId).then(response => {
+            this.setState({
+                region: response.data
+            });
+
+        })
     }
 
     render() {
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message,{entityname})}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
+                <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
-                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity',entityname)}</strong>{' '}
+                                <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', entityname)}</strong>{' '}
                             </CardHeader>
                             <Formik
                                 enableReinitialize={true}
@@ -121,27 +160,6 @@ class EditRegionComponent extends Component {
                                                 })
                                             }
                                         })
-                                        .catch(
-                                            error => {
-                                                if (error.message === "Network Error") {
-                                                    this.setState({ message: error.message });
-                                                } else {
-                                                    switch (error.response ? error.response.status : "") {
-                                                        case 500:
-                                                        case 401:
-                                                        case 404:
-                                                        case 406:
-                                                        case 412:
-                                                            this.setState({ message: error.response.data.messageCode });
-                                                            break;
-                                                        default:
-                                                            this.setState({ message: 'static.unkownError' });
-                                                            console.log("Error code unkown");
-                                                            break;
-                                                    }
-                                                }
-                                            }
-                                        );
                                 }}
                                 render={
                                     ({
@@ -160,28 +178,28 @@ class EditRegionComponent extends Component {
                                                     <FormGroup>
                                                         <Label htmlFor="realmCountryId">{i18n.t('static.region.country')}</Label>
                                                         <Input
-                                                                type="text"
-                                                                name="realmCountryId"
-                                                                id="realmCountryId"
-                                                                bsSize="sm"
-                                                                readOnly
-                                                                value={getLabelText(this.state.region.realmCountry.country.label, this.state.lang)}
-                                                            >
-                                                            </Input>
-                                                      </FormGroup>
+                                                            type="text"
+                                                            name="realmCountryId"
+                                                            id="realmCountryId"
+                                                            bsSize="sm"
+                                                            readOnly
+                                                            value={getLabelText(this.state.region.realmCountry.country.label, this.state.lang)}
+                                                        >
+                                                        </Input>
+                                                    </FormGroup>
                                                     <FormGroup>
-                                                        <Label for="region">{i18n.t('static.region.region')}</Label>
-                                                                                                                  <Input type="text"
-                                                                name="region"
-                                                                id="region"
-                                                                bsSize="sm"
-                                                                valid={!errors.region}
-                                                                invalid={touched.region && !!errors.region}
-                                                                onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
-                                                                onBlur={handleBlur}
-                                                                value={getLabelText(this.state.region.label, this.state.lang)}
-                                                                required />
-                                                       
+                                                        <Label for="region">{i18n.t('static.region.region')}<span className="red Reqasterisk">*</span></Label>
+                                                        <Input type="text"
+                                                            name="region"
+                                                            id="region"
+                                                            bsSize="sm"
+                                                            valid={!errors.region}
+                                                            invalid={touched.region && !!errors.region}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e); this.Capitalize(e.target.value) }}
+                                                            onBlur={handleBlur}
+                                                            value={getLabelText(this.state.region.label, this.state.lang)}
+                                                            required />
+
                                                         <FormText className="red">{errors.region}</FormText>
                                                     </FormGroup>
                                                     <FormGroup>
@@ -224,6 +242,7 @@ class EditRegionComponent extends Component {
                                                     <FormGroup>
                                                         {/* <Button type="reset" size="md" color="warning" className="float-right mr-1"><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button> */}
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="success" className="float-right mr-1" onClick={this.resetClicked}><i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)}><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
                                                         &nbsp;
                                                     </FormGroup>
@@ -238,6 +257,16 @@ class EditRegionComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/region/listRegion/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+
+    resetClicked() {
+        AuthenticationService.setupAxiosInterceptors();
+        RegionService.getRegionById(this.props.match.params.regionId).then(response => {
+            this.setState({
+                region: response.data
+            });
+
+        })
     }
 }
 

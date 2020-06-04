@@ -13,6 +13,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import filterFactory, { textFilter, selectFilter, multiSelectFilter } from 'react-bootstrap-table2-filter';
 import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory from 'react-bootstrap-table2-paginator'
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent'
 
 const entityname = i18n.t('static.healtharea.healtharea');
 export default class HealthAreaListComponent extends Component {
@@ -29,11 +30,23 @@ export default class HealthAreaListComponent extends Component {
         this.addHealthArea = this.addHealthArea.bind(this);
         this.filterData = this.filterData.bind(this);
         this.formatLabel = this.formatLabel.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
+    }
+    hideFirstComponent() {
+        setTimeout(function () {
+            document.getElementById('div1').style.display = 'none';
+        }, 8000);
+    }
+
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
     filterData() {
         let realmId = document.getElementById("realmId").value;
         if (realmId != 0) {
-            const selSource = this.state.healthAreas.filter(c => c.realm.realmId == realmId)
+            const selSource = this.state.healthAreas.filter(c => c.realm.id == realmId)
             this.setState({
                 selSource
             });
@@ -46,7 +59,7 @@ export default class HealthAreaListComponent extends Component {
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-
+        this.hideFirstComponent();
         RealmService.getRealmListAll()
             .then(response => {
                 if (response.status == 200) {
@@ -54,53 +67,36 @@ export default class HealthAreaListComponent extends Component {
                         realms: response.data
                     })
                 } else {
-                    this.setState({ message: response.data.messageCode })
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
                 }
-            }).catch(
-                error => {
-                    if (error.message === "Network Error") {
-                        this.setState({ message: error.message });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({ message: error.response.data.messageCode });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError' });
-                                break;
-                        }
-                    }
-                }
-            );
+            })
 
         HealthAreaService.getHealthAreaList()
             .then(response => {
-                console.log("response---", response.data);
+                if (response.status == 200) {
+                    console.log("response---", response.data);
                 this.setState({
                     healthAreas: response.data,
                     selSource: response.data
                 })
-
-            }).catch(
-                error => {
-                    switch (error.message) {
-                        case "Network Error":
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                        default:
-                            this.setState({
-                                message: error.message
-                            })
-                            break
-                    }
                 }
-            );
+                else{
+
+                    this.setState({
+                        message: response.data.messageCode
+                    },
+                        () => {
+                            this.hideSecondComponent();
+                        })
+                }
+                
+
+            })
     }
 
     // render() {
@@ -215,10 +211,13 @@ export default class HealthAreaListComponent extends Component {
         }
         return (
             <div className="animated">
-                <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
+                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}
                         <div className="card-header-actions">
                             <div className="card-header-action">
@@ -227,9 +226,9 @@ export default class HealthAreaListComponent extends Component {
                         </div>
 
                     </CardHeader>
-                    <CardBody>
+                    <CardBody className="pb-lg-0">
                         <Col md="3 pl-0">
-                            <FormGroup>
+                            <FormGroup className="Selectdiv">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
                                 <div className="controls SelectGo">
                                     <InputGroup>
@@ -238,13 +237,14 @@ export default class HealthAreaListComponent extends Component {
                                             name="realmId"
                                             id="realmId"
                                             bsSize="sm"
+                                            onChange={this.filterData}
                                         >
                                             <option value="0">{i18n.t('static.common.all')}</option>
                                             {realmList}
                                         </Input>
-                                        <InputGroupAddon addonType="append">
+                                        {/* <InputGroupAddon addonType="append">
                                             <Button color="secondary Gobtn btn-sm" onClick={this.filterData}>{i18n.t('static.common.go')}</Button>
-                                        </InputGroupAddon>
+                                        </InputGroupAddon> */}
                                     </InputGroup>
                                 </div>
                             </FormGroup>

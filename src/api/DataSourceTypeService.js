@@ -27,5 +27,10 @@ class DataSourceTypeService {
         return axios.get(`${API_URL}/api/dataSourceType/${json}`, {}
         );
     }
+
+    getDataSourceTypeByRealmId(json) {
+        return axios.get(`${API_URL}/api/dataSourceType/realmId/${json}`, {}
+        );
+    }
 }
 export default new DataSourceTypeService();
