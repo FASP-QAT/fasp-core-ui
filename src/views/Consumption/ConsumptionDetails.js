@@ -809,6 +809,8 @@ export default class ConsumptionDetails extends React.Component {
         // }
 
         var validation = this.checkValidation();
+        // var validationForDuplicate = this.checkValidationForDuplicate();
+        // console.log("validationForDuplicate------", validationForDuplicate);
         if (validation == true) {
             this.setState(
                 {
@@ -830,6 +832,7 @@ export default class ConsumptionDetails extends React.Component {
 
                 var programRequest = programTransaction.get(programId);
                 programRequest.onsuccess = function (event) {
+                    let valid = true;
                     // console.log("(programRequest.result)----", (programRequest.result))
                     var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
@@ -865,7 +868,7 @@ export default class ConsumptionDetails extends React.Component {
                     }
 
 
-                    console.log("productCategoryId--2222-->>>>>>>>> ", this.state.productCategoryId);
+                    // console.log("productCategoryId--2222-->>>>>>>>> ", this.state.productCategoryId);
                     for (var i = consumptionDataList.length; i < tableJson.length; i++) {
                         var map = new Map(Object.entries(tableJson[i]))
                         var json = {
@@ -895,28 +898,62 @@ export default class ConsumptionDetails extends React.Component {
                                 }
                             }
                         }
-                        consumptionDataList.push(json);
+                        // consumptionDataList.push(json);
                         consumptionDataListNotFiltered.push(json);
                     }
 
 
-                    console.log("1111111111111111111   ", consumptionDataList)
-                    programJson.consumptionList = consumptionDataListNotFiltered;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
+                    let count = 0;
+                    for (var i = 0; i < tableJson.length; i++) {
 
-                    putRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    putRequest.onsuccess = function (event) {
-                        // $("#saveButtonDiv").hide();
+                        count = 0;
+                        var map = new Map(Object.entries(tableJson[i]));
+
+                        for (var j = 0; j < tableJson.length; j++) {
+
+                            var map1 = new Map(Object.entries(tableJson[j]));
+
+                            if (moment(map.get("0")).format("YYYY-MM") === moment(map1.get("0")).format("YYYY-MM") && parseInt(map.get("1")) === parseInt(map1.get("1")) && map.get("6") === map1.get("6")) {
+                                count++;
+                            }
+                            if (count > 1) {
+                                i = tableJson.length;
+                                break;
+                            }
+                        }
+                    }
+
+                    // console.log("count***********************   ", count);
+
+                    if (count <= 1) {
+                        // console.log("INNNNNNNNN");
+
+                        programJson.consumptionList = consumptionDataListNotFiltered;
+                        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        var putRequest = programTransaction.put(programRequest.result);
+
+                        putRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        putRequest.onsuccess = function (event) {
+                            // $("#saveButtonDiv").hide();
+                            this.setState({
+                                message: 'static.message.consumptionSaved',
+                                changedFlag: 0
+                            })
+                            // this.props.history.push(`/consumptionDetails/${document.getElementById('programId').value}/${document.getElementById("planningUnitId").value}/` + i18n.t('static.message.consumptionSuccess'))
+                            this.props.history.push(`/consumptionDetails/` + i18n.t('static.message.consumptionSuccess'));
+                        }.bind(this)
+                    } else {
                         this.setState({
-                            message: 'static.message.consumptionSaved',
+                            message: 'Duplicate Consumption Details Found',
                             changedFlag: 0
                         })
-                        // this.props.history.push(`/consumptionDetails/${document.getElementById('programId').value}/${document.getElementById("planningUnitId").value}/` + i18n.t('static.message.consumptionSuccess'))
-                        this.props.history.push(`/consumptionDetails/` + i18n.t('static.message.consumptionSuccess'));
-                    }.bind(this)
+                    }
+
+
+
+
                 }.bind(this)
             }.bind(this)
 
@@ -928,7 +965,7 @@ export default class ConsumptionDetails extends React.Component {
     }.bind(this);
 
     render() {
-        
+
         const lan = 'en';
         const { programList } = this.state;
         let programs = programList.length > 0
@@ -961,7 +998,7 @@ export default class ConsumptionDetails extends React.Component {
                 )
             }, this);
         return (
-            
+
             // <>
             //     <Col xs="12" sm="12">
             //         <Card>
@@ -1071,85 +1108,85 @@ export default class ConsumptionDetails extends React.Component {
 
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
-                this.setState({ message: message })
-            }} />
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-             
-                    <Card>
 
-                        <CardHeader>
-                            <strong>{i18n.t('static.consumption.consumptionadd')}</strong>
-                        </CardHeader>
-                        <CardBody className="">
-                            <Formik
-                                render={
-                                    ({
-                                    }) => (
-                                            <Form name='simpleForm'>
+                <Card>
 
-                                                <Col md="12 pl-0">
-                                                    <div className="d-md-flex">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.program')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        value={this.state.programId}
-                                                                        name="programId" id="programId"
-                                                                        onChange={this.getPlanningUnitList}
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {programs}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.planningunit')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="planningUnitId"
-                                                                        id="planningUnitId"
-                                                                        bsSize="sm"
-                                                                        value={this.state.planningUnitId}
-                                                                        onChange={this.formSubmit}
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {planningUnits}
-                                                                    </Input>
-                                                                    {/* <InputGroupAddon addonType="append">
+                    <CardHeader>
+                        <strong>{i18n.t('static.consumption.consumptionadd')}</strong>
+                    </CardHeader>
+                    <CardBody className="">
+                        <Formik
+                            render={
+                                ({
+                                }) => (
+                                        <Form name='simpleForm'>
+
+                                            <Col md="12 pl-0">
+                                                <div className="d-md-flex">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.program')}</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input type="select"
+                                                                    bsSize="sm"
+                                                                    value={this.state.programId}
+                                                                    name="programId" id="programId"
+                                                                    onChange={this.getPlanningUnitList}
+                                                                >
+                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                    {programs}
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.consumption.planningunit')}</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="planningUnitId"
+                                                                    id="planningUnitId"
+                                                                    bsSize="sm"
+                                                                    value={this.state.planningUnitId}
+                                                                    onChange={this.formSubmit}
+                                                                >
+                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                    {planningUnits}
+                                                                </Input>
+                                                                {/* <InputGroupAddon addonType="append">
                                                                         <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
                                                                     </InputGroupAddon> */}
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
-                                        )} />
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
+                                    )} />
 
-                            <Col xs="12" sm="12">
-                                <div className="table-responsive">
-                                    <div id="consumptiontableDiv">
-                                    </div>
+                        <Col xs="12" sm="12">
+                            <div className="table-responsive">
+                                <div id="consumptiontableDiv">
                                 </div>
-                            </Col>
-                        </CardBody>
-                        <CardFooter>
-                            <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addRow')}</Button>
+                            </div>
+                        </Col>
+                    </CardBody>
+                    <CardFooter>
+                        <FormGroup>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addRow')}</Button>
 
-                                &nbsp;
+                            &nbsp;
 </FormGroup>
-                        </CardFooter>
-                    </Card>
-               
+                    </CardFooter>
+                </Card>
+
             </div >
 
 

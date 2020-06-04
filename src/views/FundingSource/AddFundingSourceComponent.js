@@ -65,6 +65,7 @@ class AddFundingSourceComponent extends Component {
     this.dataChange = this.dataChange.bind(this);
     this.Capitalize = this.Capitalize.bind(this);
     this.resetClicked = this.resetClicked.bind(this);
+    this.hideSecondComponent = this.hideSecondComponent.bind(this);
   }
 
   dataChange(event) {
@@ -121,6 +122,11 @@ class AddFundingSourceComponent extends Component {
         }
       })
   }
+  hideSecondComponent() {
+    setTimeout(function () {
+        document.getElementById('div2').style.display = 'none';
+    }, 8000);
+}
 
   render() {
     const { realms } = this.state;
@@ -137,7 +143,7 @@ class AddFundingSourceComponent extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-        <h5>{i18n.t(this.state.message, { entityname })}</h5>
+         <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
             <Card>
@@ -153,9 +159,14 @@ class AddFundingSourceComponent extends Component {
                     .then(response => {
                       console.log("Response->", response);
                       if (response.status == 200) {
-                        this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
+                        this.props.history.push(`/fundingSource/listFundingSource/`  + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
                       } else {
-                        this.setState({ message: response.data.messageCode })
+                        this.setState({
+                            message: response.data.messageCode
+                        },
+                            () => {
+                                this.hideSecondComponent();
+                            })
                       }
                     })
                 }}
@@ -233,7 +244,7 @@ class AddFundingSourceComponent extends Component {
     );
   }
   cancelClicked() {
-    this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
+    this.props.history.push(`/fundingSource/listFundingSource/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
   }
   resetClicked() {
     let { fundingSource } = this.state;

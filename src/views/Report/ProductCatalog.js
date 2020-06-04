@@ -249,7 +249,7 @@ export default class ProductCatalog extends React.Component {
 
         doc.text(title, marginLeft, 40);
         doc.autoTable(content);
-        doc.save("report.pdf")
+        doc.save("ProductCatelog.pdf")
     }
 
 

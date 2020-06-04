@@ -655,11 +655,11 @@ export default class AddInventory extends Component {
                             realmCountryPlanningUnit: {
                                 id: countrySKU,
                             },
-                            multiplier:inventoryDataList[0].multiplier,
+                            multiplier: inventoryDataList[0].multiplier,
                             planningUnit: {
                                 id: planningUnitId
                             },
-                            notes:""
+                            notes: ""
                         }
                         inventoryDataList.push(json);
                         inventoryDataListNotFiltered.push(json);
@@ -667,21 +667,58 @@ export default class AddInventory extends Component {
 
                     console.log("inventoryDataListNotFiltered------->", inventoryDataListNotFiltered);
 
-                    programJson.inventoryList = inventoryDataListNotFiltered;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
 
-                    putRequest.onerror = function (event) {
-                        // Handle errors!
-                    };
-                    putRequest.onsuccess = function (event) {
-                        // $("#saveButtonDiv").hide();
+
+                    let count = 0;
+                    for (var i = 0; i < tableJson.length; i++) {
+
+                        count = 0;
+                        var map = new Map(Object.entries(tableJson[i]));
+
+                        for (var j = 0; j < tableJson.length; j++) {
+
+                            var map1 = new Map(Object.entries(tableJson[j]));
+
+                            if (moment(map.get("2")).format("YYYY-MM") === moment(map1.get("2")).format("YYYY-MM") && parseInt(map.get("1")) === parseInt(map1.get("1"))) {
+                                count++;
+                            }
+                            if (count > 1) {
+                                i = tableJson.length;
+                                break;
+                            }
+                        }
+                    }
+
+
+
+
+
+
+
+
+                    if (count <= 1) {
+                        programJson.inventoryList = inventoryDataListNotFiltered;
+                        programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                        var putRequest = programTransaction.put(programRequest.result);
+
+                        putRequest.onerror = function (event) {
+                            // Handle errors!
+                        };
+                        putRequest.onsuccess = function (event) {
+                            // $("#saveButtonDiv").hide();
+                            this.setState({
+                                message: 'static.message.inventorysuccess',
+                                changedFlag: 0
+                            })
+                            this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
+                        }.bind(this)
+                    } else {
                         this.setState({
-                            message: 'static.message.inventorysuccess',
+                            message: 'Duplicate Inventory Details Found',
                             changedFlag: 0
                         })
-                        this.props.history.push(`/inventory/addInventory/` + i18n.t('static.message.addSuccess', { entityname }))
-                    }.bind(this)
+                    }
+
                 }.bind(this)
             }.bind(this)
 
@@ -721,79 +758,79 @@ export default class AddInventory extends Component {
                 }} /> */}
                 <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-              
-                    <Card>
 
-                        <CardHeader>
-                            <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
-                        </CardHeader>
-                        <CardBody>
-                            <Formik
-                                render={
-                                    ({
-                                    }) => (
-                                            <Form name='simpleForm'>
+                <Card>
 
-                                                <Col md="12 pl-0">
-                                                    <div className="d-md-flex">
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input type="select"
-                                                                        bsSize="sm"
-                                                                        // value={this.state.programId}
-                                                                        name="programId" id="programId"
-                                                                        onChange={this.getCountrySKUList}
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {programs}
-                                                                    </Input>
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                        <FormGroup className="col-md-3">
-                                                            <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
-                                                            <div className="controls ">
-                                                                <InputGroup>
-                                                                    <Input
-                                                                        type="select"
-                                                                        name="countrySKU"
-                                                                        id="countrySKU"
-                                                                        bsSize="sm"
-                                                                        onChange={this.formSubmit}
-                                                                    >
-                                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                                        {countrySKUs}
-                                                                    </Input>
-                                                                    {/* <InputGroupAddon addonType="append">
+                    <CardHeader>
+                        <i className="icon-note"></i><strong>{i18n.t('static.common.addEntity', { entityname })}</strong>{' '}
+                    </CardHeader>
+                    <CardBody>
+                        <Formik
+                            render={
+                                ({
+                                }) => (
+                                        <Form name='simpleForm'>
+
+                                            <Col md="12 pl-0">
+                                                <div className="d-md-flex">
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.program')}</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input type="select"
+                                                                    bsSize="sm"
+                                                                    // value={this.state.programId}
+                                                                    name="programId" id="programId"
+                                                                    onChange={this.getCountrySKUList}
+                                                                >
+                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                    {programs}
+                                                                </Input>
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-3">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.inventory.countrySKU')}</Label>
+                                                        <div className="controls ">
+                                                            <InputGroup>
+                                                                <Input
+                                                                    type="select"
+                                                                    name="countrySKU"
+                                                                    id="countrySKU"
+                                                                    bsSize="sm"
+                                                                    onChange={this.formSubmit}
+                                                                >
+                                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                                    {countrySKUs}
+                                                                </Input>
+                                                                {/* <InputGroupAddon addonType="append">
                                                                         <Button color="secondary Gobtn btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
                                                                     </InputGroupAddon> */}
-                                                                </InputGroup>
-                                                            </div>
-                                                        </FormGroup>
-                                                    </div>
-                                                </Col>
-                                            </Form>
-                                        )} />
+                                                            </InputGroup>
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                            </Col>
+                                        </Form>
+                                    )} />
 
-                            <Col xs="12" sm="12">
-                                <div className="table-responsive">
-                                    <div id="inventorytableDiv" >
-                                    </div>
+                        <Col xs="12" sm="12">
+                            <div className="table-responsive">
+                                <div id="inventorytableDiv" >
                                 </div>
-                            </Col>
-                        </CardBody>
-                        <CardFooter>
-                            <FormGroup>
-                                <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addData')}</Button>
-                                &nbsp;
+                            </div>
+                        </Col>
+                    </CardBody>
+                    <CardFooter>
+                        <FormGroup>
+                            <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveData()} ><i className="fa fa-check"></i>{i18n.t('static.common.saveData')}</Button>
+                            <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.addRow()} ><i className="fa fa-check"></i>{i18n.t('static.common.addData')}</Button>
+                            &nbsp;
 </FormGroup>
-                        </CardFooter>
-                    </Card>
-               
+                    </CardFooter>
+                </Card>
+
 
             </div >
         );

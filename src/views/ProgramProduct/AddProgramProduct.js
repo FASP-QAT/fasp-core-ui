@@ -561,7 +561,7 @@ class AddprogramPlanningUnit extends Component {
                                                         </FormGroup>
 
 
-                                                        <FormGroup className="col-md-12 mt-md-4">
+                                                        <FormGroup className="col-md-12 mt-md-0">
                                                             {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
                                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                             &nbsp;
@@ -570,7 +570,7 @@ class AddprogramPlanningUnit extends Component {
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-0">
                                     <thead>
                                         <tr>
                                             <th className="text-left"> {i18n.t('static.program.program')} </th>

@@ -141,6 +141,9 @@ export default class DownloadProgram extends Component {
                                 db1 = e.target.result;
                                 var transactionForSavingData = db1.transaction(['programData'], 'readwrite');
                                 var programSaveData = transactionForSavingData.objectStore('programData');
+
+                                var transactionForSavingDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                var downloadedProgramSaveData = transactionForSavingDownloadedProgramData.objectStore('downloadedProgramData');
                                 for (var i = 0; i < json.length; i++) {
                                     var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[i]), SECRET_KEY);
                                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -157,15 +160,31 @@ export default class DownloadProgram extends Component {
                                     putRequest.onerror = function (error) {
                                         this.props.history.push(`/program/downloadProgram/` +i18n.t('static.program.errortext') )
                                     }.bind(this);
+
+                                    var putDownloadedProgramDataRequest = downloadedProgramSaveData.put(item);
+                                    putDownloadedProgramDataRequest.onerror = function (error) {
+                                        this.props.history.push(`/program/downloadProgram/` +i18n.t('static.program.errortext') )
+                                    }.bind(this);
                                 }
                                 transactionForSavingData.oncomplete = function (event) {
                                     console.log("in transaction complete")
+                                    // this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
+                                }.bind(this);
+                                transactionForSavingDownloadedProgramData.oncomplete = function (event) {
+                                    console.log("in transaction complete downloaded")
                                     this.props.history.push(`/dashboard/` + i18n.t('static.program.downloadsuccess'))
                                 }.bind(this);
                                 transactionForSavingData.onerror = function (event) {
                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                 }.bind(this);
                                 programSaveData.onerror = function (event) {
+                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
+                                }.bind(this)
+
+                                transactionForSavingDownloadedProgramData.onerror = function (event) {
+                                    this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
+                                }.bind(this);
+                                downloadedProgramSaveData.onerror = function (event) {
                                     this.props.history.push(`/program/downloadProgram/` + i18n.t('static.program.errortext'))
                                 }.bind(this)
                             } else {
@@ -179,6 +198,9 @@ export default class DownloadProgram extends Component {
                                                 db1 = e.target.result;
                                                 var transactionForOverwrite = db1.transaction(['programData'], 'readwrite');
                                                 var programOverWrite = transactionForOverwrite.objectStore('programData');
+
+                                                var transactionForOverwriteDownloadedProgramData = db1.transaction(['downloadedProgramData'], 'readwrite');
+                                                var programOverWriteForDownloadedProgramData = transactionForOverwriteDownloadedProgramData.objectStore('downloadedProgramData');
                                                 for (var i = 0; i < json.length; i++) {
                                                     var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[i]), SECRET_KEY);
                                                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
@@ -191,22 +213,32 @@ export default class DownloadProgram extends Component {
                                                         programData: encryptedText.toString(),
                                                         userId: userId
                                                     };
+                                                    
                                                     var putRequest = programOverWrite.put(item);
                                                     putRequest.onerror = function (error) {
+                                                        this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
+                                                    }.bind(this);
+
+                                                    var putRequestForDownloadedProgramData = programOverWriteForDownloadedProgramData.put(item);
+                                                    putRequestForDownloadedProgramData.onerror = function (error) {
                                                         this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                                     }.bind(this);
 
                                                 }
                                                 transactionForOverwrite.oncomplete = function (event) {
                                                     console.log("in transaction complete")
+                                                    // this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
+                                                }.bind(this);
+                                                transactionForOverwriteDownloadedProgramData.oncomplete = function (event) {
+                                                    console.log("in transaction complete downloaded")
                                                     this.props.history.push(`/dashboard/` + "Program downloaded successfully.")
                                                 }.bind(this);
                                                 transactionForOverwrite.onerror = function (event) {
                                                     this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
                                                 }.bind(this);
-                                                transactionForOverwrite.onerror = function (event) {
+                                                transactionForOverwriteDownloadedProgramData.onerror = function (event) {
                                                     this.props.history.push(`/program/downloadProgram/` + "An error occured please try again.")
-                                                }.bind(this)
+                                                }.bind(this);
                                             }
                                         },
                                         {
