@@ -198,6 +198,8 @@ const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusO
 const SupplyPlanFormulas = React.lazy(() => import('./views/SupplyPlan/SupplyPlanFormulas'));
 const ForecastMetrics = React.lazy(() => import('./views/Report/ForecastMetrics'));
 const AnnualShipmentCost = React.lazy(() => import('./views/Report/AnnualShipmentCost'));
+const SupplyPlanVersionAndReview = React.lazy(() => import('./views/Report/SupplyPlanVersionAndReview'));
+const EditSupplyPlanStatus= React.lazy(() => import('./views/Report/EditSupplyPlanStatus'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -397,7 +399,10 @@ const routes = [
   { path: '/report/stockStatusOverTime', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.stockstatusovertime'), component: StockStatusOverTime },
   { path: '/report/forecastMetrics', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.dashboard.forecastmetrics'), component: ForecastMetrics },
   { path: '/report/annualShipmentCost', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.annualshipmentcost'), component: AnnualShipmentCost },
- 
+  { path: '/report/supplyPlanVersionAndReview', exact: true, name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
+  { path: '/report/editStatus/:programId/:versionId', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: EditSupplyPlanStatus },
+  { path: '/report/supplyPlanVersionAndReview/:message', name: i18n.t('static.dashboard.report') + " / " + i18n.t('static.report.supplyplanversionandreviewReport'), component: SupplyPlanVersionAndReview },
+
   { path: '/theme', name: 'Theme', component: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
