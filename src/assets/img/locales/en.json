@@ -676,6 +676,8 @@
     "static.shipment.ordereddate":"Orderd Date",
     "static.shipment.shipdate":"Shipped Date",
     "static.shipment.receiveddate":"Received Date",
-    "static.shipment.productcost":"Product Cost"
+    "static.shipment.productcost":"Product Cost",
+    "static.dashboard.costOfInventory":"Cost Of Inventory",
+    "static.dashboard.inventoryTurns":"Inventory Turn"
 
 }

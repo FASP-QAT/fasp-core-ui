@@ -199,10 +199,14 @@ const StockStatusOverTime = React.lazy(() => import('./views/Report/StockStatusO
 const PipelineProgramList = React.lazy(() => import('./views/Pipeline/PipelineProgramList'));
 
 const PlanningUnitListNegativeInventory=React.lazy(() => import('./views/Pipeline/PlanningUnitListNegativeInventory'));
+const CostOfInventoryReport=React.lazy(() => import('./views/Report/CostOfInventory'));
+const InventoryTurnsReport=React.lazy(() => import('./views/Report/InventoryTurns'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
-  { path: '/pipeline/planningUnitListFinalInventory/:pipelineId', name: 'PlanningUnit List', component: PlanningUnitListNegativeInventory },
+  { path: '/report/inventoryTurns',name: 'Report  / Inventory Turns',component: InventoryTurnsReport },
+  { path: '/report/costOfInventory',name: 'Report  /  Cost Of Inventory',component: CostOfInventoryReport },
+  { path: '/pipeline/planningUnitListFinalInventory/:pipelineId',name: 'PlanningUnit List',component: PlanningUnitListNegativeInventory },
   { path: '/pipeline/pieplineProgramList', name: 'Program List', component: PipelineProgramList },
   { path: '/pipeline/pieplineProgramSetup/:pipelineId', name: 'Pipeline Program Setup', component: pipelineProgramSetup },
   { path: '/pipeline/pipelineProgramImport', name: 'Pipeline Program Import', component: pipeline },

@@ -14,7 +14,7 @@ const initialValuesSix = {
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
-    deliveredToReceivedLeadTime: '',
+    // deliveredToReceivedLeadTime: '',
     draftToSubmittedLeadTime: '',
     plannedToDraftLeadTime: '',
     submittedToApprovedLeadTime: '',
@@ -40,8 +40,8 @@ const validationSchemaSix = function (values) {
             .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
         seaFreightPerc: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
+        // deliveredToReceivedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
+            // .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
         draftToSubmittedLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
         plannedToDraftLeadTime: Yup.number().typeError(i18n.t('static.procurementUnit.validNumberText'))
@@ -107,7 +107,7 @@ export default class PipelineProgramDataStepSix extends Component {
             userId: true,
             airFreightPerc: true,
             seaFreightPerc: true,
-            deliveredToReceivedLeadTime: true,
+            // deliveredToReceivedLeadTime: true,
             draftToSubmittedLeadTime: true,
             plannedToDraftLeadTime: true,
             submittedToApprovedLeadTime: true,
@@ -195,7 +195,7 @@ export default class PipelineProgramDataStepSix extends Component {
                         userId: this.props.items.program.programManager.userId,
                         airFreightPerc: this.props.items.program.airFreightPerc,
                         seaFreightPerc: this.props.items.program.seaFreightPerc,
-                        deliveredToReceivedLeadTime: this.props.items.program.deliveredToReceivedLeadTime,
+                        // deliveredToReceivedLeadTime: this.props.items.program.deliveredToReceivedLeadTime,
                         draftToSubmittedLeadTime: this.props.items.program.draftToSubmittedLeadTime,
                         plannedToDraftLeadTime: this.props.items.program.plannedToDraftLeadTime,
                         submittedToApprovedLeadTime: this.props.items.program.submittedToApprovedLeadTime,
@@ -343,7 +343,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             name="approvedToShippedLeadTime" id="approvedToShippedLeadTime" placeholder={i18n.t('static.program.approvetoshiptext')} />
                                         <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                     </FormGroup>
-                                    <FormGroup className="col-md-6">
+                                    {/* <FormGroup className="col-md-6">
                                         <Label htmlFor="company">{i18n.t('static.program.delivertoreceivetext')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
                                             onBlur={handleBlur}
@@ -356,7 +356,7 @@ export default class PipelineProgramDataStepSix extends Component {
                                             value={this.props.items.program.deliveredToReceivedLeadTime}
                                             name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                         <FormFeedback className="red">{errors.deliveredToReceivedLeadTime}</FormFeedback>
-                                    </FormGroup>
+                                    </FormGroup> */}
                                     <FormGroup className="col-md-6">
                                         <Label htmlFor="company">Arrived To Delivered Lead Time<span class="red Reqasterisk">*</span></Label>
                                         <Input

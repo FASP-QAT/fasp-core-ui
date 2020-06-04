@@ -69,7 +69,9 @@ export default class PipelineProgramImport extends Component {
                                             type="file"
                                             id="file-input"
                                             name="file-input"
-                                            onChange={e => this.showFile(e)} />
+                                            onChange={e => this.showFile(e)}
+                                            accept=".json" 
+                                            />
                                     </Col>
                                 </FormGroup>
                             </CardBody>

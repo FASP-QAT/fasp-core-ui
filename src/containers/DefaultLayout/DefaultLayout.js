@@ -416,6 +416,16 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.dashboard.stockstatus'),
                             url: '/report/stockStatus',
                             icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.costOfInventory'),
+                            url: '/report/costOfInventory',
+                            icon: 'fa fa-exchange'
+                          },
+                          {
+                            name: i18n.t('static.dashboard.inventoryTurns'),
+                            url: '/report/inventoryTurns',
+                            icon: 'fa fa-exchange'
                           }
                         ]
                       }
