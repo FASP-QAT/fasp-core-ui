@@ -171,7 +171,7 @@ class GlobalConsumption extends Component {
 
     var csvRow = [];
     csvRow.push((i18n.t('static.report.dateRange') + ' , ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
-    this.state.programLabels.map(ele=>
+    this.state.countryLabels.map(ele=>
       csvRow.push(i18n.t('static.dashboard.country') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
       this.state.programLabels.map(ele=>
       csvRow.push(i18n.t('static.program.program') + ' , ' + ((ele.toString()).replaceAll(',', '%20')).replaceAll(' ', '%20')))
@@ -242,7 +242,7 @@ class GlobalConsumption extends Component {
       //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
       //}); 
       for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(18)
+        doc.setFontSize(12)
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         /*doc.addImage(data, 10, 30, {
@@ -253,22 +253,22 @@ class GlobalConsumption extends Component {
           align: 'center'
         })
         if (i == 1) {
-          doc.setFontSize(12)
+          doc.setFontSize(8)
           doc.text(i18n.t('static.report.dateRange') + ' : ' +this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
             align: 'left'
           })
-          doc.text(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width / 8, 110, {
-            align: 'left'
-        })
-          doc.text(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width / 8, 130, {
-            align: 'left'
-          })
-          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
-            align: 'left'
-          })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString(), doc.internal.pageSize.width / 8, 170, {
+          var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+          doc.text(doc.internal.pageSize.width / 8, 110, planningText)
+
+          planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.toString(), doc.internal.pageSize.width * 3 / 4);
+
+          doc.text(doc.internal.pageSize.width / 8, 130, planningText)
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 170 : 150, {
             align: 'left'
           })
+          planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.toString()), doc.internal.pageSize.width * 3 / 4);
+
+          doc.text(doc.internal.pageSize.width / 8, this.state.programLabels.size > 2 ? 190 : 170, planningText)
         }
 
       }
@@ -280,7 +280,7 @@ class GlobalConsumption extends Component {
     const marginLeft = 10;
     const doc = new jsPDF(orientation, unit, size, true);
 
-    doc.setFontSize(15);
+    doc.setFontSize(8);
 
     const title = "Consumption Report";
     var canvas = document.getElementById("cool-canvas");
@@ -292,7 +292,7 @@ class GlobalConsumption extends Component {
     var h1 = 50;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 200,750,290,'CANVAS');
+    doc.addImage(canvasImg, 'png', 50, 220,750,290,'CANVAS');
       
       const headers =[[i18n.t('static.dashboard.country'),i18n.t('static.report.month'),i18n.t('static.consumption.consumptionqty')]]
       const data =   this.state.consumptions.map( elt =>[getLabelText(elt.realmCountry.label),elt.consumptionDateString,elt.planningUnitQty]);

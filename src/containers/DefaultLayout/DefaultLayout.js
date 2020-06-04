@@ -443,6 +443,16 @@ class DefaultLayout extends Component {
                             name: i18n.t('static.report.annualshipmentcost'),
                             url: '/report/annualShipmentCost',
                             icon: 'fa fa-file-text'
+                          } ,
+                          {
+                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                            url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange'
+                          } ,
+                          {
+                            name: i18n.t('static.report.supplyplanversionandreviewReport'),
+                            url: '/report/supplyPlanVersionAndReview',
+                            icon: 'fa fa-exchange'
                           }
                         ]
                       }
