@@ -60,7 +60,14 @@ export default class AddDimensionComponent extends Component {
         this.resetClicked = this.resetClicked.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
 
     dataChange(event) {
         let { dimension } = this.state
@@ -113,7 +120,7 @@ export default class AddDimensionComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -129,10 +136,13 @@ export default class AddDimensionComponent extends Component {
                                         console.log(this.state.dimension)
                                         DimensionService.addDimension(this.state.dimension).then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/diamension/diamensionlist/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/diamension/diamensionlist/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                message: response.data.messageCode
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
                                                 })
                                             }
                                         }
@@ -218,7 +228,7 @@ export default class AddDimensionComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/diamension/diamensionlist/` + "Action Canceled")
+        this.props.history.push(`/diamension/diamensionlist/` + 'red/' + "Action Canceled")
     }
 
     resetClicked() {

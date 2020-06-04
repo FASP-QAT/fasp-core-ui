@@ -41,13 +41,13 @@ const validationSchema = function (values) {
                 return schema;
             }),
         // roleId: Yup.array()
-        //     .min(3, 'Pick at least 3 tags')
-        //     .of(
-        //         Yup.object().shape({
-        //             label: Yup.string().required(),
-        //             value: Yup.string().required(),
-        //         })
-        //     ),
+        // .min(3, 'Pick at least 3 tags')
+        // .of(
+        // Yup.object().shape({
+        // label: Yup.string().required(),
+        // value: Yup.string().required(),
+        // })
+        // ),
         languageId: Yup.string()
             .required(i18n.t('static.user.validlanguage')),
         emailId: Yup.string()
@@ -101,6 +101,7 @@ class AddUserComponent extends Component {
                 emailId: '',
                 phoneNumber: '',
             },
+            loading: false,
             roleId: '',
             roleList: [],
             message: '',
@@ -300,7 +301,7 @@ class AddUserComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
@@ -310,13 +311,17 @@ class AddUserComponent extends Component {
                                 initialValues={initialValues}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
-                                    console.log(JSON.stringify(this.state.user))
+                                    this.setState({
+                                        loading: true
+                                    })
+                                    // console.log(JSON.stringify(this.state.user))
                                     UserService.addNewUser(this.state.user)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
+                                                    loading: false,
                                                     message: response.data.messageCode
                                                 })
                                             }
@@ -324,6 +329,7 @@ class AddUserComponent extends Component {
                                         })
                                         .catch(
                                             error => {
+                                                this.setState({ loading: false });
                                                 if (error.message === "Network Error") {
                                                     this.setState({ message: error.message });
                                                 } else {
@@ -450,21 +456,21 @@ class AddUserComponent extends Component {
                                                                 <div style={{ color: 'red', marginTop: '.5rem' }}>{this.props.error}</div>
                                                             )}
                                                         {/* <Input
-                                                            type="select"
-                                                            name="roleId"
-                                                            id="roleId"
-                                                            bsSize="sm"
-                                                            valid={!errors.roleId}
-                                                            invalid={touched.roleId && !!errors.roleId}
-                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
-                                                            onBlur={handleBlur}
-                                                            required
-                                                            value={this.state.user.roles}
-                                                            multiple={true}
-                                                        >
-                                                            <option value="" disabled>{i18n.t('static.common.select')}</option>
-                                                            {roleList}
-                                                        </Input> */}
+ type="select"
+ name="roleId"
+ id="roleId"
+ bsSize="sm"
+ valid={!errors.roleId}
+ invalid={touched.roleId && !!errors.roleId}
+ onChange={(e) => { handleChange(e); this.dataChange(e) }}
+ onBlur={handleBlur}
+ required
+ value={this.state.user.roles}
+ multiple={true}
+ >
+ <option value="" disabled>{i18n.t('static.common.select')}</option>
+ {roleList}
+ </Input> */}
                                                         {/* <FormFeedback>{errors.roleId}</FormFeedback> */}
                                                     </FormGroup>
                                                     <FormGroup>
@@ -493,13 +499,24 @@ class AddUserComponent extends Component {
                                                         <Button type="reset" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} disabled={!isValid}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>
 
-                                                        &nbsp;
-                          </FormGroup>
+ &nbsp;
+ </FormGroup>
                                                 </CardFooter>
                                             </Form>
                                         )} />
                         </Card>
                     </Col>
+                </Row>
+                <Row style={{ display: this.state.loading ? "block" : "none" }}>
+                    <div  className="d-flex align-items-center justify-content-center" style={{height: "500px"}} >
+                <div class="align-items-center">
+                       <div ><h4> <strong>Loading...</strong></h4></div>
+                        
+                        <div class="spinner-border blue ml-4" role="status">
+
+                        </div>
+                    </div>
+                    </div>
                 </Row>
             </div>
         );

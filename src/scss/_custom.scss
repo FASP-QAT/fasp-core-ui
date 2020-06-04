@@ -414,6 +414,12 @@ label.arrow_label:after {
 
   color: red !important;
 }
+.blue{color: 20a8d8 !important;}
+.green {
+  //  color: #f86c6b !important;
+
+  color: green !important;
+}
 
 .invalid-feedback {
   display: none;
@@ -473,6 +479,7 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
+  padding: 5px !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -591,33 +598,6 @@ label.arrow_label:after {
   border-radius: 0.25rem;
 }
 
-// table loader
-#loader {
-  border: 12px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 12px solid #444444;
-  width: 45px;
-  height: 45px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-// .center {
-//   position: absolute;
-//   top: 0;
-//   bottom: 0;
-//   left: 0;
-//   right: 0;
-//   margin: auto;
-// }
-// .order-1 :first-child {
-//  display: none;
-// }
 
 .RemoveStriped .jexcel_content .jexcel .draggable {
   tr:nth-of-type(odd) {
@@ -716,9 +696,94 @@ label.arrow_label:after {
       animation: fade-out 8s ease-in-out both;
     }
 
+    .ReportFirstHead>.react-bootstrap-table>.table thead tr th:first-child {
+      width: 60px !important;
+    }
+    .ReportFirstHead>.react-bootstrap-table>.table thead tr th{
+      width: 60px !important;
+    }
+  
+    .jexcel_clear_btn {
+  
+       margin-left: 0px !important; 
+  }   .jexcel_pagination_dropdown {
+          
+    margin-left: 0px !important;}
+
+//  table dropdown css removed sorting in all master consistent to jexcel
+.dropdown-item {
+    border-bottom: none;
+}.dropdown-menu {border-radius: 0px !important;}
+.jexcel_pagination_dropdown option {
+  color: #205493 !important;}
+.dropdown-menu {
+  text-align: center !important;
+}
+.dropdown-item:hover {
+  background-color: #ef6e12e8;
+  
+}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a:hover {color: #fff !important;}
+.dropdown-menu.show{width:50px !important;z-index: 1000!important;}
+.dropdown-menu { min-width: 4rem !important; margin-left: 2px;top: auto !important; z-index: 1000;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item a {padding: 8px 35px 8px 15px;}
+.react-bs-table-sizePerPage-dropdown .dropdown-menu .dropdown-item:active{ background-color: #ef6e12e8;}
+.TableCust span.btn-default{padding-left: 10px !important;}
+#pageDropDown span{padding-left: 7px;}
+// loader css
+.spinner-border{color:#20a8d8; height: 2.5rem;width: 2.5rem;}
+
+// tableAlignThtd
+// user
+.userAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+.userAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+// listRalm
+.listRealmAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+.listRealmAlignThtd .react-bootstrap-table .table td:nth-child(8){text-align: right !important;}
+
+// listBudgetAlignThtd 
+.listBudgetAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd  .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+.listBudgetAlignThtd .react-bootstrap-table .table td:nth-child(5){text-align: right !important;}
+
+// PlanningUnitlist
+.PlanningUnitlistAlignThtd .PlanningUnirlistAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.PlanningUnitlistAlignThtd .react-bootstrap-table .table td:nth-child(4){text-align: right !important;}
+
+.listprocurementUnitAlignThtd .react-bootstrap-table .table thead tr th:nth-child(1){text-align: left !important;}
+.listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(1){text-align: left !important;}
+.listprocurementUnitAlignThtd .react-bootstrap-table .table td:nth-child(3){text-align: right !important;}
+
+// .realmcountrypUnitTd{text-align: right !important;}
+// css by junaid last line
 
 
 
+
+
+    // #consumptionDetailsTable>.jexcel_content>.jexcel > tbody > tr > td:nth-child(4)  {text-align: right;}
+  //   #hideMe {
+  //     -webkit-animation: cssAnimation 8s forwards; 
+  //     animation: cssAnimation 8s forwards;
+  //     // display: block;
+  // }
+  // @keyframes cssAnimation {
+  //     0%   {opacity: 1;}
+  //     90%  {opacity: 1;}
+  //     100% {opacity: 0;}
+  // }
+  // @-webkit-keyframes cssAnimation {
+  //     0%   {opacity: 1;}
+  //     90%  {opacity: 1;}
+  //     100% {opacity: 0;}
+  // }
 
 // .react-bootstrap-table::-webkit-scrollbar {width: 10px;}
 
@@ -940,6 +1005,9 @@ label.arrow_label:after {
 .chart-graph {
   height: 280px;
 }
+.chart-graph-report {
+  height:400px;
+}
 a {
   color: #205493;
   text-decoration: none;
@@ -972,6 +1040,7 @@ a:hover {
 
 .table-responsive {
   overflow-x: auto;
+  // max-height: 240px;
 }
 
 .navbar-nav .nav-link {
@@ -1366,6 +1435,16 @@ h5,
   background-color: red;
   border-color: 1px solid red;
 }
+
+.legend .skipedShipmentslegend{
+  background-color: #696969;
+  border-color: 1px solid #696969;
+}
+
+.legend .skipedShipmentsEmegencylegend{
+  background-color: #FA8072;
+  border-color: 1px solid #FA8072;
+}
 .legend .purplelegend {
   background-color: rgb(170, 85, 161);
   border-color: 1px solid rgb(170, 85, 161);
@@ -1380,9 +1459,10 @@ h5,
   border-color: 1px solid #e5edf5;
 }
 
-// .card {
-//   margin-top: -2%;
-// }
+.card {
+  // margin-top: -2%;
+  margin: 0px -2% 1.5em -2%!important;
+}
 
 ///avtar icon
 .avatar .avatar-status {
@@ -1735,7 +1815,7 @@ input::placeholder {
 
 .background-red {
   // background-color: red;
-  background-color: #fac8c8;
+  background-color: #fac8c8!important;
 }
 
 .supplyplan-larrow {
@@ -1780,7 +1860,7 @@ input::placeholder {
 }
 .legendsync {
   list-style: none;
-  margin-top: 3%!important;
+  margin-top: 0%!important;
   float: right;
   display: inline-flex!important;
 }
@@ -1792,12 +1872,21 @@ input::placeholder {
   margin: -17px -13px 0px -9px !important;
   border-radius: 3px;
 }
+
+.legendTextSupplyPlan{
+  float: right!important;
+  width: 300px !important;
+  height: 15px;
+  padding-left: 44%!important;
+  margin: -17px -13px 0px -9px !important;
+  border-radius: 3px;
+}
 .showdatabtn{
-  margin-top:-3%;
+  margin-top:-1%;
 }
 ///////Report Consumption globe
 .css-1r4vtzz {
-padding: 1px 8px 5px 8px !important;
+padding: 1px 8px 5px 10px !important;
 background-color: #FFF;
  box-shadow: none !important;
 color: #515151;
@@ -1811,9 +1900,14 @@ text-decoration: none;
  max-width: none!important; 
 position: relative!important;
 display: flex!important;
-flex-wrap: wrap!important;
+// flex-wrap: wrap!important;
+overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
 align-items: stretch!important;
-width: 261%!important;
+// width: 238%!important;
+width: 229px!important;
 height: calc(1.5em + 0.5rem + 2px)!important;
 background-clip: padding-box!important;
 border: 1px solid #e4e7ea!important;
@@ -1824,7 +1918,7 @@ border-radius: 0.2rem!important;
 }
 .css-48ayfv
 {
-  padding: 1px 8px 5px 8px !important;
+  padding: 1px 8px 5px 10px !important;
   background-color: #FFF;
    box-shadow: none !important;
   color: #515151;
@@ -1838,9 +1932,14 @@ border-radius: 0.2rem!important;
    max-width: none!important; 
   position: relative!important;
   display: flex!important;
-  flex-wrap: wrap!important;
+  // flex-wrap: wrap!important;
   align-items: stretch!important;
-  width: 231%!important;
+  width: 229px!important;
+  overflow: hidden;
+word-wrap: normal !important;
+white-space: normal;
+text-overflow: ellipsis;
+  // width: 238%!important;
   height: calc(1.5em + 0.5rem + 2px)!important;
   background-clip: padding-box!important;
   border: 1px solid #e4e7ea!important;
@@ -1849,15 +1948,86 @@ border-radius: 0.2rem!important;
   border-radius: 0.2rem!important;
   
 }
+.css-1gpjby2 {
 
+  margin: 0px -12px!important;
+}
+
+
+@media (max-width: 992px){
+
+  .css-1r4vtzz {
+    padding: 1px 8px 5px 10px !important;
+    background-color: #FFF;
+     box-shadow: none !important;
+    color: #515151;
+    cursor: pointer;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    text-align: left;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+     max-width: none!important; 
+    position: relative!important;
+    display: flex!important;
+    // flex-wrap: wrap!important;
+    overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+    align-items: stretch!important;
+    // width: 238%!important;
+    width: 355px!important;
+    height: calc(1.5em + 0.5rem + 2px)!important;
+    background-clip: padding-box!important;
+    border: 1px solid #e4e7ea!important;
+    font-size: 0.76562rem!important;
+    line-height: 1.5!important;
+    border-radius: 0.2rem!important;
+    
+    }
+    .css-48ayfv
+    {
+      padding: 1px 8px 5px 10px !important;
+      background-color: #FFF;
+       box-shadow: none !important;
+      color: #515151;
+      cursor: pointer;
+      display: -webkit-inline-box;
+      display: -webkit-inline-flex;
+      display: -ms-inline-flexbox;
+      text-align: left;
+      -webkit-text-decoration: none;
+      text-decoration: none;
+       max-width: none!important; 
+      position: relative!important;
+      display: flex!important;
+      // flex-wrap: wrap!important;
+      align-items: stretch!important;
+      width: 355px!important;
+      overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+      // width: 238%!important;
+      height: calc(1.5em + 0.5rem + 2px)!important;
+      background-clip: padding-box!important;
+      border: 1px solid #e4e7ea!important;
+      font-size: 0.76562rem!important;
+      line-height: 1.5!important;
+      border-radius: 0.2rem!important;
+      
+    }
+}
 @media (max-width: 768px){
 .css-1r4vtzz
 {
-  width: 175%!important;
+  width: 380px!important;
 }
 .css-48ayfv
 {
-  width: 175%!important;
+  width: 380px!important;
 }
 .css-1jllj6i-control {
   min-height: 30px!important;
@@ -1878,13 +2048,34 @@ border-radius: 0.2rem!important;
 @media only screen and (max-width: 1024px) {
   .css-1r4vtzz
 {
-  width: 180%!important;
+  width: 157px!important;
 }
 .css-48ayfv
 {
-  width: 180%!important;
+  width: 157px!important;
 }
 }
+@media screen and (min-width: 1920px) {
+  .css-48ayfv{
+    width: 380px!important;
+    overflow: hidden;
+  word-wrap: normal !important;
+  white-space: normal;
+  text-overflow: ellipsis;
+  }
+  .css-1r4vtzz {
+   
+    overflow: hidden;
+    word-wrap: normal !important;
+    white-space: normal;
+    text-overflow: ellipsis;
+    align-items: stretch!important;
+    // width: 238%!important;
+    width: 380px!important;
+
+    
+    }
+  }
 .css-1hwfws3
 {
   height: calc(1.5em + 0.5rem + -1px) !important;
@@ -1912,11 +2103,72 @@ border-radius: 0.2rem!important;
 // }
 
 .supplyplanformulas{
-  color: #212721 !important;
-  font-size: 11px!important;
+  color: #20a8d8 !important;
+  font-size: 12px!important;
   font-weight: bold!important;
 }
 .formulasheading{
   font-size:14px!important;
   font-weight: bold!important;
+  color: #20a8d8!important;
+}
+.formulastext{
+
+  color: #212721!important;
+}
+.grapg-margin{
+  margin-top:-2%;
+}
+.app-footer {
+  flex: 0 0 26px!important;
+}
+.uploadfilelable
+{
+  margin-left: -11px;
+}
+
+.custom-file-label::after {
+  color: #fff!important;
+ background-color: #20a8d8!important;
+ 
+}
+.custom-file-label {
+  color: #697069!important;
+ 
+}
+.report-table{
+  max-height:300px;
+}
+
+// .table-fixed tbody {
+//   height: 300px;
+//   overflow-y: auto;
+//   width: 100%;
+// }
+
+// .table-fixed thead,
+// .table-fixed tbody,
+// .table-fixed tr,
+// .table-fixed td,
+// .table-fixed th {
+//   display: block;
+// }
+
+.formula-img-mr{
+  margin: 10px 0px 20px 0px;
+  border: 1px solid #20a8d8;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.formulastext-p{
+
+  color: #20a8d8!important;
+}
+
+.ml-field{
+  margin-left: -15px;
+}
+.mt-reporttable{
+  margin-top: -4%;
 }

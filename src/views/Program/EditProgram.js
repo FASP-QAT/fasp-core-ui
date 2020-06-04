@@ -27,11 +27,14 @@ let initialValues = {
     userId: '',
     airFreightPerc: '',
     seaFreightPerc: '',
-    deliveredToReceivedLeadTime: '',
+    // deliveredToReceivedLeadTime: '',
     draftToSubmittedLeadTime: '',
     plannedToDraftLeadTime: '',
     submittedToApprovedLeadTime: '',
     approvedToShippedLeadTime: '',
+    shippedToArrivedByAirLeadTime: '',
+    shippedToArrivedBySeaLeadTime: '',
+    arrivedToDeliveredLeadTime: '',
     monthsInFutureForAmc: '',
     monthsInPastForAmc: '',
     healthAreaId: '',
@@ -50,23 +53,29 @@ const validationSchema = function (values) {
             .required(i18n.t('static.program.validorganisationtext')),
         userId: Yup.string()
             .required(i18n.t('static.program.validmanagertext')),
-        airFreightPerc: Yup.number()
+        airFreightPerc: Yup.string()
             .required(i18n.t('static.program.validairfreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        seaFreightPerc: Yup.number()
+        seaFreightPerc: Yup.string()
             .required(i18n.t('static.program.validseafreighttext')).min(0, i18n.t('static.program.validvaluetext')),
-        deliveredToReceivedLeadTime: Yup.number()
-            .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
-        draftToSubmittedLeadTime: Yup.number()
+        // deliveredToReceivedLeadTime: Yup.number()
+        //     .required(i18n.t('static.program.validdelivertoreceivetext')).min(0, i18n.t('static.program.validvaluetext')),
+        draftToSubmittedLeadTime: Yup.string()
             .required(i18n.t('static.program.validdrafttosubmittext')).min(0, i18n.t('static.program.validvaluetext')),
-        plannedToDraftLeadTime: Yup.number()
+        plannedToDraftLeadTime: Yup.string()
             .required(i18n.t('static.program.validplantodrafttext')).min(0, i18n.t('static.program.validvaluetext')),
-        submittedToApprovedLeadTime: Yup.number()
+        submittedToApprovedLeadTime: Yup.string()
             .required(i18n.t('static.program.validsubmittoapprovetext')).min(0, i18n.t('static.program.validvaluetext')),
-        approvedToShippedLeadTime: Yup.number()
+        approvedToShippedLeadTime: Yup.string()
             .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInFutureForAmc: Yup.number()
+        shippedToArrivedByAirLeadTime: Yup.string()
+            .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
+        shippedToArrivedBySeaLeadTime: Yup.string()
+            .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
+        arrivedToDeliveredLeadTime: Yup.string()
+            .required(i18n.t('static.program.validapprovetoshiptext')).min(0, i18n.t('static.program.validvaluetext')),
+        monthsInFutureForAmc: Yup.string()
             .required(i18n.t('static.program.validfutureamctext')).min(0, i18n.t('static.program.validvaluetext')),
-        monthsInPastForAmc: Yup.number()
+        monthsInPastForAmc: Yup.string()
             .required(i18n.t('static.program.validpastamctext')).min(0, i18n.t('static.program.validvaluetext')),
         healthAreaId: Yup.string()
             .required(i18n.t('static.program.validhealthareatext')),
@@ -153,11 +162,14 @@ export default class EditProgram extends Component {
                 },
                 airFreightPerc: '',
                 seaFreightPerc: '',
-                deliveredToReceivedLeadTime: '',
+                // deliveredToReceivedLeadTime: '',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
+                shippedToArrivedByAirLeadTime: '',
+                shippedToArrivedBySeaLeadTime: '',
+                arrivedToDeliveredLeadTime: '',
                 monthsInFutureForAmc: '',
                 monthsInPastForAmc: '',
                 healthArea: {
@@ -219,11 +231,14 @@ export default class EditProgram extends Component {
                 userId: this.state.program.programManager.userId,
                 airFreightPerc: this.state.program.airFreightPerc,
                 seaFreightPerc: this.state.program.seaFreightPerc,
-                deliveredToReceivedLeadTime: this.state.program.deliveredToReceivedLeadTime,
+                // deliveredToReceivedLeadTime: this.state.program.deliveredToReceivedLeadTime,
                 draftToSubmittedLeadTime: this.state.program.draftToSubmittedLeadTime,
                 plannedToDraftLeadTime: this.state.program.plannedToDraftLeadTime,
                 submittedToApprovedLeadTime: this.state.program.submittedToApprovedLeadTime,
                 approvedToShippedLeadTime: this.state.program.approvedToShippedLeadTime,
+                shippedToArrivedByAirLeadTime: this.state.program.shippedToArrivedByAirLeadTime,
+                shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
+                arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                 monthsInFutureForAmc: this.state.program.monthsInFutureForAmc,
                 monthsInPastForAmc: this.state.program.monthsInPastForAmc,
                 healthAreaId: this.state.program.healthArea.id,
@@ -292,9 +307,11 @@ export default class EditProgram extends Component {
             program.airFreightPerc = event.target.value;
         } if (event.target.name == 'seaFreightPerc') {
             program.seaFreightPerc = event.target.value;
-        } if (event.target.name == 'deliveredToReceivedLeadTime') {
-            program.deliveredToReceivedLeadTime = event.target.value;
-        } if (event.target.name == 'draftToSubmittedLeadTime') {
+        }
+        // if (event.target.name == 'deliveredToReceivedLeadTime') {
+        //     program.deliveredToReceivedLeadTime = event.target.value;
+        // } 
+        if (event.target.name == 'draftToSubmittedLeadTime') {
             program.draftToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'plannedToDraftLeadTime') {
             program.plannedToDraftLeadTime = event.target.value;
@@ -302,7 +319,17 @@ export default class EditProgram extends Component {
             program.submittedToApprovedLeadTime = event.target.value;
         } if (event.target.name == 'approvedToShippedLeadTime') {
             program.approvedToShippedLeadTime = event.target.value;
-        } if (event.target.name == 'monthsInFutureForAmc') {
+        }
+        if (event.target.name == 'shippedToArrivedByAirLeadTime') {
+            program.shippedToArrivedByAirLeadTime = event.target.value;
+        }
+        if (event.target.name == 'shippedToArrivedBySeaLeadTime') {
+            program.shippedToArrivedBySeaLeadTime = event.target.value;
+        }
+        if (event.target.name == 'arrivedToDeliveredLeadTime') {
+            program.arrivedToDeliveredLeadTime = event.target.value;
+        }
+        if (event.target.name == 'monthsInFutureForAmc') {
             program.monthsInFutureForAmc = event.target.value;
         } if (event.target.name == 'monthsInPastForAmc') {
             program.monthsInPastForAmc = event.target.value;
@@ -327,11 +354,14 @@ export default class EditProgram extends Component {
             userId: true,
             airFreightPerc: true,
             seaFreightPerc: true,
-            deliveredToReceivedLeadTime: true,
+            // deliveredToReceivedLeadTime: true,
             draftToSubmittedLeadTime: true,
             plannedToDraftLeadTime: true,
             submittedToApprovedLeadTime: true,
             approvedToShippedLeadTime: true,
+            shippedToArrivedByAirLeadTime: true,
+            shippedToArrivedBySeaLeadTime: true,
+            arrivedToDeliveredLeadTime: true,
             monthsInFutureForAmc: true,
             monthsInPastForAmc: true,
             healthAreaId: true,
@@ -642,7 +672,7 @@ export default class EditProgram extends Component {
                                                         <FormFeedback>{errors.approvedToShippedLeadTime}</FormFeedback>
 
                                                     </FormGroup>
-                                                    <FormGroup>
+                                                    {/* <FormGroup>
 
                                                         <Label htmlFor="company">{i18n.t('static.program.delivedtoreceivedleadtime')}<span class="red Reqasterisk">*</span></Label>
 
@@ -658,7 +688,64 @@ export default class EditProgram extends Component {
                                                             name="deliveredToReceivedLeadTime" id="deliveredToReceivedLeadTime" placeholder={i18n.t('static.program.delivertoreceivetext')} />
                                                         <FormFeedback>{errors.deliveredToReceivedLeadTime}</FormFeedback>
 
+                                                    </FormGroup> */}
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedAirLeadTime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.shippedToArrivedByAirLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.shippedToArrivedByAirLeadTime && this.state.program.shippedToArrivedByAirLeadTime != ''}
+                                                            invalid={touched.shippedToArrivedByAirLeadTime && !!errors.shippedToArrivedByAirLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="shippedToArrivedByAirLeadTime" id="shippedToArrivedByAirLeadTime" placeholder={i18n.t('static.realmcountry.shippedToArrivedAirLeadTimetext')} />
+                                                        <FormFeedback>{errors.shippedToArrivedByAirLeadTime}</FormFeedback>
+
                                                     </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.shippedToArrivedBySeaLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.shippedToArrivedBySeaLeadTime && this.state.program.shippedToArrivedBySeaLeadTime != ''}
+                                                            invalid={touched.shippedToArrivedBySeaLeadTime && !!errors.shippedToArrivedBySeaLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="shippedToArrivedBySeaLeadTime" id="shippedToArrivedBySeaLeadTime" placeholder={i18n.t('static.realmcountry.shippedToArrivedSeaLeadTimetext')} />
+                                                        <FormFeedback>{errors.shippedToArrivedBySeaLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+                                                    <FormGroup>
+
+                                                        <Label htmlFor="company">{i18n.t('static.realmcountry.arrivedToDeliveredLeadTime')}<span class="red Reqasterisk">*</span></Label>
+
+                                                        <Input
+                                                            value={this.state.program.arrivedToDeliveredLeadTime}
+                                                            bsSize="sm"
+                                                            valid={!errors.arrivedToDeliveredLeadTime && this.state.program.arrivedToDeliveredLeadTime != ''}
+                                                            invalid={touched.arrivedToDeliveredLeadTime && !!errors.arrivedToDeliveredLeadTime}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            min="0"
+                                                            name="arrivedToDeliveredLeadTime" id="arrivedToDeliveredLeadTime" placeholder={i18n.t('static.realmcountry.arrivedToDeliveredLeadTimetext')} />
+                                                        <FormFeedback>{errors.arrivedToDeliveredLeadTime}</FormFeedback>
+
+                                                    </FormGroup>
+
+
+
+
+
+
                                                     <FormGroup>
 
                                                         <Label htmlFor="company">{i18n.t('static.program.monthpastamc')}<span class="red Reqasterisk">*</span></Label>
@@ -729,11 +816,14 @@ export default class EditProgram extends Component {
                 userId: this.state.program.programManager.userId,
                 airFreightPerc: this.state.program.airFreightPerc,
                 seaFreightPerc: this.state.program.seaFreightPerc,
-                deliveredToReceivedLeadTime: this.state.program.deliveredToReceivedLeadTime,
+                // deliveredToReceivedLeadTime: this.state.program.deliveredToReceivedLeadTime,
                 draftToSubmittedLeadTime: this.state.program.draftToSubmittedLeadTime,
                 plannedToDraftLeadTime: this.state.program.plannedToDraftLeadTime,
                 submittedToApprovedLeadTime: this.state.program.submittedToApprovedLeadTime,
                 approvedToShippedLeadTime: this.state.program.approvedToShippedLeadTime,
+                shippedToArrivedByAirLeadTime: this.state.program.shippedToArrivedByAirLeadTime,
+                shippedToArrivedBySeaLeadTime: this.state.program.shippedToArrivedBySeaLeadTime,
+                arrivedToDeliveredLeadTime: this.state.program.arrivedToDeliveredLeadTime,
                 monthsInFutureForAmc: this.state.program.monthsInFutureForAmc,
                 monthsInPastForAmc: this.state.program.monthsInPastForAmc,
                 healthAreaId: this.state.program.healthArea.id,
@@ -754,7 +844,7 @@ export default class EditProgram extends Component {
                         })
                     }
                 })
-                
+
             ProgramService.getRegionList(response.data.realmCountry.realmCountryId)
                 .then(response => {
                     if (response.status == 200) {
@@ -773,8 +863,8 @@ export default class EditProgram extends Component {
                         })
                     }
                 })
-                
+
         })
-        
+
     }
 }

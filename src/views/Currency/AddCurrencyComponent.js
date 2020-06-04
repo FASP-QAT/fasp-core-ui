@@ -75,7 +75,14 @@ export default class AddCurrencyComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
 
     dataChange(event) {
         console.log(event.target.name)
@@ -143,7 +150,7 @@ export default class AddCurrencyComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+               <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -159,10 +166,13 @@ export default class AddCurrencyComponent extends Component {
                                         .then(response => {
                                             if (response.status == 200) {
                                                 // console.log("----------after add", response.data.messageCode);
-                                                this.props.history.push(`/currency/listCurrency/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/currency/listCurrency/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
-                                                    message: response.data.messageCode
+                                                message: response.data.messageCode
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
                                                 })
                                             }
                                         })
@@ -309,7 +319,7 @@ export default class AddCurrencyComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/currency/listCurrency/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/currency/listCurrency/` + 'red/'  + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

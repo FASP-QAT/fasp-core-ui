@@ -370,7 +370,7 @@ class RealmCountry extends Component {
             }
         );
         RealmCountryService.getRealmCountryrealmIdById(this.props.match.params.realmId).then(response => {
-            console.log(response.data);
+            console.log("getRealmCountryrealmIdById---", response.data);
             this.setState({
                 realmCountry: response.data,
                 rows: response.data
@@ -797,7 +797,7 @@ class RealmCountry extends Component {
 
                                 <thead>
                                     <tr>
-                                        <th className="text-center"> {i18n.t('static.dashboard.country')} </th>
+                                        <th className="text-left"> {i18n.t('static.dashboard.country')} </th>
                                         <th className="text-center"> {i18n.t('static.dashboard.currency')}</th>
                                         {/* <th className="text-center"> {i18n.t('static.dashboard.unit')} </th> */}
                                         <th className="text-center">{i18n.t('static.realmcountry.airFreightPercentage')}</th>
@@ -816,7 +816,7 @@ class RealmCountry extends Component {
                                         this.state.rows.map((item, idx) =>
 
                                             <tr id="addr0" key={idx}>
-                                                <td>
+                                                <td className="text-left">
                                                     {this.state.rows[idx].country.label.label_en}
                                                 </td>
                                                 <td>
@@ -825,18 +825,18 @@ class RealmCountry extends Component {
                                                 {/* <td>
                                                     {this.state.rows[idx].palletUnit.label.label_en}
                                                 </td> */}
-                                                <td>
+                                                <td className="text-right">
                                                     {this.state.rows[idx].airFreightPercentage}
                                                 </td>
-                                                <td>
+                                                <td className="text-right">
                                                     {this.state.rows[idx].seaFreightPercentage}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].shippedToArrivedAirLeadTime}
+                                                    {this.state.rows[idx].shippedToArrivedByAirLeadTime}
                                                 </td>
                                                 <td>
-                                                    {this.state.rows[idx].shippedToArrivedSeaLeadTime}
-                                                </td> <td>
+                                                    {this.state.rows[idx].shippedToArrivedBySeaLeadTime}
+                                                </td> <td className="text-right">
                                                     {this.state.rows[idx].arrivedToDeliveredLeadTime}
                                                 </td>
                                                 <td>

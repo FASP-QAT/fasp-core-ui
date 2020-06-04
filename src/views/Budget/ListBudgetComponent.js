@@ -51,7 +51,21 @@ class ListBudgetComponent extends Component {
     this.formatDate = this.formatDate.bind(this);
     this.formatLabel = this.formatLabel.bind(this);
     this.addCommas = this.addCommas.bind(this);
-    this.rowClassNameFormat = this.rowClassNameFormat.bind(this)
+    this.rowClassNameFormat = this.rowClassNameFormat.bind(this);
+    this.hideFirstComponent = this.hideFirstComponent.bind(this);
+    this.hideSecondComponent = this.hideSecondComponent.bind(this);
+  }
+
+  hideFirstComponent() {
+    setTimeout(function () {
+      document.getElementById('div1').style.display = 'none';
+    }, 8000);
+  }
+
+  hideSecondComponent() {
+    setTimeout(function () {
+      document.getElementById('div2').style.display = 'none';
+    }, 8000);
   }
 
 
@@ -95,6 +109,7 @@ class ListBudgetComponent extends Component {
 
   componentDidMount() {
     AuthenticationService.setupAxiosInterceptors();
+    this.hideFirstComponent();
     BudgetServcie.getBudgetList()
       .then(response => {
         console.log(response)
@@ -105,7 +120,12 @@ class ListBudgetComponent extends Component {
             selBudget: response.data
           })
         } else {
-          this.setState({ message: response.data.messageCode })
+          this.setState({
+            message: response.data.messageCode
+          },
+            () => {
+              this.hideSecondComponent();
+            })
         }
       })
     // .catch(
@@ -260,29 +280,46 @@ class ListBudgetComponent extends Component {
         headerAlign: 'center',
         formatter: this.addCommas
       },
-      {
+      // {
 
-        dataField: 'usedAmt',
+      //   dataField: 'usedAmt',
+      //   text: i18n.t('static.budget.availableAmt'),
+      //   sort: true,
+      //   align: 'center',
+      //   headerAlign: 'center',
+      //   formatter: (cell, row) => {
+
+
+      //     var cell1 = row.budgetAmt - row.usedAmt
+      //     var currencyCode = row.currency.currencyCode;
+      //     cell1 += '';
+      //     var x = cell1.split('.');
+      //     var x1 = x[0];
+      //     var x2 = x.length > 1 ? '.' + x[1] : '';
+      //     var rgx = /(\d+)(\d{3})/;
+      //     while (rgx.test(x1)) {
+      //       x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      //     }
+      //     return currencyCode + " " + x1 + x2;
+      //   }
+      // }
+      {
+        dataField: 'budgetUsdAmt',
+        text: i18n.t('static.budget.budgetamountUSD'),
+        sort: true,
+        align: 'center',
+        headerAlign: 'center',
+        formatter: this.addCommas
+      },
+      {
+        dataField: 'usedUsdAmt',
         text: i18n.t('static.budget.availableAmt'),
         sort: true,
         align: 'center',
         headerAlign: 'center',
-        formatter: (cell, row) => {
+        formatter: this.addCommas
+      },
 
-
-          var cell1 = row.budgetAmt - row.usedAmt
-          var currencyCode = row.currency.currencyCode;
-          cell1 += '';
-          var x = cell1.split('.');
-          var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          return currencyCode + " " + x1 + x2;
-        }
-      }
       ,
       {
         dataField: 'startDate',
@@ -343,8 +380,8 @@ class ListBudgetComponent extends Component {
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
-        <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
-        <h5>{i18n.t(this.state.message, { entityname })}</h5>
+       <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
           <CardHeader className="mb-md-3 pb-lg-1">
             <i className="icon-menu"></i>{i18n.t('static.common.listEntity', { entityname })}{' '}
@@ -397,7 +434,7 @@ class ListBudgetComponent extends Component {
             >
               {
                 props => (
-                  <div className="TableCust">
+                  <div className="TableCust listBudgetAlignThtd">
                     <div className="col-md-6 pr-0 offset-md-6 text-right mob-Left">
                       <SearchBar {...props.searchProps} />
                       <ClearSearchButton {...props.searchProps} />

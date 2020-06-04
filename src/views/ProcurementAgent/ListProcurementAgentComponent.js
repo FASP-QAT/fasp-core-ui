@@ -274,6 +274,18 @@ class ListProcurementAgentComponent extends Component {
                 headerAlign: 'center'
             },
             {
+                dataField: 'localProcurementAgent',
+                text: i18n.t('static.procurementAgent.localProcurementAgent'),
+                sort: true,
+                align: 'center',
+                headerAlign: 'center',
+                formatter: (cellContent, row) => {
+                    return (
+                        (row.localProcurementAgent ? i18n.t('static.program.yes') : i18n.t('static.program.no'))
+                    );
+                }
+            },
+            {
                 dataField: 'active',
                 text: i18n.t('static.common.status'),
                 sort: true,

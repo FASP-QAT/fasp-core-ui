@@ -74,7 +74,8 @@ class AddProcurementAgentComponent extends Component {
 
                 },
                 procurementAgentCode: '',
-                submittedToApprovedLeadTime: ''
+                submittedToApprovedLeadTime: '',
+                localProcurementAgent: false,
             },
             message: '',
             lang: localStorage.getItem('lang')
@@ -107,6 +108,9 @@ class AddProcurementAgentComponent extends Component {
         }
         if (event.target.name == "submittedToApprovedLeadTime") {
             procurementAgent.submittedToApprovedLeadTime = event.target.value;
+        }
+        if (event.target.name === "localProcurementAgent") {
+            procurementAgent.localProcurementAgent = event.target.id === "localProcurementAgent2" ? false : true
         }
 
 
@@ -287,6 +291,41 @@ class AddProcurementAgentComponent extends Component {
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
+                                                    </FormGroup>
+                                                    <FormGroup>
+                                                        <Label className="P-absltRadio">{i18n.t('static.procurementAgent.localProcurementAgent')}  </Label>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="localProcurementAgent1"
+                                                                name="localProcurementAgent"
+                                                                value={true}
+                                                                checked={this.state.procurementAgent.localProcurementAgent === true}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio1">
+                                                                {i18n.t('static.program.yes')}
+                                                            </Label>
+                                                        </FormGroup>
+                                                        <FormGroup check inline>
+                                                            <Input
+                                                                className="form-check-input"
+                                                                type="radio"
+                                                                id="localProcurementAgent2"
+                                                                name="localProcurementAgent"
+                                                                value={false}
+                                                                checked={this.state.procurementAgent.localProcurementAgent === false}
+                                                                onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            />
+                                                            <Label
+                                                                className="form-check-label"
+                                                                check htmlFor="inline-radio2">
+                                                                {i18n.t('static.program.no')}
+                                                            </Label>
+                                                        </FormGroup>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>

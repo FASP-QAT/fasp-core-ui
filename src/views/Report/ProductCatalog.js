@@ -249,7 +249,7 @@ export default class ProductCatalog extends React.Component {
 
         doc.text(title, marginLeft, 40);
         doc.autoTable(content);
-        doc.save("report.pdf")
+        doc.save("ProductCatelog.pdf")
     }
 
 
@@ -424,8 +424,8 @@ export default class ProductCatalog extends React.Component {
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                         {  this.state.data.length > 0 && <div className="card-header-actions">
-                        <img style={{ height: '25px', width: '25px' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(columns)}/>
-                        <img style={{ height: '25px', width: '25px' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />                  
+                        <img style={{ height: '25px', width: '25px',cursor:'pointer' }} src={pdfIcon} title="Export PDF"  onClick={() => this.exportPDF(columns)}/>
+                        <img style={{ height: '25px', width: '25px', cursor:'pointer' }} src={csvicon} title="Export CSV" onClick={() => this.exportCSV(columns)} />                  
                                         
                         </div>}
                     </CardHeader>

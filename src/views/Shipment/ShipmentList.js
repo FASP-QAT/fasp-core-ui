@@ -73,10 +73,13 @@ export default class LanguageListComponent extends Component {
     }
 
     handleRangeChange(value, text, listIndex) {
-        //
+        this.formSubmit();
     }
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
+        this.setState({ rangeValue: value },
+            () => {
+                this.formSubmit();
+            });
 
     }
 
@@ -230,60 +233,122 @@ export default class LanguageListComponent extends Component {
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
 
-        this.setState({ programId: programId });
-        this.setState({ planningUnitId: planningUnitId });
-        this.setState({ filterBy: filterBy });
-        this.setState({ startDate: startDate });
-        this.setState({ endDate: endDate });
+        console.log("programId--------- ", programId);
+        console.log("planningUnitId---------", planningUnitId);
+        console.log("filterBy--------", filterBy);
+        console.log("startDate------", startDate);
+        console.log("endDate--------", endDate);
 
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
 
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-            var programRequest = programTransaction.get(programId);
 
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
 
-                let shipmentListWithoutFilter = (programJson.shipmentList);
 
-                for (var i = 0; i < shipmentListWithoutFilter.length; i++) {
-                    console.log("------> ", shipmentListWithoutFilter[i]);
-                }
+        if (parseInt(programId) != 0) {
+            this.setState({ programId: programId });
+            this.setState({ planningUnitId: planningUnitId });
+            this.setState({ filterBy: filterBy });
+            this.setState({ startDate: startDate });
+            this.setState({ endDate: endDate });
 
-                // const programFilterList = shipmentListWithoutFilter.filter(c => c.program.id == programId);
 
-                const planningUnitFilterList = shipmentListWithoutFilter.filter(c => c.planningUnit.id == planningUnitId);
 
-                let dateFilterList = '';
-                if (filterBy == 1) {
-                    //Order Date Filter
-                    dateFilterList = planningUnitFilterList.filter(c => moment(c.orderedDate).isBetween(startDate, endDate, null, '[)'))
-                } else {
-                    //Expected Delivery Date
-                    dateFilterList = planningUnitFilterList.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
-                }
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open('fasp', 1);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
 
-                console.log("d1111111111---> ", dateFilterList);
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programRequest = programTransaction.get(programId);
 
-                this.setState({
-                    shipmentList: dateFilterList,
-                    selSource: dateFilterList
-                },
-                    () => {
-                        // console.log("dateFilterList---> ", dateFilterList);
-                    });
+                programRequest.onsuccess = function (event) {
+                    var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    var programJson = JSON.parse(programData);
 
-                document.getElementById("TableCust").style.display = "block";
+                    let shipmentListWithoutFilter = (programJson.shipmentList);
 
+                    for (var i = 0; i < shipmentListWithoutFilter.length; i++) {
+                        console.log("------> ", shipmentListWithoutFilter[i]);
+                    }
+
+                    // const programFilterList = shipmentListWithoutFilter.filter(c => c.program.id == programId);
+
+                    const planningUnitFilterList = shipmentListWithoutFilter.filter(c => c.planningUnit.id == planningUnitId);
+
+                    let dateFilterList = '';
+                    if (filterBy == 1) {
+                        //Order Date Filter
+                        dateFilterList = planningUnitFilterList.filter(c => moment(c.orderedDate).isBetween(startDate, endDate, null, '[)'))
+                    } else {
+                        //Expected Delivery Date
+                        dateFilterList = planningUnitFilterList.filter(c => moment(c.expectedDeliveryDate).isBetween(startDate, endDate, null, '[)'))
+                    }
+
+                    console.log("d1111111111---> ", dateFilterList);
+
+                    var procurementAgentObjList = [];
+                    var shipmentStatusList = [];
+                    let finalShipmentList = [];
+
+                    var planningUnitTransaction = db1.transaction(['planningUnit'], 'readwrite');
+                    var planningUnitOs = planningUnitTransaction.objectStore('planningUnit');
+                    var planningUnitRequest = planningUnitOs.getAll();
+
+                    planningUnitRequest.onsuccess = function (event) {
+                        var planningUnitResult = [];
+                        planningUnitResult = planningUnitRequest.result;
+
+                        for (var k = 0; k < planningUnitResult.length; k++) {
+
+                            for (var i = 0; i < dateFilterList.length; i++) {
+                                if (planningUnitResult[k].planningUnitId == dateFilterList[i].planningUnit.id) {
+                                    dateFilterList[i].planningUnit.label.label_en = planningUnitResult[k].label.label_en;
+                                }
+                            }
+                        }
+
+                        var allowShipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+                        var allowShipmentStatusOs = allowShipmentStatusTransaction.objectStore('shipmentStatus');
+                        var allowShipmentStatusRequest = allowShipmentStatusOs.getAll();
+
+
+                        allowShipmentStatusRequest.onsuccess = function (event) {
+                            var allowShipmentStatusResult = [];
+                            allowShipmentStatusResult = allowShipmentStatusRequest.result;
+                            for (var k = 0; k < allowShipmentStatusResult.length; k++) {
+                                // if (shipmentList.shipmentStatus.id == allowShipmentStatusResult[k].shipmentStatusId) {
+                                //     shipmentStatusList = allowShipmentStatusResult[k].nextShipmentStatusAllowedList;
+                                // }
+                                for (var i = 0; i < dateFilterList.length; i++) {
+                                    if (dateFilterList[i].shipmentStatus.id == allowShipmentStatusResult[k].shipmentStatusId) {
+                                        dateFilterList[i].shipmentStatus.label.label_en = allowShipmentStatusResult[k].label.label_en;
+                                    }
+                                }
+                            }
+
+
+
+                            console.log("d2222222222222---> ", dateFilterList);
+
+
+
+                            this.setState({
+                                shipmentList: dateFilterList,
+                                selSource: dateFilterList
+                            },
+                                () => {
+                                    // console.log("dateFilterList---> ", dateFilterList);
+                                });
+
+                            document.getElementById("TableCust").style.display = "block";
+
+                        }.bind(this);
+                    }.bind(this);
+                }.bind(this);
             }.bind(this);
-        }.bind(this);
+        }
     }.bind(this);
 
     formatLabel(cell, row) {
@@ -335,19 +400,19 @@ export default class LanguageListComponent extends Component {
             align: 'center',
             headerAlign: 'center'
         }, {
-            dataField: 'shipmentStatus.label',
+            dataField: 'shipmentStatus.label.label_en',
             text: 'Shipment Status',
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter: this.formatLabel
+            // formatter: this.formatLabel
         }, {
-            dataField: 'planningUnit.label',
+            dataField: 'planningUnit.label.label_en',
             text: 'Planning Unit',
             sort: true,
             align: 'center',
             headerAlign: 'center',
-            formatter: this.formatLabel
+            // formatter: this.formatLabel
         },
         {
             dataField: 'suggestedQty',
@@ -391,14 +456,36 @@ export default class LanguageListComponent extends Component {
                     <CardHeader className="mb-md-3 pb-lg-1">
                         <i className="icon-menu"></i><strong>{i18n.t('static.common.listEntity', { entityname })}</strong>{' '}
                     </CardHeader>
-                    <CardBody className="pb-lg-0">
+                    <CardBody className="">
 
                         <Col md="12 pl-0">
                             <div className="d-md-flex">
-                            <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Select Period</Label>
-                                    <div className="controls">
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton">Filter By</Label>
+                                    <div className="controls ">
                                         <InputGroup>
+                                            <Input type="select"
+                                                bsSize="sm"
+                                                value={this.state.filterBy}
+                                                name="filterBy" id="filterBy"
+                                                // onChange={this.displayInsertRowButton}
+                                                onChange={this.formSubmit}
+                                            >
+                                                {/* <option value="0">Please select</option> */}
+                                                <option value="1">Ordered Date</option>
+                                                <option value="2">Expected Delivery Date</option>
+
+                                            </Input>
+                                            {/* <InputGroupAddon addonType="append" className="ml-1">
+                                                <Button color="secondary btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
+                                            </InputGroupAddon> */}
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="col-md-3">
+                                    <Label htmlFor="appendedInputButton"><span className="stock-box-icon  fa fa-sort-desc ml-1"></span>Select Period</Label>
+                                    <div className="controls">
+                                        
                                             <Picker
                                                 ref="pickRange"
                                                 years={{ min: 2013 }}
@@ -406,17 +493,18 @@ export default class LanguageListComponent extends Component {
                                                 lang={pickerLang}
                                                 //theme="light"
                                                 onChange={this.handleRangeChange}
+                                                // onChange={this.formSubmit}
                                                 onDismiss={this.handleRangeDissmis}
                                             >
                                                 <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                             </Picker>
-                                            
-                                        </InputGroup>
+
+                                        
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Program</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input type="select"
                                                 bsSize="sm"
@@ -430,45 +518,29 @@ export default class LanguageListComponent extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                                <FormGroup className="tab-ml-1">
+                                <FormGroup className="col-md-3">
                                     <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                    <div className="controls SelectGo">
+                                    <div className="controls ">
                                         <InputGroup>
                                             <Input
                                                 type="select"
                                                 name="planningUnitId"
                                                 id="planningUnitId"
                                                 bsSize="sm"
-                                                value={this.state.planningUnitId}
+                                                // value={this.state.planningUnitId}
+                                                onChange={this.formSubmit}
                                             >
                                                 <option value="0">Please Select</option>
                                                 {planningUnits}
                                             </Input>
-                                        </InputGroup>
-                                    </div>
-                                </FormGroup>
-                                <FormGroup className="tab-ml-1">
-                                    <Label htmlFor="appendedInputButton">Filter By</Label>
-                                    <div className="controls SelectGo">
-                                        <InputGroup>
-                                            <Input type="select"
-                                                bsSize="sm"
-                                                value={this.state.filterBy}
-                                                name="filterBy" id="filterBy"
-                                            // onChange={this.displayInsertRowButton}
-                                            >
-                                                {/* <option value="0">Please select</option> */}
-                                                <option value="1">Ordered Date</option>
-                                                <option value="2">Expected Delivery Date</option>
-
-                                            </Input>
-                                            <InputGroupAddon addonType="append" className="ml-1">
+                                            {/* <InputGroupAddon addonType="append" className="ml-1">
                                                 <Button color="secondary btn-sm" onClick={this.formSubmit}>{i18n.t('static.common.go')}</Button>
-                                            </InputGroupAddon>
+                                            </InputGroupAddon> */}
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
-                               
+
+
                             </div>
                         </Col>
                         <ToolkitProvider

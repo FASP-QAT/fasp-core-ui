@@ -235,7 +235,10 @@ class Consumption extends Component {
           doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
         }
@@ -261,7 +264,7 @@ class Consumption extends Component {
     var h1 = 50;
     var aspectwidth1 = (width - h1);
 
-    doc.addImage(canvasImg, 'png', 50, 130, aspectwidth1, height * 3 / 4);
+    doc.addImage(canvasImg, 'png', 50, 170, aspectwidth1, height * 3 / 4);
 
     const headers = [[i18n.t('static.report.consumptionDate'),
     i18n.t('static.report.forecastConsumption'),
@@ -282,7 +285,7 @@ class Consumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("report.pdf")
+    doc.save("Consumption.pdf")
     //creates PDF from img
     /* var doc = new jsPDF('landscape');
     doc.setFontSize(20);
@@ -561,9 +564,10 @@ class Consumption extends Component {
   }
   getProductCategories() {
     let programId = document.getElementById("programId").value;
+    let realmId=AuthenticationService.getRealmId();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      ProductService.getProductCategoryListByProgram(programId)
+      ProductService.getProductCategoryListByProgram(realmId,programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -951,9 +955,9 @@ class Consumption extends Component {
                                 {productCategories.length > 0
                                   && productCategories.map((item, i) => {
                                     return (
-                                      <option key={i} value={item.productCategoryId}>
-                                        {getLabelText(item.label, this.state.lang)}
-                                      </option>
+                                      <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
+                                      {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                    </option>
                                     )
                                   }, this)}
                               </Input>
@@ -1054,8 +1058,8 @@ class Consumption extends Component {
                         this.state.consumptions.length > 0
                         &&
                         <div className="col-md-12">
-                          <div className="col-md-9">
-                            <div className="chart-wrapper chart-graph">
+                          <div className="col-md-12">
+                            <div className="chart-wrapper chart-graph-report">
                               <Bar id="cool-canvas" data={bar} options={options} />
 
                             </div>
@@ -1074,8 +1078,8 @@ class Consumption extends Component {
                         this.state.offlineConsumptionList.length > 0
                         &&
                         <div className="col-md-12">
-                          <div className="col-md-9">
-                            <div className="chart-wrapper chart-graph">
+                          <div className="col-md-12">
+                            <div className="chart-wrapper chart-graph-report">
                               <Bar id="cool-canvas" data={bar} options={options} />
 
                             </div>

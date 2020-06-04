@@ -15,6 +15,7 @@ const initialValues = {
     businessFunctions: [],
     canCreateRole: []
 }
+
 const entityname = i18n.t('static.role.role');
 const validationSchema = function (values) {
     return Yup.object().shape({
@@ -55,7 +56,14 @@ class EditRoleComponent extends Component {
             lang: localStorage.getItem('lang'),
             businessFunctions: [],
             roles: [],
-            role: this.props.location.state.role,
+            // role: this.props.location.state.role,
+            role: {
+                businessFunctions: [],
+                canCreateRoles: [],
+                label: {
+                    label_en: ''
+                }
+            },
             businessFunctionId: '',
             businessFunctionList: [],
             canCreateRoleId: '',
@@ -67,6 +75,7 @@ class EditRoleComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.businessFunctionChange = this.businessFunctionChange.bind(this);
         this.canCreateRoleChange = this.canCreateRoleChange.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
     }
 
     Capitalize(str) {
@@ -109,7 +118,7 @@ class EditRoleComponent extends Component {
         for (var i = 0; i < canCreateRoleId.length; i++) {
             canCreateRoleIdArray[i] = canCreateRoleId[i].value;
         }
-        role.canCreateRole = canCreateRoleIdArray;
+        role.canCreateRoles = canCreateRoleIdArray;
         this.setState({
             role
         },
@@ -120,7 +129,7 @@ class EditRoleComponent extends Component {
         setTouched({
             roleName: true,
             businessFunctions: true,
-            canCreateRole: true
+            canCreateRoles: true
         }
         )
         this.validateForm(errors)
@@ -141,6 +150,9 @@ class EditRoleComponent extends Component {
     }
 
     componentDidMount() {
+
+        // console.log("----**************---", this.props.match.params.roleId);
+        // alert("hi");
         AuthenticationService.setupAxiosInterceptors();
         UserService.getBusinessFunctionList()
             .then(response => {
@@ -200,6 +212,35 @@ class EditRoleComponent extends Component {
                     }
                 }
             );
+
+        UserService.getRoleById(this.props.match.params.roleId)
+            .then(response => {
+                this.setState({
+                    role: response.data
+                },
+                    () => {
+                        console.log("ROLE****************> ", this.state.role)
+                    });
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({ message: error.message });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({ message: error.response.data.messageCode });
+                                break;
+                            default:
+                                this.setState({ message: 'static.unkownError' });
+                                break;
+                        }
+                    }
+                }
+            );
     }
 
     render() {
@@ -213,10 +254,11 @@ class EditRoleComponent extends Component {
                                 <i className="icon-note"></i><strong>{i18n.t('static.common.editEntity', { entityname })}</strong>{' '}
                             </CardHeader>
                             <Formik
+                                enableReinitialize={true}
                                 initialValues={{
                                     roleName: this.state.role.label.label_en,
                                     businessFunctions: this.state.role.businessFunctions,
-                                    canCreateRole: this.state.role.canCreateRole
+                                    canCreateRoles: this.state.role.canCreateRoles
                                 }}
                                 validate={validate(validationSchema)}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -304,29 +346,30 @@ class EditRoleComponent extends Component {
                                                         <FormFeedback className="red">{errors.businessFunctions}</FormFeedback>
                                                     </FormGroup>
                                                     <FormGroup>
-                                                        <Label htmlFor="canCreateRole">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
+                                                        <Label htmlFor="canCreateRoles">{i18n.t('static.role.cancreaterole')}<span className="red Reqasterisk">*</span> </Label>
                                                         <Select
-                                                            valid={!errors.canCreateRole}
+                                                            valid={!errors.canCreateRoles}
                                                             bsSize="sm"
-                                                            invalid={touched.canCreateRole && !!errors.canCreateRole}
+                                                            invalid={touched.canCreateRoles && !!errors.canCreateRoles}
                                                             onChange={(e) => { handleChange(e); this.canCreateRoleChange(e) }}
                                                             onBlur={handleBlur}
-                                                            name="canCreateRole"
-                                                            id="canCreateRole"
+                                                            name="canCreateRoles"
+                                                            id="canCreateRoles"
                                                             multi
                                                             required
                                                             min={1}
                                                             options={this.state.canCreateRoleList}
-                                                            value={this.state.role.canCreateRole}
-                                                            error={errors.canCreateRole}
-                                                            touched={touched.canCreateRole}
+                                                            value={this.state.role.canCreateRoles}
+                                                            error={errors.canCreateRoles}
+                                                            touched={touched.canCreateRoles}
                                                         />
-                                                        <FormFeedback className="red">{errors.canCreateRole}</FormFeedback>
+                                                        <FormFeedback className="red">{errors.canCreateRoles}</FormFeedback>
                                                     </FormGroup>
                                                 </CardBody>
                                                 <CardFooter>
                                                     <FormGroup>
                                                         <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                        <Button type="button" size="md" color="warning" className="float-right mr-1 text-white" onClick={this.resetClicked}><i className="fa fa-refresh"></i> Reset</Button>
                                                         <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.touchAll(setTouched, errors)} ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>
 
                                                         &nbsp;
@@ -342,6 +385,14 @@ class EditRoleComponent extends Component {
     }
     cancelClicked() {
         this.props.history.push(`/role/listRole/` + i18n.t('static.message.cancelled', { entityname }))
+    }
+    resetClicked() {
+        UserService.getRoleById(this.props.match.params.roleId)
+            .then(response => {
+                this.setState({
+                    role: response.data
+                });
+            })
     }
 }
 

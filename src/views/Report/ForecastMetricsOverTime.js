@@ -168,16 +168,22 @@ class ForcastMatrixOverTime extends Component {
     if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
     return '?'
   }
+  roundN = num=>{
+    return parseFloat(Math.round(num * Math.pow(10, 2)) /Math.pow(10,2)).toFixed(2);
+  }
 
   toggledata = () => this.setState((currentState) => ({show: !currentState.show}));
 
   exportCSV() {
 
     var csvRow = [];
-    csvRow.push((i18n.t('static.report.dateRange')+' : '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
-    csvRow.push(i18n.t('static.dashboard.country')+' : '+ (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ','%20'))
-    csvRow.push(i18n.t('static.planningunit.planningunit')+' : '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.report.dateRange')+' , '+this.makeText(this.state.rangeValue.from) + ' ~ ' + this.makeText(this.state.rangeValue.to)).replaceAll(' ','%20'))
+    csvRow.push(i18n.t('static.dashboard.country')+' , '+ (document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ','%20'))
+    csvRow.push((i18n.t('static.dashboard.productcategory')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("productCategoryId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+    csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ','%20')+' , '+ ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',','%20')).replaceAll(' ','%20'))
     csvRow.push('')
+    csvRow.push('')
+    csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
     csvRow.push('')
     var re;
     var A = [[(i18n.t('static.report.month')).replaceAll(' ','%20'), (i18n.t('static.report.forecastConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.actualConsumption')).replaceAll(' ','%20'), (i18n.t('static.report.errorperc')).replaceAll(' ','%20'), (i18n.t('static.report.noofmonth')).replaceAll(' ','%20')]]
@@ -186,7 +192,7 @@ class ForcastMatrixOverTime extends Component {
    
 
     for (var item = 0; item < re.length; item++) {
-      A.push([re[item].ACTUAL_DATE, re[item].FORECASTED_CONSUMPTION, re[item].ACTUAL_CONSUMPTION, re[item].FORECAST_ERROR*100, re[item].MONTHS_COUNT])
+      A.push([re[item].consumptionDateString, re[item].forecastedConsumption, re[item].actualConsumption, this.roundN(re[item].forecastError*100), re[item].monthsInCalc])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -244,7 +250,10 @@ class ForcastMatrixOverTime extends Component {
           doc.text(i18n.t('static.dashboard.country')+' : '+ document.getElementById("countryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
             align: 'left'
           })
-          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+          doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+            align: 'left'
+          })
+          doc.text(i18n.t('static.planningunit.planningunit')+' : '+ document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 150, {
             align: 'left'
           })
         }
@@ -269,10 +278,10 @@ class ForcastMatrixOverTime extends Component {
     var h1=50;
     var aspectwidth1= (width-h1);
 
-    doc.addImage(canvasImg, 'png', 50, 130,aspectwidth1, height*3/4,'','FAST' );
+    doc.addImage(canvasImg, 'png',  50, 200,750,290,'CANVAS' );
     const headers =[ [   i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'),i18n.t('static.report.actualConsumption'),i18n.t('static.report.errorperc'),i18n.t('static.report.noofmonth')]];
-    const data =   this.state.matricsList.map( elt =>[ elt.ACTUAL_DATE,elt.FORECASTED_CONSUMPTION,elt.ACTUAL_CONSUMPTION,elt.FORECAST_ERROR*100,elt.MONTHS_COUNT]);
+    const data =   this.state.matricsList.map( elt =>[ elt.consumptionDateString,elt.forecastedConsumption,elt.actualConsumption,this.roundN(elt.forecastError*100),elt.monthsInCalc]);
     
     let content = {
     margin: {top: 80},
@@ -288,7 +297,7 @@ class ForcastMatrixOverTime extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save("report.pdf")
+    doc.save("ForecastMetricsOverTime.pdf")
     //creates PDF from img
   /*  var doc = new jsPDF('landscape');
     doc.setFontSize(20);
@@ -302,9 +311,13 @@ class ForcastMatrixOverTime extends Component {
    let countryId = document.getElementById("countryId").value;
    let productCategoryId = document.getElementById("productCategoryId").value;
     let planningUnitId = document.getElementById("planningUnitId").value;
+    let startDate=this.state.rangeValue.from.year + '-' +  ("00"+this.state.rangeValue.from.month).substr(-2) + '-01';
+    let stopDate=this.state.rangeValue.to.year + '-' + ("00"+this.state.rangeValue.to.month).substr(-2) + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+   
+    var input= {"realmCountryId":countryId,"planningUnitId":planningUnitId,"startDate": startDate,"stopDate":stopDate}
     if(countryId>0 && planningUnitId>0){
       AuthenticationService.setupAxiosInterceptors();
-      ReportService.getForecastMatricsOverTime(countryId,planningUnitId, this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01', this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate())
+      ReportService.getForecastMatricsOverTime(input)
         .then(response => {
           console.log(JSON.stringify(response.data));
           this.setState({
@@ -484,8 +497,10 @@ class ForcastMatrixOverTime extends Component {
     //
   }
   handleRangeDissmis(value) {
-    this.setState({ rangeValue: value })
-this.fetchData();
+    this.setState({ rangeValue: value }, () => {
+      this.fetchData();
+    })
+
   }
 
   _handleClickRangeBox(e) {
@@ -519,7 +534,7 @@ this.fetchData();
           && productCategories.map((item, i) => {
               return (
                 <option key={i} value={item.payload.productCategoryId} disabled= {item.payload.active?"":"disabled"}>
-                {Array(item.level).fill('_ _ ').join('')+(getLabelText(item.payload.label, this.state.lang))}
+                {Array(item.level).fill(' ').join('')+(getLabelText(item.payload.label, this.state.lang))}
               </option>
               )
           }, this);
@@ -528,20 +543,20 @@ this.fetchData();
     
     const  bar = {
     
-        labels: this.state.matricsList.map((item, index) => (item.ACTUAL_DATE)),
+        labels: this.state.matricsList.map((item, index) => (item.consumptionDateString)),
         datasets: [
            {
             type: "line",
             label: i18n.t('static.report.forecasterrorovertime'),
             backgroundColor: 'transparent',
-            borderColor: 'rgba(179,181,158,1)',
+            borderColor: '#ffc107',
             lineTension:0,
             showActualPercentages: true,
             showInLegend: true,
             pointStyle: 'line',
             yValueFormatString: "$#####%",
             
-            data: this.state.matricsList.map((item, index) => (item.FORECAST_ERROR*100))
+            data: this.state.matricsList.map((item, index) => (this.roundN(item.forecastError*100)))
           }
         ],
 
@@ -673,8 +688,8 @@ this.fetchData();
                         this.state.matricsList.length > 0
                         &&
                         <div className="col-md-12">
-                          <div className="col-md-9">
-                        <div   className="chart-wrapper chart-graph">
+                          <div className="col-md-12">
+                        <div   className="chart-wrapper chart-graph-report">
                           <Bar id="cool-canvas" data={bar} options={options} />
                          </div>
                          </div>
@@ -693,11 +708,11 @@ this.fetchData();
 
                         <thead>
                           <tr>
-                            <th className="text-center"> {i18n.t('static.report.month')} </th>
-                            <th className="text-center"> {i18n.t('static.report.forecastConsumption')} </th>
-                            <th className="text-center">{i18n.t('static.report.actualConsumption')}</th>
-                            <th className="text-center">{i18n.t('static.report.errorperc')}</th>
-                            <th className="text-center">{i18n.t('static.report.noofmonth')}</th>
+                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.month')} </th>
+                            <th className="text-center" style={{width:'20%'}}> {i18n.t('static.report.forecastConsumption')} </th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.actualConsumption')}</th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.errorperc')}</th>
+                            <th className="text-center" style={{width:'20%'}}>{i18n.t('static.report.noofmonth')}</th>
                           </tr>
                         </thead>
                        
@@ -709,19 +724,19 @@ this.fetchData();
 
                                 <tr id="addr0" key={idx} >
                                 
-                                  <td>{this.state.matricsList[idx].ACTUAL_DATE}</td>
+                                  <td>{this.state.matricsList[idx].consumptionDateString}</td>
                                   <td>
 
-                                    {this.state.matricsList[idx].FORECASTED_CONSUMPTION}
+                                    {this.state.matricsList[idx].forecastedConsumption}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].ACTUAL_CONSUMPTION}
+                                    {this.state.matricsList[idx].actualConsumption}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].FORECAST_ERROR*100+'%'}
+                                    {this.roundN(this.state.matricsList[idx].forecastError*100)+'%'}
                                   </td>
                                   <td>
-                                    {this.state.matricsList[idx].MONTHS_COUNT}
+                                    {this.state.matricsList[idx].monthsInCalc}
                                   </td></tr>)
 
                             }
