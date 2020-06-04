@@ -53,8 +53,9 @@ export default class PipelineProgramImport extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+                <h6></h6>
                 <Row>
-                    <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <strong>{i18n.t('static.program.import')}</strong>
@@ -64,7 +65,7 @@ export default class PipelineProgramImport extends Component {
                                     <Col md="3">
                                         <Label htmlFor="file-input">{i18n.t('static.program.fileinput')}</Label>
                                     </Col>
-                                    <Col xs="12" md="9">
+                                    <Col xs="12" md="4">
                                         <Input
                                             type="file"
                                             id="file-input"
@@ -72,6 +73,7 @@ export default class PipelineProgramImport extends Component {
                                             onChange={e => this.showFile(e)}
                                             accept=".json" 
                                             />
+                                            
                                     </Col>
                                 </FormGroup>
                             </CardBody>
