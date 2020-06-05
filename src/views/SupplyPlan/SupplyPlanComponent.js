@@ -260,7 +260,7 @@ export default class SupplyPlanComponent extends React.Component {
 
     formSubmit(monthCount) {
         this.setState({
-            planningUnitChange: 1
+            planningUnitChange: true
         })
         document.getElementById("supplyPlanTableId").style.display = 'block';
 
@@ -910,7 +910,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var json = {
                         month: m[jsonForGraph].month,
                         consumption: consumptionTotalData[jsonForGraph],
-                        stock: inventoryTotalData[jsonForGraph],
+                        stock: openingBalanceArray[jsonForGraph],
                         planned: plannedTotalShipmentsBasedOnMonth[jsonForGraph],
                         draft: draftTotalShipmentsBasedOnMonth[jsonForGraph],
                         submitted: submittedTotalShipmentsBasedOnMonth[jsonForGraph],
@@ -1706,6 +1706,15 @@ export default class SupplyPlanComponent extends React.Component {
                         var inventoryDataArr = [];
                         var readonlyCountrySKU = true;
                         for (var j = 0; j < inventoryList.length; j++) {
+                            var expectedBalPlanningUnitQty = "";
+                            if (j == 0) {
+                                var openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == month && c.region.id == region)[0]).balance;
+                                var consumptionQty = (this.state.consumptionFilteredArray.filter(c => c.month.month == month && c.region.id == region)[0]).consumptionQty;
+                                expectedBalPlanningUnitQty = (openingBalance - consumptionQty);
+
+                            } else {
+                                expectedBalPlanningUnitQty = `=(G${j}+I${j})`
+                            }
                             var readonlyCountrySKU = true;
                             data = [];
                             data[0] = month;
@@ -1713,8 +1722,8 @@ export default class SupplyPlanComponent extends React.Component {
                             data[2] = inventoryList[j].dataSource.id;
                             data[3] = inventoryList[j].realmCountryPlanningUnit.id;
                             data[4] = inventoryList[j].multiplier;
-                            data[5] = inventoryList[j].expectedBal;
-                            data[6] = `=E${j + 1}*F${j + 1}`;
+                            data[5] = `=IF(NOT(ISBLANK(E${j+1})), G${j+1}/E${j+1},0)`;
+                            data[6] = expectedBalPlanningUnitQty;
                             data[7] = inventoryList[j].adjustmentQty;
                             data[8] = `=E${j + 1}*H${j + 1}`;
                             data[9] = inventoryList[j].actualQty;
@@ -1732,14 +1741,17 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                         if (inventoryList.length == 0) {
                             var readonlyCountrySKU = false;
+                            var openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == month && c.region.id == region)[0]).balance;
+                            var consumptionQty = (this.state.consumptionFilteredArray.filter(c => c.month.month == month && c.region.id == region)[0]).consumptionQty;
+                            var expectedBalPlanningUnitQty = (openingBalance - consumptionQty);
                             data = [];
                             data[0] = month;
                             data[1] = region;
                             data[2] = "";
                             data[3] = "";
                             data[4] = "";
-                            data[5] = "";
-                            data[6] = `=E1*F1`;
+                            data[5] = `=IF(NOT(ISBLANK(E1)), G1/E1,0)`;
+                            data[6] = expectedBalPlanningUnitQty;
                             data[7] = "";
                             data[8] = `=E1*H1`;
                             data[9] = "";
@@ -1881,8 +1893,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                 data[2] = "";
                                                 data[3] = "";
                                                 data[4] = "";
-                                                data[5] = "";
-                                                data[6] = `=E${(json.length) + 1}*F${(json.length) + 1}`;
+                                                data[5] = `=IF(NOT(ISBLANK(E${(json.length)+1})), G${(json.length) + 1}/E${(json.length)+1},0)`;
+                                                data[6] = `=(G${json.length}+I${json.length})`;
                                                 data[7] = "";
                                                 data[8] = `=E${(json.length) + 1}*H${(json.length) + 1}`;
                                                 data[9] = "";
@@ -1996,27 +2008,27 @@ export default class SupplyPlanComponent extends React.Component {
                 var countrySKU = this.state.countrySKUListAll.filter(c => c.realmCountryPlanningUnitId == value)[0];
                 var multiplier = countrySKU.multiplier;
                 elInstance.setValueFromCoords(4, y, multiplier, true);
-                var region = elInstance.getValueFromCoords(1, y);
-                var endDate = elInstance.getValueFromCoords(14, y);
-                var inventoryDetails = this.state.inventoryListUnFiltered.filter(c => c.realmCountryPlanningUnit.id == value
-                    && c.region.id == region
-                    && c.inventoryDate <= endDate
-                );
-                var lastInventoryDate = "";
-                for (var id = 0; id < inventoryDetails.length; id++) {
-                    if (id == 0) {
-                        lastInventoryDate = inventoryDetails[id].inventoryDate;
-                    }
-                    if (lastInventoryDate < inventoryDetails[id].inventoryDate) {
-                        lastInventoryDate = inventoryDetails[id].inventoryDate;
-                    }
-                }
-                var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
-                var expBal = 0;
-                if (inventoryDetailsFiltered.length > 0) {
-                    var expBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
-                }
-                elInstance.setValueFromCoords(5, y, expBal, true);
+                // var region = elInstance.getValueFromCoords(1, y);
+                // var endDate = elInstance.getValueFromCoords(14, y);
+                // var inventoryDetails = this.state.inventoryListUnFiltered.filter(c => c.realmCountryPlanningUnit.id == value
+                //     && c.region.id == region
+                //     && c.inventoryDate <= endDate
+                // );
+                // var lastInventoryDate = "";
+                // for (var id = 0; id < inventoryDetails.length; id++) {
+                //     if (id == 0) {
+                //         lastInventoryDate = inventoryDetails[id].inventoryDate;
+                //     }
+                //     if (lastInventoryDate < inventoryDetails[id].inventoryDate) {
+                //         lastInventoryDate = inventoryDetails[id].inventoryDate;
+                //     }
+                // }
+                // var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
+                // var expBal = 0;
+                // if (inventoryDetailsFiltered.length > 0) {
+                //     var expBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
+                // }
+                // elInstance.setValueFromCoords(5, y, expBal, true);
                 // elInstance.setValueFromCoords(6, y, parseInt(expBal)*parseInt(multiplier), true);
                 // elInstance.setValueFromCoords(8, y, parseInt(elInstance.getValueFromCoords(7,y))*parseInt(multiplier), true);
                 // elInstance.setValueFromCoords(10, y, parseInt(elInstance.getValueFromCoords(9,y))*parseInt(multiplier), true);
@@ -3519,7 +3531,7 @@ export default class SupplyPlanComponent extends React.Component {
 
                                     )} />
 
-                        {/* {this.state.planningUnitChange && <SupplyPlanComparisionComponent />} */}
+                        {this.state.planningUnitChange && <SupplyPlanComparisionComponent />}
                         <div id="supplyPlanTableId" style={{ display: 'none' }}>
                             <Row>
                                 <div className="col-md-12">

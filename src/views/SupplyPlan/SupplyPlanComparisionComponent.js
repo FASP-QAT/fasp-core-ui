@@ -66,43 +66,17 @@ export default class SupplyPlanComponent extends React.Component {
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
         this.formSubmit = this.formSubmit.bind(this);
         this.toggleLarge = this.toggleLarge.bind(this);
-        this.saveConsumption = this.saveConsumption.bind(this);
         this.consumptionDetailsClicked = this.consumptionDetailsClicked.bind(this);
-        this.consumptionChanged = this.consumptionChanged.bind(this);
-
         this.adjustmentsDetailsClicked = this.adjustmentsDetailsClicked.bind(this);
-        this.inventoryChanged = this.inventoryChanged.bind(this);
-        this.checkValidationConsumption = this.checkValidationConsumption.bind(this);
-        this.checkValidationInventory = this.checkValidationInventory.bind(this);
-        this.inventoryOnedit = this.inventoryOnedit.bind(this);
-        this.saveInventory = this.saveInventory.bind(this);
-
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
         this.leftClickedConsumption = this.leftClickedConsumption.bind(this);
         this.rightClickedConsumption = this.rightClickedConsumption.bind(this);
-
         this.leftClickedAdjustments = this.leftClickedAdjustments.bind(this);
         this.rightClickedAdjustments = this.rightClickedAdjustments.bind(this);
-
         this.actionCanceled = this.actionCanceled.bind(this);
-
         this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
-        this.suggestedShipmentChanged = this.suggestedShipmentChanged.bind(this);
-        this.saveSuggestedShipments = this.saveSuggestedShipments.bind(this);
-        this.checkValidationSuggestedShipments = this.checkValidationSuggestedShipments.bind(this);
-
-
-        this.budgetChanged = this.budgetChanged.bind(this);
-        this.checkBudgetValidation = this.checkBudgetValidation.bind(this);
-        this.shipmentStatusDropdownFilter = this.shipmentStatusDropdownFilter.bind(this);
-        this.procurementUnitDropdownFilter = this.procurementUnitDropdownFilter.bind(this);
         this.shipmentsDetailsClicked = this.shipmentsDetailsClicked.bind(this);
-        this.shipmentChanged = this.shipmentChanged.bind(this);
-        this.saveShipments = this.saveShipments.bind(this);
-        this.checkValidationForShipments = this.checkValidationForShipments.bind(this);
-
-        this.budgetDropdownFilter = this.budgetDropdownFilter.bind(this);
     }
 
     componentDidMount() {
@@ -117,8 +91,8 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+            var program = transaction.objectStore('downloadedProgramData');
             var getRequest = program.getAll();
             var proList = []
             getRequest.onerror = function (event) {
@@ -145,14 +119,12 @@ export default class SupplyPlanComponent extends React.Component {
                 this.setState({
                     programList: proList
                 })
+                this.getPlanningUnitList();
             }.bind(this);
         }.bind(this);
-        this.getPlanningUnitList();
-        this.formSubmit(this.state.monthCount);
     };
 
-    getPlanningUnitList() {
-        console.log("In planning unit list");
+    getPlanningUnitList(event) {
         const lan = 'en';
         var db1;
         var storeOS;
@@ -161,25 +133,21 @@ export default class SupplyPlanComponent extends React.Component {
         var dataSourceList = [];
         var openRequest = indexedDB.open('fasp', 1);
         openRequest.onerror = function (event) {
-            console.log("In error")
             this.setState({
                 supplyPlanError: i18n.t('static.program.errortext')
             })
         }.bind(this);
         openRequest.onsuccess = function (e) {
-            console.log("In success")
             db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('programData');
+            var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+            var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
             var programRequest = programDataOs.get(document.getElementById("programId").value);
-            console.log("ProgramId", document.getElementById("programId").value);
             programRequest.onerror = function (event) {
                 this.setState({
                     supplyPlanError: i18n.t('static.program.errortext')
                 })
             }.bind(this);
             programRequest.onsuccess = function (e) {
-                console.log("In success")
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
@@ -237,7 +205,6 @@ export default class SupplyPlanComponent extends React.Component {
                                 }
                             }
                         }
-                        console.log("MyResult------------>", myResult)
                         this.setState({
                             planningUnitList: proList,
                             programPlanningUnitList: myResult,
@@ -245,6 +212,7 @@ export default class SupplyPlanComponent extends React.Component {
                             programJson: programJson,
                             dataSourceList: dataSourceList
                         })
+                        this.formSubmit(this.state.monthCount);
                     }.bind(this);
                 }.bind(this);
             }.bind(this);
@@ -271,10 +239,9 @@ export default class SupplyPlanComponent extends React.Component {
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
 
         var programId = document.getElementById("programId").value;
-        console.log("Program Id", programId);
         var regionId = -1;
         var planningUnitId = document.getElementById("planningUnitId").value;
-        console.log("Planning Unit list", planningUnitId);
+
         var planningUnit = document.getElementById("planningUnitId");
         var planningUnitName = planningUnit.options[planningUnit.selectedIndex].text;
 
@@ -340,8 +307,8 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-            var programDataOs = programDataTransaction.objectStore('programData');
+            var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+            var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
             var programRequest = programDataOs.get(document.getElementById("programId").value);
             programRequest.onerror = function (event) {
                 this.setState({
@@ -915,7 +882,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var json = {
                         month: m[jsonForGraph].month,
                         consumption: consumptionTotalData[jsonForGraph],
-                        stock: inventoryTotalData[jsonForGraph],
+                        stock: openingBalanceArray[jsonForGraph],
                         planned: plannedTotalShipmentsBasedOnMonth[jsonForGraph],
                         draft: draftTotalShipmentsBasedOnMonth[jsonForGraph],
                         submitted: submittedTotalShipmentsBasedOnMonth[jsonForGraph],
@@ -1108,8 +1075,8 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                var programDataOs = programDataTransaction.objectStore('programData');
+                var programDataTransaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programDataOs = programDataTransaction.objectStore('downloadedProgramData');
                 var programRequest = programDataOs.get(document.getElementById("programId").value);
                 programRequest.onerror = function (event) {
                     this.setState({
@@ -1191,7 +1158,8 @@ export default class SupplyPlanComponent extends React.Component {
                         allowManualInsertColumn: false,
                         allowDeleteRow: false,
                         allowManualInsertRow: false,
-                        onchange: this.consumptionChanged,
+                        allowInsertRow: false,
+                        editable: false,
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             if (y == null) {
@@ -1345,298 +1313,6 @@ export default class SupplyPlanComponent extends React.Component {
         }
     }
 
-    // Consumption changed
-    consumptionChanged = function (instance, cell, x, y, value) {
-        this.setState({
-            consumptionError: "",
-            consumptionDuplicateError: ""
-        })
-        var elInstance = this.state.consumptionEl;
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 8) {
-            var col = ("I").concat(parseInt(y) + 1);
-            elInstance.setStyle(col, "background-color", "transparent");
-            elInstance.setComments(col, "");
-        }
-        if (x == 3) {
-            var reg = /^[0-9\b]+$/;
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.setState({
-                        consumptionNoStockError: ''
-                    })
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-        this.setState({
-            consumptionChangedFlag: 1
-        })
-    }
-
-    // consumption final validations
-    checkValidationConsumption() {
-        var valid = true;
-        var elInstance = this.state.consumptionEl;
-        var json = elInstance.getJson();
-        var mapArray = [];
-        for (var y = 0; y < json.length; y++) {
-            var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
-
-            var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("8") == map.get("8")
-            )
-            if (checkDuplicateInMap.length > 1) {
-                var colArr = ['I'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateConsumption'));
-                }
-                valid = false;
-                this.setState({
-                    consumptionDuplicateError: i18n.t('static.supplyPlan.duplicateConsumption')
-                })
-            } else {
-                var openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).balance;
-                var adjustmentQty = (this.state.inventoryFilteredArray.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).adjustmentQty;
-                var consumptionQty = 0;
-                if (json.length == 2) {
-                    if (map.get("8") == true) {
-                        consumptionQty = map.get("3");
-                    }
-                } else {
-                    consumptionQty = map.get("3");
-                }
-                if ((openingBalance + adjustmentQty - consumptionQty) < 0) {
-                    if (json.length == 2) {
-                        if (map.get("8") == true) {
-                            console.log("In 2nd if");
-                            var col = ("D").concat(parseInt(y) + 1);
-                            elInstance.setStyle(col, "background-color", "transparent");
-                            elInstance.setStyle(col, "background-color", "yellow");
-                            elInstance.setComments(col, i18n.t('static.supplyPlan.noStockAvailable'));
-                        }
-                    } else {
-                        var col = ("D").concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.supplyPlan.noStockAvailable'));
-                    }
-                    valid = false;
-                    this.setState({
-                        consumptionNoStockError: i18n.t('static.supplyPlan.noStockAvailable')
-                    })
-                } else {
-                    var colArr = ['I'];
-                    for (var c = 0; c < colArr.length; c++) {
-                        var col = (colArr[c]).concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                    var col = ("C").concat(parseInt(y) + 1);
-                    var value = elInstance.getValueFromCoords(2, y);
-                    if (value == "") {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                        valid = false;
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
-                    var col = ("D").concat(parseInt(y) + 1);
-                    var value = elInstance.getValueFromCoords(3, y);
-                    var reg = /^[0-9\b]+$/;
-                    if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        valid = false;
-                        if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                        } else {
-                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                        }
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
-                    var reg = /^[0-9\b]+$/;
-                    var col = ("E").concat(parseInt(y) + 1);
-                    var value = elInstance.getValueFromCoords(4, y);
-                    if (value === "" || isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        valid = false;
-                        if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                            elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                        } else {
-                            elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                        }
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                }
-            }
-        }
-        return valid;
-    }
-
-    // Save consumption
-    saveConsumption() {
-        this.setState({
-            consumptionError: '',
-            consumptionDuplicateError: ''
-        })
-        var validation = this.checkValidationConsumption();
-        if (validation == true) {
-            var inputs = document.getElementsByClassName("submitBtn");
-            for (var i = 0; i < inputs.length; i++) {
-                inputs[i].disabled = true;
-            }
-            var elInstance = this.state.consumptionEl;
-            var json = elInstance.getJson();
-            var planningUnitId = document.getElementById("planningUnitId").value;
-            var productCategoryId = (this.state.programPlanningUnitList).filter(c => c.planningUnit.id == planningUnitId);
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var consumptionDataList = (programJson.consumptionList);
-                    for (var i = 0; i < json.length; i++) {
-                        var map = new Map(Object.entries(json[i]));
-                        if (map.get("6") != -1) {
-                            consumptionDataList[parseInt(map.get("6"))].dataSource.id = map.get("2");
-                            consumptionDataList[parseInt(map.get("6"))].consumptionQty = map.get("3");
-                            consumptionDataList[parseInt(map.get("6"))].dayOfStockOut = parseInt(map.get("4"));
-                            consumptionDataList[parseInt(map.get("6"))].notes = map.get("5");
-                            consumptionDataList[parseInt(map.get("6"))].actualFlag = map.get("8");
-                            consumptionDataList[parseInt(map.get("6"))].active = map.get("9");
-                        } else {
-                            var consumptionJson = {
-                                consumptionId: 0,
-                                consumptionDate: moment(map.get("7")).format("YYYY-MM-DD"),
-                                region: {
-                                    id: map.get("1")
-                                },
-                                consumptionQty: map.get("3"),
-                                dayOfStockOut: parseInt(map.get("4")),
-                                dataSource: {
-                                    id: map.get("2")
-                                },
-                                notes: map.get("5"),
-                                actualFlag: map.get("8"),
-                                active: map.get("9"),
-
-                                // planningUnit: {
-                                //     id: plannigUnitId
-                                // }
-                                planningUnit: {
-                                    id: planningUnitId,
-                                    forecastingUnit: {
-                                        productCategory: {
-                                            id: productCategoryId
-                                        }
-                                    }
-                                }
-                            }
-                            consumptionDataList.push(consumptionJson);
-                        }
-                    }
-                    programJson.consumptionList = consumptionDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge('Consumption');
-                        this.setState({
-                            message: i18n.t('static.message.consumptionSaved'),
-                            consumptionChangedFlag: 0
-                        })
-                        this.formSubmit(this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                consumptionError: i18n.t('static.supplyPlan.validationFailed')
-            })
-        }
-    }
-
-
     // Consumption Functionality
 
     // Adjustments Functionality
@@ -1659,8 +1335,8 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
+                var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+                var programTransaction = transaction.objectStore('downloadedProgramData');
                 var programRequest = programTransaction.get(programId);
                 programRequest.onerror = function (event) {
                     this.setState({
@@ -1711,6 +1387,15 @@ export default class SupplyPlanComponent extends React.Component {
                         var inventoryDataArr = [];
                         var readonlyCountrySKU = true;
                         for (var j = 0; j < inventoryList.length; j++) {
+                            var expectedBalPlanningUnitQty = "";
+                            if (j == 0) {
+                                var openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == month && c.region.id == region)[0]).balance;
+                                var consumptionQty = (this.state.consumptionFilteredArray.filter(c => c.month.month == month && c.region.id == region)[0]).consumptionQty;
+                                expectedBalPlanningUnitQty = (openingBalance - consumptionQty);
+
+                            } else {
+                                expectedBalPlanningUnitQty = `=(G${j}+I${j})`
+                            }
                             var readonlyCountrySKU = true;
                             data = [];
                             data[0] = month;
@@ -1718,8 +1403,8 @@ export default class SupplyPlanComponent extends React.Component {
                             data[2] = inventoryList[j].dataSource.id;
                             data[3] = inventoryList[j].realmCountryPlanningUnit.id;
                             data[4] = inventoryList[j].multiplier;
-                            data[5] = inventoryList[j].expectedBal;
-                            data[6] = `=E${j + 1}*F${j + 1}`;
+                            data[5] = `=IF(NOT(ISBLANK(E${j + 1})), G${j + 1}/E${j + 1},0)`;
+                            data[6] = expectedBalPlanningUnitQty;
                             data[7] = inventoryList[j].adjustmentQty;
                             data[8] = `=E${j + 1}*H${j + 1}`;
                             data[9] = inventoryList[j].actualQty;
@@ -1737,14 +1422,17 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                         if (inventoryList.length == 0) {
                             var readonlyCountrySKU = false;
+                            var openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == month && c.region.id == region)[0]).balance;
+                            var consumptionQty = (this.state.consumptionFilteredArray.filter(c => c.month.month == month && c.region.id == region)[0]).consumptionQty;
+                            var expectedBalPlanningUnitQty = (openingBalance - consumptionQty);
                             data = [];
                             data[0] = month;
                             data[1] = region;
                             data[2] = "";
                             data[3] = "";
                             data[4] = "";
-                            data[5] = "";
-                            data[6] = `=E1*F1`;
+                            data[5] = `=IF(NOT(ISBLANK(E1)), G1/E1,0)`;
+                            data[6] = expectedBalPlanningUnitQty;
                             data[7] = "";
                             data[8] = `=E1*H1`;
                             data[9] = "";
@@ -1807,10 +1495,9 @@ export default class SupplyPlanComponent extends React.Component {
                             allowInsertColumn: false,
                             allowManualInsertColumn: false,
                             allowDeleteRow: false,
-                            // allowInsertRow: false,
+                            allowInsertRow: false,
                             allowManualInsertRow: false,
-                            onchange: this.inventoryChanged,
-                            oneditionend: this.inventoryOnedit,
+                            editable: false,
                             contextMenu: function (obj, x, y, e) {
                                 var items = [];
                                 if (y == null) {
@@ -1886,8 +1573,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                 data[2] = "";
                                                 data[3] = "";
                                                 data[4] = "";
-                                                data[5] = "";
-                                                data[6] = `=E${(json.length) + 1}*F${(json.length) + 1}`;
+                                                data[5] = `=IF(NOT(ISBLANK(E${(json.length) + 1})), G${(json.length) + 1}/E${(json.length) + 1},0)`;
+                                                data[6] = `=(G${json.length}+I${json.length})`;
                                                 data[7] = "";
                                                 data[8] = `=E${(json.length) + 1}*H${(json.length) + 1}`;
                                                 data[9] = "";
@@ -1969,397 +1656,6 @@ export default class SupplyPlanComponent extends React.Component {
             })
         }
     }
-
-    // Adjustments changed
-    inventoryChanged = function (instance, cell, x, y, value) {
-        this.setState({
-            inventoryError: '',
-            inventoryDuplicateError: ''
-        })
-        var elInstance = this.state.inventoryEl;
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-
-        if (x == 3) {
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var countrySKU = this.state.countrySKUListAll.filter(c => c.realmCountryPlanningUnitId == value)[0];
-                var multiplier = countrySKU.multiplier;
-                elInstance.setValueFromCoords(4, y, multiplier, true);
-                var region = elInstance.getValueFromCoords(1, y);
-                var endDate = elInstance.getValueFromCoords(14, y);
-                var inventoryDetails = this.state.inventoryListUnFiltered.filter(c => c.realmCountryPlanningUnit.id == value
-                    && c.region.id == region
-                    && c.inventoryDate <= endDate
-                );
-                var lastInventoryDate = "";
-                for (var id = 0; id < inventoryDetails.length; id++) {
-                    if (id == 0) {
-                        lastInventoryDate = inventoryDetails[id].inventoryDate;
-                    }
-                    if (lastInventoryDate < inventoryDetails[id].inventoryDate) {
-                        lastInventoryDate = inventoryDetails[id].inventoryDate;
-                    }
-                }
-                var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
-                var expBal = 0;
-                if (inventoryDetailsFiltered.length > 0) {
-                    var expBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
-                }
-                elInstance.setValueFromCoords(5, y, expBal, true);
-                // elInstance.setValueFromCoords(6, y, parseInt(expBal)*parseInt(multiplier), true);
-                // elInstance.setValueFromCoords(8, y, parseInt(elInstance.getValueFromCoords(7,y))*parseInt(multiplier), true);
-                // elInstance.setValueFromCoords(10, y, parseInt(elInstance.getValueFromCoords(9,y))*parseInt(multiplier), true);
-            }
-        }
-        if (x == 7) {
-            var col = ("H").concat(parseInt(y) + 1);
-            var reg = /-?\d+/;
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.setState({
-                        inventoryNoStockError: ''
-                    })
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-        }
-
-        if (x == 9) {
-            if (elInstance.getValueFromCoords(9, y) != "") {
-                var reg = /^[0-9\b]+$/;
-                if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                    var col = ("J").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    var col = ("J").concat(parseInt(y) + 1);
-                    var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
-                    elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            } else {
-                var col = ("J").concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 5) {
-            if (elInstance.getValueFromCoords(9, y) != "") {
-                var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
-                elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
-            }
-        }
-
-        this.setState({
-            inventoryChangedFlag: 1
-        })
-    }
-
-    // Adjustments edit
-    inventoryOnedit = function (instance, cell, x, y, value) {
-        var elInstance = this.state.inventoryEl;
-        if (x == 7) {
-            elInstance.setValueFromCoords(9, y, "", true);
-        }
-    }.bind(this);
-
-    // Adjustments final validation
-    checkValidationInventory() {
-        var valid = true;
-        var elInstance = this.state.inventoryEl;
-        var json = elInstance.getJson();
-        var mapArray = [];
-        var adjustmentsQty = 0;
-        var openingBalance = 0;
-        var consumptionQty = 0;
-        for (var y = 0; y < json.length; y++) {
-            var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
-
-            var checkDuplicateInMap = mapArray.filter(c =>
-                c.get("4") == map.get("4")
-            )
-            if (checkDuplicateInMap.length > 1) {
-                var colArr = ['D'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateAdjustments'));
-                }
-                valid = false;
-                this.setState({
-                    inventoryDuplicateError: i18n.t('static.supplyPlan.duplicateAdjustments')
-                })
-            } else {
-                openingBalance = (this.state.openingBalanceRegionWise.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).balance;
-                consumptionQty = (this.state.consumptionFilteredArray.filter(c => c.month.month == map.get("0") && c.region.id == map.get("1"))[0]).consumptionQty;
-                adjustmentsQty += (map.get("7") * map.get("4"))
-                console.log("adjustmentsqty", adjustmentsQty);
-                var colArr = ['D'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(2, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("H").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(7, y);
-                var reg = /-?\d+/;
-                if (value === "" || isNaN(parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    valid = false;
-                    if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    }
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var value = elInstance.getValueFromCoords(9, y);
-                if (elInstance.getValueFromCoords(9, y) != "") {
-                    var reg = /^[0-9\b]+$/;
-                    if (isNaN(parseInt(value)) || !(reg.test(value))) {
-                        var col = ("J").concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        var col = ("J").concat(parseInt(y) + 1);
-                        var manualAdj = elInstance.getValueFromCoords(9, y) - elInstance.getValueFromCoords(5, y);
-                        elInstance.setValueFromCoords(7, y, parseInt(manualAdj), true);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                } else {
-                    var col = ("J").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-            // }
-        }
-
-        console.log("Opening balamce---->", openingBalance);
-        console.log("adjustments Qty----------->", adjustmentsQty);
-        console.log("Consumption Qty----------->", consumptionQty);
-        if ((openingBalance + adjustmentsQty - consumptionQty) < 0) {
-            valid = false;
-            this.setState({
-                inventoryNoStockError: i18n.t('static.supplyPlan.noStockAvailable')
-            })
-        }
-        return valid;
-    }
-
-    // Save adjustments
-    saveInventory() {
-        this.setState({
-            inventoryError: ''
-        })
-        var validation = this.checkValidationInventory();
-        if (validation == true) {
-            var inputs = document.getElementsByClassName("submitBtn");
-            for (var i = 0; i < inputs.length; i++) {
-                inputs[i].disabled = true;
-            }
-            var elInstance = this.state.inventoryEl;
-            var planningUnitId = document.getElementById("planningUnitId").value;
-            var json = elInstance.getJson();
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var inventoryDataList = (programJson.inventoryList);
-                    for (var i = 0; i < json.length; i++) {
-                        var map = new Map(Object.entries(json[i]));
-                        if (parseInt(map.get("12")) != -1) {
-                            inventoryDataList[parseInt(map.get("12"))].dataSource.id = map.get("2");
-                            inventoryDataList[parseInt(map.get("12"))].expectedBal = parseInt(map.get("5"));
-                            inventoryDataList[parseInt(map.get("12"))].adjustmentQty = parseInt(map.get("7"));
-                            inventoryDataList[parseInt(map.get("12"))].actualQty = parseInt(map.get("9"));
-                            inventoryDataList[parseInt(map.get("12"))].notes = map.get("11");
-                            inventoryDataList[parseInt(map.get("12"))].active = map.get("13");
-
-                            var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
-                            for (var j = 0; j < inventoryDataListFiltered.length; j++) {
-                                var inventoryId = inventoryDataListFiltered[j].inventoryId;
-                                var index;
-                                if (inventoryId != 0) {
-                                    index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
-                                } else {
-                                    index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
-                                }
-                                if (j == 0) {
-                                    inventoryDataList[index].expectedBal = 0
-                                } else {
-                                    var inventoryDetails = inventoryDataListFiltered.filter(c => c.inventoryDate >= map.get("14"));
-                                    var lastInventoryDate = "";
-                                    for (var id = 0; id < inventoryDetails.length; id++) {
-                                        if (id == 0) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                        if (lastInventoryDate < inventoryDetails[id].inventoryDate) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                    }
-                                    var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
-                                    if (inventoryDetailsFiltered.length != 0) {
-                                        inventoryDataList[index].expectedBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
-                                    }
-                                }
-
-                            }
-                        } else {
-                            var inventoryJson = {
-                                inventoryId: 0,
-                                dataSource: {
-                                    id: map.get("2")
-                                },
-                                region: {
-                                    id: map.get("1")
-                                },
-                                inventoryDate: map.get("14"),
-                                expectedBal: map.get("5"),
-                                adjustmentQty: map.get("7"),
-                                actualQty: map.get("9"),
-                                // batchNo: map.get("6"),
-                                // expiryDate: expiryDate,
-                                active: map.get("13"),
-                                realmCountryPlanningUnit: {
-                                    id: map.get("3"),
-                                },
-                                multiplier: map.get("4"),
-                                planningUnit: {
-                                    id: planningUnitId
-                                },
-                                notes: map.get("11")
-                            }
-
-
-                            inventoryDataList.push(inventoryJson);
-                            var inventoryDataListFiltered = inventoryDataList.filter(c => c.realmCountryPlanningUnit.id == map.get("3") && c.region.id == map.get("2"));
-                            for (var j = 0; j < inventoryDataListFiltered.length; j++) {
-                                var inventoryId = inventoryDataListFiltered[j].inventoryId;
-                                var index;
-                                if (inventoryId != 0) {
-                                    index = inventoryDataList.findIndex(c => c.inventoryId == inventoryId)
-                                } else {
-                                    index = inventoryDataList.findIndex(c => c.planningUnit.id == inventoryDataListFiltered[j].planningUnit.id && c.region.id == inventoryDataListFiltered[j].region.id && moment(c.inventoryDate).format("MMM YY") == moment(inventoryDataListFiltered[j].inventoryDate).format("MMM YY") && c.inventoryDate == inventoryDataListFiltered[j].inventoryDate && c.realmCountryPlanningUnit.id == inventoryDataListFiltered[j].realmCountryPlanningUnit.id);
-                                }
-                                if (j == 0) {
-                                    inventoryDataList[index].expectedBal = 0
-                                } else {
-                                    var inventoryDetails = inventoryDataListFiltered.filter(c => c.inventoryDate >= map.get("14"));
-                                    var lastInventoryDate = "";
-                                    for (var id = 0; id < inventoryDetails.length; id++) {
-                                        if (id == 0) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                        if (lastInventoryDate < inventoryDetails[id].inventoryDate) {
-                                            lastInventoryDate = inventoryDetails[id].inventoryDate;
-                                        }
-                                    }
-                                    var inventoryDetailsFiltered = inventoryDetails.filter(c => c.inventoryDate == lastInventoryDate);
-                                    if (inventoryDetailsFiltered.length != 0) {
-                                        inventoryDataList[index].expectedBal = parseInt(inventoryDetailsFiltered[0].expectedBal) + parseInt(inventoryDetailsFiltered[0].adjustmentQty);
-                                    }
-                                }
-
-
-                            }
-                        }
-                    }
-                    programJson.inventoryList = inventoryDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge('Adjustments');
-                        this.setState({
-                            message: i18n.t('static.message.adjustmentsSaved'),
-                            inventoryChangedFlag: 0
-                        })
-                        this.formSubmit(this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                inventoryError: i18n.t('static.supplyPlan.validationFailed')
-            })
-        }
-    }
-
     // Adjustments Functionality
 
     // Shipments functionality
@@ -2384,8 +1680,8 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
+            var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+            var programTransaction = transaction.objectStore('downloadedProgramData');
             var programRequest = programTransaction.get(programId);
             var consumptionTotalData = [];
             var filteredArray = [];
@@ -2493,9 +1789,9 @@ export default class SupplyPlanComponent extends React.Component {
                         allowInsertColumn: false,
                         allowManualInsertColumn: false,
                         allowDeleteRow: false,
-                        // allowInsertRow: false,
+                        allowInsertRow: false,
                         allowManualInsertRow: false,
-                        onchange: this.suggestedShipmentChanged,
+                        editable: false,
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             if (y == null) {
@@ -2643,796 +1939,10 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
-
-    // Suggested shipment changed 
-    suggestedShipmentChanged = function (instance, cell, x, y, value) {
-        this.setState({
-            suggestedShipmentError: '',
-            suggestedShipmentDuplicateError: ''
-        })
-        var elInstance = this.state.suggestedShipmentsEl;
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            var reg = /^[0-9\b]+$/;
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || !(reg.test(value))) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-        }
-
-        if (x == 5) {
-            var col = ("F").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var valueOfG = elInstance.getValueFromCoords(6, y);
-                var addLeadTimes = 0;
-                if (valueOfG != "") {
-                    var db1;
-                    var storeOS;
-                    getDatabase();
-                    var openRequest = indexedDB.open('fasp', 1);
-                    openRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                    }.bind(this);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var transaction = db1.transaction(['programData'], 'readwrite');
-                        var programTransaction = transaction.objectStore('programData');
-
-                        var programId = (document.getElementById("programId").value);
-
-                        var programRequest = programTransaction.get(programId);
-                        programRequest.onerror = function (event) {
-                            this.setState({
-                                supplyPlanError: i18n.t('static.program.errortext')
-                            })
-                        }.bind(this);
-                        programRequest.onsuccess = function (event) {
-                            var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
-                            var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                            var papuOs = papuTransaction.objectStore('procurementAgent');
-                            var papuRequest = papuOs.get(parseInt(value));
-                            papuRequest.onerror = function (event) {
-                                this.setState({
-                                    supplyPlanError: i18n.t('static.program.errortext')
-                                })
-                            }.bind(this);
-                            papuRequest.onsuccess = function (event) {
-                                var papuResult = [];
-                                papuResult = papuRequest.result;
-
-                                if (papuResult.localProcurementAgent) {
-                                    addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
-                                } else {
-                                    addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
-
-                                    if (valueOfG == "Sea") {
-                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
-                                    } else {
-                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredByAirLeadTime);
-                                    }
-                                }
-                                addLeadTimes = parseInt(addLeadTimes) + 1;
-                                var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("YYYY-MM-DD");
-                                elInstance.setValueFromCoords(9, y, expectedDeliveryDate, true);
-                            }.bind(this)
-                        }.bind(this)
-                    }.bind(this)
-                }
-
-                var valueOfJ = elInstance.getValueFromCoords(9, y);
-                if (valueOfJ != "") {
-                    var col1 = ("J").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-            }
-        }
-
-        if (x == 6) {
-            var col = ("G").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var valueOfF = elInstance.getValueFromCoords(5, y);
-                var addLeadTimes = 0;
-                if (valueOfF != "") {
-                    var db1;
-                    var storeOS;
-                    getDatabase();
-                    var openRequest = indexedDB.open('fasp', 1);
-                    openRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                    }.bind(this);
-                    openRequest.onsuccess = function (e) {
-                        db1 = e.target.result;
-                        var transaction = db1.transaction(['programData'], 'readwrite');
-                        var programTransaction = transaction.objectStore('programData');
-
-                        var programId = (document.getElementById("programId").value);
-
-                        var programRequest = programTransaction.get(programId);
-                        programRequest.onerror = function (event) {
-                            this.setState({
-                                supplyPlanError: i18n.t('static.program.errortext')
-                            })
-                        }.bind(this);
-                        programRequest.onsuccess = function (event) {
-                            var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson = JSON.parse(programData);
-
-                            var papuTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                            var papuOs = papuTransaction.objectStore('procurementAgent');
-                            var papuRequest = papuOs.get(parseInt(valueOfF));
-                            papuRequest.onerror = function (event) {
-                                this.setState({
-                                    supplyPlanError: i18n.t('static.program.errortext')
-                                })
-                            }.bind(this);
-                            papuRequest.onsuccess = function (event) {
-                                var papuResult = [];
-                                papuResult = papuRequest.result;
-
-                                if (papuResult.localProcurementAgent) {
-                                    addLeadTimes = this.state.programPlanningUnitList.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value)[0].localProcurementLeadTime;
-                                } else {
-
-                                    var addLeadTimes = parseFloat(programJson.plannedToDraftLeadTime) + parseFloat(programJson.draftToSubmittedLeadTime) + parseFloat(programJson.arrivedToDeliveredLeadTime) +
-                                        parseFloat(programJson.submittedToApprovedLeadTime) + parseFloat(programJson.approvedToShippedLeadTime);
-
-                                    if (value == "Sea") {
-                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToArrivedBySeaLeadTime);
-                                    } else {
-                                        addLeadTimes = addLeadTimes + parseFloat(programJson.shippedToDeliveredByAirLeadTime);
-                                    }
-                                }
-                                addLeadTimes = parseInt(addLeadTimes) + 1;
-                                var expectedDeliveryDate = moment(Date.now()).utcOffset('-0500').add(addLeadTimes, 'months').format("YYYY-MM-DD");
-                                elInstance.setValueFromCoords(9, y, expectedDeliveryDate, true);
-                            }.bind(this)
-                        }.bind(this)
-                    }.bind(this)
-                }
-            }
-        }
-
-        if (x == 9) {
-            var col = ("J").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // if (isNaN(Date.parse(value))) {
-                //     elInstance.setStyle(col, "background-color", "transparent");
-                //     elInstance.setStyle(col, "background-color", "yellow");
-                //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                // } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var valueOfF = elInstance.getValueFromCoords(5, y);
-                if (valueOfF != "") {
-                    var col1 = ("F").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-                // }
-            }
-        }
-
-        this.setState({
-            suggestedShipmentChangedFlag: 1
-        });
-    }
-
-    // Suggested shipments final validations
-    checkValidationSuggestedShipments() {
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var valid = true;
-        var elInstance = this.state.suggestedShipmentsEl;
-        var json = elInstance.getJson();
-        var mapArray = []
-        for (var y = 0; y < json.length; y++) {
-            var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
-            var shipmentDataList = this.state.shipmentListUnFiltered;
-            var checkDuplicate = shipmentDataList.filter(c =>
-                moment(c.expectedDeliveryDate).format("YYYY-MM") == moment(Date.parse(map.get("9"))).format("YYYY-MM")
-                && c.planningUnit.id == planningUnitId
-                && c.procurementAgent.id == map.get("5")
-                && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS
-            )
-            var checkDuplicateInMap = mapArray.filter(c =>
-                moment(Date.parse(c.get("9"))).format("YYYY-MM") == moment(Date.parse(map.get("9"))).format("YYYY-MM")
-                && c.get("5") == map.get("5")
-            )
-            if (checkDuplicate.length >= 1 || checkDuplicateInMap.length > 1) {
-                var colArr = ['F', 'J'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateShipment'));
-                }
-                valid = false;
-                this.setState({
-                    suggestedShipmentDuplicateError: i18n.t('static.supplyPlan.duplicateShipment'),
-                })
-            } else {
-                var colArr = ['F', 'J'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(4, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("F").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(5, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("G").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(6, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("J").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(9, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                } else {
-                    // if (isNaN(Date.parse(value))) {
-                    //     elInstance.setStyle(col, "background-color", "transparent");
-                    //     elInstance.setStyle(col, "background-color", "yellow");
-                    //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                    //     valid = false;
-                    // } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                    // }
-                }
-            }
-        }
-        return valid;
-
-    }
-
-    // Save suggested shipments
-    saveSuggestedShipments() {
-        var validation = this.checkValidationSuggestedShipments();
-        if (validation == true) {
-            var inputs = document.getElementsByClassName("submitBtn");
-            for (var i = 0; i < inputs.length; i++) {
-                inputs[i].disabled = true;
-            }
-            var elInstance = this.state.suggestedShipmentsEl;
-            var json = elInstance.getJson();
-            var planningUnitId = document.getElementById("planningUnitId").value;
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var shipmentDataList = (programJson.shipmentList);
-                    for (var jl = 0; jl < json.length; jl++) {
-                        var map = new Map(Object.entries(json[jl]));
-                        var shipmentJson = {
-                            accountFlag: true,
-                            active: true,
-                            dataSource: {
-                                id: map.get("4")
-                            },
-                            erpFlag: false,
-                            expectedDeliveryDate: moment(Date.parse(map.get("9"))).format("YYYY-MM-DD"),
-                            freightCost: 0,
-                            notes: map.get("7"),
-                            orderedDate: map.get("8"),
-                            planningUnit: {
-                                id: planningUnitId
-                            },
-                            procurementAgent: {
-                                id: map.get("5")
-                            },
-                            procurementUnit: {
-                                id: 0
-                            },
-                            productCost: 0,
-                            shipmentQty: map.get("2"),
-                            rate: 0,
-                            deliveredDate: "",
-                            shipmentId: 0,
-                            shipmentMode: map.get("6"),
-                            shipmentStatus: {
-                                id: PLANNED_SHIPMENT_STATUS
-                            },
-                            shippedDate: "",
-                            suggestedQty: map.get("2"),
-                            supplier: {
-                                id: 0
-                            },
-                            shipmentBudgetList: [],
-                            emergencyOrder: map.get("10")
-                        }
-
-                        shipmentDataList.push(shipmentJson);
-                    }
-                    programJson.shipmentList = shipmentDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge('SuggestedShipments');
-                        this.setState({
-                            message: i18n.t('static.message.suggestedShipmentsSaved'),
-                            suggestedShipmentChangedFlag: 0
-                        })
-                        this.formSubmit(this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                suggestedShipmentError: i18n.t('static.supplyPlan.validationFailed')
-            })
-        }
-    }
-
-    // Suggested shipments
-
-    budgetDropdownFilter = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[1];
-        if (value != "") {
-            var budgetList = this.state.budgetList;
-            var mylist = budgetList.filter(b => b.fundingSource.fundingSourceId == value);
-        }
-        return mylist;
-    }
-
-    //Shipment budget
-    //Budget changed
-    budgetChanged = function (instance, cell, x, y, value) {
-        this.setState({
-            budgetChangedFlag: 1,
-        })
-        var elInstance = instance.jexcel;
-        if (x == 1) {
-            var col = ("B").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-            elInstance.setValueFromCoords(parseInt(x) + 1, y, '', true);
-        }
-        if (x == 2) {
-            var col = ("C").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-        if (x == 3) {
-            var col = ("D").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    this.setState({
-                        budgetError: '',
-                        noFundsBudgetError: ''
-                    })
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var currency = (this.state.currencyListAll).filter(c => c.currencyId == value)[0];
-                elInstance.setValueFromCoords(5, y, currency.conversionRateToUsd, true)
-            }
-        }
-    }
-
-    //Final validations for Budget
-    checkBudgetValidation() {
-        var valid = true;
-        var elInstance = this.state.shipmentBudgetTableEl;
-        var json = elInstance.getJson();
-        for (var y = 0; y < json.length; y++) {
-            var map = new Map(Object.entries(json[y]));
-            var budget = this.state.budgetListAll.filter(c => c.budgetId == map.get("2"))[0]
-            var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
-            var shipmentList = this.state.shipmentListUnFiltered.filter(c => c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
-            var usedBudgetTotalAmount = 0;
-            for (var s = 0; s < shipmentList.length; s++) {
-                var shipmentBudgetList = (shipmentList[s].shipmentBudgetList).filter(c => c.budget.id == map.get("2"));
-                for (var sb = 0; sb < shipmentBudgetList.length; sb++) {
-                    usedBudgetTotalAmount += shipmentBudgetList[sb].budgetAmt * shipmentBudgetList[sb].conversionRateToUsd;
-                }
-
-            }
-            var enteredBudgetAmt = (map.get('3') * map.get("5")).toFixed(2);
-            usedBudgetTotalAmount = usedBudgetTotalAmount.toFixed(2);
-            var availableBudgetAmount = totalBudget - usedBudgetTotalAmount;
-            if (enteredBudgetAmt > availableBudgetAmount) {
-                valid = false;
-                var col = ("D").concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.noFundsAvailable'));
-                this.setState({
-                    noFundsBudgetError: i18n.t('static.label.noFundsAvailable')
-                })
-            } else {
-                var col = ("B").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(1, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(2, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-                var col = ("D").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(3, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                        valid = false;
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
-                }
-
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(4, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-            }
-        }
-        return valid;
-    }
-
-    //Budget Save
-    saveBudget() {
-        var validation = this.checkBudgetValidation()
-        if (validation == true) {
-            var elInstance = this.state.shipmentBudgetTableEl;
-            var json = elInstance.getJson();
-            var budgetArray = [];
-            var rowNumber = 0;
-            var totalBudget = 0;
-            for (var i = 0; i < json.length; i++) {
-                var map = new Map(Object.entries(json[i]));
-                var budgetJson = {
-                    shipmentBudgetId: map.get("0"),
-                    budget: {
-                        budgetId: map.get("2"),
-                        fundingSource: {
-                            fundingSourceId: map.get("1")
-                        }
-                    },
-                    active: true,
-                    budgetAmt: map.get('3'),
-                    conversionRateToUsd: map.get("5"),
-                    currency: {
-                        currencyId: map.get("4")
-                    }
-                }
-                budgetArray.push(budgetJson);
-                totalBudget += map.get('3') * map.get("5");
-                if (i == 0) {
-                    rowNumber = map.get("6");
-                }
-            }
-            var shipmentInstance = this.state.shipmentsEl;
-            var rowData = shipmentInstance.getRowData(rowNumber);
-            rowData[31] = totalBudget;
-            rowData[32] = budgetArray;
-            shipmentInstance.setRowData(rowNumber, rowData);
-            // shipmentInstance.setValueFromCoords(31, rowNumber, totalBudget, true)
-            // shipmentInstance.setValueFromCoords(32, rowNumber, budgetArray, true)
-            this.setState({
-                shipmentChangedFlag: 1,
-                budgetChangedFlag: 0,
-                shipmentBudgetTableEl: ''
-            })
-            document.getElementById("showButtonsDiv").style.display = 'none';
-            elInstance.destroy();
-        } else {
-            this.setState({
-                budgetError: i18n.t('static.supplyPlan.validationFailed')
-            })
-        }
-    }
-
-    shipmentStatusDropdownFilter = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[35];
-        if (value != "") {
-            var shipmentStatusList = this.state.shipmentStatusList;
-            var shipmentStatus = (this.state.shipmentStatusList).filter(c => c.shipmentStatusId == value)[0];
-            var possibleStatusArray = shipmentStatus.nextShipmentStatusAllowedList;
-            for (var k = 0; k < shipmentStatusList.length; k++) {
-                if (possibleStatusArray.includes(shipmentStatusList[k].shipmentStatusId)) {
-                    var shipmentStatusJson = {
-                        name: shipmentStatusList[k].label.label_en,
-                        id: shipmentStatusList[k].shipmentStatusId
-                    }
-                    mylist.push(shipmentStatusJson);
-                }
-
-            }
-        }
-        return mylist;
-    }
-
-    // Procurement Unit list based on procurement agent
-
-    procurementUnitDropdownFilter = function (instance, cell, c, r, source) {
-        var mylist = [];
-        var value = (instance.jexcel.getJson()[r])[5];
-        if (value != "") {
-            var procurementUnitList = (this.state.procurementUnitListAll).filter(c => c.procurementAgent.id == value);
-            for (var k = 0; k < procurementUnitList.length; k++) {
-                var procurementUnitJson = {
-                    name: procurementUnitList[k].procurementUnit.label.label_en,
-                    id: procurementUnitList[k].procurementUnit.id
-                }
-                mylist.push(procurementUnitJson);
-            }
-        }
-        return mylist;
-    }
-
-    // To be accounted funtionality for shipments
-    handleEvent(e, toBeAccounted, startDate, endDate, type) {
-        e.preventDefault();
-        if (toBeAccounted == true) {
-            contextMenu.show({
-                id: 'menu_id',
-                event: e,
-                props: {
-                    type: type,
-                    startDate: startDate,
-                    endDate: endDate
-                }
-            });
-        } else {
-            contextMenu.show({
-                id: 'no_skip',
-                event: e,
-                props: {
-                    type: type,
-                    startDate: startDate,
-                    endDate: endDate
-                }
-            });
-        }
-    }
-
-    // On click of context menu
-    onClick = ({ event, props }) => {
-        var db1;
-        var storeOS;
-        getDatabase();
-        var openRequest = indexedDB.open('fasp', 1);
-        openRequest.onerror = function (event) {
-            this.setState({
-                supplyPlanError: i18n.t('static.program.errortext')
-            })
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
-
-            var programId = (document.getElementById("programId").value);
-
-            var programRequest = programTransaction.get(programId);
-            programRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            programRequest.onsuccess = function (event) {
-                var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var shipmentDataList = (programJson.shipmentList);
-                for (var i = 0; i < shipmentDataList.length; i++) {
-                    if (props.type == 'psm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == false && shipmentDataList[i].procurementAgent.id == PSM_PROCUREMENT_AGENT_ID) {
-                        shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
-                    } else if (props.type == 'nonPsm' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].procurementAgent.id != PSM_PROCUREMENT_AGENT_ID) {
-                        shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
-                    } else if (props.type == 'artmis' && shipmentDataList[i].expectedDeliveryDate >= props.startDate && shipmentDataList[i].expectedDeliveryDate <= props.endDate && shipmentDataList[i].erpFlag == true) {
-                        shipmentDataList[i].accountFlag = !shipmentDataList[i].accountFlag;
-                    }
-                }
-
-                programJson.shipmentList = shipmentDataList;
-                programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                var putRequest = programTransaction.put(programRequest.result);
-
-                putRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                putRequest.onsuccess = function (event) {
-                    this.setState({
-                        message: i18n.t('static.message.accountFlagChanged')
-                    })
-                    this.formSubmit(this.state.monthCount);
-                }.bind(this)
-            }.bind(this)
-        }.bind(this)
-    }
-
     // Shipments Functionality
 
 
     render() {
-        const MyMenu = (props) => (
-            <Menu id='menu_id'>
-                <Item disabled>{i18n.t('static.supplyPlan.yesAccount')}</Item>
-                <Item onClick={this.onClick}>{i18n.t('static.supplyPlan.noSkip')}</Item>
-            </Menu>
-        );
-
-        const NoSkip = () => (
-            <Menu id='no_skip'>
-                <Item onClick={this.onClick}>{i18n.t('static.supplyPlan.yesAccount')}</Item>
-                <Item disabled>{i18n.t('static.supplyPlan.noSkip')}</Item>
-            </Menu>
-        );
-
         const lan = 'en';
         const { programList } = this.state;
         let programs = programList.length > 0
@@ -3459,438 +1969,414 @@ export default class SupplyPlanComponent extends React.Component {
             }, this);
         return (
             <div className="animated fadeIn">
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
-                <h5 className="red">{this.state.supplyPlanError}</h5>
 
-                <Card>
-                    <CardHeader>
-                        <strong>{i18n.t('static.dashboard.supplyPlan')}</strong>
-                        <div className="card-header-actions">
-                            <a className="card-header-action">
-                                <Link to='/supplyPlanFormulas' target="_blank"><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></Link>
-                            </a>
+
+                <div id="supplyPlanTableId" style={{ display: 'none' }}>
+                    <Row>
+                        <div className="col-md-12">
+                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
                         </div>
-                    </CardHeader>
-                    <CardBody>
-                        <div id="supplyPlanTableId" style={{ display: 'none' }}>
-                            <Row>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                            </Row>
-                            <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                <thead>
-                                    <tr>
-                                        <th ></th>
-                                        {
-                                            this.state.monthsArray.map(item => (
-                                                <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
-                                            ))
+                    </Row>
+                    <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                        <thead>
+                            <tr>
+                                <th ></th>
+                                {
+                                    this.state.monthsArray.map(item => (
+                                        <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
+                                    ))
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td align="left">{i18n.t('static.supplyPlan.openingBalance')}</td>
+                                {
+                                    this.state.openingBalanceArray.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                            <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
+                                <td align="left">{i18n.t('static.dashboard.consumption')}</td>
+                                {
+                                    this.state.consumptionTotalData.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                            <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
+                                <td align="left">{i18n.t('static.supplyPlan.suggestedShipments')}</td>
+                                {
+                                    this.state.suggestedShipmentsTotalData.map(item1 => {
+                                        if (item1.suggestedOrderQty.toString() != "") {
+                                            if (item1.isEmergencyOrder == 1) {
+                                                return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                            } else {
+                                                return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
+                                            }
+                                        } else {
+                                            var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
+                                            if (compare) {
+                                                return (<td align="right"></td>)
+                                            } else {
+                                                return (<td></td>)
+                                            }
                                         }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <MyMenu props />
-                                    <NoSkip props />
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.openingBalance')}</td>
-                                        {
-                                            this.state.openingBalanceArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '')}>
-                                        <td align="left">{i18n.t('static.dashboard.consumption')}</td>
-                                        {
-                                            this.state.consumptionTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(255, 229, 202)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.suggestedShipments')}</td>
-                                        {
-                                            this.state.suggestedShipmentsTotalData.map(item1 => {
-                                                if (item1.suggestedOrderQty.toString() != "") {
-                                                    if (item1.isEmergencyOrder == 1) {
-                                                        return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
-                                                    } else {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, `${item1.suggestedOrderQty}`, '', '', `${item1.isEmergencyOrder}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.suggestedOrderQty} /></td>)
-                                                    }
+                                    })
+                                }
+                            </tr>
+                            <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
+                                <td align="left">{i18n.t('static.supplyPlan.psmShipments')}</td>
+                                {
+                                    this.state.psmShipmentsTotalData.map(item1 => {
+                                        if (item1.toString() != "") {
+                                            if (item1.accountFlag == true) {
+                                                if (item1.isEmergencyOrder == 1) {
+                                                    return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
-                                                    var compare = item1.month >= moment(Date.now()).utcOffset('-0500').startOf('month').format("YYYY-MM-DD");
-                                                    if (compare) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('SuggestedShipments', `${item1.month}`, ``, '', '', `${item1.isEmergencyOrder}`)}>{item1.suggestedOrderQty}</td>)
-                                                    } else {
-                                                        return (<td>{item1.suggestedOrderQty}</td>)
-                                                    }
+                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 }
-                                            })
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(224, 239, 212)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.psmShipments')}</td>
-                                        {
-                                            this.state.psmShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    if (item1.accountFlag == true) {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    } else {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'psm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    }
+                                            } else {
+                                                if (item1.isEmergencyOrder == 1) {
+                                                    return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 } else {
-                                                    return (<td align="right" >{item1}</td>)
+                                                    return (<td align="right" className="hoverTd" style={{ color: '#696969' }} onClick={() => this.toggleLarge('psmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
                                                 }
-                                            })
+                                            }
+                                        } else {
+                                            return (<td align="right" >{item1}</td>)
                                         }
-                                    </tr>
+                                    })
+                                }
+                            </tr>
 
-                                    <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.artmisShipments')}</td>
-                                        {
-                                            this.state.artmisShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    if (item1.accountFlag == true) {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                            <tr style={{ "backgroundColor": "rgb(255, 251, 204)" }}>
+                                <td align="left">{i18n.t('static.supplyPlan.artmisShipments')}</td>
+                                {
+                                    this.state.artmisShipmentsTotalData.map(item1 => {
+                                        if (item1.toString() != "") {
+                                            if (item1.accountFlag == true) {
+                                                if (item1.isEmergencyOrder == 1) {
+                                                    return (<td align="right" style={{ color: 'red' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                } else {
+                                                    return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                }
+                                            } else {
+                                                if (item1.isEmergencyOrder == 1) {
+                                                    return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                } else {
+                                                    return (<td align="right" style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                }
+                                            }
+                                        } else {
+                                            return (<td align="right" > {item1}</td>)
+                                        }
+                                    })
+                                }
+                            </tr>
+
+                            <tr style={{ "backgroundColor": "rgb(207, 226, 243)" }}>
+                                <td align="left">{i18n.t('static.supplyPlan.nonPsmShipments')}</td>
+                                {
+                                    this.state.nonPsmShipmentsTotalData.map(item1 => {
+                                        if (item1.toString() != "") {
+                                            if (item1.accountFlag == true) {
+                                                if (item1.isEmergencyOrder == 1) {
+                                                    return (<td align="right" style={{ color: 'red' }} onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                } else {
+                                                    return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                }
+                                            } else {
+                                                if (item1.isEmergencyOrder == 1) {
+                                                    return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#FA8072' }} className="hoverTd"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                } else {
+                                                    return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                }
+
+                                            }
+                                        } else {
+                                            return (<td align="right" >{item1}</td>)
+                                        }
+                                    })
+                                }
+                            </tr>
+
+                            <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
+                                <td align="left">{i18n.t('static.supplyPlan.adjustments')}</td>
+                                {
+                                    this.state.inventoryTotalData.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                            <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
+                                <td align="left">{i18n.t('static.supplyPlan.endingBalance')}</td>
+                                {
+                                    this.state.closingBalanceArray.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                            <tr>
+                                <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
+                                {
+                                    this.state.amcTotalData.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                            <tr>
+                                <td align="left">{i18n.t('static.supplyPlan.monthsOfStock')}</td>
+                                {
+                                    this.state.monthsOfStockArray.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                            <tr>
+                                <td align="left">{i18n.t('static.supplyPlan.minStock')}</td>
+                                {
+                                    this.state.minStockArray.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                            <tr>
+                                <td align="left">{i18n.t('static.supplyPlan.maxStock')}</td>
+                                {
+                                    this.state.maxStockArray.map(item1 => (
+                                        <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
+                                    ))
+                                }
+                            </tr>
+                        </tbody>
+                    </Table>
+                </div>
+
+                {/* Consumption modal */}
+                <Modal isOpen={this.state.consumption}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
+                        <ul className="legend legend-supplypln">
+                            <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
+                            <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
+                        </ul>
+                    </ModalHeader>
+                    <ModalBody>
+                        <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
+                        <div className="col-md-12">
+                            <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                            <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
+                        </div>
+                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {
+                                        this.state.monthsArray.map(item => (
+                                            <th>{item.month}</th>
+                                        ))
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    this.state.regionListFiltered.map(item => (
+                                        <tr>
+                                            <td align="left">{item.name}</td>
+                                            {
+                                                this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                    if (item1.consumptionQty.toString() != '') {
+                                                        if (item1.actualFlag.toString() == 'true') {
+                                                            return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                         } else {
-                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
+                                                            return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                         }
                                                     } else {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: '#FA8072' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" style={{ color: '#696969' }} className="hoverTd" onClick={() => this.toggleLarge('artmisShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'artmis')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
+                                                        return (<td align="right"></td>)
                                                     }
-                                                } else {
-                                                    return (<td align="right" > {item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-
-                                    <tr style={{ "backgroundColor": "rgb(207, 226, 243)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.nonPsmShipments')}</td>
-                                        {
-                                            this.state.nonPsmShipmentsTotalData.map(item1 => {
-                                                if (item1.toString() != "") {
-                                                    if (item1.accountFlag == true) {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" style={{ color: 'red' }} onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-                                                    } else {
-                                                        if (item1.isEmergencyOrder == 1) {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#FA8072' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        } else {
-                                                            return (<td align="right" onClick={() => this.toggleLarge('nonPsmShipments', '', '', `${item1.month.startDate}`, `${item1.month.endDate}`)} style={{ color: '#696969' }} className="hoverTd" onContextMenu={(e) => this.handleEvent(e, `${item1.accountFlag}`, `${item1.month.startDate}`, `${item1.month.endDate}`, 'nonPsm')}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.qty} /></td>)
-                                                        }
-
-                                                    }
-                                                } else {
-                                                    return (<td align="right" >{item1}</td>)
-                                                }
-                                            })
-                                        }
-                                    </tr>
-
-                                    <tr className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '')}>
-                                        <td align="left">{i18n.t('static.supplyPlan.adjustments')}</td>
-                                        {
-                                            this.state.inventoryTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr style={{ "backgroundColor": "rgb(188, 228, 229)" }}>
-                                        <td align="left">{i18n.t('static.supplyPlan.endingBalance')}</td>
-                                        {
-                                            this.state.closingBalanceArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.amc')}</td>
-                                        {
-                                            this.state.amcTotalData.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.monthsOfStock')}</td>
-                                        {
-                                            this.state.monthsOfStockArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.minStock')}</td>
-                                        {
-                                            this.state.minStockArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                    <tr>
-                                        <td align="left">{i18n.t('static.supplyPlan.maxStock')}</td>
-                                        {
-                                            this.state.maxStockArray.map(item1 => (
-                                                <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
-                                            ))
-                                        }
-                                    </tr>
-                                </tbody>
-                            </Table>
+                                                })
+                                            }
+                                        </tr>
+                                    )
+                                    )
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
+                                    {
+                                        this.state.consumptionTotalMonthWise.map(item => (
+                                            <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                        ))
+                                    }
+                                </tr>
+                            </tfoot>
+                        </Table>
+                        <div className="table-responsive">
+                            <div id="consumptionDetailsTable" />
                         </div>
 
-                        {/* Consumption modal */}
-                        <Modal isOpen={this.state.consumption}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('Consumption')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.dashboard.consumptiondetails')}</strong>
-                                <ul className="legend legend-supplypln">
-                                    <li><span className="purplelegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.forecastedConsumption')}</span></li>
-                                    <li><span className="blacklegend"></span> <span className="legendText">{i18n.t('static.supplyPlan.actualConsumption')}</span></li>
-                                </ul>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClickedConsumption}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClickedConsumption}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                    <thead>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
+                {/* Consumption modal */}
+                {/* Adjustments modal */}
+                <Modal isOpen={this.state.adjustments}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
+                    <ModalBody>
+                        <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
+                        <div className="col-md-12">
+                            <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
+                            <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
+                        </div>
+                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    {
+                                        this.state.monthsArray.map(item => (
+                                            <th>{item.month}</th>
+                                        ))
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    this.state.regionListFiltered.map(item => (
                                         <tr>
-                                            <th></th>
+                                            <td style={{ textAlign: 'left' }}>{item.name}</td>
                                             {
-                                                this.state.monthsArray.map(item => (
-                                                    <th>{item.month}</th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.regionListFiltered.map(item => (
-                                                <tr>
-                                                    <td align="left">{item.name}</td>
-                                                    {
-                                                        this.state.consumptionFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                            if (item1.consumptionQty.toString() != '') {
-                                                                if (item1.actualFlag.toString() == 'true') {
-                                                                    return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
-                                                                } else {
-                                                                    return (<td align="right" style={{ color: 'rgb(170, 85, 161)' }} className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, `${item1.actualFlag}`, `${item1.month.month}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
-                                                                }
-                                                            } else {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.consumptionDetailsClicked(`${item1.month.startDate}`, `${item1.month.endDate}`, `${item1.region.id}`, ``, `${item1.month.month}`)}></td>)
-                                                            }
-                                                        })
+                                                this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
+                                                    if (item1.adjustmentQty.toString() != '') {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
+                                                    } else {
+                                                        return (<td align="right"></td>)
                                                     }
-                                                </tr>
-                                            )
-                                            )
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
-                                            {
-                                                this.state.consumptionTotalMonthWise.map(item => (
-                                                    <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
-                                                ))
+                                                })
                                             }
                                         </tr>
-                                    </tfoot>
-                                </Table>
-                                <div className="table-responsive">
-                                    <div id="consumptionDetailsTable" />
-                                </div>
+                                    )
+                                    )
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
+                                    {
+                                        this.state.inventoryTotalMonthWise.map(item => (
+                                            <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
+                                        ))
+                                    }
+                                </tr>
+                            </tfoot>
+                        </Table>
+                        <div className="table-responsive">
+                            <div id="adjustmentsTable" className="table-responsive" />
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
+                {/* adjustments modal */}
 
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.consumptionChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveConsumption}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Consumption')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Consumption modal */}
-                        {/* Adjustments modal */}
-                        <Modal isOpen={this.state.adjustments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('Adjustments')} className="modalHeaderSupplyPlan">{i18n.t('static.supplyPlan.adjustmentsDetails')}</ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
-                                <div className="col-md-12">
-                                    <span className="supplyplan-larrow" onClick={this.leftClickedAdjustments}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i class="cui-arrow-right icons" ></i> </span>
-                                </div>
-                                <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            {
-                                                this.state.monthsArray.map(item => (
-                                                    <th>{item.month}</th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            this.state.regionListFiltered.map(item => (
-                                                <tr>
-                                                    <td style={{ textAlign: 'left' }}>{item.name}</td>
-                                                    {
-                                                        this.state.inventoryFilteredArray.filter(c => c.region.id == item.id).map(item1 => {
-                                                            if (item1.adjustmentQty.toString() != '') {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
-                                                            } else {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}></td>)
-                                                            }
-                                                        })
-                                                    }
-                                                </tr>
-                                            )
-                                            )
-                                        }
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</th>
-                                            {
-                                                this.state.inventoryTotalMonthWise.map(item => (
-                                                    <th style={{ textAlign: 'right' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item} /></th>
-                                                ))
-                                            }
-                                        </tr>
-                                    </tfoot>
-                                </Table>
-                                <div className="table-responsive">
-                                    <div id="adjustmentsTable" className="table-responsive" />
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.inventoryChangedFlag == 1 && <Button size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveInventory}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('Adjustments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* adjustments modal */}
+                {/* Suggested shipments modal */}
+                <Modal isOpen={this.state.suggestedShipments}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.supplyPlan.suggestedShipmentDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <h6 className="red">{this.state.suggestedShipmentDuplicateError || this.state.suggestedShipmentError}</h6>
+                        <div className="table-responsive">
+                            <div id="suggestedShipmentsDetailsTable" />
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
+                {/* Suggested shipments modal */}
+                {/* PSM Shipments modal */}
+                <Modal isOpen={this.state.psmShipments}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader toggle={() => this.toggleLarge('psmShipments')} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.supplyPlan.psmShipmentsDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentsDetailsTable" />
+                        </div>
+                        <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentBudgetTable"></div>
+                        </div>
 
-                        {/* Suggested shipments modal */}
-                        <Modal isOpen={this.state.suggestedShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('SuggestedShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.suggestedShipmentDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.suggestedShipmentDuplicateError || this.state.suggestedShipmentError}</h6>
-                                <div className="table-responsive">
-                                    <div id="suggestedShipmentsDetailsTable" />
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                {this.state.suggestedShipmentChangedFlag == 1 && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={this.saveSuggestedShipments}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>}{' '}
-                                <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled('SuggestedShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Suggested shipments modal */}
-                        {/* PSM Shipments modal */}
-                        <Modal isOpen={this.state.psmShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('psmShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.psmShipmentsDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" />
-                                </div>
-                                <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentBudgetTable"></div>
-                                </div>
+                        <div id="showButtonsDiv" style={{ display: 'none' }}>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('psmShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
+                {/* PSM Shipments modal */}
+                {/* artmis shipments modal */}
+                <Modal isOpen={this.state.artmisShipments}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader toggle={() => this.toggleLarge('artmisShipments')} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.supplyPlan.artmisShipmentsDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentError || this.state.shipmentBudgetError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentsDetailsTable" />
+                        </div>
+                        <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentBudgetTable"></div>
+                        </div>
 
-                                <div id="showButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBudget')}</Button>}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1" onClick={() => this.saveShipments('psmShipments')}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('psmShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* PSM Shipments modal */}
-                        {/* artmis shipments modal */}
-                        <Modal isOpen={this.state.artmisShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('artmisShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.artmisShipmentsDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentError || this.state.shipmentBudgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" />
-                                </div>
-                                <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentBudgetTable"></div>
-                                </div>
+                        <div id="showButtonsDiv" style={{ display: 'none' }}>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('artmisShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
+                {/* artmis shipments modal */}
 
-                                <div id="showButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBudget')}</Button>}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('artmisShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* artmis shipments modal */}
+                {/* Non PSM Shipments modal */}
+                <Modal isOpen={this.state.nonPsmShipments}
+                    className={'modal-lg ' + this.props.className, "modalWidth"}>
+                    <ModalHeader toggle={() => this.toggleLarge('nonPsmShipments')} className="modalHeaderSupplyPlan">
+                        <strong>{i18n.t('static.supplyPlan.nonPsmShipmentsDetails')}</strong>
+                    </ModalHeader>
+                    <ModalBody>
+                        <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentsDetailsTable" />
+                        </div>
+                        <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
+                        <div className="table-responsive">
+                            <div id="shipmentBudgetTable"></div>
+                        </div>
 
-                        {/* Non PSM Shipments modal */}
-                        <Modal isOpen={this.state.nonPsmShipments}
-                            className={'modal-lg ' + this.props.className, "modalWidth"}>
-                            <ModalHeader toggle={() => this.toggleLarge('nonPsmShipments')} className="modalHeaderSupplyPlan">
-                                <strong>{i18n.t('static.supplyPlan.nonPsmShipmentsDetails')}</strong>
-                            </ModalHeader>
-                            <ModalBody>
-                                <h6 className="red">{this.state.shipmentDuplicateError || this.state.shipmentBudgetError || this.state.shipmentError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentsDetailsTable" />
-                                </div>
-                                <h6 className="red">{this.state.noFundsBudgetError || this.state.budgetError}</h6>
-                                <div className="table-responsive">
-                                    <div id="shipmentBudgetTable"></div>
-                                </div>
-
-                                <div id="showButtonsDiv" style={{ display: 'none' }}>
-                                    {this.state.budgetChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveBudget()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBudget')}</Button>}
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveShipments('nonPsmShipments')}> <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>{' '}
-                                <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('nonPsmShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            </ModalFooter>
-                        </Modal>
-                        {/* Non PSM Shipments modal */}
-                    </CardBody>
-                </Card>
-
+                        <div id="showButtonsDiv" style={{ display: 'none' }}>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceled('nonPsmShipments')}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                    </ModalFooter>
+                </Modal>
+                {/* Non PSM Shipments modal */}
             </div>
         )
     }
@@ -3923,8 +2409,8 @@ export default class SupplyPlanComponent extends React.Component {
         }.bind(this);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var programTransaction = transaction.objectStore('programData');
+            var transaction = db1.transaction(['downloadedProgramData'], 'readwrite');
+            var programTransaction = transaction.objectStore('downloadedProgramData');
             var programRequest = programTransaction.get(programId);
             programRequest.onerror = function (event) {
                 this.setState({
@@ -4293,8 +2779,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 allowInsertRow: false,
                                                 allowManualInsertRow: false,
                                                 copyCompatibility: true,
-                                                editable: tableEditableBasedOnSupplyPlan,
-                                                onchange: this.shipmentChanged,
+                                                editable: false,
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el.jexcel;
                                                     var rowData = elInstance.getRowData(y);
@@ -4390,7 +2875,6 @@ export default class SupplyPlanComponent extends React.Component {
                                                                         title: i18n.t('static.dashboard.budget'),
                                                                         type: 'dropdown',
                                                                         source: budgetList,
-                                                                        filter: this.budgetDropdownFilter
                                                                     },
                                                                     {
                                                                         title: i18n.t('static.budget.budgetamount'),
@@ -4421,8 +2905,9 @@ export default class SupplyPlanComponent extends React.Component {
                                                                 allowDeleteRow: false,
                                                                 oneditionend: this.onedit,
                                                                 copyCompatibility: true,
-                                                                editable: tableEditableBasedOnSupplyPlan,
-                                                                onchange: this.budgetChanged,
+                                                                allowInsertRow: false,
+                                                                allowManualInsertRow: false,
+                                                                editable: false,
                                                                 contextMenu: function (obj, x, y, e) {
                                                                     var items = [];
                                                                     if (y == null) {
@@ -4701,708 +3186,4 @@ export default class SupplyPlanComponent extends React.Component {
             }.bind(this)
         }.bind(this)
     }
-
-    shipmentChanged = function (instance, cell, x, y, value) {
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var elInstance = this.state.shipmentsEl;
-        this.setState({
-            shipmentError: '',
-            shipmentDuplicateError: '',
-        })
-        if (x == 0) {
-            var col = ("A").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                // if (isNaN(Date.parse(value))) {
-                //     elInstance.setStyle(col, "background-color", "transparent");
-                //     elInstance.setStyle(col, "background-color", "yellow");
-                //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                // } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var valueOfF = elInstance.getValueFromCoords(5, y);
-                if (valueOfF != "") {
-                    var col1 = ("F").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-
-                // }
-            }
-        }
-
-        if (x == 1) {
-            var col = ("B").concat(parseInt(y) + 1);
-            var col1 = ("C").concat(parseInt(y) + 1);
-            var col2 = ("D").concat(parseInt(y) + 1);
-            var col4 = ("S").concat(parseInt(y) + 1);
-            var col5 = ("T").concat(parseInt(y) + 1);
-            var supplyPlanType = elInstance.getValueFromCoords(36, y);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                if (value == 3 && supplyPlanType == 'psmShipments') {
-                    var orderNo = elInstance.getValueFromCoords(2, y);
-                    var lineNo = elInstance.getValueFromCoords(3, y);
-                    if (orderNo == "") {
-                        elInstance.setStyle(col1, "background-color", "transparent");
-                        elInstance.setStyle(col1, "background-color", "yellow");
-                        elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
-                    } else {
-                        elInstance.setStyle(col1, "background-color", "transparent");
-                        elInstance.setComments(col1, "");
-                    }
-
-                    if (lineNo == "") {
-                        elInstance.setStyle(col2, "background-color", "transparent");
-                        elInstance.setStyle(col2, "background-color", "yellow");
-                        elInstance.setComments(col2, i18n.t('static.label.fieldRequired'));
-                    } else {
-                        elInstance.setStyle(col2, "background-color", "transparent");
-                        elInstance.setComments(col2, "");
-                    }
-                } else if (value == 4 && supplyPlanType == 'nonPsmShipments') {
-                    var procurementUnit = elInstance.getValueFromCoords(18, y);
-                    var supplier = elInstance.getValueFromCoords(19, y);
-                    if (procurementUnit == "") {
-                        elInstance.setStyle(col4, "background-color", "transparent");
-                        elInstance.setStyle(col4, "background-color", "yellow");
-                        elInstance.setComments(col4, i18n.t('static.label.fieldRequired'));
-                    } else {
-                        elInstance.setStyle(col4, "background-color", "transparent");
-                        elInstance.setComments(col4, "");
-                    }
-
-                    if (supplier == "") {
-                        elInstance.setStyle(col5, "background-color", "transparent");
-                        elInstance.setStyle(col5, "background-color", "yellow");
-                        elInstance.setComments(col5, i18n.t('static.label.fieldRequired'));
-                    } else {
-                        elInstance.setStyle(col5, "background-color", "transparent");
-                        elInstance.setComments(col5, "");
-                    }
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                    elInstance.setStyle(col2, "background-color", "transparent");
-                    elInstance.setComments(col2, "");
-                    elInstance.setStyle(col4, "background-color", "transparent");
-                    elInstance.setComments(col4, "");
-                    elInstance.setStyle(col5, "background-color", "transparent");
-                    elInstance.setComments(col5, "");
-
-                }
-
-            }
-        }
-
-        if (x == 4) {
-            var col = ("E").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-
-        if (x == 22) {
-            var col = ("W").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            }
-        }
-
-        if (x == 5) {
-            elInstance.setValueFromCoords(18, y, "", true);
-            var col = ("F").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-            } else {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-                var valueOfA = elInstance.getValueFromCoords(0, y);
-                if (valueOfA != "") {
-                    var col1 = ("A").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-                var procurementAgentPlanningUnit = this.state.procurementAgentListAll.filter(c => c.procurementAgent.id == value && c.planningUnit.id == planningUnitId)[0];
-                var procurementUnitValue = elInstance.getRowData(y)[18];
-                console.log("Procurement Unit Value", procurementUnitValue);
-                var pricePerUnit = procurementAgentPlanningUnit.catalogPrice;
-                if (procurementUnitValue != "") {
-                    var procurementUnit = this.state.procurementUnitListAll.filter(p => p.procurementUnit.id == procurementUnitValue && p.procurementAgent.id == value)[0];
-                    pricePerUnit = procurementUnit.vendorPrice;
-                }
-                elInstance.setValueFromCoords(8, y, procurementAgentPlanningUnit.moq, true);
-                elInstance.setValueFromCoords(20, y, pricePerUnit, true);
-                elInstance.setValueFromCoords(27, y, procurementAgentPlanningUnit.unitsPerPallet, true);
-                elInstance.setValueFromCoords(28, y, procurementAgentPlanningUnit.unitsPerContainer, true);
-                if (procurementAgentPlanningUnit.unitsPerPallet == 0 || procurementAgentPlanningUnit.unitsPerPallet == 0) {
-                    elInstance.setValueFromCoords(11, y, "", true);
-                    elInstance.setValueFromCoords(12, y, "", true);
-                    elInstance.setValueFromCoords(13, y, "", true);
-                }
-            }
-        }
-
-        if (x == 17) {
-            var col = ("R").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-
-        if (x == 13) {
-            var col = ("N").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-
-        if (x == 23) {
-            var col = ("X").concat(parseInt(y) + 1);
-            if (value == "") {
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, "");
-            } else {
-                if (isNaN(Number.parseInt(value)) || value < 0) {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-            }
-        }
-
-        if (x == 31) {
-            var totalAmount = parseFloat((elInstance.getCell(`Z${y + 1}`)).innerHTML).toFixed(2);
-            if (value != totalAmount) {
-                var col = ("Z").concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setStyle(col, "background-color", "yellow");
-                elInstance.setComments(col, i18n.t('static.supplyPlan.budgetAmountMissMatch'));
-                this.setState({
-                    shipmentBudgetError: i18n.t('static.supplyPlan.budgetAmountMissMatch'),
-                })
-            } else {
-                var col = ("Z").concat(parseInt(y) + 1);
-                elInstance.setStyle(col, "background-color", "transparent");
-                elInstance.setComments(col, '');
-                this.setState({
-                    shipmentBudgetError: '',
-                })
-            }
-        }
-
-        if (x == 2) {
-            var shipmentStatus = elInstance.getValueFromCoords(1, y);
-            var col1 = ("C").concat(parseInt(y) + 1);
-            if (shipmentStatus == 3 && supplyPlanType == 'psmShipments') {
-                var orderNo = value;
-                if (orderNo == "") {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setStyle(col1, "background-color", "yellow");
-                    elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
-                } else {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-            } else {
-                elInstance.setStyle(col1, "background-color", "transparent");
-                elInstance.setComments(col1, "");
-            }
-        }
-
-        if (x == 3) {
-            var shipmentStatus = elInstance.getValueFromCoords(1, y);
-            var col1 = ("D").concat(parseInt(y) + 1);
-            if (shipmentStatus == 3 && supplyPlanType == 'psmShipments') {
-                var orderNo = value;
-                if (orderNo == "") {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setStyle(col1, "background-color", "yellow");
-                    elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
-                } else {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-            } else {
-                elInstance.setStyle(col1, "background-color", "transparent");
-                elInstance.setComments(col1, "");
-            }
-        }
-
-        if (x == 18) {
-            if (value != "") {
-                // Logic for Procurement Unit on change
-                var valueOfF = elInstance.getRowData(y)[5];
-                console.log("Value of f", valueOfF);
-                if (valueOfF != "") {
-                    var procurementUnit = this.state.procurementUnitListAll.filter(p => p.procurementUnit.id == value && p.procurementAgent.id == valueOfF)[0];
-                    pricePerUnit = procurementUnit.vendorPrice;
-                    elInstance.setValueFromCoords(20, y, pricePerUnit, true);
-                }
-            }
-
-            var shipmentStatus = elInstance.getValueFromCoords(1, y);
-            var col1 = ("S").concat(parseInt(y) + 1);
-            if (shipmentStatus == 4 && supplyPlanType == 'nonPsmShipments') {
-                var orderNo = value;
-                if (orderNo == "") {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setStyle(col1, "background-color", "yellow");
-                    elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
-                } else {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-            } else {
-                elInstance.setStyle(col1, "background-color", "transparent");
-                elInstance.setComments(col1, "");
-            }
-        }
-
-        if (x == 19) {
-            var shipmentStatus = elInstance.getValueFromCoords(1, y);
-            var col1 = ("T").concat(parseInt(y) + 1);
-            if (shipmentStatus == 4 && supplyPlanType == 'nonPsmShipments') {
-                var orderNo = value;
-                if (orderNo == "") {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setStyle(col1, "background-color", "yellow");
-                    elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
-                } else {
-                    elInstance.setStyle(col1, "background-color", "transparent");
-                    elInstance.setComments(col1, "");
-                }
-            } else {
-                elInstance.setStyle(col1, "background-color", "transparent");
-                elInstance.setComments(col1, "");
-            }
-        }
-
-        this.setState({
-            shipmentChangedFlag: 1
-        });
-    }
-
-    checkValidationForShipments(supplyPlanType) {
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        var valid = true;
-        var elInstance = this.state.shipmentsEl;
-        var json = elInstance.getJson();
-        var mapArray = [];
-        for (var y = 0; y < json.length; y++) {
-            var map = new Map(Object.entries(json[y]));
-            mapArray.push(map);
-            var shipmentDataList = this.state.shipmentListUnFiltered;
-            var checkDuplicate = shipmentDataList.filter(c =>
-                moment(c.expectedDeliveryDate).format("YYYY-MM") == moment(Date.parse(map.get("0"))).format("YYYY-MM")
-                && c.planningUnit.id == planningUnitId
-                && c.procurementAgent.id == map.get("5")
-                && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS
-            )
-            var index = shipmentDataList.findIndex(c => moment(c.expectedDeliveryDate).format("YYYY-MM") == moment(Date.parse(map.get("0"))).format("YYYY-MM")
-                && c.planningUnit.id == planningUnitId
-                && c.procurementAgent.id == map.get("5")
-                && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS);
-
-            var checkDuplicateInMap = mapArray.filter(c =>
-                moment(c.get("0")).format("YYYY-MM") == moment(Date.parse(map.get("0"))).format("YYYY-MM")
-                && c.get("5") == map.get("5")
-            )
-
-            if ((checkDuplicate.length >= 1 && index != map.get("33")) || checkDuplicateInMap.length > 1) {
-                var colArr = ['A', 'F'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.duplicateShipment'));
-                }
-                valid = false;
-                this.setState({
-                    shipmentDuplicateError: i18n.t('static.supplyPlan.duplicateShipment')
-                })
-            } else {
-                var colArr = ['A', 'F'];
-                for (var c = 0; c < colArr.length; c++) {
-                    var col = (colArr[c]).concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-                var col = ("A").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(0, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    // if (isNaN(Date.parse(value))) {
-                    //     elInstance.setStyle(col, "background-color", "transparent");
-                    //     elInstance.setStyle(col, "background-color", "yellow");
-                    //     elInstance.setComments(col, i18n.t('static.message.invaliddate'));
-                    //     valid = false;
-                    // } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                    // }
-                }
-
-                var col = ("B").concat(parseInt(y) + 1);
-                var col1 = ("C").concat(parseInt(y) + 1);
-                var value = elInstance.getRowData(y)[1];
-                var col2 = ("D").concat(parseInt(y) + 1);
-
-                var col4 = ("S").concat(parseInt(y) + 1);
-                var col5 = ("T").concat(parseInt(y) + 1);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    if (value == SUBMITTED_SHIPMENT_STATUS && supplyPlanType == 'psmShipments') {
-                        var value1 = elInstance.getValueFromCoords(2, y);
-                        if (value1 == "") {
-                            elInstance.setStyle(col1, "background-color", "transparent");
-                            elInstance.setStyle(col1, "background-color", "yellow");
-                            elInstance.setComments(col1, i18n.t('static.label.fieldRequired'));
-                            valid = false;
-                        } else {
-                            elInstance.setStyle(col1, "background-color", "transparent");
-                            elInstance.setComments(col1, "");
-                        }
-
-                        var col2 = ("D").concat(parseInt(y) + 1);
-                        var value2 = elInstance.getValueFromCoords(3, y);
-                        if (value2 == "") {
-                            elInstance.setStyle(col2, "background-color", "transparent");
-                            elInstance.setStyle(col2, "background-color", "yellow");
-                            elInstance.setComments(col2, i18n.t('static.label.fieldRequired'));
-                            valid = false;
-                        } else {
-                            elInstance.setStyle(col2, "background-color", "transparent");
-                            elInstance.setComments(col2, "");
-                        }
-
-                    } else if (value == APPROVED_SHIPMENT_STATUS && supplyPlanType == 'nonPsmShipments') {
-                        var procurementUnit = elInstance.getValueFromCoords(18, y);
-                        var supplier = elInstance.getValueFromCoords(19, y);
-                        if (procurementUnit == "") {
-                            elInstance.setStyle(col4, "background-color", "transparent");
-                            elInstance.setStyle(col4, "background-color", "yellow");
-                            elInstance.setComments(col4, i18n.t('static.label.fieldRequired'));
-                            valid = false;
-                        } else {
-                            elInstance.setStyle(col4, "background-color", "transparent");
-                            elInstance.setComments(col4, "");
-                        }
-
-                        if (supplier == "") {
-                            elInstance.setStyle(col5, "background-color", "transparent");
-                            elInstance.setStyle(col5, "background-color", "yellow");
-                            elInstance.setComments(col5, i18n.t('static.label.fieldRequired'));
-                            valid = false
-                        } else {
-                            elInstance.setStyle(col5, "background-color", "transparent");
-                            elInstance.setComments(col5, "");
-                        }
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                        elInstance.setStyle(col1, "background-color", "transparent");
-                        elInstance.setComments(col1, "");
-                        elInstance.setStyle(col2, "background-color", "transparent");
-                        elInstance.setComments(col2, "");
-
-                        elInstance.setStyle(col4, "background-color", "transparent");
-                        elInstance.setComments(col4, "");
-                        elInstance.setStyle(col5, "background-color", "transparent");
-                        elInstance.setComments(col5, "");
-
-                    }
-                }
-
-                var col = ("W").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(22, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("N").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(13, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
-                }
-
-                var col = ("F").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(5, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("E").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(4, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
-                    valid = false;
-                } else {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                }
-
-                var col = ("R").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(17, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
-                }
-
-                var col = ("X").concat(parseInt(y) + 1);
-                var value = elInstance.getValueFromCoords(23, y);
-                if (value == "") {
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setComments(col, "");
-                } else {
-                    if (isNaN(Number.parseInt(value)) || value < 0) {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setStyle(col, "background-color", "yellow");
-                        elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
-                    } else {
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-
-                }
-                var shipmentStatus = elInstance.getRowData(y)[1];
-                if (shipmentStatus != CANCELLED_SHIPMENT_STATUS && shipmentStatus != ON_HOLD_SHIPMENT_STATUS) {
-                    var budgetAmount = (elInstance.getValueFromCoords(31, y));
-                    budgetAmount = parseFloat(budgetAmount).toFixed(2);
-                    var totalAmount = parseFloat((elInstance.getCell(`Z${y + 1}`)).innerHTML).toFixed(2);
-                    var col = ("Z").concat(parseInt(y) + 1);
-                    elInstance.setStyle(col, "background-color", "transparent");
-                    elInstance.setStyle(col, "background-color", "yellow");
-                    elInstance.setComments(col, i18n.t('static.supplyPlan.budgetAmountMissMatch'));
-                    if (budgetAmount != totalAmount) {
-                        this.setState({
-                            shipmentBudgetError: i18n.t('static.supplyPlan.budgetAmountMissMatch')
-                        })
-                        valid = false;
-                    } else {
-                        var col = ("Z").concat(parseInt(y) + 1);
-                        elInstance.setStyle(col, "background-color", "transparent");
-                        elInstance.setComments(col, "");
-                    }
-                }
-            }
-        }
-        return valid;
-    }
-
-    saveShipments(supplyPlanType) {
-        var validation = this.checkValidationForShipments(supplyPlanType);
-        if (validation == true) {
-            var inputs = document.getElementsByClassName("submitBtn");
-            for (var i = 0; i < inputs.length; i++) {
-                inputs[i].disabled = true;
-            }
-            this.setState({
-                shipmentError: "",
-                shipmentDuplicateError: '',
-                shipmentBudgetError: ''
-            })
-            var elInstance = this.state.shipmentsEl;
-            var json = elInstance.getJson();
-            var planningUnitId = document.getElementById("planningUnitId").value;
-            var db1;
-            var storeOS;
-            getDatabase();
-            var openRequest = indexedDB.open('fasp', 1);
-            openRequest.onerror = function (event) {
-                this.setState({
-                    supplyPlanError: i18n.t('static.program.errortext')
-                })
-            }.bind(this);
-            openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var transaction = db1.transaction(['programData'], 'readwrite');
-                var programTransaction = transaction.objectStore('programData');
-
-                var programId = (document.getElementById("programId").value);
-
-                var programRequest = programTransaction.get(programId);
-                programRequest.onerror = function (event) {
-                    this.setState({
-                        supplyPlanError: i18n.t('static.program.errortext')
-                    })
-                }.bind(this);
-                programRequest.onsuccess = function (event) {
-                    var programDataBytes = CryptoJS.AES.decrypt((programRequest.result).programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
-                    var shipmentDataList = (programJson.shipmentList);
-                    for (var j = 0; j < json.length; j++) {
-                        var map = new Map(Object.entries(json[j]));
-                        var selectedShipmentStatus = map.get("1");
-                        var shipmentStatusId = DRAFT_SHIPMENT_STATUS;
-                        if (selectedShipmentStatus == PLANNED_SHIPMENT_STATUS || selectedShipmentStatus == DRAFT_SHIPMENT_STATUS || (selectedShipmentStatus == SUBMITTED_SHIPMENT_STATUS && supplyPlanType == 'psmShipments')) {
-                            if (map.get("2").length != 0 && map.get("3").length != 0) {
-                                shipmentStatusId = SUBMITTED_SHIPMENT_STATUS;
-                            }
-                        } else if ((selectedShipmentStatus == SUBMITTED_SHIPMENT_STATUS && supplyPlanType == 'nonPsmShipments')) {
-                            if (parseInt(map.get("18")) > 0 && parseInt(map.get("19")) > 0) {
-                                shipmentStatusId = APPROVED_SHIPMENT_STATUS;
-                            } else {
-                                shipmentStatusId = SUBMITTED_SHIPMENT_STATUS;
-                            }
-                        } else {
-                            shipmentStatusId = selectedShipmentStatus;
-                        }
-                        var shipmentQty = (elInstance.getCell(`O${j}`)).innerHTML;
-                        var productCost = (elInstance.getCell(`V${j}`)).innerHTML;
-                        var rate = 0;
-                        if ((elInstance.getCell(`R${j}`)).innerHTML != "" || (elInstance.getCell(`R${j}`)).innerHTML != 0) {
-                            rate = (elInstance.getCell(`R${j}`)).innerHTML;
-                        } else {
-                            rate = (elInstance.getCell(`U${j}`)).innerHTML;
-                        }
-                        var freightCost = 0;
-                        if ((elInstance.getCell(`X${j}`)).innerHTML != "" || (elInstance.getCell(`X${j}`)).innerHTML != 0) {
-                            freightCost = (elInstance.getCell(`X${j}`)).innerHTML;
-                        } else {
-                            freightCost = (elInstance.getCell(`Y${j}`)).innerHTML;
-                        }
-                        shipmentDataList[parseInt(map.get("33"))].shipmentStatus.id = shipmentStatusId;
-                        shipmentDataList[parseInt(map.get("33"))].expectedDeliveryDate = moment(map.get("0")).format("YYYY-MM-DD");
-                        shipmentDataList[parseInt(map.get("33"))].orderNo = map.get("2");
-                        shipmentDataList[parseInt(map.get("33"))].primeLineNo = map.get("3");
-                        shipmentDataList[parseInt(map.get("33"))].dataSource.id = map.get("4");
-                        shipmentDataList[parseInt(map.get("33"))].procurementAgent.id = map.get("5");
-                        shipmentDataList[parseInt(map.get("33"))].shipmentQty = shipmentQty;
-                        shipmentDataList[parseInt(map.get("33"))].rate = rate;
-                        shipmentDataList[parseInt(map.get("33"))].productCost = productCost;
-                        shipmentDataList[parseInt(map.get("33"))].shipmentMode = map.get("22");
-                        shipmentDataList[parseInt(map.get("33"))].freightCost = parseFloat(freightCost).toFixed(2);
-                        shipmentDataList[parseInt(map.get("33"))].notes = map.get("26");
-                        shipmentDataList[parseInt(map.get("33"))].shipmentBudgetList = map.get("32");
-                        shipmentDataList[parseInt(map.get("33"))].procurementUnit.id = map.get("18");
-                        shipmentDataList[parseInt(map.get("33"))].supplier.id = map.get("19");
-                        shipmentDataList[parseInt(map.get("33"))].active = map.get("37");
-                        if (shipmentStatusId == 5) {
-                            shipmentDataList[parseInt(map.get("33"))].shippedDate = moment(Date.now()).format("YYYY-MM-DD");
-                        }
-                        if (shipmentStatusId == 7) {
-                            shipmentDataList[parseInt(map.get("33"))].deliveredDate = moment(Date.now()).format("YYYY-MM-DD");
-                        }
-                    }
-
-                    programJson.shipmentList = shipmentDataList;
-                    programRequest.result.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
-                    var putRequest = programTransaction.put(programRequest.result);
-
-                    putRequest.onerror = function (event) {
-                        this.setState({
-                            supplyPlanError: i18n.t('static.program.errortext')
-                        })
-                    }.bind(this);
-                    putRequest.onsuccess = function (event) {
-                        this.toggleLarge(supplyPlanType);
-                        this.setState({
-                            message: i18n.t('static.message.shipmentsSaved'),
-                            shipmentChangedFlag: 0,
-                            budgetChangedFlag: 0,
-                            shipmentsEl: '',
-                            shipmentBudgetTableEl: ''
-                        })
-                        this.formSubmit(this.state.monthCount);
-                    }.bind(this)
-                }.bind(this)
-            }.bind(this)
-        } else {
-            this.setState({
-                shipmentError: i18n.t('static.supplyPlan.validationFailed')
-            })
-        }
-    }
-
 }
