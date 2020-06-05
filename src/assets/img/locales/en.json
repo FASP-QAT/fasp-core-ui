@@ -796,7 +796,6 @@
     "static.report.mospast":"MOS Past(In Months)",
     "static.report.mosfuture":"MOS Future(In Months)",
     "static.program.validstatus":"Please select Status",
-    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed.",
-    "static.report.supplyplan":"Supply Plan"
+    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed."
 
 }
