@@ -185,7 +185,7 @@ export default class SupplyPlanComponent extends React.Component {
             csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
             csvRow.push('')
 
-            const header = [...[""], ... (this.state.monthsArray.filter(m => m.display == 1).map(item => (
+            const header = [...[""], ... (this.state.monthsArray.map(item => (
                 item.month
             ))
             )]
@@ -223,7 +223,7 @@ export default class SupplyPlanComponent extends React.Component {
             var a = document.createElement("a")
             a.href = 'data:attachment/csv,' + csvString
             a.target = "_Blank"
-            a.download = i18n.t('static.dashboard.supplyplan') + ".csv"
+            a.download = i18n.t('static.dashboard.supplyPlan') + ".csv"
             document.body.appendChild(a)
             a.click()
         }
@@ -269,7 +269,7 @@ export default class SupplyPlanComponent extends React.Component {
                     align: 'justify'
                     });*/
                     doc.setTextColor("#002f6c");
-                    doc.text(i18n.t('static.supplyplan.supplyplan'), doc.internal.pageSize.width / 2, 60, {
+                    doc.text(i18n.t('static.dashboard.supplyPlan'), doc.internal.pageSize.width / 2, 60, {
                         align: 'center'
                     })
                     if (i == 1) {
@@ -303,7 +303,7 @@ export default class SupplyPlanComponent extends React.Component {
             var aspectwidth1 = (width - h1);
 
             doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
-            const header = [...[""], ... (this.state.monthsArray.filter(m => m.display == 1).map(item => (
+            const header = [...[""], ... (this.state.monthsArray.map(item => (
                 item.month
             ))
             )]
@@ -442,8 +442,15 @@ export default class SupplyPlanComponent extends React.Component {
         return (
             <>
                 <TabPane tabId="1">
-                    {this.state.planningUnitChange && <SupplyPlanComparisionComponent />}
+                   
                     <div id="supplyPlanTableId" style={{ display: this.state.display }}>
+                    <Row>
+            <div className="col-md-12">
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => exportPDF()} />
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => exportCSV()} />
+
+            </div>
+        </Row>
                         <Row>
                             <div className="col-md-12">
                                 <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> Scroll to left </span>
@@ -455,7 +462,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 <tr>
                                     <th ></th>
                                     {
-                                        this.state.monthsArray.filter(m => m.display == 1).map(item => (
+                                        this.state.monthsArray.map(item => (
                                             <th style={{ padding: '10px 0 !important' }}>{item.month}</th>
                                         ))
                                     }
@@ -868,30 +875,24 @@ export default class SupplyPlanComponent extends React.Component {
                     </Modal>
                     {/* Non PSM Shipments modal */}
 
+                    <div className="row" >
 
+{
+    this.state.jsonArrForGraph.length > 0
+    &&
+    <div className="col-md-12 grapg-margin " >
+        
+        <div className="col-md-12">
+            <div className="chart-wrapper chart-graph-report">
+                <Bar id="cool-canvas" data={bar} options={chartOptions} />
+            </div>
+        </div>   </div>}
+
+</div>
 
                 </TabPane>
                 <TabPane tabId="2">
-                    <div className="row" >
-
-                        {
-                            this.state.jsonArrForGraph.length > 0
-                            &&
-                            <div className="col-md-12 grapg-margin " >
-                                <Row>
-                                    <div className="col-md-12">
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => exportPDF()} />
-                                        <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => exportCSV()} />
-
-                                    </div>
-                                </Row>
-                                <div className="col-md-12">
-                                    <div className="chart-wrapper chart-graph-report">
-                                        <Bar id="cool-canvas" data={bar} options={chartOptions} />
-                                    </div>
-                                </div>   </div>}
-
-                    </div>
+                {this.state.planningUnitChange && <SupplyPlanComparisionComponent />}
 
                 </TabPane></>)
     }
@@ -967,14 +968,14 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-                /* for (var i = 0; i < programJson.regionList.length; i++) {
+                 for (var i = 0; i < programJson.regionList.length; i++) {
                      var regionJson = {
-                         name: getLabelText(programJson.regionList[i].label, lan),
+                         name:programJson.regionList[i].regionId,// getLabelText(programJson.regionList[i].label, lan),
                          id: programJson.regionList[i].regionId
                      }
                      regionList[i] = regionJson
  
-                 }*/
+                 }
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
@@ -4272,7 +4273,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                                     id="planningUnitId"
                                                                     bsSize="sm"
                                                                     value={this.state.planningUnitId}
-                                                                    onChange={() => this.formSubmit(this.state.monthCount)}
+                                                                    onChange={() => {this.formSubmit(this.state.monthCount);}}
                                                                 >
                                                                     <option value="0">{i18n.t('static.common.select')}</option>
                                                                     {planningUnits}
@@ -4307,7 +4308,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 active={this.state.activeTab[0] === '2'}
                                                 onClick={() => { this.toggle(0, '2'); }}
                                             >
-                                                Supply Plan Graphical Representation
+                                                Supply Plan For Compare
                 </NavLink>
 
                                         </NavItem>
