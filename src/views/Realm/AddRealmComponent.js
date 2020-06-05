@@ -81,6 +81,7 @@ export default class AddRealmComponent extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.dataChange = this.dataChange.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
 
     dataChange(event) {
@@ -138,6 +139,11 @@ export default class AddRealmComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
     Capitalize(str) {
         let { realm } = this.state
         realm.label.label_en = str.charAt(0).toUpperCase() + str.slice(1)
@@ -151,7 +157,7 @@ export default class AddRealmComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} message={(message) => {
                     this.setState({ message: message })
                 }} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                 <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -166,11 +172,14 @@ export default class AddRealmComponent extends Component {
                                     RealmService.addRealm(this.state.realm)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/realm/realmList/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/realm/realmList/`+ 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
                                         .catch(
@@ -339,7 +348,7 @@ export default class AddRealmComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/realm/realmList/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/realm/realmList/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

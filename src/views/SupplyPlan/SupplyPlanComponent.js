@@ -20,6 +20,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { Link } from "react-router-dom";
 import NumberFormat from 'react-number-format';
 import SupplyPlanComparisionComponent from "./SupplyPlanComparisionComponent";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 const entityname = i18n.t('static.dashboard.supplyPlan')
 
@@ -61,7 +62,8 @@ export default class SupplyPlanComponent extends React.Component {
             psmShipmentsTotalData: [],
             nonPsmShipmentsTotalData: [],
             artmisShipmentsTotalData: [],
-            plannedPsmChangedFlag: 0
+            plannedPsmChangedFlag: 0,
+            message: ''
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -3428,6 +3430,9 @@ export default class SupplyPlanComponent extends React.Component {
             }, this);
         return (
             <div className="animated fadeIn">
+                <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                    this.setState({ message: message })
+                }} />
                 <h5>{i18n.t(this.state.message, { entityname })}</h5>
                 <h5 className="red">{this.state.supplyPlanError}</h5>
 
