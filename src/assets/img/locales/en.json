@@ -713,6 +713,7 @@
     "static.report.comment":"Comments",
     "static.report.mospast":"MOS Past(In Months)",
     "static.report.mosfuture":"MOS Future(In Months)",
-    "static.program.validstatus":"Please select Status"
+    "static.program.validstatus":"Please select Status",
+    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed."
 
 }
