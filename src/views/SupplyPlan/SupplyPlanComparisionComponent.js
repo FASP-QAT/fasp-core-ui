@@ -20,7 +20,49 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { Link } from "react-router-dom";
 import NumberFormat from 'react-number-format';
 
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { Bar, Line, Pie } from 'react-chartjs-2';
+import pdfIcon from '../../assets/img/pdf.png';
+import { LOGO } from '../../CommonComponent/Logo.js'
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import csvicon from '../../assets/img/csv.png'
+
 const entityname = i18n.t('static.dashboard.supplyPlan')
+
+const chartOptions1 = {
+    title: {
+        display: true,
+        text: i18n.t('static.dashboard.stockstatus')
+    },
+    scales: {
+        yAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: i18n.t('static.dashboard.unit')
+            },
+            stacked: false,
+            ticks: {
+                beginAtZero: true
+            }
+        }]
+    },
+    tooltips: {
+        enabled: false,
+        custom: CustomTooltips
+    },
+    maintainAspectRatio: false
+    ,
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+        }
+    }
+}
+
+
 
 export default class SupplyPlanComponent extends React.Component {
 
@@ -60,7 +102,8 @@ export default class SupplyPlanComponent extends React.Component {
             psmShipmentsTotalData: [],
             nonPsmShipmentsTotalData: [],
             artmisShipmentsTotalData: [],
-            plannedPsmChangedFlag: 0
+            plannedPsmChangedFlag: 0,
+            jsonArrForGraph:[]
         }
         this.getMonthArray = this.getMonthArray.bind(this);
         this.getPlanningUnitList = this.getPlanningUnitList.bind(this)
@@ -78,7 +121,171 @@ export default class SupplyPlanComponent extends React.Component {
         this.suggestedShipmentsDetailsClicked = this.suggestedShipmentsDetailsClicked.bind(this);
         this.shipmentsDetailsClicked = this.shipmentsDetailsClicked.bind(this);
     }
+     exportCSV = () => {
 
+        var csvRow = [];
+        csvRow.push(i18n.t('static.program.program') + ' , ' + ((document.getElementById("programId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push((i18n.t('static.planningunit.planningunit')).replaceAll(' ', '%20') + ' , ' + ((document.getElementById("planningUnitId").selectedOptions[0].text).replaceAll(',', '%20')).replaceAll(' ', '%20'))
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push((i18n.t('static.common.youdatastart')).replaceAll(' ', '%20'))
+        csvRow.push('')
+
+        const header = [...[""], ... (this.state.monthsArray.map(item => (
+            item.month
+        ))
+        )]
+        var A = [header]
+
+        var openningArr = [...[("Opening Balance").replaceAll(' ', '%20')], ... this.state.openingBalanceArray]
+        var consumptionArr = [...["Consumption"], ...this.state.consumptionTotalData]
+        var suggestedArr = [...[("Suggested Shipments").replaceAll(' ', '%20')], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+        var psmShipmentArr = [...[("PSM Shipments in QAT").replaceAll(' ', '%20')], ...this.state.psmShipmentsTotalData.map(item => item.qty)]
+        var artmisShipmentArr = [...[("PSM Shipments from ARTMIS").replaceAll(' ', '%20')], ...this.state.artmisShipmentsTotalData.map(item => item.qty)]
+        var nonPsmShipmentArr = [...[("Non PSM Shipment").replaceAll(' ', '%20')], ...this.state.nonPsmShipmentsTotalData.map(item => item.qty)]
+        var inventoryArr = [...["Adjustments"], ...this.state.inventoryTotalData]
+        var closingBalanceArr = [...[("Ending Balance").replaceAll(' ', '%20')], ...this.state.closingBalanceArray]
+        var amcgArr = [...["AMC"], ...this.state.amcTotalData]
+        var monthsOfStockArr = [...[("Months of Stock").replaceAll(' ', '%20')], ... this.state.monthsOfStockArray]
+        var minStockArr = [...[("Min stock").replaceAll(' ', '%20')], ...this.state.minStockArray]
+        var maxStockArr = [...[("Max stock").replaceAll(' ', '%20')], ...this.state.maxStockArray]
+
+        A.push(openningArr)
+        A.push(consumptionArr)
+        A.push(suggestedArr)
+        A.push(psmShipmentArr)
+        A.push(artmisShipmentArr)
+        A.push(nonPsmShipmentArr)
+        A.push(inventoryArr)
+        A.push(closingBalanceArr)
+        A.push(amcgArr)
+        A.push(monthsOfStockArr)
+        A.push(minStockArr)
+        A.push(maxStockArr)
+        for (var i = 0; i < A.length; i++) {
+            csvRow.push(A[i].join(","))
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.supplyPlan') + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+
+    exportPDF = () => {
+        const addFooters = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(10)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Quantification Analytics Tool', doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+
+
+            }
+        }
+        const addHeaders = doc => {
+
+            const pageCount = doc.internal.getNumberOfPages()
+            doc.setFont('helvetica', 'bold')
+
+            // var file = new File('QAT-logo.png','../../../assets/img/QAT-logo.png');
+            // var reader = new FileReader();
+
+            //var data='';
+            // Use fs.readFile() method to read the file 
+            //fs.readFile('../../assets/img/logo.svg', 'utf8', function(err, data){ 
+            //}); 
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                /*doc.addImage(data, 10, 30, {
+                align: 'justify'
+                });*/
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.supplyPlan'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 80, {
+                        align: 'left'
+                    })
+                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 90, {
+                        align: 'left'
+                    })
+                }
+
+            }
+        }
+        const unit = "pt";
+        const size = "A4"; // Use A1, A2, A3 or A4
+        const orientation = "landscape"; // portrait or landscape
+
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+
+        doc.setFontSize(15);
+
+        var canvas = document.getElementById("cool-canvas1");
+        //creates image
+
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var width = doc.internal.pageSize.width;
+        var height = doc.internal.pageSize.height;
+        var h1 = 100;
+        var aspectwidth1 = (width - h1);
+
+        doc.addImage(canvasImg, 'png', 50, 110, aspectwidth1, (height - h1) * 3 / 4);
+        const header = [...[""], ... (this.state.monthsArray.map(item => (
+            item.month
+        ))
+        )]
+
+        const headers = [header];
+
+        var openningArr = [...["Opening Balance"], ... this.state.openingBalanceArray]
+        var consumptionArr = [...["Consumption"], ...this.state.consumptionTotalData]
+        var suggestedArr = [...["Suggested Shipments"], ...this.state.suggestedShipmentsTotalData.map(item => item.suggestedOrderQty)]
+        var psmShipmentArr = [...["PSM Shipments in QAT"], ...this.state.psmShipmentsTotalData.map(item => item.qty)]
+        var artmisShipmentArr = [...["PSM Shipments from ARTMIS"], ...this.state.artmisShipmentsTotalData.map(item => item.qty)]
+        var nonPsmShipmentArr = [...["Non PSM Shipment"], ...this.state.nonPsmShipmentsTotalData.map(item => item.qty)]
+        var inventoryArr = [...["Adjustments"], ...this.state.inventoryTotalData]
+        var closingBalanceArr = [...["Ending Balance"], ...this.state.closingBalanceArray]
+        var amcgArr = [...["AMC"], ...this.state.amcTotalData]
+        var monthsOfStockArr = [...["Months of Stock"], ... this.state.monthsOfStockArray]
+        var minStocArr = [...["Min stock"], ...this.state.minStockArray]
+        var maxStockArr = [...["Max stock"], ...this.state.maxStockArray]
+
+        const data = [openningArr, consumptionArr, suggestedArr, psmShipmentArr, artmisShipmentArr, nonPsmShipmentArr, inventoryArr, closingBalanceArr, amcgArr, monthsOfStockArr, minStocArr, maxStockArr];
+
+        let content = {
+            margin: { top: 80 },
+            startY: height,
+            head: headers,
+            body: data,
+            styles: { lineWidth: 1, fontSize: 8 },
+        };
+        doc.autoTable(content);
+        addHeaders(doc)
+        addFooters(doc)
+        doc.save("SupplyPlan.pdf")
+
+    }
+
+   
     componentDidMount() {
         const lan = 'en';
         var db1;
@@ -151,14 +358,14 @@ export default class SupplyPlanComponent extends React.Component {
                 var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
                 var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                 var programJson = JSON.parse(programData);
-              /*  for (var i = 0; i < programJson.regionList.length; i++) {
+                for (var i = 0; i < programJson.regionList.length; i++) {
                     var regionJson = {
-                        name: getLabelText(programJson.regionList[i].label, lan),
+                        name:programJson.regionList[i].regionId,// getLabelText(programJson.regionList[i].label, lan),
                         id: programJson.regionList[i].regionId
                     }
                     regionList[i] = regionJson
 
-                }*/
+                }
                 var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
                 var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
                 var planningunitRequest = planningunitOs.getAll();
@@ -234,7 +441,7 @@ export default class SupplyPlanComponent extends React.Component {
     }
 
     formSubmit(monthCount) {
-        document.getElementById("supplyPlanTableId").style.display = 'block';
+        //document.getElementById("supplyPlanTableId").style.display = 'block';
 
         var m = this.getMonthArray(moment(Date.now()).add(monthCount, 'months').utcOffset('-0500'));
 
@@ -882,7 +1089,7 @@ export default class SupplyPlanComponent extends React.Component {
                     var json = {
                         month: m[jsonForGraph].month,
                         consumption: consumptionTotalData[jsonForGraph],
-                        stock: openingBalanceArray[jsonForGraph],
+                        stock: closingBalanceArray[jsonForGraph],
                         planned: plannedTotalShipmentsBasedOnMonth[jsonForGraph],
                         draft: draftTotalShipmentsBasedOnMonth[jsonForGraph],
                         submitted: submittedTotalShipmentsBasedOnMonth[jsonForGraph],
@@ -1967,11 +2174,119 @@ export default class SupplyPlanComponent extends React.Component {
                     <option key={i} value={item.id}>{item.name}</option>
                 )
             }, this);
+
+            let bar1 = {}
+            if (this.state.jsonArrForGraph.length > 0)
+                bar1 = {
+        
+                    labels: [...new Set(this.state.jsonArrForGraph.map(ele => (ele.month)))],
+                    datasets: [
+                        {
+                            label: 'planned',
+                            backgroundColor: '#000050',
+                            borderColor: 'rgba(179,181,198,1)',
+                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.planned)),
+                        }, {
+                            label: 'Draft',
+                            backgroundColor: '#1E1E6E',
+                            borderColor: 'rgba(179,181,198,1)',
+                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.draft)),
+                        }, {
+                            label: 'Shipped',
+                            backgroundColor: '#5A5AAA',
+                            borderColor: 'rgba(179,181,198,1)',
+                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.shipped)),
+                        },
+                        {
+                            label: 'Arrived',
+                            backgroundColor: '#5B5BF5',
+                            borderColor: 'rgba(179,181,198,1)',
+                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.arrived)),
+                        }, {
+                            label: 'Delivered',
+                            backgroundColor: '#AAAAFA',
+                            borderColor: 'rgba(179,181,198,1)',
+                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                        }, {
+                            label: 'Submitted',
+                            backgroundColor: '#0FB5FF',
+                            borderColor: 'rgba(179,181,198,1)',
+                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.submitted)),
+                        }, {
+                            label: 'Approved',
+                            backgroundColor: '#52CAFF',
+                            borderColor: 'rgba(179,181,198,1)',
+                            pointBackgroundColor: 'rgba(179,181,198,1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(179,181,198,1)',
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
+                        }, {
+                            label: "Stock",
+                            type: 'line',
+                            borderColor: 'rgba(179,181,158,1)',
+                            borderStyle: 'dotted',
+                            ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                            },
+                            pointStyle: 'line',
+                            showInLegend: true,
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.stock))
+                        }, {
+                            label: "Consumption",
+                            type: 'line',
+                            backgroundColor: 'transparent',
+                            borderColor: 'rgba(255.102.102.1)',
+                            borderStyle: 'dotted',
+                            ticks: {
+                                fontSize: 2,
+                                fontColor: 'transparent',
+                            },
+                            pointStyle: 'line',
+                            showInLegend: true,
+                            data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                        }
+                    ]
+        
+                };
+        
         return (
             <div className="animated fadeIn">
 
 
-                <div id="supplyPlanTableId" style={{ display: 'none' }}>
+                <div id="supplyPlanTableId" style={{ display: 'block' }}>
+                <Row>
+            <div className="col-md-12">
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+
+            </div>
+        </Row>
                     <Row>
                         <div className="col-md-12">
                             <span className="supplyplan-larrow" onClick={this.leftClicked}> <i class="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
@@ -2377,7 +2692,20 @@ export default class SupplyPlanComponent extends React.Component {
                     </ModalFooter>
                 </Modal>
                 {/* Non PSM Shipments modal */}
+                {
+    this.state.jsonArrForGraph.length > 0
+    &&
+    <div className="col-md-12 grapg-margin " >
+        
+        <div className="col-md-12">
+            <div className="chart-wrapper chart-graph-report">
+                <Bar id="cool-canvas1" data={bar1} options={chartOptions1} />
             </div>
+        </div>   </div>}
+
+
+            </div>
+            
         )
     }
 
