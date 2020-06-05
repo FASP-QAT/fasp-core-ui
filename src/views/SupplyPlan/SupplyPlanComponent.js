@@ -1045,6 +1045,7 @@ export default class SupplyPlanComponent extends React.Component {
         this.setState({
             monthsArray: month
         })
+        console.log("Month--------->",month);
         return month;
     }
 
