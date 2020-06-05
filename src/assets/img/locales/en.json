@@ -689,6 +689,7 @@
     "static.common.receivedate":"Receiving Date",
     "static.report.supplyplanversionandreviewReport":"Supply Plan Version and Review",
     "static.report.version":"Version",
+    "static.report.versiontype":"Version Type",
     "static.report.veruploaddate":"Date Version Uploaded",
     "static.report.veruploaduser":"Version Uploaded by User",
     "static.report.issupplyplanapprove":"Supply Plan Approved?",
@@ -701,6 +702,8 @@
     "static.report.comment":"Comments",
     "static.report.mospast":"MOS Past(In Months)",
     "static.report.mosfuture":"MOS Future(In Months)",
-    "static.program.validstatus":"Please select Status"
+    "static.program.validstatus":"Please select Status",
+    "static.report.supplyplan":"Supply Plan"
+
 
 }
