@@ -336,7 +336,7 @@ export default class ConsumptionDetails extends React.Component {
         return (
 
             <div className="animated fadeIn">
-                <Col xs="12" sm="12">
+                
                     <h5>{i18n.t(this.state.message)}</h5>
                     <Card>
 
@@ -367,11 +367,11 @@ export default class ConsumptionDetails extends React.Component {
                                     }) => (
                                             <Form name='simpleForm'>
 
-                                                <Col md="9 pl-0">
+                                                <Col md="12 pl-0">
                                                     <div className="d-md-flex">
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">Program</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input type="select"
                                                                         bsSize="sm"
@@ -385,9 +385,9 @@ export default class ConsumptionDetails extends React.Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">Planning Unit</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input
                                                                         type="select"
@@ -403,9 +403,9 @@ export default class ConsumptionDetails extends React.Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">Priority</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input type="select"
                                                                         bsSize="sm"
@@ -421,9 +421,9 @@ export default class ConsumptionDetails extends React.Component {
                                                                 </InputGroup>
                                                             </div>
                                                         </FormGroup>
-                                                        <FormGroup className="tab-ml-1">
+                                                        <FormGroup className="col-md-3">
                                                             <Label htmlFor="appendedInputButton">HQ Status</Label>
-                                                            <div className="controls SelectGo">
+                                                            <div className="controls ">
                                                                 <InputGroup>
                                                                     <Input type="select"
                                                                         bsSize="sm"
@@ -457,7 +457,7 @@ export default class ConsumptionDetails extends React.Component {
 </FormGroup>
                         </CardFooter>
                     </Card>
-                </Col>
+                
 
             </div >
         );

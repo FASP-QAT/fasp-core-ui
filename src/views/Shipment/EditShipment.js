@@ -17,6 +17,7 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import moment from "moment";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import i18n from '../../i18n';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 
 export default class ConsumptionDetails extends React.Component {
 
@@ -3782,6 +3783,9 @@ export default class ConsumptionDetails extends React.Component {
 
             <div className="animated fadeIn">
                 <Col xs="12" sm="12">
+                    <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+                        this.setState({ message: message })
+                    }} />
                     <h5>{i18n.t(this.state.message)}</h5>
                     <h5 style={{ color: 'red' }}>{i18n.t(this.state.budgetError)}</h5>
                     <Card>

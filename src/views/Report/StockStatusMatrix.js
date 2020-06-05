@@ -23,7 +23,8 @@ import Pdf from "react-to-pdf"
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Online, Offline } from "react-detect-offline";
-import { LOGO } from '../../CommonComponent/Logo.js'
+import { LOGO } from '../../CommonComponent/Logo.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 const pickerLang = {
   months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
   from: 'From', to: 'To',
@@ -46,6 +47,7 @@ export default class StockStatusMatrix extends React.Component {
       offlineInventoryList: [],
       years: [],
       pulst: [],
+      message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -784,14 +786,14 @@ export default class StockStatusMatrix extends React.Component {
 
     console.log(header);
     let data;
-    if (navigator.onLine && this.state.view==2) {
-      data = this.state.data.map(ele => ele.map((item,index) => (index==0?{content:item,styles: { halign: 'left' }}:{content:this.formatter(item),styles: { halign: 'right' }})));
+    if (navigator.onLine && this.state.view == 2) {
+      data = this.state.data.map(ele => ele.map((item, index) => (index == 0 ? { content: item, styles: { halign: 'left' } } : { content: this.formatter(item), styles: { halign: 'right' } })));
     }
     else if (navigator.onLine) {
       data = this.state.data.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan, ele.Feb, ele.Mar, ele.Apr, ele.May, ele.Jun, ele.Jul, ele.Aug, ele.Sep, ele.Oct, ele.Nov
         , ele.Dec]);
-        
-       } else {
+
+    } else {
       data = this.state.offlineInventoryList.map(ele => [ele.PLANNING_UNIT_LABEL_EN, ele.YEAR, ele.Jan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Feb.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Mar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Apr.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.May.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jun.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Jul.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Aug.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Sep.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Oct.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Nov
         .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), ele.Dec.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")]);
     }
@@ -802,7 +804,7 @@ export default class StockStatusMatrix extends React.Component {
       startY: 180,
       head: header,
       body: data,
-      styles:{lineWidth:  1,fontSize : 8},
+      styles: { lineWidth: 1, fontSize: 8 },
       columnStyles: {
         0: { cellWidth: 120 },
         1: { cellWidth: 15 },
@@ -1252,6 +1254,9 @@ export default class StockStatusMatrix extends React.Component {
     return (
 
       <div className="animated">
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5>{i18n.t(this.state.message, { entityname })}</h5>
         <Card>
@@ -1427,7 +1432,7 @@ export default class StockStatusMatrix extends React.Component {
                     </div>
                   </FormGroup>
                 </Offline>
-            
+
                 <FormGroup className="col-md-3">
                   <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
                   <div className="controls">

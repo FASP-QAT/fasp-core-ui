@@ -358,13 +358,13 @@ class AuthenticationService {
         return userObj;
     }
 
-    getLoggedInUserRoleBusinessFunction() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        let businessFunctions = decryptedUser.businessFunction;
-        console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
-        return businessFunctions;
-    }
+    // getLoggedInUserRoleBusinessFunction() {
+    //     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+    //     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    //     let businessFunctions = decryptedUser.businessFunction;
+    //     console.log("decryptedUser.businessfunctions---" + decryptedUser.businessFunction);
+    //     return businessFunctions;
+    // }
 
 }
 

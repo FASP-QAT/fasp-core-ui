@@ -30,17 +30,20 @@ const validationSchema = function (values, t) {
     return Yup.object().shape({
         planningUnitId: Yup.string()
             .required(i18n.t('static.procurementUnit.validPlanningUnitText')),
-        reorderFrequencyInMonths: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
+        reorderFrequencyInMonths: Yup.string()
+            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required(i18n.t('static.programPlanningUnit.validReorderFrequencyText')).min(0, i18n.t('static.procurementUnit.validValueText')),
-        minMonthsOfStock: Yup.number().
-            typeError(i18n.t('static.procurementUnit.validNumberText'))
+        minMonthsOfStock: Yup.string()
+            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter minimum month of stock').min(0, i18n.t('static.procurementUnit.validValueText')),
         localProcurementLeadTime: Yup.number().
             typeError(i18n.t('static.procurementUnit.validNumberText'))
             .required('Please enter local procurement lead time').min(0, i18n.t('static.procurementUnit.validValueText'))
     })
 }
+
 
 const validate = (getValidationSchema) => {
 
@@ -561,7 +564,7 @@ class AddprogramPlanningUnit extends Component {
                                                         </FormGroup>
 
 
-                                                        <FormGroup className="col-md-12 mt-md-4">
+                                                        <FormGroup className="col-md-12 mt-md-0">
                                                             {/* <Button type="button" size="sm" color="danger" onClick={this.deleteLastRow} className="float-right mr-1" ><i className="fa fa-times"></i> Remove Last Row</Button> */}
                                                             <Button type="submit" size="sm" color="success" onClick={() => this.touchAll(errors)} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.add')}</Button>
                                                             &nbsp;
@@ -570,7 +573,7 @@ class AddprogramPlanningUnit extends Component {
                                                 </Form>
                                             )} />
                                 <h5 className="red">{this.state.rowErrorMessage}</h5>
-                                <Table responsive className="table-striped table-hover table-bordered text-center mt-2">
+                                <Table responsive className="table-striped table-hover table-bordered text-center mt-0">
                                     <thead>
                                         <tr>
                                             <th className="text-left"> {i18n.t('static.program.program')} </th>
@@ -594,10 +597,10 @@ class AddprogramPlanningUnit extends Component {
                                                     <td>
                                                         {this.state.rows[idx].planningUnit.label.label_en}
                                                     </td>
-                                                    <td  className="text-right">
+                                                    <td className="text-right">
                                                         {this.state.rows[idx].reorderFrequencyInMonths}
                                                     </td>
-                                                    <td  className="text-right">
+                                                    <td className="text-right">
                                                         {this.state.rows[idx].minMonthsOfStock}
                                                     </td>
                                                     <td>

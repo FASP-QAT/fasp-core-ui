@@ -479,7 +479,8 @@ label.arrow_label:after {
 .table thead tr th {
   position: sticky;
   top: 0px;
-  padding: 5px !important;
+  padding: 6px 4px 5px 4px!important;
+  // padding: 5px !important;
   background: #fff;
   position: -webkit-sticky;
 }
@@ -1076,6 +1077,7 @@ a:hover {
 h5,
 .h5 {
   font-size: 14px !important;
+  margin-top: 5px;
 }
 
 .frgtpass-heading {
@@ -1651,16 +1653,16 @@ input::placeholder {
   left: 7px;
 }
 .progresdatatext2 {
-  left: 19%;
+  left: 23%;
 }
 .progresdatatext3 {
-  left: 37%;
+  left: 46%;
 }
 .progresdatatext4 {
-  left: 55.46%;
+  left: 71.46%;
 }
 .progresdatatext5 {
-  left: 76%;
+  left: 94%;
 }
 .progresdatatext6 {
   left: 94.79%;
@@ -2176,4 +2178,11 @@ text-overflow: ellipsis;
 }
 .mt-reporttable{
   margin-top: -4%;
+}
+h6{
+  margin-top:5px;
+}
+
+.custom-file-input {
+  cursor: pointer;
 }

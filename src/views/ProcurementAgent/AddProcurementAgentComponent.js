@@ -28,13 +28,16 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementagent.codetext')),
         procurementAgentName: Yup.string()
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
+        // submittedToApprovedLeadTime: Yup.string()
+        //     .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
+        //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime')),
         submittedToApprovedLeadTime: Yup.string()
-            .matches(/^[0-9]*$/, i18n.t('static.procurementagent.onlynumberText'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
+            .required(i18n.t('static.procurementagent.submitToApproveLeadTime')).min(0, i18n.t('static.program.validvaluetext')),
         // submittedToApprovedLeadTime: Yup.number()
         //     .typeError(i18n.t('static.procurementUnit.validNumberText'))
         //     .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
         //     .min(0, i18n.t('static.program.validvaluetext'))
+
 
     })
 }
@@ -287,7 +290,7 @@ class AddProcurementAgentComponent extends Component {
                                                             onBlur={handleBlur}
                                                             required
                                                             value={this.state.procurementAgent.submittedToApprovedLeadTime}
-                                                            min={1}
+                                                            min="0"
                                                         />
                                                         {/* </InputGroupAddon> */}
                                                         <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>

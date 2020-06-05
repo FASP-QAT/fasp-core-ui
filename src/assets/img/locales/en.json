@@ -664,8 +664,20 @@
     "static.report.errorperc": "Forecast Error Percentage",
     "static.common.selectPlanningUnit": "Please select planning unit",
     "static.common.selectProductCategory": "Please select product category",
+    "static.report.stockstatusovertimeReport":"Stock Status Over time Report",
+    "static.shipment.edd":"Expected Delivery Date",
+    "static.shipment.suggestedQty":"Suggested Quantity",
+    "static.shipment.qty":"Quantity",
+    "static.shipment.rate":"Rate",
+    "static.shipment.mode":"Shipping Mode",
+    "static.shipment.freightcost":"Freight Cost",
+    "static.shipment.ordereddate":"Orderd Date",
+    "static.shipment.shipdate":"Shipped Date",
+    "static.shipment.receiveddate":"Received Date",
+    "static.shipment.productcost":"Product Cost",
+    "static.dashboard.costOfInventory":"Cost Of Inventory",
+    "static.dashboard.inventoryTurns":"Inventory Turn",
     "static.dashboard.stockstatusovertime": "Stock Status Over time",
-    "static.report.stockstatusovertimeReport": "Stock Status Over time Report",
     "static.report.noofmonth": "Number Of Months",
     "static.supplyplan.supplyplanformula": "Supply plan formulas",
     "static.message.shipmentSaved": "Shipment Data Saved",
@@ -701,6 +713,7 @@
     "static.report.comment":"Comments",
     "static.report.mospast":"MOS Past(In Months)",
     "static.report.mosfuture":"MOS Future(In Months)",
-    "static.program.validstatus":"Please select Status"
+    "static.program.validstatus":"Please select Status",
+    "static.procurementUnit.validMinValueText": "Minimum 14 characters are allowed."
 
 }
