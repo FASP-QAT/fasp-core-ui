@@ -49,6 +49,7 @@ import csvicon from '../../assets/img/csv.png'
 import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 //import fs from 'fs'
 const Widget04 = lazy(() => import('../../views/Widgets/Widget04'));
 // const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -133,6 +134,7 @@ class Consumption extends Component {
       productCategories: [],
       offlineProductCategoryList: [],
       show: false,
+      message: '',
       rangeValue: { from: { year: new Date().getFullYear() - 1, month: new Date().getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
 
 
@@ -564,10 +566,10 @@ class Consumption extends Component {
   }
   getProductCategories() {
     let programId = document.getElementById("programId").value;
-    let realmId=AuthenticationService.getRealmId();
+    let realmId = AuthenticationService.getRealmId();
     if (navigator.onLine) {
       AuthenticationService.setupAxiosInterceptors();
-      ProductService.getProductCategoryListByProgram(realmId,programId)
+      ProductService.getProductCategoryListByProgram(realmId, programId)
         .then(response => {
           console.log(JSON.stringify(response.data))
           this.setState({
@@ -812,6 +814,9 @@ class Consumption extends Component {
 
     return (
       <div className="animated fadeIn" >
+        <AuthenticationServiceComponent history={this.props.history} message={(message) => {
+          this.setState({ message: message })
+        }} />
         <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
 
         <Card>
@@ -956,8 +961,8 @@ class Consumption extends Component {
                                   && productCategories.map((item, i) => {
                                     return (
                                       <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                      {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                    </option>
+                                        {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
+                                      </option>
                                     )
                                   }, this)}
                               </Input>
