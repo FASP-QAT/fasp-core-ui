@@ -89,6 +89,7 @@ export default class EditHealthAreaComponent extends Component {
         this.updateFieldData = this.updateFieldData.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
         // this.getRealmCountryList = this.getRealmCountryList.bind(this);
 
         // initialValues = {
@@ -103,6 +104,12 @@ export default class EditHealthAreaComponent extends Component {
     changeMessage(message) {
         this.setState({ message: message })
     }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
+    }
+
 
     dataChange(event) {
         let { healthArea } = this.state
@@ -151,9 +158,21 @@ export default class EditHealthAreaComponent extends Component {
 
         AuthenticationService.setupAxiosInterceptors();
         HealthAreaService.getHealthAreaById(this.props.match.params.healthAreaId).then(response => {
-            this.setState({
-                healthArea: response.data
-            })
+            if (response.status == 200) {
+                this.setState({
+                    healthArea: response.data
+                })
+
+            }
+            else {
+
+                this.setState({
+                    message: response.data.messageCode
+                },
+                    () => {
+                        this.hideSecondComponent();
+                    })
+            }
 
             initialValues = {
                 healthAreaName: this.state.healthArea.label.label_en,
@@ -167,7 +186,7 @@ export default class EditHealthAreaComponent extends Component {
                         realms: response.data
                     })
                 })
-                
+
             HealthAreaService.getRealmCountryList(this.state.healthArea.realm.id)
                 .then(response => {
                     console.log("Realm Country List -------list---", response.data);
@@ -186,10 +205,10 @@ export default class EditHealthAreaComponent extends Component {
                         })
                     }
                 })
-                
+
 
         })
-        
+
     }
 
     updateFieldData(value) {
@@ -231,7 +250,7 @@ export default class EditHealthAreaComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -247,11 +266,14 @@ export default class EditHealthAreaComponent extends Component {
                                     HealthAreaService.editHealthArea(this.state.healthArea)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/healthArea/listHealthArea/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/healthArea/listHealthArea/` + 'green/'+ i18n.t(response.data.messageCode, { entityname }))
                                             } else {
                                                 this.setState({
                                                     message: response.data.messageCode
-                                                })
+                                                },
+                                                    () => {
+                                                        this.hideSecondComponent();
+                                                    })
                                             }
                                         })
 
@@ -378,7 +400,7 @@ export default class EditHealthAreaComponent extends Component {
     }
 
     cancelClicked() {
-        this.props.history.push(`/healthArea/listHealthArea/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/healthArea/listHealthArea/`+ 'red/'  + i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {
@@ -400,7 +422,7 @@ export default class EditHealthAreaComponent extends Component {
                         realms: response.data
                     })
                 })
-                
+
             HealthAreaService.getRealmCountryList(this.state.healthArea.realm.id)
                 .then(response => {
                     console.log("Realm Country List -------list---", response.data);
@@ -419,11 +441,11 @@ export default class EditHealthAreaComponent extends Component {
                         })
                     }
                 })
-                
+
 
 
         })
-        
+
     }
 
 }

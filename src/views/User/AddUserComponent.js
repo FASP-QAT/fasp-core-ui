@@ -319,7 +319,6 @@ class AddUserComponent extends Component {
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/user/listUser/` + i18n.t(response.data.messageCode, { entityname }))
-
                                             } else {
                                                 this.setState({
                                                     loading: false,
@@ -330,6 +329,7 @@ class AddUserComponent extends Component {
                                         })
                                         .catch(
                                             error => {
+                                                this.setState({ loading: false });
                                                 if (error.message === "Network Error") {
                                                     this.setState({ message: error.message });
                                                 } else {
@@ -508,11 +508,14 @@ class AddUserComponent extends Component {
                     </Col>
                 </Row>
                 <Row style={{ display: this.state.loading ? "block" : "none" }}>
-                    <div class="d-flex justify-content-center">
-                        <strong>Loading...</strong>
-                        <div class="spinner-border" role="status">
+                    <div  className="d-flex align-items-center justify-content-center" style={{height: "500px"}} >
+                <div class="align-items-center">
+                       <div ><h4> <strong>Loading...</strong></h4></div>
+                        
+                        <div class="spinner-border blue ml-4" role="status">
 
                         </div>
+                    </div>
                     </div>
                 </Row>
             </div>

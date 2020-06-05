@@ -71,6 +71,7 @@ class EditFundingSourceComponent extends Component {
         this.Capitalize = this.Capitalize.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changeMessage = this.changeMessage.bind(this);
+        this.hideSecondComponent = this.hideSecondComponent.bind(this);
     }
     changeMessage(message) {
         this.setState({ message: message })
@@ -79,11 +80,27 @@ class EditFundingSourceComponent extends Component {
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
         FundingSourceService.getFundingSourceById(this.props.match.params.fundingSourceId).then(response => {
-            this.setState({
+            if (response.status == 200) {     
+                     this.setState({
                 fundingSource: response.data
             });
+        }
+        else{
+
+            this.setState({
+                message: response.data.messageCode
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
+        }
 
         })
+    }
+    hideSecondComponent() {
+        setTimeout(function () {
+            document.getElementById('div2').style.display = 'none';
+        }, 8000);
     }
 
     dataChange(event) {
@@ -132,7 +149,7 @@ class EditFundingSourceComponent extends Component {
         return (
             <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} message={this.changeMessage} />
-                <h5>{i18n.t(this.state.message, { entityname })}</h5>
+                <h5 style={{ color: "red" }} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Row>
                     <Col sm={12} md={6} style={{ flexBasis: 'auto' }}>
                         <Card>
@@ -150,9 +167,15 @@ class EditFundingSourceComponent extends Component {
                                     FundingSourceService.updateFundingSource(this.state.fundingSource)
                                         .then(response => {
                                             if (response.status == 200) {
-                                                this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t(response.data.messageCode, { entityname }))
+                                                this.props.history.push(`/fundingSource/listFundingSource/`+ 'green/'  + i18n.t(response.data.messageCode, { entityname }))
                                             } else {
-                                                this.setState({ message: response.data.messageCode })
+                                                
+                                            this.setState({
+                                                message: response.data.messageCode
+                                            },
+                                                () => {
+                                                    this.hideSecondComponent();
+                                                })
                                             }
                                         })
                                 }}
@@ -255,7 +278,7 @@ class EditFundingSourceComponent extends Component {
         );
     }
     cancelClicked() {
-        this.props.history.push(`/fundingSource/listFundingSource/` + i18n.t('static.message.cancelled', { entityname }))
+        this.props.history.push(`/fundingSource/listFundingSource/` + 'red/'+ i18n.t('static.message.cancelled', { entityname }))
     }
 
     resetClicked() {

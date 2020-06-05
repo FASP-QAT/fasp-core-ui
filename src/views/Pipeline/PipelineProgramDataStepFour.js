@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import ProgramService from "../../api/ProgramService";
@@ -10,30 +11,30 @@ import {
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
 
-const initialValuesThree = {
-    healthAreaId: ''
+const initialValuesFour = {
+    organisationId: ''
 }
 
-const validationSchemaThree = function (values) {
+const validationSchemaFour = function (values) {
     return Yup.object().shape({
-        healthAreaId: Yup.string()
-            .required(i18n.t('static.program.validhealthareatext')),
+        organisationId: Yup.string()
+            .required(i18n.t('static.program.validorganisationtext')),
     })
 }
 
-const validateThree = (getValidationSchema) => {
+const validateFour = (getValidationSchema) => {
     return (values) => {
         const validationSchema = getValidationSchema(values)
         try {
             validationSchema.validateSync(values, { abortEarly: false })
             return {}
         } catch (error) {
-            return getErrorsFromValidationErrorThree(error)
+            return getErrorsFromValidationErrorFour(error)
         }
     }
 }
 
-const getErrorsFromValidationErrorThree = (validationError) => {
+const getErrorsFromValidationErrorFour = (validationError) => {
     const FIRST_ERROR = 0
     return validationError.inner.reduce((errors, error) => {
         return {
@@ -44,27 +45,27 @@ const getErrorsFromValidationErrorThree = (validationError) => {
 }
 
 
-export default class PipelineProgramDataStepThree extends Component {
+export default class PipelineProgramDataStepFour extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            healthAreaList: []
+            organisationList: []
         }
     }
 
-    touchAllThree(setTouched, errors) {
+    touchAllFour(setTouched, errors) {
         setTouched({
-            healthAreaId: true
+            organisationId: true
         }
         )
-        this.validateFormThree(errors)
+        this.validateFormFour(errors)
     }
-    validateFormThree(errors) {
-        this.findFirstErrorThree('healthAreaForm', (fieldName) => {
+    validateFormFour(errors) {
+        this.findFirstErrorFour('organisationForm', (fieldName) => {
             return Boolean(errors[fieldName])
         })
     }
-    findFirstErrorThree(formName, hasError) {
+    findFirstErrorFour(formName, hasError) {
         const form = document.forms[formName]
         for (let i = 0; i < form.length; i++) {
             if (hasError(form[i].name)) {
@@ -74,13 +75,13 @@ export default class PipelineProgramDataStepThree extends Component {
         }
     }
 
-    // getHealthAreaList() {
+    // getOrganisationList() {
     //     AuthenticationService.setupAxiosInterceptors();
-    //     ProgramService.getHealthAreaList(document.getElementById('realmId').value)
+    //     ProgramService.getOrganisationList(document.getElementById('realmId').value)
     //         .then(response => {
     //             if (response.status == 200) {
     //                 this.setState({
-    //                     healthAreaList: response.data
+    //                     organisationList: response.data
     //                 })
     //             } else {
     //                 this.setState({
@@ -88,32 +89,32 @@ export default class PipelineProgramDataStepThree extends Component {
     //                 })
     //             }
     //         })
+
+
     // }
 
     componentDidMount() {
         AuthenticationService.setupAxiosInterceptors();
-        ProgramService.getHealthAreaList(1)
+        ProgramService.getOrganisationList(1)
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        healthAreaList: response.data
+                        organisationList: response.data
                     })
                 } else {
                     this.setState({
                         message: response.data.messageCode
                     })
                 }
-            }).catch(error => {
-                console.log("error--------", error);
             })
-    }
 
+    }
     render() {
-        const { healthAreaList } = this.state;
-        let realmHealthArea = healthAreaList.length > 0
-            && healthAreaList.map((item, i) => {
+        const { organisationList } = this.state;
+        let realmOrganisation = organisationList.length > 0
+            && organisationList.map((item, i) => {
                 return (
-                    <option key={i} value={item.healthAreaId}>
+                    <option key={i} value={item.organisationId}>
                         {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
@@ -121,14 +122,14 @@ export default class PipelineProgramDataStepThree extends Component {
 
         return (
             <>
+
                 <Formik
                     enableReinitialize={true}
-                    initialValues={{ healthAreaId: this.props.items.program.healthArea.id }}
-                    validate={validateThree(validationSchemaThree)}
+                    initialValues={{ organisationId: this.props.items.program.organisation.id }}
+                    validate={validateFour(validationSchemaFour)}
                     onSubmit={(values, { setSubmitting, setErrors }) => {
-                        // console.log("in success--");
-                        // this.props.finishedStepThree && this.props.finishedStepThree();
-                        this.props.endProgramInfoStepTwo && this.props.endProgramInfoStepTwo();
+                        // this.props.finishedStepFour && this.props.finishedStepFour();
+                        this.props.endProgramInfoStepThree && this.props.endProgramInfoStepThree();
 
                     }}
                     render={
@@ -143,38 +144,40 @@ export default class PipelineProgramDataStepThree extends Component {
                             isValid,
                             setTouched
                         }) => (
-                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='healthAreaForm'>
+                                <Form className="needs-validation" onSubmit={handleSubmit} noValidate name='organisationForm'>
                                     <FormGroup>
-                                        <Label htmlFor="select">{i18n.t('static.program.healtharea')}<span class="red Reqasterisk">*</span></Label>
+                                        <Label htmlFor="select">{i18n.t('static.program.organisation')}<span class="red Reqasterisk">*</span></Label>
                                         <Input
-                                            valid={!errors.healthAreaId && this.props.items.program.healthArea.id != ''}
-                                            invalid={touched.healthAreaId && !!errors.healthAreaId}
+                                            valid={!errors.organisationId && this.props.items.program.organisation.id != ''}
+                                            invalid={touched.organisationId && !!errors.organisationId}
                                             onBlur={handleBlur}
                                             bsSize="sm"
                                             type="select"
-                                            name="healthAreaId"
-                                            id="healthAreaId"
+                                            name="organisationId"
+                                            id="organisationId"
                                             className="col-md-6"
-                                            value={this.props.items.program.healthArea.id}
+                                            value={this.props.items.program.organisation.id}
                                             onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                         >
                                             <option value="">{i18n.t('static.common.select')}</option>
-                                            {realmHealthArea}
+                                            {realmOrganisation}
+
                                         </Input>
-                                        <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
+
+                                        <FormFeedback className="red">{errors.organisationId}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="healthPrevious" id="healthPrevious" onClick={this.props.backToprogramInfoStepOne} > <i className="fa fa-angle-double-left"></i> Previous</Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="button" name="organizationPrevious" id="organizationPrevious" onClick={this.props.backToprogramInfoStepTwo} > <i className="fa fa-angle-double-left"></i> Previous</Button>
                                         &nbsp;
-                                        <Button color="info" size="md" className="float-left mr-1" type="submit" onClick={() => this.touchAllThree(setTouched, errors)}>Next <i className="fa fa-angle-double-right"></i></Button>
+                                        <Button color="info" size="md" className="float-left mr-1" type="submit" name="organizationSub" id="organizationSub" onClick={() => this.touchAllFour(setTouched, errors)}  >Next <i className="fa fa-angle-double-right"></i></Button>
                                         &nbsp;
                                     </FormGroup>
                                 </Form>
                             )} />
 
+
             </>
 
         );
     }
-
 }
