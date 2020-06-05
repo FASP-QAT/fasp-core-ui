@@ -351,6 +351,16 @@ export default class SupplyPlanComponent extends React.Component {
                 var programJson = JSON.parse(programData);
 
                 var consumptionList = (programJson.consumptionList).filter(c => c.planningUnit.id == planningUnitId && c.active == true);
+                var consumptionListForlastActualConsumptionDate = consumptionList.filter(c => c.actualFlag == true);
+                var lastActualConsumptionDate = "";
+                for (var lcd = 0; lcd < consumptionListForlastActualConsumptionDate.length; lcd++) {
+                    if (lcd == 0) {
+                        lastActualConsumptionDate = consumptionListForlastActualConsumptionDate[lcd].consumptionDate;
+                    }
+                    if (lastActualConsumptionDate < consumptionListForlastActualConsumptionDate[lcd].consumptionDate) {
+                        lastActualConsumptionDate = consumptionListForlastActualConsumptionDate[lcd].consumptionDate;
+                    }
+                }
                 if (regionId != -1) {
                     consumptionList = consumptionList.filter(c => c.region.id == regionId)
                 }
@@ -947,7 +957,8 @@ export default class SupplyPlanComponent extends React.Component {
                     artmisShipmentsTotalData: artmisShipmentsTotalData,
                     jsonArrForGraph: jsonArrForGraph,
                     openingBalanceRegionWise: openingBalanceRegionWise,
-                    closingBalanceRegionWise: closingBalanceRegionWise
+                    closingBalanceRegionWise: closingBalanceRegionWise,
+                    lastActualConsumptionDate: lastActualConsumptionDate
                 })
             }.bind(this)
         }.bind(this)
@@ -967,6 +978,8 @@ export default class SupplyPlanComponent extends React.Component {
             budgetError: '',
             consumptionDuplicateError: '',
             inventoryDuplicateError: '',
+            inventoryNoStockError: '',
+            consumptionNoStockError: ''
 
         })
         if (supplyPlanType == 'Consumption') {
@@ -1026,7 +1039,9 @@ export default class SupplyPlanComponent extends React.Component {
             suggestedShipmentChangedFlag: 0,
             inventoryChangedFlag: 0,
             consumptionDuplicateError: '',
-            inventoryDuplicateError: ''
+            inventoryDuplicateError: '',
+            inventoryNoStockError: '',
+            consumptionNoStockError: ''
 
         })
         this.toggleLarge(supplyPlanType);
@@ -3788,7 +3803,15 @@ export default class SupplyPlanComponent extends React.Component {
                                                             if (item1.adjustmentQty.toString() != '') {
                                                                 return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentQty} /></td>)
                                                             } else {
-                                                                return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}></td>)
+                                                                var lastActualConsumptionDate = moment(this.state.lastActualConsumptionDate).format("YYYY-MM");
+                                                                var currentMonthDate = moment(item1.month.startDate).format("YYYY-MM");
+                                                                console.log("lastActualConsumption date",lastActualConsumptionDate);
+                                                                console.log("Current month date",currentMonthDate);
+                                                                if (currentMonthDate > lastActualConsumptionDate) {
+                                                                    return (<td align="right"></td>)
+                                                                } else {
+                                                                    return (<td align="right" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.region.id}`, `${item1.month.month}`, `${item1.month.endDate}`)}></td>)
+                                                                }
                                                             }
                                                         })
                                                     }
